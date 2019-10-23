@@ -97,11 +97,11 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 							Ke, cham_dim, H2Oi)
 							
 		# concentration of water at wall surface in gas phase (molecules/cc (air))
-		Csit = y[num_speci*(num_sb)+H2Oi]
-			
+		Csit = y[num_speci*(num_sb)+H2Oi]/((Kw*Cw)[H2Oi, 0])
+		
 		dydt = kimt[H2Oi, num_sb-1]*(Cgit-Csit) # partitioning rate (molecules/cc.s)
 		# new estimate of concentration of condensed water (molecules/cc (air))
-		y[num_speci*(num_sb)+H2Oi] += dydt*(1.0e1)
+		y[num_speci*(num_sb)+H2Oi] += dydt*(1.0e0)
 		
 	print('finished initiating water condensation')
 	return(y, Varr, radius)

@@ -40,6 +40,9 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, Ke,
 								np.log10(inflectDp))*pwl_xpro+inflectk)
 		
 		
+		print(Dp)
+		print(Pn)
+		print(Beta)
 	if Rader==1:
 		# -------------------------------------------------------------------------
 		# Rader and McMurry option
@@ -127,6 +130,10 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, Ke,
 		# eq. 1 of McMurry (1985))
 		Beta = (Beta1*Beta2).reshape(-1, 1)
 	
+	if (Beta<0).sum()>0:
+		Beta[Beta<0] = 0.0
+		print('Warning Beta in walloss.py estimated below 0, which is not possible, so value forced to 0.0')
+		
 	# integrate this fraction over the time step interval to give total 
 	# fraction lost over interval	
 	Beta = Beta*t

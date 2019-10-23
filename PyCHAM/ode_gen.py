@@ -170,8 +170,10 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 						Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]
 						# sum of molecular concentrations per bin (molecules/cc (air))
 						conc_sum = np.zeros((1))
-						conc_sum[0] = ((Csit[0:-1].sum())+Csit[-1]*core_diss)
-							
+						if pconc>0.0: # if seed particles present
+							conc_sum[0] = ((Csit[0:-1].sum())+Csit[-1]*core_diss)
+						else:
+							conc_sum[0] = Csit.sum()
 						# prevent numerical error due to division by zero
 						ish = conc_sum==0.0
 						conc_sum[ish] = 1.0e-40

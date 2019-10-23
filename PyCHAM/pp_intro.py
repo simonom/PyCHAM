@@ -100,6 +100,8 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 		# core mass concentration in each size bin (molecules/cc (air))
 		y[num_speci*2-1:(num_speci*(num_sb+1)-1):num_speci] = ((y_dens[-1]*1.0e-3)*
 								(Varr*1.0e-12*N_perbin)*(1.0/y_mw[-1])*NA)
+	
+	#if (total_pconc>0.0):
 	if testf==2:
 		print('calling init_water_partit.py')
 	# allow water to equilibrate with particles
