@@ -94,7 +94,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 		[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 							x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-							Ke, cham_dim, H2Oi)
+							cham_dim, H2Oi)
 							
 		# concentration of water at wall surface in gas phase (molecules/cc (air))
 		Csit = y[num_speci*(num_sb)+H2Oi]/((Kw*Cw)[H2Oi, 0])

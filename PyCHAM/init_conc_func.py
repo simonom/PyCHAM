@@ -1,4 +1,4 @@
-'''function to initiate concentrations of components and obtain MCM reaction rate constsants'''
+'''function to initiate concentrations of components, obtain MCM reaction rate constants and produce the reaction coefficient file'''
 
 import numpy as np
 from water_calc import water_calc

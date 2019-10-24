@@ -32,6 +32,7 @@ def run(testf):
 	if testf==1:
 		print('user_input.py called and returned fine')
 		print('calling eqn_parser.extract_mechanism')
+	
 	# obtain gas-phase reaction info
 	[rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, num_speci, 
 		RO2_indices, nreac, nprod, prodn, 
