@@ -1,4 +1,5 @@
-# function to set up particle phase part of box model
+'''module to provide PyCHAM with required wall properties'''
+
 import numpy as np
 import scipy.constants as si
 

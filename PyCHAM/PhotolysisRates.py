@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+'''module for calculating photolysis rates for MCM (Master Chemical Mechanism) equations'''
+
 # Originaated from KPP (Kinetic Pre-processor)
 
 import scipy

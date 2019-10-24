@@ -1,9 +1,11 @@
+'''module to estimate the particle and wall partitioning coefficient'''
+
 import numpy as np
 from part_prop import part_prop
 import ipdb
 
 def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
-				y_dens, N_perbin, DStar_org, radius, Psat, wall_accom, therm_sp, Ke,
+				y_dens, N_perbin, DStar_org, radius, Psat, wall_accom, therm_sp,
 				cham_dim, H2Oi):
 
 	# ------------------------------------------------------------------------------------
@@ -18,7 +20,6 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	# surfT - surface tension (g/s2==mN/m==dyn/cm)
 	# wall_accom - accommodation coefficient of wall (dimensionless)
 	# therm_sp - thermal speed of components (m/s) (num_speci, 1)
-	# Ke - eddy diffusion coefficient (/s)
 	# cham_dim - ratio of chamber area to chamber volume (/m)
 	# nuccor - Fuchs-Sutugin correction for newly nucleating particles
 	# H2Oi - water index (integer)
@@ -73,6 +74,8 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	
 	# rate of movement toward wall (m/s)
 	wall_diff0 = (wall_accom*therm_sp)
+	Ke = 1.0 # eddy diffusion coefficient (/s) (1)
+	
 	# rate of diffusion to wall (dimensionless)
 	wall_diff1 = ((np.pi*wall_diff0)/(8.0*(DStar_org*Ke)**0.5))+1
 	# partitioning coefficient (/s)

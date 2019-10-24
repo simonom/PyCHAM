@@ -1,4 +1,5 @@
-# function to set up particle phase part of box model
+'''module to set up particle phase part of box model, calls on init_water_partit to initiate water partitioning with seed particles and wall'''
+
 import numpy as np
 import Size_distributions # custom library - see source code
 from init_water_partit import init_water_partit
@@ -8,7 +9,7 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
 			DStar_org, RH, num_sb, lowersize, uppersize, total_pconc, tmax, 
 			nuc_comp, voli, volP, testf, std, loc, scale, cham_dim, wall_accom, therm_sp,
-			Ke, Kw, Cw, y_dens, Psat, core_diss):
+			Kw, Cw, y_dens, Psat, core_diss):
 	
 	# inputs -----------------------------------
 	# y_mw - molecular weight (g/mol) of components (num_speci, 1)
@@ -30,7 +31,6 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	# particles (dimensionless)
 	# cham_dim - ratio of chamber area to chamber volume (/m)
 	# wall_accom - accommodation coefficient of wall (dimensionless)
-	# Ke - eddy diffusion coefficient (/s) (1)
 	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# y_dens - liquid density of components (kg/m3) (num_speci, 1)
@@ -108,7 +108,7 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	[y, Varr, x] = init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, tmax, MV,
-					cham_dim, wall_accom, therm_sp, Ke, Kw, Cw, total_pconc)
+					cham_dim, wall_accom, therm_sp, Kw, Cw, total_pconc)
 	if testf==2:
 		print('finished with init_water_partit.py')		
 

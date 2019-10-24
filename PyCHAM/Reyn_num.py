@@ -1,4 +1,4 @@
-# estimates Reynold number
+'''module to calculate Reynold number'''
 
 import numpy as np
 import scipy.constants as si

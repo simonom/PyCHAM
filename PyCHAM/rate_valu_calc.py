@@ -1,4 +1,4 @@
-# function to calculate gas-phase reaction coefficients
+'''module to link ode_gen with Rate_coefficients for calculation of gas-phase reaction coefficients'''
 
 import numpy as np
 from Rate_coefficients import evaluate_rates # calculate the rate coef. for each equation

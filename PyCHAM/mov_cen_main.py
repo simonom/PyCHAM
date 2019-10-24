@@ -1,5 +1,4 @@
-# function to track particle number size distribution using moving centre 
-# size structure (p. 416 of Jacobson 2000).
+'''module to track particle number size distribution using moving centre size structure (p. 416 of Jacobson 2000)'''
 
 import numpy as np
 import ipdb

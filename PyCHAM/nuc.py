@@ -1,4 +1,5 @@
-# function to implement nucleation in box model
+'''module to implement nucleation in PyCHAM'''
+
 import numpy as np
 import scipy.constants as si
 import ipdb

@@ -1,4 +1,4 @@
-# function called on by PyCHAM.py to initiate the box model
+'''module called on by __main__ to initiate the box model'''
 
 import numpy as np
 from ode_gen import ode_gen
@@ -24,7 +24,7 @@ def run(testf):
 		print('calling user_input.py')
 	# module to ask, receive and return required inputs
 	[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
-	tmax, TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, Ke, 
+	tmax, TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, 
 	cham_dim, ChamR, wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre,  
 	pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, voli, volP, 
 	pconc, std, loc, scale, core_diss, light_stat, light_time] = ui.run(0, testf)
@@ -78,7 +78,7 @@ def run(testf):
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
 							voli, volP, testf, std, loc, scale, cham_dim, wall_accom, 
-							therm_sp, Ke, Kw, Cw, y_dens, Psat, core_diss)
+							therm_sp, Kw, Cw, y_dens, Psat, core_diss)
 	
 	
 	t1 = time.clock() # get wall clock time before call to solver
@@ -91,7 +91,7 @@ def run(testf):
 				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
 				end_sim_time, pconc, save_step, 
-				rbou, cham_dim, wall_accom, therm_sp, Ke, Kw, Cw, light_time, light_stat,
+				rbou, cham_dim, wall_accom, therm_sp, Kw, Cw, light_time, light_stat,
 				nreac, nprod, prodn,
 				reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf)

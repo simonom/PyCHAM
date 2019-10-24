@@ -1,5 +1,6 @@
-# estimate Knudsen number for particles in air, eq. nos. refer to Jacobson 
-# (2005)
+''' module to estimate variables related to the fluidity of particles in air'''
+
+# eq. nos. refer to Jacobson (2005)
 
 import numpy as np 
 import scipy.constants as si
@@ -12,11 +13,12 @@ def reg_determ(RH, T, sbr, Pa):
 	# RH - relative humidity at this time (fraction) 
 	# T - temperature (K)
 	# sbr - size bin radii (m)
-	# sbn - size bin number
 	# Pa - pressure inside chamber (Pa)
 	
 	# ------------------------------------------------
 	# outputs:
+	# Kni - Knudsen number of particles
+	# rho_a - mass density of moist air
 	# eta_a - dynamic viscosity (4.54) (g/m.s)
 	# kin_visc - kinematic viscosity of air (4.55) (m2/s)	
 	# ------------------------------------------------

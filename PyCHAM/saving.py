@@ -1,4 +1,4 @@
-# function to save ode data
+'''module to save PyCHAM results to files'''
 import pandas as pd
 import os
 import sys

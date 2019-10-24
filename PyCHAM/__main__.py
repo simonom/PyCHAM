@@ -1,5 +1,4 @@
-# function called to run the PyCHAM model
-# produces graphical user interface
+'''module called to run the PyCHAM model, produces graphical user interface'''
 
 import os
 import sys

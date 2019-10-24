@@ -1,3 +1,4 @@
+'''module to state PyCHAM package metadata'''
 from setuptools import setup
 
 setup(

@@ -1,4 +1,5 @@
-# function to estimate the initial concentration of water on particles
+'''function to estimate the initial concentration of water on particles and walls'''
+
 import numpy as np
 from kimt_calc import kimt_calc
 import ipdb
@@ -7,7 +8,7 @@ from mov_cen_main import mov_cen_main as movcen # moving centre method for rebin
 def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci, 
 						accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 						N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, tmax, MV,
-						cham_dim, wall_accom, therm_sp, Ke, Kw, Cw, total_pconc):
+						cham_dim, wall_accom, therm_sp, Kw, Cw, total_pconc):
 						
 	# --------------------------------------------------------------
 	# inputs:
@@ -16,7 +17,6 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 	# cham_dim - ratio of chamber area to chamber volume (/m)
 	# wall_accom - accommodation coefficient of wall (dimensionless)
 	# therm_sp - thermal speed of components (m/s) (num_speci)
-	# Ke - eddy diffusion coefficient (/s)
 	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# total_pconc - total initial particle concentration (#/cc (air))
@@ -59,7 +59,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 				[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 								x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-								Ke, cham_dim, H2Oi)
+								cham_dim, H2Oi)
 				
 				# concentration of water at particle surface in gas phase (molecules/cc (air))
 				Csit = y[num_speci*(sbstep+1)+H2Oi]

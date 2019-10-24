@@ -1,4 +1,5 @@
-# function to calculate density of particles (kg/m3)
+'''module to calculate density of particles (kg/m3)'''
+
 import numpy as np
 
 def part_prop(y, num_speci, num_sb, NA, y_mw, y_dens, n0):

@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-# This script is a collection of functions that are used to format chemical schemes
-# Most of them (eg, MCM) are designed for fortran, which have a different format of
-# function names of scientific notations. They must be converted to the format that
-# python can understand.
+'''module is a collection of functions that are used to format chemical schemes, most of them (eg, MCM) are designed for fortran, which have a different format of function names of scientific notations. They must be converted to the format that python can understand'''
 
 import re
 import collections

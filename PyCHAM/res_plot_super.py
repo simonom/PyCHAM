@@ -1,4 +1,6 @@
-#use this guide: https://matplotlib.org/3.1.0/gallery/ticks_and_spines/multiple_yaxis_with_spines.html
+'''module to plot results from PyCHAM, called on by __main__ when 'Plot Results' button selected'''
+
+# used this guide: https://matplotlib.org/3.1.0/gallery/ticks_and_spines/multiple_yaxis_with_spines.html
 
 import numpy as np
 import matplotlib

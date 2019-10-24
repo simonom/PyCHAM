@@ -1,4 +1,4 @@
-# function to record ode results
+'''function to record ode results in model real-time, but not to save a hard copy of results'''
 import numpy as np
 import ipdb
 

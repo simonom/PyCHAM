@@ -1,3 +1,4 @@
+'''module to create log-normal size distribution'''
 ##########################################################################################
 #                                                                                        #
 #    Module to create log-normal size distribution. Code copied/modified from            #

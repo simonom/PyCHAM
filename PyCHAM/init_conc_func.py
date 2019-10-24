@@ -1,4 +1,5 @@
-# function to initiate concentrations of species
+'''function to initiate concentrations of components and obtain MCM reaction rate constsants'''
+
 import numpy as np
 from water_calc import water_calc
 import MCM_constants_auto

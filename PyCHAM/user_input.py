@@ -1,4 +1,4 @@
-# collects and passes user input information to front.py
+'''module collects and passes user input information to front.py'''
 
 import importlib
 import numpy as np
@@ -14,7 +14,7 @@ def run(source, testf):
 	if testf==1: # testing mode
 		# return dummies to continue test
 		if source==0:
-			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 		
 	
 	import pickle
@@ -34,9 +34,6 @@ def run(source, testf):
 		if source == 1:	# when called from res_plot_super.py
 			[fname, resfname, y_indx_plot, Comp0] = pickle.load(pk)
 					
-	# would be eddy diffusion coefficient for particle and vapour wall loss
-	Ke = 1.0
-	
 	output_root = 'output'
 	filename = os.path.basename(fname)
 	filename = os.path.splitext(filename)[0]
@@ -58,7 +55,7 @@ def run(source, testf):
 	if source == 0:
 		return(fname, num_sb, lowersize, uppersize, end_sim_time, resfname, 
 		tstep_len, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, save_step, 
-		Cw, Ke, cham_dim, ChamR, wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
+		Cw, cham_dim, ChamR, wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
 		pwl_xpre, pwl_xpro, inflectk, xmlname, C0, Comp0, Rader, voli, volP, pconc, std, 
 		loc, scale, core_diss, light_stat, light_time)
 		

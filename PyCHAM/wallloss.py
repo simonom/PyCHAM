@@ -1,10 +1,11 @@
-# module to model particle loss to walls
+'''module to model particle loss to walls, called on by ode_gen'''
+
 import numpy as np
 import scipy.constants as si
 from scipy import integrate
 import matplotlib.pyplot as plt 
 
-def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, Ke, 
+def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, 
 			inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader):
 
 	# ----------------------------------------------------------------
@@ -24,7 +25,6 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, Ke,
 	# nc - number of species
 	# TEMP - system temperature (K)
 	# t - time that wall loss occurs over (s)
-	# Ke - eddy diffusion coefficient (/s) (table 1 Charan (2018))
 	# inflectDp - particle diameter at which wall loss inflection occurs (m)
 	# pwl_xpre - x value preceding inflection point
 	# pwl_xpro - x value proceeding inflection point
@@ -82,7 +82,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, Ke,
 		# multiply eta_a by 1.0e-3 to convert from g/m.s to kg/m.s
 		# this makes it consistent with the units of Boltzmann constant
 		Dpi = (((si.k*TEMP)/(3.0*np.pi*Dp*(eta_ai*1.0e-3)))*Gi)
-		
+		Ke = 1.0 # eddy diffusion coefficient (/s) (1)
 		# x and y terms in eq. 2 of Charan (2018)
 		# x (eq. 13 McMurry (1985)) (dimensionless)
 		x = (np.pi*vs)/(2.0*((Ke*Dpi)**(1.0/2.0)))

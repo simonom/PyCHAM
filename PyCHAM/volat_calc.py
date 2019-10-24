@@ -1,4 +1,4 @@
-# function to estimate component volatilities
+'''module to estimate component volatilities and liquid densities'''
 import numpy as np
 import sys
 import os

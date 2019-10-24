@@ -1,4 +1,4 @@
-# function to solve the gas-phase reactions and gas-particle partitioning odes
+'''module to solve the gas-phase reactions odes, and odes for partitioning of gas-particle and gas-wall'''
 
 import numpy as np
 from assimulo.problem import Explicit_Problem
@@ -20,7 +20,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			Psat, mfp, accom_coeff, surfT, y_dens, 
 			N_perbin, DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, 
 			Vol0, end_sim_time, pconc, 
-			save_step, rbou, cham_dim, wall_accom, therm_sp, Ke, Kw,
+			save_step, rbou, cham_dim, wall_accom, therm_sp, Kw,
 			Cw, light_time, light_stat, nreac, 
 			nprod, prodn, reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, 
 			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf):
@@ -39,7 +39,6 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# wall_accom - wall accommodation coefficient (dimensionless)
 	# therm_sp - thermal speed of components (m/s)
 	# DStar_org - gas-phase diffusion coefficient of components (m2/s)
-	# Ke - coefficient of eddy diffusion (/s)
 	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# light_time - times (s) of when lights on and lights off (corresponding to light 
@@ -135,7 +134,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 							x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-							Ke, cham_dim, H2Oi)
+							cham_dim, H2Oi)
 		
 		# ensure no confusion that components are present due to low value fillers for  
 		# concentrations (molecules/cc (air))
@@ -269,7 +268,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 													y[num_speci:-(num_speci)], Gi, eta_ai, 
 													x*2.0e-6, y_mw, Varr*1.0e-18, 
 													num_sb, num_speci, TEMP, 
-													t, Ke, inflectDp, pwl_xpre,
+													t, inflectDp, pwl_xpre,
 													pwl_xpro, inflectk, ChamR, Rader)
 			
 			

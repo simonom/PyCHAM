@@ -1,3 +1,5 @@
+'''module to calculate the integration needed for coagulation, called on by coag'''
+
 import numpy as np
 import scipy.constants as si
 import scipy.integrate as integ

@@ -1,4 +1,4 @@
-# function to estimate coagulation kernel using p. 508 of Jacobson (2005)
+'''module to estimate coagulation kernel using p. 508 of Jacobson (2005), called on by ode_gen'''
 
 import numpy as np 
 import scipy.constants as si

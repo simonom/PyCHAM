@@ -1,4 +1,5 @@
-# function to estimate concentration of water
+'''module to calculate saturation vapour pressure of water'''
+
 import numpy as np
 
 def water_calc(TEMP, RH, NA):

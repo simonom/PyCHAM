@@ -1,4 +1,5 @@
-# function to prepare box model for partitioning coefficient calculation
+'''module to prepare PyCHAM for partitioning coefficient calculation (particle and wall)'''
+
 import numpy as np
 import scipy.constants as si
 
