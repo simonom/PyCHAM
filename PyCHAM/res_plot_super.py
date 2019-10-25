@@ -44,20 +44,27 @@ def run():
 	# name of file where concentration (molecules/cc (air)) results saved
 	fname = str(output_by_sim+'/y')
 	y = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
-	
+	if y.ndim==1: # occurs if only one time step saved
+		y = np.array(y.reshape(1, -1))
 	
 	# withdraw times
 	fname = str(output_by_sim+'/t')
-	t_array = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
-	
+	t_array = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)	
+	if t_array.ndim==0: # occurs if only one time step saved
+		print('Please note only results for one time step have been saved; number size distribution contours will not be plotted')
+		t_array = np.array(t_array.reshape(-1, 1))	
+
 	# name of file where concentration (# particles/cc (air)) results saved
 	fname = str(output_by_sim+'/N')
 	N = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
-	
+	if N.ndim==1: # occurs if only one time step saved
+		N = np.array(N.reshape(1, num_sb-1))	
 	
 	# name of file where particle size results saved
 	fname = str(output_by_sim+'/x')
 	x = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+	if x.ndim==1: # occurs if only one time step saved
+		x = np.array(x.reshape(1, num_sb-1))
 	
 	# calculate radius bounds (um) for the number size distribution contour plot 
 	# (assumes a linear size distribution)
@@ -126,7 +133,8 @@ def run():
 	#dNdlog10D_smooth[:, 0] = dNdlog10D[:, 0]
 	#dNdlog10D_smooth[:, -1] = dNdlog10D[:, -1]
 	
-	dNdlog10D_smooth = dNdlog10D # don't smooth option
+	dNdlog10D_smooth = np.zeros((np.shape(dNdlog10D)))
+	dNdlog10D_smooth[:,:] = dNdlog10D[:,:] # don't smooth option
 	
 	fig, host = plt.subplots(figsize=(14, 7))
 	fig.subplots_adjust(right=0.75)
@@ -220,7 +228,7 @@ def run():
 			SOAvst[0, :] += np.sum((y[:, ((i+1)*num_speci):((i+2)*num_speci-2)]/si.N_A*(y_MV[0:-2])*1.0e12), axis = 1)
 			
 	
-	p5, = par2.plot(t_array/3600.0, SOAvst[0, :], '+r', label = 'M (sim)')
+	p5, = par2.plot(t_array/3600.0, SOAvst[0, :], 'xr', label = 'M (sim)')
 	par2.set_ylabel('[SOA] ($\mathrm{\mu g\, m^{-3}})$', rotation=270, size=18, labelpad=25)
 	# set label, tick font and [SOA] vertical axis to red to match scatter plot presentation
 	par2.yaxis.label.set_color('red')
@@ -236,9 +244,9 @@ def run():
 	
 	plt.figure(figsize=(8,7))
 	for i in range(len(y_indx_plot)):
-		plt.plot(t_array/3600, y[:, y_indx_plot[i]], label=str(str(Comp0[i])+' (sim)'), 
-					linewidth=4.0)
-	
+		plt.plot(t_array/3600, y[:, y_indx_plot[i]], '+',linewidth=4.0, 
+					label=str(str(Comp0[i])+' (sim)'))
+		
 	plt.ylabel(r'Gas-phase concentration (ppb)', fontsize=18)
 	plt.xlabel(r'Time (hours)', fontsize=18)
 	plt.yticks(fontsize=18)

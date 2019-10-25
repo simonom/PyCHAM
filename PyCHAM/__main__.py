@@ -158,7 +158,7 @@ if __name__ == '__main__':
 						# vertical coordinate for plot results button
 						b6 = Button(canvas, text='Plot Results', command=plotting)
 						b6.pack()
-						canvas.create_window(45, ystart+60, window=b6)
+						canvas.create_window(55, ystart+60, window=b6)
 					
 					if test!=1:
 						with open('var_store.pkl','wb') as f:
@@ -187,23 +187,23 @@ if __name__ == '__main__':
 						# vertical coordinate for plot results button
 						b6 = Button(canvas, text='Plot Results', command=plotting)
 						b6.pack()
-						canvas.create_window(45, ystart+60, window=b6)
+						canvas.create_window(60, ystart+60, window=b6)
 				
 				# vertical coordinate for manual input button
 				# button that calls PyCHAM model
 				b5 = Button(canvas, text='Run Model', command=clicked)
 				b5.pack()
-				canvas.create_window(40, ystart+30, window=b5)				
+				canvas.create_window(50, ystart+30, window=b5)				
 				
 			# button to choose text file with variable parameters stated
 			b4 = Button(canvas, text='Model Variables .txt File', command=File)
 			b4.pack()
-			canvas.create_window(84, ystart-10, window=b4)
+			canvas.create_window(102, ystart-10, window=b4)
 		
 		# set button to select chemical scheme from file
 		b2 = Button(canvas, text='Chemical Scheme .xml File', command=xml)
 		b2.pack()
-		canvas.create_window(92, ystart-40, window=b2)
+		canvas.create_window(102, ystart-40, window=b2)
 	
 	# vertical coordinate for manual input button
 	ystart = 150
@@ -211,7 +211,7 @@ if __name__ == '__main__':
 	# set button to select chemical scheme from file
 	b1 = Button(canvas, text='Chemical Scheme .txt File', command=chemscm)
 	b1.pack()
-	canvas.create_window(89, ystart-70, window=b1)
+	canvas.create_window(102, ystart-70, window=b1)
 	
 	l21 = Label(canvas, text="PyCHAM Inputs",font=("Helvetica",30))
 	l21.pack()
