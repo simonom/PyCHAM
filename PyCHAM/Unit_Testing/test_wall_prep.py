@@ -26,4 +26,4 @@ if (wall_accom!=1.0).sum()>0:
 	print('issue with wall_accom')
 if (int(Kw[0]*1e4)!=399) or (int(Kw[1]*1e3)!=675) or (int(Kw[2]*1e3)!=133) or (int(Kw[3]*1e3)!=430) or (int(Kw[4]*1e3)!=187):
 	print('issue with Kw')
-print('is no issues stated above, then wall_prep is working fine and test is complete')
+print('if no issues stated above, then wall_prep is working fine and test is complete')

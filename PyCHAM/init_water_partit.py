@@ -8,18 +8,16 @@ from mov_cen_main import mov_cen_main as movcen # moving centre method for rebin
 def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci, 
 						accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 						N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, tmax, MV,
-						cham_dim, wall_accom, therm_sp, Kw, Cw, total_pconc):
+						therm_sp, Cw, total_pconc, kgwt):
 						
 	# --------------------------------------------------------------
 	# inputs:
 	
 	# Psat - saturation vapour pressure of components (molecules/cc (air))
-	# cham_dim - ratio of chamber area to chamber volume (/m)
-	# wall_accom - accommodation coefficient of wall (dimensionless)
 	# therm_sp - thermal speed of components (m/s) (num_speci)
-	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# total_pconc - total initial particle concentration (#/cc (air))
+	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# --------------------------------------------------------------
 	if total_pconc>0.0:
 		sbstep = 0 # count on size bins
@@ -58,8 +56,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 				# update partitioning coefficients
 				[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-								x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-								cham_dim, H2Oi)
+								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
+								H2Oi)
 				
 				# concentration of water at particle surface in gas phase (molecules/cc (air))
 				Csit = y[num_speci*(sbstep+1)+H2Oi]
@@ -81,27 +79,34 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 		radius = np.zeros((len(x)))
 		radius[:] = x[:]
 	
+	# first guess of wall-phase water concentration based on RH = mole 
+	# fraction (molecules/cc (air))
+	y[num_speci*num_sb+H2Oi] = Cw*RH
 	# concentration of water at wall surface in gas phase (molecules/cc (air))
 	Csit = y[num_speci*(num_sb)+H2Oi]
 	# gas phase concentration of water (molecules/cc (air)), will stay constant
 	# because RH is constant
 	Cgit = y[H2Oi]
-	
+	diff_rec = (Cgit-Csit) # record of gas and wall concentration difference
+	scaling = 1.0e-2 # scaling for new estimate
 	# allow gas-phase water to equilibrate with walls
 	while np.abs(Cgit-Csit)>1.0e8:
 		
 		# update partitioning coefficients
 		[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-							x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-							cham_dim, H2Oi)
-							
+							x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
+							H2Oi)
+												
 		# concentration of water at wall surface in gas phase (molecules/cc (air))
-		Csit = y[num_speci*(num_sb)+H2Oi]/((Kw*Cw)[H2Oi, 0])
+		Csit = Psat[H2Oi,0]*((y[num_speci*(num_sb)+H2Oi]/Cw))
 		
-		dydt = kimt[H2Oi, num_sb-1]*(Cgit-Csit) # partitioning rate (molecules/cc.s)
+		dydt = (kgwt*Cw)*(Cgit-Csit) # partitioning rate (molecules/cc.s)
+		
 		# new estimate of concentration of condensed water (molecules/cc (air))
-		y[num_speci*(num_sb)+H2Oi] += dydt*(1.0e0)
+		y[num_speci*(num_sb)+H2Oi] += dydt*(scaling)
+		
+		diff_rec = (Cgit-Csit) # keep record
 		
 	print('finished initiating water condensation')
 	return(y, Varr, radius)

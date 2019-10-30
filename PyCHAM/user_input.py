@@ -14,20 +14,24 @@ def run(source, testf):
 	if testf==1: # testing mode
 		# return dummies to continue test
 		if source==0:
-			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 		
 	
 	import pickle
 	
-	
-	with open('var_store.pkl','rb') as pk:
+	if testf==2: # testing mode
+		var_store_name = 'test_var_store.pkl'
+	else:
+		var_store_name = 'var_store.pkl'
+		
+	with open(var_store_name,'rb') as pk:
 		# read in variables from gui
 		if source == 0: # when called from front.py
 			[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
-			TEMP, PInit, RH, lat, lon, dt_start, Cw, save_step, cham_dim, ChamSA, 
-			wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre, pwl_xpro, 
+			TEMP, PInit, RH, lat, lon, dt_start, Cw, save_step, ChamSA, 
+			nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, Rader, xmlname, C0, Comp0, voli, volP, pconc, 
-			std, loc, scale, core_diss, light_stat, light_time] = pickle.load(pk)
+			std, loc, scale, core_diss, light_stat, light_time, kgwt] = pickle.load(pk)
 			# convert chamber surface area (m2) to spherical equivalent radius (m)
 			# (below eq. 2 in Charan (2018))
 			ChamR = (ChamSA/(4.0*np.pi))**0.5
@@ -55,9 +59,9 @@ def run(source, testf):
 	if source == 0:
 		return(fname, num_sb, lowersize, uppersize, end_sim_time, resfname, 
 		tstep_len, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, save_step, 
-		Cw, cham_dim, ChamR, wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
+		Cw, ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
 		pwl_xpre, pwl_xpro, inflectk, xmlname, C0, Comp0, Rader, voli, volP, pconc, std, 
-		loc, scale, core_diss, light_stat, light_time)
+		loc, scale, core_diss, light_stat, light_time, kgwt)
 		
 	if source == 1:
 		return(fname, resfname, y_indx_plot, Comp0)

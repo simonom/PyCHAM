@@ -9,7 +9,6 @@ from init_conc_func import init_conc_func
 from pp_intro import pp_intro
 from kimt_prep import kimt_prep
 from saving import saving
-from wall_prep import wall_prep
 import time # timing how long operations take
 import user_input as ui
 import pickle # for storing inputs
@@ -25,9 +24,9 @@ def run(testf):
 	# module to ask, receive and return required inputs
 	[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
 	tmax, TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, 
-	cham_dim, ChamR, wall_accom, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre,  
+	ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre,  
 	pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, voli, volP, 
-	pconc, std, loc, scale, core_diss, light_stat, light_time] = ui.run(0, testf)
+	pconc, std, loc, scale, core_diss, light_stat, light_time, kgwt] = ui.run(0, testf)
 	
 	if testf==1:
 		print('user_input.py called and returned fine')
@@ -53,8 +52,8 @@ def run(testf):
 		print('init_conc_func called and returned fine')
 		print('calling kimt_prep')
 	# set up partitioning variables
-	[DStar_org, mfp, accom_coeff, therm_sp, surfT] = kimt_prep(y_mw, TEMP, num_speci, 
-																testf)
+	[DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt] = kimt_prep(y_mw, TEMP, 
+														num_speci, testf, Cw, kgwt)
 	
 	# volatility (molecules/cc (air)) and density (rho, kg/m3) of components
 	if testf==1:
@@ -66,8 +65,6 @@ def run(testf):
 	if testf==1:
 		print('volat_calc called and returned fine')
 		print('calling wall_prep')
-	# prepare wall part
-	[wall_accom, Kw] = wall_prep(TEMP, Psat_Pa, y_mw, num_speci, wall_accom, testf)
 	
 	if testf==1:
 		print('wall_prep called and returned fine')
@@ -78,9 +75,9 @@ def run(testf):
 							num_speci, spec_list, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
-							voli, volP, testf, std, loc, scale, cham_dim, wall_accom, 
-							therm_sp, Kw, Cw, y_dens, Psat, core_diss)
-	
+							voli, volP, testf, std, loc, scale, 
+							therm_sp, Cw, y_dens, Psat, core_diss, kgwt)
+							
 	
 	t1 = time.clock() # get wall clock time before call to solver
 	if testf==1:
@@ -89,13 +86,13 @@ def run(testf):
 	# call on ode function
 	[t_out, y_mat, Nresult, x2] = ode_gen(tstep_len, y, num_speci, num_eqn, rindx, pindx, 
 				rstoi, pstoi, H2Oi, TEMP, RO2_indices, 
-				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
+				num_sb, Psat_Pa, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
 				end_sim_time, pconc, save_step, 
-				rbou, cham_dim, wall_accom, therm_sp, Kw, Cw, light_time, light_stat,
+				rbou, therm_sp, Cw, light_time, light_stat,
 				nreac, nprod, prodn,
 				reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, pwl_xpre, 
-				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf)
+				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt)
 				
 	
 	t2 = time.clock() # get wall clock time after call to solver
@@ -111,9 +108,12 @@ def run(testf):
 		print('dumping variables in pickle file')
 		# dummy list of variables to dump
 		list_vars = ['fnametest','resfnametest', 0, 0]
+		with open('test_var_store.pkl','wb') as f:
+			pickle.dump(list_vars,f)
 	
-	with open('var_store.pkl','wb') as f:
-		pickle.dump(list_vars,f) 
+	if testf==00:
+		with open('var_store.pkl','wb') as f:
+			pickle.dump(list_vars,f) 
 	
 	if testf==1:
 		print('dumped successfully')

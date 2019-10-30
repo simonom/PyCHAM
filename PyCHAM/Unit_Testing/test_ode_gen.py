@@ -60,12 +60,12 @@ end_sim_time = 60.0
 pconc = 1000.0
 save_step = 60.0
 rbou = np.array((0.0, 400.0e-4, 8.0))
-cham_dim = 2.33333
 wall_accom = 1.0
 therm_sp = (np.array((0,0,0,218,0))).reshape(num_speci,1)
 Ke = 1.0
 Kw = np.array((399.0, 675.0, 133.0, 430.0, 187.0)).reshape(num_speci,1)
-Cw = 1.0
+kgwt = 1.0e-16
+Cw = 1.0e12
 light_time = np.array((0.0, 14400.0))
 light_stat = np.array((0, 0))
 nreac = np.array((1)).reshape(1,1)
@@ -94,10 +94,10 @@ print('now calling ode_gen with test inputs')
 				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
 				end_sim_time, pconc, save_step, 
-				rbou, cham_dim, wall_accom, therm_sp, Ke, Kw, Cw, light_time, light_stat,
+				rbou, wall_accom, therm_sp, Cw, light_time, light_stat,
 				nreac, nprod, prodn,
 				reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, pwl_xpre, 
-				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf)
+				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt)
 
 print('now checking outputs')
 if int(t_out[0])!=0 or int(t_out[1])!=65:

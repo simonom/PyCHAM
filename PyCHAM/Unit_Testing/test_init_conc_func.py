@@ -1,6 +1,7 @@
 # module to test init_conc_func, water_calc
 
-print('testing inputs')
+print('tesint init_conc_func.py and eqn_parser.write_rate_file and water_calc.py and MCM_constants_auto.mcm_constants')
+print('testing imports')
 
 import os
 import sys
@@ -39,7 +40,7 @@ for name_only in spec_list:
 	Pybel_object = pybel.readstring('smi', name_only)
 	# append to Pybel object list
 	Pybel_objects.append(Pybel_object)
-testf = 0
+testf = 2
 pconc = 1000.0
 print('submitting inputs to init_conc_func')
 
@@ -71,4 +72,4 @@ if y_indx_plot[0]!= 0 and y_indx_plot[1]!=1:
 if corei!=num_speci-1:
 	print('issue with corei')
 
-print('if no issues stated above, the init_conc_func code is fine')
+print('if no issues stated above, the init_conc_func.py code and its called on functions (listed above) are fine')

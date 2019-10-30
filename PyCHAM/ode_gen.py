@@ -20,10 +20,10 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			Psat, mfp, accom_coeff, surfT, y_dens, 
 			N_perbin, DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, 
 			Vol0, end_sim_time, pconc, 
-			save_step, rbou, cham_dim, wall_accom, therm_sp, Kw,
+			save_step, rbou, therm_sp,
 			Cw, light_time, light_stat, nreac, 
 			nprod, prodn, reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, 
-			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf):
+			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kwgt):
 	
 	# ----------------------------------------------------------
 	# inputs
@@ -31,15 +31,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# t - suggested time step length (s)
 	# num_speci - number of components
 	# num_eqn - number of equations
+	# Psat - saturation vapour pressures (molecules/cm3 (air))
 	# y_dens - components' densities (g/cc)
 	# y_mw - components' molecular weights (g/mol)
 	# x - radii of particle size bins (um) (excluding walls)
-	# cham_dim - ratio of chamber surface area to chamber volume (/m), used
-	# in gas-wall partitioning of vapours
-	# wall_accom - wall accommodation coefficient (dimensionless)
 	# therm_sp - thermal speed of components (m/s)
 	# DStar_org - gas-phase diffusion coefficient of components (m2/s)
-	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# light_time - times (s) of when lights on and lights off (corresponding to light 
 	# 				status in light_stat)
@@ -62,6 +59,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# Rader - flag of whether or not to use Rader and McMurry approach
 	# PInit - pressure inside chamber (Pa)
 	# testf - flag to say whether in normal mode (0) or testing mode (1)
+	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# ----------------------------------------------------------
 
 	if testf==1:
@@ -133,8 +131,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			# update partitioning coefficients
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-							x.reshape(1, -1)*1.0e-6, Psat, wall_accom, therm_sp, 
-							cham_dim, H2Oi)
+							x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi)
 		
 		# ensure no confusion that components are present due to low value fillers for  
 		# concentrations (molecules/cc (air))
@@ -145,6 +142,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		while redt == 1:
 
 			print('cumulative time', sumt)
+			print((Psat*(Csit/Cw)).shape)
 			# numba compiler to convert to machine code
 			@jit(f8[:](f8, f8[:]), nopython=True)
 			# ode solver -------------------------------------------------------------
@@ -194,12 +192,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 						
 					# concentration at wall (molecules/cc (air))
 					Csit = y[num_speci*num_sb:num_speci*(num_sb+1)]
-					Csit = Csit/((Kw*Cw)[:, 0])
+					Csit = (Psat*(Csit/Cw))[:,0]
 		
 					# eq. 14 of Zhang et al. (2015) 
 					# (https://www.atmos-chem-phys.net/15/4197/2015/
 					# acp-15-4197-2015.pdf) (molecules/cc.s (air))
-					dydt_all = kimt[:, num_sb-1]*(y[0:num_speci]-Csit)
+					dydt_all = (kwgt*Cw)*(y[0:num_speci]-Csit)
 						
 					# gas-phase change
 					dydt[0:num_speci] -= dydt_all

@@ -17,13 +17,13 @@ def init_conc_func(num_speci, init_SMIL, smiles_array, init_conc, TEMP, RH, M, N
 	# PInit - initial pressure (Pa)
 	# init_SMIL - SMILES of components present at start of experiment (whose 
 	# concentrations are given in init_conc)
-	# testf - flag for whether in normal mode (0) or testing mode (1)
+	# testf - flag for whether in normal mode (0) or testing mode (1/2)
 	# pconc - initial concentration of particles (# particles/cc (air))
 	# -----------------------------------------------------------
 
 	if testf==1: # testing mode
 		# return dummies
-		return(0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0)
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	# empty array for storing species' concentrations, must be an array
@@ -69,14 +69,15 @@ def init_conc_func(num_speci, init_SMIL, smiles_array, init_conc, TEMP, RH, M, N
 	
 	
 	# concentration (molecules/cc (air))
-	
 	[y[H2Oi], Psat_water, y_mw[H2Oi]] = water_calc(TEMP, RH, NA)
 	
 	# obtain a list of MCM constants and their equations
 	# get photolysis rates at initial time
 	(mcm_constants, MCMConstNameList) = MCM_constants_auto.mcm_constants(TEMP, 
 											y[H2Oi], M, N2, O2, time, lat, lon)
-											
+	
 	# now create reaction rate file (reaction rates are set up to have units /s)
-	eqn_parser.write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList)
+	eqn_parser.write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, 
+								testf)
+	
 	return (y, H2Oi, Psat_water, y_mw, num_speci, Cfactor, y_indx_plot, corei)

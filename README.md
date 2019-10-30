@@ -71,7 +71,9 @@ lower_part_size = Radius of smallest size bin boundary (um)
 
 upper_part_size = Radius of largest size bin boundary (um)
 
-eff_abs_wall_massC = effective absorbing wall mass concentration (g/m3)
+kgwt = mass transfer coefficient of vapour-wall partitioning (cm3/molecule.s)
+
+eff_abs_wall_massC = effective absorbing wall mass concentration (ug/m3 (air))
 
 Temperature = Temperature (K)
 
@@ -85,11 +87,7 @@ lon = representative longitude (degrees) for light intensity (if lights used)
 
 daytime_start = representative time of the day for light intensity (s since midnight)
 
-Cham_SA_to_Vol_ratio = Ratio of chamber surface area to chamber volume (/m)
-
 ChamSA = Chamber surface area (m2)
-
-Wall_accomm_coeff = Accommodation coefficient of wall (0-1)
 
 nucv1 = Nucleation parameterisation value 1
 

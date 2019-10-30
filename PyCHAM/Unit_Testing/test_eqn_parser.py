@@ -34,8 +34,7 @@ print('calling on eqn_parser.extract_mechanism, eqn_parser.write_RO2_indices and
 		init_SMIL] = eqn_parser.extract_mechanism(fname, xmlname, 
 							TEMP, PInit, Comp0, testf)
 print('successfully called, now checking outputs')
-print('whoop', len(reac_coef))
-print('yarr', reac_coef)
+
 if rindx[0,0]!= 0 or rindx[0,1]!= 1:
 	print('issue with rindx')
 if pindx!=2:

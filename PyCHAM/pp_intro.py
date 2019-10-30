@@ -8,9 +8,10 @@ import scipy.constants as si
 def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
 			DStar_org, RH, num_sb, lowersize, uppersize, total_pconc, tmax, 
-			nuc_comp, voli, volP, testf, std, loc, scale, cham_dim, wall_accom, therm_sp,
-			Kw, Cw, y_dens, Psat, core_diss):
+			nuc_comp, voli, volP, testf, std, loc, scale, therm_sp,
+			Cw, y_dens, Psat, core_diss, kgwt):
 	
+			
 	# inputs -----------------------------------
 	# y_mw - molecular weight (g/mol) of components (num_speci, 1)
 	# num_sb - number of size bins
@@ -29,15 +30,12 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	# number-size distribution (um)
 	# scale - scaling factor of lognormal probability distribution function for seed 
 	# particles (dimensionless)
-	# cham_dim - ratio of chamber area to chamber volume (/m)
-	# wall_accom - accommodation coefficient of wall (dimensionless)
-	# Kw - vapour-wall partition coefficient (m3/g)
 	# Cw - concentration of wall (g/m3 (air))
 	# y_dens - liquid density of components (kg/m3) (num_speci, 1)
 	# Psat - saturation vapour pressure of components (molecules/cc (air))
 	# core_diss - core dissociation constant
+	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# ------------------------------------------
-	
 	if testf==1:
 		return(0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
@@ -108,7 +106,7 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	[y, Varr, x] = init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, tmax, MV,
-					cham_dim, wall_accom, therm_sp, Kw, Cw, total_pconc)
+					therm_sp, Cw, total_pconc, kgwt)
 	if testf==2:
 		print('finished with init_water_partit.py')		
 

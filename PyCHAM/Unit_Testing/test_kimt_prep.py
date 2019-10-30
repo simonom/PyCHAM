@@ -17,9 +17,12 @@ y_mw = np.array((130.0, 2.0, 200.0, 18.0, 132.14))
 TEMP = 298.15
 num_speci = 5
 testf = 0
+Cw = 1.0
+kgwt = 1.0e5
 print('calling kimt_prep')
 
-[DStar_org, mfp, accom_coeff, therm_sp, surfT] = kimt_prep(y_mw, TEMP, num_speci, testf)
+[DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt] = kimt_prep(y_mw, TEMP, num_speci, 
+																testf, Cw, kgwt)
 print('checking outputs')
 if int(DStar_org[0]*1e8)!=740 or int(DStar_org[1]*1e6)!=119 or int(DStar_org[2]*1e8)!=555 or int(DStar_org[3]*1e7)!=276 or int(DStar_org[4]*1e8)!=732:
 	print('issue with Dstar_org')
@@ -31,4 +34,9 @@ if int(therm_sp[0])!=220 or int(therm_sp[1])!=1776 or int(therm_sp[2])!=177 or i
 	print('issue with therm_sp')
 if surfT!=72.0:
 	print('issue with surfT')
+if int(Cw*1e-7)!= 301:
+	print('issue with Cw')
+if int(kgwt*1e19)!= 332:
+	print('issue with kgwt')
+
 print('if no issues printed above, code is fine')

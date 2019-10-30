@@ -28,13 +28,12 @@ TEMP = 298.15
 H2Oi=3
 Psat_water = -1.5
 mfp = (np.array((2.49e-8, 2.56e-7, 1.61e-8, 1.17e-7, 2.45e-8))).reshape(5,1)
-accom_coeff = np.ones((num_speci,1))
 y_mw = (np.array((130.0, 2.0, 200.0, 18.0, 132.14))).reshape(5,1)
 surfT = 72.0
 DStar_org = (np.array((7.40e-06, 1.20e-04, 5.56e-06, 2.77e-05, 7.32e-06))).reshape(5,1)
 RH = 0.60
 testf = 0
-num_sb = 3
+num_sb = 2
 lowersize = 0.0
 uppersize = 8.0e-2
 pconc = 1.0e3
@@ -46,25 +45,25 @@ testf = 2
 std = 1.0
 loc = 0.0
 scale = 1.0e-2
-cham_dim = 2.0
-wall_accom = 1.0
+kgwt = 1.0e-16
+accom_coeff = np.ones((num_speci,1)) # particle accommodation coefficient
 therm_sp = (np.array((0,0,0,218,0))).reshape(num_speci,1)
-Ke = 1.0
-Kw = np.array((399.0, 675.0, 133.0, 430.0, 187.0))
-Cw = 1.0
+Cw = 3011070428.5
 y_dens = np.array((870, 1133, 1033, 1000, 1770)).reshape(num_speci,1)
 Psat = (np.array((110*1e15, 526*1e20, 242/1e18, 778*1e15, 242/1e18))).reshape(num_speci,1)
 core_diss = 3.0
+
 [y, N_perbin, x, Varr, Vbou, 
 							rad0, Vol0, rbou, 
-							new_partr, MV] = pp_intro(y, 
+							new_partr, MV, num_sb] = pp_intro(y, 
 							num_speci, spec_list, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
-							voli, volP, testf, std, loc, scale, cham_dim, wall_accom,
-							therm_sp, Ke, Kw, Cw, y_dens, Psat, core_diss)
+							voli, volP, testf, std, loc, scale,
+							therm_sp, Cw, y_dens, Psat, core_diss, kgwt)
 print('pp_intro called and returned fine, now checking returned values')
-if int(y[5])!=0 or int(y[8]*1e-6)!=717 or int(y[9]*1e-6)!=252 or int(y[13]*1e-7)!=179 or int(y[14]*1e-6)!=476 or int(y[18]*1e-18)!=198:
+
+if int(y[5])!=0 or int(y[8]*1e-6)!=717 or int(y[9]*1e-6)!=252 or int(y[13]*1e-7)!=179 or int(y[14]*1e-6)!=476 or int(y[18]*1e-7)!=178:
 	print('issue with y, possibly due to init_water_partit.py or Size_distributions.py')  
 if int(N_perbin[0])!=934 or int(N_perbin[1])!=65:
 	print('issue with N_perbin possibly due to Size_distributions')
@@ -84,4 +83,6 @@ if int(new_partr*1e10)!=535:
 	print('issue with new_partr')
 if int(MV[0])!=149 or int(MV[1]*1e2)!=176 or int(MV[2])!=193 or int(MV[3]*1e1)!=180 or int(MV[4]*1e1)!=746:   
 	print('issue with MV')
+if num_sb!=3:
+	print('issue with num_sb')
 print('testing finished, if no issues printed above, pp_intro.py working fine')

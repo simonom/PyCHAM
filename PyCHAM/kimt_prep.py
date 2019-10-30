@@ -3,7 +3,7 @@
 import numpy as np
 import scipy.constants as si
 
-def kimt_prep(y_mw, TEMP, num_speci, testf):
+def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	
 	# ------------------------------------------------------------------
 	# inputs:
@@ -11,10 +11,12 @@ def kimt_prep(y_mw, TEMP, num_speci, testf):
 	# TEMP - temperature (K)
 	# num_speci - number of components
 	# testf - flag for whether in normal mode (0) or testing mode (1)
+	# Cw - effective absorbing mass of wall (ug/m3 (air))
+	# kgwt - mass transfer coefficient for vapor-wall partitioning (m3/ug.s)
 	# -----------------------------------------------------------------
 	
 	if testf == 1: # if in testing mode (for test_front.py)
-		return(0,0,0,0,0) # return dummies
+		return(0,0,0,0,0,0,0) # return dummies
 	
 	surfT = 72.0 # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
 	# molecular diffusion coeffficient of each species in air (m2/s) 
@@ -35,7 +37,13 @@ def kimt_prep(y_mw, TEMP, num_speci, testf):
 	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
 	mfp = (((64.0*DStar_org)/(5*np.pi*therm_sp))*(28.966/(28.966+y_mw))).reshape(-1, 1)
 
-	# accommodation coefficient
+	# accommodation coefficient of particles
 	accom_coeff = np.ones((num_speci, 1))*1.0e0
 
-	return DStar_org, mfp, accom_coeff, therm_sp, surfT
+	# convert Cw (effective absorbing mass of wall) from ug/m3 (air) to 
+	# molecules/cc (air), assuming a molecular weight of 200g/mol
+	Cw = ((Cw*1.0e-12)/200.0)*si.N_A
+
+	# convert kgwt from m3/ug.s to cm3/molecules.s
+	kgwt = (kgwt*200.0)/si.N_A
+	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt
