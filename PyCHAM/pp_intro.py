@@ -37,11 +37,13 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# ------------------------------------------
 	if testf==1:
-		return(0,0,0,0,0,0,0,0,0,0,0) # return dummies
+		return(0,0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
 	num_sb += 1 # add one to size bin number to account for wall
 	
-
+	# if elements of nuc_comp are relative index (-n), change to absolute
+	if nuc_comp<0:
+		nuc_comp = num_speci+nuc_comp
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
@@ -114,4 +116,4 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	new_partr = ((((MV[nuc_comp,0]/si.N_A)*2.0)*3/(4.0*np.pi))**(1/3))
 	
 	
-	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, new_partr, MV, num_sb)
+	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, new_partr, MV, num_sb, nuc_comp)

@@ -45,17 +45,17 @@ testf = 2
 std = 1.0
 loc = 0.0
 scale = 1.0e-2
-kgwt = 1.0e-16
+kgwt = 332.0e-25
 accom_coeff = np.ones((num_speci,1)) # particle accommodation coefficient
 therm_sp = (np.array((0,0,0,218,0))).reshape(num_speci,1)
-Cw = 3011070428.5
+Cw = 301.0e13
 y_dens = np.array((870, 1133, 1033, 1000, 1770)).reshape(num_speci,1)
 Psat = (np.array((110*1e15, 526*1e20, 242/1e18, 778*1e15, 242/1e18))).reshape(num_speci,1)
 core_diss = 3.0
 
 [y, N_perbin, x, Varr, Vbou, 
 							rad0, Vol0, rbou, 
-							new_partr, MV, num_sb] = pp_intro(y, 
+							new_partr, MV, num_sb, nuc_comp] = pp_intro(y, 
 							num_speci, spec_list, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
@@ -63,7 +63,7 @@ core_diss = 3.0
 							therm_sp, Cw, y_dens, Psat, core_diss, kgwt)
 print('pp_intro called and returned fine, now checking returned values')
 
-if int(y[5])!=0 or int(y[8]*1e-6)!=717 or int(y[9]*1e-6)!=252 or int(y[13]*1e-7)!=179 or int(y[14]*1e-6)!=476 or int(y[18]*1e-7)!=178:
+if int(y[5])!=0 or int(y[8]*1e-6)!=717 or int(y[9]*1e-6)!=252 or int(y[13]*1e-7)!=179 or int(y[14]*1e-6)!=476 or int(y[18]*1e-13)!=178:
 	print('issue with y, possibly due to init_water_partit.py or Size_distributions.py')  
 if int(N_perbin[0])!=934 or int(N_perbin[1])!=65:
 	print('issue with N_perbin possibly due to Size_distributions')

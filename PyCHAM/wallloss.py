@@ -33,16 +33,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# Rader - flag of whether or not to use Rader and McMurry approach
 	# ----------------------------------------------------------------
 	if Rader==0: # manual input of wall loss rate
+		
 		Beta = np.zeros((Pn.shape))
 		Beta[Dp<inflectDp, 0] = ((np.log10(inflectDp)-
 								np.log10(Dp[Dp<inflectDp]))*pwl_xpre+inflectk)
 		Beta[Dp>=inflectDp, 0] = ((np.log10(Dp[Dp>=inflectDp])-
 								np.log10(inflectDp))*pwl_xpro+inflectk)
 		
-		
-		print(Dp)
-		print(Pn)
-		print(Beta)
 	if Rader==1:
 		# -------------------------------------------------------------------------
 		# Rader and McMurry option

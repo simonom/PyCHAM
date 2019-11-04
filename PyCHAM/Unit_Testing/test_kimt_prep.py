@@ -34,9 +34,9 @@ if int(therm_sp[0])!=220 or int(therm_sp[1])!=1776 or int(therm_sp[2])!=177 or i
 	print('issue with therm_sp')
 if surfT!=72.0:
 	print('issue with surfT')
-if int(Cw*1e-7)!= 301:
+if int(Cw*1e-13)!= 301:
 	print('issue with Cw')
-if int(kgwt*1e19)!= 332:
+if int(kgwt*1e25)!= 332:
 	print('issue with kgwt')
 
 print('if no issues printed above, code is fine')

@@ -71,7 +71,7 @@ def run(testf):
 		print('calling pp_intro')
 	# set up particle phase part
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, 
-							new_partr, MV, num_sb] = pp_intro(y, 
+							new_partr, MV, num_sb, nuc_comp] = pp_intro(y, 
 							num_speci, spec_list, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
@@ -83,10 +83,11 @@ def run(testf):
 	if testf==1:
 		print('pp_intro called and returned fine')
 		print('calling ode_gen')
+	
 	# call on ode function
 	[t_out, y_mat, Nresult, x2] = ode_gen(tstep_len, y, num_speci, num_eqn, rindx, pindx, 
 				rstoi, pstoi, H2Oi, TEMP, RO2_indices, 
-				num_sb, Psat_Pa, mfp, accom_coeff, surfT, y_dens, N_perbin,
+				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
 				end_sim_time, pconc, save_step, 
 				rbou, therm_sp, Cw, light_time, light_stat,
@@ -112,7 +113,7 @@ def run(testf):
 			pickle.dump(list_vars,f)
 	
 	if testf==00:
-		with open('var_store.pkl','wb') as f:
+		with open('PyCHAM/var_store.pkl','wb') as f:
 			pickle.dump(list_vars,f) 
 	
 	if testf==1:

@@ -6,12 +6,11 @@ dirpath = os.getcwd() # get current path
 sys.path.append(os.path.split(dirpath)[0]) # add path to system path
 
 print('importing modules required for wall_prep')
-from wall_prep import wall_prep
 import numpy as np
 import scipy.constants as si
 
 print('if no issues stated above, importing successful')
-print('now calling wall_prep as in front.py')
+print('now calling wall_prep.py as in front.py')
 from wall_prep import wall_prep
 print('wall_prep imported okay')
 TEMP = 298.15

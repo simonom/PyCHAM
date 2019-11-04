@@ -22,7 +22,7 @@ def run(source, testf):
 	if testf==2: # testing mode
 		var_store_name = 'test_var_store.pkl'
 	else:
-		var_store_name = 'var_store.pkl'
+		var_store_name = 'PyCHAM/var_store.pkl'
 		
 	with open(var_store_name,'rb') as pk:
 		# read in variables from gui

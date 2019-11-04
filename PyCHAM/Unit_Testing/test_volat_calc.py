@@ -46,11 +46,12 @@ testf = 0
 corei = 4
 [Psat, y_dens, Psat_Pa] = volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci,  
 								Psat_water, voli, volP, testf, corei)
+
 print('now asserting returned values are as expected')
 if int(Psat[0]*1e-15)!=110 or int(Psat[1]*1e-20)!=526 or int(Psat[2]*1e18)!=242 or int(Psat[3]*1e-15)!=778 or int(Psat[4]*1e18)!=242:
 	print('issue with y_dens, possibly due to UManSysProp')
 if int(Psat_Pa[0]*1e0)!=456 or int(Psat_Pa[1]*1e-6)!=216 or int(Psat_Pa[2]*1e32)!=100 or int(Psat_Pa[3]*1e-1)!=320 or int(Psat_Pa[4]*1e32)!=100:
 	print('issue with y_dens, possibly due to UManSysProp')
-if int(y_dens[0]!=870) or int(y_dens[1]!=1133) or int(y_dens[2]!=1033) or int(y_dens[3]!=1000) or int(y_dens[0]!=1770):
+if int(y_dens[0])!=870 or int(y_dens[1])!=1133 or int(y_dens[2])!=1033 or int(y_dens[3])!=1000 or int(y_dens[4])!=1770:
 	print('issue with y_dens, possibly due to UManSysProp')
 print('if no issues stated above, volat_calc is working fine, test complete')

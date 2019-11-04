@@ -61,7 +61,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# testf - flag to say whether in normal mode (0) or testing mode (1)
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# ----------------------------------------------------------
-
+	
 	if testf==1:
 		return(0,0,0,0) # return dummies
 
@@ -140,9 +140,8 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		# enter a while loop that continues to decrease the time step until particle
 		# size bins don't change by more than one size bin (given by moving centre)
 		while redt == 1:
-
 			print('cumulative time', sumt)
-			print((Psat*(Csit/Cw)).shape)
+			
 			# numba compiler to convert to machine code
 			@jit(f8[:](f8, f8[:]), nopython=True)
 			# ode solver -------------------------------------------------------------
@@ -192,8 +191,8 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 						
 					# concentration at wall (molecules/cc (air))
 					Csit = y[num_speci*num_sb:num_speci*(num_sb+1)]
-					Csit = (Psat*(Csit/Cw))[:,0]
-		
+					Csit = (Psat[:,0]*(Csit/Cw))
+					
 					# eq. 14 of Zhang et al. (2015) 
 					# (https://www.atmos-chem-phys.net/15/4197/2015/
 					# acp-15-4197-2015.pdf) (molecules/cc.s (air))
@@ -274,7 +273,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			if sumt<3600.0 and pconc==0.0:
 				[N_perbin, y, x[0], Varr[0], new_part_sum1] = nuc(sumt, new_part_sum1, 
 							N_perbin, y, y_mw.reshape(-1, 1), np.squeeze(y_dens*1.0e-3),  
-							num_speci, x[0], step, new_partr, t, MV, nucv1, nucv2, 
+							num_speci, x[0], new_partr, t, MV, nucv1, nucv2, 
 							nucv3, nuc_comp)
 			
 		if sumt>=save_step*save_count: # save at every time step given by save_step (s)

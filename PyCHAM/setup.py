@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='PyCHAM',
-    version='0.0.2',
+    version='0.0.4',
     description='PyCHAM: Python CHemistry with Aerosol Microphysics Box Model',
     license='GNU General Public License v3.0',
     packages=['PyCHAM'],

@@ -4,7 +4,7 @@ import numpy as np
 import scipy.constants as si
 import ipdb
 
-def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, step, new_partr, t, MV, 
+def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, new_partr, t, MV, 
 		nucv1, nucv2, nucv3, nuc_comp):
 
 
@@ -21,7 +21,6 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, step, new_partr, t, M
 	# rho - density (g/cc)
 	# num_speci - number of species
 	# x - particles radius in smallest size bin(s) (um)
-	# step - ode step number
 	# new_partr - radius of two ELVOC molecules together in a newly nucleating 
 	# particle (cm)
 	# t - time step (s)
@@ -37,11 +36,6 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, step, new_partr, t, M
 	# (# particles/cc (air))
 	# ---------------------------------------------------------------
 	
-	# remove low value filler if no particles expected to be present
-	if (step==1):
-		n0[0] = 0.0
-		y[nuc_comp*2+nuc_comp] = 0.0
-		
 	# total number of particles that should have been produced through nucleation 
 	# by now given by integration:
 
@@ -64,7 +58,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, step, new_partr, t, M
 	ELVOC_conc1 = new_vol1/Vpermolec
 	 		
 	# if insufficient ELVOC present
-	if y[num_speci+nuc_comp]<(ELVOC_conc1):
+	if y[nuc_comp]<(ELVOC_conc1):
 	
 		# reverse above changes
 		n0[0] -= new_part1
@@ -73,14 +67,14 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, step, new_partr, t, M
 		
 		ELVOC_conc1 = 0.0
 		
-		print('insufficient ELVOC')
+		print('insufficient ELVOC for nucleation')
 	
 	
 	# remove from gas-phase (molecules/cc (air))
-	y[num_speci+nuc_comp] -= ELVOC_conc1
+	y[nuc_comp] -= ELVOC_conc1
 		
 	# add to particle-phase (molecules/cc (air))
-	y[num_speci*2+nuc_comp] += ELVOC_conc1
+	y[num_speci*1+nuc_comp] += ELVOC_conc1
 	
 	# average volume of single particles in first bin now (scale by 1.0e12 to convert 
 	# from cm3 to um3)

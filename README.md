@@ -95,7 +95,7 @@ nucv2 = Nucleation parameterisation value 2
 
 nucv3 = Nucleation parameterisation value 3
 
-nuc_comp = Index of component contributing to nucleation
+nuc_comp = Index of component contributing to nucleation (only one index allowed, can be absolute or relative)
 
 inflectDp = Particle diameter wall loss kernel inflection point (m)
 
@@ -115,7 +115,7 @@ Comp0 = Names of trace gases present at start (in the order corresponding to the
 		concentrations in C0).  Note, this is case sensitive, with the case matching that 
 		in the xml file
 
-voli = index of components with vapour pressures stated in volP
+voli = index of components with vapour pressures stated in volP (multiple indices allowed, can be absolute or relative)
 
 volP = vapour pressures (Pa) of components with indices given in voli
 

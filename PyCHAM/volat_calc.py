@@ -34,6 +34,10 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 	if testf==1:
 		return(0,0,0) # return dummies
 
+	# if voli is in relative index (-n), change to absolute
+	for i in range(len(voli)):
+		if voli[i]<0:
+			voli[i] = num_speci+voli[i]
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	y_dens = np.zeros((num_speci, 1)) # components' liquid density (kg/m3)

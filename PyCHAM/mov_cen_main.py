@@ -71,13 +71,25 @@ def mov_cen_main(n0, s0, Cn, rho, sbn, nc, MW, x, Vol0, t, tmax, tinc_count, C0,
 	ind_movedn = (Vnew>0.0)*ind_movedn
 	ind_movedn2 = np.asarray(np.where(ind_movedn==1))-1 # ready for excess shrink check
 	
+	# return if particles have grown too large (beyond uppermost boundary)
+	if (ind_moveup2>(sbn-1)).sum()>0:
+		
+		print('largest particles exceed uppermost volume bound, reducing time step')
+		print('Vnew = ', Vnew)
+		print('s0 = ', s0)
+		print('n0 = ', n0)
+		redt = 1
+		tnew = t/2.0 # new time for integration on next step (s)
+
+		return(np.squeeze(n0), np.squeeze(Vol0), C0, x, redt, t/2.0, tnew)
+	
 	# return if any volumes have moved up or down by more than one size bin
 	if (np.sum(Vnew[ind_moveup]>(s0[1::][ind_moveup2]))>0 or 
 		np.sum(Vnew[ind_movedn]<(s0[0:-1][ind_movedn2]))>0 or (Vnew<0).sum()>0):
 		print('size bin change excessive in moving centre, reducing time step')
-		print('Vnew', Vnew)
-		print('s0', s0)
-		print('n0', n0)
+		print('Vnew = ', Vnew)
+		print('s0 = ', s0)
+		print('n0 = ', n0)
 		
 		redt = 1
 			

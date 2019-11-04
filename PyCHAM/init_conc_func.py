@@ -2,7 +2,7 @@
 
 import numpy as np
 from water_calc import water_calc
-import MCM_constants_auto
+import MCM_const
 import eqn_parser
 import scipy.constants as si
 
@@ -73,7 +73,7 @@ def init_conc_func(num_speci, init_SMIL, smiles_array, init_conc, TEMP, RH, M, N
 	
 	# obtain a list of MCM constants and their equations
 	# get photolysis rates at initial time
-	(mcm_constants, MCMConstNameList) = MCM_constants_auto.mcm_constants(TEMP, 
+	(mcm_constants, MCMConstNameList) = MCM_const.mcm_constants(TEMP, 
 											y[H2Oi], M, N2, O2, time, lat, lon)
 	
 	# now create reaction rate file (reaction rates are set up to have units /s)

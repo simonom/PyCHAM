@@ -40,10 +40,10 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	# accommodation coefficient of particles
 	accom_coeff = np.ones((num_speci, 1))*1.0e0
 
-	# convert Cw (effective absorbing mass of wall) from ug/m3 (air) to 
+	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
 	# molecules/cc (air), assuming a molecular weight of 200g/mol
-	Cw = ((Cw*1.0e-12)/200.0)*si.N_A
+	Cw = ((Cw*1.0e-6)/200.0)*si.N_A
 
-	# convert kgwt from m3/ug.s to cm3/molecules.s
-	kgwt = (kgwt*200.0)/si.N_A
+	# convert kgwt from m3/g.s to cm3/molecules.s
+	kgwt = (kgwt*1.0e-6*200.0)/si.N_A
 	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt

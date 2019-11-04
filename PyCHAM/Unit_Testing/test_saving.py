@@ -37,7 +37,7 @@ import scipy.constants as si
 Cfactor = 101325.0*(si.N_A/(8.3144598e6*298.15))*1.0e-9
 MV = (np.array((149.0, 176.0e-2, 193.0, 180.0e-1, 746.0e-1))).reshape(num_speci,1)
 testf = 2
-
+print('going to save test outputs in '+dirpath +'/output/'+fname+'/'+resfname)
 output_by_sim = saving(fname, y_mat, t_out, Nresult, x2, num_sb, y_mw, num_speci, 
 							resfname, rbou, Cfactor, MV, testf)
 print('now checking output')

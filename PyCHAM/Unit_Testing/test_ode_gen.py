@@ -60,12 +60,10 @@ end_sim_time = 60.0
 pconc = 1000.0
 save_step = 60.0
 rbou = np.array((0.0, 400.0e-4, 8.0))
-wall_accom = 1.0
 therm_sp = (np.array((0,0,0,218,0))).reshape(num_speci,1)
-Ke = 1.0
 Kw = np.array((399.0, 675.0, 133.0, 430.0, 187.0)).reshape(num_speci,1)
-kgwt = 1.0e-16
-Cw = 1.0e12
+kgwt = 332.0e-25
+Cw = 301.0e13
 light_time = np.array((0.0, 14400.0))
 light_stat = np.array((0, 0))
 nreac = np.array((1)).reshape(1,1)
@@ -87,14 +85,14 @@ Rader = 0
 PInit = 101325.0
 testf = 2
 
-print('now calling ode_gen with test inputs')
+print('now calling ode_gen.py with test inputs')
 
 [t_out, y_mat, Nresult, x2] = ode_gen(tstep_len, y, num_speci, num_eqn, rindx, pindx, 
 				rstoi, pstoi, H2Oi, TEMP, RO2_indices, 
 				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
 				end_sim_time, pconc, save_step, 
-				rbou, wall_accom, therm_sp, Cw, light_time, light_stat,
+				rbou, therm_sp, Cw, light_time, light_stat,
 				nreac, nprod, prodn,
 				reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt)
@@ -102,10 +100,10 @@ print('now calling ode_gen with test inputs')
 print('now checking outputs')
 if int(t_out[0])!=0 or int(t_out[1])!=65:
 	print('issue with t_out')
-if int(y_mat[0,0]*1e-9)!=246 or int(y_mat[0,1]*1e-9)!=295 or int(y_mat[1,0]*1e-4)!=375 or int(y_mat[1,1]*1e-8)!=490 or int(y_mat[1,2]*1e-9)!=138 or int(y_mat[1,12]*1e-9)!=106:
+if int(y_mat[0,0]*1e-9)!=246 or int(y_mat[0,1]*1e-9)!=295 or int(y_mat[1,0]*1e-4)!=380 or int(y_mat[1,1]*1e-8)!=490 or int(y_mat[1,2]*1e-9)!=128 or int(y_mat[1,12]*1e-9)!=117:
 	print('issue with y_mat, possibly due to ode solver or mov_cen_main')
-if int(Nresult[0,0])!=934 or int(Nresult[0,1])!=65 or int(Nresult[1,0])!=0 or int(Nresult[1,1])!=993:
+if int(Nresult[0,0])!=934 or int(Nresult[0,1])!=65 or int(Nresult[1,0])!=0 or int(Nresult[1,1])!=994:
 	print('issue with Nresult')
-if int(x2[0,0]*1e4)!=237 or int(x2[0,1]*1e4)!=743 or int(x2[1,0]*1e2)!=2 or int(x2[1,1]*1e3)!=210:
+if int(x2[0,0]*1e4)!=237 or int(x2[0,1]*1e4)!=743 or int(x2[1,0]*1e2)!=2 or int(x2[1,1]*1e2)!=117:
 	print('issue with x2')
 print('if no issue stated above, then ode_gen working fine')

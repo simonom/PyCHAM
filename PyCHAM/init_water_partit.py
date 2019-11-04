@@ -82,15 +82,14 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 	# first guess of wall-phase water concentration based on RH = mole 
 	# fraction (molecules/cc (air))
 	y[num_speci*num_sb+H2Oi] = Cw*RH
-	# concentration of water at wall surface in gas phase (molecules/cc (air))
-	Csit = y[num_speci*(num_sb)+H2Oi]
-	# gas phase concentration of water (molecules/cc (air)), will stay constant
-	# because RH is constant
-	Cgit = y[H2Oi]
-	diff_rec = (Cgit-Csit) # record of gas and wall concentration difference
-	scaling = 1.0e-2 # scaling for new estimate
+	
+	# gas phase concentration of water (molecules/cc (air)) responds to loss to walls
+	y[H2Oi] = y[H2Oi]-y[num_speci*(num_sb)+H2Oi]
+	
+	scaling = 10**(19.0-np.log10(Cw)) # scaling for new estimate
+	
 	# allow gas-phase water to equilibrate with walls
-	while np.abs(Cgit-Csit)>1.0e8:
+	while np.abs(y[H2Oi]-Psat[H2Oi,0]*((y[num_speci*(num_sb)+H2Oi]/Cw)))>1.0e8:
 		
 		# update partitioning coefficients
 		[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
@@ -101,12 +100,11 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 		# concentration of water at wall surface in gas phase (molecules/cc (air))
 		Csit = Psat[H2Oi,0]*((y[num_speci*(num_sb)+H2Oi]/Cw))
 		
-		dydt = (kgwt*Cw)*(Cgit-Csit) # partitioning rate (molecules/cc.s)
+		dydt = (kgwt*Cw)*(y[H2Oi]-Csit) # partitioning rate (molecules/cc.s)
 		
 		# new estimate of concentration of condensed water (molecules/cc (air))
 		y[num_speci*(num_sb)+H2Oi] += dydt*(scaling)
-		
-		diff_rec = (Cgit-Csit) # keep record
+		y[H2Oi] -= dydt*(scaling)
 		
 	print('finished initiating water condensation')
 	return(y, Varr, radius)

@@ -153,7 +153,7 @@ def PyCHAM():
 						canvas.create_window(55, ystart+60, window=b6)
 					
 					if test!=1:
-						with open('var_store.pkl','wb') as f:
+						with open('PyCHAM/var_store.pkl','wb') as f:
 							pickle.dump(list_vars,f)
 							
 						import front as model
@@ -174,7 +174,7 @@ def PyCHAM():
 							t = threading.Thread(target=plotter.run())
 							t.daemon = False
 							t.start()
-							
+							sys.exit("PyCHAM finished")
 	
 						# vertical coordinate for plot results button
 						b6 = Button(canvas, text='Plot Results', command=plotting)
@@ -210,7 +210,7 @@ def PyCHAM():
 	canvas.create_window(280, ystart-130, window=l21)
 	
 	
-	l20 = Label(canvas, text="Please see README file for help and Example Run for an example")
+	l20 = Label(canvas, text="Please see the README file for the model manual")
 	l20.pack()
 	canvas.create_window(234, ystart-100, window=l20)
 	
