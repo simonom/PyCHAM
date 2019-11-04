@@ -27,7 +27,7 @@ The code is controlled via a graphical user interface (gui).  To initiate the gu
 **Unit Testing and Example Run**
 Unit tests for PyCHAM modules can be found in the Unit_Testing folder.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
-The example run output is saved in output/Example_Run/Example_output.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.1 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.5 of PyCHAM.
 
 **Chemical Scheme .txt file**
 

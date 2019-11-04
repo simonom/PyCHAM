@@ -10,7 +10,7 @@
 #                                                                                                   # 
 ##################################################################################################### 
 # Minor modified by XSX
-# File Created as 2019-11-04 09:46:51.249624
+# File Created as 2019-11-04 11:46:46.946703
 
 import numpy
 
@@ -1106,14 +1106,14 @@ def evaluate_rates(RO2, H2O, TEMP, lightm):
     rate_values[934] = J[35]
     rate_values[935] = 1.2e-12*numpy.exp(490/TEMP)*0.65
     rate_values[936] = 1.2e-12*numpy.exp(490/TEMP)*0.35
-    rate_values[937] = 1.2e-11*numpy.exp(440/TEMP)*0.532
-    rate_values[938] = 1.2e-11*numpy.exp(440/TEMP)*0.343
+    rate_values[937] = 1.2e-11*numpy.exp(440/TEMP)*0.522
+    rate_values[938] = 1.2e-11*numpy.exp(440/TEMP)*0.333
     rate_values[939] = 1.2e-11*numpy.exp(440/TEMP)*0.075
-    rate_values[940] = 6.3e-16*numpy.exp(-580/TEMP)*0.58
-    rate_values[941] = 6.3e-16*numpy.exp(-580/TEMP)*0.37
-    rate_values[942] = 6.3e-16*numpy.exp(-580/TEMP)*0.02
-    rate_values[943] = 6.3e-16*numpy.exp(-580/TEMP)*0.03
-    rate_values[944] = 1.2e-11*numpy.exp(440/TEMP)*0.02
-    rate_values[945] = 1.2e-11*numpy.exp(440/TEMP)*0.03
+    rate_values[940] = 6.3e-16*numpy.exp(-580/TEMP)*0.59
+    rate_values[941] = 6.3e-16*numpy.exp(-580/TEMP)*0.38
+    rate_values[942] = 6.3e-16*numpy.exp(-580/TEMP)*0.03
+    rate_values[943] = 6.3e-16*numpy.exp(-580/TEMP)*0.00
+    rate_values[944] = 1.2e-11*numpy.exp(440/TEMP)*0.07
+    rate_values[945] = 1.2e-11*numpy.exp(440/TEMP)*0.00
 
     return rate_values
