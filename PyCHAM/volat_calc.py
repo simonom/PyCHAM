@@ -5,11 +5,21 @@ import os
 from git import Repo
 import shutil
 import scipy.constants as si
+import errno
+import stat
 
 # download latest version of umansysprop
 cwd = os.getcwd() # address of current working directory
 if os.path.isdir(cwd + '/umansysprop'): # check if there is an existing umansysprop folder
- 	shutil.rmtree(cwd + '/umansysprop') # remove existing folder
+	def handleRemoveReadonly(func, path, exc):
+		excvalue = exc[1]
+		if not os.access(path, os.W_OK):
+			# Is the error an access error ?
+			os.chmod(path, stat.S_IWUSR)
+			func(path)
+		else:
+			raise
+	shutil.rmtree(cwd + '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly) # remove existing folder, onerror will change permission of directory if needed. 
 sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
 git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 Repo.clone_from(git_url, (cwd + '/umansysprop'))
