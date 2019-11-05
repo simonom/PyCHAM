@@ -37,7 +37,7 @@ authors:
    index: 3
 
 date: 5 November 2019
-bibliography: Bibtex_refs.bib
+bibliography: paper_refs.bib
 
 # Summary
 
