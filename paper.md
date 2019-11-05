@@ -1,3 +1,4 @@
+---
 title: 'PyCHAM: CHemistry with Aerosol Microphysics in Python'
 tags:
   - Python
@@ -38,6 +39,7 @@ authors:
 
 date: 5 November 2019
 bibliography: paper_refs.bib
+---
 
 # Summary
 
