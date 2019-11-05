@@ -1,5 +1,5 @@
 ---
-title: 'PyCHAM: CHemistry with Aerosol Microphysics in Python'
+# title: 'PyCHAM: CHemistry with Aerosol Microphysics in Python'
 tags:
   - Python
   - atmospheric science
