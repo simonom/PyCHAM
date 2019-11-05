@@ -32,7 +32,7 @@ affiliations:
    index: 1
  - name: National Centre for Atmospheric Science
    index: 2
- - name: Research Computing Services, University of Manchester}
+ - name: Research Computing Services, University of Manchester
    index: 3
 date: 5 November 2019
 bibliography: paper_refs.bib
