@@ -1,5 +1,5 @@
 ---
-# title: 'PyCHAM: CHemistry with Aerosol Microphysics in Python'
+title: 'PyCHAM: CHemistry with Aerosol Microphysics in Python'
 tags:
   - Python
   - atmospheric science
@@ -26,17 +26,14 @@ authors:
     affiliation: "1, 2"
   - name: Gordon McFiggans
     orcid: 0000-0002-3423-7896
-    affiliation: "1, 2" 
-
- 
-#affiliations:
+    affiliation: "1, 2"
+affiliations:
  - name: Department of Earth and Environmental Sciences, University of Manchester
    index: 1
  - name: National Centre for Atmospheric Science
    index: 2
  - name: Research Computing Services, University of Manchester}
    index: 3
-
 date: 5 November 2019
 bibliography: paper_refs.bib
 ---
