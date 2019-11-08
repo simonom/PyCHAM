@@ -268,5 +268,7 @@ def run(testf):
 	
 	plt.legend(fontsize=18)
 	plt.savefig(str(output_by_sim+'/gas_ppb.png'), transparent=True)
-
+	
+	os.remove('PyCHAM/var_store.pkl') # remove pickle file
+	
 	return()
