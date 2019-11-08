@@ -37,7 +37,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# x - radii of particle size bins (um) (excluding walls)
 	# therm_sp - thermal speed of components (m/s)
 	# DStar_org - gas-phase diffusion coefficient of components (m2/s)
-	# Cw - concentration of wall (g/m3 (air))
+	# Cw - concentration of wall (molecules/cm3 (air))
 	# light_time - times (s) of when lights on and lights off (corresponding to light 
 	# 				status in light_stat)
 	# light_stat - order of lights on (1) and lights off (0)
