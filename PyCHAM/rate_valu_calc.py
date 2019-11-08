@@ -9,7 +9,9 @@ def rate_valu_calc(RO2_indices, H2O, TEMP, lightm, y):
 	# ---------------------------------------------
 	# inputs:
 	
+	# TEMP - temperature (K)
 	# lightm - whether lights off (0) or on (1)
+	# y - component concentrations (molecules/cc (air))
 	# ---------------------------------------------
 	
 	# calculate total RO2 concentration

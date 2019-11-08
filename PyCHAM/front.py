@@ -17,8 +17,12 @@ from volat_calc import volat_calc
 def run(testf):
 	
 	# inputs:
-	# testf - test flag, 1 for test mode, 0 for normal mode
+	# testf - test flag, 1 for test mode (called by test_front.py), 2 for test mode 
+	# (called by test_PyCHAM.py), 0 for normal mode
 	
+	if testf==2:
+		print('"Run Model" button works fine')
+		return()
 	if testf==1:
 		print('calling user_input.py')
 	# module to ask, receive and return required inputs
@@ -26,7 +30,12 @@ def run(testf):
 	tmax, TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, 
 	ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre,  
 	pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, voli, volP, 
-	pconc, std, loc, scale, core_diss, light_stat, light_time, kgwt] = ui.run(0, testf)
+	pconc, std, loc, scale, core_diss, light_stat, light_time, kgwt, testm] = ui.run(0, testf)
+	
+	if testm == 1:
+		print('PyCHAM calls front fine, now returning to PyCHAM.py')
+		print('Please select the "Plot Results" button to ensure this works fine')
+		return()
 	
 	if testf==1:
 		print('user_input.py called and returned fine')

@@ -1,218 +1,261 @@
-import os
+'''The module that generates the Graphical User Interface for PyCHAM, and connects that GUI with the core PyCHAM model'''
+
 import sys
-from tkinter import*
-from tkinter.filedialog import askopenfilename
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot, Qt
 import pickle # for storing inputs
-import threading # for calling on further functions
-import numpy as np
+import threading # for calling on further PyCHAM functions
+import os
 
+class PyCHAM(QWidget):
 
-def PyCHAM():
-        
-	master = Tk() # intiate gui window
-	heightv=550
-	# to produce a vertical scrollbar need to embed button and entry widgets into a canvas
-	# which is embedded into a frame
-	frame = Frame(master, width=550, height=heightv) # establish frame
-	frame.grid(row=0,column=0) # state frame position
-	canvas = Canvas(frame, width=550, height=heightv, scrollregion=(0,0,2000,heightv*1.5))
-	vbar = Scrollbar(frame, orient=VERTICAL)
-	vbar.pack(side=RIGHT,fill=Y)
-	vbar.config(command=canvas.yview)
-	canvas.config(width=550, height=heightv)
-	canvas.config(yscrollcommand=vbar.set)
-	canvas.pack(side=LEFT,expand=True,fill=BOTH)
-	master.title("PyCHAM") # goes in title bar
-
-
-	def chemscm(): # function called when button pressed for chemical scheme
-		fname = askopenfilename()
+	def __init__(self):
+		super().__init__()
+		self.title = 'PyCHAM'
+		self.left = 10
+		self.top = 10
+		self.width = 450
+		self.height = 300
+		self.initUI()
+    
+	def initUI(self):
+		self.setWindowTitle(self.title)
+		self.setGeometry(self.left, self.top, self.width, self.height)
 		
-		def xml():
-			xmlname = askopenfilename() # function called when button pressed for xml file
+		label = QLabel(self)
+		label.setText("Welcome to PyCHAM.  Please see the README file for guidance.")
+		label.move(20,35)
+		label.show()
+		
+		
+		button = QPushButton('Chemical Scheme .txt File', self)
+		button.setToolTip('Select the .txt file containing the desired chemical scheme')
+		button.move(100,70)
+		button.clicked.connect(self.on_click1)
+		
+		button = QPushButton('Chemical Scheme .xml File', self)
+		button.setToolTip('Select the .xml file containing the desired conversion file')
+		button.move(100,100)
+		button.clicked.connect(self.on_click2)
+		
+		button = QPushButton('Model Variables .txt File', self)
+		button.setToolTip('Select the desired file containing the model variables')
+		button.move(100,130)
+		button.clicked.connect(self.on_click3)
+		
+		button = QPushButton('Run Model', self)
+		button.setToolTip('Start the simulation')
+		button.move(100,160)
+		button.clicked.connect(self.on_click4)
+		
+		button = QPushButton('Plot Results', self)
+		button.setToolTip('Plot output from simulation')
+		button.move(100,190)
+		button.clicked.connect(self.on_click5)
+		
+		self.show()
+		
+
+	@pyqtSlot()
+	def on_click1(self):
+		# set path prefix based on whether this is a test or not (i.e. whether test flag 
+		# file exists)
+		dirpath = os.getcwd() # get current path
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			prefix = os.path.split(dirpath)[0]		
+		else:
+			prefix = 'PyCHAM'
+		
+		fname = self.openFileNameDialog()
+		if os.path.isfile(prefix+'/fname.txt'):
+			os.remove(prefix+'/fname.txt')
+		with open(prefix+'/fname.txt','a+') as f:
+			f.write(fname)
+		f.close()
+	
+	@pyqtSlot()
+	def on_click2(self):
+		# set path prefix based on whether this is a test or not (i.e. whether test flag 
+		# file exists)
+		dirpath = os.getcwd() # get current path
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			prefix = os.path.split(dirpath)[0]		
+		else:
+			prefix = 'PyCHAM'
+		
+		xmlname = self.openFileNameDialog()
+		if os.path.isfile(prefix+'/xmlname.txt'):
+			os.remove(prefix+'/xmlname.txt')
+		with open(prefix+'/xmlname.txt','a+') as f:
+			f.write(xmlname)
+		f.close()
+	@pyqtSlot()
+	def on_click3(self):
+		inname = self.openFileNameDialog()
+		
+		# open the file
+		inputs = open(inname, mode='r')
+		
+		# read the file and store everything into a list
+		in_list = inputs.readlines()
+		inputs.close()
+		
+		if len(in_list) != 36:
+			print('Error: The number of model inputs is incorrect, should be 36, but is ' + str(len(in_list)) )
+			sys.exit()
+		for i in range(len(in_list)):
+			key, value = in_list[i].split('=')
+			key = key.strip() # a string
+			if key == 'Res_file_name':
+				resfname = str(value.strip())
+			if key == 'Total_model_time':
+				end_sim_time = float(value.strip())
+			if key == 'Time_step':
+				tstep_len = float(value.strip())
+			if key == 'Recording_time_step':
+				save_step = float(value.strip())
+			if key == 'Number_size_bins':
+				num_sb = int(value.strip())
+			if key == 'lower_part_size':
+				lowersize = float(value.strip())
+			if key == 'upper_part_size':
+				uppersize = float(value.strip())
+			if key == 'mass_trans_coeff':
+				kgwt = float(value.strip())
+			if key == 'eff_abs_wall_massC':
+				Cw = float(value.strip())
+			if key == 'Temperature':
+				TEMP = float(value.strip())
+			if key == 'PInit':
+				PInit = float(value.strip())
+			if key == 'RH':
+				RH = float(value.strip())
+			if key == 'lat':
+				lat = float(value.strip())
+			if key == 'lon':
+				lon = float(value.strip())
+			if key == 'daytime_start':
+				dt_start = float(value.strip())
+			if key == 'ChamSA':
+				ChamSA = float(value.strip())
+			if key == 'nucv1':
+				nucv1 = float(value.strip())
+			if key == 'nucv2':
+				nucv2 = float(value.strip())
+			if key == 'nucv3':
+				nucv3 = float(value.strip())
+			if key == 'nuc_comp':
+				nuc_comp = int(value.strip())
+			if key == 'inflectDp':
+				inflectDp = float(value.strip())
+			if key == 'Grad_pre_inflect':
+				pwl_xpre = float(value.strip())
+			if key == 'Grad_post_inflect':
+				pwl_xpro = float(value.strip())
+			if key == 'Kern_at_inflect':
+				inflectk = float(value.strip())
+			if key == 'Rader_flag':
+				Rader = int(value.strip())
+			if key == 'C0':
+				C0 = [float(i) for i in (value.split(','))]
+			if key == 'Comp0': # strip removes white space
+				Comp0 = [str(i).strip() for i in (value.split(','))]
+			if key == 'voli':
+				voli = [int(i) for i in (value.split(','))]
+			if key == 'volP':
+				volP = [float(i) for i in (value.split(','))]
+			if key == 'pconc':
+				pconc = float(value.strip())
+			if key == 'std':
+				std = float(value.strip())
+			if key == 'loc':
+				loc = float(value.strip())
+			if key == 'scale':
+				scale = float(value.strip())
+			if key == 'core_diss':
+				core_diss = float(value.strip())
+			if key == 'light_time':
+				light_time = [float(i) for i in (value.split(','))]
+			if key == 'light_stat':
+				light_stat = [int(i) for i in (value.split(','))]
+		
+		# get names of chemical scheme and xml files
+		# set path prefix based on whether this is a test or not (i.e. whether test flag 
+		# file exists)
+		dirpath = os.getcwd() # get current path
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			prefix = os.path.split(dirpath)[0]		
+		else:
+			prefix = 'PyCHAM'
 			
-			def File():
-				inname = askopenfilename()
-				
-				# open the file
-				inputs = open(inname, mode='r')
-				
-				# read the file and store everything into a list
-				in_list = inputs.readlines()
-				inputs.close()
-				
-				if len(in_list) != 37:
-					print('The number of model inputs is incorrect, should be 37, but is ' + str(len(in_list)) )
-				for i in range(len(in_list)):
-					key, value = in_list[i].split('=')
-					key = key.strip() # a string
-					if key == 'Res_file_name':
-						resfname = str(value.strip())
-					if key == 'Total_model_time':
-						end_sim_time = float(value.strip())
-					if key == 'Time_step':
-						tstep_len = float(value.strip())
-					if key == 'Recording_time_step':
-						save_step = float(value.strip())
-					if key == 'Number_size_bins':
-						num_sb = int(value.strip())
-					if key == 'lower_part_size':
-						lowersize = float(value.strip())
-					if key == 'upper_part_size':
-						uppersize = float(value.strip())
-					if key == 'mass_trans_coeff':
-						kgwt = float(value.strip())
-					if key == 'eff_abs_wall_massC':
-						Cw = float(value.strip())
-					if key == 'Temperature':
-						TEMP = float(value.strip())
-					if key == 'PInit':
-						PInit = float(value.strip())
-					if key == 'RH':
-						RH = float(value.strip())
-					if key == 'lat':
-						lat = float(value.strip())
-					if key == 'lon':
-						lon = float(value.strip())
-					if key == 'daytime_start':
-						dt_start = float(value.strip())
-					if key == 'ChamSA':
-						ChamSA = float(value.strip())
-					if key == 'nucv1':
-						nucv1 = float(value.strip())
-					if key == 'nucv2':
-						nucv2 = float(value.strip())
-					if key == 'nucv3':
-						nucv3 = float(value.strip())
-					if key == 'nuc_comp':
-						nuc_comp = int(value.strip())
-					if key == 'inflectDp':
-						inflectDp = float(value.strip())
-					if key == 'Grad_pre_inflect':
-						pwl_xpre = float(value.strip())
-					if key == 'Grad_post_inflect':
-						pwl_xpro = float(value.strip())
-					if key == 'Kern_at_inflect':
-						inflectk = float(value.strip())
-					if key == 'Rader_flag':
-						Rader = int(value.strip())
-					if key == 'C0':
-						C0 = [float(i) for i in (value.split(','))]
-					if key == 'Comp0': # strip removes white space
-						Comp0 = [str(i).strip() for i in (value.split(','))]
-					if key == 'voli':
-						voli = [int(i) for i in (value.split(','))]
-					if key == 'volP':
-						volP = [float(i) for i in (value.split(','))]
-					if key == 'test':
-						test = int(value.strip())
-					if key == 'pconc':
-						pconc = float(value.strip())
-					if key == 'std':
-						std = float(value.strip())
-					if key == 'loc':
-						loc = float(value.strip())
-					if key == 'scale':
-						scale = float(value.strip())
-					if key == 'core_diss':
-						core_diss = float(value.strip())
-					if key == 'light_time':
-						light_time = [float(i) for i in (value.split(','))]
-					if key == 'light_stat':
-						light_stat = [int(i) for i in (value.split(','))]
-				# function to write namelist to pickle file, which is read in by model
-				def clicked():
-					
-					# write variable values to pickle file
-					list_vars = [fname, num_sb, lowersize, uppersize, end_sim_time, 
-					resfname, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, Cw,  
-					save_step, ChamSA, nucv1, nucv2, nucv3, nuc_comp,   
-					inflectDp, pwl_xpre, pwl_xpro, inflectk, Rader, xmlname, C0, Comp0, 
-					voli, volP, pconc, std, loc, scale, core_diss, light_stat, light_time,
-					kgwt]
-					
-					if test==1:
-						print('Run Model button works successfully')
-						with open('test_var_store.pkl','wb') as f:
-							pickle.dump(list_vars,f)
-							print('pickle file dumped successfully')
-							print('now press the "Plot Results" button to ensure this works')
-								
-							
-						# plots one figure, a superimposition of the:
-						# particle number concentration, SOA mass, and number size
-						# distribution
-						def plotting():
-							print('Plotting button works successfully')
-							print('PyCHAM.py test complete and successful')
-							exit()
-							
-						# vertical coordinate for plot results button
-						b6 = Button(canvas, text='Plot Results', command=plotting)
-						b6.pack()
-						canvas.create_window(55, ystart+60, window=b6)
-					
-					if test!=1:
-						with open('PyCHAM/var_store.pkl','wb') as f:
-							pickle.dump(list_vars,f)
-							
-						import front as model
-						# flag to tell front to operate normally
-						testf = 0
-						# call on model to run
-						t = threading.Thread(target=model.run(testf))
-						t.daemon = False
-						t.start()
-						
-						# plots one figure, a superimposition of the:
-						# particle number concentration, SOA mass, and number size
-						# distribution
-						def plotting():
-							
-							import res_plot_super as plotter
-							# pass the name of the folder where results are saved
-							t = threading.Thread(target=plotter.run())
-							t.daemon = False
-							t.start()
-							sys.exit("PyCHAM finished")
-	
-						# vertical coordinate for plot results button
-						b6 = Button(canvas, text='Plot Results', command=plotting)
-						b6.pack()
-						canvas.create_window(60, ystart+60, window=b6)
-				
-				# vertical coordinate for manual input button
-				# button that calls PyCHAM model
-				b5 = Button(canvas, text='Run Model', command=clicked)
-				b5.pack()
-				canvas.create_window(50, ystart+30, window=b5)				
-				
-			# button to choose text file with variable parameters stated
-			b4 = Button(canvas, text='Model Variables .txt File', command=File)
-			b4.pack()
-			canvas.create_window(102, ystart-10, window=b4)
+		f = open(prefix+'/fname.txt','r')
+		content = f.readlines()
+		f.close()
+		fname = str(content[0])
+		f = open(prefix+'/xmlname.txt','r')
+		content = f.readlines()
+		f.close()
+		xmlname = str(content[0])
+		# remove temporary files
+		os.remove(prefix+'/fname.txt')
+		os.remove(prefix+'/xmlname.txt')
 		
-		# set button to select chemical scheme from file
-		b2 = Button(canvas, text='Chemical Scheme .xml File', command=xml)
-		b2.pack()
-		canvas.create_window(102, ystart-40, window=b2)
+		# write variable values to pickle file
+		list_vars = [fname, num_sb, lowersize, uppersize, end_sim_time, 
+		resfname, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, Cw,  
+		save_step, ChamSA, nucv1, nucv2, nucv3, nuc_comp,   
+		inflectDp, pwl_xpre, pwl_xpro, inflectk, Rader, xmlname, C0, Comp0, 
+		voli, volP, pconc, std, loc, scale, core_diss, light_stat, light_time,
+		kgwt]
+			
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			print('Model input buttons work successfully')
+			with open('test_var_store.pkl','wb') as f:
+				pickle.dump(list_vars,f)
+				print('Pickle file dumped successfully')
+				os.remove('test_var_store.pkl')
+			f.close()
+		else:
+			with open('PyCHAM/var_store.pkl','wb') as f:
+				pickle.dump(list_vars,f)
+			f.close()
 	
-	# vertical coordinate for manual input button
-	ystart = 150
+	@pyqtSlot()	
+	def on_click4(self):
+		import front as model
+		dirpath = os.getcwd() # get current path
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			testf=2	
+		else:
+			testf=0
+		# call on model to run
+		t = threading.Thread(target=model.run(testf))
+		t.daemon = False
+		t.start()
 	
-	# set button to select chemical scheme from file
-	b1 = Button(canvas, text='Chemical Scheme .txt File', command=chemscm)
-	b1.pack()
-	canvas.create_window(102, ystart-70, window=b1)
-	
-	l21 = Label(canvas, text="PyCHAM Inputs",font=("Helvetica",30))
-	l21.pack()
-	canvas.create_window(280, ystart-130, window=l21)
-	
-	
-	l20 = Label(canvas, text="Please see the README file for the model manual")
-	l20.pack()
-	canvas.create_window(234, ystart-100, window=l20)
-	
-	mainloop( )
-PyCHAM()
+	@pyqtSlot()
+	def on_click5(self):
+		import res_plot_super as plotter
+		
+		dirpath = os.getcwd() # get current path
+		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+			testf=1		
+		else:
+			testf=0
+		
+		# pass the name of the folder where results are saved
+		t = threading.Thread(target=plotter.run(testf))
+		t.daemon = False
+		t.start()
+		
+		if testf==1:
+			# remove the test flag file
+			# remove test file
+			os.remove(os.path.split(dirpath)[0]+'/testf.txt')
+		
+		
+	def openFileNameDialog(self):
+		options = QFileDialog.Options()
+		fname, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
+		return fname

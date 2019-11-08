@@ -271,9 +271,9 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# nprod - number of products per equation
 	# prodn - number of columns in pindx
 	# reacn - rindx number of columns
-	# M_val - gas-phase concentration of M
-	# N2_val - gas-phase concentration of nitrogen
-	# O2_val - gas-phase concentration of oxygen
+	# M_val - gas-phase concentration of M (molecules/cc (air))
+	# N2_val - gas-phase concentration of nitrogen (molecules/cc (air))
+	# O2_val - gas-phase concentration of oxygen (molecules/cc (air))
 	# init_SMIL - SMILE string for each component
 	
 	return (rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, 
@@ -284,7 +284,8 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 
 # This function generates a python script that calculate rate coef. numerically
 # main part by Dave (/s)
-def write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, testf):
+def write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, testf, M, N2, 
+					O2):
     if testf==0:
     	f = open('PyCHAM/Rate_coeffs.py', mode='w')
     if testf==2:
@@ -322,9 +323,9 @@ def write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, testf)
     f.write('    if lightm == 0:\n')
     f.write('    	J = [0]*len(J)\n')
     f.write('    # Environmental Variables: M, O2, N2\n')
-    f.write('    M = 2.55e19 # 3rd body; number of molecules in per unit volume\n')
-    f.write('    N2 = 0.79*M # Nitrogen mass mixing ratio : 79%\n')
-    f.write('    O2 = 0.2096*M # Oxygen mass mixing ratio : 20.95%\n')
+    f.write('    M = ' + str(M) + ' # 3rd body; number of molecules in per unit volume\n')
+    f.write('    N2 = ' + str(N2) + ' # Nitrogen mass mixing ratio : 79%\n')
+    f.write('    O2 = ' + str(O2) + ' # Oxygen mass mixing ratio : 20.96%\n')
     
     # calculate the rate coef. numerically for each equation
     f.write('    rate_values = numpy.zeros(%i)\n' %(len(reac_coef)))

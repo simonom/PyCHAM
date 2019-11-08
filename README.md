@@ -28,7 +28,7 @@ The code is controlled via a graphical user interface (gui).  To initiate the gu
 
 Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
-The example run output is saved in output/Example_Run/Example_output.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.5 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.6 of PyCHAM.
 
 **Chemical Scheme .txt file**
 
@@ -37,15 +37,13 @@ from the Master Chemical Mechanism website and modified.
 
 // can be used for preceding comments, as in the example.
 
-note on equations: the expression for the rate coefficient can use Fortran type scientific notation or python type
+Equations should adhere to the syntax in the following standard expression for an equation: % rate coefficient equation : reactant1 + reactant2 = product1 + product2 ;
+Each equation should be represented on a new line.
 
-note on equations: acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10
 
-note on equations: MCM (master chemical mechanism) rate constants are accepted, e.g. KMT01, as are MCM photolysis rates, e.g. J<1>
+The rate coefficients must adhere to the following rules:
+The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; MCM (master chemical mechanism) rate constants are accepted, e.g. KMT01, as are MCM photolysis rates, e.g. J<1> ;rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py; rate coefficients may also be a function of MCM names such as RO2.
 
-note on equations: rate coefficients may be functions of TEMP, RH, M, N2, O2
-
-An example of the standard expression for an equation is: % rate : reactant1 + reactant2 = product1 + product2 ;
 
 **Chemical Scheme .xml file**
 
@@ -119,8 +117,6 @@ Comp0 = Names of trace gases present at start (in the order corresponding to the
 voli = index of components with vapour pressures stated in volP (multiple indices allowed, can be absolute or relative)
 
 volP = vapour pressures (Pa) of components with indices given in voli
-
-test = flag to give the option of testing PyCHAM.py (if =1) or not testing (if =0)
 
 pconc = total particle concentration at start of experiment (seed particles) 
 		(# particles/cc (air))

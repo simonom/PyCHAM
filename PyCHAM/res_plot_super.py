@@ -17,7 +17,17 @@ from mpl_toolkits.axes_grid1 import host_subplot
 import mpl_toolkits.axisartist as AA
 import user_input as ui
 
-def run():
+def run(testf):
+	
+	# --------------------------------------------------------------
+	# inputs:
+	# testf - flag for whether in test mode (=0 no test, =1, testing from test_PyCHAM.py)
+	
+	# --------------------------------------------------------------
+	if testf==1:
+		print('"Plot Results button works fine", GUI should now close.')
+		return()
+	
 	# module to ask, receive and return required inputs
 	[fname, resfname, y_indx_plot, Comp0] = ui.run(1,0)
 	
@@ -83,6 +93,8 @@ def run():
 		for sp in ax.spines.values():
 			sp.set_visible(False)
 	
+	
+	plt.ion() # show figures on screen
 	
 	# ------------------------
 	# plotting number-size distribution
@@ -213,6 +225,7 @@ def run():
 	
 	
 	# ----------------------------------------------------------------------------------------
+	
 	# SOA mass concentration
 	# array for SOA sum with time
 	SOAvst = np.zeros((1, len(t_array)))
@@ -236,9 +249,9 @@ def run():
 	par2.spines['right'].set_color('red')
 	par2.yaxis.set_tick_params(labelsize=18)
 	plt.legend(fontsize=18, handles=[p3, p5] ,loc=4)
-	
+
 	plt.savefig(str(output_by_sim+'/contours.png'), transparent=True)
-	
+
 	# -----------------------------------------------------------------------------------
 	# gas-phase concentrations
 	
@@ -255,6 +268,5 @@ def run():
 	
 	plt.legend(fontsize=18)
 	plt.savefig(str(output_by_sim+'/gas_ppb.png'), transparent=True)
-	plt.show() # present on screen
-	
+
 	return()

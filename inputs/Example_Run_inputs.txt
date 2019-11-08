@@ -1,5 +1,5 @@
-Res_file_name = Example_output
-Total_model_time = 14400.0
+Res_file_name = Example_output2
+Total_model_time = 1.0
 Time_step = 60.0
 Recording_time_step = 60.0
 Number_size_bins = 2
@@ -27,7 +27,6 @@ C0 = 25.0, 30.0, 0.75, 0.75
 Comp0 = O3,APINENE,NO,NO2
 voli = -5, -4, -3, -2
 volP = 1e-30, 1e-5, 1e-30, 1e-5
-test = 0
 pconc = 0.0
 std = 1.0e-1
 loc = 0.0

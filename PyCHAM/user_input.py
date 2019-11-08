@@ -14,7 +14,7 @@ def run(source, testf):
 	if testf==1: # testing mode
 		# return dummies to continue test
 		if source==0:
-			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 		
 	
 	import pickle
@@ -32,11 +32,17 @@ def run(source, testf):
 			nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, Rader, xmlname, C0, Comp0, voli, volP, pconc, 
 			std, loc, scale, core_diss, light_stat, light_time, kgwt] = pickle.load(pk)
+			if testf!=2:
+				# remove pickle file
+				os.remove('PyCHAM/var_store.pkl')	
+				
 			# convert chamber surface area (m2) to spherical equivalent radius (m)
 			# (below eq. 2 in Charan (2018))
 			ChamR = (ChamSA/(4.0*np.pi))**0.5
 		if source == 1:	# when called from res_plot_super.py
 			[fname, resfname, y_indx_plot, Comp0] = pickle.load(pk)
+			if testf!=2:
+				os.remove('PyCHAM/var_store.pkl')
 					
 	output_root = 'output'
 	filename = os.path.basename(fname)
@@ -54,14 +60,14 @@ def run(source, testf):
 		Ke = 18
 	
 	if os.path.isdir(output_by_sim)==True and source==0:
-		sys.exit('Results file name already exists, please use an alternative')
+		sys.exit('Results file name (' +output_by_sim+ ') already exists, please use an alternative')
 	
 	if source == 0:
 		return(fname, num_sb, lowersize, uppersize, end_sim_time, resfname, 
 		tstep_len, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, save_step, 
 		Cw, ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
 		pwl_xpre, pwl_xpro, inflectk, xmlname, C0, Comp0, Rader, voli, volP, pconc, std, 
-		loc, scale, core_diss, light_stat, light_time, kgwt)
+		loc, scale, core_diss, light_stat, light_time, kgwt, 0)
 		
 	if source == 1:
 		return(fname, resfname, y_indx_plot, Comp0)

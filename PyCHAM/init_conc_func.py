@@ -12,8 +12,10 @@ def init_conc_func(num_speci, init_SMIL, smiles_array, init_conc, TEMP, RH, M, N
 		
 	# -----------------------------------------------------------
 	# inputs:
-
-	# N2 - initial concentration of N2 (ppb)
+	
+	# M - initial concentration of M (molecules/cc (air))
+	# N2 - initial concentration of N2 (molecules/cc (air))
+	# O2 - initial concentration of O2 (molecules/cc (air))
 	# PInit - initial pressure (Pa)
 	# init_SMIL - SMILES of components present at start of experiment (whose 
 	# concentrations are given in init_conc)
@@ -78,6 +80,6 @@ def init_conc_func(num_speci, init_SMIL, smiles_array, init_conc, TEMP, RH, M, N
 	
 	# now create reaction rate file (reaction rates are set up to have units /s)
 	eqn_parser.write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, 
-								testf)
+								testf, M, N2, O2)
 	
 	return (y, H2Oi, Psat_water, y_mw, num_speci, Cfactor, y_indx_plot, corei)

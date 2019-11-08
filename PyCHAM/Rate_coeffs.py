@@ -10,7 +10,7 @@
 #                                                                                                   # 
 ##################################################################################################### 
 # Minor modified by XSX
-# File Created as 2019-11-04 11:46:46.946703
+# File Created as 2019-11-08 13:40:45.913614
 
 import numpy
 
@@ -164,9 +164,9 @@ def evaluate_rates(RO2, H2O, TEMP, lightm):
     if lightm == 0:
     	J = [0]*len(J)
     # Environmental Variables: M, O2, N2
-    M = 2.55e19 # 3rd body; number of molecules in per unit volume
-    N2 = 0.79*M # Nitrogen mass mixing ratio : 79%
-    O2 = 0.2096*M # Oxygen mass mixing ratio : 20.95%
+    M = 2.4130932097941574e+19 # 3rd body; number of molecules in per unit volume
+    N2 = 1.9063436357373846e+19 # Nitrogen mass mixing ratio : 79%
+    O2 = 5.057843367728554e+18 # Oxygen mass mixing ratio : 20.96%
     rate_values = numpy.zeros(946)
     # reac_coef has been formatted so that python can recognize it
     rate_values[0] = 5.6e-34*N2*(TEMP/300)**-2.6*O2
@@ -1108,12 +1108,12 @@ def evaluate_rates(RO2, H2O, TEMP, lightm):
     rate_values[936] = 1.2e-12*numpy.exp(490/TEMP)*0.35
     rate_values[937] = 1.2e-11*numpy.exp(440/TEMP)*0.522
     rate_values[938] = 1.2e-11*numpy.exp(440/TEMP)*0.333
-    rate_values[939] = 1.2e-11*numpy.exp(440/TEMP)*0.075
+    rate_values[939] = 1.2e-11*numpy.exp(440/TEMP)*0.065
     rate_values[940] = 6.3e-16*numpy.exp(-580/TEMP)*0.59
     rate_values[941] = 6.3e-16*numpy.exp(-580/TEMP)*0.38
     rate_values[942] = 6.3e-16*numpy.exp(-580/TEMP)*0.03
     rate_values[943] = 6.3e-16*numpy.exp(-580/TEMP)*0.00
-    rate_values[944] = 1.2e-11*numpy.exp(440/TEMP)*0.07
+    rate_values[944] = 1.2e-11*numpy.exp(440/TEMP)*0.08
     rate_values[945] = 1.2e-11*numpy.exp(440/TEMP)*0.00
 
     return rate_values
