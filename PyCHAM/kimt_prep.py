@@ -11,7 +11,7 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	# TEMP - temperature (K)
 	# num_speci - number of components
 	# testf - flag for whether in normal mode (0) or testing mode (1)
-	# Cw - effective absorbing mass of wall (ug/m3 (air))
+	# Cw - effective absorbing mass of wall (g/m3 (air))
 	# kgwt - mass transfer coefficient for vapor-wall partitioning (m3/ug.s)
 	# -----------------------------------------------------------------
 	
@@ -45,5 +45,5 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	Cw = ((Cw*1.0e-6)/200.0)*si.N_A
 
 	# convert kgwt from m3/g.s to cm3/molecules.s
-	kgwt = (kgwt*1.0e-6*200.0)/si.N_A
+	kgwt = (kgwt*1.0e6*200.0)/si.N_A
 	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt
