@@ -70,9 +70,9 @@ lower_part_size = Radius of smallest size bin boundary (um)
 
 upper_part_size = Radius of largest size bin boundary (um)
 
-kgwt = mass transfer coefficient of vapour-wall partitioning (cm3/molecule.s)
+kgwt = mass transfer coefficient of vapour-wall partitioning (m3/g.s)
 
-eff_abs_wall_massC = effective absorbing wall mass concentration (ug/m3 (air))
+eff_abs_wall_massC = effective absorbing wall mass concentration (g/m3 (air))
 
 Temperature = Temperature (K)
 
