@@ -10,7 +10,7 @@ dependencies:
   - assimulo=3.0=py37hc04db61_1007
   - backcall=0.1.0=py_0
   - bzip2=1.0.8=h516909a_0
-  - ca-certificates=2019.9.11=hecc5488_0
+  - ca-certificates=2019.10.16=0
   - cairo=1.14.12=h8948797_3
   - certifi=2019.9.11=py37_0
   - cycler=0.10.0=py_1
@@ -72,7 +72,7 @@ dependencies:
   - ptyprocess=0.6.0=py_1001
   - pygments=2.4.2=py_0
   - pyparsing=2.4.2=py_0
-  - pyqt=5.9.2=py37hcca6a23_2
+  - pyqt=5.9.2=py37h05f1152_2
   - python=3.7.3=h33d41f4_1
   - python-dateutil=2.8.0=py_0
   - pytz=2019.2=py_0
