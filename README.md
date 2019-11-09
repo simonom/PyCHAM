@@ -2,7 +2,7 @@
 
 Welcome to the PyCHAM repository.  Funding has been provided from the [EUROCHAMP-2020 research project](http://www.eurochamp.org).  Please contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.
 
-PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.
+PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0 which is provided in its repository.
 
 The code is controlled via a graphical user interface (gui).  To initiate the gui please follow the steps below:
 
