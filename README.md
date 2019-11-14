@@ -1,38 +1,59 @@
 **PyCHAM: Python CHemistry with Aerosol Microphysics Box Model**
 
-Welcome to the PyCHAM repository.  Funding has been provided from the [EUROCHAMP-2020 research project](http://www.eurochamp.org).  Please contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.
+Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 research project](http://www.eurochamp.org).  Please contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.
 
-PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0 which is provided in its repository.
+PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.
 
-The code is controlled via a graphical user interface (gui).  To initiate the gui please follow the steps below:
+The programme is controlled via a graphical user interface (GUI).  There are two options for installing, via conda and via pip. 
+
+
+**conda Install**
 
 1. Download the repository
 
-2. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below
+2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
-3. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
+3. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored, then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
 
-4. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored, then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
+4. Now the environment is set up you can activate it by: conda activate PyCHAM
 
-5. Now the environment is set up you can activate it by: conda activate PyCHAM
+5. Install complete
 
-6. Now you are ready to run the model: python PyCHAM
+**pip Install**
 
-7. Follow the gui directions (see below for details on the chemical scheme, xml and model input files)
+1. Inside the terminal/command prompt, create a virtual env using venv: python -m venv PyCHAM
 
-8. The 'run model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
+2. cd to this environment then activate: source bin/activate
 
-9. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
+3. Install PyCHAM from the PyPi site: python -m pip install --upgrade PyCHAM
+
+4. cd to where PyCHAM installed: cd lib/python3.6/site-packages
+
+5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install SUNDIALS and Assimulo on the PyPi Assimulo page.  
+
+6. Install complete
+
+**Once Installed**
+
+1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below
+
+2. Now you are ready to run the model: python PyCHAM
+
+3. Follow the gui directions (see below for details on the chemical scheme, xml and model input files)
+
+4. The 'run model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
+
+5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
 
 **Unit Testing and Example Run**
 
-Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
+Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
-The example run output is saved in output/Example_Run/Example_output.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.6 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.6 of PyCHAM.
 
 **Chemical Scheme .txt file**
 
-An example chemical scheme .txt file is given in the inputs folder, called 'Example_Run.txt', which has been obtained
+An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
 from the Master Chemical Mechanism website and modified.
 
 // can be used for preceding comments, as in the example.
@@ -47,14 +68,14 @@ The expression for the rate coefficient can use Fortran type scientific notation
 
 **Chemical Scheme .xml file**
 
-An example is given in the inputs folder, called 'Examples_Run_xml.xml'.  It has a two line header, the first states that the mechanism is beginning (`<mechanism>`) and the second states that the species definition is beginning (`<species_defs>`).  The end of the species list must be marked (`</species_defs>`) and finally, the end of the mechanism must be marked (`</mechanism>`). 
+An example is given in the inputs folder (of the Github repository), called 'Examples_Run_xml.xml'.  It has a two line header, the first states that the mechanism is beginning (`<mechanism>`) and the second states that the species definition is beginning (`<species_defs>`).  The end of the species list must be marked (`</species_defs>`) and finally, the end of the mechanism must be marked (`</mechanism>`). 
 
 Beneath this, every species included in the reactions of the chemical scheme must have its SMILES string given.
 
 
 **Model Variables .txt File**
 
-An example is provided in the inputs folder, called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable):
+An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable):
 
 Res_file_name = Name of folder to save results to
 

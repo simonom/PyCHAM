@@ -25,17 +25,16 @@ def run(testf):
 	
 	# --------------------------------------------------------------
 	if testf==1:
-		print('"Plot Results button works fine", GUI should now close.')
+		print('"Plot Results" button works fine')
 		return()
 	
 	# module to ask, receive and return required inputs
 	[fname, resfname, y_indx_plot, Comp0] = ui.run(1,0)
 	
 	# path to saved files
-	pathname = os.path.dirname(sys.argv[0])        
-	dir_path = os.path.abspath(pathname)    
+	dir_path = os.getcwd()    
 		
-	output_root = 'output'
+	output_root = 'PyCHAM/output'
 	filename = os.path.basename(fname)
 	filename = os.path.splitext(filename)[0]
 	# one folder for one simulation

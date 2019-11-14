@@ -16,8 +16,18 @@ import scipy.constants as si
 
 # download latest version of umansysprop
 cwd = os.getcwd() # address of current working directory
+
 if os.path.isdir(cwd + '/umansysprop'): # check if there is an existing umansysprop folder
-	shutil.rmtree(cwd + '/umansysprop') # remove existing folder
+	def handleRemoveReadonly(func, path, exc):
+		excvalue = exc[1]
+		if not os.access(path, os.W_OK):
+			# Is the error an access error ?
+			os.chmod(path, stat.S_IWUSR)
+			func(path)
+		else:
+			raise
+	shutil.rmtree(cwd + '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly) # remove existing folder, onerror will change permission of directory if needed. 
+
 sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
 git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 Repo.clone_from(git_url, (cwd + '/umansysprop'))
@@ -54,4 +64,19 @@ if int(Psat_Pa[0]*1e0)!=456 or int(Psat_Pa[1]*1e-6)!=216 or int(Psat_Pa[2]*1e32)
 	print('issue with y_dens, possibly due to UManSysProp')
 if int(y_dens[0])!=870 or int(y_dens[1])!=1133 or int(y_dens[2])!=1033 or int(y_dens[3])!=1000 or int(y_dens[4])!=1770:
 	print('issue with y_dens, possibly due to UManSysProp')
+	
+print('now removing temporary UManSysProp directory')
+
+if os.path.isdir(cwd + '/umansysprop'): # check if there is an existing umansysprop folder
+	def handleRemoveReadonly(func, path, exc):
+		excvalue = exc[1]
+		if not os.access(path, os.W_OK):
+			# Is the error an access error ?
+			os.chmod(path, stat.S_IWUSR)
+			func(path)
+		else:
+			raise
+	shutil.rmtree(cwd + '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly) # remove existing folder, onerror will change permission of directory if needed. 
+
+
 print('if no issues stated above, volat_calc is working fine, test complete')

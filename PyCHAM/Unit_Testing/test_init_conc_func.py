@@ -10,7 +10,7 @@ sys.path.append(os.path.split(dirpath)[0]) # add path for eqn_parser to system p
 
 import numpy as np
 from water_calc import water_calc
-import MCM_constants_auto
+import MCM_const
 import eqn_parser
 import scipy.constants as si
 
@@ -71,5 +71,7 @@ if y_indx_plot[0]!= 0 and y_indx_plot[1]!=1:
 	print('issue with y_indx_plot')
 if corei!=num_speci-1:
 	print('issue with corei')
+
+os.remove('Rate_coeffs.py') # remove rate coefficient file
 
 print('if no issues stated above, the init_conc_func.py code and its called on functions (listed above) are fine')

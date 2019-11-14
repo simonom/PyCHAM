@@ -100,10 +100,10 @@ print('now calling ode_gen.py with test inputs')
 print('now checking outputs')
 if int(t_out[0])!=0 or int(t_out[1])!=65:
 	print('issue with t_out')
-if int(y_mat[0,0]*1e-9)!=246 or int(y_mat[0,1]*1e-9)!=295 or int(y_mat[1,0]*1e-4)!=380 or int(y_mat[1,1]*1e-8)!=490 or int(y_mat[1,2]*1e-9)!=128 or int(y_mat[1,12]*1e-9)!=117:
+if int(y_mat[0,0]*1e-9)!=246 or int(y_mat[0,1]*1e-9)!=295 or int(y_mat[1,0]*1e35)!=441 or int(y_mat[1,1]*1e-8)!=489 or int(y_mat[1,2]*1e-9)!=123 or int(y_mat[1,12]*1e-9)!=122:
 	print('issue with y_mat, possibly due to ode solver or mov_cen_main')
 if int(Nresult[0,0])!=934 or int(Nresult[0,1])!=65 or int(Nresult[1,0])!=0 or int(Nresult[1,1])!=994:
 	print('issue with Nresult')
-if int(x2[0,0]*1e4)!=237 or int(x2[0,1]*1e4)!=743 or int(x2[1,0]*1e2)!=2 or int(x2[1,1]*1e2)!=117:
+if int(x2[0,0]*1e4)!=237 or int(x2[0,1]*1e4)!=743 or int(x2[1,0]*1e2)!=2 or int(x2[1,1]*1e2)!=127:
 	print('issue with x2')
 print('if no issue stated above, then ode_gen working fine')

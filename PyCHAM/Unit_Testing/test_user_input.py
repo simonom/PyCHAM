@@ -18,12 +18,13 @@ print('now retrieving variables from user_input.py as done in front.py')
 # call user_input
 import user_input as ui
 # module to ask, receive and return required inputs as in front
-[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
-tmax, TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, 
+[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, tstep_len,
+TEMP, PInit, RH, lat, lon, start_sim_time, save_step, Cw, 
 ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre,  
 pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, voli, volP, pconc, 
-	std, loc, scale, core_diss, light_stat, light_time, kgwt] = ui.run(0, 2)
-	
+	std, loc, scale, core_diss, light_stat, light_time, kgwt, testm] = ui.run(0, 2)
+
+
 if fname!='test':
 	print('issue with fname variable')
 if num_sb!=1:
@@ -38,8 +39,6 @@ if resfname!='test2':
 	print('issue with resfname variable')
 if tstep_len!=6:
 	print('issue with tstep_len')
-if tmax!=6:
-	print('issue with tmax variable')
 if TEMP!=7:
 	print('issue with TEMP variable')
 if PInit!=8:
@@ -92,6 +91,8 @@ if std!=33:
 	print('issue with std variable')
 if kgwt!=39:
 	print('issue with kgwt variable')
+if testm!=0:
+	print('issue with testm')
 
 	
 print('testing when called by front.py finished, if no issues printed above, then call and return is fine')
@@ -116,5 +117,7 @@ if y_indx_plot!=5:
 	print('issue with y_indx_plot variable')
 if Comp0!=6:
 	print('issue with Comp0 variable')
+
+os.remove('test_var_store.pkl') # remove pickle file
 
 print('testing when called by res_plot_super.py complete, if no issues printed above then code is fine')

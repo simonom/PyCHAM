@@ -19,7 +19,7 @@ if os.path.isfile(os.path.split(dirpath)[0]+'/PyCHAM.py') == 1:
 	print('to finish the test select the "Plot Results" button')
 	
 	# make test flag file
-	with open(os.path.split(dirpath)[0]+'/testf.txt','a+') as f:
+	with open(dirpath+'/testf.txt','w') as f:
 		f.write('testf=1')
 	
 	# call as in __main__.py

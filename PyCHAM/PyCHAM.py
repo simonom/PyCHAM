@@ -62,15 +62,10 @@ class PyCHAM(QWidget):
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 
 		# file exists)
 		dirpath = os.getcwd() # get current path
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
-			prefix = os.path.split(dirpath)[0]		
-		else:
-			prefix = 'PyCHAM'
 		
-		fname = self.openFileNameDialog()
-		if os.path.isfile(prefix+'/fname.txt'):
-			os.remove(prefix+'/fname.txt')
-		with open(prefix+'/fname.txt','a+') as f:
+		fname = self.openFileNameDialog() # ask for location of input file
+
+		with open(dirpath+'/fname.txt','w') as f:
 			f.write(fname)
 		f.close()
 	
@@ -79,17 +74,13 @@ class PyCHAM(QWidget):
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 
 		# file exists)
 		dirpath = os.getcwd() # get current path
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
-			prefix = os.path.split(dirpath)[0]		
-		else:
-			prefix = 'PyCHAM'
 		
 		xmlname = self.openFileNameDialog()
-		if os.path.isfile(prefix+'/xmlname.txt'):
-			os.remove(prefix+'/xmlname.txt')
-		with open(prefix+'/xmlname.txt','a+') as f:
+		
+		with open(dirpath+'/xmlname.txt','w') as f:
 			f.write(xmlname)
 		f.close()
+		
 	@pyqtSlot()
 	def on_click3(self):
 		inname = self.openFileNameDialog()
@@ -184,22 +175,18 @@ class PyCHAM(QWidget):
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 
 		# file exists)
 		dirpath = os.getcwd() # get current path
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
-			prefix = os.path.split(dirpath)[0]		
-		else:
-			prefix = 'PyCHAM'
 			
-		f = open(prefix+'/fname.txt','r')
+		f = open(dirpath+'/fname.txt','r')
 		content = f.readlines()
 		f.close()
 		fname = str(content[0])
-		f = open(prefix+'/xmlname.txt','r')
+		f = open(dirpath+'/xmlname.txt','r')
 		content = f.readlines()
 		f.close()
 		xmlname = str(content[0])
 		# remove temporary files
-		os.remove(prefix+'/fname.txt')
-		os.remove(prefix+'/xmlname.txt')
+		os.remove(dirpath+'/fname.txt')
+		os.remove(dirpath+'/xmlname.txt')
 		
 		# write variable values to pickle file
 		list_vars = [fname, num_sb, lowersize, uppersize, end_sim_time, 
@@ -209,7 +196,7 @@ class PyCHAM(QWidget):
 		voli, volP, pconc, std, loc, scale, core_diss, light_stat, light_time,
 		kgwt]
 			
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+		if os.path.isfile(dirpath+'/testf.txt'):
 			print('Model input buttons work successfully')
 			with open('test_var_store.pkl','wb') as f:
 				pickle.dump(list_vars,f)
@@ -225,7 +212,7 @@ class PyCHAM(QWidget):
 	def on_click4(self):
 		import front as model
 		dirpath = os.getcwd() # get current path
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+		if os.path.isfile(dirpath+'/testf.txt'):
 			testf=2	
 		else:
 			testf=0
@@ -239,7 +226,7 @@ class PyCHAM(QWidget):
 		import res_plot_super as plotter
 		
 		dirpath = os.getcwd() # get current path
-		if os.path.isfile(os.path.split(dirpath)[0]+'/testf.txt'):
+		if os.path.isfile(dirpath+'/testf.txt'):
 			testf=1		
 		else:
 			testf=0
@@ -252,7 +239,8 @@ class PyCHAM(QWidget):
 		if testf==1:
 			# remove the test flag file
 			# remove test file
-			os.remove(os.path.split(dirpath)[0]+'/testf.txt')
+			os.remove(dirpath+'/testf.txt')
+			print('test_PyCHAM complete, please close the user interface')
 		
 		
 	def openFileNameDialog(self):

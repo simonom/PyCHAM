@@ -1,5 +1,5 @@
 '''module to save PyCHAM results to files'''
-import pandas as pd
+
 import os
 import sys
 import numpy as np
@@ -19,10 +19,9 @@ def saving(filename, y_mat, t_out, Nresult, x2, numsb, y_mw, num_speci,
 	
 	if testf==1:
 		return(0) # return dummy
-	pathname = os.path.dirname(sys.argv[0])        
-	dir_path = os.path.abspath(pathname)    
-	
-	output_root = 'output'
+	dir_path = os.getcwd()
+	  
+	output_root = 'PyCHAM/output'
 	filename = os.path.basename(filename)
 	filename = os.path.splitext(filename)[0]
 	# one folder for one simulation
