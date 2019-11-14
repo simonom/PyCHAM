@@ -1,0 +1,15 @@
+PyQt5
+pickleshare
+openbabel
+numpy
+backcall
+certifi
+cycler
+decorator
+gitpython
+ipdb
+matplotlib
+llvmlite
+numba
+scipy
+xmltodict

@@ -1,8 +1,8 @@
 '''module to solve the gas-phase reactions odes, and odes for partitioning of gas-particle and gas-wall'''
 
 import numpy as np
-from assimulo.problem import Explicit_Problem
-from assimulo.solvers import CVode
+# from assimulo.problem import Explicit_Problem
+# from assimulo.solvers import CVode
 import numba
 from numba import jit, f8
 import matplotlib.pyplot as plt
