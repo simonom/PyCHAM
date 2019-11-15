@@ -5,13 +5,19 @@
 import scipy
 import numpy
 import ipdb
+import os
 
 def PhotolysisCalculation(time, lat, lon):
 
 	(theta, secx, cosx) = zenith(time, lat, lon)
 
 	J = [0.0 for i in range(62)] # modified, so that we dont have to check None type
+    # if requested, open the wavelength and total actinic flux 
+    # arrays for the hamber in question
+    fname = str(os.get.cwd()+'/inputs/wavel')
+    const = np.loadtxt(fname,delimiter=',',skiprows=0) # skiprows=1 includes first row)
     
+
     #J          L           M          N
 	J[1]=6.073E-05*cosx**(1.743)*numpy.exp(-1.0*0.474*secx)
 	J[2]=4.775E-04*cosx**(0.298)*numpy.exp(-1.0*0.080*secx)
