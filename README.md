@@ -9,7 +9,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 **conda Install**
 
-1. Download the repository
+1. Download or clone the repository from: github.com/simonom/PyCHAM
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
