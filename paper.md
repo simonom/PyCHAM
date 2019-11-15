@@ -34,8 +34,8 @@ affiliations:
    index: 2
  - name: Research Computing Services, University of Manchester
    index: 3
-date: 5 November 2019
-bibliography: paper_refs.bib
+date: 15 November 2019
+bibliography: paper.bib
 ---
 
 # Summary
