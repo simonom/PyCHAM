@@ -36,6 +36,7 @@ def lognormal(num_bins, total_conc, std, lowersize, uppersize, loc, scale):
 	# ---------------------------------
 	# Inputs:
 	
+	# num_bins - number of size bins (not including wall)
 	# loc - shift of lognormal probability distribution function for seed particles 
 	# number-size distribution (um)
 	# scale - scaling factor of lognormal probability distribution function for seed 
@@ -54,22 +55,22 @@ def lognormal(num_bins, total_conc, std, lowersize, uppersize, loc, scale):
 		
 	# constant volume ratio method --------------
 	# constant volume ratio (13.3 Jacobson 2005)
-# 		Vrat = (vNb/v1)**(1/(num_bins-2))
+# 		Vrat = (vNb/v1)**(1/(num_bins-1))
 	# volume at centre of each size bin (um3) (13.2 Jacobson 2005)
-# 		Varr = v1*(Vrat**np.arange(0, num_bins-1))
+# 		Varr = v1*(Vrat**np.arange(0, num_bins))
 # 		Varr = np.append(Varr, ((4.0*np.pi)/3.0)*(1.0**3.0)) # wall volume (um3)
 # 		# radius at centre of each size bin (um)
 # 		x_output = ((3.0/(4.0*np.pi))*Varr[0:-1])**(1.0/3.0)
 	# ---------------------------------------
 	# lognormal method
 # 		x_output = np.exp(np.linspace(np.log(lowersize), 
-# 						np.log(uppersize), num=(num_bins-1)))
+# 						np.log(uppersize), num=(num_bins)))
 	# radius bounds on size bins (um)
 # 		rad_bounds = np.exp((np.log(x_output[1:-1])+np.log(x_output[0:-2]))/2.0)
 	
 	# ---------------------------------------
 	# linear method
-	rad_bounds = np.linspace(lowersize, uppersize, (num_bins))
+	rad_bounds = np.linspace(lowersize, uppersize, (num_bins+1))
 	rwid = (rad_bounds[1]-rad_bounds[0]) # width of size bins (um)
 	x_output = rad_bounds[0:-1]+rwid/2.0 # particle radius (um)
 
@@ -83,15 +84,15 @@ def lognormal(num_bins, total_conc, std, lowersize, uppersize, loc, scale):
 		# distribution of seed particles fully captured
 		hires = np.linspace(lowersize, uppersize, 1000)
 		pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
-		pdf_out = np.zeros((num_bins-1))
+		pdf_out = np.zeros((num_bins))
 		# now loop through actual bins and sum probabilities bounded by them
-		for i in range(num_bins-1):
+		for i in range(num_bins):
 			hires_ind = (hires>=rad_bounds[i])*(hires<rad_bounds[i+1])
 			pdf_out[i] = pdf_output[hires_ind].sum()
 		# number concentration of all size bins (# particle/cc (air))
 		Nperbin = (pdf_out/sum(pdf_out))*total_conc
 	else:
-		Nperbin = np.zeros((num_bins-1))
+		Nperbin = np.zeros((num_bins))
 	
 	# volume of particles per size bin (um3) - use with lognormal method
 	Varr = ((4.0*np.pi)/3.0)*(x_output**3.0)

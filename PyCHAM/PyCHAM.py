@@ -7,6 +7,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 import pickle # for storing inputs
 import threading # for calling on further PyCHAM functions
 import os
+import numpy as np
 
 class PyCHAM(QWidget):
 
@@ -153,9 +154,16 @@ class PyCHAM(QWidget):
 			if key == 'Comp0': # strip removes white space
 				Comp0 = [str(i).strip() for i in (value.split(','))]
 			if key == 'voli':
-				voli = [int(i) for i in (value.split(','))]
+				
+				if value.split(',')==['\n']:
+					voli = np.empty(0)
+				else:
+					voli = [int(i) for i in (value.split(','))]	
 			if key == 'volP':
-				volP = [float(i) for i in (value.split(','))]
+				if value.split(',')==['\n']:
+					volP = np.empty(0)
+				else:
+					volP = [float(i) for i in (value.split(','))]
 			if key == 'pconc':
 				pconc = float(value.strip())
 			if key == 'std':
@@ -171,6 +179,11 @@ class PyCHAM(QWidget):
 			if key == 'light_stat':
 				light_stat = [int(i) for i in (value.split(','))]
 		
+		# can't have a recording time step (s) less than the ode solver time step (s),
+		# so force to be equal and tell user
+		if save_step<tstep_len:
+			print('Recording time step cannot be less than the ode solver time step, so increasing recording time step to be equal to input ode solver time step')
+			save_step = tstep_len
 		# get names of chemical scheme and xml files
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 
 		# file exists)

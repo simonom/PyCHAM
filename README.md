@@ -9,7 +9,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 **conda Install**
 
-1. Download or clone the repository from: github.com/simonom/PyCHAM
+1. Download the repository
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
@@ -49,7 +49,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
-The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.0.6 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.2.0 of PyCHAM.
 
 **Chemical Scheme .txt file**
 
@@ -75,7 +75,7 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 
 **Model Variables .txt File**
 
-An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable):
+An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. voli = ):
 
 Res_file_name = Name of folder to save results to
 

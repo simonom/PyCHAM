@@ -69,7 +69,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
 	step = 0 # ode time interval step number
-	t0 = t # remember original suggested time step
+	t0 = t # remember original suggested time step (s)
 	# final +1 for ELVOC in newly nucleating particles
 	y0 = np.zeros((num_speci+num_sb*num_speci))	
 	y0[:] = y[:] # initial concentrations (molecules/cc (air))
@@ -120,14 +120,15 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		
 		# update reaction rate coefficients
 		reac_coef = rate_valu_calc(RO2_indices, y[H2Oi], TEMP, lightm, y)
-
+		
+		
 		y0[:] = y[:] # update initial concentrations (molecules/cc (air))
 		# update particle volumes at start of time step (um3)
 		Vstart = Varr*N_perbin
 		redt = 1 # reset time reduction flag
 		t = tnew # reset integration time (s)
 		
-		if num_sb>0:
+		if num_sb>1:
 			# update partitioning coefficients
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
@@ -136,7 +137,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		# ensure no confusion that components are present due to low value fillers for  
 		# concentrations (molecules/cc (air))
 		y0[y0==1.0e-40] = 0.0
-			
+		print()
 		# enter a while loop that continues to decrease the time step until particle
 		# size bins don't change by more than one size bin (given by moving centre)
 		while redt == 1:
@@ -154,11 +155,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 				for i in range(num_eqn): # equation loop
 			
 					# gas-phase rate of change (molecules/cc (air).s)
-					gprate = ((y[rindx[i, :]]**rstoi[i, :]).prod())*reac_coef[i]
-					dydt[rindx[i, :]] -= gprate*rstoi[i, :] # loss of reactants
-					dydt[pindx[i, :]] += gprate*pstoi[i, :] # gain of products
 					
-				if num_sb>0:
+					gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i]
+					dydt[rindx[i, 0:nreac[i]]] -= gprate # loss of reactants
+					dydt[pindx[i, 0:nprod[i]]] += gprate # gain of products
+	
+				if num_sb>1:
 						
 					# -----------------------------------------------------------
 					for ibin in range(num_sb-1): # size bin loop
@@ -184,24 +186,24 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 						# particle-phase change
 						dydt[num_speci*(ibin+1):num_speci*(ibin+2)] += dydt_all
 						
-					# -----------------------------------------------------------
-					# gas-wall partitioning eq. 14 of Zhang et al.  
-					# (2015) (https://www.atmos-chem-phys.net/15/4197/2015/
-					# acp-15-4197-2015.pdf) (molecules/cc.s (air))
-						
-					# concentration at wall (molecules/cc (air))
-					Csit = y[num_speci*num_sb:num_speci*(num_sb+1)]
-					Csit = (Psat[:,0]*(Csit/Cw))
+				# -----------------------------------------------------------
+				# gas-wall partitioning eq. 14 of Zhang et al.  
+				# (2015) (https://www.atmos-chem-phys.net/15/4197/2015/
+				# acp-15-4197-2015.pdf) (molecules/cc.s (air))
 					
-					# eq. 14 of Zhang et al. (2015) 
-					# (https://www.atmos-chem-phys.net/15/4197/2015/
-					# acp-15-4197-2015.pdf) (molecules/cc.s (air))
-					dydt_all = (kwgt*Cw)*(y[0:num_speci]-Csit)
+				# concentration at wall (molecules/cc (air))
+				Csit = y[num_speci*num_sb:num_speci*(num_sb+1)]
+				Csit = (Psat[:,0]*(Csit/Cw))
+					
+				# eq. 14 of Zhang et al. (2015) 
+				# (https://www.atmos-chem-phys.net/15/4197/2015/
+				# acp-15-4197-2015.pdf) (molecules/cc.s (air))
+				dydt_all = (kwgt*Cw)*(y[0:num_speci]-Csit)
 						
-					# gas-phase change
-					dydt[0:num_speci] -= dydt_all
-					# wall concentration change
-					dydt[num_speci*num_sb:num_speci*(num_sb+1)] += dydt_all
+				# gas-phase change
+				dydt[0:num_speci] -= dydt_all
+				# wall concentration change
+				dydt[num_speci*num_sb:num_speci*(num_sb+1)] += dydt_all
 					
 				return(dydt)
 				

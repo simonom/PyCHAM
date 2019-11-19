@@ -19,7 +19,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 	# total_pconc - total initial particle concentration (#/cc (air))
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (cm3/molecule.s)
 	# --------------------------------------------------------------
-	if total_pconc>0.0:
+	if total_pconc>0.0: # if seed particles present
 		sbstep = 0 # count on size bins
 		
 		for radius in x:
@@ -76,8 +76,11 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 				
 			sbstep += 1
 	else:
-		radius = np.zeros((len(x)))
-		radius[:] = x[:]
+		if num_sb>1: 
+			radius = np.zeros((len(x)))
+			radius[:] = x[:]
+		else:
+			radius = 0.0
 	
 	# first guess of wall-phase water concentration based on RH = mole 
 	# fraction (molecules/cc (air))
@@ -91,11 +94,6 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 	# allow gas-phase water to equilibrate with walls
 	while np.abs(y[H2Oi]-Psat[H2Oi,0]*((y[num_speci*(num_sb)+H2Oi]/Cw)))>1.0e8:
 		
-		# update partitioning coefficients
-		[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
-							surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-							x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-							H2Oi)
 												
 		# concentration of water at wall surface in gas phase (molecules/cc (air))
 		Csit = Psat[H2Oi,0]*((y[num_speci*(num_sb)+H2Oi]/Cw))

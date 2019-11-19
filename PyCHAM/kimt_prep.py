@@ -12,7 +12,7 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	# num_speci - number of components
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# Cw - effective absorbing mass of wall (g/m3 (air))
-	# kgwt - mass transfer coefficient for vapor-wall partitioning (m3/ug.s)
+	# kgwt - mass transfer coefficient for vapor-wall partitioning (m3/g.s)
 	# -----------------------------------------------------------------
 	
 	if testf == 1: # if in testing mode (for test_front.py)

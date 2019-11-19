@@ -23,7 +23,7 @@ def run(source, testf):
 		var_store_name = 'test_var_store.pkl'
 	else:
 		var_store_name = 'PyCHAM/var_store.pkl'
-		
+	
 	with open(var_store_name,'rb') as pk:
 		# read in variables from gui
 		if source == 0: # when called from front.py

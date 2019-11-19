@@ -78,7 +78,8 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 
 	Psat = (np.power(10.0, Psat)*101325.0) # convert to Pa
 	# manually assigned vapour pressures (Pa) (including seed component (if applicable))
-	Psat[voli, 0] = volP
+	if len(voli)>0:
+		Psat[voli, 0] = volP
 	Psat_Pa = np.zeros((len(Psat), 1)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[:, 0] = Psat[:, 0]
     	
