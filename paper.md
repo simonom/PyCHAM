@@ -51,8 +51,14 @@ The model employs non-equilibrium equations to simulate the known processes occu
 $$\frac{d[i]}{dt} = \pm k_{n}[a]^{a_{s}}[b]^{b_{s}},
 $$
 
-where square brackets represent concentrations, $i$ is the affected species, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
+where square brackets represent concentrations, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
 
+The gas-particle partitioning equation is:
+
+$$\frac{d[i]}{dt} = \pm k_{i}([i]-p^{0}_{i}x_{i}K_{v}),
+$$
+
+where $k$ is the mass transfer coefficient, $[i]$ is the gas-phase concentration, $p^{0}$ is the liquid saturation vapour pressure, $x$ is mole fraction and $K_{v}$ is the kelvin effect.
 
 particle loss to walls, coagulation and nucleation.  It takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
