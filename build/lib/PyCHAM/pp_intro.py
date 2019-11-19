@@ -14,7 +14,7 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 			
 	# inputs -----------------------------------
 	# y_mw - molecular weight (g/mol) of components (num_speci, 1)
-	# num_sb - number of size bins
+	# num_sb - number of size bins (excluding wall)
 	# lowersize - lowest size bin radius bound (um)
 	# uppersize - largest size bin radius bound (um)
 	# total_pconc - starting particle concentration (# particle/cc (air))
@@ -39,7 +39,6 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	if testf==1:
 		return(0,0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
-	num_sb += 1 # add one to size bin number to account for wall
 	
 	# if elements of nuc_comp are relative index (-n), change to absolute
 	if nuc_comp<0:
@@ -50,8 +49,8 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	
 	# create dummy variables if no size bins
 	if num_sb==0:
-		N_perbin = 0.0
-		x = 0.0
+		N_perbin = np.zeros((1,1))
+		x = np.zeros((1,1))
 		Varr = 0.0
 		Vbou = 0.0
 		rad0 = 0.0
@@ -63,10 +62,12 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 	if testf==2:
 		print('calling Size_distributions.lognormal')
 	if num_sb>1:
+		
 		[N_perbin, x, rbou, rwid, Vbou, Varr] = Size_distributions.lognormal(num_sb, 
 									total_pconc, std, lowersize, uppersize, loc, scale)
 		if testf==2:
 			print('finished with Size_distributions.lognormal')
+
 	if num_sb == 1:
 		N_perbin = np.array((total_pconc)) # particles per cc (air)
 		x = np.zeros(1)
@@ -85,6 +86,8 @@ def pp_intro(y, num_speci, spec_list, Pybel_objects, TEMP, H2Oi,
 		Vol0 = np.zeros((len(Varr)))
 		Vol0[:] = Varr[:]
 	
+	num_sb += 1 # add one to size bin number to account for wall
+
 	# append particle-phase concentrations of species to y (molecules/cc (air))
 	# note, there's a very small amount of each species in the particle phase to
 	# prevent nan errors later on
