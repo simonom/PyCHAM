@@ -46,19 +46,26 @@ With air quality and climate models increasingly important to guiding sustainabl
 
 Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere and the partitioning of semi-volatile vapours to soot aerosol.  Here is the repository: github.com/simonom/PyCHAM.
 
-The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls.  The general equation for chemical reactions is: 
+The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls.  The general equation for chemical reactions is [@Jacobson:2005]: 
 
-$$\frac{d[i]}{dt} = \pm k_{n}[a]^{a_{s}}[b]^{b_{s}},
+$$\frac{d[i_{g}]}{dt} = \pm k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
 $$
 
-where square brackets represent concentrations, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
+where square brackets represent concentrations, with $_{g}$ representing the gas phase, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
 
-The gas-particle partitioning equation is:
+The gas-particle partitioning equation is [@Jacobson:2005]:
 
-$$\frac{d[i]}{dt} = \pm k_{i}([i]-p^{0}_{i}x_{i}K_{v}),
+$$\frac{d[i_{g}]}{dt} = -k_{i}([i_{g}]-p^{0}_{i}x_{i}K_{v}),
 $$
 
-where $k$ is the mass transfer coefficient, $[i]$ is the gas-phase concentration, $p^{0}$ is the liquid saturation vapour pressure, $x$ is mole fraction and $K_{v}$ is the kelvin effect.
+where $k$ is the mass transfer coefficient, $[i]$ is the gas-phase concentration, $p^{0}$ is the liquid saturation vapour pressure, $x$ is particle-phase mole fraction and $K_{v}$ is the kelvin effect.
+
+Gas partitioning to walls is an area of ongoing research [@Zhang:2015], therefore we provide an equation analogous to gas-particle partitioning given above:
+
+$$\frac{d[i_{g}]}{dt} = -k_{gwt}C_{w}([i_{g}]-p^{0}_{i}\frac{[i_{w}]}{C_{w}}),
+$$
+
+where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.
 
 particle loss to walls, coagulation and nucleation.  It takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
