@@ -58,16 +58,16 @@ The gas-particle partitioning equation is [@Jacobson:2005]:
 $$\frac{d[i_{g}]}{dt} = -k_{i}([i_{g}]-p^{0}_{i}x_{i}K_{v}),
 $$
 
-where $k$ is the mass transfer coefficient, $[i]$ is the gas-phase concentration, $p^{0}$ is the liquid saturation vapour pressure, $x$ is particle-phase mole fraction and $K_{v}$ is the kelvin effect.
+where $k$ is the mass transfer coefficient, $p^{0}$ is the liquid saturation vapour pressure, $x$ is particle-phase mole fraction and $K_{v}$ is the kelvin effect.
 
 Gas partitioning to walls is an area of ongoing research [@Zhang:2015], therefore we provide an equation analogous to gas-particle partitioning given above:
 
 $$\frac{d[i_{g}]}{dt} = -k_{gwt}C_{w}([i_{g}]-p^{0}_{i}\frac{[i_{w}]}{C_{w}}),
 $$
 
-where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.
+where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.  Users set the values of $k_{gwt}$ and $C_{w}$ as walls effects vary significantly between chambers.
 
-Outside the ODE solver, particle loss to walls, coagulation and nucleation are also solved, with equations for the former two given in [@Jacobson:2005] and the parameters inside the nucleation expression (for relevent experiments) tuned by the user.  PyCHAM takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
+Outside the ODE solver, particle loss to walls, coagulation and nucleation are also solved, with equations for the former two given in @Jacobson:2005 and the parameters inside the nucleation expression (for relevent experiments) tuned by the user.  PyCHAM takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
 Several variables change between different environmental chambers and different experiments; therefore, the software is designed to allow the user to set these with ease.
 
