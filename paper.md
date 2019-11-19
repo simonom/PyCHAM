@@ -48,7 +48,7 @@ Funding for model development has been provided by the EUROCHAMP-2020 research p
 
 The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls, particle loss to walls.  The general equation for chemical reactions is: 
 
-$$test
+$$\frac{d[i]}{dt}
 $$
 
 
