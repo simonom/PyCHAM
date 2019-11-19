@@ -46,13 +46,13 @@ With air quality and climate models increasingly important to guiding sustainabl
 
 Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere and the partitioning of semi-volatile vapours to soot aerosol.  Here is the repository: github.com/simonom/PyCHAM.
 
-The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls, particle loss to walls.  The general equation for chemical reactions is: 
+The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls.  The general equation for chemical reactions is: 
 
-$$\frac{d[i]}{dt} = \pm k_{n}
+$$\frac{d[i]}{dt} = \pm k_{n}[a]^{a_{s}}[b]^{b_{s}}
 $$
 
 
-coagulation and nucleation.  It takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
+particle loss to walls, coagulation and nucleation.  It takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
 Several variables change between different environmental chambers and different experiments; therefore, the software is designed to allow the user to set these with ease.
 
