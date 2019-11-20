@@ -44,17 +44,32 @@ PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access O-D box
 
 With air quality and climate models increasingly important to guiding sustainable societies, the accuracy of simulations must suffice [@Tong:2019].  However, research shows that the simulated aerosol effects in these models provides a relatively high amount of uncertainty [@Johnson:2018].  The combination of box models like PyCHAM with environmental chamber measurements to better constrain aerosol processes is therefore necessary to ultimately improve societal sustainability.
 
-Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere and the partitioning of semi-volatile vapours to soot aerosol.  Here is the repository: github.com/simonom/PyCHAM.
+Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere.  The autoxidation process has recently been discovered to play a significant role in the formation of airbourne particulates [@Ehn:2014], however its exact chemical mechanism is yet to be elucidated.  Through comparison of chamber measurements with PyCHAM outputs using various mechanism possibilities, a constrained autoxidation chemical scheme is being generated.  Here is the model repository: github.com/simonom/PyCHAM.
 
-The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations for gas-phase photochemistry and gas partitioning to particles and walls, particle loss to walls.  The general equation for chemical reactions is:
-$$\frac{d[i]}}{dt} = \pm k[a]^{a_{s}}[b]^{b_{s}}$$
+The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package for ODE solvers is called on [@Andersson:2015], using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
 
+$$\frac{d[i_{g}]}{dt} = \pm k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
+$$
 
-coagulation and nucleation.  It takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
+where square brackets represent concentrations, with $_{g}$ representing the gas phase, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
+
+The gas-particle partitioning equation is [@Jacobson:2005]:
+
+$$\frac{d[i_{g}]}{dt} = -k_{i}([i_{g}]-p^{0}_{i}x_{i}K_{v}),
+$$
+
+where $k$ is the mass transfer coefficient, $p^{0}$ is the liquid saturation vapour pressure, $x$ is particle-phase mole fraction and $K_{v}$ is the kelvin effect.
+
+Gas partitioning to walls is an area of ongoing research [@Zhang:2015], therefore we provide an equation analogous to gas-particle partitioning given above:
+
+$$\frac{d[i_{g}]}{dt} = -k_{gwt}C_{w}([i_{g}]-p^{0}_{i}\frac{[i_{w}]}{C_{w}}),
+$$
+
+where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.  Users set the values of $k_{gwt}$ and $C_{w}$ as walls effects vary significantly between chambers.
+
+Outside the ODE solver, particle loss to walls, coagulation and nucleation are also solved, with equations for the former two given in @Jacobson:2005 and the parameters inside the nucleation expression (for relevent experiments) tuned by the user.  PyCHAM takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
 Several variables change between different environmental chambers and different experiments; therefore, the software is designed to allow the user to set these with ease.
-
-Central to the model is solution of the ordinary differential equations for the rate of gas-phase chemistry, gas-particle partitioning and gas-wall partitioning.  Here, the CVode function of the Assimulo package for ODE solvers is called on [@Andersson:2015], using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].
 
 # Acknowledgements
 
