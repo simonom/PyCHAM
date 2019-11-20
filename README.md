@@ -29,7 +29,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 4. cd to where PyCHAM installed: cd lib/python3.6/site-packages
 
-5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install SUNDIALS and Assimulo on the PyPi Assimulo page.  
+5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install SUNDIALS and Assimulo on the PyPi Assimulo page.  Please also install the openbabel package. 
 
 6. Install complete
 
