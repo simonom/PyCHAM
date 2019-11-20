@@ -24,3 +24,4 @@ install:
   
   - conda activate test-environment
   - python setup.py install
+script: PyCHAM
