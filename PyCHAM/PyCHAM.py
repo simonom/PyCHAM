@@ -60,8 +60,7 @@ class PyCHAM(QWidget):
 
 	@pyqtSlot()
 	def on_click1(self):
-		# set path prefix based on whether this is a test or not (i.e. whether test flag 
-		# file exists)
+		
 		dirpath = os.getcwd() # get current path
 		
 		fname = self.openFileNameDialog() # ask for location of input file
@@ -72,8 +71,7 @@ class PyCHAM(QWidget):
 	
 	@pyqtSlot()
 	def on_click2(self):
-		# set path prefix based on whether this is a test or not (i.e. whether test flag 
-		# file exists)
+		
 		dirpath = os.getcwd() # get current path
 		
 		xmlname = self.openFileNameDialog()
@@ -84,7 +82,7 @@ class PyCHAM(QWidget):
 		
 	@pyqtSlot()
 	def on_click3(self):
-		inname = self.openFileNameDialog()
+		inname = self.openFileNameDialog() # name of model inputs file
 		
 		# open the file
 		inputs = open(inname, mode='r')

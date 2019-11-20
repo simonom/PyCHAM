@@ -23,5 +23,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-install_requires=["PyQt5","pickleshare","openbabel","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","llvmlite","numba","scipy","xmltodict"]
+install_requires=["PyQt5","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","llvmlite","numba","scipy","xmltodict"]
 )

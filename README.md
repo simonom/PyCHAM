@@ -45,9 +45,11 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
 
-## Unit Testing and Example Run
+## Unit Testing, Integration Testing and Example Run
 
 Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
+
+Integration testing can be completed using the '.travis.yml' file at the website: travis-ci.org.
 
 The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.2.1 of PyCHAM.
 
