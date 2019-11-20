@@ -7,7 +7,6 @@ channels:
   - anaconda
   - defaults
 before_install:
-  - sudo apt-get -y install _libgcc_mutex=0.1=main
   - sudo apt-get -y install assimulo=3.0=py37hc04db61_1007
   - sudo apt-get -y install backcall=0.1.0=py_0
   - sudo apt-get -y install bzip2=1.0.8=h516909a_0
