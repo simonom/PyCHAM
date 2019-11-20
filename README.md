@@ -9,7 +9,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 ## conda Install
 
-1. Download the repository from github.com/simonom/PyCHAM
+1. Download the PyCHAM repository from github.com/simonom/PyCHAM or data.eurochamp.org/modelling-tools/
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
@@ -87,7 +87,7 @@ Time_step = Maximum time interval for ode (s)
 
 Recording_time_step = Time interval for recording results (s)
 
-Number_size_bins = Number of size bins (excluding wall)
+Number_size_bins = Number of size bins (excluding wall), please use zero if no particles to be modelled
 
 lower_part_size = Radius of smallest size bin boundary (um)
 

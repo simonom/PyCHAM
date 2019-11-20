@@ -1,3 +1,5 @@
+# site for using conda with Travis-CI: https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/use-conda-with-travis-ci.html
+
 language: python
 
 install:

@@ -1,5 +1,5 @@
 Res_file_name = Example_output
-Total_model_time = 14400.0
+Total_model_time = 1.0
 Time_step = 60.0
 Recording_time_step = 60.0
 Number_size_bins = 2

@@ -98,61 +98,148 @@ class PyCHAM(QWidget):
 			key, value = in_list[i].split('=')
 			key = key.strip() # a string
 			if key == 'Res_file_name':
+				if value.split(',')==['\n']:
+					print('Error: no requested results file name detected in model inputs file, please supply')
+					sys.exit()
 				resfname = str(value.strip())
 			if key == 'Total_model_time':
-				end_sim_time = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Error: no total model run time detected in model inputs file, please supply')
+					sys.exit()
+				else:
+					end_sim_time = float(value.strip())
 			if key == 'Time_step':
-				tstep_len = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Notice: No model time step detected in model inputs file, defaulting to 60s')
+					tstep_len = float(60.0)
+				else:
+					tstep_len = float(value.strip())
 			if key == 'Recording_time_step':
-				save_step = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Notice: no recording time step detected in model inputs file, defaulting to 60s')
+					save_step = float(60.0)
+				else:
+					save_step = float(value.strip())
 			if key == 'Number_size_bins':
-				num_sb = int(value.strip())
+				if value.split(',')==['\n']:
+					print('Notice: no size bin number detected in model inputs, defaulting to zero')
+					num_sb = int(0)
+				else:
+					num_sb = int(value.strip())
 			if key == 'lower_part_size':
-				lowersize = float(value.strip())
+				if value.split(',')==['\n']:
+					lowersize = float(0.0)
+				else:
+					lowersize = float(value.strip())
 			if key == 'upper_part_size':
-				uppersize = float(value.strip())
+				if value.split(',')==['\n']:
+					uppersize = float(0.0)
+				else:
+					uppersize = float(value.strip())
 			if key == 'mass_trans_coeff':
-				kgwt = float(value.strip())
+				if value.split(',')==['\n']:
+					kgwt = float(0.0)
+				else:
+					kgwt = float(value.strip())
 			if key == 'eff_abs_wall_massC':
-				Cw = float(value.strip())
+				if value.split(',')==['\n']:
+					Cw = float(0.0)
+				else:
+					Cw = float(value.strip())
 			if key == 'Temperature':
-				TEMP = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Error: no air temperature detected in model inputs file')
+					sys.exit()
+				else:
+					TEMP = float(value.strip())
 			if key == 'PInit':
-				PInit = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Error: no air pressure detected in model inputs file')
+					sys.exit()
+				else:
+					PInit = float(value.strip())
 			if key == 'RH':
-				RH = float(value.strip())
+				if value.split(',')==['\n']:
+					print('Error: no relative humidity detected in model inputs file')
+					sys.exit()
+				else:
+					RH = float(value.strip())
 			if key == 'lat':
-				lat = float(value.strip())
+				if value.split(',')==['\n']:
+					lat = float(0.0)
+				else:
+					lat = float(value.strip())
 			if key == 'lon':
-				lon = float(value.strip())
-			if key == 'daytime_start':
-				dt_start = float(value.strip())
-			if key == 'ChamSA':
-				ChamSA = float(value.strip())
-			if key == 'nucv1':
-				nucv1 = float(value.strip())
+				if value.split(',')==['\n']:
+					lon = float(0.0)
+				else:
+					lon = float(value.strip())
+			if key == 'daytime_start': # for outdoor actinic flux equation
+				if value.split(',')==['\n']:
+					dt_start = float(0.0)
+				else:
+					dt_start = float(value.strip())
+			if key == 'ChamSA': # chamber surface area used for particle loss to walls
+				if value.split(',')==['\n']:
+					ChamSA = float(0.0)
+				else:
+					ChamSA = float(value.strip())
+			if key == 'nucv1': # first parameter in the nucleation equation
+				if value.split(',')==['\n']:
+					nucv1 = float(0.0)
+				else:
+					nucv1 = float(value.strip())
 			if key == 'nucv2':
-				nucv2 = float(value.strip())
+				if value.split(',')==['\n']:
+					nucv2 = float(0.0)
+				else:
+					nucv2 = float(value.strip())
 			if key == 'nucv3':
-				nucv3 = float(value.strip())
-			if key == 'nuc_comp':
-				nuc_comp = int(value.strip())
+				if value.split(',')==['\n']:
+					nucv3 = float(0.0)
+				else:
+					nucv3 = float(value.strip())
+			if key == 'nuc_comp': # index of the nucleating component
+				if value.split(',')==['\n']:
+					nuc_comp = float(0.0)
+				else:
+					nuc_comp = int(value.strip())
 			if key == 'inflectDp':
-				inflectDp = float(value.strip())
+				if value.split(',')==['\n']:
+					inflectDp = float(0.0)
+				else:
+					inflectDp = float(value.strip())
 			if key == 'Grad_pre_inflect':
-				pwl_xpre = float(value.strip())
+				if value.split(',')==['\n']:
+					pwl_xpre = float(0.0)
+				else:
+					pwl_xpre = float(value.strip())
 			if key == 'Grad_post_inflect':
-				pwl_xpro = float(value.strip())
+				if value.split(',')==['\n']:
+					pwl_xpro = float(0.0)
+				else:
+					pwl_xpro = float(value.strip())
 			if key == 'Kern_at_inflect':
-				inflectk = float(value.strip())
+				if value.split(',')==['\n']:
+					inflectk = float(0.0)
+				else:
+					inflectk = float(value.strip())
 			if key == 'Rader_flag':
-				Rader = int(value.strip())
-			if key == 'C0':
-				C0 = [float(i) for i in (value.split(','))]
+				if value.split(',')==['\n']:
+					Rader = int(0)
+				else:
+					Rader = int(value.strip())
+			if key == 'C0': # initial concentrations of components given in Comp0
+				if value.split(',')==['\n']:
+					C0 = np.empty(0)
+				else:
+					C0 = [float(i) for i in (value.split(','))]
 			if key == 'Comp0': # strip removes white space
-				Comp0 = [str(i).strip() for i in (value.split(','))]
+				if value.split(',')==['\n']:
+					Comp0 = np.empty('none')
+				else:
+					Comp0 = [str(i).strip() for i in (value.split(','))]
 			if key == 'voli':
-				
 				if value.split(',')==['\n']:
 					voli = np.empty(0)
 				else:
@@ -163,19 +250,40 @@ class PyCHAM(QWidget):
 				else:
 					volP = [float(i) for i in (value.split(','))]
 			if key == 'pconc':
-				pconc = float(value.strip())
+				if value.split(',')==['\n']:
+					pconc = np.empty(0.0)
+				else:
+					pconc = float(value.strip())
 			if key == 'std':
-				std = float(value.strip())
+				if value.split(',')==['\n']:
+					std = np.empty(0.0)
+				else:
+					std = float(value.strip())
 			if key == 'loc':
-				loc = float(value.strip())
+				if value.split(',')==['\n']:
+					loc = np.empty(0.0)
+				else:
+					loc = float(value.strip())
 			if key == 'scale':
-				scale = float(value.strip())
+				if value.split(',')==['\n']:
+					scale = np.empty(0.0)
+				else:
+					scale = float(value.strip())
 			if key == 'core_diss':
-				core_diss = float(value.strip())
+				if value.split(',')==['\n']:
+					core_diss = np.empty(0.0)
+				else:
+					core_diss = float(value.strip())
 			if key == 'light_time':
-				light_time = [float(i) for i in (value.split(','))]
+				if value.split(',')==['\n']:
+					light_time = np.empty(0.0)
+				else:
+					light_time = [float(i) for i in (value.split(','))]
 			if key == 'light_stat':
-				light_stat = [int(i) for i in (value.split(','))]
+				if value.split(',')==['\n']:
+					light_stat = np.empty(0)
+				else:
+					light_stat = [int(i) for i in (value.split(','))]
 		
 		# can't have a recording time step (s) less than the ode solver time step (s),
 		# so force to be equal and tell user
