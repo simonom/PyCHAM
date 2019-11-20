@@ -7,7 +7,7 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 The programme is controlled via a graphical user interface (GUI).  There are two options for installing, via conda and via pip. 
 
 
-# conda Install
+## conda Install
 
 1. Download the repository from github.com/simonom/PyCHAM
 
@@ -19,7 +19,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 5. Install complete
 
-# pip Install
+## pip Install
 
 1. Inside the terminal/command prompt, create a virtual env using venv: python -m venv PyCHAM
 
@@ -33,7 +33,7 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 6. Install complete
 
-# Once Installed
+## Once Installed
 
 1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below
 
@@ -45,13 +45,13 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
 
-# Unit Testing and Example Run
+## Unit Testing and Example Run
 
 Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
 The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.2.1 of PyCHAM.
 
-# Chemical Scheme .txt file
+## Chemical Scheme .txt file
 
 An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
 from the [Master Chemical Mechanism website](http://mcm.leeds.ac.uk/MCM/) and modified.
@@ -66,14 +66,14 @@ The rate coefficients must adhere to the following rules:
 The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; MCM (master chemical mechanism) rate constants are accepted, e.g. KMT01, as are MCM photolysis rates, e.g. J<1> ;rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py; rate coefficients may also be a function of MCM names such as RO2.
 
 
-# Chemical Scheme .xml file
+## Chemical Scheme .xml file
 
 An example is given in the inputs folder (of the Github repository), called 'Examples_Run_xml.xml'.  It has a two line header, the first states that the mechanism is beginning (`<mechanism>`) and the second states that the species definition is beginning (`<species_defs>`).  The end of the species list must be marked (`</species_defs>`) and finally, the end of the mechanism must be marked (`</mechanism>`). 
 
 Beneath this, every species included in the reactions of the chemical scheme must have its SMILES string given.
 
 
-# Model Variables .txt File
+## Model Variables .txt File
 
 An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. voli = ):
 
@@ -161,6 +161,6 @@ light_status = 1 for lights on and 0 for lights off, with times given in light_t
 				(above), minimum requirement is stating the status at the start and end
 				time of the experiment
 	
-# Acknowledgements
+## Acknowledgements
 
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.
