@@ -4,7 +4,7 @@ Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 resea
 
 PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.
 
-The programme is controlled via a graphical user interface (GUI).  There are two options for installing, via conda and via pip. 
+The programme is controlled via a graphical user interface (GUI).  There are two options for installing, via conda and via pip.  Experience indicates that the conda install is more straightforward than the pip, therefore we recommend this.
 
 
 ## conda Install
@@ -15,21 +15,23 @@ The programme is controlled via a graphical user interface (GUI).  There are two
 
 3. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored, then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
 
-4. Now the environment is set up you can activate it by: conda activate PyCHAM
+4. This will install all PyCHAM dependencies, no need for further installations.
 
-5. Install complete
+5. Now the environment is set up you can activate it by typing into terminal: conda activate PyCHAM
+
+6. Install complete
 
 ## pip Install
 
-1. Inside the terminal/command prompt, create a virtual env using venv: python -m venv PyCHAM
+1. Inside the terminal/command prompt, create a virtual env using venv by typing: python -m venv PyCHAM
 
-2. cd to this environment then activate: source bin/activate
+2. cd to this environment then activate by typing into terminal/command prompt: source bin/activate
 
 3. Install PyCHAM from the PyPi site: python -m pip install --upgrade PyCHAM
 
 4. cd to where PyCHAM installed: cd lib/python3.6/site-packages
 
-5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install SUNDIALS and Assimulo on the PyPi Assimulo page.  Please also install the openbabel package. 
+5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install [SUNDIALS](https://computing.llnl.gov/projects/sundials/sundials-software) and [Assimulo](https://jmodelica.org/assimulo/installation.html).  Please also install the [openbabel](https://pypi.org/project/openbabel/) package. 
 
 6. Install complete
 
