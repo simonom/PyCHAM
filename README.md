@@ -5,7 +5,7 @@ Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 resea
 PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.
 
 
-# Table of Contents
+# Table of Content
 1. [Installation](#Installation)
 2. [Running](#Running)
 3. [Testing](#Testing)
@@ -16,7 +16,7 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 There are two options for installing, via conda and from source.  Experience indicates that the conda install is more straightforward than the pip, therefore we recommend this.
 
 
-## conda Install
+## Install from conda
 
 1. Download the PyCHAM repository from github.com/simonom/PyCHAM or data.eurochamp.org/modelling-tools/
 
@@ -28,21 +28,89 @@ There are two options for installing, via conda and from source.  Experience ind
 
 5. Now the environment is set up you can activate it by typing into terminal: conda activate PyCHAM
 
-6. Install complete
+Install is complete
 
-## pip Install
+## Install from source
 
-1. Inside the terminal/command prompt, create a virtual env using venv by typing: python -m venv PyCHAM
+1) open your terminal/command prompt 
 
-2. cd to this environment then activate by typing into terminal/command prompt: source bin/activate
+2) cd to directory where you want the PyCHAM environment stored (here we will use the example Documents)
 
-3. Install PyCHAM from the PyPi site: python -m pip install --upgrade PyCHAM
+3) create an environment called myenv: python3 -m venv myenv
 
-4. cd to where PyCHAM installed: cd lib/python3.6/site-packages
+4) activate the environment: source myenv/bin/activate
 
-5. Although several PyCHAM dependencies are installed along with PyCHAM, the SUNDIALS package is currently not available on PyPi (true on 14/11/2019), however this package is required by the Assimulo package.  Therefore, please follow the instructions to install [SUNDIALS](https://computing.llnl.gov/projects/sundials/sundials-software) and [Assimulo](https://jmodelica.org/assimulo/installation.html).  Please also install the [openbabel](https://pypi.org/project/openbabel/) package. 
+5) cd to the environment’s site packages: cd lib/python3.x/site-packages
 
-6. Install complete
+6) install PyCHAM: python3 -m pip install --upgrade PyCHAM
+
+7) make directory to contain sundials build and install (inside site-packages): mkdir sundials
+
+8) make directory to build sundials: mkdir sundials/builddir
+
+9) make directory to install sundials: mkdir sundials/installdir
+
+10) download .tar file for sundials-3.2.1 from: https://github.com/LLNL/sundials/releases/tag/v3.2.1
+
+11) unzip and move to the site-packages folder in the environment you have created above
+
+12) in the terminal/command prompt, from inside the site-packages directory: cd sundials/builddir
+
+13) this next step requires that cmake is installed on your system (https://cmake.org/install/), it allows you to configure sundials: ccmake /Documents/myenv/lib/python3.x/site-packages/sundials-3.2.1
+
+14) press c to view install options
+
+15) using the i key, set the CMAKE_INSTALL_PREFIX and EXAMPLES_INSTALL_PATH to your installdir path, e.g. Documents/myenv/lib/python3.x/site-packages/sundials/installdir
+
+16) press ‘c’ (causes configuration) then ‘g’ (generation)
+
+17) back in the terminal/command window: make
+
+18) finally, to complete installation of sundials: make install
+
+19) download the .tgz file for BLAS from: http://www.netlib.org/blas/
+
+20) unzip the BLAS download and move to the site-packages folder
+
+21) cd into the BLAS folder
+
+22) into terminal type: make
+
+23) download the .tar.gz file for LAPACK from: 	http://www.netlib.org/lapack/
+
+24) unzip and move to the site-packages folder
+
+25) copy the blas_LINUX.a from the BLAS folder to the LAPACK folder
+
+26) inside LAPACK folder copy the make.inc.template (or make.inc.example) file and rename make.inc and state address of the blas_LINUX.a beside the BLASLIB variable, e.g: BLASLIB = $ Documents/myenv/lib/python3.x/site-packages/lapack3.9.0/blas_LINUX.a
+
+27) in terminal, inside the LAPACK folder type: make
+
+28) still inside the LAPACK folder copy both BLAS .a file to the system folder: sudo cp blas_LINUX.a /usr/local/lib/ 
+
+29) still inside the LAPACK folder copy lapack .a. file to the system fodler: sudo cp liblapack.a /usr/local/lib/
+ 
+30) install Cython: pip3 install Cython
+
+31) in a text editor open Cython/Compiler/main.py and find language_level =, set to: language_level = 3
+
+32) save and close Main.py and cd back to the site-packages directory
+
+33) download the .tar file for Assimulo-3.0: https://github.com/modelon/Assimulo/releases
+
+34) unzip this and move to the site-packages folder
+
+35) cd to the new Assimulo folder
+
+36) install assimulo, stating the path to sundials, blas and lapack: e.g.: python setup.py install --sundials-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/sundials/installdir --blas-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/BLAS-3.8.0 --lapack-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/lapack-3.9.0
+
+37) set the environment variable so that assimulo can link to the sundials library: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/sundials/installdir/lib/
+
+38) cd out of the assimulo folder: cd ..
+
+39) install openbabel: pip3 install openbabel
+
+Install is complete
 
 ## Running
 
