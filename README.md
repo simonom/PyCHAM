@@ -82,11 +82,11 @@ Install is complete
 
 25) copy the blas_LINUX.a from the BLAS folder to the LAPACK folder
 
-26) inside LAPACK folder copy the make.inc.template (or make.inc.example) file and rename make.inc and state address of the blas_LINUX.a beside the BLASLIB variable, e.g: BLASLIB = $ Documents/myenv/lib/python3.x/site-packages/lapack3.9.0/blas_LINUX.a
+26) inside LAPACK folder copy the make.inc.template (or make.inc.example) file and rename make.inc and state address of the blas_LINUX.a beside the BLASLIB variable, e.g: BLASLIB = $Documents/myenv/lib/python3.x/site-packages/lapack3.9.0/blas_LINUX.a
 
 27) in terminal, inside the LAPACK folder type: make
 
-28) still inside the LAPACK folder copy both BLAS .a file to the system folder: sudo cp blas_LINUX.a /usr/local/lib/ 
+28) still inside the LAPACK folder copy BLAS .a file to the system folder: sudo cp blas_LINUX.a /usr/local/lib/ 
 
 29) still inside the LAPACK folder copy lapack .a. file to the system fodler: sudo cp liblapack.a /usr/local/lib/
  
