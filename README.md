@@ -22,7 +22,7 @@ There are two options for installing, via conda and from source.  Experience ind
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
-3. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored, then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
+3. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored (likely called PyCHAM-master), then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
 
 4. This will install all PyCHAM dependencies, no need for further installations.
 
@@ -114,7 +114,7 @@ Install is complete
 
 ## Running
 
-1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below
+1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below and note that example files are available in PyCHAM/inputs
 
 2. Now you are ready to run the model: python PyCHAM
 
