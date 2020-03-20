@@ -275,10 +275,11 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# N2_val - gas-phase concentration of nitrogen (molecules/cc (air))
 	# O2_val - gas-phase concentration of oxygen (molecules/cc (air))
 	# init_SMIL - SMILE string for each component
+	# spec_namelist - names of components as given in the equation file
 	
 	return (rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, 
 			species_step, RO2_indices, nreac,
-			nprod, prodn, reacn, M_val, N2_val, O2_val, init_SMIL)
+			nprod, prodn, reacn, M_val, N2_val, O2_val, init_SMIL, spec_namelist)
 
 
 
