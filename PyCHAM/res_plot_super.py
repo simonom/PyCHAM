@@ -40,25 +40,50 @@ def run(testf):
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, resfname)
 	
-	# name of file where experiment constants saved (number of size bins and whether wall 
-	# included)
-	fname = str(output_by_sim+'/constants')
-	const = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+	# name of file where experiment constants saved
+	fname = str(output_by_sim+'/model_and_component_constants')
+
+	const_in = open(fname)
+	const = {} # prepare to create dictionary
+	for line in const_in.readlines():
 	
-	num_sb = int(const[0,0]) # number of size bins
-	num_speci = int(const[0,1]) # number of species
-	y_mw = (const[1,:])
-	y_MV = (const[2,:])
+		# convert to python list
+		dlist = []
+		for i in line.split(',')[1::]:
+			if str(line.split(',')[0]) == 'number_of_size_bins':
+				dlist.append(int(i))
+			if str(line.split(',')[0]) == 'number_of_components':
+				dlist.append(int(i))
+			if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol':
+				i = i.strip('\n')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(float(i))
+			if str(line.split(',')[0]) == 'component_names':
+				i = i.strip('\n')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				i = i.strip('\'')
+				dlist.append(str(i))
+		const[str(line.split(',')[0])] = dlist
+	
+	num_sb = (const['number_of_size_bins'])[0] # number of size bins
+	num_speci = (const['number_of_components'])[0] # number of components
+	y_mw = const['molecular_weights_g/mol_corresponding_to_component_names']
+	y_MV = const['molecular_volumes_cm3/mol']
+	PyCHAM_names = const['component_names']
 	
 	# name of file where concentration (molecules/cc (air)) results saved
-	fname = str(output_by_sim+'/y')
-	y = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
+	y = np.loadtxt(fname, delimiter=',', skiprows=2) 
 	if y.ndim==1: # occurs if only one time step saved
 		y = np.array(y.reshape(1, -1))
 	
 	# withdraw times
-	fname = str(output_by_sim+'/t')
-	t_array = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)	
+	fname = str(output_by_sim+'/time')
+	t_array = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header)	
 	if t_array.ndim==0: # occurs if only one time step saved
 		print('Please note only results for one time step have been saved; number size distribution contours will not be plotted')
 		t_array = np.array(t_array.reshape(-1, 1))	
@@ -67,14 +92,14 @@ def run(testf):
 
 	if num_sb>1:
 		# name of file where concentration (# particles/cc (air)) results saved
-		fname = str(output_by_sim+'/N')
-		N = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+		fname = str(output_by_sim+'/particle_number_concentration')
+		N = np.loadtxt(fname, delimiter=',', skiprows=2) # skiprows=1 omits header)
 		if N.ndim==1: # occurs if only one time step saved
 			N = np.array(N.reshape(1, num_sb-1))	
 	
 		# name of file where particle size results saved
-		fname = str(output_by_sim+'/x')
-		x = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+		fname = str(output_by_sim+'/size_bin_radius')
+		x = np.loadtxt(fname, delimiter=',', skiprows=2)
 		if x.ndim==1: # occurs if only one time step saved
 			x = np.array(x.reshape(1, num_sb-1))
 	
@@ -85,8 +110,8 @@ def run(testf):
 	
 		# size bin radius bounds (um) for calculating dN/dlog10D (/cc (air))
 		# name of file where particle size results saved
-		fname = str(output_by_sim+'/sbb')
-		sbb = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+		fname = str(output_by_sim+'/size_bin_bounds')
+		sbb = np.loadtxt(fname, delimiter=',', skiprows=2)
 	
 	
 		def make_patch_spines_invisible(ax):

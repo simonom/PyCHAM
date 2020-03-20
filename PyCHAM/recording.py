@@ -54,11 +54,11 @@ def recording(y, N_perbin, x, step, sumt, y_mat, Nresult, x2, t_out, tot_stps,
 	
 		Nresult[step, :] = N_perbin_no_wat
 		if (N_perbin_no_wat<0).sum()>0:
-			print('neagtive particle concentration')
+			print('negative particle concentration')
 			print(N_perbin)
 			print(N_perbin_no_wat)
 			ipdb.set_trace()
-		x2[step, :] = x # note, this saves the size including contribution of water
+		x2[step, :] = x # note, this saves the size including contribution of water (um)
 	
 	else:
 		x2 = 0.0

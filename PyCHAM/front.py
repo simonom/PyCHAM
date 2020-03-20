@@ -45,7 +45,7 @@ def run(testf):
 	[rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, num_speci, 
 		RO2_indices, nreac, nprod, prodn, 
 		reacn, M_val, N2_val, O2_val, 
-		init_SMIL] = eqn_parser.extract_mechanism(fname, xmlname, 
+		init_SMIL, spec_namelist] = eqn_parser.extract_mechanism(fname, xmlname, 
 							TEMP, PInit, Comp0, testf)
 	
 	if testf==1:
@@ -130,7 +130,7 @@ def run(testf):
 		print('dumped successfully')
 	# save data
 	output_by_sim = saving(fname, y_mat, t_out, Nresult, x2, num_sb, y_mw, num_speci, 
-							resfname, rbou, Cfactor, MV, testf)
+							resfname, rbou, Cfactor, MV, testf, spec_namelist)
 	if testf==1:
 		print('saving called and returned successfully')
 	return()
