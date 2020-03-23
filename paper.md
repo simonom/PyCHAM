@@ -4,7 +4,7 @@ tags:
   - Python
   - atmospheric science
   - aerosol
-  - environmental chambers
+  - aerosol chambers
   - air quality
   - climate change
   - EUROCHAMP
@@ -40,13 +40,13 @@ bibliography: paper.bib
 
 # Summary
 
-PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access O-D box model for environmental chamber studies.  Environmental chambers provide a means for atmospheric scientists to interrogate aerosol processes [@Finlayson:2000; @Schwantes:2017; @Hidy:2019].  Allying PyCHAM with chamber measurements allows quantification of unknown parameters, such as branching ratios for oxidation schemes [@Chen:2005].  Although several box models have already been published [@Pierce:2008; @Roldin:2014; @Sunol:2018; @Roldin:2019], PyCHAM is novel in its ease of accessibility and utility.  To the best of our knowledge, PyBOX [@Topping:2018], which formed the basis of PyCHAM, and AtCHEM [@AtCHEM:2020], are the only other box models available online or with a graphical user interface.  However, PyCHAM provides a considerable upgrade to the functionality of both prior models, as AtCHEM only simulates gas-phase chemistry and PyBOX has limited particle effects, whilst PyCHAM models all particle microphysics (detailed below) and wall effects in addition to the gas phase.  The intention therefore, is that it will be readily employed by research groups undertaking environmental chamber measurements.
+PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access O-D box model for aerosol chamber studies.  Aerosol chambers provide a means for atmospheric scientists to interrogate aerosol processes [@Finlayson:2000; @Schwantes:2017; @Hidy:2019].  Allying PyCHAM with chamber measurements allows quantification of unknown parameters, such as branching ratios for oxidation schemes [@Chen:2005].  Although several box models have already been published [@Pierce:2008; @Roldin:2014; @Sunol:2018; @Roldin:2019], PyCHAM is novel in its ease of accessibility and utility.  To the best of our knowledge, PyBOX [@Topping:2018], which formed the basis of PyCHAM, and AtCHEM [@AtCHEM:2020], are the only other box models available online or with a graphical user interface.  However, PyCHAM provides a considerable upgrade to the functionality of both prior models, as AtCHEM only simulates gas-phase chemistry and PyBOX has limited particle effects, whilst PyCHAM models all particle microphysics (detailed below) and wall effects in addition to the gas phase.  The intention therefore, is that it will be readily employed by research groups undertaking aerosol chamber measurements.
 
-With air quality and climate models increasingly important to guiding sustainable societies, the accuracy of simulations must suffice [@Tong:2019].  However, research shows that the simulated aerosol effects in these models provides a relatively high amount of uncertainty [@Johnson:2018].  The combination of box models like PyCHAM with environmental chamber measurements to better constrain aerosol processes is therefore necessary to ultimately improve societal sustainability.
+With air quality and climate models increasingly important to guiding sustainable societies, the accuracy of simulations must suffice [@Tong:2019].  However, research shows that the simulated aerosol effects in these models provides a relatively high amount of uncertainty [@Johnson:2018].  The combination of box models like PyCHAM with aerosol chamber measurements to better constrain aerosol processes is therefore necessary to ultimately improve societal sustainability.
 
 Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere.  The autoxidation process has recently been discovered to play a significant role in the formation of airbourne particulates [@Ehn:2014], however its exact chemical mechanism is yet to be elucidated.  Through comparison of chamber measurements with PyCHAM outputs using various mechanism possibilities, a constrained autoxidation chemical scheme is being generated.  Here is the model repository: github.com/simonom/PyCHAM.
 
-The model employs non-equilibrium equations to simulate the known processes occurring in environmental chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package for ODE solvers is called on [@Andersson:2015], using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
+The model employs non-equilibrium equations to simulate the known processes occurring in aerosol chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package for ODE solvers is called on [@Andersson:2015], using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
 
 $$\frac{d[i_{g}]}{dt} = \pm k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
 $$
@@ -69,7 +69,7 @@ where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coeffi
 
 Outside the ODE solver, particle loss to walls, coagulation and nucleation are also solved, with equations for the former two given in @Jacobson:2005 and the parameters inside the nucleation expression (for relevent experiments) tuned by the user.  PyCHAM takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
-Several variables change between different environmental chambers and different experiments; therefore, the software is designed to allow the user to set these with ease.
+Several variables change between different aerosol chambers and different experiments; therefore, the software is designed to allow the user to set these with ease.
 
 # Acknowledgements
 
