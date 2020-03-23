@@ -19,7 +19,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# testf - flag for operating in normal mode (0) or testing mode (1)
 	
 	if testf == 1:
-		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
     	
 	# Open the file
 	f_open_eqn = open(filename, mode='r')
