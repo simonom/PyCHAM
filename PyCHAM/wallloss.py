@@ -6,7 +6,8 @@ from scipy import integrate
 import matplotlib.pyplot as plt 
 
 def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, 
-			inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader):
+			inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, testf, p_char, 
+			e_field):
 
 	# ----------------------------------------------------------------
 	# inputs:
@@ -28,31 +29,33 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# inflectDp - particle diameter at which wall loss inflection occurs (m)
 	# pwl_xpre - x value preceding inflection point
 	# pwl_xpro - x value proceeding inflection point
-	# inflectk - kernel at inflection
+	# inflectk - deposition rate at inflection (/s)
 	# ChamR - spherical equivalent radius of chamber (below eq. 2 Charan (2018)) (m)
 	# Rader - flag of whether or not to use Rader and McMurry approach
+	# testf - flag of whether in testing mode or not (1 for one 0 for normal mode)
+	# p_char - average number of charges per particle (/particle)
+	# e_field - average electric field inside chamber (g.m/A.s3)
 	# ----------------------------------------------------------------
 	if Rader==0: # manual input of wall loss rate
 		
 		Beta = np.zeros((Pn.shape))
-		Beta[Dp<inflectDp, 0] = ((np.log10(inflectDp)-
-								np.log10(Dp[Dp<inflectDp]))*pwl_xpre+inflectk)
-		Beta[Dp>=inflectDp, 0] = ((np.log10(Dp[Dp>=inflectDp])-
-								np.log10(inflectDp))*pwl_xpro+inflectk)
+		Beta[Dp<inflectDp, 0] = 10**((np.log10(inflectDp)-
+								np.log10(Dp[Dp<inflectDp]))*pwl_xpre+np.log10(inflectk))
+		Beta[Dp>=inflectDp, 0] = 10**((np.log10(Dp[Dp>=inflectDp])-
+								np.log10(inflectDp))*pwl_xpro+np.log10(inflectk))
 		
 	if Rader==1:
 		# -------------------------------------------------------------------------
-		# Rader and McMurry option
-			# average number of charges per particle (/particle)
-		n = 0.0
+		# McMurry & Rader option McMurry 1985, DOI: 10.1080/02786828508959054
+		# average number of charges per particle (/particle)
+		n = p_char
 		# elementary charge (C==A.s) (Charan et al. 2018)
 		e = 1.602e-19
-		# average magnitude of electric field (V/m == kg.m/A.s3), scale up
-		# by 1.0e3 to move from kg.m/A.s3 to g.m/A.s3
-		E = 4500*1.0e3
+		# average magnitude of electric field (g.m/A.s3) (note: V/m == kg.m/A.s3) 
+		E = e_field
 		
 		# electrostatic migration velocity/deposition velocity 
-		# (eq. 11 McMurry (1985), eq. 5 Charan (2018)) (m/s)
+		# (eq. 11 McMurry and Rader (1985), eq. 5 Charan (2018)) (m/s)
 		ve = np.abs((n*e*Gi*E)/(3.0*np.pi*eta_ai*Dp))
 		
 		
@@ -79,7 +82,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		# multiply eta_a by 1.0e-3 to convert from g/m.s to kg/m.s
 		# this makes it consistent with the units of Boltzmann constant
 		Dpi = (((si.k*TEMP)/(3.0*np.pi*Dp*(eta_ai*1.0e-3)))*Gi)
-		Ke = 1.0 # eddy diffusion coefficient (/s) (1)
+		
+		# eddy diffusion coefficient (/s) (scalar)
+		if testf == 1:
+			Ke = 6.4e-3 
+		else:
+			Ke = 1.0
+			
 		# x and y terms in eq. 2 of Charan (2018)
 		# x (eq. 13 McMurry (1985)) (dimensionless)
 		x = (np.pi*vs)/(2.0*((Ke*Dpi)**(1.0/2.0)))
@@ -122,15 +131,19 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		Beta1[ish] = (3.0*((Ke*Dpi[ish])**(0.5)))/(np.pi*ChamR*x[ish])
 		Beta2 = ((x+y)**2.0)/2.0+(x+y)*D1+(x-y)*D11 # second bit
 	
-		# Beta (loss rate to walls (/s)) calculation (eq. 2 Charan (2018)) - value
-		# represents fraction of particles lost to walls every second (just above 
-		# eq. 1 of McMurry (1985))
+		# Beta (loss rate to walls (/s)) calculation (eq. 2 Charan (2018) and eq. 15 
+		# McMurry and Rader 1985) - value
+		# represents fraction of particles lost to walls every second (Beta meaning is 
+		# just above eq. 1 of McMurry (1985) DOI: 10.1080/02786828508959054)
 		Beta = (Beta1*Beta2).reshape(-1, 1)
 	
 	if (Beta<0).sum()>0:
 		Beta[Beta<0] = 0.0
 		print('Warning Beta in walloss.py estimated below 0, which is not possible, so value forced to 0.0')
-		
+	
+	if testf == 1: # if in test mode
+		return(Beta)
+	
 	# integrate this fraction over the time step interval to give total 
 	# fraction lost over interval	
 	Beta = Beta*t
@@ -149,5 +162,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	for i in ish[0, :]:
 		Pn[i] = 1.0e-30
 		Cn[nc*(i):nc*(i+1)] = 1.0e-30
-
-	return(np.squeeze(Pn), Cn)
+	
+	# prepare output
+	if len(Pn)>1:
+		Pn = np.squeeze(Pn)
+	if len(Pn)==1:
+		holder = Pn
+		Pn = np.zeros((1))
+		Pn[0] = holder
+	
+	return(Pn, Cn)

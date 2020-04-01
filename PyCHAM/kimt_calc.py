@@ -18,6 +18,7 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	# radius - particle radius (m)
 	# Psat - vapour pressures (molecules/cc (air))
 	# surfT - surface tension (g/s2==mN/m==dyn/cm)
+	# y_dens - density of components (kg/m3)
 	# therm_sp - thermal speed of components (m/s) (num_speci, 1)
 	# nuccor - Fuchs-Sutugin correction for newly nucleating particles
 	# H2Oi - water index (integer)
@@ -48,9 +49,8 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 
 	# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
 	# note that avMW has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
-	# 1e7 for units
-	# g cm2/s2.mol.K, TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is
-	# g/cm3
+	# 1e7 for units g cm2/s2.mol.K, 
+	# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
 	kelv_fac = np.zeros((num_sb-1))
 	kelv_fac[ish] = np.exp((2.0E0*avMW[ish]*surfT)/(R_gas*1.0e7*TEMP*(radius[0, ish]*
 					1.0e2)*tot_rho[ish]))
@@ -59,16 +59,17 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	# gas phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
 	# eq. 5 Zaveri et al. (2008), scale by 1e4 to convert from m2/s to cm2/s
 	kimt = (DStar_org*1e4)*correction
-	# final partitioning coefficient (converting m to cm)
+	# final partitioning coefficient (converting radius from m to cm)
 	# eq. 16.2 of Jacobson (2005) and eq. 5 Zaveri et al. (2008)
-	# species in rows and size bins in columns (cm3/s)
+	# species in rows and size bins in columns (/s)
 	kimt = (4.0E0*np.pi*(radius*1.0e2)*N_perbin.reshape(1, -1))*kimt
 	
-	# zero partitioning for any components with vapour pressures greater than
-	# 10^11 molecules/cc (air) - accelerates computation time with negligible change to 
+	# zero partitioning to particles for any components with high vapour pressures
+	# - accelerates computation time with negligible change to 
 	# output
-	highVPi = np.squeeze(Psat>1.0e11)
-	highVPi[H2Oi] = 0 # mask water
+	highVPi = Psat>1.0e40
+	highVPi = highVPi[:, 0] # ignore second dimension
+	highVPi[H2Oi] = 0 # mask water, thereby allowing water partitioning in ode
 	kimt[highVPi, :] = 0.0
 	
 	# zero partitioning coefficient for size bins where no particles - enables significant

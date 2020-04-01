@@ -14,7 +14,8 @@ def run(source, testf):
 	if testf==1: # testing mode
 		# return dummies to continue test
 		if source==0:
-			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+			return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+					0,0,0,0,0,0,0,0,0,0,0,0,0)
 		
 	
 	import pickle
@@ -23,20 +24,26 @@ def run(source, testf):
 		var_store_name = 'test_var_store.pkl'
 	else:
 		var_store_name = 'PyCHAM/var_store.pkl'
-		
+	
 	with open(var_store_name,'rb') as pk:
 		# read in variables from gui
 		if source == 0: # when called from front.py
 			[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
-			TEMP, PInit, RH, lat, lon, dt_start, Cw, save_step, ChamSA, 
-			nucv1, nucv2, nucv3, nuc_comp, inflectDp, pwl_xpre, pwl_xpro, 
+			TEMP, PInit, RH, lat, lon, DayOfYear, dt_start, act_flux_path, Cw, save_step, 
+			ChamSA, 
+			nucv1, nucv2, nucv3, nuc_comp, new_partr, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, Rader, xmlname, C0, Comp0, voli, volP, pconc, 
-			std, loc, scale, core_diss, light_stat, light_time, kgwt] = pickle.load(pk)	
+			std, mean_rad, core_diss, light_stat, light_time, kgwt, 
+			dydt_trak, space_mode, Ct, Compt, injectt, seed_name, 
+			const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
+			umansysprop_update, core_dens, p_char, e_field, 
+			const_infl_t] = pickle.load(pk)	
 
 			
 			# convert chamber surface area (m2) to spherical equivalent radius (m)
 			# (below eq. 2 in Charan (2018))
 			ChamR = (ChamSA/(4.0*np.pi))**0.5
+			
 		if source == 1:	# when called from res_plot_super.py
 			[fname, resfname, y_indx_plot, Comp0] = pickle.load(pk)
 				
@@ -50,7 +57,7 @@ def run(source, testf):
 	
 	# one folder for one simulation - only relevant if called from front 
 	# (rather than res_plot_super)
-	output_by_sim = os.path.join(dir_path, 'output', filename, resfname)
+	output_by_sim = os.path.join(dir_path, 'PyCHAM/output', filename, resfname)
 	
 	
 	if os.path.isdir(output_by_sim)==True and source==0:
@@ -58,10 +65,12 @@ def run(source, testf):
 	
 	if source == 0:
 		return(fname, num_sb, lowersize, uppersize, end_sim_time, resfname, 
-		tstep_len, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, save_step, 
-		Cw, ChamR, nucv1, nucv2, nucv3, nuc_comp, inflectDp, 
+		tstep_len, tstep_len, TEMP, PInit, RH, lat, lon, dt_start, act_flux_path, save_step, 
+		Cw, ChamR, nucv1, nucv2, nucv3, nuc_comp, new_partr, inflectDp, 
 		pwl_xpre, pwl_xpro, inflectk, xmlname, C0, Comp0, Rader, voli, volP, pconc, std, 
-		loc, scale, core_diss, light_stat, light_time, kgwt, 0)
+		mean_rad, core_diss, light_stat, light_time, kgwt, 0, dydt_trak, DayOfYear, 
+		space_mode, Ct, Compt, injectt, seed_name, const_comp, const_infl, Cinfl, act_wi, 
+		act_w, seed_mw, umansysprop_update, core_dens, p_char, e_field, const_infl_t)
 		
 	if source == 1:
 		return(fname, resfname, y_indx_plot, Comp0)

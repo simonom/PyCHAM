@@ -1,0 +1,36 @@
+HCHO (298K and 1 atm) photolysis quantum yields for the radical (H + HCO) and non radical (H2 + CO) channels			
+
+Recommendation of IUPAC 2003			NB:  (H2 + CO) QYs are p and T dependent above 330 nm
+http://www.iupac-kinetic.ch.cam.ac.uk		    - see JCPMoortgat83 for quenching parameters
+
+taken from:			
+1.  (H + HCO):  G. D. Smith, L. T. Molina and M. Molina. J.Phys.Chem A, 106, 1233 (2002)			
+2.  (H2 + CO) :  G. K. Moortgat, W. Seiler, and P. Warneck, J. Chem. Phys. 78, 1185 (1983)			
+
+wavelength (nm)	qy_r (H+HCO)	qy_nr (H2+CO)	total
+240	0.27	0.49	0.76
+250	0.29	0.49	0.78
+260	0.3	0.49	0.79
+268.75	0.425	0.385	0.81
+278.75	0.57	0.32	0.89
+283.75	0.673	0.247	0.92
+288.75	0.746	0.214	0.96
+293.75	0.694	0.286	0.98
+298.75	0.642	0.348	0.99
+301.25	0.725	0.275	1
+303.75	0.78	0.22	1
+306.25	0.684	0.316	1
+308.75	0.735	0.265	1
+311.25	0.704	0.296	1
+313.75	0.715	0.285	1
+316.25	0.673	0.327	1
+321.25	0.663	0.337	1
+326.25	0.528	0.452	0.98
+328.75	0.373	0.577	0.95
+331.25	0.476	0.424	0.9
+333.75	0.311	0.489	0.8
+336.25	0.072	0.627	0.699
+338.75	0.041	0.559	0.6
+340	0	0.56	0.56
+350	0	0.21	0.21
+360	0	0.03	0.03

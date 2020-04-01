@@ -36,11 +36,13 @@ def SN_conversion(RateExp):
 			# replace the 'D/d' with 'e' in the SLICE
 			TempSlice = TempSlice.replace('d', 'e')
 			TempSlice = TempSlice.replace('D', 'e')
-			RateExp = RateExp[:SliceStart] + TempSlice + RateExp[SliceEnd:] # reconstruct the rate conef string
+			# reconstruct the rate conef string
+			RateExp = RateExp[:SliceStart] + TempSlice + RateExp[SliceEnd:]
 			
 			# convert '@' marker to '**' (power) marker
 			RateExp = RateExp.replace('@', '**')
-
+	if re.search(r'@', RateExp)!=None: # ensure using @ to raise to a power converted
+		RateExp = RateExp.replace('@', '**')
 	return RateExp
 
 # This function ensures that the function names can be recognized by python
@@ -85,14 +87,3 @@ def convert_rate_mcm(rate_coef):
     # The output rate_coef has length equal to the number of
     # equations and values giving the reaction rate coefficient
 	return new_rate
-
-# for some special rate constants expressions
-# from Dave's code
-# def convert_rate_general(rate_dict, print_options):
-
-#     # create a dict used when calculating final rates in ODE solvers
-#     rate_dict_converted = collections.defaultdict(lambda : collections.defaultdict())
-
-
-
-#     pass

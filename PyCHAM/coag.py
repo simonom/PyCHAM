@@ -7,10 +7,12 @@ from Reyn_num import Reyn_num
 from W_k_int import W_k_int
 import scipy.integrate as integ
 import matplotlib.pyplot as plt
+import scipy.constants as si
 import ipdb
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
-			num_comp, vdWon, rho, rad0, PInit):
+			num_comp, vdWon, rho, rad0, PInit, testf, num_molec_rint, num_part_rint, 
+			sbVj):
 
 	# --------------------------------------------------------------
 	# inputs:
@@ -18,20 +20,27 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# RH - relative humidity (fraction)
 	# T - temperature (K)
 	# sbr - size bin radius (m)
-	# sbVi - single particle volume for i sizes (m3)
+	# sbVi - single particle volume for i sizes (relating to sbr) (m3)
 	# M - molecular weight of components (g/mol)	
 	# rint - size of interest (m)
 	# num_molec - molecular concentration (molecules/cc (air)),
-	# arranged by component in rows and size bins in columns
+	# arranged by component in rows and size bins in columns, for particles in sbr
 	# num_part - concentration of particles per size bin 
-	# (particle/cc (air)) (columns) (excluding walls)
+	# (particle/cc (air)) (columns) (excluding walls), for particles in sbr
 	# tint - time interval coagulation occurs over (s)
 	# sbbound - size bin volume boundaries (m3)
 	# num_comp - number of components
-	# vdWon - saying whether the van der Waals kernel should be calculated or ignored
+	# vdWon - flagging whether the van der Waals kernel should be calculated or ignored (0
+	# for ignore, 1 for calculate)
 	# rho - components densities (g/cm3) in a 1D array
 	# rad0 - original radius at size bin centre (um)
 	# PInit - pressure inside chamber (Pa)
+	# testf - unit testing flag (0 for off, 1 for on)
+	# num_molec_rint - molecular concentration (molecules/cc (air)),
+	# arranged by component in rows and size bins in columns, for particles in rint
+	# num_part_rint - concentration of particles per size bin 
+	# (particle/cc (air)) (columns) (excluding walls), for particles in rint
+	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	
 	# --------------------------------------------------------------
 	# outputs:
@@ -40,26 +49,31 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# --------------------------------------------------------------
 
 	# wall parts
-	num_molec = num_molec[:, 0:-1]
+	if testf == 0: # non-testing mode
+		num_molec = num_molec[:, 0:-1]
+		num_molec_rint = num_molec_rint[:, 0:-1]
 	num_part = num_part.reshape(1, -1)
+	# volume concentration of particles (m3/cc (air))
+	vol_part = (sbVi*num_part).reshape(1, -1)
 	
 	# ensure sbn is integer
-	sbn = np.int(np.max(rint.shape))
 	sbrn = np.int(np.max(sbr.shape))
-
+	sbn = np.int(np.max(rint.shape))
+	
 	# call on function to determine the Knudsen no. and therefore flow 
 	# regime of each size bin
 	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr, PInit)
 	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint, PInit)
+
 	# Reynold number and terminal fall velocity for each size bin
 	[Rei, Vfi] = Reyn_num(sbr, eta_ai, rho_ai, kin_visc, 1.0e6, Kni)
-	[Rej, Vfj] = Reyn_num(sbr, eta_aj, rho_aj, kin_visc, 1.0e6, Knj)
+	[Rej, Vfj] = Reyn_num(rint, eta_aj, rho_aj, kin_visc, 1.0e6, Knj)
 	
 	# repeat Knudsen number over number of size bins
 	Kni_m = np.tile(Kni, (sbn, 1))
 	
 	# Cunningham slip-flow correction (15.30) with constant taken
-	# from text below (dimensionless)
+	# from text below textbook equation (dimensionless)
 	Gi = 1.0+Kni*(1.249+0.42*(np.exp(-0.87/Kni)))
 	Gj = 1.0+Knj*(1.249+0.42*(np.exp(-0.87/Knj)))
 	# particle diffusion coefficient (15.29) (m2/s)
@@ -67,13 +81,17 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# this makes it consistent with the units of Boltzmann constant
 	Dpi = (((si.k*T)/(6.0*np.pi*sbr*(eta_ai*1.0e-3)))*Gi).reshape(sbrn, 1)
 	Dpj = (((si.k*T)/(6.0*np.pi*rint*(eta_aj*1.0e-3)))*Gj).reshape(1, sbn)
-
-	# repeat Dpj over size bins of i (m)
+	
+	# repeat Dpi over size bins of j (m2/s)
+	Dp_mi = np.repeat(Dpi, sbn, 1)
+	# repeat Dpj over size bins of i (m2/s)
 	Dp_mj = np.repeat(Dpj, sbrn, 0)
 	# matrix for sums of Dp in size bins (m2/s)
-	Dp_sum = Dpi+Dp_mj
+	Dp_sum = Dp_mi+Dp_mj
+
 	# zero the upper triangle part of the matrix as only the lower is needed
-	Dp_sum[np.triu_indices(sbrn, 1)] = 0.0
+# 	Dp_sum[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
+	
 	# Brownian collision kernel (m3/particle.s) (p. 508) 
 	K_B = np.zeros((sbrn, sbn))
 
@@ -87,11 +105,11 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	rint2 = np.repeat(rint2, sbrn, 0)
 	sbr_m = np.repeat(sbr2, sbn, 1)
 	# zero the upper triangle part of the matrix as only the lower is needed
-	rint2[np.triu_indices(sbrn, 1)] = 0.0
-	sbr_m[np.triu_indices(sbrn, 1)] = 0.0
+# 	rint2[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
+# 	sbr_m[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
 	
 	# matrix for size bins sums (m)
-	sbr_sum = sbr2+rint2
+	sbr_sum = sbr_m+rint2
 	
 	
 	# size bins in continuum regime
@@ -99,10 +117,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# spread across rint (j)
 	i = np.repeat(i, sbn, 1)
 	
-	# collision kernel (15.28) (m3/particle.s)
+	# Brownian collision kernel (15.28) (m3/particle.s) in the continuum regime
 	K_B[i] = 4.0*np.pi*(sbr_sum[i])*(Dp_sum[i])
-	
-	
 	
 	# size bins in free-molecular regime	
 	i = ((Kni>10.0).reshape(sbrn,1))
@@ -110,29 +126,32 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	i = np.repeat(i, sbn, 1)
 	
 	# single particle mass (g):
-	# first, number of moles per component in a single particle
-	num_mol_single = (num_molec/num_part)/si.N_A
+	# first, number of moles per component in a single particle (relating to sbr)
+	num_mol_single_sbr = (num_molec/num_part)/si.N_A
 	# second product of number of moles and molecular weight
-	weight_compon = num_mol_single*M
+	weight_compon = num_mol_single_sbr*M
 	# final sum mass across components for single particle mass (g)
 	Mpi = np.sum(weight_compon, 0)
+	# number of moles per component in a single particle (relating to rint)
+	num_mol_single_rint = (num_molec_rint/num_part_rint)/si.N_A
+	# second product of number of moles and molecular weight
+	weight_compon = num_mol_single_rint*M
 	Mpj = np.sum(weight_compon, 0)
 
 	# thermal speed of particle (15.32) (m/s) (multiply mass by 1.0e-3 to 
 	# convert from g to kg and therefore be consistent with Boltzmann's 
 	# constant (1.380658e-23kgm2/s2.K.molec))
-	nu_pi = (((8.0*si.k*T)/(np.pi*(Mpi*1.0e-3)))**0.5).reshape(sbrn, 1)
-	nu_pj = np.zeros((sbrn, sbn))
-	ind = Mpj>0 # prevent division by zero
-	nu_pj[ind] = ((8.0*si.k*T)/(np.pi*(Mpj[ind]*1.0e-3)))**0.5
+	nu_pi = np.repeat((((8.0*si.k*T)/(np.pi*(Mpi*1.0e-3)))**0.5).reshape(sbrn, 1), sbn, 1)
+	nu_pj = np.repeat((((8.0*si.k*T)/(np.pi*(Mpj*1.0e-3)))**0.5).reshape(1, sbn), sbrn, 0)
 	
 	# sum of squares of speeds (m2) (15.31)
 	nu_p_sum = nu_pi**2.0+nu_pj**2.0
 			
-	# collision kernel (15.31)
-	K_B[i] = np.pi*(sbr_sum[i]**2.0)*((nu_p_sum[i])**(0.5))
+	# Brownian collision kernel (15.31) (m3/particle.s)
+	K_B[i] = np.pi*(sbr_sum[i]**2.0)*(nu_p_sum[i]**0.5)
 	
-	# size bins in transition regime
+	# size bins in transition regime, where the transition regime corresponds to particles
+	# of size i, not size j
 	i = (1.0<=Kni) 
 	j = (Kni<=10.0) # size bins in transition regime		
 	i = (i*j).reshape(sbrn,1)	# size bins in transition regime
@@ -140,16 +159,13 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	i = np.repeat(i, sbn, 1)
 	
 	# particle mean free path (15.34) (m)
-	lam_pi = ((8.0*Dpi)/(np.pi*nu_pi))
-	lam_pj = np.zeros((sbrn, sbn))
-	ind = nu_pj>0 # prevent division by zero
-	lam_pj[ind] = ((8.0*Dp_mj[ind])/(np.pi*nu_pj[ind]))
+	lam_pi = ((8.0*Dpi[:,0])/(np.pi*nu_pi[:,0]))
+	lam_pj = ((8.0*Dp_mj[0,:])/(np.pi*nu_pj[0,:]))
+
 	# mean distance from centre of a sphere travelled by particles
 	# leaving sphere's surface and travelling lam_p (m) (15.34)
-	sig_pi = (((2.0*sbr+lam_pi)**3.0-(4.0*sbr**2.0+lam_pi**2.0)**1.5)/(6.0*sbr*lam_pi)-2.0*sbr)
-	sig_pj = np.zeros((sbrn, sbn))
-	ind = rint2>0 # prevent division by zero
-	sig_pj[ind] = (((2.0*rint2[ind]+lam_pj[ind])**3.0-(4.0*rint2[ind]**2.0+lam_pj[ind]**2.0)**1.5)/(6.0*rint2[ind]*lam_pj[ind])-2.0*np.repeat(sbr2, sbn, 1)[ind])
+	sig_pi = np.repeat((((2.0*sbr+lam_pi)**3.0-(4.0*sbr**2.0+lam_pi**2.0)**1.5)/(6.0*sbr*lam_pi)-2.0*sbr).reshape(-1, 1), sbn, 1)
+	sig_pj = np.repeat((((2.0*rint+lam_pj)**3.0-(4.0*rint**2.0+lam_pj**2.0)**1.5)/(6.0*rint*lam_pj)-2.0*rint).reshape(1, -1), sbrn, 0)
 
 	# sum mean distances (m)
 	sig_p_sum = sig_pi**2.0+sig_pj**2.0
@@ -163,9 +179,20 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# right term kernel denominator
 	K_Brden = ((4.0*Dp_sum[i])/(((nu_p_sum[i])**0.5)*sbr_sum[i]))
 	
-	# collision kernel (15.33)	
+	# collision kernel (15.33) (m3/particle.s)
 	K_B[i] = (K_Bnum/(K_Blden+K_Brden))
 	
+
+	
+	if testf==1: # testing flag on
+		fig, (ax0,ax1) = plt.subplots(1, 2, figsize=(12,6))
+		ax0.loglog(sbr*10**6, K_B[:,0]*10**6, label='Brownian')
+		ax0.set_xlabel(r'Radius of second particle ($\rm{\mu}$m)', fontsize=10)
+		ax0.set_ylabel(r'Coagulation kernel ($\rm{cm^{3}particle^{-1}s^{-1}}$)', fontsize=10)
+		ax1.loglog(sbr*10**6, K_B[:,1]*10**6, label='Brownian')
+		ax1.set_xlabel(r'Radius of second particle ($\rm{\mu}$m)', fontsize=10)
+		ax1.set_ylabel(r'Coagulation kernel ($\rm{cm^{3}particle^{-1}s^{-1}}$)', fontsize=10)
+		
 	
 	# Convective Brownian Diffusion Enhancement kernel:
 
@@ -204,10 +231,13 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	K_DE[i3] = (K_B[i3]*0.45*Re_jm[i3]**(1.0/2.0)*Scpi_m[i3]**(1.0/3.0))
 	K_DE[j4] = (K_B[j4]*0.45*Re_im[j4]**(1.0/2.0)*Scpj_m[j4]**(1.0/3.0))
 	
+	if testf==1:
+		ax0.loglog(sbr*10**6, K_DE[:,0]*10**6, label='Diff. Enhancement')
+		ax1.loglog(sbr*10**6, K_DE[:,1]*10**6, label='Diff. Enhancement')
 	
-	# Gravitational Collection Kernel:
 
 	
+	# Gravitational Collection Kernel:
 	Ecoll = np.zeros((sbrn, sbn))
 	j = rint2>=sbr2
 	Ecoll[j] = ((sbr2.repeat(sbn, 1))[j])**2.0/((sbr_sum[j])**2.0)
@@ -219,6 +249,11 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	del_Vf = np.abs(np.repeat(Vfj.reshape(1, sbn), sbrn, 0)-Vfi.reshape(sbrn,1))
 	K_GC = Ecoll*np.pi*((sbr_sum)**2.0)*del_Vf
 	
+	if testf==1:
+		ax0.loglog(sbr*10**6, K_GC[:,0]*10**6, label='Settling')
+		ax1.loglog(sbr*10**6, K_GC[:,1]*10**6, label='Settling')
+	
+	
 	# Kernel for Turbulent Inertial Motion:
 
 	# rate of dissipation of turbulent kinetic energy per gram of medium 
@@ -228,13 +263,20 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# kernel for turbulent inertial motion (15.40)
 	K_TI = (((np.pi*epsilon**(3.0/4.0))/(si.g*kin_visc**(1.0/4.0)))*(
 		sbr_sum**2.0)*del_Vf)
-	
+		
+	if testf==1:
+		ax0.loglog(sbr*10**6, K_TI[:,0]*10**6, label='Turb. inertia')
+		ax1.loglog(sbr*10**6, K_TI[:,1]*10**6, label='Turb. inertia')
 	
 	# kernel for Turbulent Shear (15.41)
 	K_TS = ((8.0*np.pi*epsilon)/(15.0*kin_visc))**0.5*(sbr_sum**3.0)
 	
+	if testf==1:
+		ax0.loglog(sbr*10**6, K_TS[:,0]*10**6, label='Turb. shear')
+		ax1.loglog(sbr*10**6, K_TS[:,1]*10**6, label='Turb. shear')
+	
 	# -----------------------------------------------------------------
-	# van der Waals/viscous collision kernel:	
+	# Van der Waals/viscous collision kernel:	
 	
 	# particle radius (m)
 	radi = sbr2 # radii array (m)
@@ -321,6 +363,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 			# -----------------------------------------
 			# particle Knudsen number calculated above
 			
+			# Cunningham slip-correction factor (dimensionless)
 			Gi = 1.0+Kni[i]*(1.249+0.42*(np.exp(-0.87/Kni[i])))
 			Gj = 1.0+Knj[j]*(1.249+0.42*(np.exp(-0.87/Knj[j])))
 			# particle diffusion coefficient (15.29) (m2/s) (note the 
@@ -349,7 +392,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 			res_all[i, j] = V_E
 		
 	
-	# van der Waals/collision coagulation kernel
+	# Van der Waals/collision coagulation kernel
 	if vdWon == 0:
 		K_V = K_B*(1.0-1.0) # when omitting van der Waals correction for expediency
 	else:
@@ -362,94 +405,144 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# by a dimensionless coalescence efficiency.  For particles under 2um this should be
 	# close to unity it says in the coalescence efficiency section.
 	Beta = (K_B+K_DE+K_GC+K_TI+K_TS+K_V)
-	# zero beta for any size bins that don't have particles
+	
+	if testf==1: # plot to compare to Fig. 15.7 of Jacobson (2005)
+		ax0.loglog(sbr*10**6, Beta[:,0]*10**6, label='Total')
+		ax1.loglog(sbr*10**6, Beta[:,1]*10**6, label='Total')
+		plt.legend()
+		plt.show()
+		return()
+	
+	# zero beta for any size bins that have low number of particles
 	ish = np.squeeze(num_part<1.0e-10)
 	Beta[ish, :] = 0.0
+	ish = np.squeeze(num_part_rint<1.0e-10)
 	Beta[:, ish] = 0.0
 	
 	# Perform coagulation, using the implicit approach of Jacobson (2005), given in 
 	# eq. 15.5 
 
-	# product of Beta and time interval (m3/particle), scale up by 1e6 to convert to 
-	# cm3/particle and therefore consistent with particle concentrations which are 
-	# (# particles/cm3 (air))
-	Beta = Beta*tint*1.0e6
+	# scale up by 1e6 to convert to cm3/particle.s from m3/particle.s
+	# and therefore be consistent with particle concentrations which are 
+	# (# particles/cm3 (air)).  For the production term due to coagulation below, we use
+	# only the k,j coordinates in beta, where j goes as high as k-1, therefore, production
+	# only uses the lower left triangle in beta.  However, the loss term below uses
+	# k,j coordinates where j goes from 1 to the number of size bins
+	Beta = Beta*1.0e6
 	
-	# now produce matrices for number concentration in size bins repeated across rows
-	# and columns
-	num_partk = np.tile(num_part.reshape(-1, 1), (1, sbrn))
-	num_partj = np.tile(num_part.reshape(1, -1), (sbn, 1))
 	
 	# matrix with volume of coagulated particles resulting from pairing of k and j 
-	# particles
-	# single particle volumes of i and j (m3) 
-	sbVmati = (sbVi.reshape(sbrn, 1)).repeat(sbrn, 1)
-	sbVmatj = sbVi.repeat(sbrn, 0)
+	# particles single particle volumes of k and j (m3) 
+	sbVmatk = (sbVi.reshape(-1, 1)).repeat(sbn, 1)
+	sbVmatj = (sbVj.reshape(1, -1)).repeat(sbrn, 0)
 	
 	# combined volume of single coagulated particles (m3)
-	coagV = sbVmati+sbVmatj
-	# set as lower triangular matrices, as the upper triangle is just a repetition of the 
-	# lower and therefore would cause duplication
-	coagV[np.triu_indices(sbrn, k=1, m=None)] = -1.0
+	coagV = sbVmatk+sbVmatj
 	
-	MV = ((M[:, 0]/(rho)).reshape(num_comp, 1)) # molar volume (cc/mol)
-	# total volume of molecules in each size bin (m3)
-	V0 = np.sum(((num_molec[:, :]/(6.0221409e+23*num_part[0, :]))*MV*1.0e-6), 0)
+	# matrix for number concentration at t-h in size bins repeated across rows
+	num_partj = np.tile(num_part.reshape(1, -1), (sbn, 1))
+	# matrix for volume concentration at t-h in size bins repeated across rows
+	vol_partj = np.tile(vol_part.reshape(1, -1), (sbn, 1))
 	
-	# for recording new number of molecules following coagulation
-	num_molec2 = np.zeros((num_comp, sbn))
-	num_molec2[:, :] = num_molec[:, :]
+	# molecular concentration for k and j particles (# particles /cc (air)), components in
+	# rows and size bins in columns.  j will represent the original concentration,
+	# whereas molec_k will be updated during size bin loop below
+	molec_k = np.zeros((num_molec.shape))
+	molec_j = np.zeros((num_molec.shape))
+	molec_k[:,:] = num_molec[:,:]
+	molec_j[:,:] = num_molec[:,:]
 	
+	# use eq. 15.8 of Jacobson (2005) to estimate n_{k,t}
+	# size bin loop, starting (importantly) with smallest size bin
+	for sbi in range(sbn):
 	
-	for sbi in range(sbn): # loop through size bins
-	
-		# index of where new particles for this size bin come from
-		new_ind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
-		Beta2 = np.zeros((sbn, sbrn))
-		Beta2[:, :] = Beta*new_ind # Beta with only the relevant kernels left
+		# matrix for updated number concentrations (all those with index<sbi) are
+		# concentrations at t, not t-h (concentrations spread across columns)
+		# (# particles/cc (air))
+		num_partk = np.tile(num_part.reshape(-1, 1), (1, sbrn))
 		
-		# number of particles coagulating for every k-j pair, eq. 15.5 of Jacobson (2005)
-		numcoag = Beta2*num_partk*num_partj
-		numcoagtot = Beta*num_partk*num_partj # all kernels, for loss calculation
-		# effect change in number of particles
-		Pn_gain = ((numcoag).sum().sum())
-		Pn_lost = ((numcoagtot[sbi, :]).sum())+((numcoagtot[:, sbi]).sum())
-		num_part[0, sbi] += Pn_gain-Pn_lost
-
-		# fraction of number of k particles coagulating with j for production
-		numfrack = (numcoag/num_partk)
-		# sum over columns to get total fraction of k contributing to new particles
-		numfrack = numfrack.sum(1)
-		# fraction of number of j particles coagulating with k for production
-		numfracj = (numcoag/num_partj)
-		# sum over rows to get total fraction of j contributing to new particles
-		numfracj = numfracj.sum(0)
-		
-		# now multiply each by number of molecules per size bin and sum over size bins
-		# for total molecules going to new size bin
-		molec_gain = (numfrack*num_molec+numfracj*num_molec).sum(1)
+		# index of k,j size bin pairs that can coagulate to give a volume that fits 
+		# into k
+		volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
+		# note in Eq. 15.8, we use n_{k-j,t}, and even though coagulation of sbi with 
+		# itself may produce a particle within the sbi bin, its number concentration
+		# has not yet been updated (from t-h to t), so we can't use it here, instead
+		# we explicitly account for coagulation with itself below
+		volind[sbi, :] = 0.0 
+		volind[:, sbi] = 0.0 
 			
-		# now, for molecules lost from k
-		# first get number of particles lost from k and divide by total number
-		numfrack = ((numcoagtot[sbi, :].sum()+numcoagtot[:, sbi].sum()))/num_partk[sbi, 0]
-		
-		molec_lost = numfrack*num_molec[:, sbi]
-		molec_change = molec_gain-molec_lost
-		num_molec2[:, sbi] += molec_change
+		# using only the relevant k-j pairs in beta, number of particles from k and j
+		# size bins coagulating to give new particle in sbi (#particles/cc.s).
+		# This accounts for both the upper and lower diagonal of Beta, so considers
+		# k-j pairs as well as j-k
+		numsum_ind = (Beta*volind)*(num_partk*num_partj)
 			
+		# sum to get the total rate of number of particles coagulating (from k and j) 
+		# (#particles/cc.s)
+		numsum = (numsum_ind.sum()).sum()
 
+		# numerator, note we use num_partj as want n_{k,t-h}; multiply by 0.5 since 2 
+		# particles make 1
+		num = num_partj[0,sbi]+0.5*tint*numsum
+		# particle number only from sbi when newly coagulated particles give a volume
+		# outside the current bounds
+		volind = coagV[sbi,:]>=sbbound[0, sbi+1]
+		# lose half the number of particles of sbi coagulating with itself to give a 
+		# volume in sbi
+		if (coagV[sbi, sbi]>=sbbound[0, sbi] and coagV[sbi, sbi]<sbbound[0, sbi+1]):
+			volind[sbi] = 0.5
+		# denominator, representing particle number loss from this size bin
+		den = 1.0+tint*((Beta[sbi, :]*volind*num_partj[0, :]).sum())
+		# updated number concentration (#particles/cc (air)) eq. 15.8 Jacobson (2005)
+		num_part[0, sbi] = num/den
+		
+		# --------------------------------------------------------------------------------
+		# particle concentration rate coagulating from each size bin
+		volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
+		# Eq. 15.8 with loss term removed
+		numsum_ind = (Beta*volind)*(num_partk*num_partj)
+		numsumj = ((numsum_ind.sum(axis=0))*0.5).reshape(-1,1)
+		numsumk = ((numsum_ind.sum(axis=1))*0.5).reshape(-1,1)
+		# ignore any particles from sbi that coagulate to give a particle in sbi
+		numsumj[sbi] = 0.0
+		numsumk[sbi] = 0.0
+		# particle concentration gained by sbi from each smaller bin
+		num_contr = np.squeeze((numsumj+numsumk)*tint)
+		# molecular concentration gained by sbi from each smaller bin, note that if 
+		# molec_k (new concentration) used instead of molec_j (old concentration), 
+		# mass conservation issues can arise when two neighbouring size bins with very
+		# different original number concentration coagulate to 
+		# give a particle in a larger size bin
+		molec_contr = ((num_contr/num_partj[0,:]).reshape(1,-1)*molec_j).sum(axis=1)
+		
+		# particle number only from sbi when newly coagulated particles give a volume
+		# outside the current bounds
+		volind = coagV[sbi,:]>=sbbound[0, sbi+1]
+		# number concentration of particles lost from sbi to produce larger particles
+		# through coagulation, Eq. 15.8 with production term removed
+		num_lost =  num_partj[0, sbi] - num_partj[0, sbi]/(1.0+tint*((Beta[sbi, :]*volind*num_partj[0, :]).sum()))
+		# molecular concentration represented by this loss
+		molec_loss = molec_j[:, sbi]*(num_lost/num_partj[0, sbi])
+		# new molecular concentration in sbi
+		molec_k[:, sbi] = molec_k[:, sbi]+(molec_contr-molec_loss)
+
+	
+	# using new molecular concentration, calculate new dimensions per size bin 
 	MV = (M[:, 0]/(rho)).reshape(num_comp, 1) # molar volume (cc/mol)
 	# new volume of single particle per size bin (um3)
 	ish = num_part[0, :]>1.0e-20 # only use size bins where particles reside
 	Vnew = np.zeros((sbrn))
-	Vnew[ish] = np.sum(((num_molec2[:, ish]/(6.0221409e+23*num_part[0, ish]))*MV*1.0e12), 
-				0)
+	Vnew[ish] = np.sum(((molec_k[:, ish]/(si.N_A*num_part[0, ish]))*MV*1.0e12), 0)
 
 	# new radius per size bin (um)
-	ish = num_part[0, :]<=1.0e-20 # only use size bins where particles reside
 	rad = ((3.0*Vnew)/(4.0*np.pi))**(1.0/3.0)
+	# size bins with no particle assigned central radius
+	ish = num_part[0, :]<=1.0e-20
 	rad[ish] = rad0[ish]
+	# just want particle number concentration as an array with one dimension
+	if num_part.ndim>1:
+		num_part = num_part[0, :]
 
 	# return number of particles/cc(air) per size bin (columns) and
 	# number of molecules (molecules/cc(air)) flattened into species followed by size bins
-	return(np.squeeze(num_part), num_molec2.flatten(order='F'), rad, Gi, eta_ai, Vnew)
+	return(num_part, molec_k.flatten(order='F'), rad, Gi, eta_ai, Vnew)

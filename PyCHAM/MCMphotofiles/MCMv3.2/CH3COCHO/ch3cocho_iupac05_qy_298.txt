@@ -1,0 +1,31 @@
+methylglyoxal (CH3C(O)CHO = CH3CO + HCO) pressure dependent quantum yields (298 K)
+
+IUPAC 2005 Recommendation
+http://www.iupac-kinetic.ch.cam.ac.uk
+
+Chen, Y., W. Wang, and L. Zhu, Wavelength-dependent photolysis of methylglyoxal 
+in the 290-440 nm region, J Phys Chem A, 104, 11126-11131, 2000
+
+zero pressure quantum yields are unity from 280 to 380 nm
+
+Apply Stern-Volmer relationship
+
+lambda (nm)	phi (zero)	phi (760 Torr)
+290	1	0.993030416
+300	1	0.981081516
+310	1	0.952710926
+320	1	0.892510118
+330	1	0.783124914
+340	1	0.622525325
+350	1	0.440624798
+360	1	0.28161113
+370	1	0.168454685
+380	0.92	0.09696674
+390	0.89	0.056109539
+400	0.56	0.032126805
+410	0.32	0.018768341
+420	0.27	0.011457273
+430	0.2	0.007092255
+440	0.17	0.004497625
+
+

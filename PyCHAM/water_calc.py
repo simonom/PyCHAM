@@ -1,10 +1,10 @@
-'''module to calculate saturation vapour pressure of water'''
+'''module to calculate gas-phase concentration of water'''
 
 import numpy as np
 
 def water_calc(TEMP, RH, NA):
 
-	# saturation vapour pressure (Pa) (TEMP in K.) (need a reference - have emailed Dave)
+	# saturation vapour pressure (Pa) (TEMP in K.)
 	Psat_water = (np.exp((-0.58002206E4/TEMP)+0.13914993E1-(0.48640239E-1*TEMP) 
 		+ (0.41764768E-4*(TEMP**2.0E0))-(0.14452093E-7*(TEMP**3.0E0))+ 
 		(0.65459673E1*np.log(TEMP))))

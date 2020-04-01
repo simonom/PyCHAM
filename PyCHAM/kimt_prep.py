@@ -3,7 +3,7 @@
 import numpy as np
 import scipy.constants as si
 
-def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
+def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, act_wi, act_w):
 	
 	# ------------------------------------------------------------------
 	# inputs:
@@ -12,7 +12,8 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	# num_speci - number of components
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# Cw - effective absorbing mass of wall (g/m3 (air))
-	# kgwt - mass transfer coefficient for vapor-wall partitioning (m3/ug.s)
+	# act_wi - index of components with activity coefficients for the wall stated in act_w
+	# act_w - activity coefficients for the wall of components whose index given in act_wi
 	# -----------------------------------------------------------------
 	
 	if testf == 1: # if in testing mode (for test_front.py)
@@ -37,13 +38,17 @@ def kimt_prep(y_mw, TEMP, num_speci, testf, Cw, kgwt):
 	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
 	mfp = (((64.0*DStar_org)/(5*np.pi*therm_sp))*(28.966/(28.966+y_mw))).reshape(-1, 1)
 
-	# accommodation coefficient of particles
+	# accommodation coefficient of components
 	accom_coeff = np.ones((num_speci, 1))*1.0e0
+	
+	# activity coefficient of components
+	act_coeff = np.ones((num_speci, 1))*1.0e0
+	if len(act_wi)>0: # user-defined activity coefficients for wall
+		act_coeff[act_wi] = act_w
 
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
-	# molecules/cc (air), assuming a molecular weight of 200g/mol
+	# molecules/cc (air), assuming a molecular weight of 200g/mol (*1.0e-6 to convert from
+	# /m3 (air) to /cm3 (air))
 	Cw = ((Cw*1.0e-6)/200.0)*si.N_A
 
-	# convert kgwt from m3/g.s to cm3/molecules.s
-	kgwt = (kgwt*1.0e6*200.0)/si.N_A
-	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, kgwt
+	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff

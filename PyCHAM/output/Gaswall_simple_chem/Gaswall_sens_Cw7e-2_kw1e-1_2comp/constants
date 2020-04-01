@@ -1,0 +1,6 @@
+num_sb,1
+num_speci,3
+mw,[72.06266, 120.10391999999999, 18.0]
+mv,[69.9996697334277, 92.30763082251792, 18.0]
+spec_namelist,['MGLYOX', 'two-methylglyceric_acid', 'H2O']
+Cfactor,24614933694.758

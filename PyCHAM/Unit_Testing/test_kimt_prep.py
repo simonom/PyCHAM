@@ -1,3 +1,5 @@
+'''module to unit test kimt_prep.py, which is used in preparation of the gas-particle and gas-wall partitioning odes'''
+
 # function to test kimt_prep.py
 print('function to test kimt_prep.py')
 import os

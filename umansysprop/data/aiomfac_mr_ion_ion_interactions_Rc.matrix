@@ -1,0 +1,13 @@
+# Numbering of subgroups is done the way it was done in old UNIFAC/LIFAC code
+# (e.g.      in PhD thesis of M. Schiller) and NOT exactly according to standard
+# UNIFAC of Hansen et al. (1991) (differences are especially between subgroups
+# 9 and 70 and of course with the added extensions)
+
+# ion     ion     interaction
+# group   group   parameter      
+            203    204  
+   203      0.0   -0.154486414200000e+00
+   204      -0.154486414200000e+00  0.0
+
+
+

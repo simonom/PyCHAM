@@ -10,17 +10,31 @@ import pybel
 import formatting
 import xmltodict # for opening and converting xml files to python dictionaries
 import ipdb
+from water_calc import water_calc
 
 # ----------Extraction of eqn info----------
 # Extract the mechanism information
-def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
+def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH, 
+						start_sim_time, lat, lon, act_flux_path, DayOfYear):
 
-	# inputs:
-	# testf - flag for operating in normal mode (0) or testing mode (1)
 	
-	if testf == 1:
-		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-    	
+	# inputs: ----------------------------------------------------------------------------
+	# testf - flag for operating in normal mode (0) or testing mode (1)
+	# ------------------------------------------------------------------------------------
+	
+	if testf == 1: # for just testing mode
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+    
+    # calculate gas-phase concentrations of M, N2 and O2 (molecules/cc (air))
+	# 1.0e-6 converts from molecules/m3 to molecules/cc
+	# R and Avogadro's constant set the same as in atmosphereFunctions.f90 of AtChem2
+	M_val = (PInit/(8.3144621*TEMP)*6.02214129e+23)*1.0e-6
+	# N2 and O2 given the same multiplication as in atmosphereFunctions.f90 of AtChem2
+	N2_val = M_val*0.7809
+	O2_val = M_val*0.2095
+	# water concentration (C_H2O) (molecules/cc (air))
+	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH, 6.02214129e+23)
+    
 	# Open the file
 	f_open_eqn = open(filename, mode='r')
 	
@@ -32,21 +46,106 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 		print('IOError')
 		print('Eqn file not closed')
 		sys.exit()
-
-	# equation list without comments
-	naked_list_eqn = formatting.remove_comments(total_list_eqn)
 	
-	# calculate gas-phase concentrations of M, N2 and O2 (molecules/cc (air))
-	# 1.0e-6 converts from molecules/m3 to molecules/cc
-	M_val = (PInit/(8.3144598*TEMP)*6.0221409e+23)*1.0e-6
-	N2_val = M_val*0.79
-	O2_val = M_val*0.2096
+	naked_list_eqn = [] # empty list for equation reactions
+	RO2_names = [] # empty list for peroxy radicals
+	rrc = [] # empty list for reaction rate coefficients
+	rrc_name = [] # empty list for reaction rate coefficient labels
+	eq_marker = r"%"
+	pr_marker = r"RO2"
+	eqn_flag = 0 # don't collate reaction equations until seen
+	pr_flag = 0 # don't collate peroxy radicals until seen
+	rrc_flag = 0 # don't collate reaction rate coefficients until seen
+	
+	# obtain lists for reaction rate coefficients, peroxy radicals and equation reactions
+	# using chemical scheme input file separators
+	for line in total_list_eqn:
+		
+		line1 = line.strip() # remove bounding white space
+		
+		# --------------------------------------------------------------------------------
+		# generic reaction rate coefficients part
+		# look out for start of coefficients
+		if line1 == str('* Generic Rate Coefficients ;'):
+			rrc_flag = 1 # ready to collate reaction rate coefficients
+		matchObj = re.match( r"\*\*\*\*", line1) # look out for end of coefficients
+		if matchObj:
+			rrc_flag = 0 # stop appending reaction equations
+		# collate reaction rate coefficients
+		if (rrc_flag==1 and re.match( r"(.*) = (.*)", line1)!=None): 
+			# remove end characters
+			line2 = line1.replace(';', '')
+			# remove all white space
+			line2 = line2.replace(' ', '')
+			# convert fortran-type scientific notation to python type
+			line2 = formatting.SN_conversion(line2)
+			# ensure rate coefficient is python readable
+			line2 = formatting.convert_rate_mcm(line2)
+			rrc.append(line2.strip())
+			# get just name of reaction rate coefficient
+			rrc_name.append((line2.split('=')[0]).strip())
+		
+		# --------------------------------------------------------------------------------
+		# peroxy radical part
+		if (re.match(pr_marker, line1) != None): # now start logging peroxy radicals
+			pr_flag = 1
+		if line1 == str('*;'): # no longer log peroxy radicals
+			pr_flag=0
+		if (pr_flag==1):
+			line2 = line1.split('+')
+			for line3 in line2: # loop through elements in line
+				if len(line3.split('='))>1:
+					line3 = (line3.split('='))[1]
+				if len(line3.split(';'))>1:
+					line3 = (line3.split(';'))[0]
+				if (line3.strip() == '' or line3.strip() == 'RO2'):
+					continue
+				else:
+					RO2_names.append(line3.strip())
+		# --------------------------------------------------------------------------------
+		# reaction equation part
+		if line1 == str('* Reaction definitions. ;'): # look out for start of equations
+			eqn_flag = 1 # ready to compile equations
+		if (eqn_flag==1 and re.match(eq_marker, line1) != None):
+			naked_list_eqn.append(line1) # begin storing reaction equations
 			
-	# format the equation list
+		matchObj = re.match( r'(.*) End (.*)', line1) # look out for end of equations
+		if matchObj:
+			eqn_flag = 0 # stop appending reaction equations
+			
+		# --------------------------------------------------------------------------------
 	
+	# format the equation list
+
 	# naked_list_eqn contains everything except the comments starting with //
 	print('Now parsing the eqn info...\n')
-	num_eqn = len(naked_list_eqn)
+	
+	# first loop through equation list to concatenate any multiple lines that hold just
+	# one equation, note this depends on a symbol representing the start and end of
+	# and equation (inside MCM this is % for start and ; for end)
+	for iline in range (0, len(naked_list_eqn)):
+		
+		# keep track of when we reach end of naked_list_eqn (required as naked_list_eqn
+		# may shorten)
+		if (iline+1)==len(naked_list_eqn):
+			break
+			
+		# if one equation already on one line
+		if (re.search(r'%', naked_list_eqn[iline])!=None and re.search(r';', naked_list_eqn[iline])!=None):
+			continue
+		# if spread across more than one line
+		else:
+			con_count = 1 # count number of lines that need concatenating
+			iline2 = iline # index for further lines
+			while con_count!=0:
+				iline2 += 1 # move onto next line
+				naked_list_eqn[iline] = str(naked_list_eqn[iline]+naked_list_eqn[iline2])
+				if re.search(r';', naked_list_eqn[iline2])!=None:
+					# remove concatenated line(s) from original list
+					naked_list_eqn = naked_list_eqn[0:iline]+naked_list_eqn[iline2+1::]
+					con_count = 0 # finish concatenating
+	
+	num_eqn = len(naked_list_eqn) # get number of equations
 	
 	
 	# --open and initialise the xml file for converting chemical names to SMILES-----
@@ -72,13 +171,6 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	max_no_reac = 0.0 # log maximum number of reactants in a reaction
 	max_no_prod = 0.0 # log maximum number of products in a reaction
 	
-	# convert input component names for components present in gas phase at experiment
-	# start from chemical scheme names to SMILES
-	init_SMIL = []
-	
-	for species_step in range(len(Comp0)): 
-		name_indx = spec_name.index(Comp0[species_step])
-		init_SMIL.append(spec_smil[name_indx])
 	species_step = 0 # ready for equation loop
 	
 	# initialising lists
@@ -92,11 +184,11 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# matrix to record stoichometries of products (cols) in each equation (rows)
 	pstoi = np.zeros((num_eqn, 1))
 	# array to store number of reactants and products in an equation
-	nreac = np.zeros((num_eqn))
-	nprod = np.zeros((num_eqn))
+	nreac = np.empty(num_eqn, dtype=np.int8)
+	nprod = np.empty(num_eqn, dtype=np.int8)
 	# list for equation reaction rate coefficients
 	reac_coef = []
-	# list for species
+	# list for components' SMILE strings
 	spec_list = []
 	# list of Pybel objects
 	Pybel_objects = []
@@ -106,7 +198,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# Loop through the equations line by line and extract the information
 	for eqn_step in range(num_eqn):
 	
-		line = naked_list_eqn[eqn_step]
+		line = naked_list_eqn[eqn_step] # extract this line
 		
 		# split the line into 2 parts: equation; rate coef 
 		# (fac format doesnt have id for each equation)
@@ -133,8 +225,8 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 			pindx = np.append(pindx, (np.zeros((num_eqn, 1))).astype(int), axis=1)
 			pstoi = np.append(pstoi, (np.zeros((num_eqn, 1))), axis=1)
 
-		# extract the rate constant (in a string)
-		rate_regex = r"\%.*\:" # rate coef starts with a : and end with a ；
+		# extract the reaction rate constant (in a string)
+		rate_regex = r"\%.*\:" # rate coef starts with a % and end with a :
 		# rate_ex: rate coefficient expression in a string
 		rate_ex = re.findall(rate_regex, line)[0][1:-1].strip()
 		# convert fortran-type scientific notation to python type
@@ -154,93 +246,119 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 		
 		# left hand side of equations (losses)
 		for reactant in reactants:
-		
-			if reactant not in spec_namelist:
-				spec_namelist.append(reactant)
+				
 			if (re.findall(stoich_regex, reactant)[0] != ''):
 				stoich_num = float(re.findall(stoich_regex, reactant)[0])
-				name_only = re.sub(stoich_regex, '', reactant) # name with no stoich number
+				# name with no stoich number
+				name_only = re.sub(stoich_regex, '', reactant)
 			elif (re.findall(stoich_regex, reactant)[0] == ''):
 				stoich_num = 1.0
 				name_only = reactant
 			
 			# store stoichometry
 			rstoi[eqn_step, reactant_step] = stoich_num
-
-			# convert MCM chemical names to SMILES
-			# index where xml file MCM name matches MCM name
-			if name_only in spec_name:
-				
-				name_indx = spec_name.index(name_only)
-				name_only = spec_smil[name_indx]
 			
-			if (name_only not in spec_list):
-				spec_list.append(name_only) # log parsed species
+			if name_only not in spec_namelist: # if new component encountered
+				spec_namelist.append(reactant) # add to chemical scheme name list
+			
+				# convert MCM chemical names to SMILES
+				if name_only in spec_name:
+					# index where xml file name matches reaction component name
+					name_indx = spec_name.index(name_only)
+					name_SMILE = spec_smil[name_indx] # SMILES of component
+				else:
+					sys.exit(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
+			
+				spec_list.append(name_SMILE) # list SMILE names
 				name_indx = species_step # allocate index to this species
 				# Generate pybel
-				Pybel_object = pybel.readstring('smi', name_only)
+				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)
 				
 				species_step += 1 # number of unique species
 				
 
-			else: # if it's a species already encountered
-				# pre-defined number of species
-				name_indx = spec_list.index(name_only)
-
+			else: # if it's a species already encountered it will be in spec_list
+				# existing index
+				name_indx = spec_namelist.index(name_only)
+			
 			# store reactant index
-			rindx[eqn_step, reactant_step] = int(name_indx)
+			# check if index already present - i.e. component appears more than once
+			if sum(rindx[eqn_step, 0:reactant_step]==int(name_indx))>0:
+				# get pre-existing index of this component
+				exist_indx = np.where(rindx[eqn_step, 0:reactant_step]==(int(name_indx)))
+				# add to pre-existing stoichometry
+				rstoi[eqn_step, exist_indx] += rstoi[eqn_step, product_step]
+				rstoi[eqn_step, reactant_step] = 0 # remove stoichometry added above
+				reactant_step -= 1 # ignore this duplicate product
+			else:
+				rindx[eqn_step, reactant_step] = int(name_indx)
 
 			reactant_step += 1
 			
 		# number of reactants in this equation
-		nreac[eqn_step] = reactant_step
+		nreac[eqn_step] = int(reactant_step)
 		
 		# right hand side of equations (gains)
 		for product in products:
-			if product not in spec_namelist:
-				spec_namelist.append(product)
+
 			if (re.findall(stoich_regex, product)[0] != ''):
 				stoich_num = float(re.findall(stoich_regex, product)[0])
 				name_only = re.sub(stoich_regex, '', product) # name with no stoich number
+
 			elif (re.findall(stoich_regex, product)[0] == ''):
 				stoich_num = 1.0
 				name_only = product
 			
 			# store stoichometry
 			pstoi[eqn_step, product_step] = stoich_num
-						
-			# convert MCM chemical names to SMILES
-			# index where xml file MCM name matches MCM name
-			if name_only in spec_name:
-				
-				name_indx = spec_name.index(name_only)
-				name_only = spec_smil[name_indx]
 			
-			if (name_only not in spec_list):
-				spec_list.append(name_only) # log parsed species
+			if name_only not in spec_namelist: # if new component encountered
+				spec_namelist.append(product)
+				
+				# convert MCM chemical names to SMILES
+				# index where xml file name matches reaction component name
+				if name_only in spec_name:
+					name_indx = spec_name.index(name_only)
+					name_SMILE = spec_smil[name_indx]
+				else:
+					sys.exit(str('Error: inside eqn_parser, chemical scheme name '+str(spec_name)+' not found in xml file'))
+				
+				spec_list.append(name_SMILE) # list SMILE string of parsed species
 				name_indx = species_step # allocate index to this species
 				# Generate pybel
 				
-				Pybel_object = pybel.readstring('smi', name_only)
+				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)
 				
 				species_step += 1 # number of unique species
 				
+			
 
 			else: # if it's a species already encountered
-				# pre-defined number of species
-				name_indx = spec_list.index(name_only)
-
+				# index of component already listed
+				name_indx = spec_namelist.index(name_only)
+				
 			# store product index
-			pindx[eqn_step, product_step] = int(name_indx)
-			
+			# check if index already present - i.e. component appears more than once
+			if sum(pindx[eqn_step, 0:product_step]==int(name_indx))>0:
+				exist_indx = np.where(pindx[eqn_step, 0:product_step]==(int(name_indx))) # get pre-existing index of this component
+				# add to pre-existing stoichometry
+				pstoi[eqn_step, exist_indx] += pstoi[eqn_step, product_step]
+				pstoi[eqn_step, product_step] = 0 # remove stoichometry added above
+				product_step -= 1 # ignore this duplicate product
+			else:
+				pindx[eqn_step, product_step] = int(name_indx)
 			product_step += 1
-			
+		
 		# number of products in this equation
-		nprod[eqn_step] = product_step
+		nprod[eqn_step] = int(product_step)
+		
+	if len(spec_list)!=len(spec_namelist):
+		sys.exit('Error: inside eqn_parser, length of spec_list is different to length of spec_namelist and the SMILES in the former should align with the chemical scheme names in the latter')	
+		
 		
 	# number of columns in rindx and pindx
 	reacn = rindx.shape[1]
@@ -248,13 +366,27 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	
 	# create a 2 column array, the first column with the RO2 list index of any RO2 species
 	# that appear in the species list, the second column for its index in the species list
-	RO2_indices = write_RO2_indices(spec_namelist)
+	RO2_indices = write_RO2_indices(spec_namelist, RO2_names)
 	
+	# automatically generate the Rate_coeffs module that will allow rate coefficients to
+	# be calculated inside ode_gen module
+	# now create reaction rate file (reaction rates are set up to have units /s)
+	write_rate_file(reac_coef, rrc, rrc_name, M_val, N2_val, O2_val, TEMP, C_H2O, testf)
+
 	# print the brief info for the simulation to the screen
 	print('Briefing:')
 	print('Total number of equations: %i' %(num_eqn))
-	print('Total number of species: %i\n' %(species_step))
-
+	print('Total number of species found in chemical scheme file: %i\n' %(species_step))
+	
+# 	print(rindx[940,:], 'whoop',pindx[940,:])
+# 	print(spec_namelist[312])
+# 	print(spec_namelist[1])
+# 	count = 0
+# 	for i in spec_namelist:
+# 		if i == "O3":
+# 			print(count, i)
+# 		count+=1
+# 	ipdb.set_trace()
 	# outputs: 
 	
 	# rindx  - matrix to record indices of reactants (cols) in each equation (rows)
@@ -262,7 +394,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# rstoi - matrix to record stoichometries of reactants (cols) in each equation (rows)
 	# pstoi - matrix to record stoichometries of products (cols) in each equation (rows)
 	# reac_coef - list for equation reaction rate coefficients
-	# spec_list - list for species
+	# spec_list - list for components' SMILE strings
 	# Pybel_objects - list of Pybel objects
 	# species_step - number of species
 	# num_eqn - number of equations
@@ -274,190 +406,149 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, Comp0, testf):
 	# M_val - gas-phase concentration of M (molecules/cc (air))
 	# N2_val - gas-phase concentration of nitrogen (molecules/cc (air))
 	# O2_val - gas-phase concentration of oxygen (molecules/cc (air))
-	# init_SMIL - SMILE string for each component
+	# spec_namelist - list of component names used in the chemical reaction file
 	
 	return (rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, 
 			species_step, RO2_indices, nreac,
-			nprod, prodn, reacn, M_val, N2_val, O2_val, init_SMIL)
+			nprod, prodn, reacn, M_val, N2_val, O2_val, C_H2O, 
+			Psat_water, H2O_mw, spec_namelist)
 
 
 
 # This function generates a python script that calculate rate coef. numerically
 # main part by Dave (/s)
-def write_rate_file(filename, reac_coef, mcm_constants, MCMConstNameList, testf, M, N2, 
-					O2):
-    if testf==0:
-    	f = open('PyCHAM/Rate_coeffs.py', mode='w')
-    if testf==2:
-    	f = open('Rate_coeffs.py', mode='w')
-    f.write('\'\'\'module for calculating gas-phase reaction rate coefficients, automatically generated by eqn_parser\'\'\'\n')
-    f.write('\n')
-    f.write('##################################################################################################### \n') # python will convert \n to os.linesep
-    f.write('# Python function to hold expressions for calculating rate coefficients for a given equation number # \n') # python will convert \n to os.linesep
-    f.write('#    Copyright (C) 2017  David Topping : david.topping@manchester.ac.uk                             # \n')
-    f.write('#                                      : davetopp80@gmail.com                                       # \n')
-    f.write('#    Personal website: davetoppingsci.com                                                           # \n')
-    f.write('#                                                                                                   # \n')
-    f.write('#                                                                                                   # \n')
-    f.write('#                                                                                                   # \n')
-    f.write('##################################################################################################### \n')    
-    f.write('# Minor modified by XSX\n')
-    f.write('# File Created as %s\n' %(datetime.datetime.now()))
-    f.write('\n')
-    f.write('import numpy\n')
-    f.write('\n')
+def write_rate_file(reac_coef, rrc, rrc_name, M, N2, O2, TEMP, C_H2O, testf):
+	if testf==0:
+		f = open('PyCHAM/Rate_coeffs.py', mode='w')
+	if testf==2:
+		f = open('Rate_coeffs.py', mode='w')
+	f.write('\'\'\'module for calculating gas-phase reaction rate coefficients, automatically generated by eqn_parser\'\'\'\n')
+	f.write('\n')
+	f.write('##################################################################################################### \n') # python will convert \n to os.linesep
+	f.write('# Python function to hold expressions for calculating rate coefficients for a given equation number # \n') # python will convert \n to os.linesep
+	f.write('#    Copyright (C) 2017  David Topping : david.topping@manchester.ac.uk                             # \n')
+	f.write('#                                      : davetopp80@gmail.com                                       # \n')
+	f.write('#    Personal website: davetoppingsci.com                                                           # \n')
+	f.write('#                                                                                                   # \n')
+	f.write('#                                                                                                   # \n')
+	f.write('#                                                                                                   # \n')
+	f.write('##################################################################################################### \n')    
+	f.write('# Minor modified by XSX\n')
+	f.write('# File Created at %s\n' %(datetime.datetime.now()))
+	f.write('\n')
+	f.write('import numpy\n')
+	f.write('import PhotolysisRates\n')
+	f.write('\n')
 
-    # following part is the function (there should be an indent at the start of each line)
-    # suggest using 4 SPACES instead of 1 Tab
-    f.write('def evaluate_rates(RO2, H2O, TEMP, lightm):\n')
-    f.write('    # mcm_constants_dict: given by mcm_constants.py\n')
-    f.write('    # RO2: specified by the chemical scheme. eg: subset of MCM\n')
-    f.write('    # H2O, TEMP: given by the user\n')
-    f.write('    # lightm: given by the user and is 0 for lights off and 1 for on\n')
-    f.write('    # Creating reference to constant values used in rate expressions\n')
-    f.write('    # mcm_constants_dict: given by MCM_constants.py\n')
-    # retrive generic rate coef calculated by MCM_constants.py
-    for rate_key in range (len(mcm_constants)):
-        f.write('    %s = %s \n' %(MCMConstNameList[rate_key], mcm_constants[rate_key]))
-    f.write('    \n')
-    f.write('    if lightm == 0:\n')
-    f.write('    	J = [0]*len(J)\n')
-    f.write('    # Environmental Variables: M, O2, N2\n')
-    f.write('    M = ' + str(M) + ' # 3rd body; number of molecules in per unit volume\n')
-    f.write('    N2 = ' + str(N2) + ' # Nitrogen mass mixing ratio : 79%\n')
-    f.write('    O2 = ' + str(O2) + ' # Oxygen mass mixing ratio : 20.96%\n')
-    
-    # calculate the rate coef. numerically for each equation
-    f.write('    rate_values = numpy.zeros(%i)\n' %(len(reac_coef)))
-    # BE NOTIFIED!!!: before writing the script, 'reac_coef' must be converted to 
-    # python-compatible format
-    f.write('    # reac_coef has been formatted so that python can recognize it\n')
-    for eqn_key in range (len(reac_coef)):
-        f.write('    rate_values[%s] = %s\n' %(eqn_key, reac_coef[eqn_key]))
-    
-    f.write('\n')
-    f.write('    return rate_values\n')
-    f.close()
+	# following part is the function (there should be an indent at the start of each line)
+	# suggest using 4 SPACES instead of 1 Tab
+	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2):\n')
+	f.write('\n')
+	f.write('	# inputs:\n')
+	f.write('	# M - third body concentration (molecules/cc (air))\n')
+	f.write('	# N2 - nitrogen concentration (molecules/cc (air))\n')
+	f.write('	# O2 - oxygen concentration (molecules/cc (air))\n')
+	f.write('\n')
+	f.write('	# mcm_constants_dict: given by mcm_constants.py\n')
+	f.write('	# RO2: specified by the chemical scheme. eg: subset of MCM\n')
+	f.write('	# H2O, TEMP: given by the user\n')
+	f.write('	# lightm: given by the user and is 0 for lights off and 1 for on\n')
+	f.write('	# reaction rate coefficients and their names parsed in eqn_parser.py \n')
+	f.write('\n')
+	f.write('	# calculate reaction rates with given by chemical scheme\n')
+	# code to calculate rate coefficients given by chemical scheme file
+	for line in rrc:
+		f.write('	%s \n' %line)
+	f.write('\n')
+	f.write('	# estimate and append photolysis rates\n')
+	f.write('	J = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear)\n')
+	f.write('	if lightm == 0:\n')
+	f.write('		J = [0]*len(J)\n')
 
+	# calculate the rate coef. numerically for each equation
+	f.write('	rate_values = numpy.zeros(%i)\n' %(len(reac_coef)))
+	# BE NOTIFIED!!!: before writing the script, 'reac_coef' must be converted to 
+	# python-compatible format
+	f.write('	# reac_coef has been formatted so that python can recognize it\n')
+	for eqn_key in range (len(reac_coef)):
+		f.write('	rate_values[%s] = %s\n' %(eqn_key, reac_coef[eqn_key]))
+	f.write('	\n')
+	f.write('	return rate_values\n')
+	f.close()
+
+# function to automatically generate a module that is used to record the tendency
+# of components (components specified by the user, their index given by rec_comp_index) 
+# to change in response to box model 
+# mechanisms - gets called inside ode_gen on each time step
+def write_dydt_rec():
+
+	f = open('PyCHAM/dydt_rec.py', mode='w')
+	f.write('\'\'\'module for calculating and recording change tendency of components, automatically generated by eqn_parser\'\'\'\n')
+	f.write('\n')
+	f.write('# File Created at %s\n' %(datetime.datetime.now()))
+	f.write('\n')
+	f.write('import numpy as np \n')
+	f.write('\n')
+	# following part is the function (there should be an indent at the start of each line)
+	# suggest 1 Tab
+	f.write('def dydt_rec(y, rindx, rstoi, reac_coef, pindx, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff):\n')
+	f.write('	# loop through components to record the tendency of change \n')
+	f.write('	for compi in dydt_vst.get(\'comp_index\'): \n')
+	f.write('		# open relevant dictionary value \n')
+	f.write('		dydt_rec = dydt_vst.get(compi) \n')
+	f.write('		# keep count on relevant reactions \n')
+	f.write('		reac_count = 0 \n')
+	f.write('		# loop through relevant reactions \n')
+	f.write('		for i in dydt_rec[0,0:-2]: # final two rows for particle- and wall-partitioning \n')
+	f.write('			i = int(i) # ensure index is integer # this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) \n')
+	f.write('			# estimate gas-phase change tendency for every reaction involving this component \n')
+	f.write('			gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i] \n')
+	f.write('			# identify whether this component reacted or produced\n')
+	f.write('			if sum(rindx[i, 0:nreac[i]]==compi)>0: \n')
+	f.write('				dydt_rec[step+1, reac_count] -= ((gprate)) #*3600)/np.abs(y[compi]))*100.0 \n')
+	f.write('			if sum(pindx[i, 0:nprod[i]]==compi)>0: \n')
+	f.write('				dydt_rec[step+1, reac_count] += ((gprate)) #*3600)/np.abs(y[compi]))*100.0 \n')
+	f.write('			reac_count += 1 \n')
+	f.write('		# now estimate and record tendency to change due to particle- and wall-partitioning  \n')
+	f.write('		# particle-partitioning \n')
+	f.write('		for ibin in range(num_sb-1): # size bin loop\n')
+	f.write('			Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]\n')
+	f.write('			conc_sum = np.zeros((1)) \n')
+	f.write('			if pconc>0.0: # if seed particles present \n')
+	f.write('				conc_sum[0] = ((Csit[0:-1].sum())+Csit[-1]*core_diss)\n')
+	f.write('			else: \n')
+	f.write('				conc_sum[0] = Csit.sum() \n')
+	f.write('			# prevent numerical error due to division by zero \n')
+	f.write('			ish = conc_sum==0.0 \n')
+	f.write('			conc_sum[ish] = 1.0e-40 \n')
+	f.write('			# particle surface gas-phase concentration (molecules/cc (air)) \n')
+	f.write('			Csit = (Csit[compi]/conc_sum)*Psat[compi, 0]*kelv_fac[ibin]*act_coeff[compi, 0] \n')
+	f.write('			# partitioning rate (molecules/cc.s) \n')
+	f.write('			dydt_all = kimt[compi, ibin]*(y[compi]-Csit) \n')
+	f.write('			# gas-phase change (molecules/cc/s) \n')
+	f.write('			dydt_rec[step+1, reac_count] -= dydt_all \n')
+	f.write('		# wall-partitioning \n')
+	f.write('		if (kwgt)>1.0e-10: \n')
+	f.write('			# concentration at wall (molecules/cc (air)) \n')
+	f.write('			Csit = y[num_speci*num_sb:num_speci*(num_sb+1)] \n')
+	f.write('			Csit = (Psat[:,0]*(Csit/Cw)*act_coeff[compi, 0])\n')
+	f.write('			dydt_all = (kwgt)*(y[compi]-Csit[compi]) \n')
+	f.write('			# gas-phase change (molecules/cc/s) \n')
+	f.write('			dydt_rec[step+1, reac_count+1] -= dydt_all \n')
+	f.write('		\n')
+	f.write('	return(dydt_vst) \n')
+	f.close()				
+						
+	
 # This function defines RO2 which is given by an MCM file
-# this function is used when certain rate coef. is a function a RO2
-# species_dict2array = {pybel_object: species_num}
-
-def write_RO2_indices(smiles_array):
-    # the list below is an universal list or a full list of RO2. 
-    # Only part of it might be used in real calculation.
-#     RO2_names = ['NBUTOLAO2','HO3C4O2','BU1ENO3O2','C43NO34O2','BZBIPERO2','CH3O2','C2H5O2','HOCH2CH2O2',
-#     'ETHENO3O2','C6H5C2H4O2','EBZBIPERO2','ISOPAO2','ISOPBO2','ISOPCO2','ISOPDO2',
-#     'NISOPO2','CH3CO3','C2H5CO3','NC3H7O2','IC3H7O2','HYPROPO2','IPROPOLO2','PRONO3BO2',
-#     'PRONO3AO2','C6H5CH2O2','TLBIPERO2','CH3COCH2O2','BUT2OLO2','C42NO33O2','IC4H9O2','TC4H9O2','IBUTOLBO2','TBUTOLO2',
-#     'MPRANO3O2','MPRBNO3O2','IPEAO2','IPEBO2','IPECO2','MXYBIPERO2','MXYLO2','MEKAO2',
-#     'MEKCO2','MEKBO2','NC4H9O2','SC4H9O2','HEXAO2','HEXBO2','HEXCO2','PEAO2','PEBO2','PECO2','OXYBIPERO2','OXYLO2',
-#     'PXYBIPERO2','PXYLO2','MPRKAO2','CO2C54O2','HO2C5O2','DIEKAO2','DIEKBO2','BZEMUCO2',
-#     'BZEMUCCO3','C5DIALO2','PHENO2','NPHENO2','EBZMUCO2','EBZMUCCO3','C715CO2O2','EBENZOLO2','NEBNZOLO2','HCOCO3','HMVKAO2',
-#     'HMVKBO2','MVKO2','MACO3','MACRO2','TLEMUCO2','TLEMUCCO3','C615CO2O2','CRESO2',
-#     'NCRESO2','MXYMUCO2','MXYMUCCO3','C726CO5O2','MXYOLO2','NMXYOLO2','OXYMUCO2',
-#     'OXYMUCCO3','MC6CO2O2','OXYOLO2','NOXYOLO2','PXYMUCO2','PXYMUCCO3','C6M5CO2O2','PXYOLO2','NPXYOLO2','HO3C3CO3',
-#     'CO3C4NO3O2','MALDIALCO3','EPXDLCO3','C3DIALO2','MALDIALO2','HOCH2CO3',
-#     'NO3CH2CO3','C6H5CH2CO3','C6DCARBBO2','C58O2','HC4ACO3','HC4CCO3','C57O2',
-#     'C59O2','NC4CO3','C510O2','HO1C3O2','CH3CHOHCO3','PRNO3CO3','C6H5CO3','C5CO14O2',
-#     'IBUTOLCO2','IBUTALBO2','IBUTALCO2','IPRCO3','IPRHOCO3','MPRBNO3CO3','M2BUOL2O2',
-#     'HM2C43O2','BUT2CO3','C52O2','ME2BUOLO2','H2M3C4O2','MIPKAO2','MIPKBO2','ME2BU2OLO2',
-#     'PROL11MO2','HO2M2C4O2','C3MCODBCO3','MXYLCO3','EPXMDLCO3','C3MDIALO2','HO1CO3C4O2','CO2C3CO3','BIACETO2',
-#     'NBUTOLBO2','BUTALO2','C3H7CO3','HO1C4O2','C5H11CO3','HO1C6O2','HEX2ONAO2','HEX2ONBO2','HEX2ONCO2','HO2C6O2','HO3C6O2',
-#     'HEX3ONDO2','HEX3ONCO2','HEX3ONBO2','HEX3ONAO2','C4CHOBO2','C4H9CO3','HO1C5O2','PE2ENEBO2','HO3C5O2','OXYLCO3','EPXM2DLCO3',
-#     'C4MCO2O2','PXYLCO3','CO23C54O2','HO2CO4C5O2','CO24C53O2','HO2C4CO3','HO2C4O2','HOCO3C54O2','CO3C4CO3','BZFUO2','NBZFUO2','HCOCOHCO3','EBFUO2','BUTALAO2',
-#     'NEBFUO2','C6DICARBO2','C7CO3OHO2','MVKOHBO2','MVKOHAO2','CO2H3CO3','ACO3','TLFUO2','NTLFUO2','C5DICARBO2','MC3CODBCO3','C4M2ALOHO2','C4MCODBCO3','C5MCO2OHO2',
-#     'MXYFUO2','C23O3MO2','NMXYFUO2','PXYFUO2','MCOCOMOXO2','NPXYFUO2','MC5CO2OHO2','MC4CODBCO3','OXYFUO2','C6OTKETO2',
-#     'NOXYFUO2','DMKOHO2','C4CO2O2','C51O2','HCOCH2O2','PBZQO2','NBZQO2','NCATECO2','NNCATECO2','CO3H4CO3','PEBQO2','NPEBQO2','ENCATECO2','ENNCATECO2','HOC2H4CO3',
-#     'MECOACETO2','PTLQO2','NPTLQO2','MNCATECO2','MNNCATECO2','HOIPRCO3','IBUDIALCO3','PROPALO2','HOIBUTCO3','HO2C43CO3','C56O2',
-#     'C53O2','C41CO3','PROL1MCO3','H2M2C3CO3','C54O2','CHOMOHCO3','MXYQO2','NMXYQO2','MXNCATECO2','MXNNCATCO2','HO2C3CO3','HOC3H6CO3','C63O2','CO2HOC61O2','CO24C6O2',
-#     'CO25C6O2','C61O2','CO23C65O2','HO3C5CO3','C6HO1CO3O2','C3COCCO3','PEN2ONE1O2','C6CO34O2','C6CO3OH5O2','HO3C4CO3','HO13C5O2','TMB1FUO2','NTMB1FUO2','OXYQO2',
-#     'NOXYQO2','OXNCATECO2','OXNNCATCO2','PXYQO2','NPXYQO2','PXNCATECO2','PXNNCATCO2',
-#     'CO2C4CO3','HO13C4O2','MALANHYO2','DNPHENO2','NDNPHENO2','DNEBNZLO2','NDNEBNZLO2','H13CO2CO3','DNCRESO2','NDNCRESO2',\
-#     'HOBUT2CO3','ACCOCOMEO2','MMALANHYO2','DNMXYOLO2','NDNMXYOLO2','CO3C5CO3','C6O4KETO2','DNOXYOLO2','NDNOXYOLO2',
-#     'TL4OHNO2O2','DNPXYOLO2','NDNPXYOLO2','CO23C4CO3','HCOCH2CO3','C5CO2OHCO3','ECO3CO3','C7OHCO2CO3','ACCOMECO3',
-#     'CH3COCO3','C6CO2OHCO3','C42CO3','H13C43CO3','C4COMOHCO3','C23O3MCO3','C23O3CCO3',
-#     'C7CO2OHCO3','C62O2','C5M2OHOCO3','C6MOHCOCO3','HO13C3CO3','C4CO2DBCO3','C7CO2DBCO3','C5CO2DBCO3','C5CO234O2',
-#     'C5CO34CO3','C4DBM2CO3','C5DBCO2CO3','C5CO23O2','EMALANHYO2','APINOOA','APINOOB','ELVOCp']
-    
-    # the following RO2 names are for 'apinene_HOM_full.eqn'
-    # the following RO2 names are for 'apinene_HOM_full.eqn'
-    RO2_names = [
-    'NAPINAO2',
-    'NAPINBO2',
-    'APINAO2',
-    'APINBO2',
-    'APINCO2',
-    'C107O2',
-    'C109O2',
-    'C96O2',
-    'NC101O2',
-    'C96CO3',
-    'C720O2',
-    'PINALO2',
-    'C108O2',
-    'C89CO3',
-    'C920CO3',
-    'C920O2',
-    'C97O2',
-    'C85CO3',
-    'C85O2',
-    'CH3COCH2O2',
-    'CH3CO3',
-    'CH3O2',
-    'C719O2',
-    'NC102O2',
-    'C106O2',
-    'C717O2',
-    'C811CO3',
-    'C89O2',
-    'C921O2',
-    'C98O2',
-    'C86O2',
-    'CO235C6CO3',
-    'CHOC3COCO3',
-    'NC71O2',
-    'C811O2',
-    'CHOC3COO2',
-    'H3C25C6CO3',
-    'H3C25C6O2',
-    'CO235C6O2',
-    'C716O2',
-    'C810O2',
-    'C922O2',
-    'C614O2',
-    'C511O2',
-    'C812O2',
-    'C721CO3',
-    'C721O2',
-    'HCOCH2CO3',
-    'BIACETO2',
-    'HOCH2CO3',
-    'H3C2C4CO3',
-    'HMVKAO2',
-    'CO23C4CO3',
-    'C312COCO3',
-    'CHOCOCH2O2',
-    'NC72O2',
-    'C514O2',
-    'HCOCH2O2',
-    'C621O2',
-    'C813O2',
-    'C722O2',
-    'HCOCO3',
-    'CO2H3CO3',
-    'NC61CO3',
-    'C516O2',
-    'C44O2',
-    'H1C23C4CO3',
-    'H1C23C4O2',
-    'APINOOA',
-    'APINOOB',
-    'R_HOM_O2'
-    ]
+# this function is used when certain reaction rate coefficients are a function a RO2
+# and is called on by the extract_mechanism function above,
+# whilst the resulting RO2 index is used inside rate_valu_calc.py
+def write_RO2_indices(smiles_array, RO2_names):
     
     # store the names of RO2 species which are present in the equation file
-    # get a list of INDICES of RO2 that present in the equation file (or total species dict)
+    # get a list of INDICES of RO2 that present in the equation file 
+    # (or total species dict)
     # empty list for RO2_indices
     RO2_indices0 = []
     RO2_indices = []
@@ -478,3 +569,37 @@ def write_RO2_indices(smiles_array):
     RO2_indices = np.hstack((RO2_indices0, RO2_indices))
     
     return (RO2_indices)
+
+# function to convert reaction rate coefficients to commands, and therefore quantities
+# that will be used by Rate_coeffs.py
+def write_rrc(rrc, rrc_name):
+
+	f = open('PyCHAM/rrc_calc.py', mode='w')
+	f.write('\'\'\'module for calculating reaction rate coefficients, automatically generated by eqn_parser\'\'\'\n')
+	f.write('\n')
+	f.write('# File Created at %s\n' %(datetime.datetime.now()))
+	f.write('\n')
+	f.write('import numpy as numpy \n')
+	f.write('import PhotolysisRates \n')
+	f.write('\n')
+	# following part is the function (there should be an indent at the start of each line)
+	# suggest 1 Tab
+	f.write('def rrc_calc(rrc_name, TEMP, H2O, M, N2, O2, time, lat, lon, act_flux_path, DayOfYear):\n')
+	f.write('	\n')
+	f.write('	# reaction rate coefficients obtained from user\'s chemical scheme file \n')
+	f.write('	rrc_constants = [] # empty list to hold rate coefficients\n')
+	for line in rrc:
+		f.write('	%s \n' %line)
+	f.write('	\n')
+	f.write('	for i in rrc_name: \n')
+	f.write('		rrc_constants.append(locals()[i]) \n')
+	f.write('	\n')
+	f.write('	# estimate and append photolysis rates \n')
+	f.write('	j = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear) \n')
+	f.write('	rrc_constants.append(j) \n')
+	f.write('	# append photolysis rate label \n')
+	f.write('	rrc_name.append(\'J\') \n')
+	f.write('	return(rrc_constants, rrc_name) \n')
+	f.close()
+	
+	return
