@@ -7,11 +7,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="PyCHAM", # Replace with your own username
+    name="PyCHAM",
     version="0.2.7",
     author="Simon O'Meara",
     author_email="simon.omeara@manchester.ac.uk",
-    description="PyCHAM: Python CHemistry with Aerosol Microphysics Box Model",
+    description="PyCHAM: CHemistry with Aerosol Microphysics in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
     keywords=['aerosol','chamber','model'],
@@ -23,5 +23,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-install_requires=["PyQt5","pickleshare","openbabel","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","llvmlite","numba","scipy","xmltodict"]
+install_requires=["PyQt5","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","llvmlite","numba","scipy","xmltodict"]
 )
