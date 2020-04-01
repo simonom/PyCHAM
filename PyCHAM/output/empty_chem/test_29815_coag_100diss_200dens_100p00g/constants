@@ -1,6 +1,0 @@
-num_sb,21
-num_speci,2
-mw,[18.0, 100.0]
-mv,[18.0, 50.0]
-spec_namelist,['H2O', 'core']
-Cfactor,23807189756.58805
