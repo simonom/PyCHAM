@@ -22,7 +22,7 @@ install:
   - conda info -a
 
   # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION _libgcc_mutex assimulo backcall bzip2 ca-certificates cairo certifi cycler dbus expat fontconfig freetype gettext glib gst-plugins-base gstreamer icu jpeg kiwisolver libblas libcblas libedit libffi libgcc-ng libgfortran-ng libiconv liblapack libopenblas libpng libstdcxx-ng libuuid libxcb libxml2 matplotlib metis ncurses numpy openbabel openssl pcre pip pixman pthread-stubs pyparsing pyqt python-dateutil pytz qt readline scipy setuptools sip six sqlite suitesparse sundials tbb tk tornado wheel xorg-kbproto xorg-libice xorg-libsm xorg-libx11 xorg-libxau xorg-libxdmcp xorg-libxext xorg-libxrender xorg-renderproto xorg-xextproto xorg-xproto xz zlib
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION _libgcc_mutex assimulo backcall bzip2 ca-certificates cairo certifi cycler dbus expat fontconfig freetype gettext glib gst-plugins-base gstreamer icu jpeg kiwisolver libblas libcblas libedit libffi libgcc-ng libgfortran-ng libiconv liblapack libopenblas libpng libstdcxx-ng libuuid libxcb libxml2 matplotlib metis ncurses numpy openbabel openssl pcre pip pixman pthread-stubs pyparsing pyqt python-dateutil pytz qt readline requests scipy setuptools sip six sqlite suitesparse sundials tbb tk tornado wheel xorg-kbproto xorg-libice xorg-libsm xorg-libx11 xorg-libxau xorg-libxdmcp xorg-libxext xorg-libxrender xorg-renderproto xorg-xextproto xorg-xproto xz zlib
   
   - conda activate test-environment
   - python setup.py install

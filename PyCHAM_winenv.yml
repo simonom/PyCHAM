@@ -30,7 +30,7 @@ dependencies:
   - gitdb2=2.0.6=py_0
   - gitpython=3.0.4=py_0
   - ipdb=0.12.2=py_0
-  - ipython=7.9.0=py36h5ca1d4c_0
+  - ipython
   - ipython_genutils=0.2.0=py_1
   - jedi=0.15.1=py36_0
   - kiwisolver=1.1.0=py36he980bc4_0
@@ -49,6 +49,7 @@ dependencies:
   - pyparsing=2.4.4=py_0
   - python-dateutil=2.8.1=py_0
   - pytz=2019.3=py_0
+  - requests
   - six=1.13.0=py36_0
   - smmap2=2.0.5=py_0
   - sundials=3.2.1=he025d50_1
@@ -70,4 +71,3 @@ dependencies:
   - wincertstore=0.2=py36h7fe50ca_0
   - openbabel=2.4.1=py36_2
 prefix: C:\ANACONDA3\envs\PyCHAM
-
