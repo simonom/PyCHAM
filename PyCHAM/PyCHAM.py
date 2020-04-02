@@ -483,7 +483,7 @@ class PyCHAM(QWidget):
 			f key == 'chem_scheme_markers': # formatting for chemical scheme
 				if (value.strip()).split(',')==['']:
 					# default to MCM inputs
-					chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*';]
+					chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*;']
 				else:
 					chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
 		# --------------------------------------------------------------------------------
