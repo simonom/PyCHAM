@@ -53,3 +53,4 @@ light_time =
 light_stat =
 tracked_comp = 
 umansysprop_update =
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*, RO2, *;
