@@ -480,7 +480,12 @@ class PyCHAM(QWidget):
 					else:
 						print('Error: user has requested cloning of UManSysProp via the model variables input file but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
 						sys.exit()
-		
+			f key == 'chem_scheme_markers': # formatting for chemical scheme
+				if (value.strip()).split(',')==['']:
+					# default to MCM inputs
+					chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*';]
+				else:
+					chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
 		# --------------------------------------------------------------------------------
 		# checks on inputs
 		
@@ -504,7 +509,9 @@ class PyCHAM(QWidget):
 			if len(const_infl_t)!=(Cinfl.shape[1]):
 				print('Error: the number of times given for constant influx by the const_infl_t variable inside the model variables input file does not match the number of times with constant influx concentrations provided by the Cinfl variable of that file, please see the README for guidance.')
 				sys.exit()
-		
+				
+		if len(chem_scheme_markers)!=8:
+			print('Error: length of chem_scheme_markers (specified in model variables input file) is not 8 and should be, please see README for guidance')
 		# --------------------------------------------------------------------------------
 		# get names of chemical scheme and xml files
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 

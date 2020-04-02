@@ -421,7 +421,7 @@ for i in range(len(in_list)):
 	if key == 'chem_scheme_markers':
 		if (value.strip()).split(',')==['']:
 			# default to MCM inputs
-			chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*';]
+			chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*;']
 		else:
 			chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
 

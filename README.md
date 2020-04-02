@@ -152,8 +152,8 @@ Therefore, for the simple working example taken using the MCM format:
 % 5.6D-34*N2*(TEMP/300)@-2.6*O2 : O = O3 ;
 * End of Subset.  No. of Species = 2, No. of Reactions = 1 ;
 
-then the chem_scheme_markers input inside the model variables file is:
-chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*)
+then the chem_scheme_markers input inside the model variables file is (note the extra commas at the end are empty spaces for further inputs described below):
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*),,,,
 
 
 Optionally, the header, end punctuation and footer of generic rate coefficients can be
@@ -166,7 +166,7 @@ KRO2NO = 2.7D-12*EXP(360/TEMP) ;
 then the chem_scheme_markers input inside the model variables file is (in addition to 
 those required for chemical reactions):
 
-chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*,,
 
 The final option is if the chemical scheme contains a description of the components that
 contribute to the peroxy radical pool, for which the start and end identifiers are 
@@ -439,5 +439,16 @@ umansysprop_update = flag to update the UManSysProp module via internet connecti
 						update via the internet.  If update requested and either no 
 						internet or UManSysProp repository page is down, code stops with 
 						an error.
-	
+
+chem_scheme_markers = markers denoting various sections of the user's chemical scheme.  If
+					left empty defaults to MCM formatting.  If filled, must have seven 
+					elements separeted by commas, which can be left empty but with commas
+					intact:
+					marker for chemical reactions starting, punctuation before each 
+					reaction, marker for chemical reactions ending, marker for generic 
+					rate coefficients starting, punctuation at the end of lines for 
+					generic rate coefficients, marker for end of generic rate 
+					coefficients, marker for start of peroxy radical pool description,
+					marker for end of peroxy radical pool description
+					
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.

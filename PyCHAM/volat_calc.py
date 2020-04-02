@@ -30,7 +30,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 		return(0,0,0) # return dummies
 	
 	if umansysprop_update == 1:
-		print('Cloning latest version of UManSysProp from volat_calc module')
+		print('Cloning latest version of UManSysProp in volat_calc module')
 		# download latest version of umansysprop
 		cwd = os.getcwd() # address of current working directory
 		# check if there is an existing umansysprop folder
