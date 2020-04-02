@@ -136,16 +136,59 @@ The example run output is saved in output/Example_Run/Example_output in the Gith
 ## Chemical Scheme .txt file
 
 An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
-from the [Master Chemical Mechanism website](http://mcm.leeds.ac.uk/MCM/) and modified.
+from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) and modified.
 
-// can be used for preceding comments, as in the example.
+Identifiers are required to recognise different sections of the chemical scheme, and these
+are set in the model variables input folder under the chem_scheme_markers input.  The
+mandatory identifiers are for the chemical reactions, for which the following are required
+in this order, separated by commas:
 
-Equations should adhere to the syntax in the following standard expression for an equation: % rate coefficient equation : reactant1 + reactant2 = product1 + product2 ;
-Each equation should be represented on a new line.
+header of chemical reactions, punctuation mark at the start of each reaction, footer of
+chemical reactions denoting termination.
+
+Therefore, for the simple working example taken using the MCM format:
+
+* Reaction definitions. ;
+% 5.6D-34*N2*(TEMP/300)@-2.6*O2 : O = O3 ;
+* End of Subset.  No. of Species = 2, No. of Reactions = 1 ;
+
+then the chem_scheme_markers input inside the model variables file is:
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*)
 
 
-The rate coefficients must adhere to the following rules:
-The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; MCM (master chemical mechanism) rate constants are accepted, e.g. KMT01, as are MCM photolysis rates, e.g. J<1> ;rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py; rate coefficients may also be a function of MCM names such as RO2.
+Optionally, the header, end punctuation and footer of generic rate coefficients can be
+stated.  For the simple working example taken using the MCM format:
+
+* Generic Rate Coefficients ;
+KRO2NO = 2.7D-12*EXP(360/TEMP) ;
+****************************************************** ;
+
+then the chem_scheme_markers input inside the model variables file is (in addition to 
+those required for chemical reactions):
+
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*
+
+The final option is if the chemical scheme contains a description of the components that
+contribute to the peroxy radical pool, for which the start and end identifiers are 
+required.  For the simple working example taken using the MCM format:
+
+RO2 = H1C23C4CO3 + H1C23C4O2 ;
+*;
+
+then the chem_scheme_markers input inside the model variables file is (in addition to 
+those required for chemical reactions and generic rate coefficients):
+
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*, RO2, *; 
+
+If one of the options is not used, then their input should be left empty, for example
+if the RO2 pool is used but not the generic rate coefficients, the input is:
+
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), , , , RO2, *; 
+
+If chem_scheme_markers is left empty, the default is MCM formatting.
+
+The reaction rate coefficients beside chemical reaction equations and inside generic rate coefficients must adhere to the following rules:
+The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py.
 
 
 ## Chemical Scheme .xml file

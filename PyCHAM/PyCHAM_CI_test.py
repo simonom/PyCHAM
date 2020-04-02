@@ -31,8 +31,8 @@ inputs = open(inname, mode='r')
 in_list = inputs.readlines()
 inputs.close()
 
-if len(in_list) != 55:
-	print('Error: The number of variables in the model variables file is incorrect, should be 55, but is ' + str(len(in_list)) )
+if len(in_list) != 56:
+	print('Error: The number of variables in the model variables file is incorrect, should be 56, but is ' + str(len(in_list)) )
 	sys.exit()
 for i in range(len(in_list)):
 	key, value = in_list[i].split('=')
@@ -390,7 +390,7 @@ for i in range(len(in_list)):
 		if (value.strip()).split(',')==['']:
 			umansysprop_update = int(0)
 		else:
-			umansysprop_update = int(i)
+			umansysprop_update = int(value)
 			
 		# if no update requested, check that there is an existing UManSysProp
 		# folder
@@ -414,11 +414,17 @@ for i in range(len(in_list)):
 					return False
 			# test internet connection
 			if connect():
-				print('Internet connection confirmed and user has requested cloning of UManSysProp via the model variables input file') 
+				print('Internet connection confirmed and either user has requested cloning of UManSysProp via the model variables input file or no pre-existing UManSysProp folder found') 
 			else:
 				print('Error: user has requested cloning of UManSysProp via the model variables input file but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
 				sys.exit()
-		
+	if key == 'chem_scheme_markers':
+		if (value.strip()).split(',')==['']:
+			# default to MCM inputs
+			chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*';]
+		else:
+			chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
+
 # --------------------------------------------------------------------------------
 # checks on inputs
 
@@ -470,7 +476,7 @@ inflectDp, pwl_xpre, pwl_xpro, inflectk, Rader, xmlname, C0, Comp0,
 voli, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-e_field, const_infl_t]
+e_field, const_infl_t, chem_scheme_markers]
 	
 if os.path.isfile(dirpath+'/testf.txt'):
 	print('Model input buttons work successfully')

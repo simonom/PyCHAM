@@ -15,11 +15,13 @@ from water_calc import water_calc
 # ----------Extraction of eqn info----------
 # Extract the mechanism information
 def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH, 
-						start_sim_time, lat, lon, act_flux_path, DayOfYear):
+						start_sim_time, lat, lon, act_flux_path, DayOfYear, 
+						chem_scheme_markers):
 
 	
 	# inputs: ----------------------------------------------------------------------------
 	# testf - flag for operating in normal mode (0) or testing mode (1)
+	# chem_scheme_markers - markers for different sections of the chemical scheme
 	# ------------------------------------------------------------------------------------
 	
 	if testf == 1: # for just testing mode
@@ -51,8 +53,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 	RO2_names = [] # empty list for peroxy radicals
 	rrc = [] # empty list for reaction rate coefficients
 	rrc_name = [] # empty list for reaction rate coefficient labels
-	eq_marker = r"%"
-	pr_marker = r"RO2"
+
 	eqn_flag = 0 # don't collate reaction equations until seen
 	pr_flag = 0 # don't collate peroxy radicals until seen
 	rrc_flag = 0 # don't collate reaction rate coefficients until seen
@@ -66,15 +67,16 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 		# --------------------------------------------------------------------------------
 		# generic reaction rate coefficients part
 		# look out for start of coefficients
-		if line1 == str('* Generic Rate Coefficients ;'):
+		if line1 == str(chem_scheme_markers[3]):
 			rrc_flag = 1 # ready to collate reaction rate coefficients
-		matchObj = re.match( r"\*\*\*\*", line1) # look out for end of coefficients
+		matchObj = re.match(chem_scheme_markers[5], line1) # look out for end of coefficients
 		if matchObj:
 			rrc_flag = 0 # stop appending reaction equations
 		# collate reaction rate coefficients
-		if (rrc_flag==1 and re.match( r"(.*) = (.*)", line1)!=None): 
+# 		if (rrc_flag==1 and re.match( r"(.*) = (.*)", line1)!=None): 
+		if (rrc_flag==1 and re.match(str('(.*)' +' = ' + '(.*)'), line1)!=None): 
 			# remove end characters
-			line2 = line1.replace(';', '')
+			line2 = line1.replace(str(chem_scheme_markers[4]), '')
 			# remove all white space
 			line2 = line2.replace(' ', '')
 			# convert fortran-type scientific notation to python type
@@ -87,9 +89,9 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 		
 		# --------------------------------------------------------------------------------
 		# peroxy radical part
-		if (re.match(pr_marker, line1) != None): # now start logging peroxy radicals
+		if (re.match(chem_scheme_markers[6], line1) != None): # now start logging peroxy radicals
 			pr_flag = 1
-		if line1 == str('*;'): # no longer log peroxy radicals
+		if line1 == chem_scheme_markers[7]: # no longer log peroxy radicals
 			pr_flag=0
 		if (pr_flag==1):
 			line2 = line1.split('+')
@@ -98,18 +100,18 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 					line3 = (line3.split('='))[1]
 				if len(line3.split(';'))>1:
 					line3 = (line3.split(';'))[0]
-				if (line3.strip() == '' or line3.strip() == 'RO2'):
+				if (line3.strip() == '' or line3.strip() == chem_scheme_markers[6]):
 					continue
 				else:
 					RO2_names.append(line3.strip())
 		# --------------------------------------------------------------------------------
 		# reaction equation part
-		if line1 == str('* Reaction definitions. ;'): # look out for start of equations
+		if line1 == chem_scheme_markers[0]: # look out for start of equations
 			eqn_flag = 1 # ready to compile equations
-		if (eqn_flag==1 and re.match(eq_marker, line1) != None):
+		if (eqn_flag==1 and re.match(chem_scheme_markers[1], line1) != None):
 			naked_list_eqn.append(line1) # begin storing reaction equations
 			
-		matchObj = re.match( r'(.*) End (.*)', line1) # look out for end of equations
+		matchObj = re.match(chem_scheme_markers[2], line1) # look out for end of equations
 		if matchObj:
 			eqn_flag = 0 # stop appending reaction equations
 			

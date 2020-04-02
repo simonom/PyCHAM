@@ -33,7 +33,8 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 		print('Cloning latest version of UManSysProp from volat_calc module')
 		# download latest version of umansysprop
 		cwd = os.getcwd() # address of current working directory
-		if os.path.isdir(cwd + '/umansysprop'): # check if there is an existing umansysprop folder
+		# check if there is an existing umansysprop folder
+		if os.path.isdir(cwd + '/umansysprop'): 
 			def handleRemoveReadonly(func, path, exc):
 				excvalue = exc[1]
 				if not os.access(path, os.W_OK):

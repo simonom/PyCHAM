@@ -33,7 +33,8 @@ def run(testf):
 	pconc, std, mean_rad, core_diss, light_stat, light_time, kgwt, testm, 
 	dydt_trak, DayOfYear, space_mode, Ct, Compt, injectt, seed_name, 
 	const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
-	umansysprop_update, core_dens, p_char, e_field, const_infl_t] = ui.run(0, testf)
+	umansysprop_update, core_dens, p_char, e_field, const_infl_t, 
+	chem_scheme_markers] = ui.run(0, testf)
 	
 	if testm == 1:
 		print('PyCHAM calls front fine, now returning to PyCHAM.py')
@@ -50,7 +51,7 @@ def run(testf):
 		reacn, M_val, N2_val, O2_val, C_H2O, Psat_water, 
 		H2O_mw, spec_namelist] = eqn_parser.extract_mechanism(fname, xmlname, 
 							TEMP, PInit, testf, RH, start_sim_time, lat, 
-							lon, act_flux_path, DayOfYear)
+							lon, act_flux_path, DayOfYear, chem_scheme_markers)
 	
 	if testf==1:
 		print('eqn_parser.extract_mechanism called and returned fine')

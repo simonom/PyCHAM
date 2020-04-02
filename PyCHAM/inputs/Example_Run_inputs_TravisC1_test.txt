@@ -52,4 +52,5 @@ core_diss =
 light_time = 
 light_stat =
 tracked_comp = 
-umansysprop_update =
+umansysprop_update = 1
+chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rate Coefficients ;, ;, \*\*\*\*, RO2, *;
