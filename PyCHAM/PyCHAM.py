@@ -222,7 +222,7 @@ class PyCHAM(QWidget):
 					nuc_comp = int(value.strip())
 			if key == 'new_partr': # radius of newly nucleated particles (cm)
 				if value.split(',')==['\n']:
-					new_partr = float(0.0)
+					new_partr = float(2.0e-7)
 				else:
 					new_partr = float(value.strip())
 			if key == 'inflectDp':

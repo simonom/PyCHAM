@@ -94,7 +94,7 @@ def run(testf):
 		print('calling pp_intro')
 	# set up particle phase part
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, 
-							MV, num_sb, nuc_comp, rbou00] = pp_intro(y, 
+							MV, num_sb, nuc_comp, rbou00, upper_bin_rad_amp] = pp_intro(y, 
 							num_speci, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
@@ -150,7 +150,7 @@ def run(testf):
 	output_by_sim = saving(fname, y_mat, t_out, Nresult_dry, Nresult_wet, x2, num_sb, 
 							y_mw, num_speci, 
 							resfname, rbou, Cfactor, MV, testf, dydt_vst, dydt_trak,
-							spec_namelist, rbou00)
+							spec_namelist, rbou00, upper_bin_rad_amp)
 	if testf==1:
 		print('saving called and returned successfully')
 	return()

@@ -78,7 +78,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		std = np.log(std)
 		loc = 0.0 # no shift
 		
-		[N_perbin, x, rbou, Vbou, Varr] = Size_distributions.lognormal(num_sb, 
+		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = Size_distributions.lognormal(num_sb, 
 									pconc, std, lowersize, uppersize, loc, scale, 
 									space_mode)
 		if testf==2:
@@ -91,7 +91,8 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		meansize = (lowersize+uppersize)/2.0
 		x[0] = meansize
 		# extend uppersize to reduce chance of particles growing beyond this
-		uppersize = uppersize*1.0e6
+		upper_bin_rad_amp = 1.0e6
+		uppersize = uppersize*upper_bin_rad_amp
 		# volume bounds of size bin (um3)
 		Vbou = np.array(((lowersize**3.0)*(4.0/3.0)*np.pi, 
 						(uppersize**3.0)*(4.0/3.0)*np.pi))
@@ -107,7 +108,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	rbou00 = rbou[0]
 
 	Vbou[0] = 0.0
-	rbou[0] = 0.0
+	rbou[0] = 0.0 # this reversed in saving.py back to rbou00
 	
 	
 	if num_sb>0:
@@ -167,4 +168,5 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		print(str('Total dry (no water) mass concentration of particles at start of simulation is ' + str(mass_conc) + ' ug/m3 (air)'))
 	else:
 		print('No particle size bins detected, simulation will not include particles')
-	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00)
+	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
+			upper_bin_rad_amp)

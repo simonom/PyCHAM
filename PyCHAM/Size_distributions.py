@@ -83,8 +83,9 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode
 
 	# ---------------------------------------
 	# enhance upper radius bound (um) to reduce possibility of particles growing beyond 
-	# this (reversed in res_plot.py)
-	rad_bounds[-1] = rad_bounds[-1]*1.0e6
+	# this (reversed in saving.py)
+	upper_bin_rad_amp = 1.0e6
+	rad_bounds[-1] = rad_bounds[-1]*upper_bin_rad_amp
 	
 	if len(pconc)==1 and sum(pconc)>0.0: # for calculating the number size distribution
 		# number fraction-size distribution - enforce high resolution to ensure size
@@ -115,4 +116,4 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode
 
 
 	# return number of particles per size bin (the number size distribution)
-	return(Nperbin, x_output, rad_bounds, V_bounds, Varr)
+	return(Nperbin, x_output, rad_bounds, V_bounds, Varr, upper_bin_rad_amp)

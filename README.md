@@ -264,6 +264,8 @@ nuc_comp = Index of component contributing to nucleation (only one index allowed
 			absolute or relative (if relative, please consider whether water or seed 
 			material will be included in components))
 
+new_partr = radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm
+
 inflectDp = Particle diameter wall deposition rate at inflection point (m)
 
 Grad_pre_inflect = Gradient of particle wall deposition before inflection (/s)

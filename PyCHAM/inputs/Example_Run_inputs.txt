@@ -1,12 +1,12 @@
 Res_file_name = Example_output
-Total_model_time = 14400.0
+Total_model_time = 60.0
 Time_step = 60.0
 Recording_time_step = 60.0
 Number_size_bins = 2
 lower_part_size = 0.0
 upper_part_size = 8.0e-2
 space_mode = lin
-mass_trans_coeff = 1.0e-7
+mass_trans_coeff = 5.0e-5
 eff_abs_wall_massC = 5.0e2
 Temperature = 294.15
 PInit = 98000
