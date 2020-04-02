@@ -28,11 +28,12 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 	
 	if testf==1:
 		return(0,0,0) # return dummies
-	
+		
+	cwd = os.getcwd() # address of current working directory
 	if umansysprop_update == 1:
 		print('Cloning latest version of UManSysProp in volat_calc module')
 		# download latest version of umansysprop
-		cwd = os.getcwd() # address of current working directory
+		
 		# check if there is an existing umansysprop folder
 		if os.path.isdir(cwd + '/umansysprop'): 
 			def handleRemoveReadonly(func, path, exc):
@@ -46,9 +47,12 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 			# remove existing folder, onerror will change permission of directory if 
 			# needed
 			shutil.rmtree(cwd + '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly)
-		sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
+		
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 		Repo.clone_from(git_url, (cwd + '/umansysprop'))
+	
+	# point to umansysprop folder
+	sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
 	
 	from umansysprop import boiling_points
 	from umansysprop import vapour_pressures

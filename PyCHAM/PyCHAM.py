@@ -63,8 +63,7 @@ class PyCHAM(QWidget):
 		
 		dirpath = os.getcwd() # get current path
 		
-# 		fname = self.openFileNameDialog() # ask for location of input chemical scheme file
-		fname = '/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/paper_GMD/GMD_paper/Results/coag_simple_chem.txt'
+		fname = self.openFileNameDialog() # ask for location of input chemical scheme file
 		with open(dirpath+'/fname.txt','w') as f:
 			f.write(fname)
 		f.close()
@@ -74,8 +73,7 @@ class PyCHAM(QWidget):
 		
 		dirpath = os.getcwd() # get current path
 		
-# 		xmlname = self.openFileNameDialog()
-		xmlname = '/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM_Gitw/PyCHAM/inputs/Example_Run_xml.xml'
+		xmlname = self.openFileNameDialog()
 		with open(dirpath+'/xmlname.txt','w') as f:
 			f.write(xmlname)
 		f.close()
@@ -83,8 +81,7 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click3(self):
 		
-# 		inname = self.openFileNameDialog() # name of model variables inputs file
-		inname = '/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/paper_GMD/GMD_paper/Results/test.txt'
+		inname = self.openFileNameDialog() # name of model variables inputs file
 		
 		# open the file
 		inputs = open(inname, mode='r')
@@ -93,8 +90,8 @@ class PyCHAM(QWidget):
 		in_list = inputs.readlines()
 		inputs.close()
 		
-		if len(in_list) != 55:
-			print('Error: The number of variables in the model variables file is incorrect, should be 55, but is ' + str(len(in_list)) )
+		if len(in_list) != 56:
+			print('Error: The number of variables in the model variables file is incorrect, should be 56, but is ' + str(len(in_list)) )
 			sys.exit()
 		for i in range(len(in_list)):
 			key, value = in_list[i].split('=')
@@ -539,7 +536,7 @@ class PyCHAM(QWidget):
 		voli, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 		kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 		const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-		e_field, const_infl_t]
+		e_field, const_infl_t, chem_scheme_markers]
 		
 		if os.path.isfile(dirpath+'/testf.txt'):
 			print('Model input buttons work successfully')
