@@ -48,7 +48,7 @@ Funding for model development has been provided by the EUROCHAMP-2020 research p
 
 The model employs non-equilibrium equations to simulate the known processes occurring in aerosol chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package for ODE solvers is called on [@Andersson:2015], using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
 
-$$\frac{d[i_{g}]}{dt} = \pm k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
+$$\frac{d[i_{g}]}{dt} = \pm i_{s}k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
 $$
 
 where square brackets represent concentrations, with $_{g}$ representing the gas phase, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichiometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
