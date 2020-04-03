@@ -1,4 +1,0 @@
-# particle radii (um) per size_bin (including water contribution to size), with size bins represented by columns and their number (starting from 1) given in second line of header, per time step which is represented by rows and corresponding times given in the time output file 
-# 1, 2
-2.000000000000000042e-02,5.999999999999999778e-02
-2.000000000000000042e-02,5.999999999999999778e-02
