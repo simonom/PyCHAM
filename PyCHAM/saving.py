@@ -103,7 +103,7 @@ def saving(filename, y_mat, t_out, Nresult_dry, Nresult_wet, x2, numsb, y_mw, nu
 	
 	# reverse change done in Size_distributions on uppermost boundary and change done
 	# in pp_intro on lowermost boundary (um)
-	rbou[-1] = rbou[-1]*upper_bin_rad_amp
+	rbou[-1] = rbou[-1]/upper_bin_rad_amp
 	rbou[0] = rbou00
 	
 	if numsb>1: # if particles present

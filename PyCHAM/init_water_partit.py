@@ -27,7 +27,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 		# new array of size bin radii (um)		
 		radius = np.zeros((len(x)))
 		radius[:] = x[:]
-
+		print('equilibrating water in vapour with water in seed particles')
 				
 		for sbstep in range(len(x)): # loop through size bins
 			

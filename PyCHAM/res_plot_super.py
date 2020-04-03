@@ -21,15 +21,24 @@ def run(testf):
 	
 	# --------------------------------------------------------------
 	# inputs:
-	# testf - flag for whether in test mode (=0 no test, =1, testing from test_PyCHAM.py)
+	# testf - flag for whether in test mode (=0 no test, =1 testing from test_PyCHAM.py,
+	#			=2 testing from test_res_plot_super.py)
 	
 	# --------------------------------------------------------------
 	if testf==1:
 		print('"Plot Results" button works fine')
 		return()
-	
-	# module to ask, receive and return required inputs
-	[fname, resfname, y_indx_plot, Comp0] = ui.run(1,0)
+	if testf==2:
+		print('in testing mode and called from test_res_plot_super.py, will try plotting results from example_run output, note that test_res_plot_super.py must be called from the PyCHAM home directory')
+		cwd = os.getcwd() # address of current working directory
+		fname = str(cwd+'/PyCHAM/output/Example_Run')
+		resfname = 'Example_output'
+		y_indx_plot = np.array(([1, 312, 2, 3]))
+		Comp0 = np.array((['O3', 'APINENE', 'NO', 'NO2']))
+	if testf==0:
+		# module to ask, receive and return required inputs
+		[fname, resfname, y_indx_plot, Comp0] = ui.run(1,0)
+		print('res_plot_super', fname, resfname, y_indx_plot, Comp0)
 	
 	# path to saved files
 	dir_path = os.getcwd()    
@@ -37,6 +46,7 @@ def run(testf):
 	output_root = 'PyCHAM/output'
 	filename = os.path.basename(fname)
 	filename = os.path.splitext(filename)[0]
+	
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, resfname)
 	
@@ -96,7 +106,8 @@ def run(testf):
 		print('Please note only results for one time step have been saved; number size distribution contours will not be plotted')
 		t_array = np.array(t_array.reshape(-1, 1))	
 	
-	plt.ion() # show figures on screen
+	if testf == 0:
+		plt.ion() # show figures on screen
 
 	if num_sb>1:
 		# name of file where concentration (# particles/cc (air)) results saved
@@ -118,7 +129,7 @@ def run(testf):
 	
 		# size bin radius bounds (um) (for the number size distribution contour plot)
 		fname = str(output_by_sim+'/size_bin_bounds')
-		sbb = np.loadtxt(fname,delimiter=',',skiprows=1) # skiprows=1 omits header)
+		sbb = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header)
 		if t_array.ndim==0: # occurs if only one time step saved
 			sbb = np.array(sbb.reshape(1, num_sb))
 	
@@ -128,8 +139,6 @@ def run(testf):
 			ax.patch.set_visible(False)
 			for sp in ax.spines.values():
 				sp.set_visible(False)
-	
-	
 	
 	
 		# ------------------------
@@ -221,6 +230,7 @@ def run(testf):
 	
 		# associate colours and contour levels
 		norm1 = BoundaryNorm(levels, ncolors = cm.N, clip=True)
+		
 		# contour plot with times along x axis and particle diameters along y axis
 		p1 = host.pcolormesh(t_array/3600.0, (sbb*2*1e3), z[:, :], cmap=cm, norm=norm1)
 	
@@ -286,15 +296,15 @@ def run(testf):
 		par2.spines['right'].set_color('red')
 		par2.yaxis.set_tick_params(labelsize=18)
 		plt.legend(fontsize=18, handles=[p3, p5] ,loc=4)
-
-		plt.savefig(str(output_by_sim+'/contours.png'), transparent=True)
+		if testf == 0:
+			plt.savefig(str(output_by_sim+'/contours.png'), transparent=True)
 
 	# -----------------------------------------------------------------------------------
 	# gas-phase concentrations
 	
 	plt.figure(figsize=(8,7))
 	for i in range(len(y_indx_plot)):
-		plt.plot(t_array/3600, y[:, y_indx_plot[i]]/Cfactor, '+',linewidth=4.0, 
+		plt.plot(t_array/3600, y[:, y_indx_plot[i]], '+',linewidth=4.0, 
 					label=str(str(Comp0[i])+' (sim)'))
 		
 	plt.ylabel(r'Gas-phase concentration (ppb)', fontsize=18)
@@ -304,8 +314,13 @@ def run(testf):
 	
 	
 	plt.legend(fontsize=18)
-	plt.savefig(str(output_by_sim+'/gas_ppb.png'), transparent=True)
 	
-	os.remove('PyCHAM/var_store.pkl') # remove pickle file
+	
+	if testf == 0:
+		plt.savefig(str(output_by_sim+'/gas_ppb.png'), transparent=True)
+		os.remove('PyCHAM/var_store.pkl') # remove pickle file
+	if testf == 2:
+		
+		plt.show()
 	
 	return()
