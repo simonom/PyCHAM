@@ -40,7 +40,7 @@ bibliography: paper.bib
 
 # Summary
 
-PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access O-D box model for aerosol chamber studies.  Aerosol chambers provide a means for atmospheric scientists to interrogate aerosol processes [@Finlayson:2000; @Schwantes:2017; @Hidy:2019].  Allying PyCHAM with chamber measurements allows quantification of unknown parameters, such as branching ratios for oxidation schemes [@Chen:2005].  Although several box models have already been published [@Pierce:2008; @Roldin:2014; @Sunol:2018; @Roldin:2019], PyCHAM is novel in its ease of accessibility and utility.  To the best of our knowledge, PyBOX [@Topping:2018], which formed the basis of PyCHAM, and AtCHEM [@AtCHEM:2020], are the only other box models available online or with a graphical user interface.  However, PyCHAM provides a considerable upgrade to the functionality of both prior models, as AtCHEM only simulates gas-phase chemistry and PyBOX has limited particle effects, whilst PyCHAM models all particle microphysics (detailed below) and wall effects in addition to the gas phase.  The intention therefore, is that it will be readily employed by research groups undertaking aerosol chamber measurements.
+PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access O-D box model for aerosol chamber studies.  Aerosol chambers provide a means for atmospheric scientists to interrogate aerosol processes [@Finlayson:2000; @Schwantes:2017; @Hidy:2019].  Allying PyCHAM with chamber measurements allows quantification of unknown parameters, such as branching ratios for oxidation schemes [@Chen:2005].  Although several box models have already been published [@Pierce:2008; @Roldin:2014; @Sunol:2018; @Roldin:2019], PyCHAM is novel in its ease of accessibility and utility.  To the best of our knowledge, PyBOX [@Topping:2018], which formed the basis of PyCHAM, and AtChem [@AtCHEM:2020], are the only other box models available online or with a graphical user interface.  However, PyCHAM provides a considerable upgrade to the functionality of both prior models, as AtChem only simulates gas-phase photochemistry and PyBOX has limited particle effects, whilst PyCHAM models significantly more particle microphysics (detailed below) and wall effects in addition to gas-phase photochemistry.  The intention therefore, is that it will be readily employed by research groups undertaking aerosol chamber measurements.
 
 With air quality and climate models increasingly important to guiding sustainable societies, the accuracy of simulations must suffice [@Tong:2019].  However, research shows that the simulated aerosol effects in these models provides a relatively high amount of uncertainty [@Johnson:2018].  The combination of box models like PyCHAM with aerosol chamber measurements to better constrain aerosol processes is therefore necessary to ultimately improve societal sustainability.
 
@@ -51,7 +51,7 @@ The model employs non-equilibrium equations to simulate the known processes occu
 $$\frac{d[i_{g}]}{dt} = \pm k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
 $$
 
-where square brackets represent concentrations, with $_{g}$ representing the gas phase, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
+where square brackets represent concentrations, with $_{g}$ representing the gas phase, $i$ is the affected component, $t$ is time, $k$ is the reaction rate coefficient for reaction $n$, $a$ and $b$ are example reactants, with stoichiometries $_{s}$.  The equation is positive for products of reactions and negative for reactants.
 
 The gas-particle partitioning equation is [@Jacobson:2005]:
 
@@ -65,7 +65,7 @@ Gas partitioning to walls is an area of ongoing research [@Zhang:2015], therefor
 $$\frac{d[i_{g}]}{dt} = -k_{gwt}C_{w}([i_{g}]-p^{0}_{i}\frac{[i_{w}]}{C_{w}}),
 $$
 
-where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.  Users set the values of $k_{gwt}$ and $C_{w}$ as walls effects vary significantly between chambers.
+where $_{w}$ represents the wall, $k_{gwt}$ is the gas-wall mass transfer coefficient, $C_{w}$ is the effective absorbing concentration of the wall.  Users set the values of $k_{gwt}$ and $C_{w}$ as wall effects vary significantly between chambers.
 
 Outside the ODE solver, particle loss to walls, coagulation and nucleation are also solved, with equations for the former two given in @Jacobson:2005 and the parameters inside the nucleation expression (for relevent experiments) tuned by the user.  PyCHAM takes a sectional approach to particulates, dividing particles into a number of size bins and treating their changing size using the moving-centre approach [@Jacobson:2005].  It builds upon PyBOX [@Topping:2018] which did not include coagulation, nucleation or a sectional method.
 
