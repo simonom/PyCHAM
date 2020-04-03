@@ -43,7 +43,10 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
 	if mean_rad == -1.0e6:
-		mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
+		if lowersize>0.0:
+			mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
+		if lowersize == 0.0:
+			mean_rad = 10**((np.log10(uppersize))/2.0)
 	
 	# if elements of nuc_comp are relative index (-n), change to absolute
 	if nuc_comp<0:

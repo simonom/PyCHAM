@@ -38,7 +38,6 @@ def run(testf):
 	if testf==0:
 		# module to ask, receive and return required inputs
 		[fname, resfname, y_indx_plot, Comp0] = ui.run(1,0)
-		print('res_plot_super', fname, resfname, y_indx_plot, Comp0)
 	
 	# path to saved files
 	dir_path = os.getcwd()    
@@ -259,8 +258,10 @@ def run(testf):
 		# empty array for holding total number of particles
 		Nvs_time = np.zeros((N.shape[0]))
 		for i in range(num_sb-1):
-			ish = x[:, i]>3.0e-3 # get the times when bin exceeds 3nm
-			Nvs_time[ish] += N[ish, i] # sum number
+			# get the times when bin exceeds 3nm - might be wanted to deal with particle counter detection limits
+# 			ish = x[:, i]>3.0e-3
+# 			Nvs_time[ish] += N[ish, i] # sum number
+			Nvs_time[:] += N[:, i] # sum number
 	
 		p3, = par1.plot(t_array/3600.0, Nvs_time, '+k', label = 'N (sim)')
 	
