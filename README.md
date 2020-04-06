@@ -129,7 +129,7 @@ Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in 
 
 Integration testing can be completed using the '.travis.yml' file at the website: travis-ci.org.
 
-The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.3.0 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.3.1 of PyCHAM.
 
 ## Inputs
 
@@ -201,7 +201,7 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 ## Model Variables .txt File
 
 
-An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. voli = ):
+An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. vol_Comp = ):
 
 Res_file_name = Name of folder to save results to
 
@@ -260,9 +260,8 @@ nucv2 = Nucleation parameterisation value 2
 
 nucv3 = Nucleation parameterisation value 3
 
-nuc_comp = Index of component contributing to nucleation (only one index allowed, can be 
-			absolute or relative (if relative, please consider whether water or seed 
-			material will be included in components))
+nuc_comp = Name of component contributing to nucleation (only one allowed), must 
+			correspond to a name in the chemical scheme file
 
 new_partr = radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm
 
@@ -370,12 +369,12 @@ Cinfl = Rate of gas-phase influx of components with constant influx (stated in t
 		therefore, the semicolon in Cinfl is used to distiniguish the influxes of
 		different components
 
-voli = index of components with vapour pressures stated in volP variable below 
-		(multiple indices allowed, 
-		can be absolute or relative (if relative, please consider whether water or seed 
-		material will be included in components))
+vol_Comp = names of components with vapour pressures to be manually assigned from volP, 
+		names must correspond to those in the chemical scheme file and if more than one, 
+		separated by commas.  Can be left empty, which is the default.
 
-volP = vapour pressures (Pa) of components with indices given in voli variable above
+volP = vapour pressures (Pa) of components with names given in vol_Comp variable above,
+		where one vapour pressure must be stated for each component named in vol_Comp
 
 act_wi = index of components with activity coefficients for the wall stated in act_w 
 		variable below (multiple indices allowed, 
@@ -453,4 +452,7 @@ chem_scheme_markers = markers denoting various sections of the user's chemical s
 					coefficients, marker for start of peroxy radical pool description,
 					marker for end of peroxy radical pool description
 					
+int_tol = integration tolerances, with absolute tolerance first followed by relative 
+		tolerance, if left empty defaults to the minimum required during testing for 
+		stable solution: 1.0e-3 for absolute and 1.0e-4 for relative 
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.

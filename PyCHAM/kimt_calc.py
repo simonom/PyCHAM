@@ -67,7 +67,7 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	# zero partitioning to particles for any components with high vapour pressures
 	# - accelerates computation time with negligible change to 
 	# output
-	highVPi = Psat>1.0e40
+	highVPi = Psat>1.0e12
 	highVPi = highVPi[:, 0] # ignore second dimension
 	highVPi[H2Oi] = 0 # mask water, thereby allowing water partitioning in ode
 	kimt[highVPi, :] = 0.0

@@ -8,8 +8,8 @@ import scipy.constants as si
 import errno
 import stat
 
-def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli, volP, 
-				testf, corei, pconc, umansysprop_update, core_dens):
+def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_Comp, 
+				volP, testf, corei, pconc, umansysprop_update, core_dens, spec_namelist):
 
 	# ------------------------------------------------------------
 	# inputs:
@@ -17,11 +17,14 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 	# (omitting water and core, if present)
 	# Pybel_objects - list of Pybel objects representing the species in spec_list
 	# (omitting water and core, if present)
+	# vol_Comp - names of components (corresponding to those in chemical scheme file)
+	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# corei - index of seed particle component
 	# pconc - initial number concentration of particles (#/cc (air))
 	# umansysprop_update - marker for cloning UManSysProp so that latest version used
 	# core_dens - density of core material (g/cc (liquid/solid density))
+	# spec_namelist - list of components' names in chemical equation file
 	# ------------------------------------------------------------
 	
 	
@@ -58,11 +61,6 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 	from umansysprop import vapour_pressures
 	from umansysprop import liquid_densities
 
-	# if voli is in relative index (-n), change to absolute
-	for i in range(len(voli)):
-		if voli[i]<0:
-			voli[i] = num_speci+voli[i]
-
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	y_dens = np.zeros((num_speci, 1)) # components' liquid density (kg/m3)
 	Psat = np.zeros((num_speci, 1)) # species' vapour pressure
@@ -96,9 +94,13 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, voli
 	# retain low volatility where wanted
 	Psat[ish] = 0.0
 	
-	# manually assigned vapour pressures (Pa) (including seed component (if applicable))
-	if len(voli)>0:
-		Psat[voli, 0] = volP
+	# manually assigned vapour pressures (Pa)
+	if len(vol_Comp)>0:
+		for i in range (len(vol_Comp)):
+			# index of component in list of components
+			vol_indx = spec_namelist.index(vol_Comp[i])
+			Psat[vol_indx, 0] = volP[i]
+
 	Psat_Pa = np.zeros((len(Psat), 1)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[:, 0] = Psat[:, 0]
     

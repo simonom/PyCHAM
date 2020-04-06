@@ -28,7 +28,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt,
 			dydt_vst, daytime, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 			corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-			e_field, const_infl_t):
+			e_field, const_infl_t, int_tol):
 	
 	# ----------------------------------------------------------
 	# inputs
@@ -82,6 +82,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# const_infl_t - times of constant influx (s)
+	# int_tol - absolute (0 index) and relative (1 index) tolerances for integration
 	# ----------------------------------------------------------
 
 	if testf==1:
@@ -316,10 +317,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			   
 			mod = Explicit_Problem(dydt, y0)
 			mod_sim = CVode(mod) # define a solver instance
-			# absolute tolerance, going higher than 1.0e-3 causes issues with water vapour
-			mod_sim.atol = 1.0e-3
-			# relative tolerance, going higher than 1.0e-4 causes issues with water vapour
-			mod_sim.rtol = 1.0e-4
+			# absolute tolerance, going higher than can 1.0e-3 cause issues with water 
+			# vapour
+			mod_sim.atol = int_tol[0]
+			# relative tolerance, going higher than 1.0e-4 can cause issues with water 
+			# vapour
+			mod_sim.rtol = int_tol[1]
 			mod_sim.discr = 'BDF' # the integration approach, default is 'Adams'
 			t_array, res = mod_sim.simulate(t)
 		
@@ -394,12 +397,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 														0, p_char, e_field)
 			
 			# particle nucleation
-			if sum(pconc)==0.0:
+			if sum(pconc)==0.0 and len(nuc_comp)>0:
 				
 				[N_perbin, y, x[0], Varr[0], new_part_sum1] = nuc(sumt, new_part_sum1, 
 							N_perbin, y, y_mw.reshape(-1, 1), np.squeeze(y_dens*1.0e-3),  
 							num_speci, x[0], new_partr, t, MV, nucv1, nucv2, 
-							nucv3, nuc_comp)
+							nucv3, nuc_comp[0])
 			
 		# save at every time step given by save_step (s) and at end of experiment
 		if sumt>=save_step*save_count or sumt == end_sim_time:

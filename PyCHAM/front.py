@@ -29,12 +29,12 @@ def run(testf):
 	[fname, num_sb, lowersize, uppersize, end_sim_time, resfname, tstep_len, 
 	tmax, TEMP, PInit, RH, lat, lon, start_sim_time, act_flux_path, save_step, Cw, 
 	ChamR, nucv1, nucv2, nucv3, nuc_comp, new_partr, inflectDp, pwl_xpre,  
-	pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, voli, volP, 
+	pwl_xpro, inflectk, xmlname, init_conc, Comp0, Rader, vol_Comp, volP, 
 	pconc, std, mean_rad, core_diss, light_stat, light_time, kgwt, testm, 
 	dydt_trak, DayOfYear, space_mode, Ct, Compt, injectt, seed_name, 
 	const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
 	umansysprop_update, core_dens, p_char, e_field, const_infl_t, 
-	chem_scheme_markers] = ui.run(0, testf)
+	chem_scheme_markers, int_tol] = ui.run(0, testf)
 	
 	if testm == 1:
 		print('PyCHAM calls front fine, now returning to PyCHAM.py')
@@ -82,8 +82,8 @@ def run(testf):
 		print('kimt_prep called and returned fine')
 		print('calling volat_calc.py')
 	[Psat, y_dens, Psat_Pa] = volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci,  
-								Psat_water, voli, volP, testf, corei, pconc,
-								umansysprop_update, core_dens)
+								Psat_water, vol_Comp, volP, testf, corei, pconc,
+								umansysprop_update, core_dens, spec_namelist)
 
 	if testf==1:
 		print('volat_calc called and returned fine')
@@ -98,9 +98,9 @@ def run(testf):
 							num_speci, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
 							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
-							voli, volP, testf, std, mean_rad, 
+							testf, std, mean_rad, 
 							therm_sp, Cw, y_dens, Psat, core_diss, kgwt, space_mode, 
-							corei)
+							corei, spec_namelist)
 	
 	t1 = time.clock() # get wall clock time before call to solver
 	if testf==1:
@@ -121,7 +121,7 @@ def run(testf):
 				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt, dydt_vst,
 				start_sim_time, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 				corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-				e_field, const_infl_t)
+				e_field, const_infl_t, int_tol)
 				
 	
 	t2 = time.clock() # get wall clock time after call to solver

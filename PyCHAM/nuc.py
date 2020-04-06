@@ -67,7 +67,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, new_partr, t, MV,
 		
 		ELVOC_conc1 = 0.0
 		
-		print('insufficient ELVOC for nucleation')
+		print('insufficient nucleating component for nucleation')
 	
 	
 	# remove from gas-phase (molecules/cc (air))

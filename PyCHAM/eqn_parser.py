@@ -89,16 +89,18 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 		
 		# --------------------------------------------------------------------------------
 		# peroxy radical part
-		if (re.match(chem_scheme_markers[6], line1) != None): # now start logging peroxy radicals
+		# now start logging peroxy radicals
+		if (re.match(chem_scheme_markers[6], line1) != None):
 			pr_flag = 1
-		if line1 == chem_scheme_markers[7]: # no longer log peroxy radicals
+		if line1 == chem_scheme_markers[8]: # no longer log peroxy radicals
 			pr_flag=0
 		if (pr_flag==1):
-			line2 = line1.split('+')
+			line2 = line1.split(chem_scheme_markers[7])
+			
 			for line3 in line2: # loop through elements in line
-				if len(line3.split('='))>1:
+				if len(line3.split('='))>1: # in case of RO2 = ...
 					line3 = (line3.split('='))[1]
-				if len(line3.split(';'))>1:
+				if len(line3.split(';'))>1: # in case of RO2 list finishing with ...;
 					line3 = (line3.split(';'))[0]
 				if (line3.strip() == '' or line3.strip() == chem_scheme_markers[6]):
 					continue
@@ -261,7 +263,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 			rstoi[eqn_step, reactant_step] = stoich_num
 			
 			if name_only not in spec_namelist: # if new component encountered
-				spec_namelist.append(reactant) # add to chemical scheme name list
+				spec_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
 				if name_only in spec_name:
@@ -317,7 +319,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 			pstoi[eqn_step, product_step] = stoich_num
 			
 			if name_only not in spec_namelist: # if new component encountered
-				spec_namelist.append(product)
+				spec_namelist.append(name_only)
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
@@ -360,8 +362,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 		
 	if len(spec_list)!=len(spec_namelist):
 		sys.exit('Error: inside eqn_parser, length of spec_list is different to length of spec_namelist and the SMILES in the former should align with the chemical scheme names in the latter')	
-		
-		
+	
 	# number of columns in rindx and pindx
 	reacn = rindx.shape[1]
 	prodn = pindx.shape[1]  

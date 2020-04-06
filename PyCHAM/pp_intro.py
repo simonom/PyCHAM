@@ -9,8 +9,8 @@ import ipdb
 def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
 			DStar_org, RH, num_sb, lowersize, uppersize, pconc, tmax, 
-			nuc_comp, voli, volP, testf, std, mean_rad, therm_sp,
-			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei):
+			nuc_comp, testf, std, mean_rad, therm_sp,
+			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, spec_namelist):
 	
 			
 	# inputs -----------------------------------
@@ -20,9 +20,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	# uppersize - largest size bin radius bound (um)
 	# pconc - starting particle concentration (# particle/cc (air))
 	# tmax - maximum time step used in ode solver (s)
-	# nuc_comp - index of the nucleating component (integer)
-	# voli - index of components with vapour pressures given in volP (integer)
-	# volP - vapour pressures of components for manual setting (Pa)
+	# nuc_comp - name of the nucleating component
 	# testf - test flag to say whether in normal mode (0) or test mode for front.py (1)
 	#       or test mode for pp_intro.py
 	# std - geometric standard deviation of the particle number concentration 
@@ -36,6 +34,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
 	# corei - index of component comprising seed particles
+	# spec_namelist - names of components noted in chemical scheme file
 	# ------------------------------------------
 	
 	if testf==1: # in test mode
@@ -48,9 +47,11 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		if lowersize == 0.0:
 			mean_rad = 10**((np.log10(uppersize))/2.0)
 	
-	# if elements of nuc_comp are relative index (-n), change to absolute
-	if nuc_comp<0:
-		nuc_comp = num_speci+nuc_comp
+	# index of nucleating component
+	if len(nuc_comp)>0:
+		nuc_compi = spec_namelist.index(nuc_comp[0])
+		nuc_comp = np.empty(1, dtype=int)
+		nuc_comp[0] = nuc_compi
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)

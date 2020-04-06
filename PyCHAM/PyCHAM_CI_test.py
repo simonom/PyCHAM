@@ -31,8 +31,8 @@ inputs = open(inname, mode='r')
 in_list = inputs.readlines()
 inputs.close()
 
-if len(in_list) != 56:
-	print('Error: The number of variables in the model variables file is incorrect, should be 56, but is ' + str(len(in_list)) )
+if len(in_list) != 57:
+	print('Error: The number of variables in the model variables file is incorrect, should be 57, but is ' + str(len(in_list)) )
 	sys.exit()
 for i in range(len(in_list)):
 	key, value = in_list[i].split('=')
@@ -156,11 +156,11 @@ for i in range(len(in_list)):
 			nucv3 = float(0.0)
 		else:
 			nucv3 = float(value.strip())
-	if key == 'nuc_comp': # index of the nucleating component
+	if key == 'nuc_comp': # name of nucleating component
 		if (value.strip()).split(',')==['']:
-			nuc_comp = float(0.0)
+			nuc_comp = [] # empty list
 		else:
-			nuc_comp = int(value.strip())
+			nuc_comp = [str(i).strip() for i in (value.split(','))]
 	if key == 'new_partr': # radius of newly nucleated particles (cm)
 		if value.split(',')==['\n']:
 			new_partr = float(0.0)
@@ -306,12 +306,11 @@ for i in range(len(in_list)):
 			for i in range(comp_count):
 				Cinfl[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 	
-	
-	if key == 'voli':
+	if key == 'vol_Comp':
 		if (value.strip()).split(',')==['']:
-			voli = np.empty(0)
+			vol_Comp = [] # empty list
 		else:
-			voli = [int(i) for i in (value.split(','))]	
+			vol_Comp = [str(i).strip() for i in (value.split(','))]
 	if key == 'volP':
 		if (value.strip()).split(',')==['']:
 			volP = np.empty(0)
@@ -421,10 +420,15 @@ for i in range(len(in_list)):
 	if key == 'chem_scheme_markers':
 		if (value.strip()).split(',')==['']:
 			# default to MCM inputs
-			chem_scheme_markers = str['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '*;']
+			chem_scheme_markers = ['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '+', '*;']
 		else:
 			chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
-
+	if key == 'int_tol': # tolerances for integration
+				if (value.strip()).split(',')==['']:
+					# default to minimum tolerances
+					int_tol = np.array(([1.0e-3, 1.0e-4]))
+				else:
+					int_tol = np.array(([float(i) for i in (value.split(','))]))
 # --------------------------------------------------------------------------------
 # checks on inputs
 
@@ -449,6 +453,12 @@ if len(Cinfl)>0:
 		print('Error: the number of times given for constant influx by the const_infl_t variable inside the model variables input file does not match the number of times with constant influx concentrations provided by the Cinfl variable of that file, please see the README for guidance.')
 		sys.exit()
 
+# components with assigned vapour pressures
+if len(vol_Comp)!=len(volP):
+	print('Error: the number of components with assigned vapour pressures does not equal the number of assigned vapour pressures (vol_Comp and volP variables, respectively, in the model variables input folder), please see the README for guidance')
+	sys.exit()
+
+# ----------------------------------------------------------------------------------------
 
 # get names of chemical scheme and xml files
 # set path prefix based on whether this is a test or not (i.e. whether test flag 
@@ -473,10 +483,10 @@ resfname, tstep_len, TEMP, PInit, RH, lat, lon, DayOfYear, dt_start,
 act_flux_path, Cw,  
 save_step, ChamSA, nucv1, nucv2, nucv3, nuc_comp, new_partr,   
 inflectDp, pwl_xpre, pwl_xpro, inflectk, Rader, xmlname, C0, Comp0, 
-voli, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
+vol_Comp, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-e_field, const_infl_t, chem_scheme_markers]
+e_field, const_infl_t, chem_scheme_markers, int_tol]
 	
 if os.path.isfile(dirpath+'/testf.txt'):
 	print('Model input buttons work successfully')
