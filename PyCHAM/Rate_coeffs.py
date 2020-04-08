@@ -10,24 +10,22 @@
 #                                                                                                   # 
 ##################################################################################################### 
 # Minor modified by XSX
-# File Created at 2020-04-06 17:03:27.882668
+# File Created at 2020-04-08 17:02:25.598634
 
 import numpy
 import PhotolysisRates
 
-def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2):
+def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen):
 
-	# inputs:
+	# ------------------------------------------------------------------------	# inputs:
 	# M - third body concentration (molecules/cc (air))
 	# N2 - nitrogen concentration (molecules/cc (air))
 	# O2 - oxygen concentration (molecules/cc (air))
-
-	# mcm_constants_dict: given by mcm_constants.py
 	# RO2: specified by the chemical scheme. eg: subset of MCM
 	# H2O, TEMP: given by the user
 	# lightm: given by the user and is 0 for lights off and 1 for on
 	# reaction rate coefficients and their names parsed in eqn_parser.py 
-
+	# Jlen - number of photolysis reactions
 	# calculate reaction rates with given by chemical scheme
 	KRO2NO=2.7e-12*numpy.exp(360/TEMP) 
 	KRO2HO2=2.91e-13*numpy.exp(1300/TEMP) 
@@ -170,10 +168,11 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	KBPPN=(KPPN0*KPPNI)*FCPPN/(KPPN0+KPPNI) 
 
 	# estimate and append photolysis rates
-	J = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear)
+	J = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen)
+
 	if lightm == 0:
 		J = [0]*len(J)
-	rate_values = numpy.zeros(959)
+	rate_values = numpy.zeros(942)
 	# reac_coef has been formatted so that python can recognize it
 	rate_values[0] = 5.6e-34*N2*(TEMP/300)**-2.6*O2
 	rate_values[1] = 6.0e-34*O2*(TEMP/300)**-2.6*O2
@@ -1117,22 +1116,5 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	rate_values[939] = 1.44e-11
 	rate_values[940] = J[34]
 	rate_values[941] = J[35]
-	rate_values[942] = 1.2e-11*numpy.exp(440/TEMP)*0.065
-	rate_values[943] = 1.2e-11*numpy.exp(440/TEMP)*0.04
-	rate_values[944] = 8.05e-16*numpy.exp(-640/TEMP)*0.065
-	rate_values[945] = 8.05e-16*numpy.exp(-640/TEMP)*0.04
-	rate_values[946] = 5.2e-12*numpy.exp(600/TEMP)*0.045
-	rate_values[947] = 5.2e-12*numpy.exp(600/TEMP)*0.025
-	rate_values[948] = 3.01e-11*0.15
-	rate_values[949] = 3.01e-11*0.10
-	rate_values[950] = 5.47e-11*0.15
-	rate_values[951] = 5.47e-11*0.10
-	rate_values[952] = 2.64e-11*0.15
-	rate_values[953] = 2.64e-11*0.10
-	rate_values[954] = 6.65e-12*0.15
-	rate_values[955] = 6.65e-12*0.10
-	rate_values[956] = 1.90e-12*numpy.exp(190/TEMP)*0.15
-	rate_values[957] = 1.90e-12*numpy.exp(190/TEMP)*0.10
-	rate_values[958] = 8.05e-16*numpy.exp(-640/TEMP)*0.001
 	
 	return rate_values

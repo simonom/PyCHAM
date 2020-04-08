@@ -79,6 +79,7 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
 		
+		
 	# empty array for storing index of components with constant concentration
 	const_compi = []
 	for i in range (len(const_comp)):

@@ -62,7 +62,7 @@ class PyCHAM(QWidget):
 	def on_click1(self):
 		
 		dirpath = os.getcwd() # get current path
-# 		fname = dirpath+'/PyCHAM/inputs/MAC_Chem.txt' # hard-code chemical scheme input
+# 		fname = dirpath+'/PyCHAM/inputs/apinene_scheme_MCM.txt' # hard-code chemical scheme input
 		fname = self.openFileNameDialog() # ask for location of input chemical scheme file
 		with open(dirpath+'/fname.txt','w') as f:
 			f.write(fname)
@@ -81,7 +81,7 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click3(self):
 		dirpath = os.getcwd() # get current path
-# 		inname = dirpath+'/PyCHAM/inputs/MAC_inputs.txt' # hard-code model variables input
+# 		inname = dirpath+'/PyCHAM/inputs/Photo_chem_inputs.txt' # hard-code model variables input
 		inname = self.openFileNameDialog() # name of model variables inputs file
 		
 		# open the file
@@ -91,9 +91,12 @@ class PyCHAM(QWidget):
 		in_list = inputs.readlines()
 		inputs.close()
 		
-		if len(in_list) != 57:
-			print('Error: The number of variables in the model variables file is incorrect, should be 57, but is ' + str(len(in_list)) )
+		# check on whether correct number of inputs supplied
+		input_len = 58
+		if len(in_list) != input_len:
+			print(('Error: The number of variables in the model variables file is incorrect, should be ' + str(input_len) + ', but is ' + str(len(in_list))))
 			sys.exit()
+			
 		for i in range(len(in_list)):
 			key, value = in_list[i].split('=')
 			key = key.strip() # a string with bounding white space removed
@@ -191,11 +194,20 @@ class PyCHAM(QWidget):
 					dt_start = float(0.0)
 				else:
 					dt_start = float(value.strip())
-			if key == 'act_flux_path': # for indoor actinic flux
+			if key == 'act_flux_file': # for indoor actinic flux
+				cwd = os.getcwd() # address of current working directory
 				if (value.strip()).split(',')==['']:
 					act_flux_path = str('no')
 				else:
-					act_flux_path = str(value.strip())
+					act_flux_path = str(cwd + '/PyCHAM/photofiles/' + value.strip())
+			# name of file with wavelength-dependent absorption cross-section and quantum yield 
+			# calculations
+			if key == 'photo_par_file':
+				cwd = os.getcwd() # address of current working directory
+				if (value.strip()).split(',')==['']:
+					photo_par_file = str(cwd + '/PyCHAM/photofiles/' + 'MCMv3.2')
+				else:
+					photo_par_file = str(cwd + '/PyCHAM/photofiles/' + value.strip())
 			if key == 'ChamSA': # chamber surface area used for particle loss to walls
 				if value.split(',')==['\n']:
 					ChamSA = float(0.0)
@@ -520,6 +532,29 @@ class PyCHAM(QWidget):
 		if len(vol_Comp)!=len(volP):
 			print('Error: the number of components with assigned vapour pressures does not equal the number of assigned vapour pressures (vol_Comp and volP variables, respectively, in the model variables input folder), please see the README for guidance')
 			sys.exit()
+		
+		# nucleation inputs
+		if nucv1>0.0 and nuc_comp == []:
+			print('Error: the nucleation parameter nucv1 set in the model variables input folder is greater than zero, but no nucleating component is recognised from the nuc_comp variable, so nucleation cannot proceed.  Please see README for guidance.')
+			sys.exit()
+		
+		# check actinic flux and photochemical parameter files in expected place
+		if (photo_par_file != str(cwd + '/PyCHAM/photofiles/MCMv3.2')): # photochemical parameters
+			
+			if os.path.isfile(photo_par_file):
+				pass
+			else:
+				print('Error: file given for the photo_par_file input in the model variables input file has not been found, please check README for guidance')
+				sys.exit()
+			
+		if act_flux_path != 'no': # actinic flux file
+			
+			if os.path.isfile(act_flux_path):
+				pass
+			else:
+				print('Error: path name given for the act_flux_path input in the model variables input file has not been found, please check README for guidance')
+				sys.exit()
+		
 		# --------------------------------------------------------------------------------
 		# get names of chemical scheme and xml files
 		# set path prefix based on whether this is a test or not (i.e. whether test flag 
@@ -547,7 +582,7 @@ class PyCHAM(QWidget):
 		vol_Comp, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 		kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 		const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-		e_field, const_infl_t, chem_scheme_markers, int_tol]
+		e_field, const_infl_t, chem_scheme_markers, int_tol, photo_par_file]
 		
 		if os.path.isfile(dirpath+'/testf.txt'):
 			print('Model input buttons work successfully')

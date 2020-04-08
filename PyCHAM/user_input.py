@@ -37,7 +37,7 @@ def run(source, testf):
 			dydt_trak, space_mode, Ct, Compt, injectt, seed_name, 
 			const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
 			umansysprop_update, core_dens, p_char, e_field, 
-			const_infl_t, chem_scheme_markers, int_tol] = pickle.load(pk)	
+			const_infl_t, chem_scheme_markers, int_tol, photo_par_file] = pickle.load(pk)	
 
 			
 			# convert chamber surface area (m2) to spherical equivalent radius (m)
@@ -71,7 +71,7 @@ def run(source, testf):
 		std, mean_rad, core_diss, light_stat, light_time, kgwt, 0, dydt_trak, DayOfYear, 
 		space_mode, Ct, Compt, injectt, seed_name, const_comp, const_infl, Cinfl, act_wi, 
 		act_w, seed_mw, umansysprop_update, core_dens, p_char, e_field, const_infl_t, 
-		chem_scheme_markers, int_tol)
+		chem_scheme_markers, int_tol, photo_par_file)
 		
 	if source == 1:
 		return(fname, resfname, y_indx_plot, Comp0)

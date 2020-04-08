@@ -6,7 +6,8 @@ def recording(y, N_perbin, x, step, sumt, y_mat, Nresult_dry, Nresult_wet, x2, t
 				tot_stps, num_speci, num_sb, MW, rho, Cn, Vbou, rindx, rstoi, 
 				pindx, nprod, dydt_vst, RO2_indices, H2Oi, TEMP, lightm, nreac, 
 				pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, timeoday, lat, lon, 
-				act_flux_path, DayOfYear, act_coeff, PInit):
+				act_flux_path, DayOfYear, act_coeff, PInit, photo_par_file, Jlen, 
+				reac_coef):
 
 	# -------------------------------------------------		
 	# inputs:
@@ -24,6 +25,9 @@ def recording(y, N_perbin, x, step, sumt, y_mat, Nresult_dry, Nresult_wet, x2, t
 	# H2Oi - index of water
 	# act_coeff - activity coefficients of components
 	# PInit - chamber pressure (Pa)
+	# photo_par_file - name of file containing photochemical reaction parameters
+	# Jlen - number of photochemical reactions
+	# reac_coef - reaction rate coefficients during this time step (/s)
 	# -------------------------------------------------
 	
     
@@ -90,10 +94,6 @@ def recording(y, N_perbin, x, step, sumt, y_mat, Nresult_dry, Nresult_wet, x2, t
 		# note, using __import__ rather than import allows opening in run time, thereby using
 		# updated module
 		dydt_rec = __import__('dydt_rec')
-		from rate_valu_calc import rate_valu_calc # function to update rate coefficients
-		# update reaction rate coefficients
-		reac_coef = rate_valu_calc(RO2_indices, y[H2Oi], TEMP, lightm, y, timeoday, lat, 
-									lon, act_flux_path, DayOfYear, PInit)
 		
 		# update fraction loss estimate of user-specified species by calling on function
 		# generated automatically in eqn_parser

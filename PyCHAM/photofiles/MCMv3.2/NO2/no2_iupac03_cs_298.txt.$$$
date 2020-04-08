@@ -1,0 +1,55 @@
+NO2 (298K) photolysis cross sections (cm^2 molecule^-1)
+
+IUPAC 2003 November data
+
+Measurements of Merienne, Coquart and Jenouvrier:
+
+M. F. Merienne, A. Jenouvrier, and B. Coquart, J. Atmos. Chem. 20, 281 (1995)
+B. Coquart, A. Jenouvrier, and M. F. Merienne, J. Atmos. Chem. 21, 251 (1995)
+A. Jenouvrier, B. Coquart, and M. F. Merienne, J. Atmos. Chem. 25, 21 (1996)
+M. F. Merienne, A. Jenouvrier, B. Coquart, and J. P. Lux, J. Atmos. Chem. 27, 219 (1997)
+
+Divide xsection values by 10^20
+
+290 8.64
+295 10.64
+300 12.99
+305 16.04
+310 18.82
+315 21.64
+320 25.42
+325 28.79
+330 31.88
+335 35.87
+340 40.20
+345 41.75
+350 46.10
+355 49.82
+360 50.77
+365 55.01
+370 56.07
+375 58.88
+380 59.24
+385 59.42
+390 62.00
+395 59.20
+400 63.85
+405 57.68
+410 61.53
+415 58.92
+420 59.50
+425 56.70
+430 54.04
+435 55.54
+440 48.42
+445 48.84
+450 48.13
+455 41.24
+460 42.97
+465 40.87
+470 33.56
+475 38.49
+480 33.44
+485 25.18
+490 30.74
+495 29.30

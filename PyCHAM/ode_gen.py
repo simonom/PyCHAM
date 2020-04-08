@@ -28,7 +28,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt,
 			dydt_vst, daytime, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 			corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-			e_field, const_infl_t, int_tol):
+			e_field, const_infl_t, int_tol, photo_par_file, Jlen):
 	
 	# ----------------------------------------------------------
 	# inputs
@@ -83,6 +83,9 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# const_infl_t - times of constant influx (s)
 	# int_tol - absolute (0 index) and relative (1 index) tolerances for integration
+	# photo_par_file - name of file with with estimates for photolysis absorption
+	# 					cross-sections and quantum yields
+	# Jlen - number of photolysis reactions
 	# ----------------------------------------------------------
 
 	if testf==1:
@@ -130,8 +133,8 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		yp = 0.0
 	
 	if len(light_time)>0:
-		# check whether lights go on or off during this time step
-		timediff = (sumt+t)-np.array(light_time)
+		# check whether lights have changed
+		timediff = (sumt)-np.array(light_time)
 		timedish = (timediff == np.min(timediff[timediff>=0])) # index of reference time
 		lightm = (np.array(light_stat))[timedish] # whether lights on or off now
 	else: # if no input provided default to lights off
@@ -149,13 +152,20 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	
 	save_count = int(1) # count on number of times saving code called
 	
+	# reaction rate coefficients at experiment time = 0s
+	reac_coef = rate_valu_calc(RO2_indices, y[H2Oi], TEMP, lightm, y, 
+								daytime+sumt, 
+								lat, lon, act_flux_path, DayOfYear, PInit, 
+								photo_par_file, Jlen)
+	
 	[t_out, y_mat, Nresult_dry, Nresult_wet, x2, dydt_vst] = recording(y, N_perbin, x, 
 				save_count-1, sumt,
     			0, 0,  0, 0, 0, math.ceil(end_sim_time/save_step), 
 				num_speci, num_sb, y_mw[:, 0], y_dens[:, 0]*1.0e-3, yp, Vbou, rindx, 
 				rstoi, pindx, nprod, dydt_vst, RO2_indices, H2Oi, TEMP, lightm, nreac,
 				pconc, core_diss, Psat, kelv_fac, kimt, kgwt, Cw, daytime+sumt, lat, lon, 
-				act_flux_path, DayOfYear, act_coeff, PInit)
+				act_flux_path, DayOfYear, act_coeff, PInit, photo_par_file, Jlen, 
+				reac_coef)
 	
 	
 	tnew = t0 # initial time step (s)
@@ -184,18 +194,19 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		t = tnew # reset integration time (s)
 		
 		if len(light_time)>0:
-			# check whether lights go on or off during this time step
-			light_ind = ((sumt+tnew)>np.array(light_time)).sum()
+			# check whether lights have changed
+			light_ind = ((sumt)>np.array(light_time)).sum()-1
 			# whether lights on (1) or off (0) during this step
 			lightm = (np.array(light_stat))[light_ind]
 		else: # if no input provided default to lights off
 			lightm = 0
 		
 		# --------------------------------------------------------------------------------
-		# component injections
+		# component injections check
+		
 		if len(injectt)>0: # if any injections occur
 			# check whether latest component injection occurs
-			inj_count_new = ((sumt+tnew)>injectt).sum()
+			inj_count_new = ((sumt)>injectt).sum()
 			# update injections if new injection time reached
 			if inj_count_new>inj_count:
 				for i in range(len(inj_indx)):
@@ -203,24 +214,32 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 					# (molecules/cc (air))
 					y[int(inj_indx[i])] += Ct[i, inj_count]
 				inj_count = inj_count_new # update count on injections
-				 
-			# withdraw injections if previous injection time no longer reached, this is in
-			# case integration step has been reduced by moving centre method
-			if inj_count_new<inj_count:
-				for i in range(len(inj_indx)):
-					# account for injection in gas-phase concentration 
-					# (molecules/cc (air))
-					y[int(inj_indx[i])] -= Ct[i, inj_count]
-				inj_count = inj_count_new # update count on injections
-		# --------------------------------------------------------------------------------
 				
+				
+# 			# only need this if using inj_count_new = ((sumt+tnew)>injectt).sum() above
+#			# rather than inj_count_new = ((sumt)>injectt).sum()
+# 			# withdraw injections if previous injection time no longer reached, this is in
+# 			# case integration step has been reduced by moving centre method
+# 			if inj_count_new<inj_count:
+# 				for i in range(len(inj_indx)):
+# 					# account for injection in gas-phase concentration 
+# 					# (molecules/cc (air))
+# 					y[int(inj_indx[i])] -= Ct[i, inj_count]
+# 				inj_count = inj_count_new # update count on injections
+		# --------------------------------------------------------------------------------
+		# constant influxes check
+		
 		# update index counter for constant influxes - used in integrator below
 		if len(const_infl_t)>0:
-			inf_ind = int(((sumt+tnew)>const_infl_t).sum())-1
+			inf_ind = int(((sumt)>const_infl_t).sum())-1
+			
+		# --------------------------------------------------------------------------------
 		
 		# update reaction rate coefficients
-		reac_coef = rate_valu_calc(RO2_indices, y[H2Oi], TEMP, lightm, y, daytime+sumt, 
-									lat, lon, act_flux_path, DayOfYear, PInit)
+		reac_coef = rate_valu_calc(RO2_indices, y[H2Oi], TEMP, lightm, y, 
+									daytime+sumt, 
+									lat, lon, act_flux_path, DayOfYear, PInit, 
+									photo_par_file, Jlen)
 		
 		y0[:] = y[:] # update initial concentrations (molecules/cc (air))
 		# update particle volumes at start of time step (um3)
@@ -243,7 +262,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		# size bins don't change by more than one size bin (given by moving centre)
 		# note, need to have rstoi and pstoi multiplication in the gas-phase reaction part
 		while redt == 1:
-			print('cumulative time (s)', sumt)
+			print('cumulative time (s)', sumt, lightm)
 
 			# numba compiler to convert to machine code
 			@jit(f8[:](f8, f8[:]), nopython=True)
@@ -415,14 +434,18 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			else:
 				yp = 0.0
 			
-			# record new values
+			# record values at the end of this time step, note that these will correspond
+			# to sumt, which is the cumulative time (s) at the end of this time step.  
+			# This makes sense because the integration results are what is being saved 
+			# and these correspond to sumt (time at the end of the time step)
 			[t_out, y_mat, Nresult_dry, Nresult_wet, x2, dydt_vst] = recording(y, 
 				N_perbin, x, save_count, 
 				sumt, y_mat, Nresult_dry, Nresult_wet, x2, t_out, int(end_sim_time/save_step), 
 				num_speci, num_sb, y_mw[:, 0], y_dens[:, 0]*1.0e-3, yp, Vbou, rindx, 
 				rstoi, pindx, nprod, dydt_vst, RO2_indices, H2Oi, TEMP, lightm, nreac,
 				pconc, core_diss, Psat, kelv_fac, kimt, kgwt, Cw, daytime+sumt, lat, lon, 
-				act_flux_path, DayOfYear, act_coeff, PInit)
-			save_count += int(1)
+				act_flux_path, DayOfYear, act_coeff, PInit, photo_par_file, Jlen, reac_coef)
+				
+			save_count += int(1) # track number of times saved at
 			
 	return(t_out, y_mat, Nresult_dry, Nresult_wet, x2, dydt_vst)

@@ -41,7 +41,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		return(0,0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
-	if mean_rad == -1.0e6:
+	if mean_rad == -1.0e6 and num_sb>0:
 		if lowersize>0.0:
 			mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
 		if lowersize == 0.0:
@@ -56,8 +56,8 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
-	# create dummy variables if no size bins
-	if num_sb==0:
+	
+	if num_sb==0: # create dummy variables if no size bins
 		N_perbin = np.zeros((1,1))
 		x = np.zeros((1,1))
 		Varr = np.zeros((1,1))
@@ -65,6 +65,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		rad0 = np.zeros((1,1))
 		Vol0 = np.zeros((1,1))
 		rbou = np.zeros((1,1))
+		upper_bin_rad_amp = 1.0e6
 	
 	# create a number concentration for a lognormal distribution (particles/cc (air))
 	# this is where gas partitioning to wall set up

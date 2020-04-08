@@ -32,7 +32,9 @@ def run(testf):
 		print('in testing mode and called from test_res_plot_super.py, will try plotting results from example_run output, note that test_res_plot_super.py must be called from the PyCHAM home directory')
 		cwd = os.getcwd() # address of current working directory
 		fname = str(cwd+'/PyCHAM/output/Example_Run')
+		fname = str(cwd+'/PyCHAM/output/MAC_Chem')
 		resfname = 'Example_output'
+		resfname = 'MAC_20120215_16sb_2'
 		y_indx_plot = np.array(([1, 312, 2, 3]))
 		Comp0 = np.array((['O3', 'APINENE', 'NO', 'NO2']))
 	if testf==0:
@@ -276,7 +278,19 @@ def run(testf):
 		# SOA mass concentration
 		# array for SOA sum with time
 		SOAvst = np.zeros((1, len(t_array)))
-	
+		
+		final_i = 0
+		# check whether water and/or core is present
+		if PyCHAM_names[-2] == 'H2O': # if both present
+			final_i = 2
+		if PyCHAM_names[-1] == 'H2O': # if just water
+			final_i = 1
+		# note that the seed component is only registered in init_conc_func if initial
+		# particle concentration (pconc) exceeds zero, therefore particle-phase material 
+		# must be present at start of experiment (row 0 in y)
+		if final_i == 0 and y[0, num_speci:(num_speci*(num_sb+1))].sum()>1.0e-10: 
+			final_i = -1
+		
 		for i in range(num_sb): # size bin loop, including wall
 	
 			# sum of organics in condensed-phase at end of simulation (ug/m3 (air))
@@ -284,9 +298,8 @@ def run(testf):
 			
 				# to replicate the SMPS results when using 
 				# low size bin resolution in the model, find the volume of particles, then
-				# assume a density of 1.3 g/cm3, note this assumes that water and core are
-				# at the end of particle-phase concentration arrays
-				SOAvst[0, :] += np.sum((y[:, ((i+1)*num_speci):((i+2)*num_speci-2)]/si.N_A*(y_MV[0:-2])*1.0e12), axis = 1)
+				# assume a density of 1.0 g/cm3
+				SOAvst[0, :] += np.sum((y[:, ((i+1)*num_speci):((i+2)*num_speci-final_i)]/si.N_A*(y_MV[0:-final_i])*1.3e12), axis = 1)
 			
 	
 		p5, = par2.plot(t_array/3600.0, SOAvst[0, :], 'xr', label = 'M (sim)')
@@ -296,6 +309,7 @@ def run(testf):
 		par2.tick_params(axis='y', colors='red')
 		par2.spines['right'].set_color('red')
 		par2.yaxis.set_tick_params(labelsize=18)
+		par2.text((t_array/3600.0)[0], max(SOAvst[0, :])/2.0, 'assumed particle density for [SOA] = 1.3 $\mathrm{g\, cm^{-3}}$')
 		plt.legend(fontsize=18, handles=[p3, p5] ,loc=4)
 		if testf == 0:
 			plt.savefig(str(output_by_sim+'/contours.png'), transparent=True)

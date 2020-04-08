@@ -121,7 +121,7 @@ Install is complete
 
 4. The 'run model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
 
-5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
+5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass (assuming a density of the particle phase of 1 g/cm3) and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
 
 ## Testing
 
@@ -129,7 +129,7 @@ Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in 
 
 Integration testing can be completed using the '.travis.yml' file at the website: travis-ci.org.
 
-The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.3.1 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.3.4 of PyCHAM.
 
 ## Inputs
 
@@ -201,7 +201,7 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 ## Model Variables .txt File
 
 
-An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the values for the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. vol_Comp = ):
+An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. vol_Comp = ), but an error message will show if a variable is missing:
 
 Res_file_name = Name of folder to save results to
 
@@ -243,13 +243,42 @@ DayOfYear = day of the year for natural light intensity (if applicable, leave em
 			 (if experiment is dark set light_status below to 0 for all times)), must be 
 			 integer between 1 and 365
 
-daytime_start = time of the day for natural light intensity (if applicable, leave empty if not (if experiment is dark set light_status below to 0 for all times)) (s since midnight)
+daytime_start = Time of the day for natural light intensity (if applicable, leave empty if
+				 not (if experiment is dark set light_status below to 0 for all times)) (s
+				  since midnight)
 
-act_flux_path = path to file with actinic flux values, use only if artificial lights
+act_flux_file = Name of csv file stored in PyCHAM/photofiles containing the actinic flux 
+				values; use only if artificial lights
 				inside chamber are used during experiment.  The file should have a line 
 				for each wavelength, with the first number in each line representing
 				the wavelength in nm, and the second number separated from the first by
-				a tab stating the flux at that wavelength.
+				a comma stating the flux (Photons /cm2/nm/s) at that wavelength.  No 
+				headers should be present in this file.
+				Example of file given by /PyCHAM/photofiles/Example_act_flux and example
+				of the act_flux_path variable is:
+				act_flux_path = Example_act_flux.csv
+				Note, please include the .csv in the variable name if this is part of the
+				file name.
+				Defaults to null file
+
+photo_par_file = Name of txt file stored in PyCHAM/photofiles containing the 
+				wavelength-dependent absorption cross-sections and quantum yields for
+				photochemistry.  If left empty defaults to MCMv3.2, and is only used
+				if act_flux_path variable above is stated.
+				
+				File must be of .txt format with the formatting:
+				J_n_axs
+				wv_m, axs_m
+				J_n_qy
+				wv_M, qy_m
+				J_end
+				
+				where n is the photochemical reaction number, axs represents the 
+				absorption cross-section (cm2/molecule), wv is wavelength (nm), _m is the 
+				wavelength number, and qy represents quantum yield (fraction).  J_end 
+				marks the end of the photolysis file.  An example
+				is provided in PyCHAM/photofiles/example_inputs.txt.  Note, please include
+				the .txt in the file name.
 
 ChamSA = Chamber surface area (m2), used if the Rader and McMurry wall loss of particles
 		option (Rader_flag) is set to 1 (on) below
@@ -261,7 +290,8 @@ nucv2 = Nucleation parameterisation value 2
 nucv3 = Nucleation parameterisation value 3
 
 nuc_comp = Name of component contributing to nucleation (only one allowed), must 
-			correspond to a name in the chemical scheme file
+			correspond to a name in the chemical scheme file.  Deafults to empty.  If
+			empty, the nucleation module (nuc.py) will not be called.
 
 new_partr = radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm
 
@@ -421,12 +451,28 @@ core_diss = core dissociation constant (for seed component) (dimensionless) (1),
 			defaults to one
 
 light_time = times (s) for light status, corresponding to the elements of light_status
-				(below), if empty defaults to lights off for whole experiment
+				(below), if empty defaults to lights off for whole experiment.
+				Use this setting regardless of whether light
+				is natural or artificial (chamber lamps).  The setting for a particular 
+				time is recognised when the time step will surpass the time given in 
+				light_time.
+				For example, for a 4 hour 
+				experiment, with lights on for first half and lights off for second, use:
+				light_time = 0.0, 7200.0
+				light_status = 1, 0
 
 light_status = 1 for lights on and 0 for lights off, with times given in light_time 
 				(above), if empty defaults to lights off for whole experiment.  Setting to
-				off (0) means that even if values given for natural light via variables
-				lat, lon, DayOfYear and daytime_start above, the simulation will be dark
+				off (0) means that even if variables defining light intensity above, 
+				the simulation will be dark.  Use this setting regardless of whether light
+				is natural or artificial (chamber lamps).  The setting for a particular 
+				time is recognised when the time step will surpass the time given in 
+				light_time.
+				For example, for a 4 hour 
+				experiment, with lights on for first half and lights off for second, use:
+				light_time = 0.0, 7200.0
+				light_status = 1, 0
+				
 				
 tracked_comp = name of component(s) to track rate of concentration change 
 				(molecules/cc.s); must match name given in chemical scheme, and if

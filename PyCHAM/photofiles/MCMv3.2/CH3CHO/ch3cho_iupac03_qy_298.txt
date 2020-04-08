@@ -1,0 +1,23 @@
+CH3CHO 298 K photolysis quantum yields			
+
+IUPAC 2003 Recommendation			
+http://www.iupac-kinetic.ch.cam.ac.uk			
+
+H. Meyrahn, G. K. Moortgat, and P. Warneck, presented at the XVth Informal Conference on Photochemistry, Stanford Research Institute, Stanford, California, July 1982			
+
+Only the radical channel (phi2) is important above the 290 nm atmospheric cut off
+
+wavelength (nm)	phi1 (ch4 + co)	phi2 (ch3 + hco)	total
+260	0.46	0.31	0.77
+270	0.31	0.39	0.7
+280	0.05	0.58	0.63
+290	0.01	0.53	0.54
+295	0	0.48	0.48
+300	0	0.43	0.43
+305	0	0.37	0.37
+310	0	0.29	0.29
+315	0	0.17	0.17
+320	0	0.1	0.1
+325	0	0.04	0.04
+330	0	0	0			
+

@@ -4,7 +4,7 @@ import numpy as np
 
 
 def rate_valu_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path, 
-					DayOfYear, PInit):
+					DayOfYear, PInit, photo_par_file, Jlen):
 
 	# ---------------------------------------------
 	# inputs:
@@ -18,6 +18,9 @@ def rate_valu_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_p
 	# act_flux_path - path to file stating actinic flux
 	# DayOfYear - day number of the year (1-365)
 	# PInit - chamber pressure (Pa)
+	# photo_par_file - name of file with with estimates for photolysis absorption
+	# 					cross-sections and quantum yields
+	# Jlen - number of photolysis reactions
 	# ---------------------------------------------
 	
 	# calculate total RO2 concentration
@@ -40,6 +43,7 @@ def rate_valu_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_p
 	Rate_coeffs = __import__('Rate_coeffs') # calculate the rate coef. for each equation
 	# Calculate the new rate coef. array (/s) 
 	reac_coef = Rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
-											act_flux_path, DayOfYear, M_val, N2_val, O2_val)
+											act_flux_path, DayOfYear, M_val, N2_val, 
+											O2_val, photo_par_file, Jlen)
 	
 	return reac_coef

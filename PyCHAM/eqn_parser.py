@@ -16,12 +16,15 @@ from water_calc import water_calc
 # Extract the mechanism information
 def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH, 
 						start_sim_time, lat, lon, act_flux_path, DayOfYear, 
-						chem_scheme_markers):
+						chem_scheme_markers, photo_par_file):
 
 	
 	# inputs: ----------------------------------------------------------------------------
+	# TEMP - experiment temperature (K)
 	# testf - flag for operating in normal mode (0) or testing mode (1)
 	# chem_scheme_markers - markers for different sections of the chemical scheme
+	# photo_par_file - path (from PyCHAM home directory) to file containing photolysis
+	#					information (absorption cross sections and quantum yields)
 	# ------------------------------------------------------------------------------------
 	
 	if testf == 1: # for just testing mode
@@ -376,6 +379,19 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 	# now create reaction rate file (reaction rates are set up to have units /s)
 	write_rate_file(reac_coef, rrc, rrc_name, M_val, N2_val, O2_val, TEMP, C_H2O, testf)
 
+	# number of photolysis reactions, if this relevant
+	cwd = os.getcwd() # address of current working directory
+	if photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2'):
+		Jlen = 62 # for MCM (default name of photolysis parameters)
+	else: # need to find out number of photolysis reactions
+		# use Fortran indexing to be consistent with MCM photochemical reaction numbers
+		Jlen = 1 
+		# open file to read
+		f = open(str(photo_par_file), 'r')
+		for line in f: # loop through line
+			if line.strip() == str('J_'+str(Jlen) + '_axs'):
+				Jlen += 1
+
 	# print the brief info for the simulation to the screen
 	print('Briefing:')
 	print('Total number of equations: %i' %(num_eqn))
@@ -414,7 +430,7 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 	return (rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, 
 			species_step, RO2_indices, nreac,
 			nprod, prodn, reacn, M_val, N2_val, O2_val, C_H2O, 
-			Psat_water, H2O_mw, spec_namelist)
+			Psat_water, H2O_mw, spec_namelist, Jlen)
 
 
 
@@ -444,19 +460,19 @@ def write_rate_file(reac_coef, rrc, rrc_name, M, N2, O2, TEMP, C_H2O, testf):
 	f.write('\n')
 
 	# following part is the function (there should be an indent at the start of each line)
-	# suggest using 4 SPACES instead of 1 Tab
-	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2):\n')
+	# suggest using 1 Tab
+	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen):\n')
 	f.write('\n')
+	f.write('	# ------------------------------------------------------------------------')
 	f.write('	# inputs:\n')
 	f.write('	# M - third body concentration (molecules/cc (air))\n')
 	f.write('	# N2 - nitrogen concentration (molecules/cc (air))\n')
 	f.write('	# O2 - oxygen concentration (molecules/cc (air))\n')
-	f.write('\n')
-	f.write('	# mcm_constants_dict: given by mcm_constants.py\n')
 	f.write('	# RO2: specified by the chemical scheme. eg: subset of MCM\n')
 	f.write('	# H2O, TEMP: given by the user\n')
 	f.write('	# lightm: given by the user and is 0 for lights off and 1 for on\n')
 	f.write('	# reaction rate coefficients and their names parsed in eqn_parser.py \n')
+	f.write('	# Jlen - number of photolysis reactions')
 	f.write('\n')
 	f.write('	# calculate reaction rates with given by chemical scheme\n')
 	# code to calculate rate coefficients given by chemical scheme file
@@ -464,7 +480,8 @@ def write_rate_file(reac_coef, rrc, rrc_name, M, N2, O2, TEMP, C_H2O, testf):
 		f.write('	%s \n' %line)
 	f.write('\n')
 	f.write('	# estimate and append photolysis rates\n')
-	f.write('	J = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear)\n')
+	f.write('	J = PhotolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen)\n')
+	f.write('\n')
 	f.write('	if lightm == 0:\n')
 	f.write('		J = [0]*len(J)\n')
 

@@ -34,7 +34,7 @@ def run(testf):
 	dydt_trak, DayOfYear, space_mode, Ct, Compt, injectt, seed_name, 
 	const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
 	umansysprop_update, core_dens, p_char, e_field, const_infl_t, 
-	chem_scheme_markers, int_tol] = ui.run(0, testf)
+	chem_scheme_markers, int_tol, photo_par_file] = ui.run(0, testf)
 	
 	if testm == 1:
 		print('PyCHAM calls front fine, now returning to PyCHAM.py')
@@ -49,9 +49,10 @@ def run(testf):
 	[rindx, pindx, rstoi, pstoi, reac_coef, spec_list, Pybel_objects, num_eqn, num_speci, 
 		RO2_indices, nreac, nprod, prodn, 
 		reacn, M_val, N2_val, O2_val, C_H2O, Psat_water, 
-		H2O_mw, spec_namelist] = eqn_parser.extract_mechanism(fname, xmlname, 
+		H2O_mw, spec_namelist, Jlen] = eqn_parser.extract_mechanism(fname, xmlname, 
 							TEMP, PInit, testf, RH, start_sim_time, lat, 
-							lon, act_flux_path, DayOfYear, chem_scheme_markers)
+							lon, act_flux_path, DayOfYear, chem_scheme_markers, 
+							photo_par_file)
 	
 	if testf==1:
 		print('eqn_parser.extract_mechanism called and returned fine')
@@ -121,7 +122,7 @@ def run(testf):
 				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt, dydt_vst,
 				start_sim_time, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 				corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-				e_field, const_infl_t, int_tol)
+				e_field, const_infl_t, int_tol, photo_par_file, Jlen)
 				
 	
 	t2 = time.clock() # get wall clock time after call to solver
