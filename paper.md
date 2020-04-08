@@ -44,9 +44,9 @@ PyCHAM (CHemistry with Aerosol Microphysics in Python) is an open-access 0-D box
 
 With air quality and climate models increasingly important to guiding sustainable societies, the accuracy of simulations must suffice [@Tong:2019].  However, research shows that the simulated aerosol effects in these models provides a relatively high amount of uncertainty [@Johnson:2018].  The combination of box models like PyCHAM with aerosol chamber measurements to better constrain aerosol processes is therefore necessary to ultimately improve societal sustainability.
 
-Funding for model development has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere.  The autoxidation process has recently been discovered to play a significant role in the formation of airbourne particulates [@Ehn:2014], however its exact chemical mechanism is yet to be elucidated.  Through comparison of chamber measurements with PyCHAM outputs using various mechanism possibilities, a constrained autoxidation chemical scheme is being generated.
+At the time of writing, PyCHAM is being used to investigate the autoxidation of organic vapours in the atmosphere.  The autoxidation process has recently been discovered to play a significant role in the formation of airbourne particulates [@Ehn:2014], however its exact chemical mechanism is yet to be elucidated.  Through comparison of chamber measurements with PyCHAM outputs using various mechanism possibilities, a constrained autoxidation chemical scheme is being generated.
 
-The model employs non-equilibrium equations to simulate the known processes occurring in aerosol chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package [@Andersson:2015] for ODE solvers is called on, using the backward differentiation formula, which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
+The model employs non-equilibrium equations to simulate the known processes occurring in aerosol chambers.  At its core is integration of ordinary differential equations (ODEs) for gas-phase photochemistry and gas partitioning to particles and walls.  Here, the CVode function of the Assimulo package [@Andersson:2015] for ODE solvers is called on, using the backward differentiation formula of the Sundials solvers [@hindmarsh:2005sundials], which studies have shown is most reliable for solution of these equations [@Jacobson:2005].  The general equation for chemical reactions is [@Jacobson:2005]: 
 
 $$\frac{d[i_{g}]}{dt} = \pm i_{s}k_{n}[a_{g}]^{a_{s}}[b_{g}]^{b_{s}},
 $$
@@ -73,6 +73,7 @@ Several variables change between different aerosol chambers and different experi
 
 # Acknowledgements
 
+Funding has been provided by the EUROCHAMP-2020 research project [@EUROCHAMP:2020].  
 This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997 and the National Centre for Atmospheric Science.
 
 # References
