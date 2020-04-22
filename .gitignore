@@ -109,3 +109,6 @@ venv.bak/
 
 # previously produced Travis output
 /PyCHAM/output/Example_Run/Example_output_Travis_CI
+
+# cache of python files
+/PyCHAM/__pycache__
