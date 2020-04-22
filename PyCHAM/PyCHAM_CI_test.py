@@ -401,7 +401,7 @@ for i in range(len(in_list)):
 			mean_rad[0, :] = [float(i) for i in ((value.strip()).split(';'))]
 	
 	if key == 'std':
-		if value.split(',')==['\n']:
+		if (value.strip()).split(',')==['']:
 			std = np.zeros((1,1)) 
 			std[0, 0] = 1.1
 		else:

@@ -106,3 +106,6 @@ venv.bak/
 
 # unsure where this comes from
 .DS_Store
+
+# previously produced Travis output
+/PyCHAM/output/Example_Run/Example_output_Travis_CI

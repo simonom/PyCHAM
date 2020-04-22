@@ -451,7 +451,8 @@ class PyCHAM(QWidget):
 					
 			if key == 'mean_rad': # seed particle mean radius (um)
 				if (value.strip()).split(',')==['']:
-					mean_rad = -1.0e6
+					mean_rad = np.zeros((1,1))
+					mean_rad[0, 0] = -1.0e6
 				else:
 					# keep track of number of times given
 					time_count = 1
