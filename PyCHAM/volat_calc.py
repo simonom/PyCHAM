@@ -64,7 +64,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	y_dens = np.zeros((num_speci, 1)) # components' liquid density (kg/m3)
 	Psat = np.zeros((num_speci, 1)) # species' vapour pressure
-	
+
 	for i in range (num_speci):
 		
 		# omit estimation for water as it's value is already given in Psat_water 
@@ -73,9 +73,9 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 			Psat[i] = Psat_water
 			y_dens[i] = 1.0*1.0E3 # (kg/m3 (particle))
 			continue 
-		if i == corei and sum(pconc)>0.0: # core properties (only used if seed particles present)
+		if i == corei and sum(sum(pconc))>0.0: # core properties (only used if seed particles present)
 			y_dens[i] = core_dens*1.0E3 # core density (kg/m3 (particle))
-			continue 
+			continue
 		if spec_list[i] == '[HH]': # omit H2 as unliked by liquid density code
 			# liquid density code does not like H2, so manually input kg/m3
 			y_dens[i] = 1.0e3

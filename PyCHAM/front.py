@@ -34,7 +34,7 @@ def run(testf):
 	dydt_trak, DayOfYear, space_mode, Ct, Compt, injectt, seed_name, 
 	const_comp, const_infl, Cinfl, act_wi, act_w, seed_mw, 
 	umansysprop_update, core_dens, p_char, e_field, const_infl_t, 
-	chem_scheme_markers, int_tol, photo_par_file] = ui.run(0, testf)
+	chem_scheme_markers, int_tol, photo_par_file, dil_fac, pconct] = ui.run(0, testf)
 	
 	if testm == 1:
 		print('PyCHAM calls front fine, now returning to PyCHAM.py')
@@ -61,15 +61,15 @@ def run(testf):
 	[y, H2Oi, y_mw, num_speci, 
 	Cfactor, y_indx_plot, corei, dydt_vst, spec_namelist, 
 							inj_indx, Ct, const_compi, 
-							const_infli, Cinfl] = init_conc_func(num_speci, Comp0, 
+							const_infli, Cinfl, core_diss] = init_conc_func(num_speci, 
+							Comp0, 
 							init_conc, TEMP, RH, M_val, N2_val, O2_val, reac_coef, fname, 
 							PInit, start_sim_time, lat, lon, Pybel_objects, testf, pconc,
 							act_flux_path, dydt_trak, end_sim_time, save_step, rindx, 
 							pindx, num_eqn, nreac, nprod, DayOfYear, C_H2O, H2O_mw, 
 							spec_namelist, Compt, Ct, seed_name, const_comp, const_infl, 
-							seed_mw, Cinfl)
-# 	print(C_H2O/Cfactor)
-# 	ipdb.set_trace()
+							seed_mw, Cinfl, core_diss)
+
 	if testf==1:
 		print('init_conc_func called and returned fine')
 		print('calling kimt_prep')
@@ -82,6 +82,7 @@ def run(testf):
 	if testf==1:
 		print('kimt_prep called and returned fine')
 		print('calling volat_calc.py')
+		
 	[Psat, y_dens, Psat_Pa] = volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci,  
 								Psat_water, vol_Comp, volP, testf, corei, pconc,
 								umansysprop_update, core_dens, spec_namelist)
@@ -93,13 +94,14 @@ def run(testf):
 	if testf==1:
 		print('wall_prep called and returned fine')
 		print('calling pp_intro')
+	
 	# set up particle phase part
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, 
 							MV, num_sb, nuc_comp, rbou00, upper_bin_rad_amp] = pp_intro(y, 
 							num_speci, Pybel_objects, TEMP, H2Oi, 
 							mfp, accom_coeff, y_mw, surfT, DStar_org, 
-							RH, num_sb, lowersize, uppersize, pconc, tmax, nuc_comp, 
-							testf, std, mean_rad, 
+							RH, num_sb, lowersize, uppersize, pconc[:, 0], tmax, nuc_comp, 
+							testf, std[0, 0], mean_rad[0, 0], 
 							therm_sp, Cw, y_dens, Psat, core_diss, kgwt, space_mode, 
 							corei, spec_namelist)
 	
@@ -115,14 +117,15 @@ def run(testf):
 				rstoi, pstoi, H2Oi, TEMP, RO2_indices, 
 				num_sb, Psat, mfp, accom_coeff, surfT, y_dens, N_perbin,
 				DStar_org, y_mw, x, core_diss, Varr, Vbou, RH, rad0, Vol0,
-				end_sim_time, np.array(pconc), save_step, 
+				end_sim_time, pconc, save_step, 
 				rbou, therm_sp, Cw, light_time, light_stat,
 				nreac, nprod, prodn,
 				reacn, new_partr, MV, nucv1, nucv2, nucv3, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt, dydt_vst,
 				start_sim_time, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 				corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-				e_field, const_infl_t, int_tol, photo_par_file, Jlen)
+				e_field, const_infl_t, int_tol, photo_par_file, Jlen, dil_fac, pconct,
+				lowersize, uppersize, mean_rad, std)
 				
 	
 	t2 = time.clock() # get wall clock time after call to solver

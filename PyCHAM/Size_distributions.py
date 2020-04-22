@@ -25,9 +25,7 @@
 #                                                                                        #
 ##########################################################################################
 
-# Last modification 28/5/17
-
-from scipy import stats # Import the scipy.stats module
+from scipy import stats # import the scipy.stats module
 import numpy as np
 import matplotlib.pyplot as plt
 import ipdb
@@ -38,7 +36,10 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode
 	# Inputs:
 	
 	# num_bins - number of size bins (not including wall)
-	# pconc - starting number concentration of particles (# particle/cc (air))
+	# pconc - starting number concentration of particles (# particle/cc (air)), if this
+	# is scalar, the number concentration will be split between size bins, and if it has
+	# the same length as number of size bins, each element will be allocated to its
+	# corresponding size bin
 	# loc - shift of lognormal probability distribution function for seed particles 
 	# number-size distribution (um)
 	# scale - scaling factor of lognormal probability distribution function for seed 
@@ -95,8 +96,9 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode
 		pdf_out = np.interp(x_output, hires, pdf_output)	
 		# number concentration of all size bins (# particle/cc (air))
 		Nperbin = (pdf_out/sum(pdf_out))*pconc
-		
-	if len(pconc)>1 and sum(pconc)>0.0: # if number concentration explicitly stated in inputs
+	
+	# if number concentration (#/cc (air)) explicitly stated in inputs
+	if len(pconc)>1 and sum(pconc)>0.0:
 		Nperbin = np.array((pconc))
 	if sum(pconc)==0.0:
 		Nperbin = np.zeros((num_bins))

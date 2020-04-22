@@ -5,10 +5,17 @@ Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 resea
 PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.
 
 # Table of Content
-1. [Installation](#Installation)
-2. [Running](#Running)
-3. [Testing](#Testing)
-4. [Inputs](#Inputs)
+1. [Documentation](#Documentation)
+2. [Installation](#Installation)
+3. [Running](#Running)
+4. [Testing](#Testing)
+5. [Inputs](#Inputs)
+
+## Documentation
+
+The README file serves as a manual explaining how to set the software up and use it.  
+
+The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.
 
 ## Installation
 
@@ -188,7 +195,7 @@ chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), , , , RO2, *;
 If chem_scheme_markers is left empty, the default is MCM formatting.
 
 The reaction rate coefficients beside chemical reaction equations and inside generic rate coefficients must adhere to the following rules:
-The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py.
+The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, exp, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py.
 
 
 ## Chemical Scheme .xml file
@@ -293,18 +300,25 @@ nuc_comp = Name of component contributing to nucleation (only one allowed), must
 			correspond to a name in the chemical scheme file.  Deafults to empty.  If
 			empty, the nucleation module (nuc.py) will not be called.
 
-new_partr = radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm
+new_partr = Radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm.
 
-inflectDp = Particle diameter wall deposition rate at inflection point (m)
+inflectDp = Particle diameter wall deposition rate at inflection point (m).
 
-Grad_pre_inflect = Gradient of particle wall deposition before inflection (/s)
+Grad_pre_inflect = Negative log 10 of the gradient of particle wall deposition rate 
+					against the 
+					log10 of particle diameter before inflection (/s).  For example, for 
+					the rate to decrease by an order of magnitude every order of magnitude
+					increase in particle diameter, set to 1.
 
-Grad_post_inflect = Gradient of particle wall deposition after inflection (/s)
+Grad_post_inflect = Log 10 of the gradient of particle wall deposition rate against the 
+					log10 of particle diameter after inflection (/s).  For example, for 
+					the rate to increase by an order of magnitude every order of magnitude
+					increase in particle diameter, set to 1.
 
-Rate_at_inflect = Particle deposition rate to wall at inflection (/s)
+Rate_at_inflect = Particle deposition rate to wall at inflection (/s).
 
 part_charge_num = Average number of charges per particle, only required if the McMurry and
-					Rader (1985) model for particle deposition to walls is selected
+					Rader (1985) model for particle deposition to walls is selected.
 					
 elec_field = Average electric field inside the chamber (g.m/A.s3), only required if the 
 			McMurry and Rader (1985) model for particle deposition to walls is selected
@@ -341,9 +355,10 @@ Ct = Concentrations of component achieved when injected at some time after exper
 Compt = Name of component injected at some time after experiment start.  Note, this is 
 		case sensitive, with the case matching that in the xml file - note this for 
 		components with concentrations allowed to change, see const_comp for those with 
-		unvariable concentrations
+		invariable concentrations
 
-injectt = Times at which injections occur (s), which correspond to the concentrations in
+injectt = Time(s) at which injections occur (seconds), which correspond to the 
+			concentrations in
 			Ct, if multiple values (representing injection at multiple times), please
 			separate with commas.  If multiple components are  injected after the start 
 			time, then this input should still consist of just one series of times as 
@@ -414,13 +429,36 @@ act_wi = index of components with activity coefficients for the wall stated in a
 act_w = activity coefficients for the wall (dimensionless) of components with indices 
 		given in act_wi variable above
 
-pconc = either total particle concentration at start of experiment, in which case should 
+pconct = Times (seconds) at which seed particles of number concentration given in pconc 
+		are introduced to the chamber.  If introduced at multiple times, separate times by
+		a semicolon.
+		For example, for a two size bin simulation with 10 and 5 particles/cc
+		in the first and second size bin respectively introduced at time 0 s, and later
+		at time 120 s seed particles of concentration 6 an 0 particles/cc in the
+		first and second size bin respectively are introduced, the pconc input is
+		pconc = 10, 5; 6, 0
+		and the pconct input is
+		pconct = 0; 120
+		and the Number_size_bins input is
+		Number_size_bins = 1
+
+pconc = Either total particle concentration at start of experiment, in which case should 
 		be a scalar, or particle concentration per size bin, in which case length should 
 		equal number of particle size bins (# particles/cc (air)).  If an array of 
 		numbers, then separate numbers by a comma.  If a scalar, the particles will be 
-		spread across size bins based on the values in the std, loc and scale variables
-		below.  To turn off particle considerations set to 0 (which is also the default), 
-		likewise set Number_size_bins variable (above) and seed_name variable (below) off
+		spread across size bins based on the values in the std and mean_rad inputs.  
+		To turn off particle considerations leave empty.  If seed aerosol 
+		introduced at mutiple times during the simulation, separate times using a 
+		semicolon.
+		For example, for a two size bin simulation with 10 and 5 particles/cc
+		in the first and second size bin respectively introduced at time 0 s, and later
+		at time 120 s seed particles of concentration 6 an 0 particles/cc in the
+		first and second size bin respectively are introduced, the pconc input is
+		pconc = 10, 5; 6, 0
+		and the pconct input is
+		pconct = 0; 120
+		and the Number_size_bins input is
+		Number_size_bins = 1
 
 seed_name = name of component comprising the seed particles, can either be core for a 
 			component not present in the equation file, or a name from the equation list
@@ -429,23 +467,34 @@ seed_name = name of component comprising the seed particles, can either be core 
 seed_mw = molecular weight of seed component (g/mol), if empty defaults to that of
 			ammonium sulphate - 132.14 g/mol
 			
-seed_dens = density of seed material (g/cc), defaults to 1.0 g/cc if left empty
+seed_dens = Density of seed material (g/cc), defaults to 1.0 g/cc if left empty.
 
-std = geometric mean standard deviation of seed particle number concentration 
+mean_rad = Mean radius of particles (um), defaults to flag that tells software to
+			estimate mean radius from the particle size bin radius bounds given by
+			lower_part_size and upper_part_size inputs above.  If more than one size bin
+			the default is the mid-point of each.  If the lognormal size distribution is
+			being found (using the std input below), mean_rad should be a 
+			scalar representing the mean radius of the lognormal size distribution.  If
+			seed particles are introduced at more than one time, then mean_rad for the
+			different times should be separated by a semicolon.  For example,
+			if seed particle with a mean_rad of 1.0e-2 um introduced at start and with 
+			mean_rad of 1.0e-1 um introduced after 120 s, the mean_rad input is:
+			mean_rad = 1.0e-2; 1.0e-1
+			and the pconct input is
+			pconct = 0; 120
+	
+
+std = Geometric mean standard deviation of seed particle number concentration 
 	(dimensionless) when scalar provided in pconc variable above, role
 	explained online in scipy.stats.lognorm page, under pdf method:
 	https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
-
-loc = shift of lognormal probability distribution function for seed particles 
-	number-size distribution (um) when scalar provided in pconc variable above, role
-	explained online in scipy.stats.lognorm page, under pdf method:
-	https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
-
-scale = scaling factor of lognormal probability distribution function for seed 
-	particles (dimensionless) when scalar provided in pconc variable above, role
-	explained online in scipy.stats.lognorm page, under pdf method:
-	https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html,
-	must be >0
+	If left empty defaults to 1.1.  If seed particles introduced after the experiment
+	start, then separate std for different times using a semicolon.  For example,
+	if seed particle with a standard deviation of 1.2 introduced at start and with 
+	standard deviation of 1.3 introduced after 120 s, the std input is:
+	std = 1.2; 1.3
+	and the pconct input is
+	pconct = 0; 120
 
 core_diss = core dissociation constant (for seed component) (dimensionless) (1), if empty
 			defaults to one
@@ -488,17 +537,21 @@ umansysprop_update = flag to update the UManSysProp module via internet connecti
 						an error.
 
 chem_scheme_markers = markers denoting various sections of the user's chemical scheme.  If
-					left empty defaults to MCM formatting.  If filled, must have seven 
-					elements separeted by commas, which can be left empty but with commas
-					intact:
+					left empty defaults to MCM FACSIMILE formatting.  If filled, must have 
+					following elements separated with commas:
 					marker for chemical reactions starting, punctuation before each 
 					reaction, marker for chemical reactions ending, marker for generic 
 					rate coefficients starting, punctuation at the end of lines for 
 					generic rate coefficients, marker for end of generic rate 
-					coefficients, marker for start of peroxy radical pool description,
-					marker for end of peroxy radical pool description
+					coefficients, marker for start of peroxy radical pool description, 
+					marker for separating peroxy radical pool constituents,
+					marker for end of peroxy radical pool description.
 					
-int_tol = integration tolerances, with absolute tolerance first followed by relative 
+int_tol = Integration tolerances, with absolute tolerance first followed by relative 
 		tolerance, if left empty defaults to the minimum required during testing for 
-		stable solution: 1.0e-3 for absolute and 1.0e-4 for relative 
-This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.
+		stable solution: 1.0e-3 for absolute and 1.0e-4 for relative.
+		
+dil_fac = Volume fraction per second chamber is diluted by, should be just a single 
+			number.  Defaults to zero if left empty.
+		
+This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.  Simon O'Meara has received funding from National Centre for Atmospheric Science (NCAS).

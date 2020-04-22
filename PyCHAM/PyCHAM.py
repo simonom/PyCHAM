@@ -62,8 +62,8 @@ class PyCHAM(QWidget):
 	def on_click1(self):
 		
 		dirpath = os.getcwd() # get current path
-# 		fname = dirpath+'/PyCHAM/inputs/apinene_scheme_MCM.txt' # hard-code chemical scheme input
-		fname = self.openFileNameDialog() # ask for location of input chemical scheme file
+		fname = dirpath+'/PyCHAM/inputs/limonene_MCM_PRAM.txt' # hard-code chemical scheme input
+# 		fname = self.openFileNameDialog() # ask for location of input chemical scheme file
 		with open(dirpath+'/fname.txt','w') as f:
 			f.write(fname)
 		f.close()
@@ -72,8 +72,8 @@ class PyCHAM(QWidget):
 	def on_click2(self):
 		
 		dirpath = os.getcwd() # get current path
-# 		xmlname = dirpath+'/PyCHAM/inputs/Example_Run_xml.xml' # hard-code xml input
-		xmlname = self.openFileNameDialog()
+		xmlname = dirpath+'/PyCHAM/inputs/Example_Run_xml.xml' # hard-code xml input
+# 		xmlname = self.openFileNameDialog()
 		with open(dirpath+'/xmlname.txt','w') as f:
 			f.write(xmlname)
 		f.close()
@@ -81,8 +81,8 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click3(self):
 		dirpath = os.getcwd() # get current path
-# 		inname = dirpath+'/PyCHAM/inputs/Photo_chem_inputs.txt' # hard-code model variables input
-		inname = self.openFileNameDialog() # name of model variables inputs file
+		inname = dirpath+'/PyCHAM/inputs/limonene_inputs.txt' # hard-code model variables input
+# 		inname = self.openFileNameDialog() # name of model variables inputs file
 		
 		# open the file
 		inputs = open(inname, mode='r')
@@ -92,7 +92,7 @@ class PyCHAM(QWidget):
 		inputs.close()
 		
 		# check on whether correct number of inputs supplied
-		input_len = 58
+		input_len = 60
 		if len(in_list) != input_len:
 			print(('Error: The number of variables in the model variables file is incorrect, should be ' + str(input_len) + ', but is ' + str(len(in_list))))
 			sys.exit()
@@ -234,27 +234,27 @@ class PyCHAM(QWidget):
 				else:
 					nuc_comp = [str(i).strip() for i in (value.split(','))]
 			if key == 'new_partr': # radius of newly nucleated particles (cm)
-				if value.split(',')==['\n']:
+				if (value.strip()).split(',')==['']:
 					new_partr = float(2.0e-7)
 				else:
 					new_partr = float(value.strip())
 			if key == 'inflectDp':
-				if value.split(',')==['\n']:
+				if (value.strip()).split(',')==['']:
 					inflectDp = float(0.0)
 				else:
 					inflectDp = float(value.strip())
 			if key == 'Grad_pre_inflect':
-				if value.split(',')==['\n']:
+				if (value.strip()).split(',')==['']:
 					pwl_xpre = float(0.0)
 				else:
 					pwl_xpre = float(value.strip())
 			if key == 'Grad_post_inflect':
-				if value.split(',')==['\n']:
+				if (value.strip()).split(',')==['']:
 					pwl_xpro = float(0.0)
 				else:
 					pwl_xpro = float(value.strip())
 			if key == 'Rate_at_inflect':
-				if value.split(',')==['\n']:
+				if (value.strip()).split(',')==['']:
 					inflectk = float(0.0)
 				else:
 					inflectk = float(value.strip())
@@ -399,15 +399,40 @@ class PyCHAM(QWidget):
 					act_w = np.empty(0)
 				else:
 					act_w = [float(i) for i in (value.split(','))]
-			if key == 'pconc':
+					
+			if key == 'pconct': # seed particles input times (s)
+				if (value.strip()) == ['']:
+					pconct = []
+				else:
+					# keep track of number of times given
+					time_count = 1
+					for i in value:
+						if i==';':
+							time_count += 1 # increase time count
+					# times in columns
+					pconct = np.zeros((1, time_count))
+					pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+					
+			if key == 'pconc': # seed particle number concentrations (#/cc)
 				if (value.strip()).split(',')==['']:
 					pconc = []
 				else:
-					pconc = [float(i) for i in (value.split(','))]
-				# overide any inputs if number of size bins left empty or set to zero
-				if num_sb == 0 and pconc != 0.0:
-					print('Notice, since no size bins detected in Model Variables .txt file, pconc variable will be set to empty (even if values supplied)')
-					pconc = []
+					# keep track of number of times given
+					time_count = 1
+					# keep track of number of size bins given
+					sb_count = 1
+					for i in value:
+						if i==';':
+							time_count += 1 # increase time count
+						if i==',':
+							sb_count += 1 # increase size bin count
+							
+					# size bins in rows, times in columns
+					pconc = np.zeros((sb_count, time_count))
+					
+					for i in range(time_count):
+						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+				
 			if key == 'seed_name':
 				if (value.strip()).split(',')==['']:
 					seed_name = 'core'
@@ -423,16 +448,33 @@ class PyCHAM(QWidget):
 					seed_dens = 1.00
 				else:
 					seed_dens = float(value.strip())
+					
+			if key == 'mean_rad': # seed particle mean radius (um)
+				if (value.strip()).split(',')==['']:
+					mean_rad = -1.0e6
+				else:
+					# keep track of number of times given
+					time_count = 1
+					for i in value:
+						if i==';':
+							time_count += 1 # increase time count
+					# times in columns
+					mean_rad = np.zeros((1, time_count))
+					mean_rad[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+			
 			if key == 'std':
 				if value.split(',')==['\n']:
 					std = float(1.1)
 				else:
-					std = float(value.strip())
-			if key == 'mean_rad':
-				if (value.strip()).split(',')==['']:
-					mean_rad = -1.0e6
-				else:
-					mean_rad = float(value.strip())
+					# keep track of number of times given
+					time_count = 1
+					for i in value:
+						if i==';':
+							time_count += 1 # increase time count
+					# times in columns
+					std = np.zeros((1, time_count))
+					std[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+			
 			if key == 'core_diss':
 				if value.split(',')==['\n']:
 					core_diss = float(1.0)
@@ -492,7 +534,7 @@ class PyCHAM(QWidget):
 						sys.exit()
 			if key == 'chem_scheme_markers': # formatting for chemical scheme
 				if (value.strip()).split(',')==['']:
-					# default to MCM inputs
+					# default to MCM FACSIMILE inputs
 					chem_scheme_markers = ['* Reaction definitions. ;', '%', '(.*) End (.*)', '* Generic Rate Coefficients ;', ';', '\*\*\*\*', 'RO2', '+', '*;']
 				else:
 					chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
@@ -502,6 +544,11 @@ class PyCHAM(QWidget):
 					int_tol = np.array(([1.0e-3, 1.0e-4]))
 				else:
 					int_tol = np.array(([float(i) for i in (value.split(','))]))
+			if key == 'dil_fac': # dilution factor rate
+				if (value.strip()).split(',')==['']:
+					dil_fac = float(0.0)
+				else:
+					dil_fac = float(value)
 		# --------------------------------------------------------------------------------
 		# checks on inputs
 		
@@ -517,6 +564,14 @@ class PyCHAM(QWidget):
 			print('If pconc (set in Model Variables .txt file) is an array, its length must equal the number of particle size bins, but currently length of pconc is '+str(len(pconc))+' and number of size bins is '+str(num_sb))
 			sys.exit()
 		
+		# overide any particle number concentration inputs if number of size bins left empty or set to zero
+		if num_sb == 0 and pconc != 0.0:
+			print('Notice, since no size bins detected in Model Variables .txt file, pconc variable will be set to empty (even if values supplied)')
+			pconc = []
+		
+		if max(pconct.shape) != pconc.shape[1]: # pconct should have dimensions 1, number of times pconc given for
+			print('Error: number of times given for pconct input variable in model variables input file does not match number of times particle number concentration given for in the pconc input variable in the same file.  Please see README for guidance.')
+			sys.exit()
 		# components with constant influx for set periods of time
 		if len(Cinfl)>0:
 			if len(const_infl)!=(Cinfl.shape[0]):
@@ -582,7 +637,8 @@ class PyCHAM(QWidget):
 		vol_Comp, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 		kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 		const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-		e_field, const_infl_t, chem_scheme_markers, int_tol, photo_par_file]
+		e_field, const_infl_t, chem_scheme_markers, int_tol, photo_par_file, dil_fac, 
+		pconct]
 		
 		if os.path.isfile(dirpath+'/testf.txt'):
 			print('Model input buttons work successfully')

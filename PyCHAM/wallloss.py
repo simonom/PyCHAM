@@ -36,7 +36,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# ----------------------------------------------------------------
-	if Rader==0: # manual input of wall loss rate
+	if Rader == 0: # manual input of wall loss rate
 		
 		Beta = np.zeros((Pn.shape))
 		Beta[Dp<inflectDp, 0] = 10**((np.log10(inflectDp)-
@@ -44,7 +44,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		Beta[Dp>=inflectDp, 0] = 10**((np.log10(Dp[Dp>=inflectDp])-
 								np.log10(inflectDp))*pwl_xpro+np.log10(inflectk))
 		
-	if Rader==1:
+	if Rader == 1:
 		# -------------------------------------------------------------------------
 		# McMurry & Rader option McMurry 1985, DOI: 10.1080/02786828508959054
 		# average number of charges per particle (/particle)

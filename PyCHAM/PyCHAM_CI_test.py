@@ -31,7 +31,7 @@ inputs = open(inname, mode='r')
 in_list = inputs.readlines()
 inputs.close()
 
-input_len = 58
+input_len = 60
 
 if len(in_list) != input_len:
 	print(('Error: The number of variables in the model variables file is incorrect, should be ' + str(input_len) + ', but is ' + str(len(in_list))))
@@ -338,15 +338,39 @@ for i in range(len(in_list)):
 			act_w = np.empty(0)
 		else:
 			act_w = [float(i) for i in (value.split(','))]
+	if key == 'pconct': # seed particles input times (s)
+		if (value.strip()) == ['']:
+			pconct = []
+		else:
+			# keep track of number of times given
+			time_count = 1
+			for i in value:
+				if i==';':
+					time_count += 1 # increase time count
+			# times in columns
+			pconct = np.zeros((1, time_count))
+			pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+	
 	if key == 'pconc':
 		if (value.strip()).split(',')==['']:
-			pconc = []
+				pconc = []
 		else:
-			pconc = [float(i) for i in (value.split(','))]
-		# overide any inputs if number of size bins left empty or set to zero
-		if num_sb == 0 and pconc != 0.0:
-			print('Notice, since no size bins detected in Model Variables .txt file, pconc variable will be set to empty (even if values supplied)')
-			pconc = []
+			# keep track of number of times given
+			time_count = 1
+			# keep track of number of size bins given
+			sb_count = 1
+			for i in value:
+				if i==';':
+					time_count += 1 # increase time count
+				if i==',':
+					sb_count += 1 # increase size bin count
+					
+			# size bins in rows, times in columns
+			pconc = np.zeros((sb_count, time_count))
+			
+			for i in range(time_count):
+				pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+		
 	if key == 'seed_name':
 		if (value.strip()).split(',')==['']:
 			seed_name = 'core'
@@ -362,16 +386,33 @@ for i in range(len(in_list)):
 			seed_dens = 1.00
 		else:
 			seed_dens = float(value.strip())
+	if key == 'mean_rad': # seed particle mean radius (um)
+		if (value.strip()).split(',')==['']:
+			mean_rad = np.zeros((1,1))
+			mean_rad[0, 0] = -1.0e6
+		else:
+			# keep track of number of times given
+			time_count = 1
+			for i in value:
+				if i==';':
+					time_count += 1 # increase time count
+			# times in columns
+			mean_rad = np.zeros((1, time_count))
+			mean_rad[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+	
 	if key == 'std':
 		if value.split(',')==['\n']:
-			std = float(1.1)
+			std = np.zeros((1,1)) 
+			std[0, 0] = 1.1
 		else:
-			std = float(value.strip())
-	if key == 'mean_rad':
-		if (value.strip()).split(',')==['']:
-			mean_rad = -1.0e6
-		else:
-			mean_rad = float(value.strip())
+			# keep track of number of times given
+			time_count = 1
+			for i in value:
+				if i==';':
+					time_count += 1 # increase time count
+			# times in columns
+			std = np.zeros((1, time_count))
+			std[0, :] = [float(i) for i in ((value.strip()).split(';'))]
 	if key == 'core_diss':
 		if value.split(',')==['\n']:
 			core_diss = float(1.0)
@@ -436,11 +477,16 @@ for i in range(len(in_list)):
 		else:
 			chem_scheme_markers = [str(i).strip() for i in (value.split(','))]
 	if key == 'int_tol': # tolerances for integration
-				if (value.strip()).split(',')==['']:
-					# default to minimum tolerances
-					int_tol = np.array(([1.0e-3, 1.0e-4]))
-				else:
-					int_tol = np.array(([float(i) for i in (value.split(','))]))
+		if (value.strip()).split(',')==['']:
+			# default to minimum tolerances
+			int_tol = np.array(([1.0e-3, 1.0e-4]))
+		else:
+			int_tol = np.array(([float(i) for i in (value.split(','))]))
+	if key == 'dil_fac': # dilution factor rate
+		if (value.strip()).split(',')==['']:
+			dil_fac = float(0.0)
+		else:
+			dil_fac = float(value)
 # --------------------------------------------------------------------------------
 # checks on inputs
 
@@ -503,7 +549,7 @@ inflectDp, pwl_xpre, pwl_xpro, inflectk, Rader, xmlname, C0, Comp0,
 vol_Comp, volP, pconc, std, mean_rad, core_diss, light_stat, light_time,
 kgwt, dydt_trak, space_mode, Ct, Compt, injectt, seed_name, const_comp,
 const_infl, Cinfl, act_wi, act_w, seed_mw, umansysprop_update, seed_dens, p_char, 
-e_field, const_infl_t, chem_scheme_markers, int_tol, photo_par_file]
+e_field, const_infl_t, chem_scheme_markers, int_tol, photo_par_file, dil_fac, pconct]
 	
 if os.path.isfile(dirpath+'/testf.txt'):
 	print('Model input buttons work successfully')

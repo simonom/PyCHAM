@@ -18,14 +18,19 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	# num_sb - number of size bins (excluding wall)
 	# lowersize - lowest size bin radius bound (um)
 	# uppersize - largest size bin radius bound (um)
-	# pconc - starting particle concentration (# particle/cc (air))
+	# pconc - starting particle concentration (# particle/cc (air)) - if scalar then
+	# gets split between size bins in Size_distributions call, or if an array, elements 
+	# are allocated to corresponding size bins
 	# tmax - maximum time step used in ode solver (s)
 	# nuc_comp - name of the nucleating component
 	# testf - test flag to say whether in normal mode (0) or test mode for front.py (1)
 	#       or test mode for pp_intro.py
 	# std - geometric standard deviation of the particle number concentration 
 	# 		(dimensionless)
-	# mean_rad - mean radius of particles in lognormal number-size distribution (um)
+	# mean_rad - either the mean radius (um) of particles in lognormal number-size 
+	#			distribution (in which case pconc should be scalar), or mean radius of
+	#			particles where just one size bin present (in which case pconc is also
+	#			scalar)
 	# Cw - concentration of wall (molecules/cc (air))
 	# y_dens - liquid density of components (kg/m3) (num_speci, 1)
 	# Psat - saturation vapour pressure of components (molecules/cc (air))
@@ -57,7 +62,7 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
 	
-	if num_sb==0: # create dummy variables if no size bins
+	if num_sb == 0: # create dummy variables if no size bins
 		N_perbin = np.zeros((1,1))
 		x = np.zeros((1,1))
 		Varr = np.zeros((1,1))
@@ -92,8 +97,9 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 	if num_sb == 1:
 		N_perbin = np.array((pconc)) # (# particles/cc (air))
 		x = np.zeros(1)
-		print('Notice: just one particle size bin detected, setting initial particle size as mid-point between size bin bounds')
-		meansize = (lowersize+uppersize)/2.0
+		
+		meansize = mean_rad # mean radius of this size bin (um)
+		
 		x[0] = meansize
 		# extend uppersize to reduce chance of particles growing beyond this
 		upper_bin_rad_amp = 1.0e6
@@ -142,13 +148,6 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 		# core mass concentration in each size bin (molecules/cc (air))
 		y[num_speci+corei:(num_speci*(num_sb)+corei):num_speci] = ((y_dens[corei]*1.0e-3)*
 								(Varr*1.0e-12*N_perbin)*(1.0/y_mw[corei])*NA)
-		
-# 		y = np.transpose(y[num_speci:-num_speci].reshape(num_sb-1, num_speci))						
-# 		nmolC = ((y/(NA*N_perbin)))
-# 		MVrep = np.repeat(MV, nmolC.shape[1], axis=1)
-# 		Vnew = np.sum(nmolC*MV*1.0e12, axis=0)
-# 		print((Vnew-Varr)/Varr)
-# 		ipdb.set_trace()
 	
 	if testf==2:
 		print('calling init_water_partit.py')
@@ -170,6 +169,8 @@ def pp_intro(y, num_speci, Pybel_objects, TEMP, H2Oi,
 			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_speci*(i+1):num_speci*(i+2)]/si.N_A)*MV[:,0]))
 			mass_conc -= (y_dens[int(H2Oi), 0]*1.0e-3)*((y[num_speci*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
 		mass_conc = mass_conc*1.0e12 # convert from g/cc (air) to ug/m3 (air)
+		if mass_conc < 1.0e-10:
+			mass_conc = 0.0
 		print(str('Total dry (no water) mass concentration of particles at start of simulation is ' + str(mass_conc) + ' ug/m3 (air)'))
 	else:
 		print('No particle size bins detected, simulation will not include particles')

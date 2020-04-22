@@ -16,6 +16,7 @@ from nuc import nuc
 import scipy.constants as si
 from rate_valu_calc import rate_valu_calc # function to update rate coefficients
 import math
+from pp_dursim import pp_dursim
 
 def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi, 
 			TEMP, RO2_indices, num_sb, 
@@ -28,7 +29,8 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			pwl_xpre, pwl_xpro, inflectk, nuc_comp, ChamR, Rader, PInit, testf, kgwt,
 			dydt_vst, daytime, lat, lon, act_flux_path, DayOfYear, Ct, injectt, inj_indx,
 			corei, const_compi, const_comp, const_infli, Cinfl, act_coeff, p_char, 
-			e_field, const_infl_t, int_tol, photo_par_file, Jlen):
+			e_field, const_infl_t, int_tol, photo_par_file, Jlen, dil_fac, pconct,
+			lowersize, uppersize, mean_rad, std):
 	
 	# ----------------------------------------------------------
 	# inputs
@@ -58,6 +60,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# pconc - concentration of seed particles (#/cc (air)) (1)
 	# new_partr - radius of two ELVOC molecules together in a newly nucleating 
 	# particle (cm)
+	# rad0 - original radius at size bin centres (um)
 	# MV - molar volume (cc/mol) (1D array)
 	# nuc_comp - index of the nucleating component
 	# ChamR - spherical equivalent radius of chamber (below eq. 2 Charan (2018)) (m)
@@ -86,10 +89,23 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	# photo_par_file - name of file with with estimates for photolysis absorption
 	# 					cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
-	# ----------------------------------------------------------
+	# dil_fac - dilution factor rate (/s)
+	# pconct - times (s) at which seep particles injected into chamber
+	# lowersize - smallest radius bound (um)
+	# uppersize - greatest radius bound (um)
+	# mean_rad - mean radius of particles (relevant if only one size bin or number size
+	# distribution being calculated (um)
+	# std - standard deviation for lognormal size distribution (dimensionless)
+	# ------------------------------------------------------------------------------------
 
+	# count on injection times of seed particles
+	seedt_count = 0
+
+	# ------------------------------------------------------------------------------------
+	# testing mode
 	if testf==1:
-		return(0,0,0,0) # return dummies
+		return(0, 0, 0, 0) # return dummies
+		
 	if testf==2:
 		# called from test_kimt_calc.py
 		# recreate the solute effect used in dydt function below
@@ -99,12 +115,12 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 			
 			# sum of molecular concentrations per bin (molecules/cc (air))
 			conc_sum = np.zeros((1))
-			if pconc>0.0: # if seed particles present
-				conc_sum[0] = ((Csit[0:-1].sum())+Csit[-1]*core_diss)
-			else:
-				conc_sum[0] = Csit.sum()
+			conc_sum[0] = ((Csit.sum()-Csit[corei])+Csit[corei]*core_diss)
+
 			sol_eff[ibin] = Csit[H2Oi]/conc_sum # mole fraction of water in particle
 		return(sol_eff)
+		
+	# ------------------------------------------------------------------------------------
 
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
@@ -116,6 +132,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 	y0[:] = y[:] # initial concentrations (molecules/cc (air))
 	y00 = np.zeros((num_speci+num_sb*num_speci))	
 	y00[:] = y[:] # initial concentrations (molecules/cc (air))
+	
 	
 	# initial volumes of particles in size bins at start of time steps
 	if num_sb>1:
@@ -163,7 +180,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
     			0, 0,  0, 0, 0, math.ceil(end_sim_time/save_step), 
 				num_speci, num_sb, y_mw[:, 0], y_dens[:, 0]*1.0e-3, yp, Vbou, rindx, 
 				rstoi, pindx, nprod, dydt_vst, RO2_indices, H2Oi, TEMP, lightm, nreac,
-				pconc, core_diss, Psat, kelv_fac, kimt, kgwt, Cw, daytime+sumt, lat, lon, 
+				pconc[:, seedt_count], core_diss, Psat, kelv_fac, kimt, kgwt, Cw, daytime+sumt, lat, lon, 
 				act_flux_path, DayOfYear, act_coeff, PInit, photo_par_file, Jlen, 
 				reac_coef)
 	
@@ -206,7 +223,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		
 		if len(injectt)>0: # if any injections occur
 			# check whether latest component injection occurs
-			inj_count_new = ((sumt)>injectt).sum()
+			inj_count_new = (sumt >= injectt).sum()
 			# update injections if new injection time reached
 			if inj_count_new>inj_count:
 				for i in range(len(inj_indx)):
@@ -231,8 +248,22 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		
 		# update index counter for constant influxes - used in integrator below
 		if len(const_infl_t)>0:
-			inf_ind = int(((sumt)>const_infl_t).sum())-1
+			inf_ind = int(((sumt)>=const_infl_t).sum())-1
 			
+		# --------------------------------------------------------------------------------
+		# seed particle influx check
+		
+		if int((sumt>=pconct).sum())-1 > seedt_count:
+			
+			seedt_count += 1
+			
+			[y[num_speci:-num_speci], N_perbin, x, 
+						Varr] = pp_dursim(y[num_speci:-num_speci], N_perbin, 
+									mean_rad[0, seedt_count],
+									pconc[:, seedt_count], corei, lowersize, 
+									uppersize, num_speci, num_sb, MV, rad0, 
+									std[0, seedt_count], y_dens, H2Oi)
+
 		# --------------------------------------------------------------------------------
 		
 		# update reaction rate coefficients
@@ -298,10 +329,9 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 						Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]
 						# sum of molecular concentrations per bin (molecules/cc (air))
 						conc_sum = np.zeros((1))
-						if pconc.sum()>0.0: # if seed particles present
-							conc_sum[0] = ((Csit.sum()-Csit[corei])+Csit[corei]*core_diss)
-						else:
-							conc_sum[0] = Csit.sum()
+						
+						conc_sum[0] = ((Csit.sum()-Csit[corei])+Csit[corei]*core_diss)
+						
 						# prevent numerical error due to division by zero
 						ish = conc_sum==0.0
 						conc_sum[ish] = 1.0e-40
@@ -386,9 +416,6 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 		sumt += t # total time covered (s)
 		step += 1 # ode time interval step number
 
-		# enforced reduction of gas-phase ozone for MAC 2012 experiment
-		# y[1] -= y[1]*0.00002*t
-
 		if num_sb>1:
 			if (N_perbin>1.0e-10).sum()>0:
 				# coagulation
@@ -405,6 +432,7 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 
 				
 				if Rader > -1:
+					
 					# particle loss to walls
 					[N_perbin, 
 					y[num_speci:-(num_speci)]] = wallloss(N_perbin.reshape(-1, 1), 
@@ -414,14 +442,20 @@ def ode_gen(t, y, num_speci, num_eqn, rindx, pindx, rstoi, pstoi, H2Oi,
 														TEMP, t, inflectDp, pwl_xpre,
 														pwl_xpro, inflectk, ChamR, Rader, 
 														0, p_char, e_field)
-			
+					
 			# particle nucleation
-			if sum(pconc)==0.0 and len(nuc_comp)>0:
+			if len(nuc_comp)>0:
 				
 				[N_perbin, y, x[0], Varr[0], new_part_sum1] = nuc(sumt, new_part_sum1, 
 							N_perbin, y, y_mw.reshape(-1, 1), np.squeeze(y_dens*1.0e-3),  
 							num_speci, x[0], new_partr, t, MV, nucv1, nucv2, 
 							nucv3, nuc_comp[0])
+							
+			# dilution of aerosol (gases and particles), most likely due to extraction
+			# from chamber
+			y -= y*(dil_fac*t) # dilution of gases (molecules/cc (air))
+			N_perbin -= N_perbin*(dil_fac*t) # dilution of particle phase (#/cc (air))
+# 			print('y af', y)
 			
 		# save at every time step given by save_step (s) and at end of experiment
 		if sumt>=save_step*save_count or sumt == end_sim_time:

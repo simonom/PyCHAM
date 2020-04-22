@@ -240,6 +240,9 @@ def extract_mechanism(filename, xmlname, TEMP, PInit, testf, RH,
 		rate_ex = formatting.SN_conversion(rate_ex)
 		# convert the rate coefficient expressions into Python readable commands
 		rate_ex = formatting.convert_rate_mcm(rate_ex)
+		if (rate_ex.find('EXP') != -1):
+			print(rate_ex)
+			sys.exit()
 		
 		# store the reaction rate for this equation (/s once any inputs applied)
 		reac_coef.append(rate_ex)

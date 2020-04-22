@@ -10,7 +10,7 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 					testf, pconc, act_flux_path, dydt_trak, end_sim_time, save_step, 
 					rindx, pindx, num_eqn, nreac, nprod, DayOfYear, C_H2O, H2O_mw, 
 					spec_namelist, Compt, Ct, seed_name, const_comp, const_infl, seed_mw,
-					Cinfl):
+					Cinfl, core_diss):
 		
 	# -----------------------------------------------------------
 	# inputs:
@@ -42,6 +42,7 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 	# const_infl - names of components with constant influx
 	# seed_mw - molecular weight of seed material (g/mol)
 	# Cinfl - concentrations of component with a specified constant influx (ppb/s)
+	# core_diss - dissociation constant of seed material
 	# -----------------------------------------------------------
 
 	if testf==1: # testing mode
@@ -147,9 +148,11 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 	spec_namelist.append('H2O') # append water's name to component name list
 
 	# ------------------------------------------------------------------------------------
-	# account for seed properties 
+	# account for seed properties - note that even if no seed particle, this code ensures
+	# that an index is provided for core material
+	
 	# if seed particles present and made of a 'core' material
-	if sum(pconc)>0.0 and seed_name=='core':
+	if sum(sum(pconc))>0.0 and seed_name=='core':
 		# append core gas-phase concentration (molecules/cc (air)) and molecular weight 
 		# (g/mol) (needs to have a 1 length in second dimension for the kimt calculations)
 		y = np.append(y, 1.0e-40) 
@@ -158,13 +161,14 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 		num_speci += 1 # update number of species to account for core material
 		spec_namelist.append('core') # append core's name to component name list
 
-	# if seed particles present and made of a non-'core' material
-	if sum(pconc)>0.0 and seed_name!='core':
+	# if seed particles made of a non-'core' material
+	if seed_name != 'core':
 		# append core gas-phase concentration (molecules/cc (air)) and molecular weight 
 		# (g/mol) (needs to have a 1 length in second dimension for the kimt calculations)
 		corei = spec_namelist.index(seed_name) # index of core component
-	if sum(pconc)==0.0: # no seed particle case
-		corei = 0 # filler
+	if sum(sum(pconc)) == 0.0: # no seed particle case
+		corei = -1 # filler
+		core_diss = 1.0 # ensure no artefact in Raoult term due to this filler
 	
 	# get index of component with latter injections
 	if len(Compt)>0:
@@ -176,4 +180,4 @@ def init_conc_func(num_speci, Comp0, init_conc, TEMP, RH, M, N2,
 		inj_indx = 0 # dummy	
 	
 	return (y, H2Oi, y_mw, num_speci, Cfactor, y_indx_plot, corei, dydt_vst, 
-				spec_namelist, inj_indx, Ct, const_compi, const_infli, Cinfl)
+				spec_namelist, inj_indx, Ct, const_compi, const_infli, Cinfl, core_diss)

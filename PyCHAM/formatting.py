@@ -53,6 +53,7 @@ def convert_rate_mcm(rate_coef):
     # create a list that contains commonly used math functions
     # ('illegal_func_name', func_regex,'legal_func_name')
 	math_func_list = [
+		('exp', 'numpy.exp'),
         ('EXP', 'numpy.exp'),
         ('dsqrt', 'numpy.sqrt'),
         ('dlog', 'numpy.log'),
@@ -65,11 +66,12 @@ def convert_rate_mcm(rate_coef):
 	# if no change is made, pass the rate expression to a new variable
 	# because this new variable is used in the process of photolysis rate J(n)
 	new_rate = rate_coef
-	
+
 	# 1. replace the illegal function names
 	for func_step in range(len(math_func_list)):
+
 		if (new_rate.find(math_func_list[func_step][0]) != -1):
-			new_rate = rate_coef.replace(math_func_list[func_step][0], math_func_list[func_step][1]) 
+			new_rate = new_rate.replace(math_func_list[func_step][0], math_func_list[func_step][1]) 
 		else:
 			continue
 
