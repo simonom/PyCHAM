@@ -1,6 +1,6 @@
 # PyCHAM: Python CHemistry with Aerosol Microphysics Box Model
 
-Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 research project](http://www.eurochamp.org).  Please contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.
+Welcome to the PyCHAM.  Funding has been provided from the [EUROCHAMP-2020 research project](http://www.eurochamp.org) and the National Centre for Atmospheric Science ([NCAS](https://www.ncas.ac.uk/en/)).  Please contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.
 
 PyCHAM is an open-access computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.
 
@@ -13,9 +13,11 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 
 ## Documentation
 
-The README file serves as a manual explaining how to set the software up and use it.  
+The README file serves as a manual explaining how to setup the software and use it.  
 
-The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.
+The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.  This article was reviewed using [v0.2.4](https://doi.org/10.5281/zenodo.3752677) of PyCHAM.
+
+Version numbers of PyCHAM try to adhere to the semantics described by [semver](https://semver.org).
 
 ## Installation
 
@@ -24,15 +26,15 @@ There are two options for installing, via conda and from source.  Experience ind
 
 ## Install from conda
 
-1. Download the PyCHAM repository from github.com/simonom/PyCHAM or data.eurochamp.org/modelling-tools/
+1. Download the PyCHAM repository from github.com/simonom/PyCHAM
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
 3. To set-up PyCHAM, use the terminal/command prompt, cd to the directory where the PyCHAM package is stored (likely called PyCHAM-master), then use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac))
 
-4. This will install all PyCHAM dependencies, no need for further installations.
+4. This will install all PyCHAM dependencies, with no need for further installations.
 
-5. Now the environment is set up you can activate it by typing into terminal: conda activate PyCHAM
+5. Now the environment is setup you can activate it by typing into terminal: conda activate PyCHAM
 
 Install is complete
 
@@ -128,22 +130,22 @@ Install is complete
 
 4. The 'run model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
 
-5. The 'plot results' button produces (and saves in the output folder) two figures, the first called contours.png that shows the particle number distribution, SOA mass (assuming a density of the particle phase of 1 g/cm3) and particle number concentration against time, and the second called gas_pbb.png that shows the gas-phase concentrations of initial components with time  
+5. The 'plot results' button produces (and saves in the output folder) two plots: the particle number distribution, SOA mass and particle number concentration against time, and another that shows the gas-phase concentrations of specified components with time.
 
 ## Testing
 
 Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
 
-Integration testing can be completed using the '.travis.yml' file at the website: travis-ci.org.
+Integration testing can be completed using the '.travis.yml' and 'PyCHAM_CI_test.py' files at the [Travis CI website](https://travis-ci.org).
 
-The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this (e.g. for testing), use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output was produced using version 0.3.4 of PyCHAM.
+The example run output is saved in output/Example_Run/Example_output in the Github repository.  To reproduce this, use the inputs/Example_Run.txt for the chemical scheme, inputs/Example_Run_xml.xml for the xml file and inputs/Example_Run_inputs.txt for the model inputs.  Note that the example output may vary between releases so check correspondence.
 
 ## Inputs
 
 ## Chemical Scheme .txt file
 
 An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
-from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) and modified.
+from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (FACSIMILE version) and modified.
 
 Identifiers are required to recognise different sections of the chemical scheme, and these
 are set in the model variables input folder under the chem_scheme_markers input.  The
@@ -153,7 +155,7 @@ in this order, separated by commas:
 header of chemical reactions, punctuation mark at the start of each reaction, footer of
 chemical reactions denoting termination.
 
-Therefore, for the simple working example taken using the MCM format:
+Therefore, for the simple working example taken using the MCM FACSIMILE format:
 
 * Reaction definitions. ;
 % 5.6D-34*N2*(TEMP/300)@-2.6*O2 : O = O3 ;
@@ -164,7 +166,7 @@ chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*),,,,
 
 
 Optionally, the header, end punctuation and footer of generic rate coefficients can be
-stated.  For the simple working example taken using the MCM format:
+stated.  For the simple working example taken using the MCM FACSIMILE format:
 
 * Generic Rate Coefficients ;
 KRO2NO = 2.7D-12*EXP(360/TEMP) ;
@@ -177,7 +179,7 @@ chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), * Generic Rat
 
 The final option is if the chemical scheme contains a description of the components that
 contribute to the peroxy radical pool, for which the start and end identifiers are 
-required.  For the simple working example taken using the MCM format:
+required.  For the simple working example taken using the MCM FACSIMILE format:
 
 RO2 = H1C23C4CO3 + H1C23C4O2 ;
 *;
@@ -192,7 +194,7 @@ if the RO2 pool is used but not the generic rate coefficients, the input is:
 
 chem_scheme_markers = * Reaction definitions. ;, %, (.*) End (.*), , , , RO2, *; 
 
-If chem_scheme_markers is left empty, the default is MCM formatting.
+If chem_scheme_markers is left empty, the default is MCM FACSIMILE formatting.
 
 The reaction rate coefficients beside chemical reaction equations and inside generic rate coefficients must adhere to the following rules:
 The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, exp, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)) - these concentrations are calculated automatically as a function of temperature and pressure inside eqn_parser.py.
@@ -207,8 +209,11 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 
 ## Model Variables .txt File
 
-
-An example is provided in the inputs folder (of the Github repository), called 'Example_Run_inputs.txt' , this must include the following variables separated by a return (so one line per variable), note that if a variable is irrelevant for your simulation, it can be left empty (e.g. vol_Comp = ), but an error message will show if a variable is missing:
+An example is provided in the inputs folder (of the Github repository), called 
+'Example_Run_inputs.txt' , this must include the following variables separated by a 
+return (so one line per variable, an error message will show if a variable is missing), 
+note that if a variable is irrelevant for your simulation, it can be left empty 
+(e.g. vol_Comp = ):
 
 Res_file_name = Name of folder to save results to
 
