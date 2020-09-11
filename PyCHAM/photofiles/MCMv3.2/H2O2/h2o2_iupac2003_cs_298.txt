@@ -1,0 +1,46 @@
+H2O2 (298K) Photolysis Cross Sections	 Note: IUPAC 2003 recommend Quantum Yield (H2O2 = 2OH) is unity > 230 nm
+
+IUPAC 2003 Recommendation
+http://www.iupac-kinetic.ch.cam.ac.uk				
+
+Based upon the mean of the data from:				
+
+1.  C. L. Lin, N. K. Rohatgi, and W. B. DeMore, Geophys. Res. Lett. 5, 113 (1978)				
+2.  L. T. Molina and M. J. Molina, J. Photochem. 15, 97 (1981)				
+3.  J. M. Nicovich and P. H. Wine, J. Geophys. Res. 93, 2417 (1988)				
+4.  G. L. Vaghjiani and A. R. Ravishankara, J. Geophys. Res. 94, 3487 (1989)				
+
+lambda (nm)	sigma (298K, cm2)
+190	6.72E-19
+195	5.63E-19
+200	4.75E-19
+205	4.08E-19
+210	3.57E-19
+215	3.07E-19
+220	2.58E-19
+225	2.17E-19
+230	1.82E-19
+235	1.5E-19
+240	1.24E-19
+245	1.02E-19
+250	8.3E-20
+255	6.7E-20
+260	5.3E-20
+265	4.2E-20
+270	3.3E-20
+275	2.6E-20
+280	2E-20
+285	1.5E-20
+290	1.2E-20
+295	9E-21
+300	6.8E-21
+305	5.1E-21
+310	3.9E-21
+315	2.9E-21
+320	2.2E-21
+325	1.6E-21
+330	1.3E-21
+335	1E-21
+340	7E-22
+345	5E-22
+350	4E-22
