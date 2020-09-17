@@ -34,5 +34,5 @@ script:
   - import def_mod_var
   - def_mod_var.def_mod_var()
   - import middle
-  - middle.middle()
+  - middle.middle(1)
   - quit()

@@ -358,7 +358,7 @@ class PyCHAM(QWidget):
 	def on_click4(self): # button to run simulation
 		import middle
 		# call on modules to solve problem
-		middle.middle()
+		middle.middle(0)
 
 	
 	@pyqtSlot() # button to plot results graphically

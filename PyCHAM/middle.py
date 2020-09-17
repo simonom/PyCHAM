@@ -14,7 +14,11 @@ import pickle
 import os
 
 # define function
-def middle():
+def middle(caller):
+	
+	# inputs: --------------------------------------------------------
+	# caller - flag for calling script
+	# ----------------------------------------------------------------
 
 	# get required inputs
 	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
@@ -52,11 +56,13 @@ def middle():
 	seed_mw, core_diss, nuc_comp, con_infl_C)
 	
 	# dump new pickle file ready for plotting script to use
-	list_vars = [sav_nam, sch_name, indx_plot, comp0]
-	input_by_sim = str(os.getcwd() + '/var_store.pkl')
-	with open(input_by_sim, 'wb') as f:
-		pickle.dump(list_vars, f)
-		f.close()
+	if (caller != 1): # not when called from Travis
+		list_vars = [sav_nam, sch_name, indx_plot, comp0]
+		input_by_sim = str(os.getcwd() + '/var_store.pkl')
+	
+		with open(input_by_sim, 'wb') as f:
+			pickle.dump(list_vars, f)
+			f.close()
 
 	# get component properties
 	[Psat, y_dens, Psat_Pa] = prop_calc.prop_calc(comp_list, Pybel_objects, temp[0], H2Oi, 

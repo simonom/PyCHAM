@@ -33,7 +33,7 @@ def share(source):
 			pk.close()
 			
 			os.remove(input_by_sim) # delete pickle file
-
+			
 			# check on inputs
 			[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
 			af_path, int_tol, update_stp, tot_time] = ui_check.ui_check(sav_nam, sch_name, wall_on, 0, 				num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, 
@@ -52,6 +52,8 @@ def share(source):
 			inflectk, chamR, Rader, p_char, e_field, dil_fac)
 
 	if (source == 1): # when called from plotting script
+		# path to store for variables
+		input_by_sim = str(os.getcwd() + '/var_store.pkl')
 		with open(input_by_sim, 'rb') as pk:
 			[sav_name, sch_name, indx_plot, Comp0] = pickle.load(pk)
 			pk.close()
