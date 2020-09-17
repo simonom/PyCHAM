@@ -2,7 +2,6 @@
 
 import numpy as np
 from partit_var import kimt_calc
-import ipdb
 from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for rebinning
 import sys
 import matplotlib.pyplot as plt

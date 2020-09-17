@@ -11,6 +11,7 @@ import pp_intro
 import time
 import save
 import pickle
+import os
 
 # define function
 def middle():
@@ -52,7 +53,8 @@ def middle():
 	
 	# dump new pickle file ready for plotting script to use
 	list_vars = [sav_nam, sch_name, indx_plot, comp0]
-	with open('PyCHAM/var_store.pkl', 'wb') as f:
+	input_by_sim = str(os.getcwd() + '/var_store.pkl')
+	with open(input_by_sim, 'wb') as f:
 		pickle.dump(list_vars, f)
 		f.close()
 

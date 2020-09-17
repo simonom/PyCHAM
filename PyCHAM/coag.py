@@ -11,7 +11,6 @@ from wk_int import W_k_int
 import scipy.integrate as integ
 import matplotlib.pyplot as plt
 import scipy.constants as si
-import ipdb
 from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for rebinning
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,

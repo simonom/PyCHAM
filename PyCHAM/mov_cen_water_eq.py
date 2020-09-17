@@ -1,7 +1,6 @@
 '''module to track particle number size distribution using moving centre size structure (p. 416 of Jacobson 2000)'''
 
 import numpy as np
-import ipdb
 import scipy.constants as si
 
 def mov_cen_main(n0, Vbou, Cn, rho, sbn, nc, MW, Vol0, t, tinc_count, MV):

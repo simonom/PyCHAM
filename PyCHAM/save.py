@@ -135,6 +135,10 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	
 		np.savetxt(os.path.join(output_by_sim, 'size_bin_bounds'), rbou.reshape(1, -1), delimiter=',',
 				header=str('particle size bin bounds (um), with size bin number (starting at 1 and in line with the lower bound) given in second line of header\n'+x2_header))		
-			
 		
+	# if save name is the default, then remove to ensure no duplication in future
+	if (savefolder == 'default_res_name'):
+		import shutil
+		print('Note: default name for save folder used, therefore now deleting this folder to avoid future duplication')	
+		shutil.rmtree(output_by_sim)
 	return()

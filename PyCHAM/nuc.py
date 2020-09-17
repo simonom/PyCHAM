@@ -2,7 +2,6 @@
 
 import numpy as np
 import scipy.constants as si
-import ipdb
 
 def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, x, new_partr, MV, 
 		nucv1, nucv2, nucv3, nuc_comp):

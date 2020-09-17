@@ -1,7 +1,6 @@
 '''module to track particle number size distribution using moving centre size structure (p. 416 of Jacobson 2000)'''
 
 import numpy as np
-import ipdb
 import scipy.constants as si
 import matplotlib.pyplot as plt
 from v_check import Vchange_check as Vchange_check

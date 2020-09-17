@@ -5,7 +5,6 @@
 from scipy import stats # import the scipy.stats module
 import numpy as np
 import matplotlib.pyplot as plt
-import ipdb
 
 def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode):
 

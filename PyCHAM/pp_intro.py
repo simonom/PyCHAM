@@ -4,7 +4,6 @@ import numpy as np
 import size_distr # custom library - see source code
 from init_water_partit import init_water_partit
 import scipy.constants as si
-import ipdb
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
