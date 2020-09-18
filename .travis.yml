@@ -26,13 +26,13 @@ install:
   
   - conda activate test-environment
   - python setup.py install
+
 script: 
-  - python
-    - import sys
-    - import os
-    - sys.path.append(os.getcwd(),'/PyCHAM')
-    - import def_mod_var
-    - def_mod_var.def_mod_var()
-    - import middle
-    - middle.middle(1)
-    - quit()
+  - python -c import sys
+  - python -c import os
+  - python -c sys.path.append(os.getcwd(),'/PyCHAM')
+  - python -c import def_mod_var
+  - python -c def_mod_var.def_mod_var()
+  - python -c import middle
+  - python -c middle.middle(1)
+  - python -c quit()
