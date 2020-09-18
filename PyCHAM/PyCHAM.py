@@ -364,7 +364,7 @@ class PyCHAM(QWidget):
 	def on_click5(self):	
 		import plotter
 		print('Plotting and saving standard results graph')
-		plotter.plotter() # plot results
+		plotter.plotter(0) # plot results
 
 	@pyqtSlot() # button to quit software
 	def on_click6(self):

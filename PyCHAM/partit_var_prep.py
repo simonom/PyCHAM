@@ -55,25 +55,22 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# list containing accommodation coefficients that are functions
 	accom_coeff_func = []
 	
-	accom_coeff_ind = []
+	ac_indx = []
 	for i in range(len(acc_comp)): # user-defined accommodation coefficients
 		# get index of component stated
-		accom_coeff_ind.append(spec_namelist.index(acc_comp[i].strip()))
+		ac_indx.append(spec_namelist.index(acc_comp[i].strip()))
 
 	# check for any accommodation coefficients set by user
-	if len(accom_coeff_ind)>0:
-		for i in range(len(accom_coeff_ind)):
-			
-			# get index of component stated
-			ac_indx = spec_namelist.index(accom_coeff_ind[i].strip())
-			
-			# ensure it's a constant (not a function, which would be a string)
-			if isinstance(accom_coeff_user[i], str)==False:
+	if len(ac_indx)>0:
+		for i in range(len(ac_indx)):
+			print(accom_coeff_user)
+			# if it is a constant (not a function, which would be a string)
+			if isinstance(accom_coeff_user[i], str) == False:
 				accom_coeff[ac_indx] = accom_coeff_user[i]
 			# if it is a function, it will be a string and needs making available to the 
 			# kimt_calc module
-			if isinstance(accom_coeff_user[i], str)==True:
-				accom_coeff_func.append(str('accom_coeff[' + str(ac_indx) + ',:]' + ' = ' + accom_coeff_user[i]))
+			if isinstance(accom_coeff_user[i], str) == True:
+				accom_coeff_func.append(str('accom_coeff[' + str(ac_indx[i]) + ', :]' + ' = ' + accom_coeff_user[i]))
 	
 	# generate module that contains any accommodation coefficient functions, note, do 
 	# this even if no functions supplied so that the accomm_coeff_calc is updated and
@@ -103,7 +100,7 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	for line in accom_coeff_func:
 		f.write('	%s \n' %line)
 	f.write('\n')
-	f.write('	return accom_coeff\n')
+	f.write('	return(accom_coeff)\n')
 	f.close()
 	
 	# activity coefficient of components - affects the particle- and wall-phase

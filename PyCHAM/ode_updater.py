@@ -290,8 +290,8 @@ def ode_updater(update_stp,
 							Varr*1.0e-18, num_sb, num_comp, temp_now, update_count, 
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, Rader, 
 							0, p_char, e_field, (num_sb-wall_on))
-				# nucleation
-				[N_perbin, y, x[0], Varr[0], np_sum] = nuc.nuc(sumt, np_sum, 
+				if (nucv1>0.): # nucleation
+					[N_perbin, y, x[0], Varr[0], np_sum] = nuc.nuc(sumt, np_sum, 
 						N_perbin, y, y_mw.reshape(-1, 1), 
 						np.squeeze(y_dens*1.0e-3),  
 						num_comp, x[0], new_partr, MV, nucv1, nucv2, 

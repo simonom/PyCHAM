@@ -28,4 +28,4 @@ install:
   - python setup.py install
 
 script: 
-  - python PyCHAM/unit_tests/TravisCI.py
+  - python PyCHAM/unit_tests/test_TravisCI.py

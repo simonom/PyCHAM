@@ -12,7 +12,11 @@ import retr_out
 import numpy as np
 import scipy.constants as si
 
-def plotter():
+def plotter(caller):
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# --------------------------------------------------------------------------
 
 	# retrieve useful information from pickle file
 	[sav_name, sch_name, indx_plot, Comp0] = ui.share(1)
@@ -49,7 +53,8 @@ def plotter():
 	# number of actual particle size bins
 	num_asb = num_sb-wall_on
 
-	plt.ion() # show results to screen and turn on interactive mode
+	if caller == 0:
+		plt.ion() # show results to screen and turn on interactive mode
 
 	# prepare sub-plots depending on whether particles present
 	if (num_asb) == 0: # no particle size bins
@@ -238,7 +243,9 @@ def plotter():
 
 	# save and display
 	plt.savefig(str(dir_path+'/'+sav_name+'_output_plot.png'))
-	
+	if caller == 2:
+		plt.show()	
+
 	return()
 
 # function to makes spines invisible
