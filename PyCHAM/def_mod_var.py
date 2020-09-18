@@ -5,7 +5,11 @@ import numpy as np
 import os
 import pickle # used for storing values
 
-def def_mod_var(): # define function
+def def_mod_var(caller): # define function
+
+	# inputs: -----------------------------------------------
+	# caller - mark for calling function
+	# -------------------------------------------------------
 
 	# names ---------------------------------------------------------------------------------
 	# name of folder to save results to
@@ -119,7 +123,10 @@ def def_mod_var(): # define function
 	accom_comp = []
 	# user-defined accommodation coefficients
 	accom_val = []
-	uman_up = 0 # marker for whether to update the UManSysProp folder
+	if (caller == 0): # called from PyCHAM
+		uman_up = 0 # marker for whether to update the UManSysProp folder
+	if (caller == 1): # called from Travis
+		uman_up = 1
 	int_tol = [1.e-3, 1.e-4]
 	coag_on = 1 # whether to model coagulation
 	dil_fac = 0. # dilution factor
@@ -129,9 +136,9 @@ def def_mod_var(): # define function
 
 	
 	# path to store for variables
-	input_by_sim = str(os.getcwd() + '/var_store.pkl')
+	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
-	with open('var_store.pkl', 'wb') as f: # the file to be used for pickling
+	with open(input_by_sim, 'wb') as f: # the file to be used for pickling
 		pickle.dump(list_vars,f) # pickle
 		f.close() # close
 

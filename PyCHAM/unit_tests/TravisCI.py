@@ -11,10 +11,10 @@ def TravisCI(): # define function
 	sys.path.append(str(os.getcwd() + '/PyCHAM'))
 	# the default model variables
 	import def_mod_var
-	def_mod_var.def_mod_var()
+	def_mod_var.def_mod_var(1)
 	# the main call to program
 	import middle
-	middle.middle(1)
+	middle.middle()
 	
 	return()
 

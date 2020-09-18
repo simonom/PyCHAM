@@ -17,6 +17,10 @@ def plotter():
 	# retrieve useful information from pickle file
 	[sav_name, sch_name, indx_plot, Comp0] = ui.share(1)
 
+	if (sav_name == 'default_res_name'):
+		print('Default results name was used, therefore results not saved and nothing to plot')
+		return()
+
 	dir_path = os.getcwd() # current working directory
 	# obtain just part of the path up to PyCHAM home directory
 	for i in range(len(dir_path)):

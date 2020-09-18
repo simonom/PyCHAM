@@ -17,7 +17,7 @@ def share(source):
 	if (source == 0): # when called from PyCHAM script
 
 		# path to store for variables
-		input_by_sim = str(os.getcwd() + '/var_store.pkl')
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
@@ -31,8 +31,6 @@ def share(source):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
 			pk.close()
-			
-			os.remove(input_by_sim) # delete pickle file
 			
 			# check on inputs
 			[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
@@ -53,11 +51,10 @@ def share(source):
 
 	if (source == 1): # when called from plotting script
 		# path to store for variables
-		input_by_sim = str(os.getcwd() + '/var_store.pkl')
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'rb') as pk:
 			[sav_name, sch_name, indx_plot, Comp0] = pickle.load(pk)
 			pk.close()
 
-			os.remove(input_by_sim) # delete pickle file
 
 		return(sav_name, sch_name, indx_plot, Comp0)
