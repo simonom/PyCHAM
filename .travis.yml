@@ -28,11 +28,11 @@ install:
   - python setup.py install
 script: 
   - python
-  - import sys
-  - import os
-  - sys.path.append(os.getcwd(),'/PyCHAM')
-  - import def_mod_var
-  - def_mod_var.def_mod_var()
-  - import middle
-  - middle.middle(1)
-  - quit()
+    - import sys
+    - import os
+    - sys.path.append(os.getcwd(),'/PyCHAM')
+    - import def_mod_var
+    - def_mod_var.def_mod_var()
+    - import middle
+    - middle.middle(1)
+    - quit()
