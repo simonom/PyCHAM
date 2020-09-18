@@ -63,6 +63,9 @@ def middle(caller):
 		with open(input_by_sim, 'wb') as f:
 			pickle.dump(list_vars, f)
 			f.close()
+	else:
+		# ensure UManSysProp updated for Travis
+		uman_up = 1
 
 	# get component properties
 	[Psat, y_dens, Psat_Pa] = prop_calc.prop_calc(comp_list, Pybel_objects, temp[0], H2Oi, 

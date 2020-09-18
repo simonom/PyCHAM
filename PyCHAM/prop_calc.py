@@ -145,4 +145,4 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_C
 	if num_asb>0:
 		Psat = np.repeat(Psat, num_asb, axis=0)
 	
-	return Psat, y_dens, Psat_Pa
+	return(Psat, y_dens, Psat_Pa)
