@@ -28,11 +28,4 @@ install:
   - python setup.py install
 
 script: 
-  - python -c import sys
-  - python -c import os
-  - python -c sys.path.append(os.getcwd(),'/PyCHAM')
-  - python -c import def_mod_var
-  - python -c def_mod_var.def_mod_var()
-  - python -c import middle
-  - python -c middle.middle(1)
-  - python -c quit()
+  - python PyCHAM/unit_tests/TravisCI.py
