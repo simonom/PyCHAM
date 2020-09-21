@@ -32,6 +32,7 @@ def def_mod_var(caller): # define function
 	Press = 9.8e4 # air pressure during experiment (Pa)
 	
 	# particle section ----------------------------------------------------------------
+	siz_stru = 0 # size structure (0 for moving-centre, 1 for full-moving)
 	num_sb = 0 # number of particle size bins
 	# initial concentration of particles (# particles/cc (air))
 	pconc = np.zeros((1, 1))
@@ -132,7 +133,7 @@ def def_mod_var(caller): # define function
 	dil_fac = 0. # dilution factor
 
 	# prepare for pickling
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
 
 	
 	# path to store for variables

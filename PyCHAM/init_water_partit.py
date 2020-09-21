@@ -2,12 +2,11 @@
 
 import numpy as np
 from partit_var import kimt_calc
-from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for rebinning
 import sys
 import matplotlib.pyplot as plt
 import scipy.constants as si
 
-def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci, 
+def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci, 
 			accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 			N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, MV,
 			therm_sp, Cw, kgwt, corei, act_coeff, wall_on):
@@ -15,6 +14,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 	# inputs: ------------------------------------------------------
 	# x - radius of particles per size bin (um)
 	# Psat - saturation vapour pressure of components (molecules/cc (air))
+	# siz_str - the size structure
+	# num_sb - number of size bins
 	# N_perbin - initial particle concentration (#/cc (air))
 	# therm_sp - thermal speed of components (m/s) (num_speci)
 	# Cw - concentration of wall (molecules/cc (air))
@@ -135,11 +136,27 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_speci,
 		# beyond their upper size bin boundary due to water condensation, note, only do this
 		# after the iteration per size bin when we know the new particle-phase concentration 
 		# of water
-	
-		(N_perbin, Varr, y[num_speci:-num_speci], x, redt, blank, tnew) = movcen(N_perbin, Vbou, 
-		np.transpose(y[num_speci:-num_speci].reshape(num_sb-1, num_speci)), 
-		(np.squeeze(y_dens*1.0e-3)), num_sb-1, num_speci, y_mw, Vol0, 0.0,
-		0, MV)
+		# concentration in particles now (molecules/cc (air))
+		if wall_on == 0:
+			Cp = y[num_speci::]
+		else:
+			Cp = y[num_speci::]
+		Cp = np.transpose(Cp.reshape(num_sb-wall_on, num_speci))
+
+		rho = np.squeeze(y_dens*1.0e-3) # component densities in particle-phase (g/cc (particle))
+		Mrho = ((rho*1.0e-12)/y_mw[:, 0]).reshape(num_speci, 1) # molar density (mol/um3)
+		MV = 1./Mrho # molar volume (um3/mol)
+
+		if siz_str == 0: # moving-centre size structure
+			
+			(N_perbin, Varr, y[num_speci:-num_speci], x, redt, blank, 
+				tnew) = mov_cen_water_eq.mov_cen_main(N_perbin, Vbou, 
+				Cp, (num_sb-wall_on), num_speci, Vol0, 0.0,
+				0, MV)
+
+		if siz_str == 1: # full-moving size structure
+			import fullmov
+			(Varr, x) = fullmov.fullmov((num_sb-wall_on), N_perbin, num_speci, Cp, MV, Vol0)
 	
 		if redt == 1: # check on whether exception raised by moving centre
 			print('Error whilst equilibrating seed particles with water vapour (inside init_water_partit module).  Please investigate, perhaps by checking rh and pconc inputs in model variables input file.  See README for guidance and how to report bugs.')

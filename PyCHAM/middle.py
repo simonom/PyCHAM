@@ -19,7 +19,7 @@ def middle():
 	# get required inputs
 	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
 		comp0, y0, temp, tempt, RH, Pnow, wall_on,
-		Cw, kw, num_sb, pconc, pconct,
+		Cw, kw, siz_str, num_sb, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, core_dens, light_stat, light_time, daytime, lat, 
@@ -73,7 +73,7 @@ def middle():
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
 	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
-		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, num_sb, lowsize, 
+		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, siz_str, num_sb, lowsize, 
 		uppsize, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei,
 		comp_namelist, act_coeff, wall_on)

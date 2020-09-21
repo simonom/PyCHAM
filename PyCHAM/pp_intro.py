@@ -7,7 +7,7 @@ import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
-			DStar_org, RH, num_sb, lowersize, uppersize, pconc, 
+			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pconc, 
 			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, spec_namelist, 
 			act_coeff, wall_on):
@@ -16,6 +16,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
 	# y_mw - molecular weight (g/mol) of components (num_comp, 1)
+	# siz_str - the size structure
 	# num_sb - number of size bins (excluding wall)
 	# lowersize - lowest size bin radius bound (um)
 	# uppersize - largest size bin radius bound (um)
@@ -170,7 +171,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# allow water to equilibrate with particles and walls
 	if num_sb>0:
-		[y, Varr, x, N_perbin] = init_water_partit(x, y, H2Oi, Psat, mfp, num_sb, num_comp, 
+		[y, Varr, x, N_perbin] = init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, MV,
 					therm_sp, Cw, kgwt, corei, act_coeff, wall_on)

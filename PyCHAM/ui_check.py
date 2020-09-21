@@ -4,13 +4,14 @@ import os
 import sys
 import numpy as np
 
-def ui_check(sav_nam, sch_name, wall_on, caller, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up):
+def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up):
 
 	# inputs: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
 	# sch_name - name of chemical scheme file
 	# wall_on - marker for whether wall on or off
 	# caller - marker for the calling module
+	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# pconc - number concentration of particles
 	# pconct - times of particle injection (s)
@@ -45,6 +46,10 @@ def ui_check(sav_nam, sch_name, wall_on, caller, num_sb, pconc, pconct, lowsize,
 
 	if os.path.isdir(output_by_sim) == True and caller == 0:
 		sys.exit('Error: results file name (' +output_by_sim+ ') already exists, please use an alternative')
+
+	# ensure size structure marker is sensible
+	if siz_str<0 or siz_str>1:
+		siz_str = 0
 	
 	# consistency between number of particle size bins and particle number concentration
 	if num_sb == 0 and sum(pconc>0)>0:
@@ -125,4 +130,4 @@ def ui_check(sav_nam, sch_name, wall_on, caller, num_sb, pconc, pconct, lowsize,
 		sys.exit(str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.'))
 
 	
-	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time)
+	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str)

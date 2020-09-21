@@ -179,6 +179,7 @@ note that if a variable is irrelevant for your simulation, it can be left empty
 | total_model_time = | Total experiment time to be simulated (s) |
 | update_step =  | Time (s) interval for updating integration constants (specifically natural light intensity (if applicable) and particle number concentration due to its change during any of: coagulation, particle loss to wall and/or nucleation).  Default to 60 s.  Can be set to more than the total_model_time variable above to prevent updates. |
 | recording_time_step =  | Time interval for recording results (s).  Must be at least the value of update_step if particles are present (number_size_bins variable below greater than zero).  Defaults to 60 s.|
+| size_structure = | The size structure for the sectional approach to particles of varying size.  Set to 0 for moving-centre (default) and 1 for full-moving |
 | number_size_bins = | Number of size bins (excluding wall); to turn off particle considerations set to 0 (which is also the default), likewise set pconc and seed_name variables below off.  Must be integer (e.g. 1) not float (e.g. 1.0) |
 | lower_part_size = | Radius of smallest size bin boundary (um) |
 | upper_part_size = | Radius of largest size bin boundary (um) |

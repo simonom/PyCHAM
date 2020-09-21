@@ -3,7 +3,7 @@
 import numpy as np
 import scipy.constants as si
 
-def mov_cen_main(n0, Vbou, Cn, rho, sbn, nc, MW, Vol0, t, tinc_count, MV):
+def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 
 
 
@@ -14,15 +14,13 @@ def mov_cen_main(n0, Vbou, Cn, rho, sbn, nc, MW, Vol0, t, tinc_count, MV):
 	# Cn - particle phase concentration per component per size bin
 	# (molecules/cc (air)), with rows representing
 	# components and columns size bins (including wall as final size bin)
-	# rho - particle phase component densities (g/cc (particle))
-	# sbn - number of size bins
+	# sbn - number of size bins excluding wall (if present)
 	# nc - number of components
-	# MW - molar weight of components (g/mol)
 	# Vol0 - original volume of size bins (um3) (excluding wall)
 	# t - integration time (s)
 	# tinc_count - count on number of time steps since time interval last required 
 	# decreasing
-	# MV - molar volume (cc/mol)
+	# MV - molar volume per component (um3/mol)
 	# ---------------------------------------------------------------
 	# output:
 	
@@ -34,10 +32,8 @@ def mov_cen_main(n0, Vbou, Cn, rho, sbn, nc, MW, Vol0, t, tinc_count, MV):
 	# tnew - integration time to use on next step
 	# ---------------------------------------------------------------
 	
-	NA = si.Avogadro # Avogadro's number (molecules/mol)
-		
-	Mrho = ((rho*1.0e-12)/MW[:, 0]).reshape(nc, 1) # molar density (mol/um3)
-	
+	NA = si.Avogadro # Avogadro's number (molecules/mol)	
+
 	Vnew = np.zeros((sbn))
 	ish = n0[:, 0]>1.0e-10
 	nmolC = np.zeros((nc, ish.sum()))
@@ -98,7 +94,7 @@ def mov_cen_main(n0, Vbou, Cn, rho, sbn, nc, MW, Vol0, t, tinc_count, MV):
 	
 	# fill volume array elements for bins without particles with central volume (um3)
 	Vsing[isb] = (Vbou[0:-1][isb]+Vbou[1::][isb])/2.0
-	rad[isb] = ((3.0*Vsing[isb])/(4.0*np.pi))**(1.0/3.0)
+	rad[isb] = ((3.0*Vsing[isb])/(4.0*np.pi))**(1.0/3.0) # new radius (um)
 	
 	# flag to show no reduction in time step needed
 	redt = 0
