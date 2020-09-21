@@ -13,7 +13,7 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 
 ## Documentation
 
-The README file you are now reading serves as a manual explaining how to setup the software and use it.  
+The README file you are now reading serves as a manual explaining how to setup the software and use it.
 
 The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.  This article was reviewed using v0.2.4 of PyCHAM, which is stored in the releases of the PyCHAM github repository and [here](https://doi.org/10.5281/zenodo.3752677).
 
@@ -21,7 +21,7 @@ Version numbers of PyCHAM try to adhere to the semantics described by [semver](h
 
 ## Installation
 
-There are two options for installing, via conda and from source.  Experience indicates that the conda install is more straightforward than the pip, therefore we recommend this.
+There are two options for installing, via conda and from source (pip).  Experience indicates that the conda install is more straightforward than the pip, therefore we recommend this.
 
 
 ## Install from conda
@@ -124,37 +124,39 @@ Install is complete
 
 ## Running
 
-1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting species names to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below and note that example files are available in PyCHAM/inputs
+1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting the component names used in the chemical reaction scheme file to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below and note that example files are available in PyCHAM/input
 
 2. Now you are ready to run the model: python PyCHAM
 
 3. Follow the gui directions (see below for details on the chemical scheme, xml and model input files)
 
-4. The 'run model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
+4. The 'Run Model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
 
-5. The 'plot results' button produces (and saves in the output folder) two plots: the particle number distribution, SOA mass and particle number concentration against time, and another that shows the gas-phase concentrations of specified components with time.
+5. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
+
+6. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved.
 
 ## Testing
 
-Unit tests for PyCHAM modules can be found in the PyCHAM/Unit_Testing folder in the Github repository.  To use, cd to this folder and use python test_module.py with module replaced by the name of the module to be tested.
+Unit tests for PyCHAM modules can be found in the PyCHAM/unit_tests folder.  Call these tests from the home folder for PyCHAM, with: python test_module.py with module replaced by the name of the PyCHAM module to be tested.  For some unit tests example inputs are required, the chemical scheme files for these are stored in unit_tests/input with file names beginning with test_ ..., therefore we recommend users do not use chemical schemes with the same naming convention to prevent confusion.  Where required, model variables for unit tests either use the default values or those given in the unit test script and use the xml file provided in PyCHAM/input.
 
-Integration testing can be completed using the '.travis.yml' and 'PyCHAM_CI_test.py' files at the [Travis CI website](https://travis-ci.org).
+Continuous integration testing can be completed using the '.travis.yml' (home folder) and 'test_TravisCI.py' (unit_tests folder) files at the [Travis CI website](https://travis-ci.com).
 
-Example run output is saved in the PyCHAM/output/Example_Run folder.  To reproduce this, select from PyCHAM/inputs Example_Run for the chemical scheme, Example_Run_xml for the xml file and Example_Run_inputs for the model variables.  Note that the example output may vary between releases so check correspondence.
+Example run output is saved in the PyCHAM/output/Example_Run folder.  To reproduce this, select from PyCHAM/inputs Example_Run for the chemical scheme, Example_Run_xml for the xml file and Example_Run_inputs for the model variables.  Note that the example output may vary between releases so please check correspondence.
 
 ## Inputs
 
 ## Chemical Scheme .txt file
 
 An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
-from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (FACSIMILE version) and modified.
+from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.  Results are automatically saved in PyCHAM/output/name_of_chemical_scheme_file/name_given_in_model_variables_input_file_for_saving.  The unit tests described above save results with the name_of-chemical_scheme_file beginning with test_ ..., therefore we recommend using a different convention for chemical schemes to prevent confusion.
 
-Identifiers are required to recognise different sections of the chemical scheme (to be stated in the model variables input file in the chem_scheme_markers input).
+Markers are required to recognise different sections of the chemical scheme.  The default markers are for the MCM KPP format, however, others can be specified using the chem_scheme_markers input in the model variables input file.
 
 Reaction rate coefficients for chemical reactions and generic rate coefficients must adhere to the following rules:
-The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, exp, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen (# molecules/cc (air)).
+The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, exp, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen, respectively (# molecules/cc (air)).
 
-Inside the chemical scheme file, the expression for the reaction rate coefficient of a chemical reaction and the reaction itself must be contained on the same line of the file, with some identifier separating them.
+Inside the chemical scheme file, the expression for the reaction rate coefficient of a chemical reaction and the reaction itself must be contained on the same line of the file, with some marker (described above with chem_scheme_markers) separating them.
 
 ## Chemical Scheme .xml file
 
