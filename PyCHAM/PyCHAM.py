@@ -9,6 +9,7 @@ import pickle # for storing inputs
 import sys
 import os
 import def_mod_var
+import numpy as np
 
 class PyCHAM(QWidget):
 
@@ -21,8 +22,9 @@ class PyCHAM(QWidget):
 		self.height = 300
 		self.initUI()
 		
-		# default variables for all required input model variables stored to pickle file
-		def_mod_var.def_mod_var(0)
+		# default variables for all required input model variables 
+		# stored to pickle file and output here
+		[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac] = def_mod_var.def_mod_var(0)
 		return
     
 	def initUI(self):
@@ -70,14 +72,74 @@ class PyCHAM(QWidget):
 
 	@pyqtSlot()
 	def on_click1(self):
-		sch_name = self.openFileNameDialog() # get location of chemical scheme file
-	
+		# prepare by opening default inputs, ready for modification
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		with open(input_by_sim, 'rb') as pk:
+			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			save_step, const_comp, Compt, injectt, Ct, seed_name,
+			seed_mw, core_diss, seed_dens,
+			light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
+			
+			sch_name = self.openFileNameDialog() # get location of chemical scheme file
+
+			# pickle with new chemical scheme name	
+			list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+
+			pickle.dump(list_vars, pk) # pickle
+			pk.close() # close
+
 	@pyqtSlot()
 	def on_click2(self):
-		xml_name = self.openFileNameDialog() # get location of xml file
-		
+		# prepare by opening default inputs, ready for modification
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		with open(input_by_sim, 'rb') as pk:
+			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			save_step, const_comp, Compt, injectt, Ct, seed_name,
+			seed_mw, core_diss, seed_dens,
+			light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
+
+			xml_name = self.openFileNameDialog() # get location of xml file
+			
+			# pickle with new xml file name	
+			list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+
+			pickle.dump(list_vars, pk) # pickle
+			pk.close() # close		
+
 	@pyqtSlot()
 	def on_click3(self):
+
+		# prepare by opening default inputs, ready for modification
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		with open(input_by_sim, 'rb') as pk:
+			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			save_step, const_comp, Compt, injectt, Ct, seed_name,
+			seed_mw, core_diss, seed_dens,
+			light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
+			pk.close() # close pickle file
+
+
 		inname = self.openFileNameDialog() # get location of model variables file
 		
 		inputs = open(inname, mode='r') # open model variables file
@@ -90,55 +152,55 @@ class PyCHAM(QWidget):
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
 
-			if key == 'res_file_name': # name of folder to save results in
-				sav_name = str(value.strip())
+			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
+				sav_nam = str(value.strip())
 
-			if key == 'chem_scheme_markers': # formatting for chemical scheme
+			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
 				chem_sch_mark = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'update_step': # time step (s) for updating ODE initial conditions
+			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
 				update_stp = float(value.strip())
 
-			if key == 'total_model_time':
+			if key == 'total_model_time' and (value.strip()):
 				tot_time = float(value.strip())
 
-			if key == 'Comp0': # names of components present at experiment start
+			if key == 'Comp0' and (value.strip()): # names of components present at experiment start
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 
-			if key == 'C0': # initial concentrations of components present at experiment start (ppb)
+			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
 				y0 = [float(i) for i in (value.split(','))]
 
-			if key == 'temperature': # chamber temperature (K)
+			if key == 'temperature' and (value.strip()): # chamber temperature (K)
 				temp = [float(i) for i in ((value.strip()).split(','))]
 
-			if key == 'tempt': # times (s) that temperature values correspond to
+			if key == 'tempt' and (value.strip()): # times (s) that temperature values correspond to
 				tempt = [float(i) for i in ((value.strip()).split(','))]
 
-			if key == 'rh': # relative humidity in chamber (0-1)
+			if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
 				RH = float(value.strip())
 
-			if key == 'p_init': # pressure inside chamber
+			if key == 'p_init' and (value.strip()): # pressure inside chamber
 				Press = float(value.strip())
 
-			if key == 'daytime_start': # time of day at experiment start (s)
+			if key == 'daytime_start' and (value.strip()): # time of day at experiment start (s)
 				daytime = float(value.strip())
 
-			if key == 'wall_on': # marker for whether or not to consider wall
+			if key == 'wall_on' and (value.strip()): # marker for whether or not to consider wall
 				wall_on = int(value.strip())
 
-			if key == 'eff_abs_wall_massC': # effective absorbing mass concentration of wall
+			if key == 'eff_abs_wall_massC' and (value.strip()): # effective absorbing mass concentration of wall
 				Cw = float(value.strip())
 
-			if key == 'mass_trans_coeff': # mass transfer coefficient of vapours with wall
+			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
 				kw = float(value.strip())
 
-			if key == 'size_structure': # the size structure
+			if key == 'size_structure' and (value.strip()): # the size structure
+				siz_stru = int(value.strip())
+
+			if key == 'number_size_bins' and (value.strip()): # number of particle size bins
 				num_sb = int(value.strip())
 
-			if key == 'number_size_bins': # number of particle size bins
-				num_sb = int(value.strip())
-
-			if key == 'pconc': # seed particle number concentrations (#/cc)
+			if key == 'pconc' and (value.strip()): # seed particle number concentrations (#/cc)
 				time_count = 1 # track number of times given
 				sb_count = 1 # track number of size bins given
 				for i in value:
@@ -150,7 +212,7 @@ class PyCHAM(QWidget):
 				for i in range(time_count):
 					pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 			
-			if key == 'pconct': # seed particle input times (s)
+			if key == 'pconct' and (value.strip()): # seed particle input times (s)
 				time_count = 1 # track number of times given
 				for i in value:
 					if i==';':
@@ -159,16 +221,16 @@ class PyCHAM(QWidget):
 				pconct = np.zeros((1, time_count))
 				pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
 
-			if key == 'lower_part_size': # lowest size bin bound
+			if key == 'lower_part_size' and (value.strip()): # lowest size bin bound
 				lowsize = float(value.strip())
 			
-			if key == 'upper_part_size': # radius of uppermost size bin boundary
+			if key == 'upper_part_size' and (value.strip()): # radius of uppermost size bin boundary
 				uppsize = float(value.strip())
 
-			if key == 'space_mode': # method of spacing size bin sizes
+			if key == 'space_mode' and (value.strip()): # method of spacing size bin sizes
 				space_mode = str(value.strip())
 
-			if key == 'std': # seed particle standard deviation of number size distribution
+			if key == 'std' and (value.strip()): # seed particle standard deviation of number size distribution
 				time_count = 1 # track of number of times
 				for i in value:
 					if i==';':
@@ -176,7 +238,7 @@ class PyCHAM(QWidget):
 				std = np.zeros((1, time_count))
 				std[0, :] = [float(i) for i in ((value.strip()).split(';'))]
 			
-			if key == 'mean_rad': # seed particle mean radius (um)
+			if key == 'mean_rad' and (value.strip()): # seed particle mean radius (um)
 				time_count = 1 # track of number of times given
 				for i in value:
 					if i==';':
@@ -184,20 +246,22 @@ class PyCHAM(QWidget):
 				mean_rad = np.zeros((1, time_count))
 				mean_rad[0, :] = [float(i) for i in ((value.strip()).split(';'))]
 
-			if key == 'recording_time_step': # frequency (s) of storing results
+			if key == 'recording_time_step' and (value.strip()): # frequency (s) of storing results
 				save_step = float(value.strip())
 
-			if key == 'const_comp': # names of components with later continuous injections
+			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
 				const_comp = [str(i).strip() for i in (value.split(','))]
 			
-			if key == 'Compt': # names of components with instantaneous gas-phase injections
+			if key == 'Compt' and (value.strip()): # names of components with instantaneous gas-phase injections
 				Compt = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'injectt': # times of later gas-phase instantaneous injections (s)
+			# times of later gas-phase instantaneous injections (s)
+			if key == 'injectt' and (value.strip()):
 				injectt = [float(i.strip()) for i in (value.split(','))]
 				injectt = np.array((injectt))
 
-			if key == 'Ct': # concentration of components with instantanetous injection (ppb)
+			# concentration of components with instantanetous injection (ppb)
+			if key == 'Ct' and (value.strip()):
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
 				for i in value:
@@ -212,54 +276,54 @@ class PyCHAM(QWidget):
 
 
 			if key == 'seed_name': # name of component comprising seed particles
-				seed_name = str(value.strip())
+				if (value.strip()): seed_name = str(value.strip())
 
 			if key == 'seed_mw':
-				seed_mw = float(value.strip())
+				if (value.strip()): seed_mw = float(value.strip())
 		
 			if key == 'core_diss': # dissociation constant of seed material
-				core_diss = float(value.strip())
+				if (value.strip()): core_diss = float(value.strip())
 
 			if key == 'seed_dens':
-				seed_dens = float(value.strip())
+				if (value.strip()): seed_dens = float(value.strip())
 
 			if key == 'light_stat': # status of lights (on or off)
-				light_stat = [int(i) for i in (value.split(','))]
+				if (value.strip()): light_stat = [int(i) for i in (value.split(','))]
 
 			if key == 'light_time': # times (s) corresponding to light status
-				light_time = [float(i) for i in (value.split(','))]
+				if (value.strip()): light_time = [float(i) for i in (value.split(','))]
 
 			if key == 'lat': # latitude (degrees)
-				lat = float(value.strip())
+				if (value.strip()): lat = float(value.strip())
 
 			if key == 'lon': # longitude (degrees)
-				lon = float(value.strip())
+				if (value.strip()): lon = float(value.strip())
 
-			if key == 'act_flux_file': # for indoor actinic flux
+			if key == 'act_flux_file' and (value.strip()): # for indoor actinic flux
 				af_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 
-			if key == 'DayOfYear':
+			if key == 'DayOfYear' and (value.strip()):
 				dayOfYear = int(value.strip())		
 			
 			# name of file with wavelength-dependent absorption cross-section and quantum yield 
 			# calculations
-			if key == 'photo_par_file':
+			if key == 'photo_par_file' and (value.strip()):
 				photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
-			if key == 'trans_fac': # transmission factor for natural light
+			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
 				tf = float(value.strip())
 
-			if key == 'light_adapt': # whether to adapt time step to naturally varying light intensity
+			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				light_ad = int(value.strip())
 
-			if key == 'const_infl': # names of components with continuous influx
+			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
 				con_infl_nam = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'const_infl_t': # times of continuous influxes (s)
+			if key == 'const_infl_t' and (value.strip()): # times of continuous influxes (s)
 				con_infl_t = [float(i.strip()) for i in (value.split(','))]
 				con_infl_t = np.array((con_infl_t))
 
-			if key == 'Cinfl': # influx rate of components with continuous influx (ppb/s)
+			if key == 'Cinfl' and (value.strip()): # influx rate of components with continuous influx (ppb/s)
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
 				for i in value:
@@ -272,88 +336,88 @@ class PyCHAM(QWidget):
 				for i in range(comp_count):
 					con_infl_C[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 
-			if key == 'tracked_comp': # names of components whose tendency to change will be tracked
+			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				dydt_trak = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'vol_Comp':
+			if key == 'vol_Comp' and (value.strip()):
 				vol_comp = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'volP':
+			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
 
-			if key == 'act_comp': # names of componentes with specified activity coefficients
+			if key == 'act_comp' and (value.strip()): # names of componentes with specified activity coefficients
 				act_comp = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'act_user': # activity coefficients (dimensionless set by user)
+			if key == 'act_user' and (value.strip()): # activity coefficients (dimensionless set by user)
 				act_user = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'accom_coeff_comp': # names of componenets with specified accommodation coefficients
+			if key == 'accom_coeff_comp' and (value.strip()): # names of componenets with specified accommodation coefficients
 				accom_comp = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'accom_coeff_user': # value(s) of accommodation coefficient set by user
+			if key == 'accom_coeff_user' and (value.strip()): # value(s) of accommodation coefficient set by user
 				accom_val = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'umansysprop_update': # marker for whether to clone latest version of UManSysProp from web
+			if key == 'umansysprop_update' and (value.strip()): # marker for whether to clone latest version of UManSysProp from web
 				uman_up = int(value.strip())
 
-			if key == 'int_tol': # tolerances for integration
+			if key == 'int_tol' and (value.strip()): # tolerances for integration
 				int_tol = np.array(([float(i) for i in (value.split(','))]))
 
-			if key == 'new_partr': # radius of newly nucleated particles (cm)
+			if key == 'new_partr' and (value.strip()): # radius of newly nucleated particles (cm)
 				new_partr = float(value.strip())
 
-			if key == 'nucv1': # first parameter in the nucleation equation
+			if key == 'nucv1' and (value.strip()): # first parameter in the nucleation equation
 				nucv1 = float(value.strip())
 
-			if key == 'nucv2': # second nucleation parameter (onset)
+			if key == 'nucv2' and (value.strip()): # second nucleation parameter (onset)
 				nucv2 = float(value.strip())
 
-			if key == 'nucv3': # third nucleation parameter (duration)
+			if key == 'nucv3' and (value.strip()): # third nucleation parameter (duration)
 				nucv3 = float(value.strip())
 
-			if key == 'nuc_comp': # chemical scheme name of nucleating component
+			if key == 'nuc_comp' and (value.strip()): # chemical scheme name of nucleating component
 				nuc_comp = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'nuc_adapt': # marker for whether to adapt time interval to nucleation
+			if key == 'nuc_adapt' and (value.strip()): # marker for whether to adapt time interval to nucleation
 				nuc_ad = int(value.strip())
 
-			if key == 'coag_on': # marker for whether to model coagulation
+			if key == 'coag_on' and (value.strip()): # marker for whether to model coagulation
 				coag_on = int(value.strip())
 
-			if key == 'inflectDp': # diameter at which wall deposition of particles inflection occurs
+			if key == 'inflectDp' and (value.strip()): # diameter at which wall deposition of particles inflection occurs
 				inflectDp = float(value.strip())
 
-			if key == 'Grad_pre_inflect': # gradient of wall deposition of particles before inflection
+			if key == 'Grad_pre_inflect' and (value.strip()): # gradient of wall deposition of particles before inflection
 				pwl_xpre = float(value.strip())
 
-			if key == 'Grad_post_inflect': # gradient of particle deposition to wall after inflection
+			if key == 'Grad_post_inflect' and (value.strip()): # gradient of particle deposition to wall after inflection
 				pwl_xpro = float(value.strip())
 
-			if key == 'Rate_at_inflect': # particle deposition to wall rate at inflection
+			if key == 'Rate_at_inflect' and (value.strip()): # particle deposition to wall rate at inflection
 				inflectk = float(value.strip())
 
-			if key == 'ChamSA': # chamber surface area (m2) used for particle loss to walls
+			if key == 'ChamSA' and (value.strip()): # chamber surface area (m2) used for particle loss to walls
 				ChamSA = float(value.strip())
 
-			if key == 'McMurry_flag': # marker for whether to use the McMurry model for particle deposition to wall
+			if key == 'McMurry_flag' and (value.strip()): # marker for whether to use the McMurry model for particle deposition to wall
 				Rader = int(value.strip())
 
-			if key == 'part_charge_num': # average number of charges per particle
+			if key == 'part_charge_num' and (value.strip()): # average number of charges per particle
 				p_char = float(value.strip())
 			
-			if key == 'elec_field': # electric field in chamber
+			if key == 'elec_field' and (value.strip()): # electric field in chamber
 				e_field = float(value.strip())
 			
-			if key == 'dil_fac': # dilution factor rate
+			if key == 'dil_fac' and (value.strip()): # dilution factor rate
 				dil_fac = float(value)
 	
 		# prepare for pickling
 		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
-		with open(input_by_sim, 'wb') as f: # the file to be used for pickling
-			pickle.dump(list_vars,f) # pickle
-			f.close() # close
+		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
+			pickle.dump(list_vars, pk) # pickle
+			pk.close() # close
 
 
 		

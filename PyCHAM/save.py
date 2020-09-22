@@ -7,7 +7,7 @@ import numpy as np
 
 def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
-	time_taken, seed_name, x2, rbou, wall_on, space_mode, rbou00, upper_bin_rad_amp):
+	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp):
 			
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -35,16 +35,16 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# time_taken - simulation computer time (s)
 	# seed_name - chemical scheme name of component comprising seed particles
 	# x2 - record of size bin radii (um)
-	# rbou - radius bounds (um)
+	# rbou_rec - radius bounds per size bin (columns) per time step (rows) (um)
 	# wall_on - marker for whether wall on or off
 	# space_mode - type of spacing between particle size bins (log or lin)
 	# rbou00 - initial lower size (radius) bound of particles (um)
 	# upper_bin_rad_amp - factor increase in radius of upper bound 
 	# -------------------------------
 	
-	# correct for changes to size bin radius bounds
-	rbou[0] = rbou00
-	rbou[-1] = rbou[-1]/upper_bin_rad_amp
+	if (numsb-wall_on > 0): # correct for changes to size bin radius bounds
+		rbou_rec[:, 0] = rbou00
+		rbou_rec[:, -1] = rbou_rec[:, -1]/upper_bin_rad_amp
 
 	if (testf == 1):
 		return(0) # return dummy
@@ -122,7 +122,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 			compind += 1
 	
 	
-	if numsb-wall_on>0: # if particles present
+	if (numsb-wall_on > 0): # if particles present
 	
 		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
 				header=('particle number concentration assuming water removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
@@ -133,8 +133,8 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 		np.savetxt(os.path.join(output_by_sim, 'size_bin_radius'), x2, delimiter=',',
 				header= str('particle radii (um) per size_bin (including water contribution to size), with size bins represented by columns and their number (starting from 1) given in second line of header, per time step which is represented by rows and corresponding times given in the time output file \n'+x2_header))
 	
-		np.savetxt(os.path.join(output_by_sim, 'size_bin_bounds'), rbou.reshape(1, -1), delimiter=',',
-				header=str('particle size bin bounds (um), with size bin number (starting at 1 and in line with the lower bound) given in second line of header\n'+x2_header))		
+		np.savetxt(os.path.join(output_by_sim, 'size_bin_bounds'), rbou_rec, delimiter=',',
+				header=str('particle size bin bounds (um), with size bins represented by columns and their number (starting at 1 and in line with the lower bound) given in second line of header, per time step which is is represented by rows and corresponding times given in the time output file \n'+x2_header))		
 		
 	# if save name is the default, then remove to ensure no duplication in future
 	if (savefolder == 'default_res_name'):

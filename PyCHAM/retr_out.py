@@ -98,18 +98,18 @@ def retr_out(output_by_sim):
 		Nwet = []
 	
 	try:
-		# withdraw size bin bounds, represented by radii (um)
-		fname = str(output_by_sim+'/size_bin_bounds')
-		sbb = np.loadtxt(fname, delimiter=',', skiprows=1)
-	except:
-		sbb = []
-	
-	try:
 		# particle sizes (um)
 		fname = str(output_by_sim+'/size_bin_radius')
 		x = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
 		x = []
+
+	try:
+		# particle size bin bounds (radii) (um3)
+		fname = str(output_by_sim+'/size_bin_bounds')
+		rbou_rec = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
+	except:
+		rbou_rec = []
 	
-	return(num_sb, num_speci, Cfactor, y, N, sbb, x, timehr, PyCHAM_names, y_MW, 
+	return(num_sb, num_speci, Cfactor, y, N, rbou_rec, x, timehr, PyCHAM_names, y_MW, 
 		Nwet, spec_namelist, MV, speed, wall_on, space_mode)

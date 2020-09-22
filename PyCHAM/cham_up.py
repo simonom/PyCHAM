@@ -13,8 +13,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
-	mean_rad, corei, lowsize, uppsize, num_sb, MV, rad0, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl):
+	mean_rad, corei, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -64,7 +64,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# uppsize - upper size bin boundary (um)
 	# num_sb - number of size bins
 	# MV - molar volume of components (cc/mol)
-	# rad0 - initial radius at particle centres (um)
+	# rad0 - initial radius at size bin centres (um)
+	# radn - current radius at size bin centres (um)
 	# std - standard deviation for injected particle number size 
 	#	distributions
 	# y_dens - component densities (g/cm3)
@@ -74,7 +75,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# infx_cnt - count on constant influx occurrences
 	# Cinfl - influx rate for components with constant 
 	# 	influx (ppb/s)
-	# --------------------------------------------------------
+	# wall_on - marker for whether wall is on
+	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
 
@@ -231,10 +233,12 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		if (sumt == pconct[0, seedt_cnt]):
 			
 			# account for change in seed particles
-			[y[num_comp:-num_comp], N_perbin, x, 
-					Varr] = pp_dursim.pp_dursim(y[num_comp:-num_comp], N_perbin, 
+			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
+					Varr] = pp_dursim.pp_dursim(y[num_comp:-num_comp*(num_sb-wall_on+1)], 
+					N_perbin, 
 					mean_rad[0, seedt_cnt], pconc[:, seedt_cnt], corei, lowsize, 
-					uppsize, num_comp, num_sb, MV, rad0, std[0, seedt_cnt], y_dens, H2Oi, rbou)
+					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
+					std[0, seedt_cnt], y_dens, H2Oi, rbou)
 			if (seedt_cnt<(pconct.shape[1]-1)):
 				seedt_cnt += 1
 			else:

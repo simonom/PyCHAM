@@ -19,7 +19,7 @@ def rec_prep(nrec_step,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	lowsize, uppsize, rad0, std, rbou, const_infl_t, 
+	lowsize, uppsize, rad0, radn, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C):
 	
 	# inputs: --------------------------------------------------------
@@ -97,7 +97,8 @@ def rec_prep(nrec_step,
 	# corei - index of core component
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
-	# rad0 - initial radius at particle centres (um) 
+	# rad0 - initial radius at size bin centres (um)
+	# radn - current radius at size bin centres (um)	
 	# std - standard deviation for injected particle number size 
 	#	distributions
 	# rbou - size bin radius bounds (um)
@@ -117,14 +118,16 @@ def rec_prep(nrec_step,
 	Cfactor_vst[0] = Cfactor
 
 	# arrays to record particle radii and number size distributions	
-	if num_sb>0:
-		x2 = np.zeros((nrec_step, num_sb-wall_on))
-		Nres_dry = np.zeros((nrec_step, num_sb-wall_on))
-		Nres_wet = np.zeros((nrec_step, num_sb-wall_on))
+	if ((num_sb-wall_on) > 0):
+		x2 = np.zeros((nrec_step, (num_sb-wall_on)))
+		Nres_dry = np.zeros((nrec_step, (num_sb-wall_on)))
+		Nres_wet = np.zeros((nrec_step, (num_sb-wall_on)))
+		rbou_rec = np.zeros((nrec_step, (num_sb-wall_on+1)))
 	else:
-		x2 = 0.0
-		Nres_dry = 0.0
-		Nres_wet = 0.0
+		x2 = 0.
+		Nres_dry = 0.
+		Nres_wet = 0.
+		rbou_rec = 0.
 
 	MV = (y_mw/y_dens).reshape(num_comp) # molar volume of components (cc/mol)
 
@@ -136,8 +139,8 @@ def rec_prep(nrec_step,
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pconc, pconct, 
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
-		uppsize, num_sb, MV, rad0, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C)
+		uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
+		const_infl_t, infx_cnt, con_infl_C, wall_on)
 	
 	
 	if (num_sb-wall_on)>0: # if particles present
@@ -150,6 +153,8 @@ def rec_prep(nrec_step,
 		# single particle radius (um) at size bin centre 
 		# including contribution of water
 		x2[0, :] = x
+		# single particle size bin bounds including water (um)
+		rbou_rec[0, :] = rbou
 		
 		# estimate particle number size distributions ----------------------------------
 		Vnew = np.zeros((num_sb-wall_on))
@@ -187,4 +192,4 @@ def rec_prep(nrec_step,
 					kimt, kw, Cw, act_coeff)
 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt, rbou_rec)

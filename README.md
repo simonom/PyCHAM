@@ -128,13 +128,13 @@ Install is complete
 
 2. Now you are ready to run the model: python PyCHAM
 
-3. Follow the gui directions (see below for details on the chemical scheme, xml and model input files)
+3. The first three buttons of the GUI allow identification of the input files.  These can be used in any order and if no file is selected for any or all of the buttons, default files will be used (defaults: Chemical Scheme .txt File - example_scheme.txt, Chemical Scheme .xml File - example_xml.xml, Model Variables .txt File - example_model_var.txt) (see below for details on the chemical scheme, xml and model variables input files).
 
 4. The 'Run Model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
 
-5. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
+5. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).  This button will not operate correctly until the simulation is complete.  The simulation is complete when the console says so.
 
-6. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved.
+6. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved and therefore making the 'Plot Results' button redundant.
 
 ## Testing
 
@@ -142,13 +142,13 @@ Unit tests for PyCHAM modules can be found in the PyCHAM/unit_tests folder.  Cal
 
 Continuous integration testing can be completed using the '.travis.yml' (home folder) and 'test_TravisCI.py' (unit_tests folder) files at the [Travis CI website](https://travis-ci.com).
 
-Example run output is saved in the PyCHAM/output/Example_Run folder.  To reproduce this, select from PyCHAM/inputs Example_Run for the chemical scheme, Example_Run_xml for the xml file and Example_Run_inputs for the model variables.  Note that the example output may vary between releases so please check correspondence.
+Example run output is saved in the PyCHAM/output/example_scheme folder.  To reproduce this, select from PyCHAM/input example_scheme.txt for the chemical scheme, example_xml.xml for the xml file and example_model_var.txt for the model variables.  Note that the example output may vary between releases so please check correspondence.
 
 ## Inputs
 
 ## Chemical Scheme .txt file
 
-An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'Example_Run.txt', which has been obtained
+An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'example_scheme.txt', which has been obtained
 from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.  Results are automatically saved in PyCHAM/output/name_of_chemical_scheme_file/name_given_in_model_variables_input_file_for_saving.  The unit tests described above save results with the name_of-chemical_scheme_file beginning with test_ ..., therefore we recommend using a different convention for chemical schemes to prevent confusion.
 
 Markers are required to recognise different sections of the chemical scheme.  The default markers are for the MCM KPP format, however, others can be specified using the chem_scheme_markers input in the model variables input file.
@@ -160,7 +160,7 @@ Inside the chemical scheme file, the expression for the reaction rate coefficien
 
 ## Chemical Scheme .xml file
 
-An example is given in the inputs folder (of the Github repository), called 'Examples_Run_xml.xml'.  It has a two line header, the first states that the mechanism is beginning (`<mechanism>`) and the second states that the species definition is beginning (`<species_defs>`).  The end of the species list must be marked (`</species_defs>`) and finally, the end of the mechanism must be marked (`</mechanism>`). 
+An example is given in the inputs folder (of the Github repository), called 'examples_xml.xml'.  It has a two line header, the first states that the mechanism is beginning (`<mechanism>`) and the second states that the species definition is beginning (`<species_defs>`).  The end of the species list must be marked (`</species_defs>`) and finally, the end of the mechanism must be marked (`</mechanism>`). 
 
 Beneath this, every species included in the reactions of the chemical scheme must have its SMILES string given.
 
@@ -168,7 +168,7 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 ## Model Variables .txt File
 
 An example is provided in the inputs folder (of the Github repository), called 
-'Example_Run_inputs.txt' , this must include the following variables separated by a 
+'example_model_var.txt' , this must include the following variables separated by a 
 return (so one line per variable, an error message will show if a variable is missing), 
 note that if a variable is irrelevant for your simulation, it can be left empty 
 (e.g. vol_Comp = ):

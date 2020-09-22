@@ -171,9 +171,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# allow water to equilibrate with particles and walls
 	if num_sb>0:
-		[y, Varr, x, N_perbin] = init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_comp, 
+		[y, Varr, x, N_perbin, Vbou, rbou] = init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
-					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, Vol0, MV,
+					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
 					therm_sp, Cw, kgwt, corei, act_coeff, wall_on)
 	
 	if testf==2:

@@ -10,6 +10,7 @@ import rec_prep
 import partit_var
 import rec
 import mov_cen
+import fullmov
 import wallloss
 import nuc
 import coag
@@ -20,7 +21,7 @@ def ode_updater(update_stp,
 	jac_den_indx, jac_indx, RO2_indx, H2Oi,	temp, tempt, 
 	Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-	dydt_vst, num_sb, num_comp, corei, core_diss, Psat, 
+	dydt_vst, siz_str, num_sb, num_comp, corei, core_diss, Psat, 
 	mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
@@ -69,6 +70,7 @@ def ode_updater(update_stp,
 	# nrec_step - number of recording steps
 	# dydt_vst - dictionary for holding change tendencies of specified
 	#		components
+	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
 	# corei - index of seed material
@@ -184,7 +186,7 @@ def ode_updater(update_stp,
 
 	# prepare recording matrices, including recording of initial
 	# conditions
-	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt] = rec_prep.rec_prep(nrec_steps, 
+	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt, rbou_rec] = rec_prep.rec_prep(nrec_steps, 
 	y, rindx, 
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
@@ -196,7 +198,7 @@ def ode_updater(update_stp,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	lowsize, uppsize, rad0, std, rbou, const_infl_t, 
+	lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C)
 	
 	print('Starting loop through update steps')	
@@ -211,8 +213,8 @@ def ode_updater(update_stp,
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
-			uppsize, num_sb, MV, rad0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt, con_infl_C)
+			uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
+			const_infl_t, infx_cnt, con_infl_C, wall_on)
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew)>save_stp*save_cnt):
@@ -224,7 +226,7 @@ def ode_updater(update_stp,
 			tnew = (update_stp-update_count)
 			ic_red = 1
 		
-		if (num_sb-wall_on)>0: # if wall present
+		if (num_sb-wall_on)>0: # if particles present
 			# update partitioning variables
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 			surfT, R_gas, temp_now, NA, y_dens, N_perbin, DStar_org, 
@@ -262,31 +264,38 @@ def ode_updater(update_stp,
 		if num_sb-wall_on>0:
 			# update particle sizes
 			if (num_sb-wall_on)>1 and (N_perbin>1.0e-10).sum()>0: # if particles present
-				# call on the moving centre method for rebinning particles
-				(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
-				Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
-				update_stp, y0, MV, Psat[0, :], ic_red, res, res_t)
+				if (siz_stru == 0): # moving centre
+					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
+					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
+					update_stp, y0, MV, Psat[0, :], ic_red, res, res_t)
+				if (si_stru == 1): # full-moving
+					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
+					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
+ 					num_comp, y, MV, Vol0, Vbou, rbou)
 
-			 # if time met to implement operator-split processes
+			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
 				if ((N_perbin>1.e-10).sum()>0):
+					# particle-phase concentrations (molecules/cc (air))
+					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp))
 					# coagulation
-					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, Varr] = coag.coag(RH, 
-						temp_now, x*1.0e-6, (Varr*1.0e-18).reshape(1, -1), 
+					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, 
+						Varr, Vbou, rbou] = coag.coag(RH, temp_now, x*1.0e-6, 
+						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.0e-6, 
-						np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on,
-						num_comp)), (N_perbin).reshape(1, -1), update_count, 
-						(Vbou*1.0e-18).reshape(1, -1), 
-						num_comp, 0, (np.squeeze(y_dens*1.0e-3)), rad0, Pnow, 0,
-						np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on,
-						num_comp)), (N_perbin).reshape(1, -1), (Varr*1.0e-18).reshape(1, -1),
-						coag_on)
+						Cp, (N_perbin).reshape(1, -1), update_count, 
+						(Vbou*1.0e-18).reshape(1, -1), rbou,
+						num_comp, 0, (np.squeeze(y_dens*1.0e-3)), Vol0, rad0, Pnow, 0,
+						Cp, (N_perbin).reshape(1, -1), (Varr*1.0e-18).reshape(1, -1),
+						coag_on, siz_stru)
 				
 					if ((Rader>-1) and (wall_on == 1)): #if particle loss to walls turned on
 						# particle loss to walls
-						[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)]] = wallloss.wallloss(
+						[N_perbin, 
+						y[num_comp:(num_comp)*(num_sb-wall_on+1)]] = wallloss.wallloss(
 							N_perbin.reshape(-1, 1), 
-							y[num_comp:(num_comp)*(num_sb-wall_on+1)], Gi, eta_ai, x*2.0e-6, y_mw, 
+							y[num_comp:(num_comp)*(num_sb-wall_on+1)], Gi, eta_ai,
+ 							x*2.0e-6, y_mw, 
 							Varr*1.0e-18, num_sb, num_comp, temp_now, update_count, 
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, Rader, 
 							0, p_char, e_field, (num_sb-wall_on))
@@ -294,7 +303,7 @@ def ode_updater(update_stp,
 					[N_perbin, y, x[0], Varr[0], np_sum] = nuc.nuc(sumt, np_sum, 
 						N_perbin, y, y_mw.reshape(-1, 1), 
 						np.squeeze(y_dens*1.0e-3),  
-						num_comp, x[0], new_partr, MV, nucv1, nucv2, 
+						num_comp, Varr[0], x[0], new_partr, MV, nucv1, nucv2, 
 						nucv3, nuc_comp[0])
 				
 				# reset count to that since original operator-split processes interval met (s)
@@ -307,11 +316,11 @@ def ode_updater(update_stp,
 		if sumt-(save_stp*save_cnt)>-1.e-10:
 
 			[trec, yrec, dydt_vst, Cfactor_vst, save_cnt, 
-				Nres_dry, Nres_wet, x2] = rec.rec(save_cnt, trec, yrec, 
+				Nres_dry, Nres_wet, x2, rbou_rec] = rec.rec(save_cnt, trec, yrec, 
 				dydt_vst, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, wall_on)		
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec)		
 		
 		# if time step was temporarily reduced, then return
 		if ic_red == 1:
@@ -319,4 +328,4 @@ def ode_updater(update_stp,
 			tnew = update_stp
 			ic_red = 0
 	
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, rbou_rec)

@@ -7,7 +7,7 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
-	MV, H2Oi, Vbou, wall_on):
+	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -44,7 +44,9 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	# MV - molar volume of components (um3/mol)
 	# H2Oi - index for water
 	# Vbou - volume boundaries per size bin (um3)
+	# rbou - size bin radius boundaries (um)
 	# wall_on - marker for whether wall turned on
+	# rbou_rec - size bin radius boundary record (um)
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)
@@ -54,7 +56,10 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	
 	# single particle radius (um) at size bin centre 
 	# including contribution of water
-	x2[save_cnt, :] = x
+	if (num_sb-wall_on > 0):
+		x2[save_cnt, :] = x
+		# single particle radius boundaries (um) including contribution of water
+		rbou_rec[save_cnt, :] = rbou 
 	
 	# estimate particle number size distributions ----------------------------------
 	Vnew = np.zeros((num_sb-wall_on))
@@ -84,4 +89,4 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 					kimt, kw, Cw, act_coeff)
 	save_cnt += 1 # track number of recordings 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2)
+	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec)

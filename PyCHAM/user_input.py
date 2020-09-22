@@ -21,7 +21,7 @@ def share(source):
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
-			Cw, kw, siz_str, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, core_diss, seed_dens,
 			light_stat, light_time, daytime, lat, lon, af_path, 
@@ -35,13 +35,13 @@ def share(source):
 			# check on inputs
 			[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
 			af_path, int_tol, update_stp, tot_time, siz_str] = ui_check.ui_check(sav_nam, sch_name,
-			wall_on, 0, siz_str, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, 
-			chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, )
+			wall_on, 0, siz_stru, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, 
+			chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up)
 	
 		return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
-			Cw, kw, siz_str, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, const_comp, Compt, injectt, C, t, seed_name,
+			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, core_diss, seed_dens,
 			light_stat, light_time, daytime, lat, lon, af_path, 
 			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 

@@ -82,13 +82,13 @@ def middle():
 	st_time = time.time()
 	
 	# solve problem
-	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2] = ode_updater.ode_updater(update_stp, 
+	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, rbou_rec] = ode_updater.ode_updater(update_stp, 
 		tot_time, save_step, y, rindx, 
 		pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
 		jac_den_indx, jac_indx, RO2_indx, H2Oi, temp, tempt, 
 		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-		dydt_vst, num_sb, num_comp, corei, core_diss, Psat, 
+		dydt_vst, siz_str, num_sb, num_comp, corei, core_diss, Psat, 
 		mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
@@ -110,7 +110,7 @@ def middle():
 	save.saving(sch_name, yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		dydt_vst, num_comp, Cfactor_vst, 0, 
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
-		seed_name, x2, rbou, wall_on, space_mode, rbou00, upper_bin_rad_amp)
+		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp)
 	print('Saved results')
 	
 	

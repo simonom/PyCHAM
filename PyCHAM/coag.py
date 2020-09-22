@@ -12,10 +12,11 @@ import scipy.integrate as integ
 import matplotlib.pyplot as plt
 import scipy.constants as si
 from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for rebinning
+import fullmov
 
-def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
-			num_comp, vdWon, rho, rad0, PInit, testf, num_molec_rint, num_part_rint, 
-			sbVj, coag_on):
+def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
+			num_comp, vdWon, rho, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
+			sbVj, coag_on, siz_stru):
 
 	# inputs:---------------------------------------------------------
 	
@@ -31,10 +32,12 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# (particle/cc (air)) (columns) (excluding walls), for particles in sbr
 	# tint - time interval coagulation occurs over (s)
 	# sbbound - size bin volume boundaries (m3)
+	# rbou - size bin radius boundaries (um)
 	# num_comp - number of components
 	# vdWon - flagging whether the van der Waals kernel should be calculated or ignored (0
 	# for ignore, 1 for calculate)
 	# rho - component densities (g/cm3) in a 1D array
+	# V0 - original volume at size bin centre (um3)
 	# rad0 - original radius at size bin centre (um)
 	# PInit - pressure inside chamber (Pa)
 	# testf - unit testing flag (0 for off, 1 for on)
@@ -44,10 +47,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# (particle/cc (air)) (columns) (excluding walls), for particles in rint
 	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	# coag_on - whether to allow coagulation to occur (1) or not (0)
-	# --------------------------------------------------------------
-	# outputs:
-	
-	# Beta - sum of coagulation kernels
+	# siz_stru - the size structure to use
 	# --------------------------------------------------------------
 
 	num_part = num_part.reshape(1, -1)
@@ -577,17 +577,12 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	Vnew[negl_indx] = 0.
 	molec_k[:, negl_indx] = 0.
 	
-	
-	# check that new volumes fit inside intended size bin bounds
-# 	plt.plot(sbbound[0, 1:20]-Vnew[0:19]*1.0e-18)
-# 	plt.show()
-	
-	
 	# new radius per size bin (um)
 	rad = ((3.0*Vnew)/(4.0*np.pi))**(1.0/3.0)
 	# size bins with no particle assigned central radius
 	ish = num_part[0, :]<=1.0e-20
 	rad[ish] = rad0[ish]
+	Vnew[ish] = V0[ish]
 	# just want particle number concentration as an array with one dimension
 	if num_part.ndim>1:
 		num_part = num_part[0, :]
@@ -595,13 +590,17 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound,
 	# molecular concentrations (molecules/cc (air))
 	y = molec_k.flatten(order='F')
 	
-	# call on the moving centre method for ensuring particles in correct size bin
-	(num_part, Vnew, y, rad, redt, blank, tnew) = movcen(num_part.reshape(-1, 1), 
-	sbbound[0, :]*1.0e18, 
-	np.transpose(y.reshape(sbn, num_comp)), 
-	rho, sbn, num_comp, M, sbVi[0, :], 0.0, 0, MV)
+	if (siz_stru == 0): # moving centre
+		(num_part, Vnew, y, rad, redt, blank, tnew) = movcen(num_part.reshape(-1, 1), 
+		sbbound[0, :]*1.e18, 
+		np.transpose(y.reshape(sbn, num_comp)), 
+		rho, sbn, num_comp, M, sbVi[0, :], 0.0, 0, MV)
+		# revert volume bounds to um3 from m3 before returning
+		sbbound = sbbound*1.e18
+	if (siz_stru == 1): # full-moving
+		(Vnew, rad, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
+		num_part, sbbound, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
+ 		num_comp, y, MV, Vol0, sbbound*1.e18, rbou)
+		
 
-
-	# return number of particles/cc(air) per size bin (columns) and
-	# number of molecules (molecules/cc(air)) flattened into species followed by size bins
-	return(num_part, y, rad, Gi, eta_ai, Vnew)
+	return(num_part, y, rad, Gi, eta_ai, Vnew, sbbound, rbou)

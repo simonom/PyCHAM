@@ -155,7 +155,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	ish = Pn<(Beta*Pn)
 	Beta[ish] = 1.0
 		
-	# new particle number concentration and species' particle-phase concentrations
+	# new particle number concentration and particle-phase concentrations of components
 	Pn -= (Beta*Pn)
 	Cn -= (Beta*Cn.reshape(sbn-1, nc)).flatten(order='C')
 			
