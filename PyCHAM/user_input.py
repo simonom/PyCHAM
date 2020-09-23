@@ -34,10 +34,10 @@ def share(source):
 			
 			# check on inputs
 			[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
-			af_path, int_tol, update_stp, tot_time, siz_str] = ui_check.ui_check(sav_nam, sch_name,
+			af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time] = ui_check.ui_check(sav_nam, sch_name,
 			wall_on, 0, siz_stru, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, 
-			chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up)
-	
+			chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time)
+			
 		return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 

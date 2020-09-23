@@ -16,7 +16,7 @@ import fullmov
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 			num_comp, vdWon, rho, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
-			sbVj, coag_on, siz_stru):
+			sbVj, coag_on, siz_stru, wall_on):
 
 	# inputs:---------------------------------------------------------
 	
@@ -48,6 +48,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	# coag_on - whether to allow coagulation to occur (1) or not (0)
 	# siz_stru - the size structure to use
+	# wall_on - marker for whether wall being considered
 	# --------------------------------------------------------------
 
 	num_part = num_part.reshape(1, -1)
@@ -56,7 +57,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	
 	# ensure sbn is integer
 	sbrn = np.int(np.max(sbr.shape))
-	sbn = np.int(np.max(rint.shape))
+	sbn = np.int(np.max(rint.shape)) # number of size bins
 	
 	# call on function to determine the Knudsen no. and therefore flow 
 	# regime of each size bin
@@ -594,13 +595,14 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		(num_part, Vnew, y, rad, redt, blank, tnew) = movcen(num_part.reshape(-1, 1), 
 		sbbound[0, :]*1.e18, 
 		np.transpose(y.reshape(sbn, num_comp)), 
-		rho, sbn, num_comp, M, sbVi[0, :], 0.0, 0, MV)
+		sbn, num_comp, sbVi[0, :], 0.0, 0, MV)
 		# revert volume bounds to um3 from m3 before returning
-		sbbound = sbbound*1.e18
+		sbbound = sbbound[0, :]*1.e18
 	if (siz_stru == 1): # full-moving
-		(Vnew, rad, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
-		num_part, sbbound, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
- 		num_comp, y, MV, Vol0, sbbound*1.e18, rbou)
+		(Vnew, rad, y, 
+		num_part, sbbound, rbou) = fullmov.fullmov(sbn, num_part.reshape(-1, 1),
+ 		num_comp, y, MV, V0, sbbound[0, :]*1.e18, rbou)
 		
+	sbbound = sbbound.reshape(-1) # return to 1D array
 
 	return(num_part, y, rad, Gi, eta_ai, Vnew, sbbound, rbou)

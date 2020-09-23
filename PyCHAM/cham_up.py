@@ -83,13 +83,14 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# begin by assuming no change to time interval required due to chamber 
 	# condition/nucleation
 	bc_red = 0
-
+	
 	if (len(light_time))>0:
 	
+		# whether lights on (1) or off (0) during this step
+		lightm = light_stat[sum(light_time<=sumt)-1]
+		
 		# check whether changes occur at start of this time step
 		if (sumt == light_time[light_time_cnt] and light_time_cnt>-1):
-			# whether lights on (1) or off (0) during this step
-			lightm = light_stat[light_time_cnt]
 			
 			if (light_time_cnt<(len(light_stat)-1)):
 				light_time_cnt += 1 # keep count of light setting index
@@ -110,10 +111,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		if light_time_cnt == -1:
 			lightm = light_stat[light_time_cnt]
  
-	# if no input for light status provided default to lights off
-	if (len(light_stat) == 0):
-		lightm = 0
-
 	# if lights are on during this step and lighting is natural, then check whether
 	# proposed time step needs reducing to limit change to light intensity, if this
 	# time interval adaption is requested

@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 
-def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up):
+def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time):
 
 	# inputs: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
@@ -27,6 +27,8 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 	# tot_time - total experiment time (s)
 	# RH - relative humidity (0-1)
 	# uman_up - marker for whether to update UManSysProp folder
+	# light_stat - marker for whether lights on or off
+	# light_time - time that lights attain status
 	# --------------------------------------------------------------------
 
 	print('Checking user inputs')
@@ -127,7 +129,16 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 	# ensure that if multiple instantaneous injections of particles, that corresponding variables
 	# have the correct shape, specifically that they cover the same number of times
 	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1]):
-		sys.exit(str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.'))
+		print(str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.'))
+		sys.exit()
+	
+	if (len(light_stat) != len(light_time)):
+		print('Error: length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
+		sys.exit()
 
 	
-	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str)
+	if (light_time[0] != 0): # if no status provided at simulation start default to lights off
+		light_stat = np.concatenate((np.zeros((1)).astype(int), light_stat))
+		light_time = np.concatenate((np.zeros((1)), light_time))
+	
+	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time)

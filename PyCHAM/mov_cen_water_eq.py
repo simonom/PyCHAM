@@ -1,4 +1,6 @@
 '''module to track particle number size distribution using moving centre size structure (p. 416 of Jacobson 2000)'''
+# note, no limits on number of size bins a particle can move in
+# this version of moving centre
 
 import numpy as np
 import scipy.constants as si

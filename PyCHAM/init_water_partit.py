@@ -158,7 +158,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 
 		if (siz_str == 1): # full-moving size structure
 			import fullmov
-			(Varr, x, Cp, N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin, num_speci, y, MV, Vol0, Vbou, rbou)
+			(Varr, x, Cp, N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin, num_speci, y[num_speci:(num_speci*(num_sb-wall_on+1))], MV, Vol0, Vbou, rbou)
 
 		# new particle-phase concentrations (molecules/cc (air))
 		y[num_speci:(num_speci*(num_sb-wall_on+1))] = Cp

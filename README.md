@@ -130,7 +130,7 @@ Install is complete
 
 3. The first three buttons of the GUI allow identification of the input files.  These can be used in any order and if no file is selected for any or all of the buttons, default files will be used (defaults: Chemical Scheme .txt File - example_scheme.txt, Chemical Scheme .xml File - example_xml.xml, Model Variables .txt File - example_model_var.txt) (see below for details on the chemical scheme, xml and model variables input files).
 
-4. The 'Run Model' button starts the simulation - results will be saved in the output folder in your PyCHAM directory
+4. The 'Run Model' button starts the simulation - results will be saved in the output folder.  The time through the simulation will be displayed in the console along with updates of programme progress.
 
 5. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).  This button will not operate correctly until the simulation is complete.  The simulation is complete when the console says so.
 
@@ -168,10 +168,9 @@ Beneath this, every species included in the reactions of the chemical scheme mus
 ## Model Variables .txt File
 
 An example is provided in the inputs folder (of the Github repository), called 
-'example_model_var.txt' , this must include the following variables separated by a 
-return (so one line per variable, an error message will show if a variable is missing), 
-note that if a variable is irrelevant for your simulation, it can be left empty 
-(e.g. vol_Comp = ):
+'example_model_var.txt' , this can include the following variables separated by a 
+return (so one line per variable), 
+note that if a variable is irrelevant for your simulation, it can be omitted and will be replaced by the default.
 
 | Input Name | Description|
 | ---------- | ---------- |
@@ -235,7 +234,7 @@ note that if a variable is irrelevant for your simulation, it can be left empty
 | core_diss = | Core dissociation constant (for seed component) (dimensionless) (1), if empty defaults to one|
 | light_time = | Times (s) for light status, corresponding to the elements of light_status (below), if empty defaults to lights off for whole experiment.  Use this setting regardless of whether light is natural or artificial (chamber lamps).  For example, for a 4 hour experiment, with lights on for first half and lights off for second, use: light_time = 0.0, 7200.0 light_status = 1, 0. If light_time doesn't include the experiment start (0.0 s), default is lights off at experiment start. |
 | light_status = | 1 for lights on and 0 for lights off, with times given in light_time (above), if empty defaults to lights off for whole experiment.  Setting to off (0) means that even if variables defining light intensity above, the simulation will be dark.  Use this setting regardless of whether light is natural or artificial (chamber lamps).  The setting for a particular time is recognised when the time step will surpass the time given in light_time.  For example, for a 4 hour experiment, with lights on for first half and lights off for second, use: light_time = 0.0, 7200.0 light_status = 1, 0.  If status not given for the experiment start (0.0 s), default is lights off at experiment start. |
-| tracked_comp = | Name of component(s) to track rate of concentration change (molecules/cc.s); must match name given in chemical scheme, and if multiple components given they must be separated by a comma.  Can be left empty and then defaults to tracking no components. |				 
+| tracked_comp = | Name of component(s) to track rate of concentration change (molecules/cc.s); must match name given in chemical scheme, and if multiple components given they must be separated by a comma.  Can be left empty and then defaults to tracking no components. |
 | umansysprop_update = | Flag to update the UManSysProp module via internet connection: set to 1 to update and 0 to not update.  If empty defaults to no update.  In the case of no update, the module PyCHAM checks whether an existing UManSysProp module is available and if not tries to update via the internet.  If update requested and either no internet or UManSysProp repository page is down, code stops with an error. |
 | chem_scheme_markers = | markers denoting various sections of the user's chemical scheme.  If left empty defaults to Kinetic Pre-Processor (KPP) formatting.  If filled, must have following elements separated with commas (brackets at start of description give pythonic index): (0) marker for punctuation at start of gas-phase reaction lines (just the first element), (1) marker for peroxy radical list starting, (2) punctuation between peroxy radical names, (3) prefix to peroxy radical name, (4) string after peroxy radical name, (5) marker for end of peroxy radical list (if no marker, then use the marker for RO2 list continuation onto next line), (6) marker for RO2 list continuation onto next line, (7) marker at the end of each line containing generic rate coefficients, (8) first element of aqueous-phase reaction lines (just the first element), (9) marker for start of reaction rate coefficient section of an equation line, (10) marker for start of equation section of an equation line, (11) final element of an equation line (should be constant for all phases of reactions).  For example, for the MCM KPP format: chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ; |
 | int_tol = | Integration tolerances, with absolute tolerance first followed by relative tolerance, if left empty defaults to the maximum required during testing for stable solution: 1.0e-3 for absolute and 1.0e-4 for relative. |

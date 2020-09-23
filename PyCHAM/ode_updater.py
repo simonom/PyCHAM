@@ -261,18 +261,19 @@ def ode_updater(update_stp,
 		sumt += tnew # total time through simulation (s)
 		update_count += tnew # time since operator-split processes last called
 		
-		if num_sb-wall_on>0:
+		if (num_sb-wall_on > 0):
 			# update particle sizes
-			if (num_sb-wall_on)>1 and (N_perbin>1.0e-10).sum()>0: # if particles present
-				if (siz_stru == 0): # moving centre
+			if ((num_sb-wall_on) > 1) and ((N_perbin > 1.0e-10).sum()>0): # if particles present
+				
+				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					update_stp, y0, MV, Psat[0, :], ic_red, res, res_t)
-				if (si_stru == 1): # full-moving
+				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
- 					num_comp, y, MV, Vol0, Vbou, rbou)
-
+ 					num_comp, y[num_comp:(num_comp)*(num_sb-wall_on+1)], MV, Vol0, Vbou, rbou)
+					
 			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
 				if ((N_perbin>1.e-10).sum()>0):
@@ -287,7 +288,7 @@ def ode_updater(update_stp,
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
 						num_comp, 0, (np.squeeze(y_dens*1.0e-3)), Vol0, rad0, Pnow, 0,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.0e-18).reshape(1, -1),
-						coag_on, siz_stru)
+						coag_on, siz_str, wall_on)
 				
 					if ((Rader>-1) and (wall_on == 1)): #if particle loss to walls turned on
 						# particle loss to walls
@@ -314,7 +315,7 @@ def ode_updater(update_stp,
 		
 		# record output
 		if sumt-(save_stp*save_cnt)>-1.e-10:
-
+			
 			[trec, yrec, dydt_vst, Cfactor_vst, save_cnt, 
 				Nres_dry, Nres_wet, x2, rbou_rec] = rec.rec(save_cnt, trec, yrec, 
 				dydt_vst, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 

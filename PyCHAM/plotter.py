@@ -131,7 +131,7 @@ def plotter(caller):
 			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], log10D.shape[1]-1)
 		if (num_asb == 1): # just one particle size bin
 			# assume lower radius bound is ten times smaller than upper
-			dlog10D = (log10D-np.log10((sbb[1::]/10.0)*2.0)).reshape(log10D.shape[0], 1)
+			dlog10D = (log10D-np.log10((rbou_rec[:, 1]/10.0)*2.0)).reshape(log10D.shape[0], 1)
 			
 	
 		# number size distribution contours (/cc (air))
@@ -159,7 +159,9 @@ def plotter(caller):
 		
 		# contour plot with times (hours) along x axis and 
 		# particle diameters (nm) along y axis
-		p1 = ax1.pcolormesh(timehr, (sbb*2*1e3), z[:, :], cmap=cm, norm=norm1)
+		
+		for ti in range(len(timehr)-1): # loop through times
+			p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), z[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
 	
 		# if logarithmic spacing of size bins specified, plot vertical axis 
 		# logarithmically
@@ -168,7 +170,7 @@ def plotter(caller):
 		ax1.set_ylabel('Diameter (nm)', size = 14)
 		ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-		ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = max(sbb*2*1e3)*1.05, s='b)', size=14)
+		ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
 		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
