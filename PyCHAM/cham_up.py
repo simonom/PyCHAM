@@ -87,7 +87,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	if (len(light_time))>0:
 	
 		# whether lights on (1) or off (0) during this step
-		lightm = light_stat[sum(light_time<=sumt)-1]
+		lightm = light_stat[int(sum(light_time<=sumt)-1)]
 		
 		# check whether changes occur at start of this time step
 		if (sumt == light_time[light_time_cnt] and light_time_cnt>-1):
