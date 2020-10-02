@@ -7,7 +7,7 @@ import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
-			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pconc, 
+			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
 			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, spec_namelist, 
 			act_coeff, wall_on):
@@ -20,6 +20,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# num_sb - number of size bins (excluding wall)
 	# lowersize - lowest size bin radius bound (um)
 	# uppersize - largest size bin radius bound (um)
+	# pmode - whether particle number concentrations given as modes or explicitly
 	# pconc - starting particle concentration (# particle/cc (air)) - if scalar then
 	# gets split between size bins in Size_distributions call, or if an array, elements 
 	# are allocated to corresponding size bins
@@ -59,15 +60,15 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mean_radn = -1.e6
 	else:
 		pconcn = pconc[:, i]
-		stdn = std[0, i]
-		mean_radn = mean_rad[0, i]
+		stdn = std[:, i]
+		mean_radn = mean_rad[:, i]
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
-	if (mean_radn == -1.e6) and (num_sb>0):
+	if (sum(mean_radn == -1.e6)>0) and (num_sb>0):
 		if lowersize>0.0:
-			mean_radn = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
+			mean_radn[mean_radn == -1.e6] = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
 		if lowersize == 0.0:
-			mean_radn = 10**((np.log10(uppersize))/2.0)
+			mean_radn[mean_radn == -1.e6] = 10**((np.log10(uppersize))/2.0)
 	
 	# index of nucleating component
 	if len(nuc_comp)>0:
@@ -94,9 +95,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if testf==2:
 		print('calling Size_distributions.lognormal')
 	# if multiple size bins, this call will assume a lognormal distribution if initial 
-	# particle concentration is a scalar, or will assign particles to size bins if
-	# initial particle concentration is an array
-	if num_sb>1:
+	# particle concentration is described by mode, or will assign particles to size bins if
+	# initial particle concentration per sizebin provided
+	if (num_sb > 1):
 		
 		# set scale and standard deviation input for lognormal probability distribution 
 		# function, following guidance here: 
@@ -106,12 +107,12 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		loc = 0.0 # no shift
 		
 		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_sb, 
-			pconcn, stdn, lowersize, uppersize, loc, scale, space_mode)
+			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode)
 		
 		if testf==2:
 			print('finished with Size_distributions.lognormal')
-		
-	if num_sb == 1:
+			
+	if (num_sb == 1):
 		N_perbin = np.array((pconcn)) # (# particles/cc (air))
 		
 		x = np.zeros(1)
@@ -126,7 +127,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		Vbou = np.array(((lowersize**3.0)*(4.0/3.0)*np.pi, 
 						(uppersize**3.0)*(4.0/3.0)*np.pi))
 		# volume of single particle (um3)
-		Varr = np.zeros((1,1))
+		Varr = np.zeros((1, 1))
 		Varr[0] = (meansize**3.0)*(4.0/3.0)*np.pi
 		# radius bounds of size bin (um)
 		rbou = ((Vbou*3.0)/(4.0*np.pi))**(1.0/3.0)
@@ -140,7 +141,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	rbou[0] = 0.0 # this reversed in saving.py back to rbou00
 	
 	
-	if num_sb>0:
+	if (num_sb > 0):
 		# remember the radii (um) and volumes (um3) at size bin centre before water 
 		# partitioning
 		rad0 = np.zeros((len(x)))
@@ -157,44 +158,42 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# molar volume (multiply y_dens by 1e-3 to convert from kg/m3 to g/cc and give
 	# MV in units cc/mol)
 	MV = (y_mw/(y_dens*1.0e-3)).reshape(num_comp, 1)
-	Vperbin = ((N_perbin*(4.0/3.0)*np.pi*x**3.0))
 	
-	if sum(pconcn)>0.0: # account for seed material concentration
+	if (sum(pconcn) > 0.0): # account for seed material concentration
 	
 		# core concentration in size bins (molecules/cc (air)):
 		# core mass concentration in each size bin (molecules/cc (air))
-		y[num_comp+corei:(num_comp*(num_sb)+corei):num_comp] = ((y_dens[corei]*1.0e-3)*
-						(Varr*1.0e-12*N_perbin[:, 0])*(1.0/y_mw[corei])*NA)
-	
+		y[num_comp+corei:(num_comp*(num_sb)+corei):num_comp] = (NA/MV[corei])*(Varr*1.e-12)*N_perbin[:, 0]
+
 	if testf==2:
 		print('calling init_water_partit.py')
 	
 	# allow water to equilibrate with particles and walls
-	if num_sb>0:
-		[y, Varr, x, N_perbin, Vbou, rbou] = init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_comp, 
+	if (num_sb > 0):
+		[y, Varr, x, N_perbin, Vbou, rbou] = init_water_partit(x, y, H2Oi, 
+					Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
 					therm_sp, Cw, kgwt, corei, act_coeff, wall_on)
-	
+		
 	if testf==2:
 		print('finished with init_water_partit.py')
 	
 	# print mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
 	# to g/cm3)
-	if num_sb>0:
-		mass_conc = 0.0
+	if (num_sb > 0): # with particles
+		mass_conc = 0. # start cumulation
 		for i in range(num_sb-1): # as size bin now account for wall too
 			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:,0]))
 			mass_conc -= (y_dens[int(H2Oi), 0]*1.0e-3)*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
-		mass_conc = mass_conc*1.0e12 # convert from g/cc (air) to ug/m3 (air)
-		if mass_conc < 1.0e-10:
-			mass_conc = 0.0
+		mass_conc = mass_conc*1.e12 # convert from g/cc (air) to ug/m3 (air)
+		
 		print(str('Total dry (no water) mass concentration of particles at start of simulation is ' + str(mass_conc) + ' ug/m3 (air)'))
-	else:
+	else: # no particles
 		print('No particle size bins detected, simulation will not include particles')
 
 	# start counter on number concentration of newly nucleated particles (#/cc (air))
 	np_sum = 0.
-
+	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
 			upper_bin_rad_amp, np_sum)

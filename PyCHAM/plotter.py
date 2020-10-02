@@ -63,46 +63,50 @@ def plotter(caller):
 			print('Please note no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
 			return()
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-	else:
-		fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
+
+	if (num_asb > 0): 
+		if not (indx_plot):
+			print('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot will not be shown')
+			fig, (ax1) = plt.subplots(1, 1, figsize=(14, 7))
+		else:
+			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
 		par1 = ax1.twinx() # first parasite axis
 		par2 = ax1.twinx() # second parasite axis
-	
+		
 		# Offset the right spine of par2.  The ticks and label have already been
 		# placed on the right by twinx above.
 		par2.spines["right"].set_position(("axes", 1.2))
 		# Having been created by twinx, par2 has its frame off, so the line of its
 		# detached spine is invisible.  First, activate the frame but make the patch
 		# and spines invisible.
-		
 		make_patch_spines_invisible(par2)
 		# Second, show the right spine.
 		par2.spines["right"].set_visible(True)	
 
-
-	# gas-phase concentration sub-plot ---------------------------------------------	
-	for i in range(len(indx_plot)):
-	
-		ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
-					label=str(str(Comp0[i])))
-
-	ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
-	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
-	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.legend(fontsize=14)
-
-	# find maximum and minimum of plotted concentrations for sub-plot label		
-	maxy = max(yrec[:, indx_plot].flatten())
-	miny = min(yrec[:, indx_plot].flatten())	
+	if (indx_plot):
+		# gas-phase concentration sub-plot ---------------------------------------------	
+		for i in range(len(indx_plot)):
 		
-	ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/10., y = maxy+((maxy-miny)/10.), s='a)', size=14)
+			ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
+						label=str(str(Comp0[i])))
 
-	# end of gas-phase concentration sub-plot ---------------------------------------
+		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
+		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+		ax0.legend(fontsize=14)
+
+		# find maximum and minimum of plotted concentrations for sub-plot label		
+		maxy = max(yrec[:, indx_plot].flatten())
+		miny = min(yrec[:, indx_plot].flatten())	
+			
+		ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/10., y = maxy+((maxy-miny)/10.), s='a)', size=14)
+
+		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 	# particle properties sub-plot --------------------------------------------------
-	if (num_asb) > 0: # if particles present		
+	if (num_asb > 0): # if particles present		
 
 		if timehr.ndim == 0: # occurs if only one time step saved
 			Ndry = np.array(Ndry.reshape(1, num_asb))
@@ -170,7 +174,12 @@ def plotter(caller):
 		ax1.set_ylabel('Diameter (nm)', size = 14)
 		ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-		ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
+
+		# label according to whether gas-phase plot also displayed		
+		if (indx_plot):
+			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
+		else:
+			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.3, s='a)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
 		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
@@ -218,13 +227,15 @@ def plotter(caller):
 	
 			# sum of organics in condensed-phase at end of simulation (ug/m3 (air))
 			
-			# to replicate the SMPS results when using 
-			# low size bin resolution in the model, find the volume of particles, then
+			# to replicate the SMPS results, find the volume of particles then
 			# assume a density of 1.0 g/cm3
 			SOAvst[0, :] += np.sum((yrec[:, ((i+1)*num_comp):((i+2)*num_comp-final_i)]/si.N_A*(y_MV[0:-final_i])*1.0e12), axis = 1)
-				
+
 		# log10 of maximum in SOA
-		SOAmax = int(np.log10(max(SOAvst[0, :])))
+		if (max(SOAvst[0, :]) > 0):
+			SOAmax = int(np.log10(max(SOAvst[0, :])))
+		else:
+			SOAmax = 0.
 		# transform SOA so no standard notation required
 		SOAvst[0, :] = SOAvst[0, :]/(10**(SOAmax))
 		

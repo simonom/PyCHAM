@@ -5,6 +5,7 @@ import numpy as np
 import partit_var
 import rrc_calc
 import cham_up
+import scipy.constants as si
 
 # define function
 def rec_prep(nrec_step, 
@@ -18,9 +19,9 @@ def rec_prep(nrec_step,
 	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
-	inj_indx, Ct, pconc, pconct, seedt_cnt, mean_rad, corei, 
+	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	lowsize, uppsize, rad0, radn, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C):
+	infx_cnt, con_infl_C, MV):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -89,6 +90,7 @@ def rec_prep(nrec_step,
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	# instantaneously after experiment start
+	# pmode - whether number size distributions expressed as modes or explicitly
 	# pconc - concentration of injected particles (#/cc (air))
 	# pconct - times of particle injection (s)
 	# seedt_cnt - count on injection of seed particles
@@ -106,6 +108,7 @@ def rec_prep(nrec_step,
 	# infx_cnt - count on constant influx occurrences
 	# con_infl_C - influx rates of components with constant influx 
 	#	(ppb/s)
+	# MV - molar volume (cc/mol)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -129,30 +132,30 @@ def rec_prep(nrec_step,
 		Nres_wet = 0.
 		rbou_rec = 0.
 
-	MV = (y_mw/y_dens).reshape(num_comp) # molar volume of components (cc/mol)
-
 	# update chamber variables
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
-		update_count, Cinfl_now, seedt_cnt] = cham_up.cham_up(sumt, temp, tempt, 
+		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+		gasinj_cnt] = cham_up.cham_up(sumt, temp, tempt, 
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
-		af_path, injectt, gasinj_cnt, inj_indx, Ct, pconc, pconct, 
+		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
 		uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on)
+		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
 	
 	
 	if (num_sb-wall_on)>0: # if particles present
 		
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
-		surfT, R_gas, temp_now, NA, y_dens, N_perbin, DStar_org, 
+		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, DStar_org, 
 		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1)
 		
 		# single particle radius (um) at size bin centre 
 		# including contribution of water
 		x2[0, :] = x
+
 		# single particle size bin bounds including water (um)
 		rbou_rec[0, :] = rbou
 		
@@ -164,8 +167,8 @@ def rec_prep(nrec_step,
 			# rearrange particle concentrations into size bins in rows, components in columns
 			Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
 			# new volume of single particle per size bin (um3) excluding volume of water	
-			Vnew[ish] = (np.sum((Cn[ish, :]/(6.0221409e+23*N_perbin[ish]))*MV*1.0e12, 1)-
-					((Cn[ish, H2Oi]/(6.0221409e+23*N_perbin[ish, 0]))*MV[H2Oi]*1.0e12))
+			Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*N_perbin[ish]))*MV[:, 0]*1.e12, 1)-
+					((Cn[ish, H2Oi]/(si.N_A*N_perbin[ish, 0]))*MV[H2Oi, 0]*1.e12))
 			# loop through size bins to find number of particles in each 
 			# (# particle/cc (air))
 			for Ni in range(0, (num_sb-wall_on)):
@@ -192,4 +195,4 @@ def rec_prep(nrec_step,
 					kimt, kw, Cw, act_coeff)
 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt, rbou_rec)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt)

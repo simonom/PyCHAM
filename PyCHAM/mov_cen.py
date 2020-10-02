@@ -35,14 +35,6 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	#		(molecules/cc (air)) 
 	# solv_time - times at which integration solved (s)
 	# ---------------------------------------------------------------
-	# output:
-	
-	# n1 - end of time step particle number concentration per size bin
-	# (# particle/cc (air))
-	# m1 - end of time step mass per size bin (g/m3 (air))
-	# rad - new radius (um)
-	# redt - flag to say whether time step needs reducing due to excess size bin changes
-	# ---------------------------------------------------------------
 	
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 
@@ -81,18 +73,17 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# ((um3 (all particles)/cc (air))/(particle number/cc (air))) 
 	# calculation is:
 	# divide number of molecules/cc (air) by Na to get moles/cc(air), then 
-	# multiply by ug3/mol (MV[:,0]*1.0e12) to get ug3 (of each component)/cc (air),
+	# multiply by um3/mol (MV*1.e12) to get ug3 (of each component)/cc (air),
 	# then sum volume of components per size bin to get ug3 (all particles)/cc (air)
-	MVrep = np.repeat(MV.reshape(1, -1), N_perbin.shape[0], axis=0)
 	ish = N_perbin[:, 0]> 0.0
 	Vsing = np.zeros((sbn))
 	for sbi in range(sbn): # size bin loop
-		if N_perbin[sbi, 0]>0.:
-			Vsing[sbi] = np.sum(((y[nc*(sbi+1):nc*(sbi+2)]/(NA*N_perbin[sbi, :]))*MV*1.e12), 0) #um3
+		if (N_perbin[sbi, 0] > 0.):
+			# um3
+			Vsing[sbi] = np.sum(((y[nc*(sbi+1):nc*(sbi+2)]/(NA*N_perbin[sbi, :]))*(MV[:, 0]*1.e12)), 0)
 	
-	Vsing[N_perbin[:, 0]<1.0e-20] = Vol0[N_perbin[:, 0]<1.0e-20] # assume the default volume if no particles in bin
+	Vsing[N_perbin[:, 0]<1.e-20] = Vol0[N_perbin[:, 0]<1.e-20] # assume volume at size bin centre
 	
-	# new radius per size bin (um)
-	rad = ((3.0*Vsing)/(4.0*np.pi))**(1.0/3.0)
+	rad = ((3.*Vsing)/(4.*np.pi))**(1./3.) # new radius per size bin (um)
 		   
 	return(N_perbin, Vsing, y, rad, redt, t, ic_red)

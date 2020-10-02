@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 
-def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time):
+def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time, injectt, Ct):
 
 	# inputs: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
@@ -13,6 +13,7 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 	# caller - marker for the calling module
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
+	# pmode - whether particle number concentrations expressed by mode or explicitly
 	# pconc - number concentration of particles
 	# pconct - times of particle injection (s)
 	# lowsize - lower bound of particle sizes (um)
@@ -29,6 +30,8 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 	# uman_up - marker for whether to update UManSysProp folder
 	# light_stat - marker for whether lights on or off
 	# light_time - time that lights attain status
+	# injectt - times of instantaneous injections of gas-phase components (s)
+	# Ct - concentrations of components instantaneously injected (ppb)
 	# --------------------------------------------------------------------
 
 	print('Checking user inputs')
@@ -47,36 +50,31 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 		wall_on = 0 
 
 	if os.path.isdir(output_by_sim) == True and caller == 0:
-		sys.exit('Error: results file name (' +output_by_sim+ ') already exists, please use an alternative')
+		print('Error: results file name (' +output_by_sim+ ') already exists, please use an alternative')
+		sys.exit()
 
 	# ensure size structure marker is sensible
 	if siz_str<0 or siz_str>1:
 		siz_str = 0
 	
 	# consistency between number of particle size bins and particle number concentration
-	if num_sb == 0 and sum(pconc>0)>0:
+	if num_sb == 0 and (sum(pconc != 0) > 0):
 		pconc[:] = 0.0
+		print('Note that zero particle size bins registered (number_size_bins in model vraibales input file), however total particle number concentration (pconc in model vraibales input file) contains a non-zero value, therefore assuming no particle size bins')
 	
 	# if lower bound of particle sizes set to 0, this will induce error when taking log10
 	# in pp_intro, so change to very small value (um)
 	if lowsize == 0.:
 		lowsize = 1.e-3
 
-	if num_sb>0: # if size bins present
-		# if only one size bin, or total particle number concentration provided
-		# rather than explicitly stated for each size bin
-		if pconc.shape[0] == 1:
-			i = (mean_rad[0, :] == 0.) # set zeros to a marker
-			if sum(i)>0:
-				mean_rad[0, i] = -1.e6
-			i = (std[0, :] == 0.) # set zeros in standard deviation to default value
-			if sum(i)>0:
-				# if std is equivalent to the default, then adapt to shape of 
-				# the stated number of particle injections
-				if std.shape[1] == 1:
-					std = np.ones((1, pconc.shape[1]))*1.2
-				else:				
-					std[0, i] = 1.2 # default value  
+	if (num_sb > 0): # if size bins present
+
+		if (pmode == 0): # number concentrations expressed as mode
+			# if mean_rad inconsistent with pconc
+			if (mean_rad.shape != pconc.shape):
+				mean_rad = np.ones((pconc.shape))*-1.e6 # default flag
+			if (std.shape != pconc.shape):
+				std = np.ones((pconc.shape))*1.2 # default value  
 
 	# if radius of newly nucleated particles empty, set to default value of 1 nm (cm)
 	if new_partr == 0:
@@ -140,5 +138,11 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pconc, pconct,
 	if (light_time[0] != 0): # if no status provided at simulation start default to lights off
 		light_stat = np.concatenate((np.zeros((1)).astype(int), light_stat))
 		light_time = np.concatenate((np.zeros((1)), light_time))
+
+	# check consistency between number of times components instantaneously injected and
+	# the number of concentrations given
+	if (len(injectt) != Ct.shape[1]):
+		print('Error: number of times given for the instantaneous injection of gas-phase components (injectt in the model variables input file) is inconsistent with the number of concentrations of instantaneous injection provided (Ct in the model variables input file), please see the README for guidance')
+		sys.exit()
 	
 	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time)

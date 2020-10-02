@@ -12,9 +12,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	light_time_cnt, light_ad, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
-	Ct, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
+	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on):
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -50,6 +50,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
+	# pmode - whether particle number size distributions stated explicitly or by mode
 	# pconc - concentration of injected 
 	#	particles (#/cc (air))
 	# pconct - times of particle injection (s)
@@ -76,6 +77,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# Cinfl - influx rate for components with constant 
 	# 	influx (ppb/s)
 	# wall_on - marker for whether wall is on
+	# Cfactor - conversion factor from ppb to molecules/cc (air)
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -144,7 +146,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	
 		# check whether changes occur at start of this time step
 		if (sumt == tempt[temp_count]):
-			print('updating temperature inside chamber to ' +str(temp[temp_count]) + ' K')
+
 			# new temperature (K)
 			temp_now = temp[temp_count]
 			
@@ -208,8 +210,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		if (sumt == injectt[gasinj_cnt]):
 			# account for change in gas-phase concentration,
 			# convert from ppb/s to molecules/cc.s (air)
-			y[inj_indx] += Ct[:, gasinj_cnt]*Cfactor
-			
+			y[inj_indx] += Ct[:, gasinj_cnt]*Cfactor-y[inj_indx]
 			if (gasinj_cnt<(Ct.shape[1]-1)):
 				gasinj_cnt += 1 # update count on injections
 			else:
@@ -233,9 +234,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
 					Varr] = pp_dursim.pp_dursim(y[num_comp:-num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
-					mean_rad[0, seedt_cnt], pconc[:, seedt_cnt], corei, lowsize, 
+					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], corei, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-					std[0, seedt_cnt], y_dens, H2Oi, rbou)
+					std[:, seedt_cnt], y_dens, H2Oi, rbou)
 			if (seedt_cnt<(pconct.shape[1]-1)):
 				seedt_cnt += 1
 			else:
@@ -250,18 +251,22 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 
 	# check on continuous influxes of components ----------------------------------------------
-	if len(const_infl_t)>0 and infx_cnt>-1: # if influx occurs
+	if (len(const_infl_t) > 0): # if influx occurs
 	
 		# in case influxes begin after simulation start
 		if (sumt == 0.0 and const_infl_t[infx_cnt] != 0.0):
 			Cinfl_now = np.zeros((con_infl_C.shape[0], 1))
-	
+		
+		# if the final input for influxes reached
+		if (infx_cnt == -1):
+			# influx of components now, convert from ppb/s to molecules/cc.s (air)
+			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
+			
 		# check whether changes occur at start of this time step
 		if (sumt == const_infl_t[infx_cnt]):
 			
 			# influx of components now, convert from ppb/s to molecules/cc.s (air)
 			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
-			
 			
 			# update index counter for constant influxes - used in integrator below
 			if (infx_cnt<(Cinfl.shape[1]-1)):
@@ -278,7 +283,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	else: # if no influxes, provide filler
 		Cinfl_now = 0.
-
+	
 	# check on nucleation ---------------------------------------------------------
 	# if automatic time step adaption to nucleation requested, check whether number of new particles
 	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
@@ -301,4 +306,4 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
-		Cinfl_now, seedt_cnt)
+		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt)

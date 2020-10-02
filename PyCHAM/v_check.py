@@ -51,8 +51,8 @@ def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, P
 			# molar concentration of components in one particle (mol/cc (air))
 			Cnow = Cnow/(NA*n0[sbi])
 			# new volume (um3) of single particles, note MV has units cc/mol, so needs 
-			# conversion to um3
-			Vnew[sbi] = sum(Cnow*(MV[:]*1.0e12))
+			# conversion to um3/mol
+			Vnew[sbi] = sum(Cnow*(MV[:, 0]*1.e12))
 			
 			# comparing new volumes against condition for volume change ------------------
 			# check for volume conditions 

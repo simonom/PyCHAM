@@ -99,7 +99,8 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_C
 				# density (convert from g/cc to kg/m3)
 				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.0E3
 			# ----------------------------------------------------------------------------
-	
+		
+
 	# estimate vapour pressures (log10(atm))
 	for i in range (num_speci):
 		

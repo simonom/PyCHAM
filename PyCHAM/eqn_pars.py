@@ -41,7 +41,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	
 	# interrogate scheme to list equations
 	[eqn_list, eqn_num, rrc, rrc_name, RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
-
+	
 	# interrogate xml to list component names and SMILES
 	[comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
 	

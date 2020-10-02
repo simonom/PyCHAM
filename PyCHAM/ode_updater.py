@@ -32,8 +32,8 @@ def ode_updater(update_stp,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, Rader, p_char, e_field, 
-	injectt, inj_indx, Ct, pconc, pconct, mean_rad, lowsize, 
-	uppsize, std, rbou, const_infl_t):
+	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
+	uppsize, std, rbou, const_infl_t, MV):
 
 	import ode_solv # import most updated version
 	# inputs: ----------------------------------------------------
@@ -153,6 +153,7 @@ def ode_updater(update_stp,
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
+	# pmode - whether number size distributions expressed as modes or explicitly
 	# pconc - concentration of injected particles (#/cc (air))
 	# pconct - times of particle injection (s)
 	# mean_rad - mean radius for particle number size 
@@ -163,6 +164,7 @@ def ode_updater(update_stp,
 	#	distributions
 	# rbou - size bin radius bounds (um)
 	# const_infl_t - times for constant influxes (s)
+	# MV - molar volume (cc/mol)
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -183,10 +185,11 @@ def ode_updater(update_stp,
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = update_stp # the time to integrate over (s)
-
+	
 	# prepare recording matrices, including recording of initial
 	# conditions
-	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, MV, seedt_cnt, rbou_rec] = rec_prep.rec_prep(nrec_steps, 
+	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, 
+	seedt_cnt, rbou_rec, Cfactor, infx_cnt] = rec_prep.rec_prep(nrec_steps, 
 	y, rindx, 
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
@@ -197,24 +200,25 @@ def ode_updater(update_stp,
 	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
-	inj_indx, Ct, pconc, pconct, seedt_cnt, mean_rad, corei, 
+	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C)
-	
+	infx_cnt, con_infl_C, MV)
+
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
 		
 		y0[:] = y[:] # remember initial concentrations (molecules/cc (air))
 		# update chamber variables
 		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
-			update_count, Cinfl_now, seedt_cnt] = cham_up.cham_up(sumt, temp, tempt, 
+			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+			gasinj_cnt] = cham_up.cham_up(sumt, temp, tempt, 
 			Pnow, light_stat, light_time, light_time_cnt, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
-			af_path, injectt, gasinj_cnt, inj_indx, Ct, pconc, pconct, 
+			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
 			uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt, con_infl_C, wall_on)
+			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew)>save_stp*save_cnt):
@@ -241,8 +245,7 @@ def ode_updater(update_stp,
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
-		
-		
+
 		# model component concentration changes to get new concentrations
 		# (molecules/cc)
 		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
@@ -261,7 +264,7 @@ def ode_updater(update_stp,
 		sumt += tnew # total time through simulation (s)
 		update_count += tnew # time since operator-split processes last called
 		
-		if (num_sb-wall_on > 0):
+		if (num_sb-wall_on > 0): # if particle size bins present
 			# update particle sizes
 			if ((num_sb-wall_on) > 1) and ((N_perbin > 1.0e-10).sum()>0): # if particles present
 				
@@ -272,8 +275,9 @@ def ode_updater(update_stp,
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
- 					num_comp, y[num_comp:(num_comp)*(num_sb-wall_on+1)], MV, Vol0, Vbou, rbou)
-					
+ 					num_comp, y[num_comp:(num_comp)*(num_sb-wall_on+1)], MV*1.e12, 
+					Vol0, Vbou, rbou)
+				
 			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
 				if ((N_perbin>1.e-10).sum()>0):

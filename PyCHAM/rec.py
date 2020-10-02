@@ -2,6 +2,7 @@
 # keeps track of model variables
 
 import numpy as np
+import scipy.constants as si
 
 def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
@@ -69,8 +70,8 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 		# rearrange particle concentrations into size bins in rows, components in columns
 		Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
 		# new volume of single particle per size bin (um3) excluding volume of water	
-		Vnew[ish] = (np.sum((Cn[ish, :]/(6.0221409e+23*pconc[ish]))*MV*1.0e12, 1)-
-				((Cn[ish, H2Oi]/(6.0221409e+23*pconc[ish, 0]))*MV[H2Oi]*1.0e12))
+		Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*pconc[ish]))*MV[:, 0]*1.e12, 1)-
+				((Cn[ish, H2Oi]/(si.N_A*pconc[ish, 0]))*MV[H2Oi]*1.e12))
 		# loop through size bins to find number of particles in each 
 		# (# particle/cc (air))
 		for Ni in range(0, (num_sb-wall_on)):

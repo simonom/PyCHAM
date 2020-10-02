@@ -188,7 +188,8 @@ def eqn_interr(num_eqn, eqn_list, chem_scheme_markers, spec_name, spec_smil, pha
 					name_indx = spec_name.index(name_only)
 					name_SMILE = spec_smil[name_indx] # SMILES of component
 				else:
-					sys.exit(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
+					print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
+					sys.exit()
 			
 				spec_list.append(name_SMILE) # list SMILE names
 				name_indx = comp_num # allocate index to this species
@@ -511,7 +512,7 @@ def eqn_interr(num_eqn, eqn_list, chem_scheme_markers, spec_name, spec_smil, pha
 				rowvals = np.append(rowvals, new_el)
 				colptrs[(comp_num+2)*(sbi+1)+compi+1::] += 1
 				part_cnt += 1
-	# wall influence on Jacobian part ----------------------------------------------------------------
+	# wall influence on Jacobian part ---------------------------------------------------
 
 	# loop through jacobian index to check whether the centre 
 	# diagonal for gas effect on gas components is due to be 
@@ -526,7 +527,7 @@ def eqn_interr(num_eqn, eqn_list, chem_scheme_markers, spec_name, spec_smil, pha
 		# loop through components in the gas-phase (add two 
 		# to account for water and seed material)
 		for compi in range(comp_num+2):
-			# gas effect on gas part ----------------------------------------------------------
+			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
 			st_indx = int(colptrs[compi])
 			en_indx = int(colptrs[compi+1])

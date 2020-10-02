@@ -19,6 +19,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 	# N_perbin - initial particle concentration (#/cc (air))
 	# Vbou - volume bounds (um3)
 	# rbou - radius bounds (um)
+	# MV - molar volume of components (cc/mol)
 	# therm_sp - thermal speed of components (m/s) (num_speci)
 	# Cw - concentration of wall (molecules/cc (air))
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (/s)
@@ -89,7 +90,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				nmolC= ((y[num_speci*(sbstep+1):num_speci*(sbstep+2)]/(si.Avogadro*N_perbin[sbstep])))
 				# new radius of single particle per size bin (um) including volume of 
 				# water
-				Vnew = np.sum(nmolC*MV*1.0e12)
+				Vnew = np.sum(nmolC*MV*1.e12) # new volume (um3)
 				x[sbstep] = ((3.0/(4.0*np.pi))*Vnew)**(1.0/3.0)
 				
 				# update partitioning coefficients
@@ -141,24 +142,22 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 		# concentration in particles now (molecules/cc (air))
 		Cp = y[num_speci:(num_speci*(num_sb-wall_on+1))]
 		Cp = np.transpose(Cp.reshape((num_sb-wall_on), num_speci))
-
-		rho = np.squeeze(y_dens*1.0e-3) # component densities in particle-phase (g/cc (particle))
-		Mrho = ((rho*1.0e-12)/y_mw[:, 0]).reshape(num_speci, 1) # molar density (mol/um3)
-		MV = 1./Mrho # molar volume (um3/mol)
-
+	
 		if (siz_str == 0): # moving-centre size structure
+			import mov_cen_water_eq
 			
 			(N_perbin, Varr, Cp, x, redt, blank, 
 				tnew) = mov_cen_water_eq.mov_cen_main(N_perbin, Vbou, 
 				Cp, (num_sb-wall_on), num_speci, Vol0, 0.0,
-				0, MV)
+				0, MV*1.e12)
+			
 			if (redt == 1): # check on whether exception raised by moving centre
 				print('Error whilst equilibrating seed particles with water vapour (inside init_water_partit module).  Please investigate, perhaps by checking rh and pconc inputs in model variables input file.  See README for guidance and how to report bugs.')
 				sys.exit()
 
 		if (siz_str == 1): # full-moving size structure
 			import fullmov
-			(Varr, x, Cp, N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin, num_speci, y[num_speci:(num_speci*(num_sb-wall_on+1))], MV, Vol0, Vbou, rbou)
+			(Varr, x, Cp, N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin, num_speci, y[num_speci:(num_speci*(num_sb-wall_on+1))], MV*1.e12, Vol0, Vbou, rbou)
 
 		# new particle-phase concentrations (molecules/cc (air))
 		y[num_speci:(num_speci*(num_sb-wall_on+1))] = Cp

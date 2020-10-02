@@ -22,16 +22,18 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	# particle-phase concentrations	(molecules/cc (air))
 	Cp = np.transpose(Cp.reshape(num_sb, num_comp))
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
-	ish = n0[:, 0]>1.0e-10 # size bins containing particles
+	ish = n0[:, 0]>0. # size bins containing particles
 
 
 	nmolC = np.zeros((num_comp, ish.sum())) # empty array for molar concentration
 	# number of moles of each component in a single particle (mol/cc (air))
-	nmolC[:,:] = ((Cp[:, ish]/(NA*n0[ish, 0])))
+	nmolC[:, :] = ((Cp[:, ish]/(NA*n0[ish, 0])))
 
 	Vnew = np.zeros((num_sb)) # empty array for new volumes
+	MVrep = np.repeat(MV, num_sb, axis=1)
 	# new volume of single particle per size bin (um3), including volume of water
-	Vnew[ish] = np.sum(nmolC*MV.reshape(-1, 1)*1.0e12, axis=0)
+	Vnew[ish] = np.sum(nmolC*MVrep[:, ish], axis=0)
+	
 	# if no particles in a size bin, assign starting volume (um3)
 	Vnew[n0[:, 0]<=1.0e-10] = Vol0[0::][n0[:, 0]<=1.0e-10]
 
@@ -54,6 +56,7 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 
 	# new radii per size bin (um)
 	x = ((3.0*Vnew)/(4.0*np.pi))**(1.0/3.0)
+		
 	# new radius bounds (um)
 	rbou = ((3.0*Vbou)/(4.0*np.pi))**(1.0/3.0)
 

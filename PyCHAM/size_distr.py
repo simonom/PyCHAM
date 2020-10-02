@@ -6,12 +6,12 @@ from scipy import stats # import the scipy.stats module
 import numpy as np
 import matplotlib.pyplot as plt
 
-def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode):
+def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, space_mode):
 
-	# ---------------------------------
-	# Inputs:
+	# inputs: -------------------------
 	
 	# num_bins - number of size bins (not including wall)
+	# pmode - whether particle number concentrations given in modes or explicitly
 	# pconc - starting number concentration of particles (# particle/cc (air)), if this
 	# is scalar, the number concentration will be split between size bins, and if it has
 	# the same length as number of size bins, each element will be allocated to its
@@ -63,25 +63,27 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, space_mode
 	upper_bin_rad_amp = 1.0e6
 	rad_bounds[-1] = rad_bounds[-1]*upper_bin_rad_amp
 	
-	if len(pconc)==1 and sum(pconc)>0.0: # for calculating the number size distribution
-		# number fraction-size distribution - enforce high resolution to ensure size
-		# distribution of seed particles fully captured
-		# note dividing rwid[0,0] by 2.1 rather than 2.0 prevents the lower bound reaching 
-		# zero and still gives a useful range
-		# high resolution size bin radii (um)
-		hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), num_bins*1.0e2))
-		# probability distribution function
-		pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
-		# probability distribution function scaled to actual size bin radii
-		pdf_out = np.interp(x_output, hires, pdf_output)	
-		# number concentration of all size bins (# particle/cc (air))
-		Nperbin = (pdf_out/sum(pdf_out))*pconc
+	if (pmode == 0): # calculating the number size distribution from modes
+		# number concentrations for all size bins
+		Nperbin = np.zeros((num_bins))
+		for i in range(len(pconc)):
+			# number fraction-size distribution - enforce high resolution to ensure size
+			# distribution of seed particles fully captured
+			# note dividing rwid[0, 0] by 2.1 rather than 2.0 prevents the lower bound reaching 
+			# zero and still gives a useful range
+			# high resolution size bin radii (um)
+			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), num_bins*1.0e2))
+			# probability distribution function
+			pdf_output = stats.lognorm.pdf(hires, std[i], loc, scale[i])
+			# probability distribution function scaled to actual size bin radii
+			pdf_out = np.interp(x_output, hires, pdf_output)	
+			# contribute the number concentration of all size bins in 
+			# this mode (# particle/cc (air))
+			Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
 	
 	# if number concentration (#/cc (air)) explicitly stated in inputs
-	if len(pconc)>1 and sum(pconc)>0.0:
+	if (pmode == 1):
 		Nperbin = np.array((pconc))
-	if sum(pconc)==0.0:
-		Nperbin = np.zeros((num_bins))
 	
 	Nperbin = Nperbin.reshape(-1, 1) # ensure correct shape
 	

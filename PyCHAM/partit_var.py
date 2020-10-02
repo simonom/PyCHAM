@@ -9,8 +9,7 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 		y_dens, N_perbin, DStar_org, radius, Psat, therm_sp,
 		H2Oi, act_coeff, wall_on, caller):
 	
-	# ------------------------------------------------------------------------------------
-	# inputs:
+	# inputs:---------------------------------------------------------------------------
 	
 	# y - concentration of components' molecules (molecules/cc (air))
 	# mfp - mean free path of gas molecules (m) (num_speci, 1)
@@ -38,7 +37,7 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 		y_part = y[num_speci:-(num_speci)]
 	if num_sb>0 and (wall_on==0): # if wall absent
 		y_part = y[num_speci::]
-
+	
 	# density (g/cm3) and average molecular weight (g/mol) of particles (excluding wall)
 	[tot_rho, ish, avMW] = part_prop(y_part, num_speci, (num_sb-wall_on), NA, y_mw, y_dens, 
 					N_perbin)
@@ -71,10 +70,10 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 	# 1e7 for units g cm2/s2.mol.K, 
 	# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
 	kelv = np.zeros((num_sb-wall_on, 1))
-	kelv[ish, 0] = np.exp((2.0E0*avMW[ish]*surfT)/(R_gas*1.0e7*TEMP*(
-				radius[0, ish]*1.0e2)*tot_rho[ish]))
-
 	
+	kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*1.e2*tot_rho[ish]))
+	
+	#import ipdb; ipdb.set_trace()
 	# gas phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
 	# eq. 5 Zaveri et al. (2008), scale by 1e4 to convert from m2/s to cm2/s
 	kimt = (DStar_org*1e4)*correction

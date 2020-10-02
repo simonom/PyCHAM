@@ -13,7 +13,7 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	testf, pconc, dydt_trak, end_sim_time, save_step, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	spec_namelist, Compt, seed_name, seed_mw,
-	core_diss, nuc_comp, con_infl_C):
+	core_diss, nuc_comp):
 		
 	# inputs:------------------------------------------------------
 	
@@ -38,7 +38,6 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
 	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
-	# con_infl_C - influx of components with constant influx (ppb/s)
 	# -----------------------------------------------------------
 
 	if testf==1: # testing mode
@@ -69,10 +68,6 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
-		
-	# convert influx of components with constant concentration to molecules/cc/s
-	# from ppb
-	con_infl_C = con_infl_C*Cfactor
 
 	# number of recording steps
 	nrec_steps = int(math.ceil(end_sim_time/save_step)+1)
@@ -123,8 +118,9 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# update gas-phase concentration (molecules/cc (air)) and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH, 6.02214129e+23)
-	
+	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH, si.N_A)
+	#print(C_H2O/Cfactor)
+	#a=b
 	# append empty element to y and y_mw to hold water values
 	y = np.append(y, C_H2O)
 	y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
@@ -179,4 +175,4 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	return (y, H2Oi, y_mw, num_speci, Cfactor, y_indx_plot, corei, dydt_vst, 
 				spec_namelist, inj_indx, core_diss,
-				Psat_water, nuci, con_infl_C, nrec_steps)
+				Psat_water, nuci, nrec_steps)

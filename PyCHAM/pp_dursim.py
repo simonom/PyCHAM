@@ -5,7 +5,7 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
-def pp_dursim(y, N_perbin, mean_rad, pconc, corei, lowersize, uppersize, num_speci, 
+def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, lowersize, uppersize, num_speci, 
 				num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou):
 	
 			
@@ -13,6 +13,7 @@ def pp_dursim(y, N_perbin, mean_rad, pconc, corei, lowersize, uppersize, num_spe
 	# y - concentrations of components in particle phase (molecules/cc (air))
 	# N_perbin - number concentration of particles (#/cc (air))
 	# mean_rad - mean radius of seed particles at this time (um)
+	# pmode - whether particle number size distribution stated by mode or explicitly
 	# pconc - number concentration of seed particles (#/cc (air))
 	# corei - index of seed material
 	# lowersize - smallest radius bound (um)
@@ -44,28 +45,29 @@ def pp_dursim(y, N_perbin, mean_rad, pconc, corei, lowersize, uppersize, num_spe
 		pconc_new = pconc
 
 	# number concentration stated per size bin in multi size bin simulation
-	if num_sb > 1 and (len(pconc) == num_sb): 
+	if (pmode == 1): 
 		N_perbin += np.array((pconc)) # (# particles/cc (air))
 		pconc_new = pconc
 
-	# total number concentration stated in multi size bin simulation
-	if num_sb > 1 and len(pconc)==1:
+	# total number concentration per mode stated in multi size bin simulation
+	if (pmode == 0):
 		
-		# set scale and standard deviation input for lognormal probability distribution 
-		# function, following guidance here: 
-		# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
-		scale = np.exp(np.log(mean_rad))
-		std = np.log(std)
-		loc = 0.0 # no shift
-	
-		# number fraction-size distribution - enforce high resolution to ensure size
-		# distribution of seed particles fully captured
-		hires = 10**(np.linspace(np.log10((rad0[0]-(rbou[1]-rbou[0])/2.1)), np.log10(uppersize), (num_sb)*1.0e2))
-		pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
-		pdf_out = np.interp(radn, hires, pdf_output)	
-		# number concentration of seed in all size bins (# particle/cc (air))
-		pconc_new = (pdf_out/sum(pdf_out))*pconc
-		N_perbin[:, 0] += pconc_new # (# particles/cc (air))
+		for i in len(pconc): # loop through modes
+			# set scale and standard deviation input for lognormal probability distribution 
+			# function, following guidance here: 
+			# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
+			scale = np.exp(np.log(mean_rad[i]))
+			std = np.log(std[i])
+			loc = 0.0 # no shift
+		
+			# number fraction-size distribution - enforce high resolution to ensure size
+			# distribution of seed particles fully captured
+			hires = 10**(np.linspace(np.log10((rad0[0]-(rbou[1]-rbou[0])/2.1)), np.log10(uppersize), (num_sb)*1.0e2))
+			pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
+			pdf_out = np.interp(radn, hires, pdf_output)	
+			# number concentration of seed in all size bins (# particle/cc (air))
+			pconc_new = (pdf_out/sum(pdf_out))*pconc[i]
+			N_perbin[:, 0] += pconc_new # (# particles/cc (air))
 	
 	# molecular concentration of seed required to comprise these additional seed particle
 	# (molecules/cc (air)):

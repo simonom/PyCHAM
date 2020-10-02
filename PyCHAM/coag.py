@@ -16,7 +16,7 @@ import fullmov
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 			num_comp, vdWon, rho, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
-			sbVj, coag_on, siz_stru, wall_on):
+			sbVj, coag_on, siz_str, wall_on):
 
 	# inputs:---------------------------------------------------------
 	
@@ -47,7 +47,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# (particle/cc (air)) (columns) (excluding walls), for particles in rint
 	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	# coag_on - whether to allow coagulation to occur (1) or not (0)
-	# siz_stru - the size structure to use
+	# siz_str - the size structure to use
 	# wall_on - marker for whether wall being considered
 	# --------------------------------------------------------------
 
@@ -490,44 +490,113 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		# (# particles/cc (air))
 		num_partk = np.tile(num_part.reshape(-1, 1), (1, sbrn))
 		
-		# index of k,j size bin pairs that can coagulate to give a volume that fits 
-		# into k
-		volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
+		if (siz_str == 1): # full-moving structure
+			volind = np.zeros((coagV.shape[0], coagV.shape[1]))
+			# only the coagV between this size bin and the one below, note that coagV equal
+			# to this size bin accounted for below (coagV between this size bin and 
+			# the one above)
+			if (sbi > 0):
+				coagV_sub_ind = (coagV>sbVi[0, sbi-1])*(coagV<sbVi[0, sbi])
+				# fraction going to this size bin rather than one smaller
+				frac_sub_in = 1.-(sbVi[0, sbi]-coagV)/(sbVi[0, sbi]-sbVi[0, sbi-1])
+				volind[coagV_sub_ind] = frac_sub_in[coagV_sub_ind] 
+
+			# only the coagV between this size bin and the one above
+			if (sbi < sbn-1):
+				coagV_exc_ind = (coagV >= sbVi[0, sbi])*(coagV < sbVi[0, sbi+1])
+				# fraction going to this size bin rather than one larger
+				frac_exc_in = 1. - (coagV-sbVi[0, sbi])/(sbVi[0, sbi+1]-sbVi[0, sbi])				
+				volind[coagV_exc_ind] = frac_exc_in[coagV_exc_ind]
+			else: # uppermost size bin
+				coagV_exc_ind = (coagV >= sbVi[0, sbi])
+				volind[coagV_exc_ind] = 1.
+
+		if (siz_str == 0): # moving-centre structure
+			# index of k,j size bin pairs that can coagulate to give a volume that fits 
+			# into k
+			volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
+
 		# note in Eq. 15.8, we use n_{k-j,t}, and even though coagulation of sbi with 
 		# itself may produce a particle within the sbi bin, its number concentration
 		# has not yet been updated (from t-h to t), so we can't use it here, instead
-		# we explicitly account for coagulation with itself below
-		volind[sbi, :] = 0.0 
-		volind[:, sbi] = 0.0 
-			
+		# we explicitly account for coagulation with itself below in the denominator.
+		# Note also that coagulation of particle in sbi with a smaller particle to
+		# produce a coagulated particle in sbi does not affect number concentration in
+		# size bin sbi
+		volind[sbi, :] = 0.0
+		volind[:, sbi] = 0.0
+		
 		# using only the relevant k-j pairs in beta, number of particles from k and j
 		# size bins coagulating to give new particle in sbi (#particles/cc.s).
 		# This accounts for both the upper and lower diagonal of Beta, so considers
 		# k-j pairs as well as j-k
-		numsum_ind = (Beta*volind)*(num_partk*num_partj)
-			
+		numsum_ind = (Beta*volind)*(num_partk*num_partj)	
 		# sum to get the total rate of number of particles coagulating (from k and j) 
 		# (#particles/cc.s)
 		numsum = (numsum_ind.sum()).sum()
-
 		# numerator, note we use num_partj as want n_{k,t-h}; multiply by 0.5 since 2 
 		# particles make 1
-		num = num_partj[0,sbi]+0.5*tint*numsum
-		# particle number only from sbi when newly coagulated particles give a volume
-		# outside the current bounds
-		volind = coagV[sbi,:]>=sbbound[0, sbi+1]
-		# lose half the number of particles of sbi coagulating with itself to give a 
-		# volume in sbi
-		if (coagV[sbi, sbi]>=sbbound[0, sbi] and coagV[sbi, sbi]<sbbound[0, sbi+1]):
-			volind[sbi] = 0.5
+		num = num_partj[0, sbi]+0.5*tint*numsum
+
+		if (siz_str == 1): # full-moving structure
+			if (sbi < sbn-1):
+				# index of sbi pairs that give a volume beyond next size bin up
+				volind = coagV[sbi, :]>=sbVi[0, sbi+1]
+				# lose half the number of particles of sbi coagulating with itself to give a 
+				# volume in sbi
+				if (coagV[sbi, sbi] < sbVi[0, sbi+1]):
+					volind[sbi] = 1.-0.5*(sbVi[0, sbi+1]-coagV[sbi, sbi])/(sbVi[0, sbi+1]-sbVi[0, sbi])
+			else: # uppermost size bin
+				volind = np.zeros((coagV.shape[1]))
+				# lose half the number of particles of sbi coagulating with itself to give a 
+				# volume in sbi
+				volind[sbi] = 0.5
+
+		if (siz_str == 0): # moving-centre structure
+			# particle number only from sbi when newly coagulated particles give a volume
+			# outside the volume bounds of sbi
+			volind = (coagV[sbi, :] >= sbbound[0, sbi+1])
+			# lose half the number of particles of sbi coagulating with itself to give a 
+			# volume in sbi
+			if (coagV[sbi, sbi]>=sbbound[0, sbi] and coagV[sbi, sbi]<sbbound[0, sbi+1]):
+				volind[sbi] = 0.5
+
 		# denominator, representing particle number loss from this size bin
 		den = 1.0+tint*((Beta[sbi, :]*volind*num_partj[0, :]).sum())
 		# updated number concentration (#particles/cc (air)) eq. 15.8 Jacobson (2005)
 		num_part[0, sbi] = num/den
-		
+			
 		# --------------------------------------------------------------------------------
-		# particle concentration rate coagulating from each size bin
-		volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])
+		# change to molecular concentration part (molecules/cc (air))
+
+		if (siz_str == 1): # full-moving structure
+
+			volind = np.zeros((coagV.shape[0], coagV.shape[1]))
+			# only the coagV between this size bin and the one below, note that coagV equal
+			# to this size bin accounted for below (coagV between this size bin and 
+			# the one above)
+			if (sbi > 0):
+				coagV_sub_ind = (coagV>sbVi[0, sbi-1])*(coagV<sbVi[0, sbi])
+				# fraction going to this size bin rather than one smaller
+				frac_sub_in = 1.-(sbVi[0, sbi]-coagV)/(sbVi[0, sbi]-sbVi[0, sbi-1])
+				volind[coagV_sub_ind] = frac_sub_in[coagV_sub_ind] 
+
+			# only the coagV between this size bin and the one above
+			if (sbi < sbn-1):
+				coagV_exc_ind = (coagV >= sbVi[0, sbi])*(coagV < sbVi[0, sbi+1])
+				# fraction going to this size bin rather than one larger
+				frac_exc_in = 1. - (coagV-sbVi[0, sbi])/(sbVi[0, sbi+1]-sbVi[0, sbi])				
+				volind[coagV_exc_ind] = frac_exc_in[coagV_exc_ind]
+			else: # uppermost size bin
+				coagV_exc_ind = (coagV >= sbVi[0, sbi])
+				volind[coagV_exc_ind] = 1.
+		
+
+		if (siz_str == 0): # moving-centre structure
+			# index of k,j size bin pairs that can coagulate to give a volume that fits 
+			# into k
+			volind = (coagV>=sbbound[0, sbi])*(coagV<sbbound[0, sbi+1])		
+
 		# Eq. 15.8 with loss term removed
 		numsum_ind = (Beta*volind)*(num_partk*num_partj)
 		numsumj = ((numsum_ind.sum(axis=0))*0.5).reshape(-1,1)
@@ -545,9 +614,24 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		ish = num_partj[0, :]>0.
 		molec_contr = ((num_contr[ish]/num_partj[0, ish]).reshape(1,-1)*molec_j[:, ish]).sum(axis=1)
 		
-		# particle number only from sbi when newly coagulated particles give a volume
-		# outside the current bounds
-		volind = coagV[sbi,:]>=sbbound[0, sbi+1]
+
+		# molecular concentration loss part (molecules/cc (air))
+
+		if (siz_str == 1): # full-moving structure
+			volind = np.zeros((coagV.shape[0], coagV.shape[1]))
+			if (sbi < sbn-1): # can't lose molecules from largest size bin due to coagulation
+				# index of sbi pairs that give a volume beyond next size bin up
+				volind = coagV[sbi, :]>=sbVi[0, sbi+1]
+				# lose a fraction of the molecular concentration of sbi coagulating 
+				# with itself to give a volume in sbi
+				if (coagV[sbi, sbi] < sbVi[0, sbi+1]):
+					volind[sbi] = 1.-(sbVi[0, sbi+1]-coagV[sbi, sbi])/(sbVi[0, sbi+1]-sbVi[0, sbi])
+		
+		if (siz_str == 0): # moving-centre structure
+			# particle number only from sbi when newly coagulated particles give a volume
+			# outside the current bounds
+			volind = (coagV[sbi,:] >= sbbound[0, sbi+1])
+
 		# number concentration of particles lost from sbi to produce larger particles
 		# through coagulation, Eq. 15.8 with production term removed
 		num_lost =  num_partj[0, sbi] - num_partj[0, sbi]/(1.0+tint*((Beta[sbi, :]*volind*num_partj[0, :]).sum()))
@@ -567,13 +651,13 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# new volume of single particle per size bin (um3)
 	ish = num_part[0, :]>1.0e-20 # only use size bins where particles reside
 	Vnew = np.zeros((sbrn))
-	Vnew[ish] = np.sum(((molec_k[:, ish]/(si.N_A*num_part[0, ish]))*MV*1.0e12), 0)
+	Vnew[ish] = np.sum(((molec_k[:, ish]/(si.N_A*num_part[0, ish]))*MV*1.e12), 0)
 
 	# new combined volume of all particles per size bin (um3)
 	Vtot = Vnew*num_part[0, :]
 	# remove particles and their corresponding component concentrations if their volume
 	# is negligibly small
-	negl_indx = Vtot.sum()==0.
+	negl_indx = (Vtot.sum() == 0.)
 	num_part[0, negl_indx] = 0.
 	Vnew[negl_indx] = 0.
 	molec_k[:, negl_indx] = 0.
@@ -591,18 +675,19 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# molecular concentrations (molecules/cc (air))
 	y = molec_k.flatten(order='F')
 	
-	if (siz_stru == 0): # moving centre
+	if (siz_str == 0): # moving centre
 		(num_part, Vnew, y, rad, redt, blank, tnew) = movcen(num_part.reshape(-1, 1), 
 		sbbound[0, :]*1.e18, 
 		np.transpose(y.reshape(sbn, num_comp)), 
-		sbn, num_comp, sbVi[0, :], 0.0, 0, MV)
+		sbn, num_comp, sbVi[0, :], 0.0, 0, MV*1.e12)
 		# revert volume bounds to um3 from m3 before returning
 		sbbound = sbbound[0, :]*1.e18
-	if (siz_stru == 1): # full-moving
+	if (siz_str == 1): # full-moving
 		(Vnew, rad, y, 
 		num_part, sbbound, rbou) = fullmov.fullmov(sbn, num_part.reshape(-1, 1),
- 		num_comp, y, MV, V0, sbbound[0, :]*1.e18, rbou)
+ 		num_comp, y, MV*1.e12, V0, sbbound[0, :]*1.e18, rbou)
 		
 	sbbound = sbbound.reshape(-1) # return to 1D array
-
+	#print(num_part[-4::, 0])
+	#import ipdb; ipdb.set_trace()
 	return(num_part, y, rad, Gi, eta_ai, Vnew, sbbound, rbou)

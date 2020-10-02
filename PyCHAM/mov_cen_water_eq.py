@@ -12,7 +12,7 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	# input:---------------------------------------------------------
 	# n0 - particle number concentration per size bin before time step
 	# (# particle/cc (air)) (excluding wall)
-	# Vbou - volume bounds per size bin (um3) (number of size bins +1) (molecules/cc (air))
+	# Vbou - volume bounds per size bin (um3) (number of size bins +1)
 	# Cn - particle phase concentration per component per size bin
 	# (molecules/cc (air)), with rows representing
 	# components and columns size bins (including wall as final size bin)
@@ -24,29 +24,21 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	# decreasing
 	# MV - molar volume per component (um3/mol)
 	# ---------------------------------------------------------------
-	# output:
-	
-	# n1 - end of time step particle number concentration per size bin
-	# (# particle/cc (air))
-	# m1 - end of time step mass per size bin (g/m3 (air))
-	# rad - new radius (um)
-	# redt - flag to say whether time step needs reducing due to excess size bin changes
-	# tnew - integration time to use on next step
-	# ---------------------------------------------------------------
 	
 	NA = si.Avogadro # Avogadro's number (molecules/mol)	
 
 	Vnew = np.zeros((sbn))
-	ish = n0[:, 0]>1.0e-10
-	nmolC = np.zeros((nc, ish.sum()))
+	ish = n0[:, 0]>0.
+	nmolC = np.zeros((nc, sbn))
 	
 	# number of moles of each component in a single particle (mol/cc (air))
-	nmolC[:,:] = ((Cn[:, ish]/(NA*n0[ish, 0])))
+	nmolC[:, ish] = ((Cn[:, ish]/(NA*n0[ish, 0])))
 	MVrep = np.repeat(MV, nmolC.shape[1], axis=1)
-
-	# new volume of single particle per size bin (um3) including volume of water
-	Vnew[ish] = np.sum(nmolC*MV*1.0e12, axis=0)
 	
+	
+	# new volume of single particle per size bin (um3) including volume of water
+	Vnew[:] = np.sum(nmolC*MV, axis=0)
+
 	Vnew[n0[:, 0]<=1.0e-10] = Vol0[0::][n0[:, 0]<=1.0e-10]
 	
 	# array of new particle number concentration (# particle/cc (air))
@@ -77,26 +69,26 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	# ((um3 (all particles)/cc (air))/(particle number/cc (air))) 
 	# calculation is:
 	# divide number of molecules/cc (air) by Na to get moles/cc(air), then 
-	# multiply by um3/mol (MV[:,0]*1.0e12) to get um3 (of each component)/cc (air),
+	# multiply by um3/mol (MV) to get um3 (of each component)/cc (air),
 	# then sum volume of components per size bin to get um3 (all particles)/cc (air)
 	MVrep = np.repeat(MV, num_molec_new.shape[1], axis=1)
 	
-	Vtot = (np.sum((num_molec_new/6.0221409e+23)*(MVrep*1.0e12), 0)) # (um3)
+	Vtot = (np.sum((num_molec_new/NA)*(MVrep), 0)) # (um3)
 
 	# then divide by particle number (#/cc (air)) to get volume of single particles
 	# per size bin (um3)
 	Vsing = np.zeros(len(Vtot))
-	isb = num_part_new[:, 0]>1.0e-40
+	isb = num_part_new[:, 0]>0.
 	Vsing[isb] = Vtot[isb]/num_part_new[isb, 0]
 	
-	# new radius of sinle particles per size bin (um)
+	# new radius of single particles per size bin (um)
 	rad = ((3.0*Vsing)/(4.0*np.pi))**(1.0/3.0)
 	
-	isb = num_part_new[:, 0]<=1.0e-40
+	isb = num_part_new[:, 0] == 0.
 	
 	# fill volume array elements for bins without particles with central volume (um3)
 	Vsing[isb] = (Vbou[0:-1][isb]+Vbou[1::][isb])/2.0
-	rad[isb] = ((3.0*Vsing[isb])/(4.0*np.pi))**(1.0/3.0) # new radius (um)
+	rad[isb] = ((3.*Vsing[isb])/(4.*np.pi))**(1./3.) # new radius (um)
 	
 	# flag to show no reduction in time step needed
 	redt = 0

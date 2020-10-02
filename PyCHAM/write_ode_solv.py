@@ -134,7 +134,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 			if Ci<len(con_infl_indx)-1:
 				f.write('%d, ' %int(con_infl_indx[Ci]))
 			else:
-				f.write('%d]] += Cinfl_now\n' %int(con_infl_indx[Ci]))
+				f.write('%d]] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
 		f.write('		\n')
 	# if any components have a constant gas-phase concentration
 	if (len(con_C_indx)>0):

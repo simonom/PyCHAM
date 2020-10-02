@@ -19,7 +19,7 @@ def middle():
 	# get required inputs
 	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
 		comp0, y0, temp, tempt, RH, Pnow, wall_on,
-		Cw, kw, siz_str, num_sb, pconc, pconct,
+		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, core_dens, light_stat, light_time, daytime, lat, 
@@ -29,7 +29,7 @@ def middle():
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac] = ui.share(0)
-
+	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
 	[rindx, pindx, rstoi, pstoi, nreac, nprod, comp_num, 
@@ -45,11 +45,11 @@ def middle():
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, con_infl_C, nrec_steps] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
+	nuci, nrec_steps] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx, 
 	pindx, eqn_num[0], nreac, nprod, 
 	comp_namelist, Compt, seed_name, 
-	seed_mw, core_diss, nuc_comp, con_infl_C)
+	seed_mw, core_diss, nuc_comp)
 	
 	# dump new pickle file ready for plotting script to use
 	list_vars = [sav_nam, sch_name, indx_plot, comp0]
@@ -74,7 +74,7 @@ def middle():
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
 	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
 		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, siz_str, num_sb, lowsize, 
-		uppsize, pconc, pconct, nuc_comp, 0, std, mean_rad, 
+		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei,
 		comp_namelist, act_coeff, wall_on)
 	
@@ -99,8 +99,8 @@ def middle():
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 		nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
-		injectt, inj_indx, Ct, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, const_infl_t)
+		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
+		uppsize, std, rbou, const_infl_t, MV)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		
