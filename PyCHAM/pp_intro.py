@@ -9,10 +9,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
 			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
 			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, spec_namelist, 
-			act_coeff, wall_on):
+			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
+			spec_namelist, act_coeff, wall_on):
 	
-			
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
 	# y_mw - molecular weight (g/mol) of components (num_comp, 1)
@@ -42,7 +41,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (/s)
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
-	# corei - index of component comprising seed particles
+	# corei - index of component(s) comprising seed particles
+	# seedVr - volume ratio of component(s) comprising seed particles
 	# spec_namelist - names of components noted in chemical scheme file
 	# act_coeff - activity coefficient of components
 	# wall_on - whether or not to consider wall
@@ -113,12 +113,10 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			print('finished with Size_distributions.lognormal')
 			
 	if (num_sb == 1):
-		N_perbin = np.array((pconcn)) # (# particles/cc (air))
-		
-		x = np.zeros(1)
-		
-		meansize = mean_radn # mean radius of this size bin (um)
-		
+
+		N_perbin = np.array((sum(pconcn))).reshape(-1, 1) # (# particles/cc (air))
+		x = np.zeros(1) # radii at size bin centre
+		meansize = 10**(sum(np.log10(mean_radn))/2.) # mean radius of this size bin (um)
 		x[0] = meansize
 		# extend uppersize to reduce chance of particles growing beyond this
 		upper_bin_rad_amp = 1.0e6
@@ -128,7 +126,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 						(uppersize**3.0)*(4.0/3.0)*np.pi))
 		# volume of single particle (um3)
 		Varr = np.zeros((1, 1))
-		Varr[0] = (meansize**3.0)*(4.0/3.0)*np.pi
+		Varr[0] = (4./3.)*np.pi*(x[0]**3.0)
 		# radius bounds of size bin (um)
 		rbou = ((Vbou*3.0)/(4.0*np.pi))**(1.0/3.0)
 	
@@ -158,12 +156,10 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# molar volume (multiply y_dens by 1e-3 to convert from kg/m3 to g/cc and give
 	# MV in units cc/mol)
 	MV = (y_mw/(y_dens*1.0e-3)).reshape(num_comp, 1)
-	
-	if (sum(pconcn) > 0.0): # account for seed material concentration
-	
-		# core concentration in size bins (molecules/cc (air)):
-		# core mass concentration in each size bin (molecules/cc (air))
-		y[num_comp+corei:(num_comp*(num_sb)+corei):num_comp] = (NA/MV[corei])*(Varr*1.e-12)*N_perbin[:, 0]
+	if (sum(pconcn) > 0.0): # account for concentration of components comprising seed
+		for ci in range(len(corei)): # loop through indices of seed components
+			# concentration in all size bins (molecules/cc (air)):
+			y[num_comp+corei[ci]:(num_comp*(num_sb)+corei[ci]):num_comp] = (NA/MV[corei[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
 
 	if testf==2:
 		print('calling init_water_partit.py')

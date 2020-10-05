@@ -24,7 +24,7 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model variables 
 		# stored to pickle file and output here
-		[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac] = def_mod_var.def_mod_var(0)
+		[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac] = def_mod_var.def_mod_var(0)
 		return
     
 	def initUI(self):
@@ -79,10 +79,10 @@ class PyCHAM(QWidget):
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, core_diss, seed_dens,
+			seed_mw, seed_diss, seed_dens, seedVr,
 			light_stat, light_time, daytime, lat, lon, af_path, 
 			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
@@ -90,7 +90,7 @@ class PyCHAM(QWidget):
 		sch_name = self.openFileNameDialog() # get location of chemical scheme file
 
 		# pickle with new chemical scheme name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -104,10 +104,10 @@ class PyCHAM(QWidget):
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, core_diss, seed_dens,
+			seed_mw, seed_diss, seed_dens, seedVr,
 			light_stat, light_time, daytime, lat, lon, af_path, 
 			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
@@ -115,7 +115,7 @@ class PyCHAM(QWidget):
 		xml_name = self.openFileNameDialog() # get location of xml file
 			
 		# pickle with new xml file name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close		
@@ -130,18 +130,18 @@ class PyCHAM(QWidget):
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, core_diss, seed_dens,
+			seed_mw, seed_diss, seed_dens, seedVr,
 			light_stat, light_time, daytime, lat, lon, af_path, 
 			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, vol_comp, volP, act_comp, act_user, 
+			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac] = pickle.load(pk)
 			pk.close() # close pickle file
 
 
-		#inname = self.openFileNameDialog() # get location of model variables file
-		inname = str(os.getcwd() + '/PyCHAM/output/GMD_paper_plotting_scripts/moving_centre_inputs.txt')
+		inname = self.openFileNameDialog() # get location of model variables file
+		#inname = str(os.getcwd() + '/PyCHAM/output/GMD_paper_plotting_scripts/moving_centre_inputs.txt')
 		inputs = open(inname, mode= 'r' ) # open model variables file
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
@@ -275,7 +275,8 @@ class PyCHAM(QWidget):
 			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
 				const_comp = [str(i).strip() for i in (value.split(','))]
 			
-			if key == 'Compt' and (value.strip()): # names of components with instantaneous gas-phase injections
+			# names of components with instantaneous gas-phase injections
+			if key == 'Compt' and (value.strip()):
 				Compt = [str(i).strip() for i in (value.split(','))]
 
 			# times of later gas-phase instantaneous injections (s)
@@ -298,27 +299,28 @@ class PyCHAM(QWidget):
 					Ct[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 
 
-			if key == 'seed_name': # name of component comprising seed particles
-				if (value.strip()): seed_name = str(value.strip())
+			if key == 'seed_name' and value.strip(): # name(s) of component(s) comprising seed particles
+				seed_name = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'seed_mw':
-				if (value.strip()): seed_mw = float(value.strip())
+			if key == 'seed_mw' and value.strip():
+				seed_mw = float(value.strip())
 		
-			if key == 'core_diss': # dissociation constant of seed material
-				if (value.strip()): core_diss = float(value.strip())
+			if key == 'seed_diss' and value.strip(): # dissociation constant of seed material
+				seed_diss = [float(i) for i in (value.split(','))]
 
-			if key == 'seed_dens':
-				if (value.strip()): seed_dens = float(value.strip())
+			if key == 'seed_dens' and value.strip():
+				seed_dens = float(value.strip())
 
-			if key == 'light_status': # status of lights (on or off)
-				if (value.strip()): 
-					light_stat = [int(i) for i in (value.split(','))]
-					light_stat = np.array((light_stat))
+			if key == 'seedVr' and value.strip(): # volume ratio of components in seed particles
+				seedVr = [float(i) for i in (value.split(','))]
+
+			if key == 'light_status' and value.strip(): # status of lights (on or off)
+				light_stat = [int(i) for i in (value.split(','))]
+				light_stat = np.array((light_stat))
 				
-			if key == 'light_time': # times (s) corresponding to light status
-				if (value.strip()): 
-					light_time = [float(i) for i in (value.split(','))]
-					light_time = np.array((light_time))
+			if key == 'light_time' and value.strip(): # times (s) corresponding to light status
+				light_time = [float(i) for i in (value.split(','))]
+				light_time = np.array((light_time))
 				
 			if key == 'lat': # latitude (degrees)
 				if (value.strip()): lat = float(value.strip())
@@ -365,6 +367,12 @@ class PyCHAM(QWidget):
 
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				dydt_trak = [str(i).strip() for i in (value.split(','))]
+
+			if key == 'dens_Comp' and (value.strip()):
+				dens_comp = [str(i).strip() for i in (value.split(','))]
+
+			if key == 'dens' and (value.strip()):
+				dens = [float(i) for i in (value.split(','))]
 
 			if key == 'vol_Comp' and (value.strip()):
 				vol_comp = [str(i).strip() for i in (value.split(','))]
@@ -439,7 +447,7 @@ class PyCHAM(QWidget):
 				dil_fac = float(value)
 		
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, core_diss, seed_dens, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

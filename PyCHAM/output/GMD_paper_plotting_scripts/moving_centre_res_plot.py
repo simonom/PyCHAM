@@ -17,28 +17,16 @@ import numpy as np
 
 
 # ----------------------------------------------------------------------------------------
-# the initial volume size distribution of Fig. 13.8 of Jacobson (2005)
+# when comparing against Fig. 13.8 of Jacobson, note that preferential growth of larger
+# particles over smaller ones is a function of the Kelvin effect, for which the density 
+# and molar weight of the seed material is important, and of the supersaturation of water
+# since it needs to be only slightly supersaturated for larger particles to reduce to
+# subsaturated due to condensation, therefore the specified vapour pressure and injection
+# concentration of water must be accurate and precise   
 
-#pconc = np.array((5.e3, 9.5e2, 4.0)) # mean particle number concentration (/cm3)
-#mean_rad = np.array((0.070, 0.2, 1.5)) # mean radius (um)
-#std = np.array((1.24, 1.46, 1.70)) # standard deviations
-#sbn = 16 # number of size bins
-#x_output = 10**(np.linspace(np.log10(0.05), np.log10(50), num=sbn)) # radius
-#Nperbin = np.zeros((sbn))
-#for i in range(len(pconc)):
-#	hires = 10**(np.linspace(np.log10(x_output[0]), np.log10(x_output[-1]), 1.e3))
-#	pdf_output = stats.lognorm.pdf(hires, np.log(std[i]), 0., np.exp(np.log(mean_rad[i])))
-#	pdf_out = np.interp(x_output, hires, pdf_output)
-#	Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
+# model variables input file for Jacobson:
 
-#dV = (4./3.)*np.pi*x_output**3.0*Nperbin
-#dVdD = dV/(np.log10(x_output[1]*2)-np.log10(x_output[0]*2))
-
-#plt.loglog(x_output[dVdD>0.1]*2., dVdD[dVdD>0.1])
-#plt.show()
-#import ipdb; ipdb.set_trace()
-
-# model variables input file for Jacobson:res_file_name = test_Jacobs_16sb_mc
+#res_file_name = test_Jacobs_16sb_mc
 #total_model_time = 600.
 #update_step = 1.
 #recording_time_step = 60.
@@ -109,6 +97,80 @@ import numpy as np
 #light_status = 0, 0
 #chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
 
+# when testing against Fig. 3 of Zhang et al. (1999): doi.org/10.1080/027868299304039
+# remember that the density and molecular weight of sulphuric acid are automatically set
+# by PyCHAM and that these determine the resulting volumetric condensation rate
+
+# inputs for Zhang (note siz_structure will vary)
+
+#res_file_name = test_Zhang_100sb_mc
+#total_model_time = 43200.
+#update_step = 120.
+#recording_time_step = 120.
+#size_structure = 0
+#number_size_bins = 100
+#lower_part_size = 5.e-4
+#upper_part_size = 1.e1
+#space_mode = log
+#coag_on = 1
+#mass_trans_coeff = 0.0
+#eff_abs_wall_massC = 0.0
+#temperature = 273.15
+#tempt = 0.0
+#p_init = 98000
+#rh = 0.000
+#const_comp = 
+#const_infl = SA
+#const_infl_t = 0.
+#Cinfl = 2.65e-5
+#vol_Comp = SA
+#volP = 0.
+#pconct = 0.
+#pconc = 2350. : 3600. : 3.95
+#mean_rad = 0.0205 : 0.0611: 0.87
+#std = 1.2 : 1.8: 2.2
+#seed_name = core
+#seed_mw = 200.00
+#seed_dens = 1.
+#core_diss = 1.
+#light_time = 0., 43200. 
+#light_status = 0, 0
+#chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
+
+# inputs for comparison against Korhonen et al. 2004 (doi.org/10.5194/acp-4-757-2004)
+# Figs. 1-2, 
+
+#res_file_name = Korhonen_20sb_mc
+#total_model_time = 36000.
+#update_step = 120.
+#recording_time_step = 120.
+#size_structure = 0
+#number_size_bins = 20
+#lower_part_size = 3.e-4
+#upper_part_size = 5.e-1
+#space_mode = log
+#coag_on = 1
+#mass_trans_coeff = 0.0
+#eff_abs_wall_massC = 0.0
+#temperature = 273.15
+#tempt = 0.0
+#p_init = 98000
+#rh = 0.
+#Comp0 = N
+#C0 = 4.e-3
+#const_comp = N
+#const_infl = SA
+#const_infl_t = 0.
+#Cinfl = 2.65e-5
+#vol_Comp = SA, ELVOC_o3
+#volP = 0., 1.e6
+#pconct = 0.
+#pconc = 1000. : 100.
+#mean_rad = 0.025 : 0.070
+#std = 1.25 : 1.3
+#seed_name = SA, ELVOC_o3
+#seedVr = 1, 1
+#chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
 
 # ----------------------------------------------------------------------------------------
 # create figure to plot results

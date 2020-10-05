@@ -5,7 +5,7 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
-def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, lowersize, uppersize, num_speci, 
+def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, uppersize, num_comp, 
 				num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou):
 	
 			
@@ -16,9 +16,10 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, lowersize, uppersize, 
 	# pmode - whether particle number size distribution stated by mode or explicitly
 	# pconc - number concentration of seed particles (#/cc (air))
 	# corei - index of seed material
+	# seedVr - volume ratio of component(s) comprising seed particles
 	# lowersize - smallest radius bound (um)
 	# uppersize - greatest radius bound (um)
-	# num_speci - number of components
+	# num_comp - number of components
 	# num_sb - number of size bins (exlcuding wall)
 	# MV - molar volume (cc/mol)
 	# rad0 - original radius at size bin centres (um)
@@ -75,15 +76,18 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, lowersize, uppersize, 
 	# volume concentration of seed particles (cm3/cc (air)), note radn scaled up to 
 	# cm from um
 	Vperbin = ((pconc_new*(4.0/3.0)*np.pi*(radn*1.0e-4)**3.0))
-	# corresponding molecular concentration of seed material (molecules/cc (air))
-	y[corei:(num_speci*(num_sb)+corei):num_speci] += Vperbin/(MV[corei]/NA)
-	
+
+	if (sum(pconc_new) > 0.0): # account for concentration of components comprising seed
+		for ci in corei: # loop through indices of seed components 
+			# concentration in all size bins (molecules/cc (air)):
+			y[num_comp+corei[ci]:(num_comp*(num_sb)+corei[ci]):num_comp] += (NA/MV[corei[ci]])*(Vperbin*(seedVr[ci]/sum(seedVr)))
+
 	# loop through size bins to estimate new total volume concentrations (um3/cc (air))
 	Vtot = np.zeros((num_sb))
 	Varr = np.zeros((num_sb)) # volume concentration of single particles (um3/cc (air))
 	mass_conc = 0.0 # mass concentration of particles (g/cm3)
 	for i in range(num_sb):
-		Vtot[i] = np.sum(y[num_speci*i:num_speci*(i+1)]/NA*MV*1.0E12)
+		Vtot[i] = np.sum(y[num_comp*i:num_comp*(i+1)]/NA*MV*1.0E12)
 		# new volume concentration of single particles (um3/cc (air))
 		if N_perbin[i]>0.0:
 			Varr[i] = Vtot[i]/N_perbin[i]

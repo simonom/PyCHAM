@@ -119,8 +119,7 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# update gas-phase concentration (molecules/cc (air)) and vapour pressure
 	# of water (log10(atm))
 	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH, si.N_A)
-	#print(C_H2O/Cfactor)
-	#a=b
+	
 	# append empty element to y and y_mw to hold water values
 	y = np.append(y, C_H2O)
 	y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
@@ -129,17 +128,22 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
-	
-	# if seed particles present and made of a 'core' material
-	if sum(sum(pconc))>0.0 and seed_name == 'core':
+
+	# empty array for index of seed component(s)
+	corei = np.zeros((len(seed_name)))	
+
+	# if seed particles present and comprise a 'core' component
+	if (sum(sum(pconc)) > 0. and ('core' in seed_name)):
 		# append core gas-phase concentration (molecules/cc (air)) and molecular 
 		# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
 		# calculations)
 		y = np.append(y, 0.) 
 		y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
-		corei = num_speci # index of core component
-		num_speci += 1 # update number of species to account for core material
+		indx = seed_name.index('core')
+		corei[indx] = num_speci # index of core component
+		num_speci += 1 # update number of components to account for core material
 		spec_namelist.append('core') # append core's name to component name list
+
 	# if nucleating component formed of core component
 	if nuc_comp[0] == 'core':
 		if sum(sum(pconc))>0.0 and seed_name == 'core':
@@ -153,13 +157,22 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	else:
 		nuci = -1 # filler
 		
-	# if seed particles made of a non-'core' material
-	if seed_name != 'core':
-		# append core gas-phase concentration (molecules/cc (air)) and molecular weight 
-		# (g/mol) (needs to have a 1 length in second dimension for the kimt calculations)
-		corei = spec_namelist.index(seed_name) # index of core component
-	if sum(sum(pconc)) == 0.0: # no seed particle case
-		corei = -1 # filler
+	# if seed particles contain non-'core' component(s)
+	non_core_flag = 0
+	if ('core' in seed_name and len(seed_name)>1):
+		non_core_flag = 1
+	if ('core' not in seed_name and len(seed_name)>0):
+		non_core_flag = 1
+	if (non_core_flag == 1):
+		indx = 0
+		for seedi in seed_name:
+			if (seedi != 'core'):
+				# index of core component
+				corei[indx] = spec_namelist.index(seedi)
+			indx += 1 # count on core component(s)
+
+	if (sum(sum(pconc)) == 0.0): # no seed particle case
+		corei = np.ones((1))*-1 # filler
 		core_diss = 1.0 # ensure no artefact in Raoult term due to this filler
 	
 	# get index of component with latter injections
@@ -170,8 +183,10 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			inj_indx[i] = spec_namelist.index(Compt[i])
 	else:
 		inj_indx = np.zeros((1)) # dummy
-	# ensure inj_indx is integer type
+
+	# ensure index arrays are integer type
 	inj_indx = inj_indx.astype('int')
+	corei = np.array((corei)).astype('int')
 	
 	return (y, H2Oi, y_mw, num_speci, Cfactor, y_indx_plot, corei, dydt_vst, 
 				spec_namelist, inj_indx, core_diss,

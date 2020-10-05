@@ -99,9 +99,11 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('\n')
 	# testing with 16 size bins and the MCM alpha-pinene chemical scheme
 	# showed that using the vectorised Python code gave just 1 %
-	# increase in wall clock compared to using numba, and won't
+	# increase in wall clock time compared to using numba, and won't
 	# give the gradual slow down in computation that arises with numba
-	# when many integration time steps are set, therefore we use the
+	# when many integration time steps are set, furthermore it means that 
+	# for fast integration systems, time isn't wasted on compilation, 
+	# therefore we use the
 	# vectorised form by default and the numba version is commented out 
 	# below
 	f.write('	def dydt(t, y): # define the ODE(s)\n')
@@ -151,7 +153,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		# size bins in rows, components in columns\n')
 		f.write('		ymat = (y[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)\n')		
 		f.write('		# total particle-phase concentration per size bin (molecules/cc (air))\n')
-		f.write('		csum = (ymat.sum(axis=1)-ymat[:, corei]+ymat[:, corei]*core_diss).reshape(-1, 1)\n')
+		f.write('		csum = ((ymat.sum(axis=1)-ymat[:, corei].sum(axis=1))+((ymat[:, corei]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)\n')
 		f.write('		# size bins with contents \n')
 		f.write('		isb = (csum[:, 0]>0.)\n')
 		f.write('		\n')
@@ -159,7 +161,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		Csit = np.zeros((num_asb, num_comp))\n')
 		f.write('		# gas-phase concentration of components at\n')
 		f.write('		# particle surface (molecules/cc (air))\n')
-		f.write('		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]\n')		
+		f.write('		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]\n')	
 		f.write('		# partitioning rate (molecules/cc/s)\n')
 		f.write('		dd_all = kimt*(y[0:num_comp].reshape(1, -1)-Csit)\n')
 		f.write('		# gas-phase change\n')
@@ -261,7 +263,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		# size bins in rows, components in columns\n')
 		f.write('		ymat = (y[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)\n')
 		f.write('		# total particle-phase concentration per size bin (molecules/cc (air))\n')
-		f.write('		csum = ymat.sum(axis=1)-ymat[:, corei]+ymat[:, corei]*core_diss\n')
+		f.write('		csum = ymat.sum(axis=1)-ymat[:, corei].sum(axis=1)+(ymat[:, corei]*core_diss).sum(axis=1)\n')
 		f.write('		\n')
 		f.write('		# effect of particle on gas\n')
 		f.write('		for isb in range(int(num_asb)): # size bin loop\n')

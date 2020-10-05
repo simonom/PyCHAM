@@ -20,8 +20,8 @@ def rec_prep(nrec_step,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	lowsize, uppsize, rad0, radn, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV):
+	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
+	const_infl_t, infx_cnt, con_infl_C, MV):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -96,7 +96,10 @@ def rec_prep(nrec_step,
 	# seedt_cnt - count on injection of seed particles
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
-	# corei - index of core component
+	# corei - index of component(s) comprising seed particles
+	# seedVr - volume ration of component(s) comprising seed particles
+	# seed_name - name(s) of component(s) comprising seed particles
+	# seedVr - volume ratio of component(s) comprising seed particles
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
 	# rad0 - initial radius at size bin centres (um)
@@ -140,8 +143,8 @@ def rec_prep(nrec_step,
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
-		uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
+		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
+		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
 	
 	

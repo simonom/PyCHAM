@@ -126,16 +126,16 @@ def plotter(caller):
 	
 		# don't use the first boundary as it's zero, so will error when log10 taken
 		log10D = np.log10(rbou_rec[:, 1::]*2.0)
-		if (num_asb>1) :
+		if (num_asb > 1) :
 			# note, can't append zero to start of log10D to cover first size bin as the log10 of the
 			# non-zero boundaries give negative results due to the value being below 1, so instead
 			# assume same log10 distance as the next pair
 			log10D = np.append((log10D[:, 0]-(log10D[:, 1]-log10D[:, 0])).reshape(-1, 1), log10D, axis=1)
 			# radius distance covered by each size bin (log10(um))
 			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], log10D.shape[1]-1)
-		if (num_asb == 1): # just one particle size bin
+		if (num_asb == 1): # single particle size bin
 			# assume lower radius bound is ten times smaller than upper
-			dlog10D = (log10D-np.log10((rbou_rec[:, 1]/10.0)*2.0)).reshape(log10D.shape[0], 1)
+			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
 			
 	
 		# number size distribution contours (/cc (air))

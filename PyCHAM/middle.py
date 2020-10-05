@@ -22,10 +22,10 @@ def middle():
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
-		core_diss, core_dens, light_stat, light_time, daytime, lat, 
+		core_diss, core_dens, seedVr, light_stat, light_time, daytime, lat, 
 		lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
-		const_infl_t, con_infl_C, dydt_trak, vol_comp, volP, 
-		act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
+		const_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac] = ui.share(0)
@@ -61,7 +61,8 @@ def middle():
 	# get component properties
 	[Psat, y_dens, Psat_Pa] = prop_calc.prop_calc(comp_list, Pybel_objects, temp[0], H2Oi, 
 		num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
-		uman_up, core_dens, comp_namelist, 0, nuci, nuc_comp, num_sb)
+		uman_up, core_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
+		seed_name)
 	
 	# prepare for the calcuation of partitioning variables
 	[DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
@@ -75,7 +76,7 @@ def middle():
 	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
 		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei,
+		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei, seedVr,
 		comp_namelist, act_coeff, wall_on)
 	
 	print('Calling integration routine, starting timer')
@@ -88,8 +89,8 @@ def middle():
 		jac_den_indx, jac_indx, RO2_indx, H2Oi, temp, tempt, 
 		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-		dydt_vst, siz_str, num_sb, num_comp, corei, core_diss, Psat, 
-		mfp, therm_sp,  
+		dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
+		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
 		y_rind, 

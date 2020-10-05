@@ -4,7 +4,7 @@ import os
 import sys
 import numpy as np
 
-def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time, injectt, Ct):
+def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, chem_sch_mark, af_path, int_tol, update_stp, tot_time, RH, uman_up, light_stat, light_time, injectt, Ct, dens_comp, dens, seed_name, seedVr, seed_diss):
 
 	# inputs: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
@@ -32,6 +32,12 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, 
 	# light_time - time that lights attain status
 	# injectt - times of instantaneous injections of gas-phase components (s)
 	# Ct - concentrations of components instantaneously injected (ppb)
+	# dens_comp - chemical scheme names of components with density 
+	# manually assigned
+	# dens - manually assigned densities (g/cc)
+	# seed_name - name of component(s) comprising seed particles
+	# seedVr - volume ratio of component(s) comprising seed particles
+	# seed_diss - dissociation constant for seed particle component(s)
 	# --------------------------------------------------------------------
 
 	print('Checking user inputs')
@@ -144,5 +150,26 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, 
 	if (len(injectt) != Ct.shape[1]):
 		print('Error: number of times given for the instantaneous injection of gas-phase components (injectt in the model variables input file) is inconsistent with the number of concentrations of instantaneous injection provided (Ct in the model variables input file), please see the README for guidance')
 		sys.exit()
+
+	# check on consistency of manually assigned densities
+	if (len(dens_comp) != len(dens)):
+		print('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
+		sys.exit()
+
+	# check on consistency of names of seed component(s) and their volume ratio
+	if (len(seed_name) != len(seedVr)):
+		if (len(seed_name) > 1) and (len(seedVr) == 1):
+			seedVr = np.ones((len(seed_name)))
+		else:
+			print('Error: the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component volume ratios (seedVr in model variables input file) are inconsistent, please see README for guidance')
+			sys.exit()
+
+	# check on consistency of names of seed component(s) and their dissociation constant
+	if (len(seed_name) != len(seed_diss)):
+		if (len(seed_name) > 1) and (len(seed_diss) == 1):
+			seed_diss = np.ones((len(seed_name)))
+		else:
+			print('Error: the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
+			sys.exit()
 	
-	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time)
+	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, seed_diss)

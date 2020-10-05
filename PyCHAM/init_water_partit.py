@@ -23,7 +23,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 	# therm_sp - thermal speed of components (m/s) (num_speci)
 	# Cw - concentration of wall (molecules/cc (air))
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (/s)
-	# corei - index of core component
+	# corei - index of seed particle component(s)
 	# act_coeff - activity coefficients of components (dimensionless)
 	# wall_on - marker for whether to consider wall
 	# --------------------------------------------------------------
@@ -39,13 +39,14 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			
 			# partitioning coefficient and kelvin factor
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
-								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-								H2Oi, act_coeff, wall_on, 0)
+				surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
+				x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
+				H2Oi, act_coeff, wall_on, 0)
 
-			# get core properties
-			# concentration (molecules/cc (air))
-			ycore = y[num_speci*(sbstep+1)+corei]*core_diss
+			# get seed particle properties: concentration (molecules/cc (air))
+			ycore = 0.			
+			for ci in range(len(corei)):
+				ycore += y[num_speci*(sbstep+1)+corei[ci]]*core_diss[ci]
 			
 			# first guess of particle-phase water concentration based on RH = mole 
 			# fraction (molecules/cc (air))
@@ -58,12 +59,13 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			# concentration of water at particle surface in gas phase (molecules/cc (air))
 			Wc_surf = y[num_speci*(sbstep+1)+H2Oi]
 			
-			# total particle surface gas-phase concentration of all species 
+			# total particle surface gas-phase concentration of all components 
 			# (molecules/cc (air)):
 			conc_sum = (np.sum(y[num_speci*(sbstep+1):num_speci*(sbstep+2)]))
 			# account for core dissociation constant
-			conc_sum = (conc_sum-y[num_speci*(sbstep+1)+corei]+
-							(y[num_speci*(sbstep+1)+corei]*core_diss))
+			for ci in range(len(corei)):
+				conc_sum = (conc_sum-y[num_speci*(sbstep+1)+corei[ci]]+
+					(y[num_speci*(sbstep+1)+corei[ci]]*core_diss[ci]))
 			
 			# partitioning coefficient and kelvin factor
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
@@ -108,9 +110,11 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				conc_sum = (np.sum(y[num_speci*(sbstep+1):num_speci*(sbstep+2)]))
 				
 				# account for core dissociation constant
-				conc_sum = (conc_sum-y[num_speci*(sbstep+1)+corei]+
-								(y[num_speci*(sbstep+1)+corei]*core_diss))
-				
+				# account for core dissociation constant
+				for ci in range(len(corei)):
+					conc_sum = (conc_sum-y[num_speci*(sbstep+1)+corei[ci]]+
+						(y[num_speci*(sbstep+1)+corei[ci]]*core_diss[ci]))
+					
 				Csit = (Wc_surf/conc_sum)*Psat[0, H2Oi]*kelv_fac[sbstep, 0]*act_coeff[0, H2Oi]
 		
 				

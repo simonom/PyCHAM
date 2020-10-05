@@ -6,6 +6,7 @@
 import numpy as np
 import os
 import pp_dursim
+import volat_calc
 
 # define function
 def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time, 
@@ -13,7 +14,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
-	mean_rad, corei, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
+	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor):
 
 	# inputs: ------------------------------------------------
@@ -60,7 +61,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# N_perbin - concentration of particles (#/cc (air))
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
-	# corei - index of core component
+	# corei - index of component(s) comprising seed particles
+	# seedVr - volume ratio of component(s) comprising seed particles
+	# seed_name - name(s) of component(s) comprising seed 
+	#	particles
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
 	# num_sb - number of size bins
@@ -157,8 +161,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			
 			# update vapour pressures of all components (molecules/cc and Pa), 
 			# ignore density output
-			[Psat, _, Psat_Pa] = volat_calc(0, Pybel_objects, temp_now, H2Oi,   
-							num_comp, Psat_water, [], [], 0, corei, 
+			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_now, H2Oi,   
+							num_comp, Psat_water, [], [], 0, corei, seed_name, 
 							pconc, 0, 0.0, [], 1)
 
 			# note, assume that air pressure inside chamber stays constant despite
@@ -234,7 +238,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
 					Varr] = pp_dursim.pp_dursim(y[num_comp:-num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
-					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], corei, lowsize, 
+					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], corei, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					std[:, seedt_cnt], y_dens, H2Oi, rbou)
 			if (seedt_cnt<(pconct.shape[1]-1)):

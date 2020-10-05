@@ -21,8 +21,8 @@ def ode_updater(update_stp,
 	jac_den_indx, jac_indx, RO2_indx, H2Oi,	temp, tempt, 
 	Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-	dydt_vst, siz_str, num_sb, num_comp, corei, core_diss, Psat, 
-	mfp, therm_sp,
+	dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
+	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
 	y_rind, 
@@ -73,7 +73,9 @@ def ode_updater(update_stp,
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
-	# corei - index of seed material
+	# corei - index of component(s) comprising seed material
+	# seed_name - name(s) of component(s) comprising seed particles
+	# seedVr - volume ratio of component(s) comprising seed material
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
 	# 	(molecules/cc (air))
@@ -201,7 +203,7 @@ def ode_updater(update_stp,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
+	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV)
 
 	print('Starting loop through update steps')	
@@ -216,8 +218,8 @@ def ode_updater(update_stp,
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, lowsize, 
-			uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
+			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
 		
 		# ensure end of time interval does not surpass recording time
@@ -259,7 +261,7 @@ def ode_updater(update_stp,
 		
 		# take last installment from res
 		y = res[-1, :]
-
+		
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		update_count += tnew # time since operator-split processes last called

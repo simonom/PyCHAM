@@ -274,5 +274,7 @@ RO2 = NISOPO2 + ISOP34O2 + CH3C2H2O2 + MACO3 + MACRO2 + MACROHO2 +
 * Reaction definitions. ;
 % 0.0 : SA = SA ;
 % 0.0 : O = O ;
+% 0.0 : N = N ;
+% 0.0 : ELVOC_o3 = ELVOC_o3 ;
 *;
 * End of Subset.  No. of Species = 1, No. of Reactions = 1 ;

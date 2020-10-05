@@ -1,6 +1,6 @@
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2020-10-02 09:30:28.662084
+# created at 2020-10-05 15:16:19.558662
 
 import numpy
 import photolysisRates
@@ -26,9 +26,18 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 
 	if lightm == 0:
 		J = [0]*len(J)
-	rate_values = numpy.zeros((2))
+	rate_values = numpy.zeros((11))
 	# reac_coef has been formatted so that python can recognize it
-	rate_values[0] = 0.0
-	rate_values[1] = 0.0
+	rate_values[0] = J[1]
+	rate_values[1] = J[2]
+	rate_values[2] = 6.3e-16*numpy.exp(-580/TEMP)*0.57
+	rate_values[3] = 6.3e-16*numpy.exp(-580/TEMP)*0.37
+	rate_values[4] = 1.2e-12*numpy.exp(490/TEMP)*0.65
+	rate_values[5] = 1.2e-12*numpy.exp(490/TEMP)*0.35
+	rate_values[6] = 1.2e-11*numpy.exp(440/TEMP)*0.482
+	rate_values[7] = 1.2e-11*numpy.exp(440/TEMP)*0.293
+	rate_values[8] = 1.2e-11*numpy.exp(440/TEMP)*0.065
+	rate_values[9] = 1.2e-11*numpy.exp(440/TEMP)*0.08
+	rate_values[10] = 6.3e-16*numpy.exp(-580/TEMP)*0.06
 	
 	return rate_values
