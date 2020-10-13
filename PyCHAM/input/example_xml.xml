@@ -18215,5 +18215,14 @@
 <species species_number="s6054" species_name="N">
 <smiles>N</smiles>
 </species>
+<species species_number="s6055" species_name="AMM_SUL">
+<smiles>O=S(=O)(O)O.N.N</smiles>
+</species>
+<species species_number="s6056" species_name="C3H7N2O">
+<smiles>CC(=O)CN</smiles>
+</species>
+<species species_number="s6056" species_name="C6H8N2">
+<smiles>CC1=CN=C(C)C=N1</smiles>
+</species>
 </species_defs>
 </mechanism>

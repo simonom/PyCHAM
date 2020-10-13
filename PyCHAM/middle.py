@@ -32,23 +32,29 @@ def middle():
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
-	[rindx, pindx, rstoi, pstoi, nreac, nprod, comp_num, 
-	jac_stoi, njac, jac_den_indx, 
-	jac_indx, RO2_indx, comp_list, Pybel_objects, eqn_num, 
-	comp_namelist, Jlen, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
-	reac_col, prod_col, rstoi_flat, 
-	pstoi_flat, rr_arr, rr_arr_p, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx] = eqn_pars.extr_mech(sch_name, 
-		chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
-		(num_sb+wall_on), const_comp)
-	
+	[rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, 
+	jac_stoi_g, njac_g, jac_den_indx_g, 
+	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
+	reac_col_g, prod_col_g, rstoi_flat_g, 
+	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
+	jac_part_indx, comp_num, RO2_indx, comp_list, Pybel_objects, eqn_num, 
+	comp_namelist, Jlen, 
+	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
+	nreac_aq, nprod_aq, jac_stoi_aq, 
+	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
+	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
+	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
+	rr_arr_aq, rr_arr_p_aq] = eqn_pars.extr_mech(sch_name, 
+	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
+	(num_sb+wall_on), const_comp)
+
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
-	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx, 
-	pindx, eqn_num[0], nreac, nprod, 
-	comp_namelist, Compt, seed_name, 
+	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
+	pindx_g, eqn_num[0], nreac_g, nprod_g, 
+	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp)
 	
 	# dump new pickle file ready for plotting script to use
@@ -84,24 +90,30 @@ def middle():
 	
 	# solve problem
 	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, rbou_rec] = ode_updater.ode_updater(update_stp, 
-		tot_time, save_step, y, rindx, 
-		pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
-		jac_den_indx, jac_indx, RO2_indx, H2Oi, temp, tempt, 
+		tot_time, save_step, y, rindx_g, 
+		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
+		jac_den_indx_g, jac_indx_g, RO2_indx, H2Oi, temp, tempt, 
 		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
 		dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
-		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
-		y_rind, 
-		uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
-		rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
+		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g,
+		y_rind_g, 
+		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
+		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 		nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, const_infl_t, MV)
+		uppsize, std, rbou, const_infl_t, MV,
+		rindx_aq, 
+		pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
+		jac_den_indx_aq, jac_indx_aq, y_arr_aq,
+		y_rind_aq, 
+		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
+		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		

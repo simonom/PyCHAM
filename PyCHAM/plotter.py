@@ -163,7 +163,6 @@ def plotter(caller):
 		
 		# contour plot with times (hours) along x axis and 
 		# particle diameters (nm) along y axis
-		
 		for ti in range(len(timehr)-1): # loop through times
 			p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), z[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
 	
@@ -204,7 +203,7 @@ def plotter(caller):
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
 		par1.set_ylabel('N (# $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
-		par1.ticklabel_format(style='sci', scilimits=(0,0)) # scientific notation used on vertical axis
+		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
 		par1.yaxis.set_tick_params(labelsize=14)
 
 		# SOA mass concentration ---------------------------------------------------------------
@@ -237,15 +236,16 @@ def plotter(caller):
 		else:
 			SOAmax = 0.
 		# transform SOA so no standard notation required
-		SOAvst[0, :] = SOAvst[0, :]/(10**(SOAmax))
+		SOAvst[0, :] = SOAvst[0, :]
 		
 	
 		p5, = par2.plot(timehr, SOAvst[0, :], 'xk', label = '[secondary]')
-		par2.set_ylabel(str('[secondary]/ ' + str(10**(SOAmax)) + ' ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
+		par2.set_ylabel(str('[secondary] ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
 		# set label, tick font and [SOA] vertical axis to red to match scatter plot presentation
 		par2.yaxis.label.set_color('black')
 		par2.tick_params(axis='y', colors='black')
 		par2.spines['right'].set_color('black')
+		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
 		par2.yaxis.set_tick_params(labelsize=16)
 		par2.text((timehr)[0], max(SOAvst[0, :])/2.0, 'assumed particle density = 1.0 $\mathrm{g\, cm^{-3}}$')
 		plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)	

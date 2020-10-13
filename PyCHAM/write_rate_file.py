@@ -3,10 +3,11 @@
 
 import datetime
 
-def write_rate_file(reac_coef, rrc, rrc_name, testf): # define function
+def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define function
 
 	# inputs: ----------------------------------------------------------------------------
-	# reac_coef - the reaction rate coefficient expression from the equation file
+	# reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
+	# reac_coef_aq - aqueous-phase reaction rate coefficient expression from the equation file
 	# rrc - expression for generic reaction rate coefficients
 	# rrc_name - name given to generic reaction rate coefficients	
 	# testf - flag for mode: 0 in gas-phase equation mode, 2 for test mode, 3 for
@@ -57,14 +58,20 @@ def write_rate_file(reac_coef, rrc, rrc_name, testf): # define function
 	f.write('		J = [0]*len(J)\n')
 
 	# calculate the rate coefficient for each equation
-	f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef)))
+	f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))
 	# BE NOTIFIED!!!: before writing the script, 'reac_coef' must be converted to 
 	# python-compatible format
+	f.write('	\n')	
 	f.write('	# reac_coef has been formatted so that python can recognize it\n')
-	for eqn_key in range (len(reac_coef)):
-		f.write('	rate_values[%s] = %s\n' %(eqn_key, reac_coef[eqn_key]))
+	f.write('	# gas-phase reactions\n')
+	for eqn_key in range (len(reac_coef_g)):
+		f.write('	rate_values[%s] = %s\n' %(eqn_key, reac_coef_g[eqn_key]))
 	f.write('	\n')
-	f.write('	return rate_values\n')
+	f.write('	# aqueous-phase reactions\n')
+	for eqn_key_aq in range (1, len(reac_coef_aq)+1):
+		f.write('	rate_values[%s] = %s\n' %(eqn_key+eqn_key_aq, reac_coef_aq[eqn_key_aq-1]))
+	f.write('	\n')
+	f.write('	return(rate_values)\n')
 	f.close()
 
 	return()

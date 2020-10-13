@@ -14,7 +14,7 @@ def def_mod_var(caller): # define function
 	# names ---------------------------------------------------------------------------------
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
-	sch_name = os.getcwd()+'/PyCHAM/input/example_scheme.txt' #'/PyCHAM/output/GMD_paper_plotting_scripts/moving_centre_scheme.txt' # chemical scheme file path
+	sch_name = os.getcwd()+'/PyCHAM/input/example_scheme.txt'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
 	chem_sch_mark = ['%', 'RO2', '+', '', '', ';', '+', ';', '', '%', ':', ';']
 	xml_name = os.getcwd()+'/PyCHAM/input/example_xml.xml' # xml file path
@@ -47,8 +47,8 @@ def def_mod_var(caller): # define function
 	lowsize = 0. # smallest size bin boundary (radius) (um)
 	uppsize = 5.e-1 # largest size bin boundary (radius) (um)
 	space_mode = 'lin' # treatment for spacing between size bins
-	std = np.zeros((1, 1)) # standard deviation for particle number size distribution
-	mean_rad = np.zeros((1, 1)) # mean radius for particle number size distribution (um)
+	std = np.ones((1, 1))*1.2 # standard deviation for particle number size distribution
+	mean_rad = np.ones((1, 1))*-1.e6 # mean radius for particle number size distribution (um)
 	new_partr = 2.e-7 # radius of newly nucleated particles (cm)
 	# nucleation parameters
 	nucv1 = 0.

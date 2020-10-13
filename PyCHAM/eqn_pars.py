@@ -11,6 +11,8 @@ import write_RO2_indices
 import write_dydt_rec
 import write_ode_solv
 import write_rate_file
+import jac_setup
+import aq_mat_prep
 
 # define function to extract the chemical mechanism
 def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
@@ -40,19 +42,44 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	f_open_eqn.close() # close file
 	
 	# interrogate scheme to list equations
-	[eqn_list, eqn_num, rrc, rrc_name, RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
+	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
+		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
 	
 	# interrogate xml to list component names and SMILES
 	[comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
+
+	# get equation information for chemical reactions
+	[rindx_g, rstoi_g, pindx_g, pstoi_g, reac_coef_g, 
+		nreac_g, nprod_g, jac_stoi_g, 
+		jac_den_indx_g, njac_g, jac_indx_g, 				
+		y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, 
+		uni_y_pind_g, reac_col_g, prod_col_g, rstoi_flat_g, pstoi_flat_g, 
+		rr_arr_g, rr_arr_p_g, rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
+		nreac_aq, nprod_aq, jac_stoi_aq, 
+		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
+		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
+		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
+		rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
+		comp_num] = eqn_interr.eqn_interr(eqn_num, 
+		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on)
 	
-	# get equation information for gas-phase reactions
-	[rindx, rstoi, pindx, pstoi, reac_coef, comp_namelist, comp_list, 
-		Pybel_objects, nreac, nprod, comp_num, jac_stoi, 
-		jac_den_indx, njac, jac_indx, rowvals, colptrs, y_arr, 
-		y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
-		rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, jac_wall_indx, 
-		jac_part_indx] = eqn_interr.eqn_interr(eqn_num[0], 
-		eqn_list, chem_sch_mrk, comp_name, comp_smil, 0, num_sb, wall_on)
+	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq)
+
+	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation
+	if (eqn_num[1] > 0): # if aqueous-phase reactions present
+		[rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
+			nprod_aq, jac_stoi_aq, njac_aq,
+			jac_den_indx_aq, jac_indx_aq, 				
+			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
+			uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
+			rr_arr_aq, rr_arr_p_aq] = aq_mat_prep.aq_mat_prep(rindx_aq, rstoi_aq, 
+			pindx_aq, pstoi_aq, reac_coef_aq, 
+			nprod_aq, jac_stoi_aq, njac_aq, 
+			jac_den_indx_aq, jac_indx_aq, 				
+			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
+			uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
+			rr_arr_aq, rr_arr_p_aq, num_sb, wall_on, eqn_num[1], comp_num) 
+	
 	
 	print('Generating modules dependent on chemical scheme')
 	# get index of components with constant influx/concentration -----------
@@ -78,19 +105,24 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	RO2_indx = write_RO2_indices.write_RO2_indices(comp_namelist, RO2_names)
 
 	# call function to generate reaction rate calculation module
-	write_rate_file.write_rate_file(reac_coef, rrc, rrc_name, 0)
+	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)
 
 	# call function to generate module that tracks change tendencies
 	# of certain components
 	write_dydt_rec.write_dydt_rec()
 
 	# get number of photolysis equations
-	Jlen = photo_num.photo_num(photo_path) 
+	Jlen = photo_num.photo_num(photo_path)
 
-
-	return(rindx, pindx, rstoi, pstoi, nreac, nprod, comp_num, jac_stoi, 
-		njac, jac_den_indx, jac_indx, RO2_indx, comp_list, 
-		Pybel_objects, eqn_num, comp_namelist, Jlen, y_arr, y_rind,
-		uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
-		rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx)
+	return(rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, 
+		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,
+		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
+		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
+		jac_wall_indx, jac_part_indx, comp_num, RO2_indx, comp_list, 
+		Pybel_objects, eqn_num, comp_namelist, Jlen, 
+		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
+		nreac_aq, nprod_aq, jac_stoi_aq, 
+		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
+		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
+		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
+		rr_arr_aq, rr_arr_p_aq)

@@ -33,7 +33,13 @@ def ode_updater(update_stp,
 	nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, Rader, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-	uppsize, std, rbou, const_infl_t, MV):
+	uppsize, std, rbou, const_infl_t, MV,
+	rindx_aq, 
+	pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
+	jac_den_indx_aq, jac_indx_aq, y_arr_aq,
+	y_rind_aq, 
+	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
+	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num):
 
 	import ode_solv # import most updated version
 	# inputs: ----------------------------------------------------
@@ -167,6 +173,30 @@ def ode_updater(update_stp,
 	# rbou - size bin radius bounds (um)
 	# const_infl_t - times for constant influxes (s)
 	# MV - molar volume (cc/mol)
+	# rindx_aq - index of reactants for aqueous-phase 
+	# pindx_aq - index of products for aqueous-phase
+	# rstoi_aq - stoichiometry of reactants for aqueous-phase
+	# pstoi_aq - stoichiometry of products for aqueous-phase
+	# nreac_aq - number of reactants per aqueous-phase reaction
+	# nprod_aq - number of products per aqueous-phase reaction
+	# jac_stoi_aq - stoichiometry for Jacobian for aqueous-phase
+	# njac_aq - number of Jacobian elements per aqueous-phase reaction 
+	# jac_den_indx_aq - index of Jacobian denominators 
+	# jac_indx_aq - index of  Jacobian for aqueous-phase
+	# y_arr_aq - y indices for aqueous-phase
+	# y_rind_aq - reactant indices for aqueous-phase 
+	# uni_y_rind_aq - y indices for reactants for aqueous-phase
+	# y_pind_aq - y indices for products for aqueous-phase
+	# uni_y_pind_aq - y indices for products for aqueous-phase
+	# reac_col_aq - columns of sparse matrix for aqueous-phase
+	# prod_col_aq - columns of sparse matrix for aqueous-phase
+	# rstoi_flat_aq - reactant stoichiometries for Jacobian for 
+	# 	aqueous-phase
+	# pstoi_flat_aq - product stoichiometries for Jacobian for
+	#	aqueous-phase
+	# rr_arr_aq - aqueous-phase reaction rate indices
+	# rr_arr_p_aq - aqueous-phase reaction rate indices
+	# eqn_num - number of reactions in gas- and aqueous-phase
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -242,7 +272,6 @@ def ode_updater(update_stp,
 			kimt = kelv_fac = 0.
 		
 		# reaction rate coefficient
-		
 		rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
@@ -257,7 +286,12 @@ def ode_updater(update_stp,
 			pstoi_flat, rr_arr, rr_arr_p, rowvals, colptrs, num_comp, 
 			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,
 			corei, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
-			jac_part_indx)
+			jac_part_indx,
+			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
+			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
+			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
+			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
+			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num)
 		
 		# take last installment from res
 		y = res[-1, :]

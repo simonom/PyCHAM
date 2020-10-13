@@ -15,8 +15,8 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 	# --------------------------------------------------------------------------
 	
 	# preparatory part ---------------------------------------------------------
-	eqn_list = [] # empty list for gas-phase equation reactions
-	naked_list_peqn = [] # empty list for other equation reactions
+	eqn_list = [] # empty list for gas-phase reaction equation
+	aqeqn_list = [] # empty list for particle-phase reaction equation
 	RO2_names = [] # empty list for peroxy radicals
 	rrc = [] # empty list for reaction rate coefficients
 	rrc_name = [] # empty list for reaction rate coefficient labels
@@ -34,28 +34,32 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 		# --------------------------------------------------------------------------------
 		# generic reaction rate coefficients part
 		# marker at end of generic reaction rate coefficient lines
-		end_mark = str('$\\' + chm_sch_mrk[7])
+		# the first \ allows python to interpret the second \ as a dash
+		# to use in regex which means an escape in case the marker is a
+		# regex special character
+		# the $ means occurs at end of string
+		end_mark = str('\\' + chm_sch_mrk[7]+'$')
 		# look out for start of generic reaction rate coefficients
 		# could be generic reaction coefficient if just one = in line
 		
-		if len(line1.split('='))==2:
+		if (len(line1.split('=')) == 2):
 			rrc_flag = 1
 			# don't record if nothing preceding '=' (can occur in KPP files, e.g.
 			# =IGNORE)
 			if (len((line1.split('=')[0]).strip()) == 0):
 				rrc_flag = 0
-				# don't record if this just an IGNORE command
+			# don't record if this just an IGNORE command
 			if len((line1.split('=')[1]).strip()) >= 6:
-				if (line1.split('=')[1]).strip()[0:6]=='IGNORE':
+				if (line1.split('=')[1]).strip()[0:6] == 'IGNORE':
 					rrc_flag = 0
 			# don't record if marker (if one present) for end of generic reaction rate
 			# coefficient lines not present
-			if len(chm_sch_mrk[7])>0:
-				if re.match(end_mark, line1) == None:
+			if (len(chm_sch_mrk[7]) > 0):
+				if re.search(end_mark, line1.strip()) == None:
 					rrc_flag = 0
 			
-			if rrc_flag == 1: 
-			
+			if (rrc_flag == 1): 
+				
 				# dont consider if start of peroxy radical list
 				if (line1.split('=')[0]).strip() != chm_sch_mrk[1]:
 					# don't consider if a gas-phase chemical scheme reaction
@@ -72,16 +76,16 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 							line2 = formatting.convert_rate_mcm(line2)
 							rrc.append(line2.strip())
 							# get just name of generic reaction rate coefficient
-							rrc_name.append((line2.split('=')[0]).strip())
+							rrc_name.append((line2.split('=')[0]).strip())		
 			
 		# --------------------------------------------------------------------------------
 		# peroxy radical part
 		# now start logging peroxy radicals
-		
-		RO2_start_mark = str('.*' + chm_sch_mrk[1])
+		RO2_start_mark = str('^' + chm_sch_mrk[1])
 		
 		# if starting marker for peroxy radical list seen, flag that recording needed
 		if (re.match(RO2_start_mark, line1) != None):
+			
 			# to double check that recording needed for peroxy radicals (in case 
 			# chm_sch_mrk[1] is not unique
 			
@@ -101,7 +105,12 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 			mark = str('.*\\' + chm_sch_mrk[6])
 			if (re.match(mark, line1) != None):
 				pr_flag = 1
-		
+			
+			# if line end or continuation marker not supplied then assume the RO2 start
+			# marker is unique
+			if (len(chm_sch_mrk[5].strip()) == 0 and len(chm_sch_mrk[6].strip()) == 0):
+				pr_flag = 1
+					
 		if (pr_flag == 1):
 			# get the elements in line separated by peroxy radical separator
 			line2 = line1.split(chm_sch_mrk[2])
@@ -145,6 +154,7 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 				mark = str('.*\\' + chm_sch_mrk[6])
 				if (re.match(mark, line1) == None):
 					pr_flag = 0
+		
 		# --------------------------------------------------------------------------------
 		# gas-phase reaction equation part
 		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
@@ -158,6 +168,7 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 			if (re.match(eqn_markers[0], line1) != None and 
 				re.match(eqn_markers[1], line1) != None):
 				eqn_list.append(line1) # store reaction equations
+
 		# aqueous-phase reaction equation part
 		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
 		# and second \ ensures recognition of marker
@@ -168,15 +179,14 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 			
 			marker = str('^\\' +  chm_sch_mrk[8])
 			if (re.match(marker, line1) != None):
-				
 				# second check is whether markers for starting reaction rate coefficients
 				# part, and markers for end of equation lines, are present
 				eqn_markers = [str('.*\\' +  chm_sch_mrk[9]), str('.*\\' +  chm_sch_mrk[11])]
 				if (re.match(eqn_markers[0], line1) != None and 
 					re.match(eqn_markers[1], line1) != None):
-					naked_list_peqn.append(line1) # store reaction equations
+					aqeqn_list.append(line1) # store reaction equations
 
 	# number of equations
-	eqn_num = np.array((len(eqn_list), len(naked_list_peqn)))
-			
-	return(eqn_list, eqn_num, rrc, rrc_name, RO2_names)
+	eqn_num = np.array((len(eqn_list), len(aqeqn_list)))
+	
+	return(eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, RO2_names)

@@ -53,7 +53,6 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# isolate the starting number size distribution information
 	i = (pconct[0, :] == 0) # index of initial information
-	
 	if (sum(i) == 0): # if no initial information provide fillers
 		pconcn = np.zeros((1))
 		stdn = 1.e20
@@ -65,9 +64,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
 	if (sum(mean_radn == -1.e6)>0) and (num_sb>0):
-		if lowersize>0.0:
+		if (lowersize > 0.):
 			mean_radn[mean_radn == -1.e6] = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
-		if lowersize == 0.0:
+		if (lowersize == 0.):
 			mean_radn[mean_radn == -1.e6] = 10**((np.log10(uppersize))/2.0)
 	
 	# index of nucleating component
@@ -75,7 +74,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		nuc_compi = spec_namelist.index(nuc_comp[0])
 		nuc_comp = np.empty(1, dtype=int)
 		nuc_comp[0] = nuc_compi
-	
+
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
