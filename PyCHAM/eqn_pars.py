@@ -99,7 +99,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and seed material
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), con_C_indx)
+			(num_sb-wall_on), con_C_indx, 0)
 	
 	# get index of components in the peroxy radical list
 	RO2_indx = write_RO2_indices.write_RO2_indices(comp_namelist, RO2_names)

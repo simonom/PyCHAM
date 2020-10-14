@@ -9,7 +9,7 @@ import datetime
 # function to generate the ordinary differential equation (ODE)
 # solver file
 def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
-		num_asb, con_C_indx):
+		num_asb, con_C_indx, testf):
 
 	# inputs: ------------------------------------------------
 	# con_infl_indx - indices of components with constant influx
@@ -21,6 +21,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	# num_asb - number of actual size bins (excluding wall)
 	# con_C_indx - index of components with constant gas-phase 
 	#	concentration
+	# testf - marker for whether in test mode or not
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
@@ -103,6 +104,28 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# eqn_num - number of gas- and aqueous-phase reactions \n')
 	f.write('	# ---------------------------------------------\n')
 	f.write('\n')
+	
+	# the module if needed for testing
+	if (testf > 0):
+		f.write('	# gas-particle partitioning-----------------\n')
+		f.write('	# transform particle phase concentrations into\n')
+		f.write('	# size bins in rows, components in columns\n')
+		f.write('	ymat = (y[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)\n')
+		f.write('	# total particle-phase concentration per size bin (molecules/cc (air))\n')
+		f.write('	csum = ((ymat.sum(axis=1)-ymat[:, corei])+((ymat[:, corei]*core_diss))).reshape(-1, 1)\n')
+		f.write('	# size bins with contents \n')
+		f.write('	isb = (csum[:, 0]>0.)\n')
+		f.write('	\n')
+		f.write('	# container for gas-phase concentrations at particle surface\n')
+		f.write('	Csit = np.zeros((num_asb, num_comp))\n')
+		f.write('	# mole fraction of components at particle surface\n')
+		f.write('	Csit[isb, :] = (ymat[isb, :]/csum[isb, :])\n')
+		f.write('	\n')
+		f.write('	return(Csit)\n')
+		f.close() # close file
+		return()
+
+
 	# testing with 16 size bins and the MCM alpha-pinene chemical scheme
 	# showed that using the vectorised Python code gave just 1 %
 	# increase in wall clock time compared to using numba, and won't
@@ -193,9 +216,11 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		\n')
 		f.write('		# container for gas-phase concentrations at particle surface\n')
 		f.write('		Csit = np.zeros((num_asb, num_comp))\n')
+		f.write('		# mole fraction of components at particle surface\n')
+		f.write('		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])\n')	
 		f.write('		# gas-phase concentration of components at\n')
 		f.write('		# particle surface (molecules/cc (air))\n')
-		f.write('		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]\n')	
+		f.write('		Csit[isb, :] = Csit[isb, :]*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]\n')	
 		f.write('		# partitioning rate (molecules/cc/s)\n')
 		f.write('		dd_all = kimt*(y[0:num_comp].reshape(1, -1)-Csit)\n')
 		f.write('		# gas-phase change\n')

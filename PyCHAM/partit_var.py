@@ -5,22 +5,22 @@
 import numpy as np
 from part_prop import part_prop
 
-def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
+def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
 		y_dens, N_perbin, DStar_org, radius, Psat, therm_sp,
 		H2Oi, act_coeff, wall_on, caller):
 	
 	# inputs:---------------------------------------------------------------------------
 	
 	# y - concentration of components' molecules (molecules/cc (air))
-	# mfp - mean free path of gas molecules (m) (num_speci, 1)
+	# mfp - mean free path of gas molecules (m) (num_comp, 1)
 	# accom_coeff - accommodation coefficients of components in each size bin
-	# DStar_org - gas molecule diffusion coefficient (m2/s) (num_speci, 1)
+	# DStar_org - gas molecule diffusion coefficient (m2/s) (num_comp, 1)
 	# radius - particle radius (m)
 	# Psat - liquid-phase saturation vapour pressures of components (molecules/cc (air))
 	# surfT - surface tension (g/s2==mN/m==dyn/cm)
 	# y_dens - density of components (kg/m3)
 	# N_perbin - number of particles per size bin (excluding wall)
-	# therm_sp - thermal speed of components (m/s) (num_speci, 1)
+	# therm_sp - thermal speed of components (m/s) (num_comp, 1)
 	# H2Oi - water index (integer)
 	# act_coeff - activity coefficient of components (dimensionless)
 	# wall_on - marker for whether wall present
@@ -34,16 +34,16 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 		return(kimt, kelv)
 
 	if num_sb>0 and (wall_on>0): # if wall present
-		y_part = y[num_speci:-(num_speci)]
+		y_part = y[num_comp:-(num_comp)]
 	if num_sb>0 and (wall_on==0): # if wall absent
-		y_part = y[num_speci::]
+		y_part = y[num_comp::]
 	
 	# density (g/cm3) and average molecular weight (g/mol) of particles (excluding wall)
-	[tot_rho, ish, avMW] = part_prop(y_part, num_speci, (num_sb-wall_on), NA, y_mw, y_dens, 
+	[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-wall_on), NA, y_mw, y_dens, 
 					N_perbin)
 	
 	# Knudsen number (dimensionless)
-	Kn = np.repeat(mfp, (num_sb-wall_on), 1)/np.repeat(radius, num_speci, 0)
+	Kn = np.repeat(mfp, (num_sb-wall_on), 1)/np.repeat(radius, num_comp, 0)
 	
 	# update accommodation coefficients if necessary
 	# note, using __import__ rather than import allows opening in run time, thereby using
@@ -87,22 +87,22 @@ def kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw, surfT, R_gas, TEMP, 
 
 	# zero partitioning to particles for any components with low partitioning rates
 	# compared to their concentrations in the gas or particle
-	#cp = y_part.reshape(num_sb-wall_on, num_speci)
-	#cpsum = ((cp).sum(axis=1)).reshape(-1, 1).repeat(num_speci, 1)
-	#cg = (y[0:num_speci].reshape(1, -1)).repeat(num_sb-wall_on, 0)
-	#cpr = Psat*act_coeff*kelv.repeat(num_speci, 1)*cp
+	#cp = y_part.reshape(num_sb-wall_on, num_comp)
+	#cpsum = ((cp).sum(axis=1)).reshape(-1, 1).repeat(num_comp, 1)
+	#cg = (y[0:num_comp].reshape(1, -1)).repeat(num_sb-wall_on, 0)
+	#cpr = Psat*act_coeff*kelv.repeat(num_comp, 1)*cp
 	#cpr[cpsum>0.] = cpr[cpsum>0.]/cpsum[cpsum>0.]
-	#rates = np.zeros((num_sb-wall_on, num_speci))
+	#rates = np.zeros((num_sb-wall_on, num_comp))
 	#rates[cpsum>0.] = cg[cpsum>0.]-cpr[cpsum>0.]
 	#cdiff = (cg-cp)
-	#cmax = np.ones((num_sb-wall_on, num_speci))*cg[:, :]
+	#cmax = np.ones((num_sb-wall_on, num_comp))*cg[:, :]
 	#cmax[cdiff<0] = cp[cdiff<0]
-	#eff_mar = np.ones((num_sb-wall_on, num_speci))==1
+	#eff_mar = np.ones((num_sb-wall_on, num_comp))==1
 	#eff_mar[cmax>0.] = (np.abs(rates[cmax>0.])/cmax[cmax>0.])<1.e-4
 	#kimt[eff_mar] = 0.
 	# if vapour pressure very great then zero the transfer coefficient
-	#cg = (y[0:num_speci].reshape(1, -1)).repeat(num_sb-wall_on, 0)
-	#rat = np.ones((num_sb-wall_on, num_speci))<0
+	#cg = (y[0:num_comp].reshape(1, -1)).repeat(num_sb-wall_on, 0)
+	#rat = np.ones((num_sb-wall_on, num_comp))<0
 	#rat[cg>0] = (Psat[cg>0]*act_coeff[cg>0]/cg[cg>0])>1.e2
 	#kimt[rat] = 0.
 	

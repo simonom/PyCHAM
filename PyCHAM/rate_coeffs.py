@@ -1,6 +1,6 @@
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2020-10-14 13:35:59.679040
+# created at 2020-10-14 15:46:20.655476
 
 import numpy
 import photolysisRates
@@ -165,21 +165,94 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 
 	if lightm == 0:
 		J = [0]*len(J)
-	rate_values = numpy.zeros((11))
+	rate_values = numpy.zeros((84))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
-	rate_values[0] = J[1]
-	rate_values[1] = J[2]
-	rate_values[2] = 6.3e-16*numpy.exp(-580/TEMP)*0.57
-	rate_values[3] = 6.3e-16*numpy.exp(-580/TEMP)*0.37
-	rate_values[4] = 1.2e-12*numpy.exp(490/TEMP)*0.65
-	rate_values[5] = 1.2e-12*numpy.exp(490/TEMP)*0.35
-	rate_values[6] = 1.2e-11*numpy.exp(440/TEMP)*0.482
-	rate_values[7] = 1.2e-11*numpy.exp(440/TEMP)*0.293
-	rate_values[8] = 1.2e-11*numpy.exp(440/TEMP)*0.065
-	rate_values[9] = 1.2e-11*numpy.exp(440/TEMP)*0.08
-	rate_values[10] = 6.3e-16*numpy.exp(-580/TEMP)*0.06
+	rate_values[0] = 5.6e-34*N2*(TEMP/300)**-2.6*O2
+	rate_values[1] = 6.0e-34*O2*(TEMP/300)**-2.6*O2
+	rate_values[2] = 8.0e-12*numpy.exp(-2060/TEMP)
+	rate_values[3] = KMT01
+	rate_values[4] = 5.5e-12*numpy.exp(188/TEMP)
+	rate_values[5] = KMT02
+	rate_values[6] = 3.2e-11*numpy.exp(67/TEMP)*O2
+	rate_values[7] = 2.0e-11*numpy.exp(130/TEMP)*N2
+	rate_values[8] = 1.4e-12*numpy.exp(-1310/TEMP)
+	rate_values[9] = 1.4e-13*numpy.exp(-2470/TEMP)
+	rate_values[10] = 3.3e-39*numpy.exp(530/TEMP)*O2
+	rate_values[11] = 1.8e-11*numpy.exp(110/TEMP)
+	rate_values[12] = 4.50e-14*numpy.exp(-1260/TEMP)
+	rate_values[13] = KMT03
+	rate_values[14] = 2.14e-10*H2O
+	rate_values[15] = 1.70e-12*numpy.exp(-940/TEMP)
+	rate_values[16] = 7.7e-12*numpy.exp(-2100/TEMP)
+	rate_values[17] = KMT05
+	rate_values[18] = 2.9e-12*numpy.exp(-160/TEMP)
+	rate_values[19] = 2.03e-16*(TEMP/300)**4.57*numpy.exp(693/TEMP)
+	rate_values[20] = 4.8e-11*numpy.exp(250/TEMP)
+	rate_values[21] = 2.20e-13*KMT06*numpy.exp(600/TEMP)
+	rate_values[22] = 1.90e-33*M*KMT06*numpy.exp(980/TEMP)
+	rate_values[23] = KMT07
+	rate_values[24] = KMT08
+	rate_values[25] = 2.0e-11
+	rate_values[26] = 3.45e-12*numpy.exp(270/TEMP)
+	rate_values[27] = KMT09
+	rate_values[28] = 3.2e-13*numpy.exp(690/TEMP)*1.0
+	rate_values[29] = 4.0e-12
+	rate_values[30] = 2.5e-12*numpy.exp(260/TEMP)
+	rate_values[31] = KMT11
+	rate_values[32] = 4.0e-32*numpy.exp(-1000/TEMP)*M
+	rate_values[33] = KMT12
+	rate_values[34] = 1.3e-12*numpy.exp(-330/TEMP)*O2
+	rate_values[35] = 6.00e-06
+	rate_values[36] = 4.00e-04
+	rate_values[37] = 1.20e-15*H2O
+	rate_values[38] = J[1]
+	rate_values[39] = J[2]
+	rate_values[40] = J[3]
+	rate_values[41] = J[4]
+	rate_values[42] = J[5]
+	rate_values[43] = J[6]
+	rate_values[44] = J[7]
+	rate_values[45] = J[8]
+	rate_values[46] = KMT04
+	rate_values[47] = KMT10
+	rate_values[48] = 1.22e-11*0.90
+	rate_values[49] = 1.22e-11*0.10
+	rate_values[50] = 2.80e-15*numpy.exp(-770/TEMP)*0.640
+	rate_values[51] = 2.80e-15*numpy.exp(-770/TEMP)*0.100
+	rate_values[52] = 2.80e-15*numpy.exp(-770/TEMP)*0.270
+	rate_values[53] = 4.28e-11*numpy.exp(401/TEMP)*0.408
+	rate_values[54] = 4.28e-11*numpy.exp(401/TEMP)*0.222
+	rate_values[55] = 4.28e-11*numpy.exp(401/TEMP)*0.370
+	rate_values[56] = KRO2HO2*0.914
+	rate_values[57] = KRO2NO
+	rate_values[58] = KRO2NO3
+	rate_values[59] = 9.20e-14*RO2*0.3
+	rate_values[60] = 9.20e-14*RO2*0.7
+	rate_values[61] = KDEC*0.5
+	rate_values[62] = KDEC*0.5
+	rate_values[63] = KDEC*0.5
+	rate_values[64] = KDEC*0.5
+	rate_values[65] = KRO2HO2*0.914
+	rate_values[66] = KRO2NO*0.228
+	rate_values[67] = KRO2NO*0.772
+	rate_values[68] = KRO2NO3
+	rate_values[69] = 9.20e-14*RO2*0.7
+	rate_values[70] = 9.20e-14*RO2*0.3
+	rate_values[71] = KRO2HO2*0.914
+	rate_values[72] = KRO2NO*0.228
+	rate_values[73] = KRO2NO*0.772
+	rate_values[74] = KRO2NO3
+	rate_values[75] = 8.80e-13*RO2*0.2
+	rate_values[76] = 8.80e-13*RO2*0.2
+	rate_values[77] = 8.80e-13*RO2*0.6
+	rate_values[78] = KRO2HO2*0.914
+	rate_values[79] = KRO2NO*0.228
+	rate_values[80] = KRO2NO*0.772
+	rate_values[81] = KRO2NO3
+	rate_values[82] = 9.20e-14*RO2*0.7
+	rate_values[83] = 9.20e-14*RO2*0.3
 	
 	# aqueous-phase reactions
 	

@@ -342,15 +342,12 @@ def ode_updater(update_stp,
 							0, p_char, e_field, (num_sb-wall_on))
 			
 				if (nucv1 > 0.): # nucleation
-					print('woop0', N_perbin)
-					print(x)
 					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
 						N_perbin, y, y_mw.reshape(-1, 1), 
 						np.squeeze(y_dens*1.0e-3),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
 						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-wall_on))
-					print('woop1', N_perbin)
-					print(x)
+					
 				# reset count to that since original operator-split processes interval met (s)
 				update_count = sumt%t0
 
