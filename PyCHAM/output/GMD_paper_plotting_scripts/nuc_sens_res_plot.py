@@ -246,4 +246,6 @@ nucv1 = np.array((50.0, 70.0, 50.0, 50.0))
 nucv2 = np.array((-10.0, -10.0, -20.0, -10.0))
 nucv3 = np.array((40.0, 40.0, 40.0, 80.0))
 
+
+
 nuc_sens(t, nucv1, nucv2, nucv3) # call function with inputs

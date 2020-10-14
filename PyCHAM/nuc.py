@@ -3,29 +3,32 @@
 import numpy as np
 import scipy.constants as si
 
-def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, V1stbin, x1stbin, new_partr, MV, 
-		nucv1, nucv2, nucv3, nuc_comp):
+def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV, 
+		nucv1, nucv2, nucv3, nuc_comp, siz_str, rbou, Vbou, num_sb):
 
 
 	# ---------------------------------------------------------------
 	# input:
 	
 	# sumt - time through simulation (s)
-	# new_part_sum - number concentration of newly nucleated particles already 
+	# new_part_sum1 - number concentration of newly nucleated particles already 
 	# added (# particles/cc (air))
 	# n0 - original number concentration of particles (# particles/cc (air))
 	# y - molecular concentration of components in the gas and particle phase
 	# (molecules/cc (air))
 	# MW - molecular weight (g/mol)
 	# rho - density (g/cc)
-	# num_speci - number of species
-	# V1stbin - particles volume in smallest size bin(s) (um3)	
-	# x1stbin - particles radius in smallest size bin(s) (um)
-	# new_partr - radius of two ELVOC molecules together in a newly nucleating 
-	# particle (cm)
+	# num_comp - number of components
+	# Varr - particles volumes per size bin(s) (um3)	
+	# x - particles radius per size bin(s) (um)
+	# new_partr - radius of newly nucleated particle (cm)
 	# MV - molar volume (cc/mol)
 	# nucv1/v2/v3 - parameter values for nucleation equation
 	# nuc_comp - index of the nucleating component
+	# siz_str - the size structure
+	# rbou - radius bounds (um)
+	# Vbou - volume bounds (um3)
+	# num_sb - number of size bins
 	# ---------------------------------------------------------------
 	
 	# total number of particles that should have been produced through nucleation 
@@ -38,7 +41,21 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, V1stbin, x1stbin, new_pa
 	new_part1 = (nsum1)-new_part_sum1
 	if (new_part1 <1. ): # reality
 		new_part1 = 0.
-
+	else: # if new particles are being added
+		if (siz_str == 1): # if full-moving being used
+			# if there is geometric space for newly formed particles to form a new size bin
+			if (rbou[1]/2. > new_partr):
+				# form new size bin for newly formed particles
+				n0[-2] += n0[-1]
+				n0 = np.concatenate((np.zeros((1, 1)), n0[0:-1]), axis = 0)
+				y[-num_comp*3:-num_comp*2] += y[-num_comp*2:-num_comp*1]
+				# remove final size bin
+				y = np.concatenate((y[0:-num_comp*2], y[-num_comp::]))
+				rbou = np.concatenate((rbou[0:-2], rbou[-1].reshape(1)))
+				# add new size bin
+				y = np.concatenate((y[0:num_comp], np.zeros((num_comp)), y[num_comp:]))
+				rbou = np.concatenate((rbou[0].reshape(1), (rbou[1]/2.).reshape(1), rbou[1::]))
+				Vbou = (4./3.)*np.pi*rbou**3.
 	n0[0] += new_part1 # add to smallest size bin
 	new_part_sum1 += new_part1
 	
@@ -55,15 +72,16 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_speci, V1stbin, x1stbin, new_pa
 # 	y[nuc_comp] -= nuc_conc1
 		
 	# addition to particle-phase (molecules/cc (air))
-	y[num_speci*1+nuc_comp] += nuc_conc1
+	y[num_comp*1+nuc_comp] += nuc_conc1
 	
-	# average volume of single particles in first bin now (scale by 1.0e12 to convert 
+	# average volume of single particles now (scale by 1.e12 to convert 
 	# from cm3 to um3)
-	if (n0[0]>0.):
-		y1stbin = y[num_speci:num_speci*2]
-		V1stbin = np.array((((y1stbin/(si.N_A*n0[0]))*MV[:]*1.0e12).sum()))
-		# average radius of first bin particles (um)
-		x1stbin = ((3.0*V1stbin)/(4.0*np.pi))**(1.0/3.0)
+	ypsb = y[num_comp:-num_comp].reshape(num_sb, num_comp, order = 'C')
+	ish = (n0[:, 0] > 0) # index of size bins containing particles
+	if (sum(ish) > 0): # if any bins contain particles
+		Varr[ish] = ((ypsb[ish, :]/(si.N_A*n0[ish, :]))*(MV[:].reshape(1, -1)*1.e12)).sum(axis = 1)
+		# average radius of particles (um)
+		x = ((3.*Varr)/(4.*np.pi))**(1./3.)
 	
 	
-	return(n0, y, x1stbin, V1stbin, new_part_sum1)
+	return(n0, y, x, Varr, new_part_sum1, rbou, Vbou)
