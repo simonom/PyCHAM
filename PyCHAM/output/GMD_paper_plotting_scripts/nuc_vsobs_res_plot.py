@@ -27,7 +27,8 @@ def fmt(x, pos):
 # ----------------------------------------------------------------------------------------
 # create figure to plot results
 fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(10, 6.5))
-fig.subplots_adjust(right=0.9, hspace=0.3)
+
+fig.subplots_adjust(right = 0.9, hspace = 0.7)
 
 #par0 = ax0.twinx() # first parasite axis uses right-hand vertical axis
 #par1 = par0.twiny() # first parasite axis uses upper horizontal axis
@@ -69,14 +70,18 @@ for ti in range(len(time_array)-1): # loop through times
 
 ax0.set_yscale("log")
 ax0.set_ylabel('Diameter (nm)', size = 14)
-ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax0.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
-		
-cb = plt.colorbar(p0, format=ticker.FuncFormatter(fmt), pad = 0.1)
-cb.ax.tick_params(labelsize = 14)  
+
+cax = plt.axes([0.30, 0.48, 0.40, 0.01])
+
+cb = plt.colorbar(p0, cax = cax, ticks=[0., 6.0e4, 1.2e5, 1.8e5], format = ticker.FuncFormatter(fmt), orientation = 'horizontal')
+cb.ax.tick_params(labelsize = 12)
 # colour bar label
-cb.set_label('dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 14, rotation = 270, labelpad = 20)
+# more control over position of color bar label
+#ax0.text(1., 3.e1, 'dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 12)
+cb.set_label('dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 12, rotation = 0, labelpad = -1.8)
 
 # observation part ---------------------------------------------------------------
 import xlrd # for opening xlsx file
@@ -84,7 +89,7 @@ import xlrd # for opening xlsx file
 wb = xlrd.open_workbook(str(cwd+'/PyCHAM/output/GMD_paper_plotting_scripts/nuc_vsobs_obs.xlsx'))
 wb = wb.sheet_by_index(0)
 
-sr = 1 # starting row for desired time since O3 injection
+sr = 14 # starting row for desired time since O3 injection
 
 obst = np.zeros((46-sr, 1)) # empty array for observation times (s)
 obsN = np.zeros((46-sr, 23)) # empty array for particle number concentration (#/cc (air)) 
@@ -118,6 +123,9 @@ dNdDp = obsN
 # contour line plot of observations
 p2 = ax0.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
 
+ax0.set_ylim(7.e1, 4.e2) # set vertical axis limits
+
+ax0.text(-0.1, 5.e2, '(a)', size = 14) # plot label
 
 # ----------------------------------------------------------------------------------------
 # moving-centre simulation results
@@ -138,36 +146,22 @@ dNdD = Ndry/dlog10D # normalised number size distribution (#/cc 9air))
 dNdD = (dNdD[:, 1::]+dNdD[:, 0:-1])/2.
 rbou_rec = (rbou_rec[:, 1::]+rbou_rec[:, 0:-1])/2. 
 
-# customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
-colors = [(0.60, 0.0, 0.70), (0, 0, 1), (0, 1.0, 1.0), (0, 1.0, 0.0), (1.0, 1.0, 0.0), (1.0, 0.0, 0.0)]  # R -> G -> B
-n_bin = 100  # discretizes the colormap interpolation into bins
-cmap_name = 'my_list'
-# Create the colormap
-cm = LinearSegmentedColormap.from_list(cmap_name, colors, N = n_bin)
-	
-# set contour levels
-levels = (MaxNLocator(nbins = 100).tick_values(np.min(dNdD), np.max(dNdD)))
-	
-# associate colours and contour levels
-norm1 = BoundaryNorm(levels, ncolors = cm.N, clip=True)
-
+# note - using same colour scheme as for full-moving above
 for ti in range(len(time_array)-1): # loop through times
 	p1 = ax1.pcolormesh(time_array[ti:ti+2], (rbou_rec[ti, :]*2*1e3), dNdD[ti, :].reshape(-1, 1), cmap=cm, norm=norm1)
 
 ax1.set_yscale("log")
 ax1.set_ylabel('Diameter (nm)', size = 14)
-ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax1.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
 		
-cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad = 0.1)
-cb.ax.tick_params(labelsize=14)   
-# colour bar label
-cb.set_label('dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 14, rotation = 270, labelpad = 20)
-
 # observation part ---------------------------------------------------------------
 # contour line plot of observations
 p2 = ax1.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
 
+ax1.set_ylim(7.e1, 4.e2) # set vertical axis limits
+
+ax1.text(-0.1, 5.e2, '(b)', size = 14) # plot label
 
 plt.show()
