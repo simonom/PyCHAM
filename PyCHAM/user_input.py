@@ -34,7 +34,8 @@ def share(source):
 			
 			# check on inputs
 			[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
-			af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, seed_diss] = ui_check.ui_check(sav_nam, sch_name,
+			af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, 
+			seed_diss, uman_up] = ui_check.ui_check(sav_nam, sch_name,
 			wall_on, 0, siz_stru, num_sb, pmode, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, 
 			chem_sch_mark, af_path, int_tol, update_stp, tot_time, 
 			RH, uman_up, light_stat, light_time, injectt, Ct,

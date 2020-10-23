@@ -172,4 +172,4 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, 
 			print('Error: the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
 			sys.exit()
 	
-	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, seed_diss)
+	return(wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, seed_diss, uman_up)
