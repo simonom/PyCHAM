@@ -442,9 +442,9 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	
 	# zero beta for any size bins that have low number of particles
 	ish = np.squeeze(num_part<1.0e-10)
-	Beta[ish, :] = 0.0
-	ish = np.squeeze(num_part_rint<1.0e-10)
-	Beta[:, ish] = 0.0
+	Beta[ish, :] = 0.
+	ish = np.squeeze(num_part_rint<1.e-10)
+	Beta[:, ish] = 0.
 	
 	# Perform coagulation, using the implicit approach of Jacobson (2005), given in 
 	# eq. 15.5 
@@ -456,9 +456,9 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# only uses the lower left triangle in beta.  However, the loss term below uses
 	# k,j coordinates where j goes from 1 to the number of size bins
 	if coag_on == 1:
-		Beta = Beta*1.0e6
+		Beta = Beta*1.e6
 	if coag_on == 0:
-		Beta = Beta*0.0
+		Beta = Beta*0.
 	
 	# matrix with volume of coagulated particles resulting from pairing of k and j 
 	# particles single particle volumes of k and j (m3) 
@@ -490,7 +490,9 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		# (# particles/cc (air))
 		num_partk = np.tile(num_part.reshape(-1, 1), (1, sbrn))
 		
-		if (siz_str == 1): # full-moving structure
+		# full-moving structure - where coagulated particles are distributed between existing
+		# size bins so that particle volumes at size bin centres are maintained
+		if (siz_str == 1):
 			volind = np.zeros((coagV.shape[0], coagV.shape[1]))
 			# only the coagV between this size bin and the one below, note that coagV equal
 			# to this size bin accounted for below (coagV between this size bin and 
@@ -523,16 +525,16 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		# Note also that coagulation of particle in sbi with a smaller particle to
 		# produce a coagulated particle in sbi does not affect number concentration in
 		# size bin sbi
-		volind[sbi, :] = 0.0
-		volind[:, sbi] = 0.0
+		volind[sbi, :] = 0.
+		volind[:, sbi] = 0.
 		
 		# using only the relevant k-j pairs in beta, number of particles from k and j
-		# size bins coagulating to give new particle in sbi (#particles/cc.s).
+		# size bins coagulating to give new particle in sbi (# particles/cc.s).
 		# This accounts for both the upper and lower diagonal of Beta, so considers
 		# k-j pairs as well as j-k
-		numsum_ind = (Beta*volind)*(num_partk*num_partj)	
+		numsum_ind = (Beta*volind)*(num_partk*num_partj)
 		# sum to get the total rate of number of particles coagulating (from k and j) 
-		# (#particles/cc.s)
+		# (# particles/cc.s)
 		numsum = (numsum_ind.sum()).sum()
 		# numerator, note we use num_partj as want n_{k,t-h}; multiply by 0.5 since 2 
 		# particles make 1
@@ -543,7 +545,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 				# index of sbi pairs that give a volume beyond next size bin up
 				volind = coagV[sbi, :]>=sbVi[0, sbi+1]
 				# lose half the number of particles of sbi coagulating with itself to give a 
-				# volume in sbi
+				# volume in sbi, note that only coagulation with itself can produce a particle
+				# of this size
 				if (coagV[sbi, sbi] < sbVi[0, sbi+1]):
 					volind[sbi] = 1.-0.5*(sbVi[0, sbi+1]-coagV[sbi, sbi])/(sbVi[0, sbi+1]-sbVi[0, sbi])
 			else: # uppermost size bin
@@ -563,7 +566,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 
 		# denominator, representing particle number loss from this size bin
 		den = 1.0+tint*((Beta[sbi, :]*volind*num_partj[0, :]).sum())
-		# updated number concentration (#particles/cc (air)) eq. 15.8 Jacobson (2005)
+		# updated number concentration (# particles/cc (air)) eq. 15.8 Jacobson (2005)
 		num_part[0, sbi] = num/den
 			
 		# --------------------------------------------------------------------------------
@@ -599,20 +602,20 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 
 		# Eq. 15.8 with loss term removed
 		numsum_ind = (Beta*volind)*(num_partk*num_partj)
-		numsumj = ((numsum_ind.sum(axis=0))*0.5).reshape(-1,1)
-		numsumk = ((numsum_ind.sum(axis=1))*0.5).reshape(-1,1)
+		numsumj = ((numsum_ind.sum(axis=0))*0.5).reshape(-1, 1)
+		numsumk = ((numsum_ind.sum(axis=1))*0.5).reshape(-1, 1)
 		# ignore any particles from sbi that coagulate to give a particle in sbi
-		numsumj[sbi] = 0.0
-		numsumk[sbi] = 0.0
-		# particle concentration gained by sbi from each smaller bin
+		numsumj[sbi] = 0.
+		numsumk[sbi] = 0.
+		# particle number concentration (# particles/cc (air)) gained by sbi from each smaller bin
 		num_contr = ((numsumj+numsumk)*tint)[:, 0]
 		# molecular concentration gained by sbi from each smaller bin, note that if 
 		# molec_k (new concentration) used instead of molec_j (old concentration), 
 		# mass conservation issues can arise when two neighbouring size bins with very
 		# different original number concentration coagulate to 
 		# give a particle in a larger size bin
-		ish = num_partj[0, :]>0.
-		molec_contr = ((num_contr[ish]/num_partj[0, ish]).reshape(1,-1)*molec_j[:, ish]).sum(axis=1)
+		ish = (num_partj[0, :] > 0.) # index of bins containing particles
+		molec_contr = ((num_contr[ish]/num_partj[0, ish]).reshape(1, -1)*molec_j[:, ish]).sum(axis=1)
 		
 
 		# molecular concentration loss part (molecules/cc (air))
@@ -682,6 +685,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		sbn, num_comp, sbVi[0, :], 0.0, 0, MV*1.e12)
 		# revert volume bounds to um3 from m3 before returning
 		sbbound = sbbound[0, :]*1.e18
+
 	if (siz_str == 1): # full-moving
 		(Vnew, rad, y, 
 		num_part, sbbound, rbou) = fullmov.fullmov(sbn, num_part.reshape(-1, 1),

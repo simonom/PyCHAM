@@ -9,7 +9,7 @@ from water_calc import water_calc
 import write_dydt_rec
 
 
-def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
+def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	testf, pconc, dydt_trak, end_sim_time, save_step, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	spec_namelist, Compt, seed_name, seed_mw,
@@ -17,7 +17,7 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		
 	# inputs:------------------------------------------------------
 	
-	# num_speci - number of unique components
+	# num_comp - number of unique components
 	# Comp0 - chemical scheme names of components present at start of experiment
 	# init_conc - initial concentrations of components (molecules/cc)	
 	# TEMP - temperature in chamber at start of experiment (K)
@@ -46,8 +46,8 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	# empty array for storing species' concentrations, must be an array
-	y = np.zeros((num_speci))
-	y_mw = np.zeros((num_speci, 1)) # species' molecular weight (g/mol)
+	y = np.zeros((num_comp))
+	y_mw = np.zeros((num_comp, 1)) # species' molecular weight (g/mol)
 	# empty array for storing index of interesting gas-phase components
 	y_indx_plot = []
 	
@@ -108,13 +108,13 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		# the tendency to change during the simulation
 		write_dydt_rec.write_dydt_rec()
 	
-	for i in range(num_speci): # loop through all components
+	for i in range(num_comp): # loop through all components
 		y_mw[i] = Pybel_objects[i].molwt # molecular weight (g/mol)
 	
 	# ------------------------------------------------------------------------------------
 	# account for water's properties
-	H2Oi = num_speci # index for water
-	num_speci += 1 # update number of species to account for water
+	H2Oi = num_comp # index for water
+	num_comp += 1 # update number of species to account for water
 	
 	# update gas-phase concentration (molecules/cc (air)) and vapour pressure
 	# of water (log10(atm))
@@ -140,23 +140,23 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		y = np.append(y, 0.) 
 		y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
 		indx = seed_name.index('core')
-		corei[indx] = num_speci # index of core component
-		num_speci += 1 # update number of components to account for core material
+		corei[indx] = num_comp # index of core component
+		num_comp += 1 # update number of components to account for core material
 		spec_namelist.append('core') # append core's name to component name list
-
+	
 	# if nucleating component formed of core component
-	if nuc_comp[0] == 'core':
-		if sum(sum(pconc))>0.0 and seed_name == 'core':
+	if (nuc_comp[0] == 'core'):
+		if sum(sum(pconc))>0.0 and ('core' in seed_name):
 			nuci = corei
 		else:
 			y = np.append(y, 0.) 
 			y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
-			nuci = num_speci # index of core component
-			num_speci += 1 # update number of species to account for core material
+			nuci = num_comp # index of core component
+			num_comp += 1 # update number of components to account for core material
 			spec_namelist.append('core') # append core's name to component name list
 	else:
 		nuci = -1 # filler
-		
+	
 	# if seed particles contain non-'core' component(s)
 	non_core_flag = 0
 	if ('core' in seed_name and len(seed_name)>1):
@@ -188,6 +188,6 @@ def init_conc(num_speci, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	inj_indx = inj_indx.astype('int')
 	corei = np.array((corei)).astype('int')
 	
-	return (y, H2Oi, y_mw, num_speci, Cfactor, y_indx_plot, corei, dydt_vst, 
+	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 				spec_namelist, inj_indx, core_diss,
 				Psat_water, nuci, nrec_steps)

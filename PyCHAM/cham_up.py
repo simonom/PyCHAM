@@ -132,18 +132,19 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		import zenith
 		# photochemical rate now
 		(secxn, cosxn) = zenith.zenith(sumt, lat, lon, dayOfYear)
-		Jn =1.747E-01*cosx**(0.155)*np.exp(-1.0*0.125*secx)
+		Jn =1.747E-01*cosxn**(0.155)*np.exp(-1.0*0.125*secxn)
 		# photochemical rate after proposed time step
 		(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
-		Jt =1.747E-01*cosx**(0.155)*np.exp(-1.0*0.125*secx)
+		Jt =1.747E-01*cosxn**(0.155)*np.exp(-1.0*0.125*secxn)
 		# iteratively reduce proposed time interval until photochemical
 		# rate changes by acceptable amount
-		while abs(Jt-Jn)>5.e-3:
+		while (abs(Jt-Jn) > 5.e-3):
 			tnew = tnew*0.9
 			# photochemical rate after proposed time step
 			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
-			Jt =1.747E-01*cosx**(0.155)*np.exp(-1.0*0.125*secx)
+			Jt =1.747E-01*cosxt**(0.155)*np.exp(-1.0*0.125*secxt)
 			bc_red = 1
+			print(Jt, Jn, tnew)
 
 	# check on updates to temperature (K) --------------------------------------	
 	if len(temp)>1: # because a temperature must be given for experiment start

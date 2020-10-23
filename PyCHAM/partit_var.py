@@ -105,7 +105,12 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	#rat = np.ones((num_sb-wall_on, num_comp))<0
 	#rat[cg>0] = (Psat[cg>0]*act_coeff[cg>0]/cg[cg>0])>1.e2
 	#kimt[rat] = 0.
-	
+
+	# zero partitioning to particles for any components with low condensability
+	highVPi = (Psat*act_coeff > 1.e12)[0, :]
+	highVPi[H2Oi] = 0 # mask water to allow its partitioning
+	kimt[:, highVPi] = 0.
+
 	# zero partitioning coefficient for size bins where no particles - enables significant
 	# computation time acceleration and is physically realistic
 	ish = N_perbin[:, 0]<=1.e-10

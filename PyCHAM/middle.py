@@ -47,7 +47,7 @@ def middle():
 	rr_arr_aq, rr_arr_p_aq] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp)
-
+	
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 

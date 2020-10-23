@@ -103,19 +103,21 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
 		scale = np.exp(np.log(mean_radn))
 		stdn = np.log(stdn)
-		loc = 0.0 # no shift
+		loc = 0. # no shift
 		
 		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_sb, 
 			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode)
 		
-		if testf==2:
+
+		if (testf == 2):
 			print('finished with Size_distributions.lognormal')
 			
 	if (num_sb == 1):
 
 		N_perbin = np.array((sum(pconcn))).reshape(-1, 1) # (# particles/cc (air))
 		x = np.zeros(1) # radii at size bin centre
-		meansize = 10**(sum(np.log10(mean_radn))/2.) # mean radius of this size bin (um)
+		# mean radius of this one size bin (um)
+		meansize = mean_radn
 		x[0] = meansize
 		# extend uppersize to reduce chance of particles growing beyond this
 		upper_bin_rad_amp = 1.0e6

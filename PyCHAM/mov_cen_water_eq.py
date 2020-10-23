@@ -38,9 +38,7 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	
 	# new volume of single particle per size bin (um3) including volume of water
 	Vnew[:] = np.sum(nmolC*MV, axis=0)
-
 	Vnew[n0[:, 0]<=1.0e-10] = Vol0[0::][n0[:, 0]<=1.0e-10]
-	
 	# array of new particle number concentration (# particle/cc (air))
 	num_part_new = np.zeros((sbn, 1))
 	# array of new molecular concentration (# molecules/cc (air))

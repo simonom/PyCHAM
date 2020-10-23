@@ -31,7 +31,7 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 		return(0,0,0,0,0,0,0) # return dummies
 	
 	surfT = 72.0 # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
-	# molecular diffusion coeffficient of each species in air (m2/s) 
+	# molecular diffusion coeffficient of each component in air (m2/s) 
 	# Equation from JL Schnoor, Environmental Modelling: fate and transport of pollutants 
 	# in water, air and soil, 1996, ISBN : 0471124362, page 331.
 	# Note that no reference given in this text book for this equation, but results for

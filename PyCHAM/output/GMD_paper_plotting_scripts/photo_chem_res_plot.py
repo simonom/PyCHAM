@@ -1,5 +1,4 @@
 '''code to plot results from AtChem2 and compare against PyCHAM results'''
-
 # introduction
 # aim is to calculate deviation of PyCHAM photochemistry output from AtChem2
 # use the AtChem2_apinene_scheme.txt in the Results folder of the GMD_paper for chemical 
@@ -17,6 +16,69 @@
 # whereas, for the temporal resolution sensitivity simulations use the appropriate
 # resolution for update_step and set recording_time_step to be the same
 
+# PyCHAM inputs are saved in GMD_paper_plotting_scripts/Photo_chem_inputs_hiNOx.txt
+
+# to run AtChem2:
+
+# prepare conda environment with python 3.6:
+# conda create -n AtChem2 python=3.6 numpy scipy
+# activate:
+# conda activate AtChem2
+# clone the AtChem2 repository to wanted folder:
+# git clone https://github.com/AtChem/AtChem2.git
+# create new folder inside new repository to hold dependencies:
+# mkdir atchem-lib
+# check all dependencies listed in the wiki (https://github.com/AtChem/AtChem2/wiki) are available;
+# fortran compiler:
+# which gfortran
+# python:
+# python -V
+# cmake:
+# cmake --version
+# check on BLAS and LAPACK from inside python:
+# python
+# import numpy as np
+# np.__config__.show()
+# quit()
+# state the path for LAPACK libararies inside the file tools/install/install_cvode.sh (line beginning LAPACK_LIBS=)
+# note that despite the last direction the installation of Sundials on my linux stated that BLAS and LAPACK tests failed
+# so that they wouldn't be able to support, however this didn't prevent AtChem2 functioning
+# in the folder tools/install, install dependencies, where the third argument states the location of fortran compiler:
+# ./install_cvode.sh ~/Documents/AtChem2/AtChem2/atchem-lib /usr/bin/gfortran
+# ./install_openlibm.sh ~/Documents/AtChem2/AtChem2/atchem-lib /usr/bin/gfortran
+# copy AtChem2/tools/install/Makefile.skel to the home directory and rename Makefile
+# inside the renames Makefile set the paths to cvode and openlibm (on linux this was):
+# CVODELIB     = /home/simonom/Documents/AtChem2/AtChem2/atchem-lib/cvode/lib
+# OPENLIBMDIR  = /home/simonom/Documents/AtChem2/AtChem2/atchem-lib/openlibm-0.4.1
+# to install and compile AtChem2:
+# /build/build_atchem2.sh mcm/mechanism_test.fac
+# if successful, this will produce a file call atchem2, which is an executable
+# to run:
+# ./atchem2
+
+# to compare with PyCHAM, ensure both AtChem2 and PyCHAM use the chemical scheme: AtChem2_apinene_scheme - for AtChem2 this should have a .fac file extension and be stored in the AtChem2 mcm folder
+# for AtChem2 model variables are stored in the model/configuration folder.  For both the high and low NOx case set APINENE and O3 concentrations inside the initialConcentrations.config to 5.2e11, whilst for high NOx set NO2 to 2.4123e11 and for low NOx set NO2 to 0.
+# inside outputRates.config state HCHO, inside outputSpecies.config set to:
+# APINENE
+# O3
+# NO2
+# NO
+# OH
+# HO2
+# CH3O2
+# O
+# HCHO
+# check that model.parameters and environmentVariables.config agree with PyCHAM
+
+# to build:
+# /build/build_atchem2.sh mcm/AtChem2_apinene_scheme.fac
+# then to run:
+# ./atchem2
+# then copy the model/output/speciesConcentrations.output and lossRates.output and productionRates.output
+# to the required folder 
+
+# assumes calling from the PyCHAM home folder
+
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
@@ -25,11 +87,15 @@ import os
 
 # get current working directory
 cwd = os.getcwd()
+# ensure modules can be seen 
+# (assumes calling from the home folder)
+sys.path.append(str(os.getcwd() + '/PyCHAM'))
+import retr_out
 
 # ----------------------------------------------------------------------------------------
 # AtChem2 part
 # open saved files
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/hiNOx/speciesConcentrations.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/speciesConcentrations.output')
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
 in_list = inputs.readlines()
@@ -60,74 +126,28 @@ for i in range(len(in_list)):
 # check that first column is time, otherwise throw error and exit
 if str(comp_names[0]) != 't' and str(comp_names[0]) != 'time':
 	sys.exit('Error, first column is not titled t or time, instead it is called: ' + str(comp_names[0]))
+else: # convert to hours from s
+	gconc[1::, 0] = gconc[1::, 0]/3600.
 # ----------------------------------------------------------------------------------------
-# PyCHAM2 part
+# PyCHAM part
 # file name
-Pyfname = str(cwd + '/photo_chem_data/PyCHAM_APINENE/hiNOx/AtChem2_comp_hiNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/PyCHAM_APINENE/hiNOx/PyCHAM_comp_hiNOx')
 
-# name of file where experiment constants saved (number of size bins and whether wall 
-# included)
-fname = str(Pyfname+'/model_and_component_constants')
+# required outputs
+(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, t_array, PyCHAM_names, 
+		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 
-const_in = open(fname)
-const = {} # prepare to create dictionary
-for line in const_in.readlines():
-
-	# convert to python list
-	dlist = []
-	for i in line.split(',')[1::]:
-		if str(line.split(',')[0]) == 'number_of_size_bins':
-			dlist.append(int(i))
-		if str(line.split(',')[0]) == 'number_of_components':
-			dlist.append(int(i))
-		if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol':
-			i = i.strip('\n')
-			i = i.strip('[')
-			i = i.strip(']')
-			i = i.strip(' ')
-			dlist.append(float(i))
-		if str(line.split(',')[0]) == 'component_names':
-			i = i.strip('\n')
-			i = i.strip('[')
-			i = i.strip(']')
-			i = i.strip(' ')
-			i = i.strip('\'')
-			dlist.append(str(i))
-		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3':
-			dlist.append(float(i))
-			
-	const[str(line.split(',')[0])] = dlist
-
-num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
-num_speci = int((const['number_of_components'])[0]) # number of species
-y_mw = const['molecular_weights_g/mol_corresponding_to_component_names']
-y_MV = const['molecular_volumes_cm3/mol']
-PyCHAM_names = const['component_names']
-# conversion factor to change gas-phase concentrations from molecules/cc 
-# (air) into ppb
-Cfactor = float((const['factor_for_multiplying_ppb_to_get_molec/cm3'])[0])
-
-# name of file where concentration (molecules/cc (air)) results saved
-fname = str(Pyfname+'/concentrations_all_components_all_times_gas_particle_wall')
-y = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header)
-# convert gas-phase results from ppb to molecules/cm3 (air), for consistency with AtChem2
-# results
-y[:, 0:num_speci] = y[:, 0:num_speci]*Cfactor
-
-# withdraw times
-fname = str(Pyfname+'/time')
-t_array = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
+# convert from ppb to molecules/cc (air)
+yrec = yrec*((np.array((Cfac))).reshape(-1,1))
 
 # ----------------------------------------------------------------------------------------
 # comparative statistics
 
-frac_dev = np.empty((len(t_array), len(comp_names)-1)) # empty fractional deviation matrix
-
 # if AtChem values don't synchronise with PyCHAM, then interpolate, note we assume the 
 # time arrays have the same units
-if len(gconc[:,0])!=len(t_array):
+if (len(gconc[:, 0]) != len(t_array)):
 	interp_flag = 1
-elif np.abs(sum(gconc[:,0]-t_array))>1.0e-3:
+elif np.abs(sum(gconc[:, 0]-t_array))>1.0e-3:
 	interp_flag = 1
 else:
 	interp_flag = 0
@@ -138,7 +158,7 @@ if interp_flag == 1:
 	gconc_int[:, 0] = t_array
 
 	# loop through the component names from the AtChem array
-	for i in range( 1, len(comp_names[1::])): # loop through AtChem components:
+	for i in range( 1, len(gconc[1::])): # loop through AtChem components:
 		# interpolate to PyCHAM times
 		gconc_int[:, i] = np.interp(gconc_int[:, 0], gconc[:, 0], gconc[:, i])
 
@@ -146,14 +166,14 @@ else:
 	gconc_int = gconc
 
 # empty array for fractional deviation
-frac_dev = np.zeros((len(t_array), len(comp_names[1::])))
+frac_dev = np.zeros((len(t_array), len(gconc[1::])))
 # loop through the component names from the AtChem array
-for i in range(1, len(comp_names[1::])): # loop through AtChem components:
+for i in range(1, comp_num): # loop through AtChem components
+	
 	# find index of corresponding component in PyCHAM results
 	ind = PyCHAM_names.index(comp_names[i])
 	nz_ind = np.where(gconc_int[:, i]!=0)
-	frac_dev[nz_ind, i-1] = ((y[nz_ind, ind]-
-							gconc_int[nz_ind, i])/np.max(gconc_int[nz_ind, i]))*100.0
+	frac_dev[nz_ind, i-1] = ((yrec[nz_ind, ind]-gconc_int[nz_ind, i])/np.max(gconc_int[nz_ind, i]))*100.0
 
 
 
@@ -165,7 +185,7 @@ for i in comp_names[1::]: # loop through components (excluding time in column 0)
 	if str(i)=="CH3O2" or str(i)=="HO2" or str(i)=="O" or str(i)=="CO":
 		compnum += 1
 		continue
-	ax0.plot(t_array/3600.0, frac_dev[:, compnum], label=str(i))
+	ax0.plot(t_array, frac_dev[:, compnum], label=str(i))
 	compnum += 1
 # plt.title('PyCHAM-AtChem2 Fractional Deviation of Gas-phase Concentration')
 ax0.set_ylabel(r'Deviation (%)', fontsize=14)
@@ -175,6 +195,7 @@ ax0.xaxis.set_tick_params(size=14)
 ax0.legend(fontsize=12)
 ax0.text(x=-1.8, y=8.6, s='(a)', size=14)
 ax0.yaxis.set_tick_params(size=13)
+
 
 # ----------------------------------------------------------------------------------------
 # temporal profile of gas-phase concentrations (ppb) (used for EAC abstract)
@@ -204,7 +225,7 @@ ax0.yaxis.set_tick_params(size=13)
 #-----------------------------------------------------------------------------------------
 # AtChem2 part
 # open saved files
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/loNOx/speciesConcentrations.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/speciesConcentrations.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -236,69 +257,19 @@ for i in range(len(in_list)):
 # check that first column is time, otherwise throw error and exit
 if str(comp_names[0]) != 't' and str(comp_names[0]) != 'time':
 	sys.exit('Error, first column is not titled t or time, instead it is called: ' + str(comp_names[0]))
-
+else: # convert to hours from s
+	gconc[1::, 0] = gconc[1::, 0]/3600.
 # ----------------------------------------------------------------------------------------
-# PyCHAM2 part
+# PyCHAM part
 # file name
-Pyfname = str(cwd + '/photo_chem_data/PyCHAM_APINENE/loNOx/AtChem2_comp_loNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/PyCHAM_APINENE/loNOx/PyCHAM_comp_loNOx')
 
+# required outputs
+(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array2, PyCHAM_names, 
+		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 
-# name of file where experiment constants saved (number of size bins and whether wall 
-# included)
-# name of file where experiment constants saved (number of size bins and whether wall 
-# included)
-fname = str(Pyfname+'/model_and_component_constants')
-
-const_in = open(fname)
-const = {} # prepare to create dictionary
-for line in const_in.readlines():
-
-	# convert to python list
-	dlist = []
-	for i in line.split(',')[1::]:
-		if str(line.split(',')[0]) == 'number_of_size_bins':
-			dlist.append(int(i))
-		if str(line.split(',')[0]) == 'number_of_components':
-			dlist.append(int(i))
-		if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol':
-			i = i.strip('\n')
-			i = i.strip('[')
-			i = i.strip(']')
-			i = i.strip(' ')
-			dlist.append(float(i))
-		if str(line.split(',')[0]) == 'component_names':
-			i = i.strip('\n')
-			i = i.strip('[')
-			i = i.strip(']')
-			i = i.strip(' ')
-			i = i.strip('\'')
-			dlist.append(str(i))
-		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3':
-			dlist.append(float(i))
-			
-	const[str(line.split(',')[0])] = dlist
-
-num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
-num_speci = int((const['number_of_components'])[0]) # number of species
-y_mw = const['molecular_weights_g/mol_corresponding_to_component_names']
-y_MV = const['molecular_volumes_cm3/mol']
-PyCHAM_names = const['component_names']
-# conversion factor to change gas-phase concentrations from molecules/cc 
-# (air) into ppb
-Cfactor = float((const['factor_for_multiplying_ppb_to_get_molec/cm3'])[0])
-
-# name of file where concentration (molecules/cc (air)) results saved
-fname = str(Pyfname+'/concentrations_all_components_all_times_gas_particle_wall')
-y = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header)
-# convert gas-phase results from ppb to molecules/cm3 (air), for consistency with AtChem2
-# results
-y[:, 0:num_speci] = y[:, 0:num_speci]*Cfactor
-
-# withdraw times
-fname = str(Pyfname+'/time')
-t_array2 = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header)
-# add starting time of day (s)
-t_array2 = t_array2+gconc[0, 0]
+# convert from ppb to molecules/cc (air)
+y = y*((np.array((Cfac))).reshape(-1, 1))
 
 # ----------------------------------------------------------------------------------------
 # comparative statistics
@@ -334,8 +305,7 @@ for i in range(1, len(comp_names[1::])): # loop through AtChem components:
 	# find index of corresponding component in PyCHAM results
 	ind = PyCHAM_names.index(comp_names[i])
 	nz_ind = np.where(gconc_int[:, i]!=0)
-	frac_dev2[nz_ind, i-1] = ((y[nz_ind, ind]-
-							gconc_int[nz_ind, i])/np.max(gconc_int[nz_ind, i]))*100.0
+	frac_dev2[nz_ind, i-1] = ((y[nz_ind, ind]-gconc_int[nz_ind, i])/np.max(gconc_int[nz_ind, i]))*100.0
 
 
 
@@ -347,8 +317,9 @@ for i in comp_names[1::]: # loop through components (excluding time in column 0)
 	if str(i)=="CH3O2" or str(i)=="HO2" or str(i)=="O" or str(i)=="CO" or str(i)=="NO2" or str(i)=="NO":
 		compnum += 1
 		continue
-	ax1.plot(t_array2/3600.0, frac_dev2[:,compnum], label=str(i))
+	ax1.plot(t_array2, frac_dev2[:,compnum], label=str(i))
 	compnum += 1
+
 # plt.title('PyCHAM-AtChem2 Fractional Deviation of Gas-phase Concentration')
 ax1.set_ylabel(r'Deviation (%)', fontsize=14)
 ax1.yaxis.set_tick_params(size=14)
@@ -358,16 +329,16 @@ ax1.set_xlabel(r'Time of day (hours)', fontsize=14)
 ax1.text(x=-1.8, y=0.18, s='(b)', size=14)
 ax1.xaxis.set_tick_params(size=13)
 ax1.yaxis.set_tick_params(size=13)
-fig.savefig('fig03.png')
+#fig.savefig('fig03.png')
 plt.show()
-
+import ipdb; ipdb.set_trace()
 # ----------------------------------------------------------------------------------------
 # comparison of reaction rates recorded by PyCHAM and AtChem2
 
 # first, the high NOx case
 
 # open AtChem2 loss reaction results
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/hiNOx/lossRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/lossRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -399,7 +370,7 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 					
 					
 # open AtChem2 production reaction results
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/hiNOx/productionRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/productionRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -431,7 +402,7 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 
 
 # open the PyCHAM tracking results
-Pyfname = str(cwd + '/photo_chem_data/PyCHAM_APINENE/hiNOx/AtChem2_comp_hiNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/PyCHAM_APINENE/hiNOx/AtChem2_comp_hiNOx')
 
 fname = str(Pyfname+'/HCHO_rate_of_change')
 dydt = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
@@ -550,7 +521,7 @@ ax0.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1f'))
 # Repeat for low NOx case
 
 # open AtChem2 loss reaction results
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/loNOx/lossRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/lossRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -582,7 +553,7 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 					
 					
 # open AtChem2 production reaction results
-Atfname = str(cwd + '/photo_chem_data/AtChem2_APINENE/loNOx/productionRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/productionRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -614,7 +585,7 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 
 
 # open the PyCHAM tracking results
-Pyfname = str(cwd + '/photo_chem_data/PyCHAM_APINENE/loNOx/AtChem2_comp_loNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/PyCHAM_APINENE/loNOx/AtChem2_comp_loNOx')
 
 fname = str(Pyfname+'/HCHO_rate_of_change')
 dydt = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header

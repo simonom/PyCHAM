@@ -1,6 +1,8 @@
 '''script to plot results for the comparison of modelled nucleation against observations'''
 # using the output produced by nuc_vsobs_inputs.txt and limonene_simp_scheme.txt, 
-# assumed calling from the PyCHAM home folder
+# assumed calling from the PyCHAM home folder - note that 24 size bin used for
+# moving-centre and 12 size bins used for full-moving, with the save file name
+# and size strucure inputs changed accordingly also
 
 # import required modules
 import  matplotlib.pyplot as plt
@@ -69,7 +71,7 @@ for ti in range(len(time_array)-1): # loop through times
 	p0 = ax0.pcolormesh(time_array[ti:ti+2], (rbou_rec[ti, :]*2*1e3), dNdD[ti, :].reshape(-1, 1), cmap=cm, norm=norm1)
 
 ax0.set_yscale("log")
-ax0.set_ylabel('Diameter (nm)', size = 14)
+ax0.set_ylabel('$D_p$ (nm)', size = 14)
 ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax0.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
@@ -80,8 +82,8 @@ cb = plt.colorbar(p0, cax = cax, ticks=[0., 6.0e4, 1.2e5, 1.8e5], format = ticke
 cb.ax.tick_params(labelsize = 12)
 # colour bar label
 # more control over position of color bar label
-#ax0.text(1., 3.e1, 'dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 12)
-cb.set_label('dN/dlog10(D) $\mathrm{(cm^{-3})}$', size = 12, rotation = 0, labelpad = -1.8)
+#ax0.text(1., 3.e1, 'dN/dlog10($D_p$) $\mathrm{(cm^{-3})}$', size = 12)
+cb.set_label('dN $\mathrm{(cm^{-3})}$/dlog10($D_p$)', size = 12, rotation = 0, labelpad = -1.8)
 
 # observation part ---------------------------------------------------------------
 import xlrd # for opening xlsx file
@@ -151,7 +153,7 @@ for ti in range(len(time_array)-1): # loop through times
 	p1 = ax1.pcolormesh(time_array[ti:ti+2], (rbou_rec[ti, :]*2*1e3), dNdD[ti, :].reshape(-1, 1), cmap=cm, norm=norm1)
 
 ax1.set_yscale("log")
-ax1.set_ylabel('Diameter (nm)', size = 14)
+ax1.set_ylabel('$D_p$ (nm)', size = 14)
 ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax1.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
@@ -163,5 +165,8 @@ p2 = ax1.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm
 ax1.set_ylim(7.e1, 4.e2) # set vertical axis limits
 
 ax1.text(-0.1, 5.e2, '(b)', size = 14) # plot label
+
+#fig.savefig('fig11.png')
+
 
 plt.show()

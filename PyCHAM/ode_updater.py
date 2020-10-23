@@ -211,7 +211,7 @@ def ode_updater(update_stp,
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	save_cnt = 1 # count on recording results
 	# count on time since update to integration initial values/constants last called (s)
-	update_count = 0.0
+	update_count = 0.
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cc (air))
 	t0 = update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
@@ -240,6 +240,7 @@ def ode_updater(update_stp,
 	while (tot_time-sumt)>(tot_time/1.e10):
 		
 		y0[:] = y[:] # remember initial concentrations (molecules/cc (air))
+				
 		# update chamber variables
 		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
@@ -253,21 +254,22 @@ def ode_updater(update_stp,
 			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
 		
 		# ensure end of time interval does not surpass recording time
-		if ((sumt+tnew)>save_stp*save_cnt):
+		if ((sumt+tnew) > save_stp*save_cnt):
 			tnew = (save_stp*save_cnt)-sumt
 			ic_red = 1
-		
+
 		# ensure update step interval not surpassed
-		if (update_count+tnew>update_stp):
+		if (update_count+tnew > update_stp):
 			tnew = (update_stp-update_count)
 			ic_red = 1
 		
-		if (num_sb-wall_on)>0: # if particles present
+		if ((num_sb-wall_on) > 0): # if particles present
 			# update partitioning variables
+			
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 			surfT, R_gas, temp_now, NA, y_dens, N_perbin, DStar_org, 
 			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1)
-			
+						
 		else: # fillers
 			kimt = kelv_fac = 0.
 		
@@ -276,7 +278,7 @@ def ode_updater(update_stp,
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
-
+		
 		# model component concentration changes to get new concentrations
 		# (molecules/cc)
 		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
@@ -298,7 +300,6 @@ def ode_updater(update_stp,
 		
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
-		update_count += tnew # time since operator-split processes last called
 		
 		if (num_sb-wall_on > 0): # if particle size bins present
 			# update particle sizes
@@ -313,7 +314,9 @@ def ode_updater(update_stp,
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
  					num_comp, y[num_comp:(num_comp)*(num_sb-wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
-				
+			
+			update_count += tnew # time since operator-split processes last called (s)
+
 			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
 				if ((N_perbin>1.e-10).sum()>0):
