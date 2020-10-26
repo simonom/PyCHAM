@@ -21,7 +21,7 @@ def rec_prep(nrec_step,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, con_infl_C, MV):
+	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -112,6 +112,9 @@ def rec_prep(nrec_step,
 	# con_infl_C - influx rates of components with constant influx 
 	#	(ppb/s)
 	# MV - molar volume (cc/mol)
+	# partit_cutoff - the product of saturation vapour pressure and
+	#		activity coefficient above which gas-particle
+	#		partitioning assumed zero (Pa)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -153,7 +156,7 @@ def rec_prep(nrec_step,
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, DStar_org, 
-		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1)
+		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff)
 		
 		# single particle radius (um) at size bin centre 
 		# including contribution of water

@@ -10,7 +10,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
 			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
-			spec_namelist, act_coeff, wall_on):
+			spec_namelist, act_coeff, wall_on, partit_cutoff):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -46,6 +46,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# spec_namelist - names of components noted in chemical scheme file
 	# act_coeff - activity coefficient of components
 	# wall_on - whether or not to consider wall
+	# partit_cutoff - product of vapour pressure and activity coefficient
+	#		at which gas-particle partitioning assumed zero (Pa)
 	# ------------------------------------------
 	
 	if testf==1: # in test mode
@@ -171,7 +173,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
-					therm_sp, Cw, kgwt, corei, act_coeff, wall_on)
+					therm_sp, Cw, kgwt, corei, act_coeff, wall_on, partit_cutoff)
 		
 	if testf==2:
 		print('finished with init_water_partit.py')

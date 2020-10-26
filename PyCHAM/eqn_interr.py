@@ -575,8 +575,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				
 				comp_list.append(name_SMILE) # list SMILE string of parsed species
 				name_indx = comp_num # allocate index to this species
-				# Generate pybel
 				
+				# generate pybel object
 				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)

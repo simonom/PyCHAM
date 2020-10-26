@@ -10,7 +10,7 @@ sys.path.append(str(os.getcwd() + '/PyCHAM'))
 import matplotlib.pyplot as plt
 import scipy.constants as si
 
-import coag3 as coag
+import coag as coag
 
 def test_coag(): # define function
 

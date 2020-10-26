@@ -28,9 +28,9 @@ def fmt(x, pos):
 
 # ----------------------------------------------------------------------------------------
 # create figure to plot results
-fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(10, 6.5))
+fig, (ax0, ax00, ax1, ax11) = plt.subplots(4, 1, figsize=(10, 6.5), sharex='all')
 
-fig.subplots_adjust(right = 0.9, hspace = 0.7)
+fig.subplots_adjust(hspace = 0.05)
 
 #par0 = ax0.twinx() # first parasite axis uses right-hand vertical axis
 #par1 = par0.twiny() # first parasite axis uses upper horizontal axis
@@ -50,9 +50,13 @@ output_by_sim = str(cwd + '/PyCHAM/output/limonene_simp_scheme/nuc_vsobs_output_
 
 dlog10D = np.log10(rbou_rec[:, 1::]*2.0)-np.log10(rbou_rec[:, 0:-1]*2.0)
 dNdD = Ndry/dlog10D # normalised number size distribution (#/cc 9air))
+# moving average
+#dNdD = (dNdD[:, 3::]+dNdD[:, 2:-1]+dNdD[:, 1:-2]+dNdD[:, 0:-3])/3.
+#rbou_rec = (rbou_rec[:, 3::]+rbou_rec[:, 2:-1]+rbou_rec[:, 1:-2]+rbou_rec[:, 0:-3])/3.
+
 # two-point moving average
-dNdD = (dNdD[:, 1::]+dNdD[:, 0:-1])/2.
-rbou_rec = (rbou_rec[:, 1::]+rbou_rec[:, 0:-1])/2. 
+#dNdD = (dNdD[:, 1::]+dNdD[:, 0:-1])/2.
+#rbou_rec = (rbou_rec[:, 1::]+rbou_rec[:, 0:-1])/2. 
 
 # customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
 colors = [(0.60, 0.0, 0.70), (0, 0, 1), (0, 1.0, 1.0), (0, 1.0, 0.0), (1.0, 1.0, 0.0), (1.0, 0.0, 0.0)]  # R -> G -> B
@@ -62,7 +66,7 @@ cmap_name = 'my_list'
 cm = LinearSegmentedColormap.from_list(cmap_name, colors, N = n_bin)
 	
 # set contour levels
-levels = (MaxNLocator(nbins = 100).tick_values(np.min(dNdD), np.max(dNdD)))
+levels = (MaxNLocator(nbins = 100).tick_values(np.min(dNdD), np.max(1.8e5)))
 	
 # associate colours and contour levels
 norm1 = BoundaryNorm(levels, ncolors = cm.N, clip=True)
@@ -73,17 +77,15 @@ for ti in range(len(time_array)-1): # loop through times
 ax0.set_yscale("log")
 ax0.set_ylabel('$D_p$ (nm)', size = 14)
 ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax0.set_yticks([1.e2])
+ax0.set_yticklabels(['$10^2$'])
 ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-ax0.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
-
-cax = plt.axes([0.30, 0.48, 0.40, 0.01])
+cax = plt.axes([0.30, 0.92, 0.40, 0.01])
 
 cb = plt.colorbar(p0, cax = cax, ticks=[0., 6.0e4, 1.2e5, 1.8e5], format = ticker.FuncFormatter(fmt), orientation = 'horizontal')
 cb.ax.tick_params(labelsize = 12)
 # colour bar label
-# more control over position of color bar label
-#ax0.text(1., 3.e1, 'dN/dlog10($D_p$) $\mathrm{(cm^{-3})}$', size = 12)
-cb.set_label('dN $\mathrm{(cm^{-3})}$/dlog10($D_p$)', size = 12, rotation = 0, labelpad = -1.8)
+cb.set_label('dN $\mathrm{(cm^{-3})}$/dlog10($D_p$)', size = 12, rotation = 0, labelpad = -44.)
 
 # observation part ---------------------------------------------------------------
 import xlrd # for opening xlsx file
@@ -125,9 +127,23 @@ dNdDp = obsN
 # contour line plot of observations
 p2 = ax0.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
 
-ax0.set_ylim(7.e1, 4.e2) # set vertical axis limits
+txtl = -0.7 # horizontal positioning of plot labels
+ax0.text(txtl, 5.e2, '(a)', size = 14) # plot label
 
-ax0.text(-0.1, 5.e2, '(a)', size = 14) # plot label
+# repeat for the close up ---------------------------------------------------------------
+for ti in range(len(time_array)-1): # loop through times
+	p0 = ax00.pcolormesh(time_array[ti:ti+2], (rbou_rec[ti, :]*2*1e3), dNdD[ti, :].reshape(-1, 1), cmap=cm, norm=norm1)
+
+ax00.set_yscale("log")
+ax00.set_ylabel('$D_p$ (nm)', size = 14)
+ax00.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax00.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+
+# contour line plot of observations
+p2 = ax00.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
+
+ax00.set_ylim(7.e1, 3.e2) # set vertical axis limits
+ax00.text(txtl, 3.e2, '(b)', size = 14) # plot label
 
 # ----------------------------------------------------------------------------------------
 # moving-centre simulation results
@@ -156,17 +172,31 @@ ax1.set_yscale("log")
 ax1.set_ylabel('$D_p$ (nm)', size = 14)
 ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-ax1.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
 		
 # observation part ---------------------------------------------------------------
 # contour line plot of observations
 p2 = ax1.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
 
-ax1.set_ylim(7.e1, 4.e2) # set vertical axis limits
+ax1.text(txtl, 5.e2, '(c)', size = 14) # plot label
 
-ax1.text(-0.1, 5.e2, '(b)', size = 14) # plot label
+# repeat for the close up --------------------------------------------------------
+# note - using same colour scheme as for full-moving above
+for ti in range(len(time_array)-1): # loop through times
+	p1 = ax11.pcolormesh(time_array[ti:ti+2], (rbou_rec[ti, :]*2*1e3), dNdD[ti, :].reshape(-1, 1), cmap=cm, norm=norm1)
 
-#fig.savefig('fig11.png')
+ax11.set_yscale("log")
+ax11.set_ylabel('$D_p$ (nm)', size = 14)
+ax11.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax11.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+ax11.set_xlabel(r'Time since O3 injected (hours)', fontsize = 14)
+
+p2 = ax11.contour(obst[:, 0]/3600., obsDp[0, :], dNdDp.transpose(), cmap=cm, norm=norm1)
+
+ax11.set_ylim(7.e1, 3.e2) # set vertical axis limits
+
+ax11.text(txtl, 3.e2, '(d)', size = 14) # plot label
+
+fig.savefig('fig11.png')
 
 
 plt.show()

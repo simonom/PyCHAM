@@ -1,7 +1,7 @@
 '''module for calculating and recording change tendency of components'''
 # changes due to gas-phase photochemistry and partitioning are included
 
-# File Created at 2020-10-23 21:23:44.487731
+# File Created at 2020-10-26 11:01:17.527878
 
 import numpy as np 
 
@@ -14,8 +14,8 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 		# keep count on relevant reactions 
 		reac_count = 0 
 		# loop through relevant reactions 
-		for i in dydt_rec[0,0:-2]: # final two rows for particle- and wall-partitioning 
-			i = int(i) # ensure index is integer # this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
+		for i in dydt_rec[0, 0:-2]: # final two rows for particle- and wall-partitioning 
+			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
 			# estimate gas-phase change tendency for each reaction involving this component 
 			gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i] 
 			# identify whether this component reacted and/or produced
@@ -23,10 +23,12 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			stoi_indx = (np.where(rindx[i, 0:nreac[i]]==compi))[0]
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] -= rstoi[i, stoi_indx]*((gprate))
-			stoi_indx = (np.where(pindx[i, 0:nreac[i]]==compi))[0]
+			stoi_indx = (np.where(pindx[i, 0:nprod[i]]==compi))[0]
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] += pstoi[i, stoi_indx]*((gprate))
 			reac_count += 1 
+			if i == 164:
+				print('yarr', step, reac_coef[i], y[rindx[i, 0:nreac[i]]], rstoi[i, 0:nreac[i]], compi, gprate)
 		# now estimate and record tendency to change due to particle- and wall-partitioning  
 		# particle-partitioning 
 		for ibin in range(num_sb-1): # size bin loop

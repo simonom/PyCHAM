@@ -9,7 +9,7 @@ import scipy.constants as si
 def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci, 
 			accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 			N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
-			therm_sp, Cw, kgwt, corei, act_coeff, wall_on):
+			therm_sp, Cw, kgwt, corei, act_coeff, wall_on, partit_cutoff):
 
 	# inputs: ------------------------------------------------------
 	# x - radius of particles per size bin (um)
@@ -26,6 +26,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 	# corei - index of seed particle component(s)
 	# act_coeff - activity coefficients of components (dimensionless)
 	# wall_on - marker for whether to consider wall
+	# partit_cutoff - product of vapour pressure and activity coefficient
+	#		at which gas-particle partitioning assumed zero (Pa)
 	# --------------------------------------------------------------
 	
 
@@ -41,7 +43,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 				surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 				x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-				H2Oi, act_coeff, wall_on, 0)
+				H2Oi, act_coeff, wall_on, 0, partit_cutoff)
 
 			# get seed particle properties: concentration (molecules/cc (air))
 			ycore = 0.			
@@ -71,7 +73,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-								H2Oi, act_coeff, wall_on, 0)
+								H2Oi, act_coeff, wall_on, 0, partit_cutoff)
 
 			Csit = (Wc_surf/conc_sum)*Psat[0, H2Oi]*kelv_fac[sbstep, 0]
 			
@@ -99,7 +101,7 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
 								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
 								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-								H2Oi, act_coeff, wall_on, 0)
+								H2Oi, act_coeff, wall_on, 0, partit_cutoff)
 				
 				# concentration of water at particle surface in gas phase 
 				# (molecules/cc (air))

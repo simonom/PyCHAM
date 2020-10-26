@@ -39,7 +39,8 @@ def ode_updater(update_stp,
 	jac_den_indx_aq, jac_indx_aq, y_arr_aq,
 	y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
-	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num):
+	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
+	partit_cutoff):
 
 	import ode_solv # import most updated version
 	# inputs: ----------------------------------------------------
@@ -197,6 +198,9 @@ def ode_updater(update_stp,
 	# rr_arr_aq - aqueous-phase reaction rate indices
 	# rr_arr_p_aq - aqueous-phase reaction rate indices
 	# eqn_num - number of reactions in gas- and aqueous-phase
+	# partit_cutoff - the product of saturation vapour pressure
+	#	and activity coefficient above which gas-particle
+	#	partitioning assumed negligible
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -234,7 +238,7 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV)
+	infx_cnt, con_infl_C, MV, partit_cutoff)
 
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
@@ -268,7 +272,7 @@ def ode_updater(update_stp,
 			
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 			surfT, R_gas, temp_now, NA, y_dens, N_perbin, DStar_org, 
-			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1)
+			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff)
 						
 		else: # fillers
 			kimt = kelv_fac = 0.

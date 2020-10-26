@@ -121,7 +121,7 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 	# estimate vapour pressures (log10(atm))
 	for i in range (num_comp):
 		
-		if (i == corei[cor_cnt+1]): # if this a component of seed particles
+		if (i == corei[cor_cnt+1]): # if this component is 'core'
 			if (seed_name[cor_cnt+1] == 'core'):
 				if (cor_cnt+1 < (len(corei)-1)):
 					cor_cnt += 1

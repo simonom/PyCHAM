@@ -26,6 +26,7 @@
 # conda activate AtChem2
 # clone the AtChem2 repository to wanted folder:
 # git clone https://github.com/AtChem/AtChem2.git
+# cd into this new folder
 # create new folder inside new repository to hold dependencies:
 # mkdir atchem-lib
 # check all dependencies listed in the wiki (https://github.com/AtChem/AtChem2/wiki) are available;
@@ -51,7 +52,7 @@
 # CVODELIB     = /home/simonom/Documents/AtChem2/AtChem2/atchem-lib/cvode/lib
 # OPENLIBMDIR  = /home/simonom/Documents/AtChem2/AtChem2/atchem-lib/openlibm-0.4.1
 # to install and compile AtChem2:
-# /build/build_atchem2.sh mcm/mechanism_test.fac
+# build/build_atchem2.sh mcm/mechanism_test.fac
 # if successful, this will produce a file call atchem2, which is an executable
 # to run:
 # ./atchem2
@@ -71,7 +72,7 @@
 # check that model.parameters and environmentVariables.config agree with PyCHAM
 
 # to build:
-# /build/build_atchem2.sh mcm/AtChem2_apinene_scheme.fac
+# build/build_atchem2.sh mcm/AtChem2_apinene_scheme.fac
 # then to run:
 # ./atchem2
 # then copy the model/output/speciesConcentrations.output and lossRates.output and productionRates.output
@@ -185,16 +186,25 @@ for i in comp_names[1::]: # loop through components (excluding time in column 0)
 	if str(i)=="CH3O2" or str(i)=="HO2" or str(i)=="O" or str(i)=="CO":
 		compnum += 1
 		continue
-	ax0.plot(t_array, frac_dev[:, compnum], label=str(i))
+	if (str(i) == "OH"): # force color for OH
+		ax0.plot(t_array, frac_dev[:, compnum], 'm', label=str(i))
+		compnum += 1		
+		continue	
+	if (str(i) == "HCHO"): # force color for HCHO
+		ax0.plot(t_array, frac_dev[:, compnum], 'k', label=str(i))
+		compnum += 1		
+		continue
+	
+	ax0.plot(t_array, frac_dev[:, compnum], label=str(i))	
 	compnum += 1
+
 # plt.title('PyCHAM-AtChem2 Fractional Deviation of Gas-phase Concentration')
 ax0.set_ylabel(r'Deviation (%)', fontsize=14)
-ax0.yaxis.set_tick_params(size=14)
 ax0.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1f'))
-ax0.xaxis.set_tick_params(size=14)
-ax0.legend(fontsize=12)
-ax0.text(x=-1.8, y=8.6, s='(a)', size=14)
-ax0.yaxis.set_tick_params(size=13)
+ax0.xaxis.set_tick_params(direction = 'in', which = 'both')
+ax0.legend(fontsize = 12, loc = 'lower right')
+ax0.text(x=-1.8, y=0.7, s='(a)', size=14)
+ax0.yaxis.set_tick_params(direction = 'in', which = 'both')
 
 
 # ----------------------------------------------------------------------------------------
@@ -317,30 +327,38 @@ for i in comp_names[1::]: # loop through components (excluding time in column 0)
 	if str(i)=="CH3O2" or str(i)=="HO2" or str(i)=="O" or str(i)=="CO" or str(i)=="NO2" or str(i)=="NO":
 		compnum += 1
 		continue
-	ax1.plot(t_array2, frac_dev2[:,compnum], label=str(i))
+	
+	if (str(i) == "OH"): # force color for OH
+		ax1.plot(t_array2, frac_dev2[:, compnum], 'm', label=str(i))
+		compnum += 1		
+		continue	
+	if (str(i) == "HCHO"): # force color for HCHO
+		ax1.plot(t_array2, frac_dev2[:, compnum], 'k', label=str(i))
+		compnum += 1		
+		continue
+	
+	ax1.plot(t_array2, frac_dev2[:,compnum], label=str(i))	
 	compnum += 1
 
 # plt.title('PyCHAM-AtChem2 Fractional Deviation of Gas-phase Concentration')
 ax1.set_ylabel(r'Deviation (%)', fontsize=14)
-ax1.yaxis.set_tick_params(size=14)
-ax1.xaxis.set_tick_params(size=14)
 ax1.legend(fontsize=12)
 ax1.set_xlabel(r'Time of day (hours)', fontsize=14)
-ax1.text(x=-1.8, y=0.18, s='(b)', size=14)
-ax1.xaxis.set_tick_params(size=13)
-ax1.yaxis.set_tick_params(size=13)
-#fig.savefig('fig03.png')
+ax1.text(x=-1.8, y=0.07, s='(b)', size=14)
+ax1.xaxis.set_tick_params(direction = 'in', which = 'both')
+ax1.yaxis.set_tick_params(direction = 'in', which = 'both')
+fig.savefig('fig03.png')
 plt.show()
-import ipdb; ipdb.set_trace()
+
 # ----------------------------------------------------------------------------------------
 # comparison of reaction rates recorded by PyCHAM and AtChem2
 
 # first, the high NOx case
 
 # open AtChem2 loss reaction results
-Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/lossRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/lossRates.output')
 
-inputs = open(Atfname, mode='r') # open results
+inputs = open(Atfname, mode= 'r') # open results
 # read the file and store everything into a list
 in_list = inputs.readlines()
 inputs.close() # close file
@@ -368,9 +386,10 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 			if (elem_num==5): # record reaction rate (molecules/cc (air).s)
 				Atres[i-1, 2] = float(ii)
 					
-					
+num_lossr = int(len(np.unique(Atres[:, 1]))) # number of loss reactions
+				
 # open AtChem2 production reaction results
-Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/productionRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/hiNOx/productionRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -382,7 +401,7 @@ inputs.close() # close file
 Atres_prod = np.zeros((0, 3))
 
 for i in range(1, len(in_list)): # loop through lines in list, skipping heading row
-	Atres_prod = np.append(Atres_prod, np.zeros((1, 3)), axis=0) # create empty row to hold results
+	Atres_prod = np.append(Atres_prod, np.zeros((1, 3)), axis=0) # empty column to hold results
 	
 	# loop through the line elements to check if reaction number is the desired
 	elem_num = 0
@@ -397,20 +416,22 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 				Atres_prod[i-1, 0] = float(ii)
 			if elem_num == 4: # record reaction number
 				Atres_prod[i-1, 1] = float(ii)
-			if (elem_num==5): # record reaction rate (molecules/cc (air).s)
+			if (elem_num == 5): # record reaction rate (molecules/cc (air).s)
 				Atres_prod[i-1, 2] = float(ii)
 
+num_prodr = int(len(np.unique(Atres_prod[:, 1]))) # number of production reactions
 
 # open the PyCHAM tracking results
-Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/PyCHAM_APINENE/hiNOx/AtChem2_comp_hiNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/PyCHAM_APINENE/hiNOx/PyCHAM_comp_hiNOx')
 
 fname = str(Pyfname+'/HCHO_rate_of_change')
-dydt = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
+dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header
 
 fname = str(Pyfname+'/time')
-Pyt = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
+Pyt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header
 
 PyCHAM_reac_num = dydt[0, :] # reaction numbers stored in PyCHAM results
+
 Pyres = np.zeros((Atres.shape[0], Atres.shape[1]))
 
 # for loss reactions
@@ -418,19 +439,18 @@ Pyres[:, 0] = Atres[:, 0] # times (s)
 # reaction numbers, subtract one to account for Fortran indexing
 Pyres[:, 1] = Atres[:, 1]-1
 
-# PyCHAM indices for loss reactions, know that there are four loss reactions for HCHO
-# in the MCM alpha-pinene ozonolysis scheme
+# PyCHAM indices for loss reactions
 Ati = 0 # count on AtChem  times
 
 for i in range(len(Pyt)):
 	
-	if Pyt[i] == Atres[Ati*4, 0]:
+	if Pyt[i] == Atres[Ati*num_lossr, 0]:
 		
 		for ii in range(4):
 			# -1 from Atres index to account for the Fortran indexing
 			PyCHAM_ind = np.where(PyCHAM_reac_num==Atres[ii, 1]-1) 
 			# record reaction rates
-			Pyres[Ati*4+ii, 2] = dydt[i, PyCHAM_ind]
+			Pyres[Ati*num_lossr+ii, 2] = dydt[i, PyCHAM_ind]
 		Ati += 1
 		
 # repeat for production reactions
@@ -439,25 +459,23 @@ Pyres_prod[:, 0] = Atres_prod[:, 0] # times (s)
 # reaction numbers, subtract one to account for Fortran indexing
 Pyres_prod[:, 1] = Atres_prod[:, 1]-1
 
-# PyCHAM indices for production reactions, know that there are thirty five production 
-# reactions for HCHO in the MCM alpha-pinene ozonolysis scheme
+# PyCHAM indices for production reactions
 Ati = 0 # count on AtChem  times
-for i in range(len(Pyt)):
-	if Pyt[i] == Atres_prod[Ati*35, 0]:
+for i in range(len(Pyt)): # loop through PyCHAM times
+	
+	if Pyt[i] == Atres_prod[Ati*num_prodr, 0]: # if times match
 		
-		for ii in range(35):
+		for ii in range(num_prodr):
+			
 			# -1 from Atres index to account for the Fortran indexing
-			PyCHAM_ind = np.where(PyCHAM_reac_num==(Atres_prod[ii, 1]-1))
-
-			# record reaction rates
-			Pyres_prod[Ati*35+ii, 2] = dydt[i, PyCHAM_ind]
-		Ati += 1
+			PyCHAM_ind = np.where(PyCHAM_reac_num == (Atres_prod[ii, 1]-1))
+			
+			# record production reaction rates
+			Pyres_prod[Ati*num_prodr+ii, 2] = dydt[i, PyCHAM_ind]
+		Ati += 1 # keep count on AtChem times
 
 # ----------------------------------------------------------------------------------------
 # comparative statistics
-
-# number of loss reactions for this component
-num_lossr = int((Atres[:, 0].shape[0])/(len(np.unique(Atres[:, 0]))))
 
 # empty array for fractional deviation, first row for times, second for equation number
 # and third for fractional deviation
@@ -467,9 +485,6 @@ for i in range(num_lossr):
 	# % difference, multiply AtChem result by -1 to represent loss
 	frac_dev_loss[i::num_lossr, 0] = ((Pyres[i::num_lossr, 2]-(-1.0*Atres[i::num_lossr, 2]))/
 									np.max(Atres[i::num_lossr, 2]))*100.0
-									
-# number of production reactions for this component
-num_prodr = int((Atres_prod[:, 0].shape[0])/(len(np.unique(Atres_prod[:, 0]))))
 
 # empty array for fractional deviation, first row for times, second for equation number
 # and third for fractional deviation
@@ -478,50 +493,64 @@ frac_dev_prod = np.zeros((Atres_prod[:, 0].shape[0], 1))
 for i in range(num_prodr):
 	# % difference
 	frac_dev_prod[i::num_prodr, 0] = ((Pyres_prod[i::num_prodr, 2]-(Atres_prod[i::num_prodr, 2]))/
-									np.max(Atres_prod[i::num_prodr, 2]))*100.0
+				np.max(Atres_prod[i::num_prodr, 2]))*100.0
+
 
 # identify the two loss and two production reactions with greatest deviation
-max_dev1 = 0.0
-max_dev0 = 0.0
-loss_reac_i = np.zeros((2))
+max_dev1 = 0.
+max_dev0 = 0.
+loss_reac_i = np.zeros((2)).astype(int)
 for i in range(num_lossr): # loop through loss reactions
+	# maximum deviation for this reaction	
 	max_dev2 = np.max(np.abs(frac_dev_loss[i::num_lossr, 0]))
-	if max_dev2>max_dev1 and max_dev2>max_dev0: # highest maximum seen so far
+	
+	if (max_dev2>max_dev0): # highest maximum seen so far
+		max_dev0 = max_dev2 # track maximum seen
+		loss_reac_i[0] = int(i) # record index of highest maximum
+	if (max_dev2<max_dev0 and max_dev2>max_dev1): # second highest maximum seen so far
 		max_dev1 = max_dev2
-		loss_reac_i[1] = int(loss_reac_i[0]) # record second highest maximum
-		loss_reac_i[0] = int(i) # record index of new highest maximum
+		loss_reac_i[1] = int(i) # record second highest maximum
 
-# identify the two loss and two production reactions with greatest deviation
-max_dev1 = 0.0
-max_dev0 = 0.0
-prod_reac_i = np.zeros((2))
-for i in range(num_prodr): # loop through loss reactions
+# identify the two production reactions with greatest deviation
+max_dev1 = 0.
+max_dev0 = 0.
+prod_reac_i = np.zeros((2)).astype(int)
+for i in range(num_prodr): # loop through production reactions
+	# maximum deviation for this reaction
 	max_dev2 = np.max(np.abs(frac_dev_prod[i::num_prodr, 0]))
-	if max_dev2>max_dev1 and max_dev2>max_dev0: # highest maximum seen so far
+	
+	if (max_dev2>max_dev0): # highest maximum seen so far
+		max_dev0 = max_dev2 # track maximum seen
+		prod_reac_i[0] = int(i) # record index of highest maximum
+	if (max_dev2<max_dev0 and max_dev2>max_dev1): # second highest maximum seen so far
 		max_dev1 = max_dev2
-		prod_reac_i[1] = int(prod_reac_i[0]) # record second highest maximum
-		prod_reac_i[0] = int(i) # record index of new highest maximum
+		prod_reac_i[1] = int(i) # record second highest maximum
 
+# print the reaction numbers where disagreement is greatest (Python indexing, starting at 
+# 0, so add 1 when comparing with line numbers in equation text file)
+print('for the high NOx case (Python indexing, starting at 0, so add 1 when comparing with line numbers in equation text file): ')
+print('equation numbers producing two highest deviations for loss: ', Pyres[loss_reac_i[:], 1])
+print('equation numbers producing two highest deviations for production: ', Pyres_prod[prod_reac_i[:], 1])
+print('now manually go find the equations these numbers relate to and add to plot labels')
 
 # plot results for hihg NOx case
 fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(10,6), sharex=True) # prepare plot
-ax0.plot(Pyres[int(loss_reac_i[0])::num_lossr, 0]/3600.0, frac_dev_loss[int(loss_reac_i[0])::num_lossr, 0], linewidth=3, label=r'$\mathrm{OH+HCHO\rightarrow HO2+CO}$')
-ax0.plot(Pyres[int(loss_reac_i[1])::num_lossr, 0]/3600.0, frac_dev_loss[int(loss_reac_i[1])::num_lossr, 0], linewidth=3, label=r'$\mathrm{NO3 + HCHO\rightarrow HNO3 + CO + HO2}$')
-ax0.plot(Pyres_prod[int(prod_reac_i[0])::num_prodr, 0]/3600.0, frac_dev_prod[int(prod_reac_i[0])::num_prodr, 0], linewidth=3, label=r'$\mathrm{C621O\rightarrow HCHO + H1C23C4CHO + HO2}$')
-ax0.plot(Pyres_prod[int(prod_reac_i[1])::num_prodr, 0]/3600.0, frac_dev_prod[int(prod_reac_i[1])::num_prodr, 0], linewidth=3, label=r'$\mathrm{C109O\rightarrow C89CO3 + HCHO}$')
-ax0.text(x=-1.0, y=4.5, s='(a)', size=16)
+ax0.plot(Pyres[loss_reac_i[0]::num_lossr, 0]/3600., frac_dev_loss[loss_reac_i[0]::num_lossr, 0], linewidth = 3, label=r'$\mathrm{HCHO\rightarrow CO + 2HO2}$')
+ax0.plot(Pyres[loss_reac_i[1]::num_lossr, 0]/3600., frac_dev_loss[loss_reac_i[1]::num_lossr, 0], linewidth = 3, label=r'$\mathrm{HCHO\rightarrow H2 + CO}$')
+ax0.plot(Pyres_prod[prod_reac_i[0]::num_prodr, 0]/3600., frac_dev_prod[prod_reac_i[0]::num_prodr, 0], linewidth = 3, label=r'$\mathrm{C516O\rightarrow CO13C3CO2H + HCHO + HO2}$')
+ax0.plot(Pyres_prod[prod_reac_i[1]::num_prodr, 0]/3600., frac_dev_prod[int(prod_reac_i[1])::num_prodr, 0], linewidth = 3, label=r'$\mathrm{C6140\rightarrow CO23C4CHO + HCHO + HO2}$')
+ax0.text(x=-0.5, y=1.5, s='(a)', size=16)
 ax0.set_ylabel(r'Deviation (%)', fontsize=16)
-ax0.legend(fontsize=13, loc = [0.55, 0.5])
-ax0.yaxis.set_tick_params(size=16)
-ax0.xaxis.set_tick_params(size=16)
-ax0.yaxis.set_tick_params(size=16)
+ax0.legend(fontsize=12, loc = 'lower right')
+ax0.xaxis.set_tick_params(direction = 'in', which = 'both')
+ax0.yaxis.set_tick_params(direction = 'in', which = 'both')
 ax0.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1f'))
 
 # ----------------------------------------------------------------------------------------
 # Repeat for low NOx case
 
 # open AtChem2 loss reaction results
-Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/lossRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/lossRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -550,10 +579,11 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 				Atres[i-1, 1] = float(ii)
 			if (elem_num==5): # record reaction rate (molecules/cc (air).s)
 				Atres[i-1, 2] = float(ii)
-					
+
+num_lossr = int(len(np.unique(Atres[:, 1]))) # number of loss reactions					
 					
 # open AtChem2 production reaction results
-Atfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/productionRates.output')
+Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/AtChem2_APINENE/loNOx/productionRates.output')
 
 inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
@@ -583,9 +613,10 @@ for i in range(1, len(in_list)): # loop through lines in list, skipping heading 
 			if (elem_num==5): # record reaction rate (molecules/cc (air).s)
 				Atres_prod[i-1, 2] = float(ii)
 
+num_prodr = int(len(np.unique(Atres_prod[:, 1]))) # number of production reactions
 
 # open the PyCHAM tracking results
-Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_potting_scripts/photo_chem_data/PyCHAM_APINENE/loNOx/AtChem2_comp_loNOx')
+Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/photo_chem_data/PyCHAM_APINENE/loNOx/PyCHAM_comp_loNOx')
 
 fname = str(Pyfname+'/HCHO_rate_of_change')
 dydt = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
@@ -601,20 +632,19 @@ Pyres[:, 0] = Atres[:, 0] # times (s)
 # reaction numbers, -1 to account for Fortran indexing
 Pyres[:, 1] = Atres[:, 1]-1 
 
-# PyCHAM indices for loss reactions, know that there are four loss reactions for HCHO
-# in the MCM alpha-pinene ozonolysis scheme
+# PyCHAM indices for loss reactions
 Ati = 0 # count on AtChem  times
 
-for i in range(len(Pyt)):
+for i in range(len(Pyt)): # loop through PyCHAM times
 	
-	if Pyt[i] == Atres[Ati*4, 0]:
+	if Pyt[i] == Atres[Ati*num_lossr, 0]:
 		
-		for ii in range(4):
+		for ii in range(num_lossr): # loop through HCHO loss reactions
 			# -1 from Atres index to account for the Fortran indexing
-			PyCHAM_ind = np.where(PyCHAM_reac_num==Atres[ii, 1]-1) 
+			PyCHAM_ind = np.where(PyCHAM_reac_num == Atres[ii, 1]-1) 
 			# record reaction rates
-			Pyres[Ati*4+ii, 2] = dydt[i, PyCHAM_ind]
-		Ati += 1
+			Pyres[Ati*num_lossr+ii, 2] = dydt[i, PyCHAM_ind]
+		Ati += 1 # keep count on AtChem times
 		
 # repeat for production reactions
 Pyres_prod = np.zeros((Atres_prod.shape[0], Atres_prod.shape[1]))		
@@ -622,34 +652,30 @@ Pyres_prod[:, 0] = Atres_prod[:, 0] # times (s)
 # reaction numbers, -1 to account for Fortran indexing
 Pyres_prod[:, 1] = Atres_prod[:, 1]-1
 
-# PyCHAM indices for production reactions, know that there are thirty five loss reactions
-# for HCHO in the MCM alpha-pinene ozonolysis scheme
+# PyCHAM indices for production reactions
 Ati = 0 # count on AtChem  times
 for i in range(len(Pyt)):
-	if Pyt[i] == Atres_prod[Ati*35, 0]:
+	if Pyt[i] == Atres_prod[Ati*num_prodr, 0]:
 		
-		for ii in range(35):
+		for ii in range(num_prodr):
 			# -1 from Atres index to account for the Fortran indexing
-			PyCHAM_ind = np.where(PyCHAM_reac_num==Atres_prod[ii, 1]-1) 
+			PyCHAM_ind = np.where(PyCHAM_reac_num == Atres_prod[ii, 1]-1) 
 			# record reaction rates
-			Pyres_prod[Ati*35+ii, 2] = dydt[i, PyCHAM_ind]
+			Pyres_prod[Ati*num_prodr+ii, 2] = dydt[i, PyCHAM_ind]
 		Ati += 1
 
 # ----------------------------------------------------------------------------------------
 # comparative statistics
 
-# number of loss reactions for this component
-num_lossr = int((Atres[:, 0].shape[0])/(len(np.unique(Atres[:, 0]))))
-
 # empty array for fractional deviation, first row for times, second for equation number
 # and third for fractional deviation
 frac_dev_loss = np.zeros((Atres[:, 0].shape[0], 1))
-# loop through loss reactions
-for i in range(num_lossr):
+
+for i in range(num_lossr): # loop through loss reactions
 	
 	# if maximum rate doesn't exceed 1 molecule/cc.s (air), then ignore
-	if np.max(Atres[i::num_lossr, 2])<1.0:
-		frac_dev_loss[i::num_lossr, 0] = 0.0
+	if (np.max(Atres[i::num_lossr, 2])<1.):
+		frac_dev_loss[i::num_lossr, 0] = 0.
 		continue
 	
 	# % difference, multiply AtChem result by -1 to represent loss
@@ -657,9 +683,6 @@ for i in range(num_lossr):
 									np.max(Atres[i::num_lossr, 2]))*100.0
 
 							
-# number of production reactions for this component
-num_prodr = int((Atres_prod[:, 0].shape[0])/(len(np.unique(Atres_prod[:, 0]))))
-
 # empty array for fractional deviation, first row for times, second for equation number
 # and third for fractional deviation
 frac_dev_prod = np.zeros((Atres_prod[:, 0].shape[0], 1))
@@ -673,48 +696,56 @@ for i in range(num_prodr):
 									np.max(Atres_prod[i::num_prodr, 2]))*100.0
 
 # identify the two loss and two production reactions with greatest deviation
-max_dev1 = 0.0
-max_dev0 = 0.0
-loss_reac_i = np.zeros((2))
+max_dev1 = 0.
+max_dev0 = 0.
+loss_reac_i = np.zeros((2)).astype(int)
 for i in range(num_lossr): # loop through loss reactions
+	# maximum deviation for this reaction	
 	max_dev2 = np.max(np.abs(frac_dev_loss[i::num_lossr, 0]))
-	if max_dev2>max_dev1 and max_dev2>max_dev0: # highest maximum seen so far
+	
+	if (max_dev2 > max_dev0): # highest maximum seen so far
+		max_dev0 = max_dev2 # track maximum seen
+		loss_reac_i[0] = int(i) # record index of highest maximum
+	if (max_dev2 < max_dev0 and max_dev2 > max_dev1): # second highest maximum seen so far
 		max_dev1 = max_dev2
-		loss_reac_i[1] = int(loss_reac_i[0]) # record second highest maximum
-		loss_reac_i[0] = int(i) # record index of new highest maximum
+		loss_reac_i[1] = int(i) # record second highest maximum
 
 # identify the two loss and two production reactions with greatest deviation
 max_dev1 = 0.0
 max_dev0 = 0.0
-prod_reac_i = np.zeros((2))
+prod_reac_i = np.zeros((2)).astype(int)
 for i in range(num_prodr): # loop through loss reactions
+	# maximum deviation for this reaction	
 	max_dev2 = np.max(np.abs(frac_dev_prod[i::num_prodr, 0]))
-	if max_dev2>max_dev1 and max_dev2>max_dev0: # highest maximum seen so far
+	
+	if (max_dev2 > max_dev0): # highest maximum seen so far
+		max_dev0 = max_dev2 # track maximum seen
+		prod_reac_i[0] = int(i) # record index of highest maximum
+	if (max_dev2 < max_dev0 and max_dev2 > max_dev1): # second highest maximum seen so far
 		max_dev1 = max_dev2
-		prod_reac_i[1] = int(prod_reac_i[0]) # record second highest maximum
-		prod_reac_i[0] = int(i) # record index of new highest maximum
+		prod_reac_i[1] = int(i) # record second highest maximum
 
 # print the reaction numbers where disagreement is greatest (Python indexing, starting at 
-# 0)
-# print('loNOx indices')
-# print(Pyres[int(loss_reac_i[0]), 1])
-# print(Pyres[int(loss_reac_i[1]), 1])
-# print(Pyres_prod[int(prod_reac_i[0]), 1])
-# print(Pyres_prod[int(prod_reac_i[1]), 1])
+# 0, so add 1 when comparing with line numbers in equation text file)
+print('for the low NOx case (Python indexing, starting at 0, so add 1 when comparing with line numbers in equation text file): ')
+print('equation numbers producing two highest deviations for loss: ', Pyres[loss_reac_i[:], 1])
+print('equation numbers producing two highest deviations for production: ', Pyres_prod[prod_reac_i[:], 1])
+print('now manually go find the equations these numbers relate to and add to plot labels')
 
-# plot results for hihg NOx case
-ax1.plot(Pyres[int(loss_reac_i[0])::num_lossr, 0]/3600.0, frac_dev_loss[int(loss_reac_i[0])::num_lossr, 0], linewidth=3, label=r'$\mathrm{OH + HCHO\rightarrow HO2 + CO}$')
-ax1.plot(Pyres[int(loss_reac_i[1])::num_lossr, 0]/3600.0, frac_dev_loss[int(loss_reac_i[1])::num_lossr, 0], linewidth=3, label=r'$\mathrm{HCHO\rightarrow H2 + CO}$')
-ax1.plot(Pyres_prod[int(prod_reac_i[0])::num_prodr, 0]/3600.0, frac_dev_prod[int(prod_reac_i[0])::num_prodr, 0], linewidth=3, label=r'$\mathrm{HOCH2CO3\rightarrow HCHO + HO2}$')
-ax1.plot(Pyres_prod[int(prod_reac_i[1])::num_prodr, 0]/3600.0, frac_dev_prod[int(prod_reac_i[1])::num_prodr, 0], linewidth=3, label=r'$\mathrm{CH3O2\rightarrow HCHO}$')
+# plot results for low NOx case
+ax1.plot(Pyres[loss_reac_i[0]::num_lossr, 0]/3600.0, frac_dev_loss[loss_reac_i[0]::num_lossr, 0], linewidth=3, label=r'$\mathrm{HCHO\rightarrow CO + 2HO2}$')
+ax1.plot(Pyres[loss_reac_i[1]::num_lossr, 0]/3600.0, frac_dev_loss[loss_reac_i[1]::num_lossr, 0], linewidth=3, label=r'$\mathrm{HCHO\rightarrow H2 + CO}$')
+ax1.plot(Pyres_prod[prod_reac_i[0]::num_prodr, 0]/3600., frac_dev_prod[prod_reac_i[0]::num_prodr, 0], linewidth=3, label=r'$\mathrm{HOCH2CO3\rightarrow HCHO + HO2}$')
+ax1.plot(Pyres_prod[prod_reac_i[1]::num_prodr, 0]/3600.0, frac_dev_prod[prod_reac_i[1]::num_prodr, 0], linewidth=3, label=r'$\mathrm{C621O\rightarrow HCHO + H1C23C4CHO + HO2}$')
 
 
-ax1.text(x=-1.0, y=0.8, s='(b)', size=16)
+ax1.text(x=-0.5, y=3.7, s='(b)', size=16)
 ax1.set_xlabel(r'Time of day (hours)', fontsize=16)
 ax1.set_ylabel(r'Deviation (%)', fontsize=16)
-ax1.legend(fontsize=13, loc = [0.70, -0.05])
-ax1.yaxis.set_tick_params(size=16)
-ax1.xaxis.set_tick_params(size=16)
+ax1.legend(fontsize=12, loc = [0.6, 0.6,])
+ax1.yaxis.set_tick_params(direction = 'in', which = 'both')
+ax1.xaxis.set_tick_params(direction = 'in', which = 'both')
+ax1.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1f'))
 
 
 fig.savefig('fig04.png')

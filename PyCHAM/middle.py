@@ -28,7 +28,7 @@ def middle():
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
-		e_field, dil_fac] = ui.share(0)
+		e_field, dil_fac, partit_cutoff] = ui.share(0)
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -83,7 +83,7 @@ def middle():
 		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei, seedVr,
-		comp_namelist, act_coeff, wall_on)
+		comp_namelist, act_coeff, wall_on, partit_cutoff)
 	
 	print('Calling integration routine, starting timer')
 	st_time = time.time()
@@ -113,7 +113,8 @@ def middle():
 		jac_den_indx_aq, jac_indx_aq, y_arr_aq,
 		y_rind_aq, 
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
-		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num)
+		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
+		partit_cutoff)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		

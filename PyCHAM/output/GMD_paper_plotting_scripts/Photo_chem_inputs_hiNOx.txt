@@ -1,4 +1,4 @@
-res_file_name = PyCHAM_comp_hiNOx
+res_file_name = PyCHAM_comp_hiNOx_notrack
 total_model_time = 43200.0
 update_step = 60.0
 recording_time_step = 60.0
@@ -17,7 +17,7 @@ C0 = 21.125386988579997, 9.8, 21.125386988579997
 Comp0 = O3, NO2, APINENE
 light_time = 0.0, 86400.0
 light_status = 1, 1
-tracked_comp = HCHO
+tracked_comp =
 umansysprop_update = 0
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
 int_tol = 1.e-3, 1.e-4
