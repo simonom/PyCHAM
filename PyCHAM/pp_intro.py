@@ -7,10 +7,10 @@ import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mfp, accom_coeff, y_mw, surfT, 
-			DStar_org, RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
+			RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
 			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
-			spec_namelist, act_coeff, wall_on, partit_cutoff):
+			spec_namelist, act_coeff, wall_on, partit_cutoff, Press, coll_dia):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -48,6 +48,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# wall_on - whether or not to consider wall
 	# partit_cutoff - product of vapour pressure and activity coefficient
 	#		at which gas-particle partitioning assumed zero (Pa)
+	# Press - pressure inside chamber
+	# coll_dia - collision diameters of components (cm)
 	# ------------------------------------------
 	
 	if testf==1: # in test mode
@@ -172,8 +174,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		[y, Varr, x, N_perbin, Vbou, rbou] = init_water_partit(x, y, H2Oi, 
 					Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
-					N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
-					therm_sp, Cw, kgwt, corei, act_coeff, wall_on, partit_cutoff)
+					N_perbin, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
+					therm_sp, Cw, kgwt, corei, act_coeff, wall_on, 
+					partit_cutoff, Press, coll_dia)
 		
 	if testf==2:
 		print('finished with init_water_partit.py')

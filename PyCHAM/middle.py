@@ -71,19 +71,19 @@ def middle():
 		seed_name)
 	
 	# prepare for the calcuation of partitioning variables
-	[DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
-		R_gas, NA] = partit_var_prep.prep(y_mw, 
+	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
+		R_gas, NA, coll_dia] = partit_var_prep.prep(y_mw, 
 		temp[0], num_comp, 0, Cw, act_comp, act_user, accom_comp, 
-		accom_coeff_user, comp_namelist, num_sb, num_sb)
+		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow)
 	count = 0	
 	
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
 	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
-		mfp, accom_coeff, y_mw, surfT, DStar_org, RH, siz_str, num_sb, lowsize, 
+		mfp, accom_coeff, y_mw, surfT, RH, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei, seedVr,
-		comp_namelist, act_coeff, wall_on, partit_cutoff)
+		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, coll_dia)
 	
 	print('Calling integration routine, starting timer')
 	st_time = time.time()
@@ -97,7 +97,7 @@ def middle():
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
 		dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
 		core_diss, Psat, mfp, therm_sp,  
-		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
+		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g,
 		y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
@@ -114,7 +114,7 @@ def middle():
 		y_rind_aq, 
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
-		partit_cutoff)
+		partit_cutoff, coll_dia)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		

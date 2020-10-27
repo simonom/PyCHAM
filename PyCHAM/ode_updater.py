@@ -23,7 +23,7 @@ def ode_updater(update_stp,
 	dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
 	dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
 	core_diss, Psat, mfp, therm_sp,
-	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, DStar_org, 
+	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
 	y_rind, 
 	uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
@@ -40,7 +40,7 @@ def ode_updater(update_stp,
 	y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
-	partit_cutoff):
+	partit_cutoff, coll_dia):
 
 	import ode_solv # import most updated version
 	# inputs: ----------------------------------------------------
@@ -93,7 +93,6 @@ def ode_updater(update_stp,
 	# R_gas - ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	# NA - Avogadro's constant (molecules/mol)
 	# y_dens - component densities (kg/m3)
-	# DStar_org - gas-phase diffusion coefficient (m2/s)
 	# x - particle radii (um)
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
@@ -201,6 +200,7 @@ def ode_updater(update_stp,
 	# partit_cutoff - the product of saturation vapour pressure
 	#	and activity coefficient above which gas-particle
 	#	partitioning assumed negligible
+	# coll_dia - collision diameter of components (cm)
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -230,7 +230,7 @@ def ode_updater(update_stp,
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
-	y_dens*1.e-3, DStar_org, x, therm_sp, H2Oi, act_coeff,
+	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
 	RO2_indx, sumt, Pnow, light_stat, light_time, 
 	light_time_cnt, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
@@ -238,7 +238,7 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV, partit_cutoff)
+	infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia)
 
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
@@ -271,8 +271,9 @@ def ode_updater(update_stp,
 			# update partitioning variables
 			
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
-			surfT, R_gas, temp_now, NA, y_dens, N_perbin, DStar_org, 
-			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff)
+			surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
+			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
+			Pnow, coll_dia)
 						
 		else: # fillers
 			kimt = kelv_fac = 0.

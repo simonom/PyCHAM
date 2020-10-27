@@ -7,9 +7,10 @@ import matplotlib.pyplot as plt
 import scipy.constants as si
 
 def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci, 
-			accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
-			N_perbin, DStar_org, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
-			therm_sp, Cw, kgwt, corei, act_coeff, wall_on, partit_cutoff):
+		accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
+		N_perbin, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
+		therm_sp, Cw, kgwt, corei, act_coeff, wall_on, 
+		partit_cutoff, Press, coll_dia):
 
 	# inputs: ------------------------------------------------------
 	# x - radius of particles per size bin (um)
@@ -28,6 +29,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 	# wall_on - marker for whether to consider wall
 	# partit_cutoff - product of vapour pressure and activity coefficient
 	#		at which gas-particle partitioning assumed zero (Pa)
+	# Press - pressure inside chamber (Pa)
+	# coll_dia - collision diameters of components (cm)
 	# --------------------------------------------------------------
 	
 
@@ -41,9 +44,9 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			
 			# partitioning coefficient and kelvin factor
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
-				surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
+				surfT, R_gas, TEMP, NA, y_dens, N_perbin, 
 				x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-				H2Oi, act_coeff, wall_on, 0, partit_cutoff)
+				H2Oi, act_coeff, wall_on, 0, partit_cutoff, Press, coll_dia)
 
 			# get seed particle properties: concentration (molecules/cc (air))
 			ycore = 0.			
@@ -71,9 +74,9 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			
 			# partitioning coefficient and kelvin factor
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
-								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-								H2Oi, act_coeff, wall_on, 0, partit_cutoff)
+					surfT, R_gas, TEMP, NA, y_dens, N_perbin, 
+					x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
+					H2Oi, act_coeff, wall_on, 0, partit_cutoff, Press, coll_dia)
 
 			Csit = (Wc_surf/conc_sum)*Psat[0, H2Oi]*kelv_fac[sbstep, 0]
 			
@@ -99,9 +102,9 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				
 				# update partitioning coefficients
 				[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
-								surfT, R_gas, TEMP, NA, y_dens, N_perbin, DStar_org, 
-								x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
-								H2Oi, act_coeff, wall_on, 0, partit_cutoff)
+					surfT, R_gas, TEMP, NA, y_dens, N_perbin, 
+					x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
+					H2Oi, act_coeff, wall_on, 0, partit_cutoff, Press, coll_dia)
 				
 				# concentration of water at particle surface in gas phase 
 				# (molecules/cc (air))

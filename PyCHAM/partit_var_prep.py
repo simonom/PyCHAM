@@ -7,7 +7,7 @@ import numpy as np
 import scipy.constants as si
 
 def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp, 
-			accom_coeff_user, spec_namelist, num_sb, num_asb):
+			accom_coeff_user, spec_namelist, num_sb, num_asb, Pnow):
 	
 	# ------------------------------------------------------------------
 	# inputs:
@@ -25,12 +25,13 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# spec_namelist - names of components as stated in the chemical scheme
 	# num_sb - number of size bins (excluding wall)
 	# num_asb - number of actual size bins excluding wall
+	# Pnow - air pressure inside chamber (Pa)
 	# -----------------------------------------------------------------
 	
 	if testf == 1: # if in testing mode (for test_front.py)
 		return(0,0,0,0,0,0,0) # return dummies
 	
-	surfT = 72.0 # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
+	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
 	# molecular diffusion coeffficient of each component in air (m2/s) 
 	# Equation from JL Schnoor, Environmental Modelling: fate and transport of pollutants 
 	# in water, air and soil, 1996, ISBN : 0471124362, page 331.
@@ -45,12 +46,18 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# Avogadro's constant, and we need it in kg, which is why we multiply by 1e-3
 	therm_sp = (np.power((8.0E0*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.0E-3), 0.5E0))
 	
-	# mean free path (m) for each species (16.23 of Jacobson 2005)
+	# mean free path (m) for each component (16.23 of Jacobson 2005)
 	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
-	mfp = (((64.0*DStar_org)/(5*np.pi*therm_sp))*(28.966/(28.966+y_mw))).reshape(-1, 1)
+	mfp = (((64.*DStar_org)/(5*np.pi*therm_sp))*(28.966/(28.966+y_mw))).reshape(-1, 1)
 
+	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
+	
+	# collision diameter of components (cm), taken from:
+	# http://hyperphysics.phy-astr.gsu.edu/hbase/Kinetic/menfre.html
+	coll_dia = (1./(np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5)
+	
 	# accommodation coefficient of components in each size bin
-	accom_coeff = np.ones((num_speci, num_sb))*1.0e0
+	accom_coeff = np.ones((num_speci, num_sb))*1.e0
 	
 	# list containing accommodation coefficients that are functions
 	accom_coeff_func = []
@@ -123,4 +130,4 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)
 
-	return DStar_org, mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA
+	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, coll_dia)

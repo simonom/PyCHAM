@@ -2,25 +2,24 @@
 
 import numpy as np
 
-def part_prop(y, num_speci, num_asb, NA, y_mw, y_dens, n0):
+def part_prop(y, num_comp, num_asb, NA, y_mw, y_dens, n0):
 
-	# ------------------------------------------------------------------------------------
-	# inputs:
+	# inputs: ------------------------------------------------------------------
 	
-	# y - concentration of species in particle size bins (molecules/cc (air)), excluding
-	# gas and wall
+	# y - concentration of components in particle size bins 
+	#	(molecules/cc (air)), excluding gas and wall
 	# num_asb - number of actual size bins (no wall)
 	# n0 - particle concentration per size bin now (# particles/cc (air))
 	# ---------------------------------------------------------------------------
 
-	y_asmat = (y.reshape(num_asb, num_speci))
+	y_asmat = (y.reshape(num_asb, num_comp))
 	y_asmat = y_asmat.transpose() # species in rows and size bins in columns
 	
 	# convert molecules/cc (air) to moles/cc (air) and then multiply by molecular weight  
 	# to get g/cc (air) of all species in size bins
 	y_mass_array = (y_asmat/NA)*y_mw # mass conc. ind. species
 	
-	mass_fracs = np.zeros((num_speci, num_asb)) # empty matrix for mass fractions
+	mass_fracs = np.zeros((num_comp, num_asb)) # empty matrix for mass fractions
 		
 	ish = np.array((n0[:, 0]))>0.0 # size bins with particles
 	

@@ -13,7 +13,7 @@ def rec_prep(nrec_step,
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
-	y_dens, DStar_org, x, therm_sp, H2Oi, act_coeff, 
+	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	RO2_indx, sumt, Pnow, light_stat, light_time, 
 	light_time_cnt, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
@@ -21,7 +21,7 @@ def rec_prep(nrec_step,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff):
+	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -48,7 +48,6 @@ def rec_prep(nrec_step,
 	# tempt - times temperatures achieved (s)
 	# NA - Avogadro constants (molecules/mol)
 	# y_dens - component densities (g/cm3)
-	# DStar_org - diffusion coefficient (m2/s)
 	# x - particle radii (um)
 	# therm_sp - thermal speed (m/s)
 	# H2Oi - index for water
@@ -115,6 +114,7 @@ def rec_prep(nrec_step,
 	# partit_cutoff - the product of saturation vapour pressure and
 	#		activity coefficient above which gas-particle
 	#		partitioning assumed zero (Pa)
+	# coll_dia - collision diameters of components (cm)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -155,8 +155,9 @@ def rec_prep(nrec_step,
 		
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
-		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, DStar_org, 
-		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff)
+		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
+		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
+		Pnow, coll_dia)
 		
 		# single particle radius (um) at size bin centre 
 		# including contribution of water
