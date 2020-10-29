@@ -38,7 +38,7 @@ fig.subplots_adjust(hspace = 0.05)
 # ------------------------------------------------------------------------------
 # full-moving simulation results
 cwd = os.getcwd() # get current working directory
-output_by_sim = str(cwd + '/PyCHAM/output/limonene_simp_scheme/nuc_vsobs_output_mc_n1_2e4_n2_-4e_n3_1e2')
+output_by_sim = str(cwd + '/PyCHAM/output/limonene_simp_scheme/nuc_vsobs_output_fm_n1_2e4_n2_-4e2_n3_1e2')
 
 # required outputs from full-moving
 (num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, time_array, comp_names, 
@@ -132,16 +132,25 @@ cax = plt.axes([0.30, 0.92, 0.40, 0.01])
 cb = plt.colorbar(p1, cax = cax, ticks=[0., 6.0e4, 1.2e5, 1.8e5], format = ticker.FuncFormatter(fmt), orientation = 'horizontal')
 
 plt.show()
-den_cnt = 0 # count on the denominator for finding the residual average
+#den_cnt = 0 # count on the denominator for finding the residual average
 res = np.zeros((obst.shape[0], obsDp.shape[1]))
 # loop through times and size bins to get residuals
 for it in range(obst.shape[0]):
 	for isb in range(obsDp.shape[1]):
-		if ((dNdD_interp[it, isb] > 0.) and (dNdDp[it, isb] > 0.)):
-			res[it, isb] = (np.abs(dNdD_interp[it, isb]-dNdDp[it, isb]))/(max(dNdD_interp[it, isb], dNdDp[it, isb]))
-			den_cnt += 1 # count on the denominator for finding the residual average
+		if ((dNdD_interp[it, isb] >= 0.) and (dNdDp[it, isb] >= 0.)):
+			res[it, isb] = (np.abs(dNdD_interp[it, isb]-dNdDp[it, isb]))#/(max(dNdD_interp[it, isb], dNdDp[it, isb]))
+			#den_cnt += 1 # count on the denominator for finding the residual average
+
+# denominator is the sum of number concentrations from all size bins at all times for each simulation
+# results to use
+dNdD_interp_sp = dNdD_interp[0:obst.shape[0], :]
+den_cnt = (sum(dNdD_interp_sp[dNdD_interp_sp>0.]))
+# results to use
+dNdDp_sp = dNdDp[0:obst.shape[0], :]
+den_cnt += (sum(dNdDp_sp[dNdDp_sp>0.]))
 
 # sum over times and size bins to get percentage error
 resT = ((sum(sum(res)))/(den_cnt))*100.
 
 print(resT)
+

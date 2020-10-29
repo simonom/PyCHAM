@@ -72,7 +72,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# note dividing rwid[0, 0] by 2.1 rather than 2.0 prevents the lower bound reaching 
 			# zero and still gives a useful range
 			# high resolution size bin radii (um)
-			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), num_bins*1.0e2))
+			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), int(num_bins*1.0e2)))
 			# probability distribution function
 			pdf_output = stats.lognorm.pdf(hires, std[i], loc, scale[i])
 			# probability distribution function scaled to actual size bin radii

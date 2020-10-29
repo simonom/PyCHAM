@@ -38,7 +38,7 @@ fig.subplots_adjust(hspace = 0.05)
 # ------------------------------------------------------------------------------
 # full-moving simulation results
 cwd = os.getcwd() # get current working directory
-output_by_sim = str(cwd + '/PyCHAM/output/limonene_simp_scheme/nuc_vsobs_output_mc_n1_2e4_n2_-4e4_n3_1e2')
+output_by_sim = str(cwd + '/PyCHAM/output/limonene_simp_scheme/nuc_vsobs_output_mc_n1_2e4_n2_-4e_n3_1e2')
 
 # required outputs from full-moving
 (num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, time_array, comp_names, 
