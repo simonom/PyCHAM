@@ -51,11 +51,12 @@ def middle():
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
+	nuci, nrec_steps, seedi] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
 	pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp)
+	
 	
 	# dump new pickle file ready for plotting script to use
 	list_vars = [sav_nam, sch_name, indx_plot, comp0]
@@ -82,8 +83,8 @@ def middle():
 	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
 		mfp, accom_coeff, y_mw, surfT, RH, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, corei, seedVr,
-		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, coll_dia)
+		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, seedVr,
+		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, coll_dia, seedi)
 	
 	print('Calling integration routine, starting timer')
 	st_time = time.time()
@@ -95,7 +96,7 @@ def middle():
 		jac_den_indx_g, jac_indx_g, RO2_indx, H2Oi, temp, tempt, 
 		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-		dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
+		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedVr, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g,
@@ -114,7 +115,7 @@ def middle():
 		y_rind_aq, 
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
-		partit_cutoff, coll_dia)
+		partit_cutoff, coll_dia, corei)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		

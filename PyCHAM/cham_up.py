@@ -15,7 +15,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor):
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -61,7 +61,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# N_perbin - concentration of particles (#/cc (air))
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
-	# corei - index of component(s) comprising seed particles
+	# corei - index of core component
 	# seedVr - volume ratio of component(s) comprising seed particles
 	# seed_name - name(s) of component(s) comprising seed 
 	#	particles
@@ -82,6 +82,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# 	influx (ppb/s)
 	# wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cc (air)
+	# seedi - index of seed component(s)
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -239,7 +240,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
 					Varr] = pp_dursim.pp_dursim(y[num_comp:num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
-					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], corei, seedVr, lowsize, 
+					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], seedi, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					std[:, seedt_cnt], y_dens, H2Oi, rbou)
 			if (seedt_cnt<(pconct.shape[1]-1)):

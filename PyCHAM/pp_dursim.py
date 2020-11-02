@@ -5,7 +5,7 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
-def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, uppersize, num_comp, 
+def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, uppersize, num_comp, 
 				num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou):
 	
 			
@@ -15,7 +15,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, upp
 	# mean_rad - mean radius of seed particles at this time (um)
 	# pmode - whether particle number size distribution stated by mode or explicitly
 	# pconc - number concentration of seed particles (#/cc (air))
-	# corei - index of seed material
+	# seedi - index of seed material
 	# seedVr - volume ratio of component(s) comprising seed particles
 	# lowersize - smallest radius bound (um)
 	# uppersize - greatest radius bound (um)
@@ -78,9 +78,9 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, upp
 	Vperbin = ((pconc_new*(4.0/3.0)*np.pi*(radn*1.0e-4)**3.0))
 
 	if (sum(pconc_new) > 0.): # account for concentration of components comprising seed
-		for ci in range(len(corei)): # loop through indices of seed components 
+		for ci in range(len(seedi)): # loop through indices of seed components 
 			# concentration in all size bins (molecules/cc (air)):
-			y[corei[ci]:num_comp*num_sb:num_comp] += (NA/MV[corei[ci]])*(Vperbin*(seedVr[ci]/sum(seedVr)))
+			y[seedi[ci]:num_comp*num_sb:num_comp] += (NA/MV[seedi[ci]])*(Vperbin*(seedVr[ci]/sum(seedVr)))
 
 	# loop through size bins to estimate new total volume concentrations (um3/cc (air))
 	Vtot = np.zeros((num_sb))
@@ -94,7 +94,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, upp
 		else:
 			Varr[i] = (4.0/3.0*np.pi)*rad0[i]**3.0
 		# multiply y_dens by 1e-3 to get g/cm3 from kg/m3
-		mass_conc += np.sum((y_dens[corei, 0]*1.0e-3)*Vperbin[i])
+		mass_conc += np.sum((y_dens[seedi, 0]*1.0e-3)*Vperbin[i])
 		
 	mass_conc = mass_conc*1.0e12 # convert from g/cc (air) to ug/m3 (air)
 	if mass_conc < 1.0e-10:

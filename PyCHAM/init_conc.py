@@ -129,51 +129,36 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
 
-	# empty array for index of seed component(s)
-	corei = np.zeros((len(seed_name)))	
-
-	# if seed particles present and comprise a 'core' component
-	if (sum(sum(pconc)) > 0. and ('core' in seed_name)):
-		# append core gas-phase concentration (molecules/cc (air)) and molecular 
-		# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
-		# calculations)
-		y = np.append(y, 0.) 
-		y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
-		indx = seed_name.index('core')
-		corei[indx] = num_comp # index of core component
-		num_comp += 1 # update number of components to account for core material
-		spec_namelist.append('core') # append core's name to component name list
+	# empty array for index of core component
+	seedi = (np.zeros((len(seed_name)))).astype(int)
 	
+	spec_namelist.append('core') # append name of core to component name list
+	corei = [num_comp] # index for core component
+	# increase number of components to account for 'core' component
+	num_comp += 1
+
+	# append core gas-phase concentration (molecules/cc (air)) and molecular 
+	# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
+	# calculations)
+	y = np.append(y, 0.)
+	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
+		
 	# if nucleating component formed of core component
 	if (nuc_comp[0] == 'core'):
-		if sum(sum(pconc))>0.0 and ('core' in seed_name):
-			nuci = corei
-		else:
-			y = np.append(y, 0.) 
-			y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
-			nuci = num_comp # index of core component
-			num_comp += 1 # update number of components to account for core material
-			spec_namelist.append('core') # append core's name to component name list
+		nuci = num_comp-1 # index of core component
 	else:
 		nuci = -1 # filler
 	
-	# if seed particles contain non-'core' component(s)
-	non_core_flag = 0
-	if ('core' in seed_name and len(seed_name)>1):
-		non_core_flag = 1
-	if ('core' not in seed_name and len(seed_name)>0):
-		non_core_flag = 1
-	if (non_core_flag == 1):
-		indx = 0
-		for seedi in seed_name:
-			if (seedi != 'core'):
-				# index of core component
-				corei[indx] = spec_namelist.index(seedi)
-			indx += 1 # count on core component(s)
+	# get indicices of seed particle component(s)
+	indx = 0 # count on seed component(s)
+	for sname in seed_name:
+		# index of core component
+		seedi[indx] = int(spec_namelist.index(sname))
+		indx += 1 # count on seed component(s)
 
-	if (sum(sum(pconc)) == 0.0): # no seed particle case
+	if (sum(sum(pconc)) == 0.): # no seed particle case
 		corei = np.ones((1))*-1 # filler
-		core_diss = 1.0 # ensure no artefact in Raoult term due to this filler
+		core_diss = 1. # ensure no artefact in Raoult term due to this filler
 	
 	# get index of component with latter injections
 	if len(Compt)>0:
@@ -190,4 +175,4 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 				spec_namelist, inj_indx, core_diss,
-				Psat_water, nuci, nrec_steps)
+				Psat_water, nuci, nrec_steps, seedi)

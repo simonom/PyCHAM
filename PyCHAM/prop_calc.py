@@ -83,7 +83,6 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 
 	
 	if (ode_gen_flag == 0): # estimate densities if called from middle
-		cor_cnt = 0 # count on components comprising seed particles
 		
 		for i in range (num_comp):
 			
@@ -91,16 +90,13 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 			if i == H2Oi:
 				y_dens[i] = 1.0*1.0E3 # (kg/m3 (particle))
 				continue
-			# core properties
-			if (i == corei[cor_cnt]):
-				if (seed_name[cor_cnt] == 'core'):
-					y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
-					continue
-				if (cor_cnt < (len(corei)-1)):
-					cor_cnt += 1
+			# core component properties
+			if (i == corei[0]):
+				y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
+				continue	
 			# nucleating component density, if component is core (kg/m3 (particle))
 			if i == nuci and nuc_comp[0] == 'core': 
-				y_dens[i] = 1.0*1.0E3
+				y_dens[i] = 1.0*1.e3
 				continue
 			if comp_list[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
@@ -117,19 +113,14 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 			dens_indx = spec_namelist.index(dens_comp[i])
 			y_dens[dens_indx] = dens[i]
 	
-	cor_cnt = -1 # count on seed components
 	# estimate vapour pressures (log10(atm))
 	for i in range (num_comp):
 		
-		if (i == corei[cor_cnt+1]): # if this component is 'core'
-			if (seed_name[cor_cnt+1] == 'core'):
-				if (cor_cnt+1 < (len(corei)-1)):
-					cor_cnt += 1
-				continue # core component not included in Pybel_objects
-			else:			
-				if (cor_cnt+1 < (len(corei)-1)):
-					cor_cnt += 1
-
+		if (i == corei[0]): # if this component is 'core'
+			# core component not included in Pybel_objects, continuing
+			# here means its vapour pressure is 0 Pa, which is fine
+			continue
+			
 		if i == nuci and nuc_comp[0] == 'core':
 			continue # core component not included in Pybel_objects
 		
@@ -157,7 +148,7 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 
 	# ensure if nucleating component is core that it is involatile
 	if (nuc_comp == 'core'):
-		Psat[0, nuci] = 0.0
+		Psat[0, nuci] = 0.
 	
 	Psat_Pa = np.zeros((1, num_comp)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[0, :] = Psat[0, :]
@@ -166,7 +157,7 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 	# gas law, R has units cc.Pa/K.mol
 	Psat = Psat*(NA/((si.R*1.e6)*TEMP))
 	# now, in preparation for ode solver, repeat over number of size bins
-	if num_asb>0:
+	if (num_asb > 0):
 		Psat = np.repeat(Psat, num_asb, axis=0)
 	
 	return(Psat, y_dens, Psat_Pa)

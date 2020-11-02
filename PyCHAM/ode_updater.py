@@ -21,7 +21,7 @@ def ode_updater(update_stp,
 	jac_den_indx, jac_indx, RO2_indx, H2Oi,	temp, tempt, 
 	Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-	dydt_vst, siz_str, num_sb, num_comp, corei, seed_name, seedVr, 
+	dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedVr, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
@@ -40,7 +40,7 @@ def ode_updater(update_stp,
 	y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
-	partit_cutoff, coll_dia):
+	partit_cutoff, coll_dia, corei):
 
 	import ode_solv # import most updated version
 	# inputs: ----------------------------------------------------
@@ -80,7 +80,7 @@ def ode_updater(update_stp,
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
-	# corei - index of component(s) comprising seed material
+	# seedi - index of component(s) comprising seed material
 	# seed_name - name(s) of component(s) comprising seed particles
 	# seedVr - volume ratio of component(s) comprising seed material
 	# core_diss - dissociation constant of seed
@@ -201,6 +201,7 @@ def ode_updater(update_stp,
 	#	and activity coefficient above which gas-particle
 	#	partitioning assumed negligible
 	# coll_dia - collision diameter of components (cm)
+	# corei - index of core component
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -238,7 +239,7 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia)
+	infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia, seedi)
 
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
@@ -255,7 +256,7 @@ def ode_updater(update_stp,
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
+			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi)
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew) > save_stp*save_cnt):
@@ -286,13 +287,14 @@ def ode_updater(update_stp,
 		
 		# model component concentration changes to get new concentrations
 		# (molecules/cc)
+		print(seedi, seedi.shape)
 		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 			reac_col, prod_col, rstoi_flat, 
 			pstoi_flat, rr_arr, rr_arr_p, rowvals, colptrs, num_comp, 
 			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,
-			corei, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+			seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
 			jac_part_indx,
 			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
@@ -370,7 +372,7 @@ def ode_updater(update_stp,
 				dydt_vst, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, corei)		
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi)		
 		
 		# if time step was temporarily reduced, then return
 		if ic_red == 1:

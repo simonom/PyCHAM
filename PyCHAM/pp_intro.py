@@ -9,8 +9,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-		Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
-		spec_namelist, act_coeff, wall_on, partit_cutoff, Press, coll_dia):
+		Cw, y_dens, Psat, core_diss, kgwt, space_mode, seedVr, 
+		spec_namelist, act_coeff, wall_on, partit_cutoff, Press, coll_dia,
+		seedi):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -41,7 +42,6 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# kgwt - mass transfer coefficient for vapour-wall partitioning (/s)
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
-	# corei - index of component(s) comprising seed particles
 	# seedVr - volume ratio of component(s) comprising seed particles
 	# spec_namelist - names of components noted in chemical scheme file
 	# act_coeff - activity coefficient of components
@@ -50,6 +50,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	#		at which gas-particle partitioning assumed zero (Pa)
 	# Press - pressure inside chamber
 	# coll_dia - collision diameters of components (cm)
+	# seedi - index of seed components
 	# ------------------------------------------
 	
 	if testf==1: # in test mode
@@ -163,9 +164,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# MV in units cc/mol)
 	MV = (y_mw/(y_dens*1.0e-3)).reshape(num_comp, 1)
 	if (sum(pconcn) > 0.0): # account for concentration of components comprising seed
-		for ci in range(len(corei)): # loop through indices of seed components
+		for ci in range(len(seedi)): # loop through indices of seed components
 			# concentration in all size bins (molecules/cc (air)):
-			y[num_comp+corei[ci]:(num_comp*(num_sb)+corei[ci]):num_comp] = (NA/MV[corei[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
+			y[num_comp+seedi[ci]:(num_comp*(num_sb)+seedi[ci]):num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
 
 	if testf==2:
 		print('calling init_water_partit.py')
@@ -176,8 +177,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					Psat, mfp, siz_str, num_sb, num_comp, 
 					accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
 					N_perbin, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
-					therm_sp, Cw, kgwt, corei, act_coeff, wall_on, 
-					partit_cutoff, Press, coll_dia)
+					therm_sp, Cw, kgwt, act_coeff, wall_on, 
+					partit_cutoff, Press, coll_dia, seedi)
 		
 	if testf==2:
 		print('finished with init_water_partit.py')

@@ -18,7 +18,7 @@ def write_dydt_rec(): # define function
 	f.write('\n')
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest 1 Tab
-	f.write('def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff, corei):\n')
+	f.write('def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff, seedi):\n')
 	f.write('	\n')
 	f.write('	# loop through components to record the tendency of change \n')
 	f.write('	for compi in dydt_vst.get(\'comp_index\'): \n')
@@ -48,7 +48,7 @@ def write_dydt_rec(): # define function
 	f.write('			Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]\n')
 	f.write('			conc_sum = np.zeros((1)) \n')
 	f.write('			if any(pconc > 0.): # if seed particles present \n')
-	f.write('				conc_sum[0] = ((Csit.sum()-Csit[corei])+Csit[corei]*core_diss)\n')
+	f.write('				conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)\n')
 	f.write('			else: \n')
 	f.write('				conc_sum[0] = Csit.sum() \n')
 	f.write('			# prevent numerical error due to division by zero \n')

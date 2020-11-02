@@ -79,8 +79,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 
 	
 	if ode_gen_flag == 0: # estimate densities
-		cor_cnt = 0 # count on components comprising seed particles
-
+		
 		for i in range (num_speci):
 			
 			# density estimation ---------------------------------------------------------
@@ -88,11 +87,9 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 				y_dens[i] = 1.0*1.0E3 # (kg/m3 (particle))
 				continue
 			# core properties
-			if (i == corei[cor_cnt]):
-				if (seed_name[cor_cnt] == 'core'):
-					y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
-					continue
-				cor_cnt += 1
+			if (i == corei[0]):
+				y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
+				continue
 			# nucleating component density, if component is core (kg/m3 (particle))
 			if i == nuci and nuc_comp[0] == 'core': 
 				y_dens[i] = 1.0*1.0E3
@@ -105,14 +102,11 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.0E3
 			# ----------------------------------------------------------------------------
 	
-	cor_cnt = -1 # count on seed components
 	# estimate vapour pressures (log10(atm))
 	for i in range (num_speci):
 		
-		if (i == corei[cor_cnt+1]): # if this a component of seed particles
-			cor_cnt += 1
-			if (seed_name[cor_cnt] == 'core'):				
-				continue # core component not included in Pybel_objects
+		if (i == corei[0]): # if this core component
+			continue # core component not included in Pybel_objects
 		if i == nuci and nuc_comp[0] == 'core':
 			continue # core component not included in Pybel_objects
 		

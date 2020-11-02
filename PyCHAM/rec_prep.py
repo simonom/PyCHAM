@@ -21,7 +21,7 @@ def rec_prep(nrec_step,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia):
+	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia, seedi):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -95,7 +95,7 @@ def rec_prep(nrec_step,
 	# seedt_cnt - count on injection of seed particles
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
-	# corei - index of component(s) comprising seed particles
+	# corei - index of core component
 	# seedVr - volume ration of component(s) comprising seed particles
 	# seed_name - name(s) of component(s) comprising seed particles
 	# seedVr - volume ratio of component(s) comprising seed particles
@@ -115,6 +115,7 @@ def rec_prep(nrec_step,
 	#		activity coefficient above which gas-particle
 	#		partitioning assumed zero (Pa)
 	# coll_dia - collision diameters of components (cm)
+	# seedi - index of seed component(s)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -148,7 +149,7 @@ def rec_prep(nrec_step,
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor)
+		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi)
 	
 	
 	if (num_sb-wall_on)>0: # if particles present

@@ -1,11 +1,11 @@
 '''module for calculating and recording change tendency of components'''
 # changes due to gas-phase photochemistry and partitioning are included
 
-# File Created at 2020-11-02 12:23:58.121060
+# File Created at 2020-11-02 16:33:42.684797
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff, corei):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff, seedi):
 	
 	# loop through components to record the tendency of change 
 	for compi in dydt_vst.get('comp_index'): 
@@ -35,7 +35,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]
 			conc_sum = np.zeros((1)) 
 			if any(pconc > 0.): # if seed particles present 
-				conc_sum[0] = ((Csit.sum()-Csit[corei])+Csit[corei]*core_diss)
+				conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)
 			else: 
 				conc_sum[0] = Csit.sum() 
 			# prevent numerical error due to division by zero 
