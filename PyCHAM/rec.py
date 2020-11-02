@@ -8,7 +8,7 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
-	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec):
+	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, corei):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -48,6 +48,7 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	# rbou - size bin radius boundaries (um)
 	# wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
+	# corei - index of seed component
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)
@@ -87,7 +88,7 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 		import dydt_rec
 		dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt, 
 					dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff)
+					kimt, kw, Cw, act_coeff, corei)
 	save_cnt += 1 # track number of recordings 
 
 	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec)

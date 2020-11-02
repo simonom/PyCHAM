@@ -237,7 +237,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			
 			# account for change in seed particles
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
-					Varr] = pp_dursim.pp_dursim(y[num_comp:-num_comp*(num_sb-wall_on+1)], 
+					Varr] = pp_dursim.pp_dursim(y[num_comp:num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
 					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], corei, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 

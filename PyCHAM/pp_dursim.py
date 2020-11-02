@@ -53,7 +53,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, upp
 	# total number concentration per mode stated in multi size bin simulation
 	if (pmode == 0):
 		
-		for i in len(pconc): # loop through modes
+		for i in range(len(pconc)): # loop through modes
 			# set scale and standard deviation input for lognormal probability distribution 
 			# function, following guidance here: 
 			# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
@@ -77,10 +77,10 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, corei, seedVr, lowersize, upp
 	# cm from um
 	Vperbin = ((pconc_new*(4.0/3.0)*np.pi*(radn*1.0e-4)**3.0))
 
-	if (sum(pconc_new) > 0.0): # account for concentration of components comprising seed
-		for ci in corei: # loop through indices of seed components 
+	if (sum(pconc_new) > 0.): # account for concentration of components comprising seed
+		for ci in range(len(corei)): # loop through indices of seed components 
 			# concentration in all size bins (molecules/cc (air)):
-			y[num_comp+corei[ci]:(num_comp*(num_sb)+corei[ci]):num_comp] += (NA/MV[corei[ci]])*(Vperbin*(seedVr[ci]/sum(seedVr)))
+			y[corei[ci]:num_comp*num_sb:num_comp] += (NA/MV[corei[ci]])*(Vperbin*(seedVr[ci]/sum(seedVr)))
 
 	# loop through size bins to estimate new total volume concentrations (um3/cc (air))
 	Vtot = np.zeros((num_sb))

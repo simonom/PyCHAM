@@ -1,6 +1,6 @@
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2020-10-28 19:07:18.097653
+# created at 2020-11-02 12:23:58.110787
 
 import numpy
 import photolysisRates
@@ -165,7 +165,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 
 	if lightm == 0:
 		J = [0]*len(J)
-	rate_values = numpy.zeros((84))
+	rate_values = numpy.zeros((49))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
@@ -217,42 +217,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	rate_values[45] = J[8]
 	rate_values[46] = KMT04
 	rate_values[47] = KMT10
-	rate_values[48] = 1.22e-11*0.92
-	rate_values[49] = 1.22e-11*0.08
-	rate_values[50] = 2.80e-15*numpy.exp(-770/TEMP)*0.660
-	rate_values[51] = 2.80e-15*numpy.exp(-770/TEMP)*0.08
-	rate_values[52] = 2.80e-15*numpy.exp(-770/TEMP)*0.270
-	rate_values[53] = 4.28e-11*numpy.exp(401/TEMP)*0.408
-	rate_values[54] = 4.28e-11*numpy.exp(401/TEMP)*0.222
-	rate_values[55] = 4.28e-11*numpy.exp(401/TEMP)*0.370
-	rate_values[56] = KRO2HO2*0.914
-	rate_values[57] = KRO2NO
-	rate_values[58] = KRO2NO3
-	rate_values[59] = 9.20e-14*RO2*0.3
-	rate_values[60] = 9.20e-14*RO2*0.7
-	rate_values[61] = KDEC*0.5
-	rate_values[62] = KDEC*0.5
-	rate_values[63] = KDEC*0.5
-	rate_values[64] = KDEC*0.5
-	rate_values[65] = KRO2HO2*0.914
-	rate_values[66] = KRO2NO*0.228
-	rate_values[67] = KRO2NO*0.772
-	rate_values[68] = KRO2NO3
-	rate_values[69] = 9.20e-14*RO2*0.7
-	rate_values[70] = 9.20e-14*RO2*0.3
-	rate_values[71] = KRO2HO2*0.914
-	rate_values[72] = KRO2NO*0.228
-	rate_values[73] = KRO2NO*0.772
-	rate_values[74] = KRO2NO3
-	rate_values[75] = 8.80e-13*RO2*0.2
-	rate_values[76] = 8.80e-13*RO2*0.2
-	rate_values[77] = 8.80e-13*RO2*0.6
-	rate_values[78] = KRO2HO2*0.914
-	rate_values[79] = KRO2NO*0.228
-	rate_values[80] = KRO2NO*0.772
-	rate_values[81] = KRO2NO3
-	rate_values[82] = 9.20e-14*RO2*0.7
-	rate_values[83] = 9.20e-14*RO2*0.3
+	rate_values[48] = 0
 	
 	# aqueous-phase reactions
 	

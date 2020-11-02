@@ -75,6 +75,8 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), int(num_bins*1.0e2)))
 			# probability distribution function
 			pdf_output = stats.lognorm.pdf(hires, std[i], loc, scale[i])
+			# remove any excess dimensions
+			pdf_output = np.squeeze(pdf_output)
 			# probability distribution function scaled to actual size bin radii
 			pdf_out = np.interp(x_output, hires, pdf_output)	
 			# contribute the number concentration of all size bins in 

@@ -199,7 +199,7 @@ def rec_prep(nrec_step,
 		import dydt_rec
 		dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, 0, 
 					dydt_vst, nreac, num_sb, num_comp, N_perbin, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff)
+					kimt, kw, Cw, act_coeff, corei)
 
 
 	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt)

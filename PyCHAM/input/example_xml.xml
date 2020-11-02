@@ -6421,7 +6421,7 @@
 <species species_number="s2142" species_name="NTM123OLOH">
 <smiles>O=N(=O)OC1C2OOC1(C)C(=C(C)C2(O)O)C</smiles>
 </species>
-<species species_number="s2143" species_name="TM123OHNO2">
+	<species species_number="s2143" species_name="TM123OHNO2">
 <smiles>Cc1cc(N(=O)=O)c(O)c(C)c1C</smiles>
 </species>
 <species species_number="s2144" species_name="TM123O2">
@@ -6446,7 +6446,7 @@
 <smiles>O=CC(=C(C)C(=O)C)C</smiles>
 </species>
 <species species_number="s2151" species_name="TMB1FUONE">
-<smiles>O=C1C=C(C)C(C)O1</smiles>
+<smiles>O=																																			C1C=C(C)C(C)O1</smiles>
 </species>
 <species species_number="s2152" species_name="TMB2FUONE">
 <smiles>CC1OC(=O)C(=C1C)C</smiles>
@@ -18221,8 +18221,12 @@
 <species species_number="s6056" species_name="C3H7N2O">
 <smiles>CC(=O)CN</smiles>
 </species>
-<species species_number="s6056" species_name="C6H8N2">
+<species species_number="s6057" species_name="C6H8N2">
 <smiles>CC1=CN=C(C)C=N1</smiles>
 </species>
+<species species_number="s6058" species_name="O2">
+<smiles>O=O</smiles>
+</species>
+
 </species_defs>
 </mechanism>

@@ -6,11 +6,11 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
-			mfp, accom_coeff, y_mw, surfT, 
-			RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
-			pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-			Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
-			spec_namelist, act_coeff, wall_on, partit_cutoff, Press, coll_dia):
+		mfp, accom_coeff, y_mw, surfT, 
+		RH, siz_str, num_sb, lowersize, uppersize, pmode, pconc, 
+		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
+		Cw, y_dens, Psat, core_diss, kgwt, space_mode, corei, seedVr, 
+		spec_namelist, act_coeff, wall_on, partit_cutoff, Press, coll_dia):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -60,18 +60,19 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if (sum(i) == 0): # if no initial information provide fillers
 		pconcn = np.zeros((1))
 		stdn = 1.e20
-		mean_radn = -1.e6
+		mean_radn = [-1.e6]
 	else:
 		pconcn = pconc[:, i]
 		stdn = std[:, i]
 		mean_radn = mean_rad[:, i]
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
-	if (sum(mean_radn == -1.e6)>0) and (num_sb>0):
-		if (lowersize > 0.):
-			mean_radn[mean_radn == -1.e6] = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
-		if (lowersize == 0.):
-			mean_radn[mean_radn == -1.e6] = 10**((np.log10(uppersize))/2.0)
+	if (num_sb > 0):
+		if (any(mrn == -1.e6 for mrn in mean_radn)):
+			if (lowersize > 0.):
+				mean_radn[mean_radn == -1.e6] = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
+			if (lowersize == 0.):
+				mean_radn[mean_radn == -1.e6] = 10**((np.log10(uppersize))/2.0)
 	
 	# index of nucleating component
 	if len(nuc_comp)>0:
@@ -105,8 +106,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		# set scale and standard deviation input for lognormal probability distribution 
 		# function, following guidance here: 
 		# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
-		scale = np.exp(np.log(mean_radn))
-		stdn = np.log(stdn)
+		scale = [np.exp(np.log(mean_radn))]
+		stdn = [np.log(stdn)]
 		loc = 0. # no shift
 		
 		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_sb, 

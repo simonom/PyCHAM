@@ -268,8 +268,8 @@ def ode_updater(update_stp,
 			ic_red = 1
 		
 		if ((num_sb-wall_on) > 0): # if particles present
+
 			# update partitioning variables
-			
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 			surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
 			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
@@ -370,7 +370,7 @@ def ode_updater(update_stp,
 				dydt_vst, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec)		
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, corei)		
 		
 		# if time step was temporarily reduced, then return
 		if ic_red == 1:

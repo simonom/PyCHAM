@@ -380,7 +380,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('		return(j)\n')
 	f.write('\n')
 	f.write('	mod = Explicit_Problem(dydt, y) # instantiate solver\n')
-	f.write('	mod.jac = jac # set the Jacobian\n')
+	f.write('	#mod.jac = jac # set the Jacobian\n')
 	f.write('	mod_sim = CVode(mod) # define a solver instance\n')
 	f.write('	# there is a general trend of an inverse relationship\n')
 	f.write('	# between tolerances and computation time\n')
