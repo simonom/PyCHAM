@@ -1,16 +1,16 @@
-'''Code to plot results for limonene oxidation example, terminal needs to be in the Results folder of GMD_paper to work'''
+'''Code to plot results for limonene oxidation example (Fig. 1 of GMD paper)'''
 # aim is to exemplify the coupled integration of gas-phase chemistry and partitioning to
-# particles and wall
+# particles and wall, call from the PyCHAM home directory if inside PyCHAM, or, if 
+# inside the GMD paper folder, call from the Results folder
 
-# For the chemical scheme file use: limonene MCM PRAM sheme (limonene_MCM_PRAM.txt)
-# For model variable inputs use: GMD_paper/Results/limonene_inputs.txt
+# For the chemical scheme file use: limonene MCM PRAM sheme (fig01_scheme.txt)
+# For model variable inputs use: GMD_paper/Results/fig01_mod_var.txt
 # Which, for the NOx present case should include:
 # C0 = 10.0, 0.0, 0.0, 22.0, 0.0, 500.0e3
 # Comp0 = LIMONENE, N2O5, NO3, NO2, O3, CO
 # injectt = 5400.0, 14400.0
 # Compt = LIMONENE, N2O5, NO3, NO2, O3
 # Ct = 0.0, 10.0; 0.0, 0.0; 0.0, 0.0; 8.0, 19.0; 38.0, 45.0
-# whereas for the NOx absent case, NOx concentrations should be set to zero
 # Use the xml file in the inputs folder as this has been updated for PRAM components
 
 # import required modules
@@ -42,8 +42,10 @@ mw_dict = {}
 
 
 cwd = os.getcwd() # get current working directory
-(num_sb_dict['num_sb0'], num_speci_dict['num_speci0'], Cfac_dict['Cfac0'], y_dict['y0'], N_dict['N0'], sbb_dict['sbb0'], x_dict['x0'], thr_dict['thr0'], comp_names['cn0'], mw_dict['mw0'], _, _, _, _) = retr(str(cwd + '/limonene_output/test19/'))
-
+try: # in case calling from inside the GMD paper folder results section
+	(num_sb_dict['num_sb0'], num_speci_dict['num_speci0'], Cfac_dict['Cfac0'], y_dict['y0'], 		N_dict['N0'], sbb_dict['sbb0'], x_dict['x0'], thr_dict['thr0'], comp_names['cn0'], mw_dict['mw0'], 		_, _, _, _) = retr(str(cwd + '/fig01_data/'))
+try: # in case calling from PyCHAM home folder
+	(num_sb_dict['num_sb0'], num_speci_dict['num_speci0'], Cfac_dict['Cfac0'], y_dict['y0'], 		N_dict['N0'], sbb_dict['sbb0'], x_dict['x0'], thr_dict['thr0'], comp_names['cn0'], mw_dict['mw0'], 		_, _, _, _) = retr(str(cwd + 'PyCHAM/output/GMD_paper_plotting_scripts/fig01_data/'))
 
 # ----------------------------------------------------------------------------------------
 # rename variables for use below
