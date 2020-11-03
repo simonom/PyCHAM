@@ -44,7 +44,7 @@ mw_dict = {}
 cwd = os.getcwd() # get current working directory
 try: # in case calling from inside the GMD paper folder results section
 	(num_sb_dict['num_sb0'], num_speci_dict['num_speci0'], Cfac_dict['Cfac0'], y_dict['y0'], 		N_dict['N0'], sbb_dict['sbb0'], x_dict['x0'], thr_dict['thr0'], comp_names['cn0'], mw_dict['mw0'], 		_, _, _, _) = retr(str(cwd + '/fig01_data/'))
-try: # in case calling from PyCHAM home folder
+except: # in case calling from PyCHAM home folder
 	(num_sb_dict['num_sb0'], num_speci_dict['num_speci0'], Cfac_dict['Cfac0'], y_dict['y0'], 		N_dict['N0'], sbb_dict['sbb0'], x_dict['x0'], thr_dict['thr0'], comp_names['cn0'], mw_dict['mw0'], 		_, _, _, _) = retr(str(cwd + 'PyCHAM/output/GMD_paper_plotting_scripts/fig01_data/'))
 
 # ----------------------------------------------------------------------------------------
@@ -71,7 +71,13 @@ for i in range(len(PyCHAM_names)):
 
 # ----------------------------------------------------------------------------------------
 # prepare plot
-fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(13,7))
+# note, we have to use the gridspec approach because the parasite axis on the lower plot
+# means that sharex won't bring the x axis of both plots in line
+fig = plt.figure(figsize = (13,7))
+gs = fig.add_gridspec(2, 15)
+
+ax0 = fig.add_subplot(gs[0, :9])
+ax1 = fig.add_subplot(gs[1, :])
 
 # parasite axis for particle-phase plot
 par1 = ax1.twinx() # first parasite axis
@@ -112,9 +118,10 @@ ax0.semilogy(thr_dict['thr0'], y[:, comp_index[2]], label = 'LIMONENE')
 # ax0.semilogy(thr_dict['thr0'], y[:, comp_index[4]], label = 'NO3')
 ax0.set_ylim(1.0e-1, 1.0e2)
 ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize=12)
-ax0.yaxis.set_tick_params(labelsize=14)
-ax0.set_xlabel(r'Time through simulation (hours)', fontsize=12)
-ax0.xaxis.set_tick_params(labelsize=14)
+ax0.yaxis.set_tick_params(labelsize=14, direction = 'in', which = 'both')
+#ax0.set_xlabel(r'Time through simulation (hours)', fontsize=12)
+ax0.xaxis.set_tick_params(direction = 'in', which = 'both')
+ax0.xaxis.set_ticklabels([])
 
 
 ax0.plot([1.5, 1.5], [0.0, 500.0], color='black', linewidth=1, linestyle='dashed')
@@ -123,7 +130,7 @@ ax0.plot([4.0, 4.0], [0.0, 500.0], color='black', linewidth=1, linestyle='dashed
 ax0.text(x=3.7, y=1, s='injection 2', size=12, rotation=90, color='black')
 
 ax0.legend(fontsize=10)
-ax0.text(x=(thr_dict['thr0'])[0], y=1.6e2, s='(a)', size=12)
+ax0.text(x=(thr_dict['thr0'])[0]-0.2, y=1.6e2, s='(a)', size=12)
 
 # ----------------------------------------------------------------------------------------
 # particle-phase properties
@@ -180,12 +187,13 @@ p1 = ax1.pcolormesh(thr_dict['thr0'], (sbb*2*1e3), z[:, :], cmap=cm, norm=norm1)
 
 
 ax1.set_ylabel('Diameter ($D_p$, nm)', size=12)
-ax1.xaxis.set_tick_params(labelsize=14)
-ax1.yaxis.set_tick_params(labelsize=14)
+ax1.xaxis.set_tick_params(labelsize=14, direction = 'in', which = 'both')
+ax1.yaxis.set_tick_params(labelsize=14, direction = 'in', which = 'both')
 ax1.set_xlabel(r'Time through simulation (hours)', fontsize=12)
-ax1.set_ylim((sbb[0]*2*1e3), (sbb[-1]*2*1e3))
+ax1.set_yscale('log')
+ax1.set_ylim((sbb[1]*2*1e3/0.7), (sbb[-1]*2*1e3))
 # set y axis to standard notation
-ax1.ticklabel_format(axis='y', style='sci')
+#ax1.ticklabel_format(axis='y', style='sci')
 
 # function for doing colorbar tick labels in standard notation
 def fmt(x, pos):
@@ -194,7 +202,7 @@ def fmt(x, pos):
 	return r'${} \times 10^{{{}}}$'.format(a, b)
 
 cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
-cb.ax.tick_params(labelsize=14)   
+cb.ax.tick_params(labelsize=14) 
 
 # colour bar label
 cb.set_label('d$N$ ($\#\,\mathrm{cm^{-3}}$)/dlog$\mathrm{_{10}}$($D_p$)', size=12, rotation=270, labelpad=20)
@@ -205,7 +213,7 @@ ax1.text(x=(thr_dict['thr0'])[0]-0.1, y=(sbb[-1]*2*1e3)*1.05, s='(b)', size=12)
 ax1.plot([1.5, 1.5], [0.0, 500.0], color='white', linewidth=1, linestyle='dashed')
 ax1.text(x=1.2, y=40, s='injection 1', size=12, rotation=90, color='white')
 ax1.plot([4.0, 4.0], [0.0, 500.0], color='white', linewidth=1, linestyle='dashed')
-ax1.text(x=3.7, y=200, s='injection 2', size=12, rotation=90, color='white')
+ax1.text(x=3.7, y=150, s='injection 2', size=12, rotation=90, color='white')
 
 # ----------------------------------------------------------------------------------------
 # organic aerosol mass concentration in particles (ug/m3)
@@ -259,7 +267,7 @@ Owall = (((y[:, num_speci*num_sb:num_speci*(num_sb+1)-final_i]/si.N_A)*y_mw[0:-f
 # # transform inorganic nitrates so no standard notation required
 # inorg_NO3vst = inorg_NO3vst/(10**(SOAmax))
 
-p5, = par2.semilogy(thr_dict['thr0'], SOAvst, '--k', label = 'SOA')
+p5, = par2.semilogy(thr_dict['thr0'], SOAvst, '--k', label = 'SOPM')
 p6, = par2.semilogy(thr_dict['thr0'], Owall, '-.k', label = 'wall deposit')
 p7, = par2.semilogy(thr_dict['thr0'], NO3vst, ':k', label = 'particle organic nitrate')
 p8, = par2.semilogy(thr_dict['thr0'], inorg_NO3vst, '.k', label = 'particle inorganic nitrate')
@@ -267,15 +275,17 @@ par2.set_ylim(5.0e-1, 1.0e2)
 # par2.set_ylabel(str('[organics]x ' + str(10**(SOAmax)) + ' ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=12, labelpad=25)
 par2.set_ylabel(str('Particulate & wall concentration' + ' ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=12, labelpad=25)
 
-par2.yaxis.set_tick_params(labelsize=12)
+par2.yaxis.set_tick_params(labelsize=12, direction = 'in', which = 'both')
 
 # ----------------------------------------------------------------------------------------
 # total particle number concentration
 
 p3, = par1.plot(thr_dict['thr0'], N.sum(axis=1), '-k', label = '$N$')
-par1.set_ylabel('$N$ ($\#\,\mathrm{cm^{-3}}$', rotation=270, size=12, labelpad=25)
-par1.yaxis.set_tick_params(labelsize=12)
+# set tick format for vertical axis
+par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
+par1.set_ylabel('$N$ ($\#\,\mathrm{cm^{-3}}$)', rotation=270, size=12, labelpad=25)
+par1.yaxis.set_tick_params(labelsize=12, direction = 'in', which = 'both')
 
-plt.legend(fontsize=12, handles=[p3, p5, p6, p7, p8] ,loc=2)
+plt.legend(fontsize=12, handles=[p3, p5, p6, p7, p8] ,loc=2, framealpha=0.25)
 fig.savefig('fig01.png')
 plt.show()
