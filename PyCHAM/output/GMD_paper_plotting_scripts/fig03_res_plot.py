@@ -87,7 +87,6 @@ import os
 # get current working directory
 cwd = os.getcwd()
 # ensure modules can be seen 
-# (assumes calling from the home folder)
 sys.path.append(str(os.getcwd() + '/PyCHAM'))
 import retr_out
 
@@ -96,10 +95,11 @@ import retr_out
 # open saved files
 try: # in case calling from the PyCHAM folder
 	Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/AtChem2_APINENE/hiNOx/speciesConcentrations.output')
+	inputs = open(Atfname, mode='r') # open results
 except: # in case calling from GMD paper/Results folder
 	Atfname = str(cwd + '/fig03_data/AtChem2_APINENE/hiNOx/speciesConcentrations.output')
+	inputs = open(Atfname, mode='r') # open results
 
-inputs = open(Atfname, mode='r') # open results
 # read the file and store everything into a list
 in_list = inputs.readlines()
 inputs.close() # close file
@@ -136,12 +136,16 @@ else: # convert to hours from s
 # file name
 try: # in case calling from the PyCHAM folder
 	Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_APINENE/hiNOx/PyCHAM_comp_hiNOx')
+	# required outputs
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, t_array, PyCHAM_names, 
+		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 except: # in case calling from the GMD paper results folder
 	Pyfname = str(cwd + '/fig03_data/PyCHAM_APINENE/hiNOx/PyCHAM_comp_hiNOx')
-
-# required outputs
-(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, t_array, PyCHAM_names, 
+	# required outputs
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, t_array, PyCHAM_names, 
 		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
+
+
 
 # convert from ppb to molecules/cc (air)
 yrec = yrec*((np.array((Cfac))).reshape(-1,1))
@@ -212,40 +216,17 @@ ax0.text(x=-1.8, y=0.7, s='(a)', size=14)
 ax0.yaxis.set_tick_params(direction = 'in', which = 'both')
 
 
-# ----------------------------------------------------------------------------------------
-# temporal profile of gas-phase concentrations (ppb) (used for EAC abstract)
-
-# fig, (ax4) = plt.subplots(1, 1, figsize=(8,6))
-# comp_num = 1
-# for i in comp_names[1::]: # loop through Atchem2 components (excluding time in column 0)
-# 	if i=='HO2' or i=='O':
-# 		comp_num += 1 # Atchem2 index
-# 		continue
-# 	ind = PyCHAM_names.index(i) # PyCHAM index for this component
-# 	# temporal (24 hour clock) profiles of gas-phase concentration (ppb), note gas-phase
-# 	# concentration conversion from molecules/cc (air) to ppb (air) 
-# 	ax4.semilogy(gconc[:,0]/3600.0, gconc[:,comp_num]/Cfactor, 
-# 						label=str('Atchem2 '+str(i)))
-# 	ax4.semilogy(t_array/3600.0, y[:, ind], '--', 
-# 						label=str('PyCHAM '+str(i)))
-# 	comp_num += 1 # Atchem2 index
-# ax4.set_ylabel(r'Gas-phase concentration (ppb)', fontsize=12)
-# ax4.set_xlabel(r'Time of day', fontsize=12)
-# ax4.yaxis.set_tick_params(size=12)
-# ax4.xaxis.set_tick_params(size=12)
-# ax4.set_ylim([1.0e-10, 2.0e2])
-# ax4.legend(fontsize=10)
-# plt.show()
-
 #-----------------------------------------------------------------------------------------
 # AtChem2 part
 # open saved files
 try: # in case calling from the PyCHAM folder
 	Atfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/AtChem2_APINENE/loNOx/speciesConcentrations.output')
+	inputs = open(Atfname, mode='r') # open results
 except: # in case calling from the GMD paper Results folder
 	Atfname = str(cwd + '/fig03_data/AtChem2_APINENE/loNOx/speciesConcentrations.output')
+	inputs = open(Atfname, mode='r') # open results
 
-inputs = open(Atfname, mode='r') # open results
+
 # read the file and store everything into a list
 in_list = inputs.readlines()
 inputs.close() # close file
@@ -282,12 +263,16 @@ else: # convert to hours from s
 # file name
 try: # in case calling from the PyCHAM folder
 	Pyfname = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_APINENE/loNOx/PyCHAM_comp_loNOx')
+	# required outputs
+	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array2, PyCHAM_names, 
+		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 except: # in case calling from the GMD paper Results folder
 	Pyfname = str(cwd + '/fig03_data/PyCHAM_APINENE/loNOx/PyCHAM_comp_loNOx')
-
-# required outputs
-(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array2, PyCHAM_names, 
+	# required outputs
+	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array2, PyCHAM_names, 
 		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
+
+
 
 # convert from ppb to molecules/cc (air)
 y = y*((np.array((Cfac))).reshape(-1, 1))
