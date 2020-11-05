@@ -329,8 +329,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('			# stack size bins\n')
 	f.write('			jac_coeff = jac_coeff.reshape(int(num_sb-wall_on), int(njac_aq[aqi, 0]/(num_sb-wall_on)), order=\'C\')\n')
 	f.write('			data[jac_indx_aq[aqi::n_aqr, 0:(int(njac_aq[aqi, 0]/(num_sb-wall_on)))]] += jac_coeff\n')
-	f.write('			#print(jac_coeff)\n')
-	f.write('			#import ipdb; ipdb.set_trace()\n')
 	f.write('			aqi += 1\n')
 	f.write('		\n')
 	if (num_asb > 0): # include gas-particle partitioning in ode solver Jacobian

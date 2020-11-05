@@ -145,7 +145,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
 			Jt =1.747E-01*cosxt**(0.155)*np.exp(-1.0*0.125*secxt)
 			bc_red = 1
-			print(Jt, Jn, tnew)
 
 	# check on updates to temperature (K) --------------------------------------	
 	if len(temp)>1: # because a temperature must be given for experiment start

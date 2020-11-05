@@ -287,7 +287,6 @@ def ode_updater(update_stp,
 		
 		# model component concentration changes to get new concentrations
 		# (molecules/cc)
-		print(seedi, seedi.shape)
 		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
