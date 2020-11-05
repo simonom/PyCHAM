@@ -3,7 +3,8 @@
 # or fig11_full_scheme.txt 
 # note that 24 size bin used for
 # moving-centre and 12 size bins used for full-moving, with the save file name
-# and size strucure inputs changed accordingly also
+# and size structure inputs changed accordingly also; when using the simple scheme,
+# manually set the vapour pressure of ELVOC_o3 to no more than 1.e-8 Pa
 
 # import required modules
 import  matplotlib.pyplot as plt
