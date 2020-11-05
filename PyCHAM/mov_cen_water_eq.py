@@ -85,7 +85,7 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	isb = num_part_new[:, 0] == 0.
 	
 	# fill volume array elements for bins without particles with central volume (um3)
-	Vsing[isb] = (Vbou[0:-1][isb]+Vbou[1::][isb])/2.0
+	Vsing[isb] = Vol0[isb]
 	rad[isb] = ((3.*Vsing[isb])/(4.*np.pi))**(1./3.) # new radius (um)
 	
 	# flag to show no reduction in time step needed
