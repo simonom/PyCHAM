@@ -234,7 +234,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	
 		# check whether changes occur at start of this time step
 		if (sumt == pconct[0, seedt_cnt]):
-			
 			# account for change in seed particles
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
 					Varr] = pp_dursim.pp_dursim(y[num_comp:num_comp*(num_sb-wall_on+1)], 
