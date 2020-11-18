@@ -63,7 +63,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 		
 			# number fraction-size distribution - enforce high resolution to ensure size
 			# distribution of seed particles fully captured
-			hires = 10**(np.linspace(np.log10((rad0[0]-(rbou[1]-rbou[0])/2.1)), np.log10(uppersize), (num_sb)*1.0e2))
+			hires = 10**(np.linspace(np.log10((rad0[0]-(rbou[1]-rbou[0])/2.1)), np.log10(uppersize), int((num_sb)*1e2)))
 			pdf_output = stats.lognorm.pdf(hires, stdn, loc, scale)
 			pdf_out = np.interp(radn, hires, pdf_output)	
 			# number concentration of seed in all size bins (# particle/cc (air))
