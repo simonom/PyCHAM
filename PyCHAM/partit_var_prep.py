@@ -32,29 +32,30 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 		return(0,0,0,0,0,0,0) # return dummies
 	
 	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
-	# molecular diffusion coeffficient of each component in air (m2/s) 
-	# Equation from JL Schnoor, Environmental Modelling: fate and transport of pollutants 
-	# in water, air and soil, 1996, ISBN : 0471124362, page 331.
-	# Note that no reference given in this text book for this equation, but results for
-	# Xe and Kr are within 10 % of those calculated independently in Table 16.1 of 
-	# Jacobson (2005)
-	# Scale by 1e-4 to convert from cm2/s to m2/s
-	DStar_org = (1.9E0*(y_mw**(-2.0E0/3.0E0)))*1e-4
+
+	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
+	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
 	
-	# mean thermal speed of each molecule (m/s) (11.151 Jacobson 2005)
+	ma = 28.966e-3 # molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
+	
+	# air density (kg/m3 (air)), ideal gas law
+	rho_a =  (Pnow*ma)/((si.R)*TEMP)
+	
+	# mean thermal speed of each component (m/s) (eq. 2.3 Jacobson 2005)
 	# note that we need the weight of one molecule, which is why y_mw is divided by
 	# Avogadro's constant, and we need it in kg, which is why we multiply by 1e-3
-	therm_sp = (np.power((8.0E0*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.0E-3), 0.5E0))
+	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
-	# mean free path (m) for each component (16.23 of Jacobson 2005)
+	# mean free path (m) for each component (15.24 of Jacobson 2005)
 	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
-	mfp = (((64.*DStar_org)/(5*np.pi*therm_sp))*(28.966/(28.966+y_mw))).reshape(-1, 1)
+	mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 
 	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
 	
-	# collision diameter of components (cm), taken from:
-	# http://hyperphysics.phy-astr.gsu.edu/hbase/Kinetic/menfre.html
-	coll_dia = (1./(np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5)
+	# collision diameter of components (cm), taken from p. 380 of Introduction to physics 
+	# by Frauenfelder and Huber (1966), ISBN : 9780080135212, 
+	# available online via University of Manchester Library
+	coll_dia = 2.*((1./(4.*(2**0.5)*np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5))
 	
 	# accommodation coefficient of components in each size bin
 	accom_coeff = np.ones((num_speci, num_sb))*1.e0
