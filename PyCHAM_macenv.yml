@@ -36,7 +36,6 @@ dependencies:
   - liblapack
   - libpng
   - libxml2
-  - llvmlite
   - matplotlib
   - matplotlib-base
   - metis

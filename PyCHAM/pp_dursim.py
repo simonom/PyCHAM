@@ -33,19 +33,11 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 	
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
-<<<<<<< HEAD
 	if (mean_rad == -1.e6 and num_sb > 0):
 		if (lowersize > 0.):
 			mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.)
 		else:
 			mean_rad = 10**((np.log10(uppersize))/2.)
-=======
-	if any(mean_rad == -1.e6) and (num_sb > 0):
-		if lowersize > 0.:
-			mean_rad[mean_rad == -1.e6] = 10**((np.log10(lowersize)+np.log10(uppersize))/2.0)
-		if lowersize == 0.:
-			mean_rad[mean_rad == -1.e6] = 10**((np.log10(uppersize))/2.0)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
@@ -67,21 +59,16 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 			# function, following guidance here: 
 			# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
 			scale = np.exp(np.log(mean_rad[i]))
-			stdn = np.log(std[i])
-			loc = 0. # no shift
+			std = np.log(std[i])
+			loc = 0.0 # no shift
 		
 			# number fraction-size distribution - enforce high resolution to ensure size
 			# distribution of seed particles fully captured
-<<<<<<< HEAD
 			if (lowersize > 0.): # if lowermost size bin bound useful
 				hires = 10**(np.linspace(np.log10(lowersize), np.log10(uppersize), int(num_sb*1.e2)))
 			else: # enforce lowermost size bin radius bound of 1 nm (1e-3 um)
 				hires = 10**(np.linspace(np.log10(1.e-3), np.log10(uppersize), int(num_sb*1.e2)))
 			pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
-=======
-			hires = 10**(np.linspace(np.log10((rad0[0]-(rbou[1]-rbou[0])/2.1)), np.log10(uppersize), int((num_sb)*1e2)))
-			pdf_output = stats.lognorm.pdf(hires, stdn, loc, scale)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			pdf_out = np.interp(radn, hires, pdf_output)	
 			# number concentration of seed in all size bins (# particle/cc (air))
 			pconc_new = (pdf_out/sum(pdf_out))*pconc[i]

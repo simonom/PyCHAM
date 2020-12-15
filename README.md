@@ -42,9 +42,9 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 ## Install via pip
 
-The following steps need are at the command line:
+The following steps are at the command line:
 
-1) Create a virtual environment in a suitable location running with at least python3.6, e.g. for python 3.6, the command line command to produce a virtual environment called 36env: python3.6 -m venv 36env
+1) Create a virtual environment in a suitable location running with at least python3.6.  For example, for python 3.6, the command to produce a virtual environment called 36env on Mac is: python3.6 -m venv 36env
 
 2) Activate this environment, e.g. for a virtual environment called 36env: source 36env/bin/activate
 
@@ -82,9 +82,9 @@ Example run output is saved in the PyCHAM/output/example_scheme folder.  To repr
 
 ## Chemical Scheme file
 
-The chemical scheme file states the reactions and their rate cofficients in the gas- and aqueous-phases.  Note that all components included in the reactions of the chemical scheme file must have a name matching a name in the corresponding xml file.  The xml file, and instructions for its modification, are described below.
+The chemical scheme file states the reactions and their rate cofficients in the gas- and aqueous-phases.
 
-An example chemical scheme file is given in the PyCHAM/input folder, called 'example_scheme.txt', which has been obtained from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.
+An example chemical scheme file is given in the PyCHAM/input folder, called 'example_scheme.txt', which has been obtained from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.  
 
 Results are automatically saved in PyCHAM/output/name_of_chemical_scheme_file/name_given_in_model_variables_input_file_for_saving.  
 

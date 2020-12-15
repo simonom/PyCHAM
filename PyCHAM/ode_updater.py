@@ -232,7 +232,7 @@ def ode_updater(update_stp,
 	# prepare recording matrices, including recording of initial
 	# conditions
 	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, 
-	seedt_cnt, rbou_rec, Cfactor, infx_cnt, coll_dia] = rec_prep.rec_prep(nrec_steps, 
+	seedt_cnt, rbou_rec, Cfactor, infx_cnt] = rec_prep.rec_prep(nrec_steps, 
 	y, rindx, 
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
@@ -255,22 +255,14 @@ def ode_updater(update_stp,
 		# update chamber variables
 		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-<<<<<<< HEAD
 			gasinj_cnt, DStar_org] = cham_up.cham_up(sumt, temp, tempt, 
-=======
-			gasinj_cnt, coll_dia] = cham_up.cham_up(sumt, temp, tempt, 
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			Pnow, light_stat, light_time, light_time_cnt, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
-<<<<<<< HEAD
 			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
-=======
-			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, coll_dia)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew) > save_stp*save_cnt):
@@ -328,13 +320,8 @@ def ode_updater(update_stp,
 			kimt[:, H2Oi] = 0.
 
 		# model component concentration changes to get new concentrations
-<<<<<<< HEAD
 		# (molecules/cc (air))
 		[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
-=======
-		# (molecules/cc)
-		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 			reac_col, prod_col, rstoi_flat, 

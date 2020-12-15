@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="PyCHAM",
-    version="2.1.5",
+    version="2.1.7",
     author="Simon O'Meara",
     author_email="simon.omeara@manchester.ac.uk",
     description="PyCHAM: CHemistry with Aerosol Microphysics in Python",
@@ -26,5 +26,5 @@ setup(
     python_requires='>=3.6',
     
 # state dependencies for PyCHAM, note that openbabel v3.1.1.1 didn't install via pip when tested on 19/11/2020
-install_requires=["PyQt5","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","llvmlite","scipy","xmltodict","openbabel==2.4.0","requests"]
+install_requires=["PyQt5","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","scipy","xmltodict","openbabel==2.4.0","requests"]
 )

@@ -255,7 +255,7 @@ class PyCHAM(QWidget):
 				for i in value:
 					if i==';':
 						time_cnt += 1 # increase time count
-					if (i == ':' and time_cnt == 1):
+					if i==':':
 						mode_cnt += 1 # increase mode count
 				std = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
@@ -267,7 +267,7 @@ class PyCHAM(QWidget):
 				for i in value:
 					if i==';':
 						time_cnt += 1 # increase time count
-					if (i == ':' and time_cnt == 1):
+					if i==':':
 						mode_cnt += 1 # increase mode count
 				
 				mean_rad = np.zeros((mode_cnt, time_cnt))

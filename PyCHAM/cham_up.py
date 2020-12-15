@@ -15,11 +15,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-<<<<<<< HEAD
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, DStar_org):
-=======
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, coll_dia):
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -87,13 +83,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cc (air)
 	# seedi - index of seed component(s)
-<<<<<<< HEAD
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
-=======
-	# coll_dia - collision diameter of components (cm)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -185,13 +177,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# to update
 			Cfactor0 = Cfactor
 			# update number of molecules in one billionth of this
-<<<<<<< HEAD
 			Cfactor = ntot*1.e-9 # ppb-to-molecules/cc
 			
-=======
-			Cfactor = ntot*1.0e-9 # ppb-to-molecules/cc
-							
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_now+120.))*(temp_now/296.16)**1.5)
 	
@@ -210,7 +197,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
 			mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 			
-<<<<<<< HEAD
 			# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
 			# the Taylor (1993) textbook 
 			# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion 
@@ -220,14 +206,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
 			
-=======
-			nv = (Pnow/(si.R*temp_now))*si.N_A # concentration of molecules (# molecules/m3)
-			
-			# collision diameter of components (cm), taken from p. 380 of Introduction to physics 
-			# by Frauenfelder and Huber (1966), ISBN : 9780080135212, 
-			# available online via University of Manchester Library
-			coll_dia = 2.*((1./(4.*(2**0.5)*np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5))
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			
 			# alter constant concentration (molecules/cc) of any components
 			# with constant gas-phase concentration (ppb)
@@ -277,6 +255,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	
 		# check whether changes occur at start of this time step
 		if (sumt == pconct[0, seedt_cnt]):
+			
 			# account for change in seed particles
 			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
 					Varr] = pp_dursim.pp_dursim(y[num_comp:num_comp*(num_sb-wall_on+1)], 
@@ -354,8 +333,4 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
-<<<<<<< HEAD
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org)
-=======
-		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, coll_dia)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f

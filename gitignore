@@ -10,15 +10,10 @@ PyCHAM/__pycache__
 # Distribution / packaging
 .Python
 build/
-<<<<<<< HEAD
 /build
 develop-eggs/
 dist/
 /dist
-=======
-develop-eggs/
-dist/
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 umansysprop/
 downloads/
 eggs/
@@ -30,10 +25,7 @@ sdist/
 var/
 wheels/
 *.egg-info/
-<<<<<<< HEAD
 /PyCHAM.egg_info
-=======
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 .installed.cfg
 *.egg
 MANIFEST

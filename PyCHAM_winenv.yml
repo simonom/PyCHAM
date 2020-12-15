@@ -12,8 +12,6 @@ dependencies:
   - jpeg
   - libpng
   - libxml2
-  - llvmlite
-  - numba
   - openssl
   - pyqt
   - sip
@@ -21,7 +19,6 @@ dependencies:
   - vc
   - vs2015_runtime
   - zlib
-  - assimulo
   - backcall
   - colorama
   - cycler
@@ -52,7 +49,6 @@ dependencies:
   - requests
   - six
   - smmap2
-  - sundials=3.2.1=he025d50_1
   - tornado
   - traitlets
   - wcwidth

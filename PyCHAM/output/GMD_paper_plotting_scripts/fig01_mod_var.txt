@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 res_file_name = fig01_res_16sb_newD
 total_model_time = 25200.
 update_step = 60.
@@ -6,30 +5,14 @@ recording_time_step = 300.
 number_size_bins = 16
 lower_part_size = 0.
 upper_part_size = 2.e-1
-=======
-res_file_name = test21
-total_model_time = 25200.
-update_step = 300.
-recording_time_step = 300.
-number_size_bins = 2
-lower_part_size = 0.
-upper_part_size = 0.17e0
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 space_mode = lin
 mass_trans_coeff = 1.e-3
 eff_abs_wall_massC = 1.e-6
 temperature = 298.
 tempt = 0.
-<<<<<<< HEAD
 p_init = 1.2e5
 rh = 0.5
 ChamSA = 353.4291735288517
-=======
-p_init = 120000
-rh = 0.50
-ChamSA = 353.4291735288517
-coag_on = 1
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 nucv1 = 1.e4
 nucv2 = -4.e3
 nucv3 = 8.e2
@@ -55,11 +38,6 @@ pconc = 2285.788630166049
 seed_name = core
 seed_mw = 100.
 seed_dens = 1.
-<<<<<<< HEAD
 mean_rad = 1.e-1
 std = 1.1
-=======
-mean_rad = 1.e-1; 1.e-1
-std = 1.1; 1.1
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;

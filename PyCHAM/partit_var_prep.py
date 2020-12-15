@@ -36,19 +36,11 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 		return(0,0,0,0,0,0,0) # return dummies
 	
 	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
-<<<<<<< HEAD
 	
 	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
 	
 	ma = 28.966e-3 # molecular weight of air (kg/mol) (eq. 16.17 Jacobson 2005)
-=======
-
-	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
-	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
-	
-	ma = 28.966e-3 # molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	# air density (kg/m3 (air)), ideal gas law
 	rho_a =  (Pnow*ma)/((si.R)*TEMP)
@@ -59,15 +51,10 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
 	# mean free path (m) for each component (15.24 of Jacobson 2005)
-<<<<<<< HEAD
-=======
-	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 
 	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
 	
-<<<<<<< HEAD
 	# get diffusion volumes
 	diff_vol = diff_vol_est.diff_vol_est(Pybel_object)
 	
@@ -85,12 +72,6 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	
 	# convert to cm2/s
 	Dstar_org = Dstar_org*1.e4
-=======
-	# collision diameter of components (cm), taken from p. 380 of Introduction to physics 
-	# by Frauenfelder and Huber (1966), ISBN : 9780080135212, 
-	# available online via University of Manchester Library
-	coll_dia = 2.*((1./(4.*(2**0.5)*np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5))
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	# accommodation coefficient of components in each size bin
 	accom_coeff = np.ones((num_speci, num_sb))*1.e0

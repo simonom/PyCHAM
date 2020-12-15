@@ -6,8 +6,7 @@ channels:
   - anaconda
   - defaults
 dependencies:
-  - _libgcc_mutex
-  - assimulo
+  - libgcc_mutex
   - backcall
   - bzip2
   - ca-certificates
@@ -51,7 +50,6 @@ dependencies:
   - libuuid
   - libxcb
   - libxml2
-  - llvmlite
   - matplotlib
   - metis
   - ncurses
@@ -86,7 +84,6 @@ dependencies:
   - smmap2
   - sqlite
   - suitesparse
-  - sundials
   - tbb
   - tk
   - tornado

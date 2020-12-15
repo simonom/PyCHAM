@@ -143,22 +143,14 @@ def rec_prep(nrec_step,
 	# update chamber variables
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-<<<<<<< HEAD
 		gasinj_cnt, DStar_org] = cham_up.cham_up(sumt, temp, tempt, 
-=======
-		gasinj_cnt, coll_dia] = cham_up.cham_up(sumt, temp, tempt, 
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-<<<<<<< HEAD
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
-=======
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, coll_dia)
->>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	
 	if (num_sb-wall_on)>0: # if particles present
@@ -212,4 +204,4 @@ def rec_prep(nrec_step,
 					kimt, kw, Cw, act_coeff, corei)
 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt, coll_dia)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt)
