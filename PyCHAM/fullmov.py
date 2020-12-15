@@ -55,10 +55,10 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	Vbou[1:-1] = Vnew_ord[0:-1]+(Vnew_ord[1::]-Vnew_ord[0:-1])/2.
 
 	# new radii per size bin (um)
-	x = ((3.0*Vnew)/(4.0*np.pi))**(1.0/3.0)
+	x = ((3.*Vnew_ord)/(4.*np.pi))**(1./3.)
 		
 	# new radius bounds (um)
-	rbou = ((3.0*Vbou)/(4.0*np.pi))**(1.0/3.0)
+	rbou = ((3.*Vbou)/(4.*np.pi))**(1./3.)
 
 
 	return(Vnew_ord, x, Cpn, nn, Vbou, rbou)

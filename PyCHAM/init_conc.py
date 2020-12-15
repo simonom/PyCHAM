@@ -7,13 +7,14 @@ import scipy.constants as si
 import math
 from water_calc import water_calc
 import write_dydt_rec
+import pybel
 
 
 def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	testf, pconc, dydt_trak, end_sim_time, save_step, 
 	rindx, pindx, num_eqn, nreac, nprod, 
-	spec_namelist, Compt, seed_name, seed_mw,
-	core_diss, nuc_comp):
+	comp_namelist, Compt, seed_name, seed_mw,
+	core_diss, nuc_comp, comp_xmlname, comp_smil):
 		
 	# inputs:------------------------------------------------------
 	
@@ -32,12 +33,14 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# end_sim_time - total simulation time (s)
 	# save_step - recording frequency (s)
 	# num_eqn - number of equations
-	# spec_namelist - list of components' names in chemical equation file
+	# comp_namelist - list of components' names in chemical equation file
 	# Compt - name of component injected after start of experiment
 	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
 	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
+	# comp_xmlname - component names in xml file
+	# comp_smil - SMILE strings in xml file
 	# -----------------------------------------------------------
 
 	if testf==1: # testing mode
@@ -62,9 +65,35 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	dydt_vst = {}
 
 	# insert initial concentrations where appropriate
-	for i in range (len(Comp0)):
-    	# index of where initial components occur in list of components
-		y_indx = spec_namelist.index(Comp0[i])
+	for i in range(len(Comp0)):
+    		# index of where initial components occur in list of components
+		try: # in case components already listed via interpretation of the chemical scheme
+			y_indx = comp_namelist.index(Comp0[i])
+			
+		# if component not already listed via interpretation of the chemical scheme
+		# then add to list
+		except:
+			print('Note: component specified in initial gas-phase concentrations of model variables has not been registered in the chemical scheme, but will try to be added to the component list inside the module for initialising gas-phase concentrations')
+			comp_namelist.append(Comp0[i]) # add to name list
+			
+			# convert MCM chemical names to SMILES
+			if (Comp0[i] in comp_xmlname):
+				# index where xml file name matches reaction component name
+				name_indx = comp_xmlname.index(Comp0[i])
+				name_SMILE = comp_smil[name_indx] # SMILES of component
+				# Generate pybel
+				Pybel_object = pybel.readstring('smi', name_SMILE)
+				# append to Pybel object list
+				Pybel_objects.append(Pybel_object)
+				
+				comp_num += 1 # number of unique species
+				
+				y_indx = len(comp_namelist)-1
+				y = y.append(np.zeros((1)))
+			else:
+				print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
+				sys.exit()
+			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
@@ -81,7 +110,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		for i in range (len(dydt_trak)):
 			reac_index = [] # indices of reactions involving this species
 			# index of where initial species occurs in SMILE string
-			y_indx = spec_namelist.index(dydt_trak[i])
+			y_indx = comp_namelist.index(dydt_trak[i])
 
 			# remember index for plotting gas-phase concentrations later
 			dydt_traki.append(int(y_indx))
@@ -123,7 +152,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# append empty element to y and y_mw to hold water values
 	y = np.append(y, C_H2O)
 	y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-	spec_namelist.append('H2O') # append water's name to component name list
+	comp_namelist.append('H2O') # append water's name to component name list
 
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
@@ -132,7 +161,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# empty array for index of core component
 	seedi = (np.zeros((len(seed_name)))).astype(int)
 	
-	spec_namelist.append('core') # append name of core to component name list
+	comp_namelist.append('core') # append name of core to component name list
 	corei = [num_comp] # index for core component
 	# increase number of components to account for 'core' component
 	num_comp += 1
@@ -153,19 +182,15 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	indx = 0 # count on seed component(s)
 	for sname in seed_name:
 		# index of core component
-		seedi[indx] = int(spec_namelist.index(sname))
+		seedi[indx] = int(comp_namelist.index(sname))
 		indx += 1 # count on seed component(s)
-
-	if (sum(sum(pconc)) == 0.): # no seed particle case
-		corei = np.ones((1))*-1 # filler
-		core_diss = 1. # ensure no artefact in Raoult term due to this filler
 	
 	# get index of component with latter injections
 	if len(Compt)>0:
 		inj_indx = np.zeros((len(Compt)))
 		for i in range(len(Compt)):
 			# index of where initial species occurs in SMILE string
-			inj_indx[i] = spec_namelist.index(Compt[i])
+			inj_indx[i] = comp_namelist.index(Compt[i])
 	else:
 		inj_indx = np.zeros((1)) # dummy
 
@@ -174,5 +199,5 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	corei = np.array((corei)).astype('int')
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
-				spec_namelist, inj_indx, core_diss,
+				comp_namelist, inj_indx, core_diss,
 				Psat_water, nuci, nrec_steps, seedi)

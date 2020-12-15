@@ -68,7 +68,7 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_str, num_sb, pmode, pconc, 
 	# consistency between number of particle size bins and particle number concentration
 	if num_sb == 0 and (sum(pconc != 0) > 0):
 		pconc[:] = 0.0
-		print('Note that zero particle size bins registered (number_size_bins in model vraibales input file), however total particle number concentration (pconc in model vraibales input file) contains a non-zero value, therefore assuming no particle size bins')
+		print('Note that zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore assuming no particle size bins')
 	
 	# if lower bound of particle sizes set to 0, this will induce error when taking log10
 	# in pp_intro, so change to very small value (um)

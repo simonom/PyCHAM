@@ -37,7 +37,7 @@ def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, P
 	while Vchang_flag>=1:
 		
 		# estimated concentrations (moleculecs/cc (air)) at this time step
-		ytest = res[-tsi, :]
+		ytest = res
 		
 		# loop through size bins to check whether volume condition met
 		for sbi in range(sbn):

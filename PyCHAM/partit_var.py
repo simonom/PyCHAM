@@ -4,10 +4,11 @@
 
 import numpy as np
 from part_prop import part_prop
+import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
 		y_dens, N_perbin, radius, Psat, therm_sp,
-		H2Oi, act_coeff, wall_on, caller, partit_cutoff, Press, coll_dia):
+		H2Oi, act_coeff, wall_on, caller, partit_cutoff, Press, DStar_org):
 	
 	# inputs:---------------------------------------------------------------------------
 	
@@ -31,7 +32,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# partit_cutoff - the product of Psat and act_coeff above which gas-particle 
 	# 		partitioning assumed zero (Pa)
 	# Press - air pressure (Pa)
-	# coll_dia - collision diameters of components (cm)
+	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
 	# ------------------------------------------------------------------------------------
 	
 	if num_sb == 0: # fillers
@@ -66,51 +67,41 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# They reference:
 	# Fuchs and Sutugin 1971
 	# Pruppacher and Klett 1997
-	Inverse_Kn = np.power(Kn, -1.0E0)
-	correct_1 = (1.33E0+0.71*Inverse_Kn)/(1.0+Inverse_Kn)
-	correct_2 = (4.0E0*(1.0E0-accom_coeff_now))/(3.0E0*accom_coeff_now)
-	correct_3 = 1.0E0+(correct_1+correct_2)*Kn
-	correction = np.power(correct_3, -1.0E0)
+	Inverse_Kn = Kn**-1.
+	correct_1 = (1.33+0.71*Inverse_Kn)/(1.+Inverse_Kn)
+	correct_2 = (4.*(1.-accom_coeff_now))/(3.*accom_coeff_now)
+	correct_3 = 1.e0+(correct_1+correct_2)*Kn
+	correction = correct_3**-1.
 	
 	# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
 	# note that avMW has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 	# 1e7 for units g cm2/s2.mol.K, 
 	# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
 	kelv = np.zeros((num_sb-wall_on, 1))
-	
 	kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*1.e2*tot_rho[ish]))
-	
-
-	ma = 28.966 # molecular weight of air (g/mol) (Eq. 16.17 Jacobson 2005)
-	# air density (g/cc (air)) (convert R_gas from m^3.Pa/K.mol to cm^3.Pa/K.mol)
-	rho_a =  (Press*ma)/((R_gas*1.e6)*TEMP)
 
 
-	# gas-phase diffusion coefficient (cm2/s), Eq. 16.17 of Jacobson (2005)
-	# note that for collision diameter we estimate in partit_var_prep
-	# scale R_gas by 1e7 to convert from m^2.kg/s^2.k.mol to cm^2.g/s^2.k.mol 
-	DStar_org = ((5./(16.*NA*(coll_dia**2.)*rho_a))*
-		(((((R_gas*1.e7)*TEMP*ma)/(2*np.pi))*((y_mw+ma)/y_mw))**0.5))
-
+	# ------------------------------------------------
 	# gas phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
 	# eq. 5 Zaveri et al. (2008)
 	kimt = (DStar_org)*correction
 	# final partitioning coefficient (converting radius from m to cm)
 	# eq. 16.2 of Jacobson (2005) and eq. 5 Zaveri et al. (2008)
 	# components in rows and size bins in columns (/s)
-	kimt = (4.0E0*np.pi*(radius*1.0e2)*N_perbin.reshape(1, -1))*kimt
+	kimt = (4.*np.pi*(radius*1.e2)*N_perbin.reshape(1, -1))*kimt
 	# transpose kimt ready for multiplication inside ode solver, so size bins
 	# in rows and components in columns
 	kimt = np.transpose(kimt)
 
 	# zero partitioning to particles for any components with low condensability
 	if (partit_cutoff): # if a value provided (default is empty list)
-		partit_cutoff_Pa = []
-		# convert partit_cutoff from Pa to molecules/cc (air)
-		partit_cutoff_Pa[:] = partit_cutoff[:]*(NA/((R_gas*1.e6)*TEMP))
-		highVPi = (Psat*act_coeff > partit_cutoff_Pa)[0, :]
-		highVPi[H2Oi] = 0 # mask water to allow its partitioning
-		kimt[:, highVPi] = 0.
+
+		# convert partit_cutoff from Pa to molecules/cc (air), note README states
+		# that just one value accepted for partit_cutoff input
+		partit_cutoff_Pa = partit_cutoff[0]*(NA/((R_gas*1.e6)*TEMP))
+		highVPi = (Psat*act_coeff) > partit_cutoff_Pa
+		highVPi[:, H2Oi] = 0 # mask water to allow its partitioning
+		kimt[highVPi] = 0.
 
 	# zero partitioning coefficient for size bins where no particles - enables significant
 	# computation time acceleration and is physically realistic

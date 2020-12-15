@@ -29,7 +29,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# 		constant influx
 	# int_tol - integration tolerances
 	# wall_on - marker for whether to include wall partitioning
-	# num_sb - number of size bins
+	# num_sb - number of size bins (including any wall)
 	# const_comp - chemical scheme name of components with 
 	#	constant concentration
 	# ------------------------------------------------------------
@@ -66,8 +66,8 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	print(('Number of gas-phase chemical reactions identified: ' + str(eqn_num[0])))
 	print(('Number of unique components identified in chemical scheme file: ' + str(comp_num)))
 
-	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq)
-
+	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on))
+	
 	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation
 	if (eqn_num[1] > 0): # if aqueous-phase reactions present
 		[rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
@@ -100,9 +100,9 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# ---------------------------------------------------------------------
 
 	# call function to generate ordinary differential equation (ODE)
-	# solver module, add two to comp_num to account for water and seed material
+	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), con_C_indx, 0)
+			(num_sb-wall_on), con_C_indx, 0, eqn_num)
 	
 	# get index of components in the peroxy radical list
 	RO2_indx = write_RO2_indices.write_RO2_indices(comp_namelist, RO2_names)
@@ -128,4 +128,4 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-		rr_arr_aq, rr_arr_p_aq)
+		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil)

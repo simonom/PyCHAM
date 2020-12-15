@@ -1,13 +1,9 @@
 name: PyCHAM
 channels:
   - openbabel
-  - numba
-  - anaconda
-  - conda-forge
   - defaults
 dependencies:
   - appnope
-  - assimulo
   - backcall
   - blas
   - bzip2
@@ -49,7 +45,6 @@ dependencies:
   - mkl_fft
   - mkl_random
   - ncurses
-  - numba
   - numpy
   - numpy-base
   - openbabel
@@ -79,7 +74,6 @@ dependencies:
   - smmap2
   - sqlite
   - suitesparse
-  - sundials=3.2.1=ha90cdbd_1
   - tbb
   - tk
   - tornado

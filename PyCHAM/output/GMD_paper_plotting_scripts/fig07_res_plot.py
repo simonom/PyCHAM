@@ -301,7 +301,7 @@ ax1.set_yticklabels(['<-2', '0', '2', '4', '$\geq$6'])
 # ----------------------------------------------------------------------------------------
 # for the next plot, we show decay of individual components over time in a dark experiment with
 # no lights or particles and no chemical interaction between the components of interest
-# in the results below the Gaswall_simple_chem chemical scheme was used, and components 
+# in the results below the fig07c_scheme chemical scheme was used, and components 
 # with an initial concentration of 50 ppb were (MCM names): MGLYOX (methylglyoxal) and 
 # two-methylglyceric_acid, the latter had to be added manually to the xml file, but its
 # production during isoprene ozonolysis is confirmed here: doi.org/10.1021/jp061734m

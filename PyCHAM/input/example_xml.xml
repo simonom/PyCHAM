@@ -18227,6 +18227,12 @@
 <species species_number="s6058" species_name="O2">
 <smiles>O=O</smiles>
 </species>
+<species species_number="s6059" species_name="CO2">
+<smiles>O=C=O</smiles>
+</species>
+<species species_number="s6060" species_name="H2O">
+<smiles>O</smiles>
+</species>
 
 </species_defs>
 </mechanism>

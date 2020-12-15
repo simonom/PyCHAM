@@ -9,6 +9,7 @@ import cham_up
 import rec_prep
 import partit_var
 import rec
+import jac_up
 import mov_cen
 import fullmov
 import wallloss
@@ -31,7 +32,7 @@ def ode_updater(update_stp,
 	colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
-	pwl_xpro, inflectk, chamR, Rader, p_char, e_field, 
+	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 	uppsize, std, rbou, const_infl_t, MV,
 	rindx_aq, 
@@ -40,9 +41,11 @@ def ode_updater(update_stp,
 	y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
-	partit_cutoff, coll_dia, corei):
+	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O):
 
 	import ode_solv # import most updated version
+	import ode_solv_wat # import most updated version
+	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
 	#		constants (s)
@@ -153,7 +156,7 @@ def ode_updater(update_stp,
 	# pwl_xpro - x value proceeding inflection point
 	# inflectk - deposition rate at inflection (/s)
 	# chamR - spherical-equivalent radius of chamber (m2)
-	# Rader - marker for treamnt of particle deposition to walls
+	# McMurry_flag - marker for treament of particle deposition to walls
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# injectt - time of injection of components (s)
@@ -200,8 +203,11 @@ def ode_updater(update_stp,
 	# partit_cutoff - the product of saturation vapour pressure
 	#	and activity coefficient above which gas-particle
 	#	partitioning assumed negligible
-	# coll_dia - collision diameter of components (cm)
+	# diff_vol - diffusion volumes of components according to 
+	#		Fuller et al. (1969)
+	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
 	# corei - index of core component
+	# ser_H2O - whether to serialise the gas-particle partitioning of water
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -239,24 +245,32 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV, partit_cutoff, coll_dia, seedi)
+	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi)
 
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
 		
 		y0[:] = y[:] # remember initial concentrations (molecules/cc (air))
-				
+		
 		# update chamber variables
 		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+<<<<<<< HEAD
+			gasinj_cnt, DStar_org] = cham_up.cham_up(sumt, temp, tempt, 
+=======
 			gasinj_cnt, coll_dia] = cham_up.cham_up(sumt, temp, tempt, 
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			Pnow, light_stat, light_time, light_time_cnt, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
+<<<<<<< HEAD
+			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
+=======
 			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, coll_dia)
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew) > save_stp*save_cnt):
@@ -267,14 +281,18 @@ def ode_updater(update_stp,
 		if (update_count+tnew > update_stp):
 			tnew = (update_stp-update_count)
 			ic_red = 1
+			
+		# ensure simulation end time not surpassed
+		if (sumt+tnew > tot_time):
+			tnew = (tot_time-sumt)
+			ic_red = 1
 		
-		if ((num_sb-wall_on) > 0): # if particles present
-
+		if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
 			# update partitioning variables
-			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
-			surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
+			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
+			y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
 			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-			Pnow, coll_dia)
+			Pnow, DStar_org)
 						
 		else: # fillers
 			kimt = kelv_fac = 0.
@@ -285,36 +303,64 @@ def ode_updater(update_stp,
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
 		
-		# model component concentration changes to get new concentrations
-		# (molecules/cc)
-		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+		# update Jacobian inputs based on particle-phase fractions of components
+		[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
+		
+		if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
+		
+			# call on ode solver for water
+			[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 			reac_col, prod_col, rstoi_flat, 
-			pstoi_flat, rr_arr, rr_arr_p, rowvals, colptrs, num_comp, 
-			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,
+			pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
 			seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
-			jac_part_indx,
+			jac_part_indxn,
 			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
 			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
 			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
-			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num)
-		
-		# take last installment from res
-		y = res[-1, :]
-		
+			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
+			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+			
+			# zero partitioning of water to particles for integration without water gas-particle partitioning
+			kimt[:, H2Oi] = 0.
+
+		# model component concentration changes to get new concentrations
+<<<<<<< HEAD
+		# (molecules/cc (air))
+		[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+=======
+		# (molecules/cc)
+		[res, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
+			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
+			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
+			reac_col, prod_col, rstoi_flat, 
+			pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+			seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+			jac_part_indxn,
+			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
+			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
+			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
+			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
+			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
+			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		
 		if (num_sb-wall_on > 0): # if particle size bins present
 			# update particle sizes
-			if ((num_sb-wall_on) > 1) and ((N_perbin > 1.0e-10).sum()>0): # if particles present
+			if ((num_sb-wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present
 				
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
-					update_stp, y0, MV, Psat[0, :], ic_red, res, res_t)
+					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, wall_on)
+					
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
@@ -325,12 +371,14 @@ def ode_updater(update_stp,
 
 			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
-				if ((N_perbin>1.e-10).sum()>0):
-					# particle-phase concentrations (molecules/cc (air))
+				if (any(N_perbin > 1.e-10)):
+				
+					# particle-phase concentration(s) (molecules/cc (air))
 					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp))
+					
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(RH, temp_now, x*1.0e-6, 
+						Varr, Vbou, rbou] = coag.coag(RH, temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.0e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
@@ -338,8 +386,8 @@ def ode_updater(update_stp,
 						num_comp, 0, (np.squeeze(y_dens*1.0e-3)), Vol0, rad0, Pnow, 0,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.0e-18).reshape(1, -1),
 						coag_on, siz_str, wall_on)
-				
-					if ((Rader>-1) and (wall_on == 1)): #if particle loss to walls turned on
+					
+					if ((McMurry_flag > -1) and (wall_on == 1)): #if particle loss to walls turned on
 						# particle loss to walls
 						[N_perbin, 
 						y[num_comp:(num_comp)*(num_sb-wall_on+1)]] = wallloss.wallloss(
@@ -347,16 +395,17 @@ def ode_updater(update_stp,
 							y[num_comp:(num_comp)*(num_sb-wall_on+1)], Gi, eta_ai,
  							x*2.0e-6, y_mw, 
 							Varr*1.0e-18, num_sb, num_comp, temp_now, update_count, 
-							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, Rader, 
+							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
 							0, p_char, e_field, (num_sb-wall_on))
 			
 				if (nucv1 > 0.): # nucleation
+					
 					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
 						N_perbin, y, y_mw.reshape(-1, 1), 
 						np.squeeze(y_dens*1.0e-3),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
 						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-wall_on))
-					
+				
 				# reset count to that since original operator-split processes interval met (s)
 				update_count = sumt%t0
 
@@ -364,7 +413,7 @@ def ode_updater(update_stp,
 		print('time through simulation (s): ', sumt)
 		
 		# record output
-		if sumt-(save_stp*save_cnt)>-1.e-10:
+		if ((sumt-(save_stp*save_cnt) > -1.e-10) or (sumt >= (tot_time-tot_time/1.e10))):
 			
 			[trec, yrec, dydt_vst, Cfactor_vst, save_cnt, 
 				Nres_dry, Nres_wet, x2, rbou_rec] = rec.rec(save_cnt, trec, yrec, 
@@ -374,7 +423,7 @@ def ode_updater(update_stp,
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi)		
 		
 		# if time step was temporarily reduced, then return
-		if ic_red == 1:
+		if (ic_red == 1):
 			update_stp = t0
 			tnew = update_stp
 			ic_red = 0

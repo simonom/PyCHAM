@@ -184,7 +184,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
-				if name_only in spec_name:
+				if (name_only in spec_name):
 					# index where xml file name matches reaction component name
 					name_indx = spec_name.index(name_only)
 					name_SMILE = spec_smil[name_indx] # SMILES of component
@@ -194,7 +194,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 			
 				comp_list.append(name_SMILE) # list SMILE names
 				name_indx = comp_num # allocate index to this species
-				# Generate pybel
+				# generate pybel object
 				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)

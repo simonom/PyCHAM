@@ -84,19 +84,15 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 	
 	if (ode_gen_flag == 0): # estimate densities if called from middle
 		
-		for i in range (num_comp):
+		for i in range (num_comp): # loop through components
 			
 			# density estimation ---------------------------------------------------------
-			if i == H2Oi:
-				y_dens[i] = 1.0*1.0E3 # (kg/m3 (particle))
+			if (i == H2Oi): # liquid-phase density of water
+				y_dens[i] = 1.*1.E3 # (kg/m3 (particle))
 				continue
 			# core component properties
-			if (i == corei[0]):
+			if (i == corei[0]): # density of core
 				y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
-				continue	
-			# nucleating component density, if component is core (kg/m3 (particle))
-			if i == nuci and nuc_comp[0] == 'core': 
-				y_dens[i] = 1.0*1.e3
 				continue
 			if comp_list[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
@@ -120,9 +116,6 @@ def prop_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Co
 			# core component not included in Pybel_objects, continuing
 			# here means its vapour pressure is 0 Pa, which is fine
 			continue
-			
-		if i == nuci and nuc_comp[0] == 'core':
-			continue # core component not included in Pybel_objects
 		
 		# water vapour pressure already given by Psat_water (log10(atm))
 		if i == H2Oi:

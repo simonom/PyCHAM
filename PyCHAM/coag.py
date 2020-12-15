@@ -55,7 +55,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	num_part = num_part.reshape(1, -1)
 	# volume concentration of particles (m3/cc (air))
 	vol_part = (sbVi*num_part).reshape(1, -1)
-	
+
 	# ensure sbn is integer
 	sbrn = np.int(np.max(sbr.shape))
 	sbn = np.int(np.max(rint.shape)) # number of size bins
@@ -180,7 +180,9 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	num = (2.0*sbr+lam_pi)**3.0-(4.0*sbr**2.0+lam_pi**2.0)**1.5
 	den = (6.0*sbr*lam_pi)-2.0*sbr
 	sig_pi = np.zeros((len(sbr), 1))
-	ish = den>0.
+	
+	ish = den > 0.
+	
 	sig_pi[ish, 0] = num[ish]/den[ish]	
 	sig_pi = sig_pi.repeat(sbn, 1)
 	
@@ -714,9 +716,10 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# new radius per size bin (um)
 	rad = ((3.0*Vnew)/(4.0*np.pi))**(1.0/3.0)
 	# size bins with no particle assigned central radius
-	ish = num_part[0, :] <= 1.0e-20
+	ish = num_part[0, :] <= 1.e-20
 	rad[ish] = rad0[ish]
 	Vnew[ish] = V0[ish]
+	
 	# just want particle number concentration as an array with one dimension
 	if num_part.ndim>1:
 		num_part = num_part[0, :]
@@ -738,7 +741,5 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
  		num_comp, y, MV*1.e12, V0, sbbound[0, :]*1.e18, rbou)
 
 	sbbound = sbbound.reshape(-1) # return to 1D array
-	
-	
 
 	return(num_part, y, rad, Gi, eta_ai, Vnew, sbbound, rbou)

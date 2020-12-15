@@ -15,7 +15,7 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	# Vbou - volume bounds per size bin (um3) (number of size bins +1)
 	# Cn - particle phase concentration per component per size bin
 	# (molecules/cc (air)), with rows representing
-	# components and columns size bins (including wall as final size bin)
+	# components and columns representing size bins
 	# sbn - number of size bins excluding wall (if present)
 	# nc - number of components
 	# Vol0 - original volume of size bins (um3) (excluding wall)
@@ -28,7 +28,7 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	NA = si.Avogadro # Avogadro's number (molecules/mol)	
 
 	Vnew = np.zeros((sbn))
-	ish = n0[:, 0]>0.
+	ish = n0[:, 0] > 0. # size bins containing particle number concentration
 	nmolC = np.zeros((nc, sbn))
 	
 	# number of moles of each component in a single particle (mol/cc (air))
@@ -38,7 +38,8 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 	
 	# new volume of single particle per size bin (um3) including volume of water
 	Vnew[:] = np.sum(nmolC*MV, axis=0)
-	Vnew[n0[:, 0]<=1.0e-10] = Vol0[0::][n0[:, 0]<=1.0e-10]
+	Vnew[n0[:, 0] <= 1.e-10] = Vol0[0::][n0[:, 0] <= 1.e-10]
+
 	# array of new particle number concentration (# particle/cc (air))
 	num_part_new = np.zeros((sbn, 1))
 	# array of new molecular concentration (# molecules/cc (air))
@@ -56,9 +57,14 @@ def mov_cen_main(n0, Vbou, Cn, sbn, nc, Vol0, t, tinc_count, MV):
 			# terminate the model, so the returned values are meaningless
 			return(0, 0, 0, 0, 0, 0, 0)
 			
-		Vindx = (Vnew[i]>=Vbou[0:-1]).sum()-1 # index of where these particle fit
+		Vindx = (Vnew[i] >= Vbou[0:-1]).sum()-1 # index of where these particle fit
 		num_part_new[Vindx, 0] += n0[i] # allocate number concentration
 		num_molec_new[:, Vindx] += Cn[:, i] # allocate molecular concentration
+		
+	# remove any particles and their constituents if number concentration is relatively very low
+	rm_indx = num_part_new[:, 0] < (sum(num_part_new)*1.e-8)
+	num_part_new[rm_indx, 0] = 0.
+	num_molec_new[:, rm_indx] = 0.
 	
 	
 	# need to find new volumes of single particles (um3) because possible that particles

@@ -40,8 +40,6 @@ def write_dydt_rec(): # define function
 	f.write('			if len(stoi_indx)>0: \n')
 	f.write('				dydt_rec[step+1, reac_count] += pstoi[i, stoi_indx]*((gprate))\n')
 	f.write('			reac_count += 1 \n')
-	f.write('			if i == 164:\n')
-	f.write('				print(\'yarr\', step, reac_coef[i], y[rindx[i, 0:nreac[i]]], rstoi[i, 0:nreac[i]], compi, gprate)\n')
 	f.write('		# now estimate and record tendency to change due to particle- and wall-partitioning  \n')
 	f.write('		# particle-partitioning \n')
 	f.write('		for ibin in range(num_sb-1): # size bin loop\n')

@@ -15,8 +15,8 @@ from scipy import stats # Import the scipy.stats module
 import numpy as np
 
 # associated files --------------------------
-# Use the fig06_scheme for the chemical scheme and the model variables provided below 
-# along with the example xml file.
+# Use the fig06_scheme for the chemical scheme and the model variables provided below,
+# possibly input to the fig06_mod_var.txt file, along with the example xml file.
 
 # ----------------------------------------------------------------------------------------
 # when comparing against Fig. 13.8 of Jacobson, note that preferential growth of larger
@@ -26,7 +26,7 @@ import numpy as np
 # subsaturated due to condensation, therefore the specified vapour pressure and injection
 # concentration of water must be accurate and precise   
 
-# model variables input file for Jacobson:
+# model variables input file for Jacobson, note the size_structure will change:
 
 #res_file_name = test_Jacobs_16sb_mc
 #total_model_time = 600.
@@ -75,8 +75,8 @@ import numpy as np
 #upper_part_size = 1.e1
 #space_mode = log
 #coag_on = 1
-#mass_trans_coeff = 0.0
-#eff_abs_wall_massC = 0.0
+#mass_trans_coeff = 0.
+#eff_abs_wall_massC = 0.
 #temperature = 273.15
 #tempt = 0.0
 #p_init = 98000
@@ -92,52 +92,13 @@ import numpy as np
 #mean_rad = 0.0205 : 0.0611: 0.87
 #std = 1.2 : 1.8: 2.2
 #seed_name = core
-#seed_mw = 200.00
+#seed_mw = 200.
 #seed_dens = 1.
 #core_diss = 1.
 #light_time = 0., 43200. 
 #light_status = 0, 0
 #chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
 
-# when testing against Fig. 3 of Zhang et al. (1999): doi.org/10.1080/027868299304039
-# remember that the density and molecular weight of sulphuric acid are automatically set
-# by PyCHAM and that these determine the resulting volumetric condensation rate
-
-# inputs for Zhang (note siz_structure will vary)
-
-#res_file_name = test_Zhang_100sb_mc
-#total_model_time = 43200.
-#update_step = 120.
-#recording_time_step = 120.
-#size_structure = 0
-#number_size_bins = 100
-#lower_part_size = 5.e-4
-#upper_part_size = 1.e1
-#space_mode = log
-#coag_on = 1
-#mass_trans_coeff = 0.0
-#eff_abs_wall_massC = 0.0
-#temperature = 273.15
-#tempt = 0.0
-#p_init = 98000
-#rh = 0.000
-#const_comp = 
-#const_infl = SA
-#const_infl_t = 0.
-#Cinfl = 2.65e-5
-#vol_Comp = SA
-#volP = 0.
-#pconct = 0.
-#pconc = 2350. : 3600. : 3.95
-#mean_rad = 0.0205 : 0.0611: 0.87
-#std = 1.2 : 1.8: 2.2
-#seed_name = core
-#seed_mw = 200.00
-#seed_dens = 1.
-#core_diss = 1.
-#light_time = 0., 43200. 
-#light_status = 0, 0
-#chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
 
 
 # ----------------------------------------------------------------------------------------

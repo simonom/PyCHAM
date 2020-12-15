@@ -30,9 +30,6 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 	vNb = (4.0/3.0)*np.pi*uppersize**3.0
 	v1 = (4.0/3.0)*np.pi*lowersize**3.0
 	
-	
-		
-		
 	# constant volume ratio method --------------
 	# constant volume ratio (13.3 Jacobson 2005)
 # 		Vrat = (vNb/v1)**(1/(num_bins-1))

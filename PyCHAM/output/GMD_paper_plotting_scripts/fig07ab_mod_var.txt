@@ -1,4 +1,4 @@
-res_file_name = Gaswall_sens_Cw1e-2_kw1e-3_
+res_file_name = Gaswall_sens_Cw1e-4_kw1e2
 total_model_time = 43200.0
 update_step = 900.0
 recording_time_step = 900.0
@@ -6,8 +6,8 @@ number_size_bins = 1
 lower_part_size = 0.0
 upper_part_size = 5.0e-1
 space_mode = lin
-mass_trans_coeff = 1.e-3
-eff_abs_wall_massC = 1.e-2
+mass_trans_coeff = 1.e2
+eff_abs_wall_massC = 1.e-4
 temperature = 298.15
 tempt = 0.0
 p_init = 101325

@@ -4,13 +4,13 @@
 # required modules
 import numpy as np
 
-def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq):
+def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, num_asb):
 
 	# inputs ---------------------------------------------
 	# jac_den_indx - index of denominators for jacobian
 	# njac - number of jacobian elements affected per equation
 	# comp_num - number of components
-	# num_sb - number of size bins
+	# num_sb - number of size bins (including any wall)
 	# num_eqn - number of chemical reactions
 	# nreac_g - number of reactants per reaction
 	# nprod_g - number of products per reaction
@@ -23,6 +23,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# rindx_aq - index of reactants per equation
 	# pindx_aq - index of prodcuts per equation
 	# jac_indx_aq - index of jacobian affected per equation
+	# num_asb - number of actual particle size bins (excluding wall) 
 	# ----------------------------------------------------
 
 	print('Preparing Jacobian inputs')
@@ -40,16 +41,18 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	
 	# track columns of Jacobian affected
 	col_tr = 0
-	# length of Jacobian
+	# length of Jacobian; add 1 to account for the gas phase
 	len_jac = comp_num*(num_sb+1)
 
 	# index for Jacobian - note can only be done after all equations checked as only then
 	# is the total number of unique components known
 	for eqni in range(num_eqn[0]): # equation loop
+	
 		# total number of components in this equation
 		tot_comp = nreac_g[eqni]+nprod_g[eqni]
 		# combined index of reactants and products in this equation
 		totindx = np.append(rindx_g[eqni, 0:nreac_g[eqni]], pindx_g[eqni, 0:nprod_g[eqni]])
+		
 		# reactant loop (equivalent to columns of 2D Jacobian)
 		for i in range(nreac_g[eqni]):
 			# index of flattened Jacobian being affected in 
@@ -187,7 +190,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 		# shape of index matrix for just one size bin
 		jsh = jac_indx_aq.shape
 		# now repeat over particle size bins
-		for sbi in range(1, num_sb-wall_on):
+		for sbi in range(1, num_asb):
 			jac_indx_aq = np.concatenate((jac_indx_aq, jac_indx_aq[0:jsh[0], 0:jsh[1]]+ran_aq*(sbi)), axis = 0)
 			
 			# account for the the gas-phase Jacobian indices
@@ -212,7 +215,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# partitioning is the first effect.  Similarly accommodate 
 	# for particle effect for: gas on particle effect, particle on gas effect
 	# and particle on particle effect
-	num_asb = (num_sb-wall_on) # number of actual particle size bins
+
 	# Jacobian index for particle effects
 	jac_part_indx = np.zeros((comp_num+2)*(num_asb+1)+((comp_num+2)*(num_asb*2)))
 	
@@ -281,7 +284,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 			part_cnt += num_asb # keep count on particle index		
 		
 		
-		# now, we must loop through components to include their particle effect on
+		# loop through components to include their particle effect on
 		# gas phase and on particle components for the Jacobian, note if no wall this 
 		# will include the final row in the final column of the Jacobian
 		for sbi in range(num_asb): # size bin loop
@@ -298,6 +301,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 				colptrs[(comp_num+2)*(sbi+1)+(compi+1)::] += 1
 				jac_indx_aq[jac_indx_aq>=st_indx] += 1 # aqueous-phase reactions
 				part_cnt += 1
+				
 				# particle component effect on particle
 				new_el = np.array(((comp_num+2)*(sbi+1)+compi)).reshape(-1)
 				# account for any aqueous-phase reactions
@@ -326,12 +330,13 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 
 	if (wall_on > 0):
 		# loop through components in the gas-phase (add two 
-		# to account for water and seed material)
+		# to account for water and core component)
 		for compi in range(comp_num+2):
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
 			st_indx = int(colptrs[compi])
 			en_indx = int(colptrs[compi+1])
+			
 			# check if any rows already attributed to this column
 			if ((st_indx<en_indx) == True):
 				# if rows are already attributed, check 
@@ -384,30 +389,29 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 			jac_indx_aq[jac_indx_aq>=en_indx] += 1
 			if (num_asb > 0):
 				jac_part_indx[jac_part_indx>=en_indx] += 1
-			new_el = np.array(((comp_num+2)*num_sb+compi)).reshape(1)
+			new_el = np.array(((comp_num+2)*(num_asb+1)+compi)).reshape(1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += 1
 			wall_cnt += 1 # keep count on wall index
 		
-		# wall effect on
-		# gas phase and on wall components for the Jacobian, note this will include the
+		# wall effect on gas phase and on wall components for the Jacobian, note this will include the
 		# final row in the final column of the Jacobian
 		for compi in range(comp_num+2):
 			# wall component effect on itself in gas-phase
 			jac_wall_indx[wall_cnt] = len(rowvals)
 			new_el = np.array((compi)).reshape(1)
 			rowvals = np.append(rowvals, new_el)
-			colptrs[(comp_num+2)*num_sb+compi+1::] += 1
+			colptrs[(comp_num+2)*(num_asb+1)+compi+1::] += 1
 			wall_cnt += 1
 			# wall component effect on itself on wall
 			jac_wall_indx[wall_cnt] = len(rowvals)
-			new_el = np.array(((comp_num+2)*num_sb+compi)).reshape(1)
+			new_el = np.array(((comp_num+2)*(num_asb+1)+compi)).reshape(1)
 			rowvals = np.append(rowvals, new_el)
-			colptrs[(comp_num+2)*num_sb+compi+1::] += 1
+			colptrs[(comp_num+2)*(num_asb+1)+compi+1::] += 1
 			wall_cnt += 1
 	# end of wall influence on Jacobian part ---------------------------------------------------
 		 		
-	if (num_sb == 0):
+	if (num_sb == 0): # if no particle size bins and no wall
 
 		# if the Jacobian matrix has an empty final row, then
 		# an error will be displayed during ODE solver call, so 

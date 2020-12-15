@@ -29,7 +29,7 @@ def share(source):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff] = pickle.load(pk)
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
 			pk.close()	
 			
 			# check on inputs
@@ -51,7 +51,7 @@ def share(source):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff)
+			inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O)
 
 	if (source == 1): # when called from plotting script
 		# path to store for variables

@@ -5,9 +5,11 @@
 
 import numpy as np
 import scipy.constants as si
+import diff_vol_est
 
 def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp, 
-			accom_coeff_user, spec_namelist, num_sb, num_asb, Pnow):
+			accom_coeff_user, spec_namelist, num_sb, num_asb, Pnow, 
+			Pybel_object, name_SMILE):
 	
 	# ------------------------------------------------------------------
 	# inputs:
@@ -26,17 +28,27 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# num_sb - number of size bins (excluding wall)
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
+	# Pybel_object - Pybel objects for components
+	# name_SMILE - SMILE strings of components
 	# -----------------------------------------------------------------
 	
 	if testf == 1: # if in testing mode (for test_front.py)
 		return(0,0,0,0,0,0,0) # return dummies
 	
 	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
+<<<<<<< HEAD
+	
+	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
+	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
+	
+	ma = 28.966e-3 # molecular weight of air (kg/mol) (eq. 16.17 Jacobson 2005)
+=======
 
 	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
 	
 	ma = 28.966e-3 # molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	# air density (kg/m3 (air)), ideal gas law
 	rho_a =  (Pnow*ma)/((si.R)*TEMP)
@@ -47,15 +59,38 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
 	# mean free path (m) for each component (15.24 of Jacobson 2005)
+<<<<<<< HEAD
+=======
 	# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 
 	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
 	
+<<<<<<< HEAD
+	# get diffusion volumes
+	diff_vol = diff_vol_est.diff_vol_est(Pybel_object)
+	
+	# append water and core (water from Table 4.1 of the Taylor (1993) textbook 
+	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
+	diff_vol = (np.append(diff_vol, np.array((13.1, 1.)))).reshape(-1, 1)
+	
+	# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
+	# the Taylor (1993) textbook 
+	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion volume for air 
+	# (19.7) taken from Table 4.1 of Taylor (1993) and mw of air converted to g/mol from 
+	# kg/mol.  This is a replication of the original method from Fuller et al. (1969): 
+	# doi.org/10.1021/j100845a020
+	Dstar_org = 1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+	
+	# convert to cm2/s
+	Dstar_org = Dstar_org*1.e4
+=======
 	# collision diameter of components (cm), taken from p. 380 of Introduction to physics 
 	# by Frauenfelder and Huber (1966), ISBN : 9780080135212, 
 	# available online via University of Manchester Library
 	coll_dia = 2.*((1./(4.*(2**0.5)*np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5))
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	
 	# accommodation coefficient of components in each size bin
 	accom_coeff = np.ones((num_speci, num_sb))*1.e0
@@ -71,7 +106,7 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# check for any accommodation coefficients set by user
 	if len(ac_indx)>0:
 		for i in range(len(ac_indx)):
-			print(accom_coeff_user)
+
 			# if it is a constant (not a function, which would be a string)
 			if isinstance(accom_coeff_user[i], str) == False:
 				accom_coeff[ac_indx] = accom_coeff_user[i]
@@ -126,9 +161,9 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
 	# molecules/cc (air), assuming a molecular weight of 200g/mol (*1.0e-6 to convert from
 	# /m3 (air) to /cm3 (air))
-	Cw = ((Cw*1.0e-6)/200.0)*si.N_A
+	Cw = ((Cw*1.e-6)/200.)*si.N_A
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)
 
-	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, coll_dia)
+	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, diff_vol, Dstar_org)

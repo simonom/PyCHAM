@@ -28,7 +28,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 	# siz_str - the size structure
 	# rbou - radius bounds (um)
 	# Vbou - volume bounds (um3)
-	# num_sb - number of size bins
+	# num_sb - number of size bins, excluding wall
 	# ---------------------------------------------------------------
 	
 	# total number of particles that should have been produced through nucleation 
@@ -39,12 +39,16 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 
 	# new number of particles this time step
 	new_part1 = (nsum1)-new_part_sum1
-	if (new_part1 <1. ): # reality
+	
+	# note, setting condition to less than zero may cause very small concentrations of particles 
+	# to appear very far from the peak nucleation time
+	if (new_part1 < 1.):
 		new_part1 = 0.
+		
 	else: # if new particles are being added
 		if (siz_str == 1): # if full-moving being used
 			# if there is geometric space for newly formed particles to form a new size bin
-			if (rbou[1]/2. > new_partr):
+			if (rbou[1]/2. > new_partr*1.e4): # scale new_partr to convert from cm to um
 				# form new size bin for newly formed particles
 				n0[-2] += n0[-1]
 				n0 = np.concatenate((np.zeros((1, 1)), n0[0:-1]), axis = 0)
@@ -56,11 +60,15 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 				y = np.concatenate((y[0:num_comp], np.zeros((num_comp)), y[num_comp:]))
 				rbou = np.concatenate((rbou[0].reshape(1), (rbou[1]/2.).reshape(1), rbou[1::]))
 				Vbou = (4./3.)*np.pi*rbou**3.
-	n0[0] += new_part1 # add to smallest size bin
+				
+	# identify size bin newly formed particles should enter
+	sbi = sum(new_partr*1.e4 > rbou[1::]) # scale new_partr to convert from cm to um
+	
+	n0[sbi] += new_part1 # add to this size bin
 	new_part_sum1 += new_part1
 	
 	# volume concentration of new particles (cc/cc (air))
-	new_vol1 = new_part1*((4.0/3.0)*np.pi*(new_partr)**3.0)
+	new_vol1 = new_part1*((4./3.)*np.pi*(new_partr)**3.)
 	
 	# molecular volume of nucleating component
 	Vpermolec = (MV[nuc_comp])/si.N_A # molecular volume (cc/molecule)
@@ -72,16 +80,18 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 # 	y[nuc_comp] -= nuc_conc1
 		
 	# addition to particle-phase (molecules/cc (air))
-	y[num_comp*1+nuc_comp] += nuc_conc1
+	y[num_comp*(1+sbi)+nuc_comp] += nuc_conc1
 	
-	# average volume of single particles now (scale by 1.e12 to convert 
-	# from cm3 to um3)
-	ypsb = y[num_comp:-num_comp].reshape(num_sb, num_comp, order = 'C')
+	# average volume of single particles now (scale MV by 1.e12 to convert 
+	# from cm3 to um3), note, consider all size bins since if full-moving used,
+	# the smallest and largest size bin will be affected
+	ypsb = y[num_comp:num_comp*(num_sb+1)].reshape(num_sb, num_comp, order = 'C')
+	
 	ish = (n0[:, 0] > 0) # index of size bins containing particles
 	if (sum(ish) > 0): # if any bins contain particles
 		Varr[ish] = ((ypsb[ish, :]/(si.N_A*n0[ish, :]))*(MV[:].reshape(1, -1)*1.e12)).sum(axis = 1)
 		# average radius of particles (um)
 		x = ((3.*Varr)/(4.*np.pi))**(1./3.)
-	
+		x = x.reshape(-1) # ensure x remains as 1D array
 	
 	return(n0, y, x, Varr, new_part_sum1, rbou, Vbou)

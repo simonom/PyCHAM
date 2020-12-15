@@ -41,17 +41,17 @@ try: # if calling from the GMD paper results folder
 except: # if calling from the PyCHAM home folder
 	
 	# 60 s intervals
-	Pyfname =str(cwd+' /PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res60s')
+	Pyfname =str(cwd+'/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res60s')
 	(num_sb, num_comp, Cfac, y0, Ndry, rbou_rec, xfm, thr0, PyCHAM_names, 
 		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 	
 	# 600 s intervals
-	Pyfname =str(cwd+' /PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res600s')
+	Pyfname =str(cwd+'/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res600s')
 	(num_sb, num_comp, Cfac, y1, Ndry, rbou_rec, xfm, thr1, PyCHAM_names, 
 		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 		
 	# 6000 s intervals
-	Pyfname =str(cwd+' /PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res6000s')
+	Pyfname =str(cwd+'/PyCHAM/output/GMD_paper_plotting_scripts/fig03_data/PyCHAM_time_res/PyCHAM_time_res6000s')
 	(num_sb, num_comp, Cfac, y2, Ndry, rbou_rec, xfm, thr2, PyCHAM_names, 
 		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(Pyfname)
 

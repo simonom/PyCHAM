@@ -1,7 +1,11 @@
 '''module for calculating and recording change tendency of components'''
 # changes due to gas-phase photochemistry and partitioning are included
 
+<<<<<<< HEAD
+# File Created at 2020-11-26 11:53:33.205682
+=======
 # File Created at 2020-11-18 16:47:47.298373
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 
 import numpy as np 
 
@@ -27,8 +31,6 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] += pstoi[i, stoi_indx]*((gprate))
 			reac_count += 1 
-			if i == 164:
-				print('yarr', step, reac_coef[i], y[rindx[i, 0:nreac[i]]], rstoi[i, 0:nreac[i]], compi, gprate)
 		# now estimate and record tendency to change due to particle- and wall-partitioning  
 		# particle-partitioning 
 		for ibin in range(num_sb-1): # size bin loop

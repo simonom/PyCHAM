@@ -13,7 +13,7 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 
 ## Documentation
 
-The README file you are now reading serves as a manual explaining how to setup the software and use it.
+The README file you are now viewing serves as the PyCHAM manual, explaining how to setup the software and use it.
 
 The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.  This article was reviewed using v0.2.4 of PyCHAM, which is stored in the releases of the PyCHAM github repository and [here](https://doi.org/10.5281/zenodo.3752677).
 
@@ -21,16 +21,16 @@ Version numbers of PyCHAM try to adhere to the semantics described by [semver](h
 
 ## Installation
 
-There are two options for installing, via conda and from source (pip).  Experience indicates that the conda install is more straightforward than the pip, therefore we recommend this.
+There are two options for installing, via conda and via pip.  They take a similar amount of time.
 
 
-## Install from conda
+## Install via conda
 
 1. Download the PyCHAM repository from github.com/simonom/PyCHAM
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
-The following steps need to be at the command line:
+The following steps need are at the command line:
 
 3. cd into the directory where the PyCHAM package is stored.
 
@@ -38,103 +38,37 @@ The following steps need to be at the command line:
 
 5. Now the environment is setup you can activate it with the command: conda activate PyCHAM
 
-Install is complete
+Install is complete, to run PyCHAM please see [Running](#Running).
 
-## Install from source
+## Install via pip
 
-1) open your terminal/command prompt 
+The following steps need are at the command line:
 
-2) cd to directory where you want the PyCHAM environment stored (here we will use the example Documents)
+1) Create a virtual environment in a suitable location running with at least python3.6, e.g. for python 3.6, the command line command to produce a virtual environment called 36env: python3.6 -m venv 36env
 
-3) create an environment called myenv: python3 -m venv myenv
+2) Activate this environment, e.g. for a virtual environment called 36env: source 36env/bin/activate
 
-4) activate the environment: source myenv/bin/activate
+3) Ensure pip is up to date: pip install --upgrade pip
 
-5) cd to the environment’s site packages: cd lib/python3.x/site-packages
+4) Install PyCHAM and its dependencies in this virtual environment: python -m pip install --no-cache-dir --upgrade PyCHAM
 
-6) install PyCHAM: python3 -m pip install --upgrade PyCHAM
-
-7) make directory to contain sundials build and install (inside site-packages): mkdir sundials
-
-8) make directory to build sundials: mkdir sundials/builddir
-
-9) make directory to install sundials: mkdir sundials/installdir
-
-10) download .tar file for sundials-3.2.1 from: https://github.com/LLNL/sundials/releases/tag/v3.2.1
-
-11) unzip and move to the site-packages folder in the environment you have created above
-
-12) in the terminal/command prompt, from inside the site-packages directory: cd sundials/builddir
-
-13) this next step requires that cmake is installed on your system (https://cmake.org/install/), it allows you to configure sundials: ccmake /Documents/myenv/lib/python3.x/site-packages/sundials-3.2.1
-
-14) press c to view install options
-
-15) using the i key, set the CMAKE_INSTALL_PREFIX and EXAMPLES_INSTALL_PATH to your installdir path, e.g. Documents/myenv/lib/python3.x/site-packages/sundials/installdir
-
-16) press ‘c’ (causes configuration) then ‘g’ (generation)
-
-17) back in the terminal/command window: make
-
-18) finally, to complete installation of sundials: make install
-
-19) download the .tgz file for BLAS from: http://www.netlib.org/blas/
-
-20) unzip the BLAS download and move to the site-packages folder
-
-21) cd into the BLAS folder
-
-22) into terminal type: make
-
-23) download the .tar.gz file for LAPACK from: 	http://www.netlib.org/lapack/
-
-24) unzip and move to the site-packages folder
-
-25) copy the blas_LINUX.a from the BLAS folder to the LAPACK folder
-
-26) inside LAPACK folder copy the make.inc.template (or make.inc.example) file and rename make.inc and state address of the blas_LINUX.a beside the BLASLIB variable, e.g. (note the one space between $ and the path): BLASLIB = $ Documents/myenv/lib/python3.x/site-packages/lapack3.9.0/blas_LINUX.a
-
-27) in terminal, inside the LAPACK folder type: make
-
-28) still inside the LAPACK folder copy BLAS .a file to the system folder: sudo cp blas_LINUX.a /usr/local/lib/ 
-
-29) still inside the LAPACK folder copy lapack .a. file to the system fodler: sudo cp liblapack.a /usr/local/lib/
- 
-30) install Cython: pip3 install Cython
-
-31) in a text editor open Cython/Compiler/main.py and find language_level =, set to: language_level = 3
-
-32) save and close Main.py and cd back to the site-packages directory
-
-33) download the .tar file for Assimulo-3.0: https://github.com/modelon/Assimulo/releases
-
-34) unzip this and move to the site-packages folder
-
-35) cd to the new Assimulo folder
-
-36) install assimulo, stating the path to sundials, blas and lapack: e.g.: python setup.py install --sundials-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/sundials/installdir --blas-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/BLAS-3.8.0 --lapack-home=/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/lapack-3.9.0
-
-37) set the environment variable so that assimulo can link to the sundials library: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/Users/Simon_OMeara/Documents/Manchester/postdoc_stuff/box-model/PyCHAM/myenv/lib/python3.6/site-packages/sundials/installdir/lib/
-
-38) cd out of the assimulo folder: cd ..
-
-39) install openbabel: pip3 install openbabel
-
-Install is complete
+Install is complete, to run PyCHAM please see [Running](#Running).
 
 ## Running
 
 1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting the component names used in the chemical reaction scheme file to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below and note that example files are available in PyCHAM/input
 
-2. Now you are ready to run the model: python PyCHAM
+2. Once [Installation](#Installation) is complete and the appropriate environment has been activated (see [Installation](#Installation)), use the command line to change into the PyCHAM directory (e.g. cd PyCHAM).
 
-3. The first three buttons of the GUI allow identification of the input files.  These can be used in any order and if no file is selected for any or all of the buttons, default files will be used (defaults: Chemical Scheme .txt File - example_scheme.txt, Chemical Scheme .xml File - example_xml.xml, Model Variables .txt File - example_model_var.txt) (see below for details on the chemical scheme, xml and model variables input files).
+3. Run the model from the command line: python PyCHAM
 
-4. The 'Run Model' button starts the simulation - results will be saved in the output folder.  The time through the simulation will be displayed in the console along with updates of programme progress.
+4. The first three buttons of the GUI allow identification of the input files.  These can be used in any order and if no file is selected for any or all of the buttons, default files will be used (defaults: Chemical Scheme .txt File - example_scheme.txt, Chemical Scheme .xml File - example_xml.xml, Model Variables .txt File - example_model_var.txt) (see below for details on the chemical scheme, xml and model variables input files).
 
-5. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).  This button will not operate correctly until the simulation is complete.  The simulation is complete when the console says so.
+5. The 'Run Model' button starts the simulation - results will be saved in the output folder.  The time through the simulation will be displayed in the console along with updates of programme progress.
 
-6. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved and therefore making the 'Plot Results' button redundant.
+6. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).  This button will not operate correctly until the simulation is complete.  The simulation is complete when the console says so.
+
+7. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved and therefore making the 'Plot Results' button redundant.
 
 ## Testing
 
@@ -146,12 +80,17 @@ Example run output is saved in the PyCHAM/output/example_scheme folder.  To repr
 
 ## Inputs
 
-## Chemical Scheme .txt file
+## Chemical Scheme file
 
-An example chemical scheme .txt file is given in the inputs folder (of the Github repository), called 'example_scheme.txt', which has been obtained
-from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.  Results are automatically saved in PyCHAM/output/name_of_chemical_scheme_file/name_given_in_model_variables_input_file_for_saving.  The unit tests described above save results with the name_of_chemical_scheme_file beginning with test_ ..., therefore we recommend using a different convention for chemical schemes to prevent confusion.
+The chemical scheme file states the reactions and their rate cofficients in the gas- and aqueous-phases.  Note that all components included in the reactions of the chemical scheme file must have a name matching a name in the corresponding xml file.  The xml file, and instructions for its modification, are described below.
 
-Markers are required to recognise different sections of the chemical scheme.  The default markers are for the MCM KPP format, however, others can be specified using the chem_scheme_markers input in the model variables input file.
+An example chemical scheme file is given in the PyCHAM/input folder, called 'example_scheme.txt', which has been obtained from the [Master Chemical Mechanism (MCM) website](http://mcm.leeds.ac.uk/MCM/) (KPP version) and modified.
+
+Results are automatically saved in PyCHAM/output/name_of_chemical_scheme_file/name_given_in_model_variables_input_file_for_saving.  
+
+The unit tests described above save results with the prefix 'test_', therefore we recommend using a different convention for chemical scheme names to prevent confusion.
+
+Markers are required to recognise different sections of the chemical scheme.  The default markers are for the MCM KPP format, however, others can be specified using the chem_scheme_markers input in the model variables input file.  A guide to chem_scheme_markers is given in the Model Variables .txt File section below.  This includes how to distinguish between gas- and aqueous-phase reactions.
 
 Reaction rate coefficients for chemical reactions and generic rate coefficients must adhere to the following rules:
 The expression for the rate coefficient can use Fortran type scientific notation or python type; acceptable math functions: EXP, exp, dsqrt, dlog, LOG, dabs, LOG10, numpy.exp, numpy.sqrt, numpy.log, numpy.abs, numpy.log10; rate coefficients may be functions of TEMP, RH, M, N2, O2 where TEMP is temperature (K), RH is relative humidity (0-1), M, N2 and O2 are the concentrations of third body, nitrogen and oxygen, respectively (# molecules/cc (air)).
@@ -164,11 +103,13 @@ An example is given in the inputs folder (of the Github repository), called 'exa
 
 Beneath this, every component included in the reactions of the chemical scheme must have its SMILES string given.  To add new components, use this three line example per new component:
 
-<species species_number="s6058" species_name="O2">
-<smiles>O=O</smiles>
-</species>
+`<species species_number="s6058" species_name="O2">`
 
-Here the first line states that the species definition is beginning and gives a unique code, s6058 in this case, and its chemical scheme name, in this case O2.  The second line provides the SMILE string, in this case O=O.  The third line states that the definition is finished.
+`<smiles>O=O</smiles>`
+
+`</species>`
+
+Here the first line states that the species definition is beginning and gives a unique code, s6058 in this case, and its chemical scheme name, in this case O2.  The second line provides the SMILES string, in this case O=O.  The third line states that the definition is finished.  For information on SMILES please see: [SMILES website](https://daylight.com/smiles/index.html).
 
 
 ## Model Variables .txt File
@@ -247,9 +188,9 @@ note that if a variable is irrelevant for your simulation, it can be omitted and
 | light_status = | 1 for lights on and 0 for lights off, with times given in light_time (above), if empty defaults to lights off for whole experiment.  Setting to off (0) means that even if variables defining light intensity above, the simulation will be dark.  Use this setting regardless of whether light is natural or artificial (chamber lamps).  The setting for a particular time is recognised when the time step will surpass the time given in light_time.  For example, for a 4 hour experiment, with lights on for first half and lights off for second, use: light_time = 0.0, 7200.0 light_status = 1, 0.  If status not given for the experiment start (0.0 s), default is lights off at experiment start. |
 | tracked_comp = | Name of component(s) to track rate of concentration change (molecules/cc.s); must match name given in chemical scheme, and if multiple components given they must be separated by a comma.  Can be left empty and then defaults to tracking no components. |
 | umansysprop_update = | Flag to update the UManSysProp module via internet connection: set to 1 to update and 0 to not update.  If empty defaults to no update.  In the case of no update, the module PyCHAM checks whether an existing UManSysProp module is available and if not tries to update via the internet.  If update requested and either no internet or UManSysProp repository page is down, code stops with an error. |
-| chem_scheme_markers = | markers denoting various sections of the user's chemical scheme.  If left empty defaults to Kinetic Pre-Processor (KPP) formatting.  If filled, must have following elements separated with commas (brackets at start of description give pythonic index): (0) marker for start of gas-phase reaction lines (just the first element), (1) marker for peroxy radical list starting, note that this should occur at the start of the peroxy radical list in the chemical scheme file, (2) marker between peroxy radical names, (3) prefix to peroxy radical name, (4) string after peroxy radical name, (5) marker for end of peroxy radical list (if no marker, then leave empty), (6) marker for RO2 list continuation onto next line, note this may be the same as marker between peroxy radical names, (7) marker at the end of each line containing generic rate coefficients, (8) marker for start of aqueous-phase reaction lines (just the first element), note this must be different to that for gas-phase reaction, (9) marker for start of reaction rate coefficient section of an equation line (note this must be the same for gas- and aqueous-phase reactions), (10) marker for start of equation section of an equation line (note this must be the same for gas- and aqueous-phase reactions), (11) final element of an equation line (should be constant for all phases of reactions).  For example, for the MCM KPP format (which only includes gas-phase reactions): chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ; |
+| chem_scheme_markers = | markers denoting various sections of the user's chemical scheme.  If left empty defaults to Kinetic Pre-Processor (KPP) formatting.  If filled, must have following elements separated with commas (brackets at start of description give pythonic index): (0) marker for start of gas-phase reaction lines (just the first element), note this must be different to that for aqueous-phase reaction, (1) marker for peroxy radical list starting, note that this should occur at the start of the peroxy radical list in the chemical scheme file, (2) marker between peroxy radical names, (3) prefix to peroxy radical name, (4) string after peroxy radical name, (5) marker for end of peroxy radical list (if no marker, then leave empty), (6) marker for RO2 list continuation onto next line, note this may be the same as marker between peroxy radical names, (7) marker at the end of each line containing generic rate coefficients, (8) marker for start of aqueous-phase reaction lines (just the first element), note this must be different to that for gas-phase reaction, (9) marker for start of reaction rate coefficient section of an equation line (note this must be the same for gas- and aqueous-phase reactions), (10) marker for start of equation section of an equation line (note this must be the same for gas- and aqueous-phase reactions), (11) final element of an equation line (should be constant for all phases of reactions).  For example, for the MCM KPP format (which only includes gas-phase reactions): chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ; |
 | int_tol = | Integration tolerances, with absolute tolerance first followed by relative tolerance, if left empty defaults to the maximum required during testing for stable solution: 1.0e-3 for absolute and 1.0e-4 for relative. |
 | dil_fac = |Volume fraction per second chamber is diluted by, should be just a single number.  Defaults to zero if left empty.|
 		
  
-This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement No 730997.  Simon O'Meara has received funding from National Centre for Atmospheric Science (NCAS).
+This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 730997.  Simon O'Meara has received funding from National Centre for Atmospheric Science (NCAS).

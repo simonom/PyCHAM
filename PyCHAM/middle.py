@@ -28,7 +28,7 @@ def middle():
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
-		e_field, dil_fac, partit_cutoff] = ui.share(0)
+		e_field, dil_fac, partit_cutoff, ser_H2O] = ui.share(0)
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -44,7 +44,7 @@ def middle():
 	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-	rr_arr_aq, rr_arr_p_aq] = eqn_pars.extr_mech(sch_name, 
+	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp)
 	
@@ -55,7 +55,7 @@ def middle():
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
 	pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
-	seed_mw, core_diss, nuc_comp)
+	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil)
 	
 	
 	# dump new pickle file ready for plotting script to use
@@ -70,21 +70,22 @@ def middle():
 		num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, core_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name)
-	
+
 	# prepare for the calcuation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
-		R_gas, NA, coll_dia] = partit_var_prep.prep(y_mw, 
+		R_gas, NA, diff_vol, Dstar_org] = partit_var_prep.prep(y_mw, 
 		temp[0], num_comp, 0, Cw, act_comp, act_user, accom_comp, 
-		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow)
-	count = 0	
+		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow, 
+		Pybel_objects, comp_smil)
+	count = 0
 	
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
-	rbou00, upper_bin_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0], H2Oi, 
-		mfp, accom_coeff, y_mw, surfT, RH, siz_str, num_sb, lowsize, 
+	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0],
+	 H2Oi, mfp, accom_coeff, y_mw, surfT, RH, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, Cw, y_dens, Psat, core_diss, kw, space_mode, seedVr,
-		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, coll_dia, seedi)
+		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedVr,
+		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi)
 	
 	print('Calling integration routine, starting timer')
 	st_time = time.time()
@@ -115,7 +116,7 @@ def middle():
 		y_rind_aq, 
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
-		partit_cutoff, coll_dia, corei)
+		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O)
 	
 	time_taken = time.time()-st_time
 	print('Simulation complete, wall clock time elapsed since first call to solver: ', time_taken, ' s')		
@@ -125,7 +126,7 @@ def middle():
 	save.saving(sch_name, yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		dydt_vst, num_comp, Cfactor_vst, 0, 
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
-		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp)
+		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp)
 	print('Saved results')
 	
 	

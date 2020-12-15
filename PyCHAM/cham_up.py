@@ -15,7 +15,11 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
+<<<<<<< HEAD
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, DStar_org):
+=======
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, coll_dia):
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -28,7 +32,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# light_ad - marker for whether to change time interval 
 	#	in response to changing natural light intensity
 	# tnew - time interval between chamber updates (s)
-	# nuc_ad - flag for whether user wants time step adapated 
+	# nuc_ad - flag for whether user wants time step adapted 
 	# to nucleation
 	# nucv1 - nucleation parameter one
 	# nucv2 - nucleation parameter two
@@ -83,7 +87,13 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cc (air)
 	# seedi - index of seed component(s)
+<<<<<<< HEAD
+	# diff_vol - diffusion volumes of components according to 
+	#	Fuller et al. (1969)
+	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
+=======
 	# coll_dia - collision diameter of components (cm)
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -170,13 +180,18 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# note, assume that air pressure inside chamber stays constant despite
 			# varying temperature, therefore total molecular concentration must vary
 			# (molecules/cc (air))
-			ntot = Pnow*(NA/(8.3144598e6*temp_now))
+			ntot = Pnow*(NA/(si.R*temp_now))
 			# remember number of molecules in one billionth of total number prior
 			# to update
 			Cfactor0 = Cfactor
 			# update number of molecules in one billionth of this
+<<<<<<< HEAD
+			Cfactor = ntot*1.e-9 # ppb-to-molecules/cc
+			
+=======
 			Cfactor = ntot*1.0e-9 # ppb-to-molecules/cc
 							
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_now+120.))*(temp_now/296.16)**1.5)
 	
@@ -195,12 +210,24 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
 			mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 			
+<<<<<<< HEAD
+			# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
+			# the Taylor (1993) textbook 
+			# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion 
+			# volume for air (19.7) taken from Table 4.1 of Taylor (1993) and mw of 
+			# air converted to g/mol from kg/mol.  This is a replication of the original method 			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
+			DStar_org = 1.013e-2*temp_now**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+			# convert to cm2/s
+			DStar_org = DStar_org*1.e4
+			
+=======
 			nv = (Pnow/(si.R*temp_now))*si.N_A # concentration of molecules (# molecules/m3)
 			
 			# collision diameter of components (cm), taken from p. 380 of Introduction to physics 
 			# by Frauenfelder and Huber (1966), ISBN : 9780080135212, 
 			# available online via University of Manchester Library
 			coll_dia = 2.*((1./(4.*(2**0.5)*np.pi*(mfp*1.e2)*(nv*1e-6)))**(0.5))
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
 			
 			# alter constant concentration (molecules/cc) of any components
 			# with constant gas-phase concentration (ppb)
@@ -246,7 +273,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# check on instantaneous injection of particles --------------------------------------	
-	if (sum(pconct[0, :])>0) and seedt_cnt>-1: # if constant influx occurs
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if constant influx occurs
 	
 		# check whether changes occur at start of this time step
 		if (sumt == pconct[0, seedt_cnt]):
@@ -273,8 +300,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# check on continuous influxes of components ----------------------------------------------
 	if (len(const_infl_t) > 0): # if influx occurs
 	
-		# in case influxes begin after simulation start
-		if (sumt == 0.0 and const_infl_t[infx_cnt] != 0.0):
+		# in case influxes begin after simulation start create a zero array of correct shape
+		if (sumt == 0. and const_infl_t[infx_cnt] != 0.):
 			Cinfl_now = np.zeros((con_infl_C.shape[0], 1))
 		
 		# if the final input for influxes reached
@@ -283,7 +310,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
 			
 		# check whether changes occur at start of this time step
-		if (sumt == const_infl_t[infx_cnt]):
+		if (sumt == const_infl_t[infx_cnt] and (infx_cnt != -1)):
 			
 			# influx of components now, convert from ppb/s to molecules/cc.s (air)
 			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
@@ -294,22 +321,23 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			else:
 				infx_cnt = -1 # reached end
 			bc_red = 0 # reset flag for time step reduction due to boundary conditions
-		
+			
 		# check whether changes occur during proposed integration time step
-		if (sumt+tnew > const_infl_t[infx_cnt] and infx_cnt!=-1):
+		if (sumt+tnew > const_infl_t[infx_cnt] and (infx_cnt != -1)):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = const_infl_t[infx_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
+			
 	else: # if no influxes, provide filler
-		Cinfl_now = 0.
+		Cinfl_now = np.zeros((1, 1))
 	
 	# check on nucleation ---------------------------------------------------------
 	# if automatic time step adaption to nucleation requested, check whether number of new particles
 	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
 	# the specifiec nucleation event has not yet reached its defined finishing particle number
 	# concentration (#/cc (air))
-	if (nuc_ad == 1 and new_part_sum1<nucv1*0.9):
+	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-wall_on) > 0)):
 		# the time step (s) needed to increase number concentration of nucleated particles by 10 %
 		t_need = (0.1*nucv1+new_part_sum1)
 		t_need = np.log(t_need/nucv1)
@@ -326,4 +354,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
+<<<<<<< HEAD
+		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org)
+=======
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, coll_dia)
+>>>>>>> e9030bfb8dc80b92571dbd02e027e8db0630f80f
