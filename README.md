@@ -21,7 +21,7 @@ Version numbers of PyCHAM try to adhere to the semantics described by [semver](h
 
 ## Installation
 
-There are two options for installing, via conda and via pip.  They take a similar amount of time.
+There are two options for installing, via conda and via pip.  The pip method takes longer as the openbabel package has to be installed separately.  The instructions below for the pip method currently apply only to linux and macOS, whilst the conda instructions apply to windows, linux and macOS.
 
 
 ## Install via conda
@@ -30,27 +30,62 @@ There are two options for installing, via conda and via pip.  They take a simila
 
 2. Download and install the package manager Anaconda using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section
 
-The following steps need are at the command line:
+3. Ensure conda is operating correctly, the method varies between operating systems and is explained [here](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 
-3. cd into the directory where the PyCHAM package is stored.
+The following steps are at the command line:
 
-4. Use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for Mac)).
+4. cd into the directory where the PyCHAM package is stored.
 
-5. Now the environment is setup you can activate it with the command: conda activate PyCHAM
+5. Use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for macOS)).
+
+6. Activate the environment with the command: conda activate PyCHAM
 
 Install is complete, to run PyCHAM please see [Running](#Running).
 
 ## Install via pip
 
+1) Ensure that swig is installed on your system.  For example, for macOS, a command at the command line like: brew install swig , and for linux a command at the command line like: sudo apt install swig
+
+2) Ensure that eigen is available on your system.  For example, for macOS, a command at the command line like: brew install eigen, and for linux, download the latest stable eigen release [here](http://eigen.tuxfamily.org/index.php?title=Main_Page#Download), then unzip and move the unzipped folder into the /usr/local/include folder using a command at the command line like: sudo mv eigen-3.3.9 /usr/local/include
+
+3) Create a virtual environment in a suitable location running with at least python3.6.  For example, if your command line recognises python3.6 as python3.6, the command to make a virtual environment called 3env on macOS is: python3.6 -m venv 3env.  Note that python3.6 in this example should be replaced with the appropriate command for recognising python on your machine (often just python).
+
+4) Activate this environment.  For example, for a virtual environment called 3env on macOS and linux the command at the command line is: source 3env/bin/activate.  For example, for a virtual environment called 3env on Windows the command at the command line is: .\3env\Scripts\activate
+
+5) openbabel must be installed separately to PyCHAM, begin by downloading and unzipping the tar file (file name containing .tar.) for the latest version of openbabel on [github](https://github.com/openbabel/openbabel/releases).  Note that the unzipped version can be stored in the Downloads folder for the installation process.
+
 The following steps are at the command line:
 
-1) Create a virtual environment in a suitable location running with at least python3.6.  For example, for python 3.6, the command to produce a virtual environment called 36env on Mac is: python3.6 -m venv 36env
+6) At the command line cd into the unzipped openbabel folder, for example: cd openbabel-3.1.1
 
-2) Activate this environment, e.g. for a virtual environment called 36env: source 36env/bin/activate
+7) Create a build directory: mkdir build
 
-3) Ensure pip is up to date: pip install --upgrade pip
+8) Change into the build directory: cd build
 
-4) Install PyCHAM and its dependencies in this virtual environment: python -m pip install --no-cache-dir --upgrade PyCHAM
+9) Using cmake, prepare the openbabel build files.  This requires several specifications, the -DCMAKE_INSTALL_PREFIX specification should be the path to the site-packages folder of the virtual environment created above: cmake -DRUN_SWIG=ON -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/3env/lib/python3.6/site-packages ..
+
+9a) If the above command causes a message at the command prompt that eigen cannot be found this can be fixed by stating its location, for example: 
+cmake .. -DRUN_SWIG=ON -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/3env/lib/python3.6/site-packages -DEIGEN3_INCLUDE_DIR=/usr/local/Cellar/eigen/3.3.9/include/eigen3
+
+10) Complete installation with: make install
+
+11) Test that openbabel is functioning with: python
+
+11a) Then inside the python interpreter use: import openbabel
+
+11b) If this works fine (no error message) continue to step 12 If this returns: ModuleNotFoundError: No module named 'openbabel', then quit the python interpreter: quit()
+
+11c) If error seen in step above, add the openbabel path to the python path, for example: export PYTHONPATH=~/3env/lib/python3.6/site-packages/lib/python3.6/site-packages/openbabel:$PYTHONPATH
+
+12) Test that pybel is functioning with: python
+
+12a) Then inside the python interpreter use: import pybel
+
+12b) If no error message seen continue to next step.  During testing this threw a relative import error which was corrected by changing the relevant line (given in the error message) in the pybel.py file (file location given in the error message) from "from . import openbabel as ob" to "import openbabel as ob"
+
+13) Ensure pip and wheel up to date: pip install --upgrade pip wheel
+
+14) Install PyCHAM and its dependencies in the virtual environment: python -m pip install --upgrade PyCHAM
 
 Install is complete, to run PyCHAM please see [Running](#Running).
 
@@ -58,7 +93,7 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 1. For model inputs, ensure you have: a .txt file chemical reaction scheme, a .xml file for converting the component names used in the chemical reaction scheme file to SMILE strings and a .txt file stating values of model variables (e.g. temperature) - see details about these three files below and note that example files are available in PyCHAM/input
 
-2. Once [Installation](#Installation) is complete and the appropriate environment has been activated (see [Installation](#Installation)), use the command line to change into the PyCHAM directory (e.g. cd PyCHAM).
+2. Once [Installation](#Installation) is complete and the appropriate environment has been activated (see [Installation](#Installation)), use the command line to change into the top level directory PyCHAM (the directory above the PyCHAM __main__ file).
 
 3. Run the model from the command line: python PyCHAM
 

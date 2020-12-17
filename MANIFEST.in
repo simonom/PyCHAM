@@ -1,0 +1,2 @@
+exclude __pycache__
+include README.md
