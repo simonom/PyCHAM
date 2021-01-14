@@ -15,6 +15,10 @@ import fullmov
 import wallloss
 import nuc
 import coag
+import ode_solv
+import ode_solv_wat
+import importlib
+
 
 def ode_updater(update_stp, 
 	tot_time, save_stp, y, rindx, 
@@ -41,10 +45,7 @@ def ode_updater(update_stp,
 	y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
-	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O):
-
-	import ode_solv # import most updated version
-	import ode_solv_wat # import most updated version
+	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -208,6 +209,8 @@ def ode_updater(update_stp,
 	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
 	# corei - index of core component
 	# ser_H2O - whether to serialise the gas-particle partitioning of water
+	# C_p2w - concentration of components on the wall due to particle
+	# deposition to wall (molecules/cc)
 	# ------------------------------------------------------------
 	
 	step_no = 0 # track number of time steps
@@ -232,8 +235,8 @@ def ode_updater(update_stp,
 	# prepare recording matrices, including recording of initial
 	# conditions
 	[trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, 
-	seedt_cnt, rbou_rec, Cfactor, infx_cnt] = rec_prep.rec_prep(nrec_steps, 
-	y, rindx, 
+	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
+	yrec_p2w] = rec_prep.rec_prep(nrec_steps, y, rindx, 
 	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
@@ -245,7 +248,8 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi)
+	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
+	C_p2w)
 
 	print('Starting loop through update steps')	
 	while (tot_time-sumt)>(tot_time/1.e10):
@@ -294,6 +298,9 @@ def ode_updater(update_stp,
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
+		
+		importlib.reload(ode_solv) # import most updated version
+		importlib.reload(ode_solv_wat) # import most updated version
 		
 		# update Jacobian inputs based on particle-phase fractions of components
 		[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
@@ -381,9 +388,9 @@ def ode_updater(update_stp,
 							N_perbin.reshape(-1, 1), 
 							y[num_comp:(num_comp)*(num_sb-wall_on+1)], Gi, eta_ai,
  							x*2.0e-6, y_mw, 
-							Varr*1.0e-18, num_sb, num_comp, temp_now, update_count, 
+							Varr*1.0e-18, (num_sb-wall_on), num_comp, temp_now, update_count, 
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
-							0, p_char, e_field, (num_sb-wall_on))
+							0, p_char, e_field, (num_sb-wall_on), C_p2w)
 			
 				if (nucv1 > 0.): # nucleation
 					
@@ -403,11 +410,11 @@ def ode_updater(update_stp,
 		if ((sumt-(save_stp*save_cnt) > -1.e-10) or (sumt >= (tot_time-tot_time/1.e10))):
 			
 			[trec, yrec, dydt_vst, Cfactor_vst, save_cnt, 
-				Nres_dry, Nres_wet, x2, rbou_rec] = rec.rec(save_cnt, trec, yrec, 
+				Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w] = rec.rec(save_cnt, trec, yrec, 
 				dydt_vst, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi)		
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, yrec_p2w, C_p2w)		
 		
 		# if time step was temporarily reduced, then return
 		if (ic_red == 1):
@@ -415,4 +422,4 @@ def ode_updater(update_stp,
 			tnew = update_stp
 			ic_red = 0
 	
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, rbou_rec)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w)

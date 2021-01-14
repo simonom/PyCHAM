@@ -54,7 +54,7 @@ def retr_out(output_by_sim):
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
-	num_speci = int((const['number_of_components'])[0]) # number of species
+	num_comp = int((const['number_of_components'])[0]) # number of components
 	# conversion factor to change gas-phase concentrations from molecules/cc 
 	# (air) into ppb 
 	Cfactor = const['factor_for_multiplying_ppb_to_get_molec/cm3_with_time']
@@ -72,8 +72,21 @@ def retr_out(output_by_sim):
 	try:
 		speed = (const["simulation_computer_time(s)"])[0]
 	except:
-		speed = 10.0
+		speed = 10.
 		
+	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
+	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
+	indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
+	# chemical scheme names of components
+	comp0 = indx_plot[1].tolist()
+	# indices of components
+	indx_plot = indx_plot[0].tolist()
+	indx_plot = [int(i) for i in indx_plot]
+	
+	# withdraw the wall concentration of components due to particle deposition to wall
+	fname = str(output_by_sim+'/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
+	yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
+
 	# withdraw times (s)
 	fname = str(output_by_sim+'/time')
 	t_array = np.loadtxt(fname, delimiter=',', skiprows=1)
@@ -111,5 +124,6 @@ def retr_out(output_by_sim):
 	except:
 		rbou_rec = []
 	
-	return(num_sb, num_speci, Cfactor, y, N, rbou_rec, x, timehr, PyCHAM_names, y_MW, 
-		Nwet, spec_namelist, MV, speed, wall_on, space_mode)
+	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, PyCHAM_names, y_MW, 
+		Nwet, spec_namelist, MV, speed, wall_on, space_mode, indx_plot, comp0, 
+		yrec_p2w)

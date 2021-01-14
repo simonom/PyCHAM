@@ -4,10 +4,12 @@
 import os
 import sys
 import numpy as np
+import csv
 
 def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
-	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp):
+	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
+	indx_plot, comp0, yrec_p2w):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -39,8 +41,15 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# wall_on - marker for whether wall on or off
 	# space_mode - type of spacing between particle size bins (log or lin)
 	# rbou00 - initial lower size (radius) bound of particles (um)
-	# upper_bin_rad_amp - factor increase in radius of upper bound 
-	# -------------------------------
+	# upper_bin_rad_amp - factor increase in radius of upper bound
+	# indx_plot - index of components to plot gas-phase concentration temporal profiles of in 
+	# standard results plot
+	# comp0 - names of components to plot gas-phase concentration temporal profiles of in 
+	# standard results plot
+	# yrec_p2w - concentration of components on the wall due to 
+	#	particle-wall loss, stacked by component first then by
+	#	size bin (molecules/cc)
+	# ---------------------------------------------------------------
 	
 	if (numsb-wall_on > 0): # correct for changes to size bin radius bounds
 		rbou_rec[:, 0] = rbou00
@@ -79,18 +88,22 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# leaving any particle-phase concentrations as molecules/cc (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
 	
-	# prepare header for concentrations with time file 
-	y_header = str('')
+	
+	y_header = str('') # prepare header for concentrations with time file 
+	# prepare header for
 	x2_header = str('') # prepare header for files relating to size bins
-	for i in range(numsb+1):
+	
+	for i in range(numsb+1): # loop through size bins
 
 		if i == 0:
 			end = '_g'
-		if (i>0 and i<numsb):
+		if ((i > 0) and (i < numsb)):
 			end = '_p'
-		if i==numsb:
-			if wall_on==0:
+			x2_header = str(x2_header+str(i))
+		if (i == numsb):
+			if (wall_on == 0):
 				end = '_p'
+				x2_header = str(x2_header+str(np.repeat(i, num_comp)))
 			else:
 				end = '_w'
 		for ii in range(num_comp):
@@ -100,15 +113,19 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 				start = ', '
 			y_header = str(y_header+str(start+comp_namelist[ii])+end)
 			
-	# saving both gas- and particle-phase concentrations of species
-	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cc (air)) and _w is the wall phase (molecules/cc (air))\n'+y_header)) 	
-	 	
+	# saving both gas, particle and wall concentrations of components
+	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cc (air)) and _w is the wall phase (molecules/cc (air))\n'+y_header)) 		
+	 
 	# saving time of outputs
-	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files') 	
+	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
+	
+	# saving the index and names of components whose gas-phase temporal profiles can be plotted on the standard results plot
+	fname = os.path.join(output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')
+	np.savetxt(fname, [indx_plot, comp0], delimiter =', ', header='index (top row) and chemical scheme name (bottom row) of components with initial gas-phase concentrations specified', fmt ='% s') 
 	
 	# if tracking of tendencies to change requested by user, loop through the components
 	# and save the tendency record for each of these (%/hour)
-	if len(dydt_vst)>0:
+	if (len(dydt_vst) > 0):
 		compind = 0
 		# loop through components to record the tendency of change \n')
 		for compi in dydt_vst.get('comp_index'):
@@ -122,7 +139,10 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 			compind += 1
 	
 	
-	if (numsb-wall_on > 0): # if particles present
+	if ((numsb-wall_on) > 0): # if particles present
+	
+		# saving the concentration of components on the wall due to particle deposition to wall
+		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (molecules/cc (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header)) 
 	
 		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
 				header=('particle number concentration assuming water removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))

@@ -1,81 +1,21 @@
-'''The module that generates the Graphical User Interface for PyCHAM, and connects that GUI with the core PyCHAM model'''
-# first module called when PyCHAM started from the terminal/command window, takes inputs
-# and sends to model modules, also calls the saving module
+'''module to read and store (via pickle file) model variables from file'''
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot, Qt
-import pickle # for storing inputs
-import sys
-import os
-import def_mod_var
+import pickle
 import numpy as np
+import os
 
-class PyCHAM(QWidget):
-
-	def __init__(self):
-		super().__init__()
-		self.title = 'PyCHAM'
-		self.left = 10
-		self.top = 10
-		self.width = 450
-		self.height = 300
-		self.initUI()
-		
-		# default variables for all required input model variables 
-		# stored to pickle file and output here
-		[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = def_mod_var.def_mod_var(0)
-		return
-    
-	def initUI(self):
-		self.setWindowTitle(self.title)
-		self.setGeometry(self.left, self.top, self.width, self.height)
-		
-		label = QLabel(self)
-		label.setText("Welcome to PyCHAM.  Please see the README file for guidance.")
-		label.move(20, 35)
-		label.show()
-		
-		button = QPushButton('Chemical Scheme File', self)
-		button.setToolTip('Select the file containing the desired chemical scheme')
-		button.move(100, 70)
-		button.clicked.connect(self.on_click1)
-		
-		button = QPushButton('Chemical Scheme .xml File', self)
-		button.setToolTip('Select the .xml file containing the desired conversion file')
-		button.move(100, 100)
-		button.clicked.connect(self.on_click2)
-		
-		button = QPushButton('Model Variables .txt File', self)
-		button.setToolTip('Select the desired file containing the model variables')
-		button.move(100, 130)
-		button.clicked.connect(self.on_click3)
-		
-		button = QPushButton('Run Model', self)
-		button.setToolTip('Start the simulation')
-		button.move(100, 160)
-		button.clicked.connect(self.on_click4)
-		
-		button = QPushButton('Plot Results', self)
-		button.setToolTip('Plot output from simulation')
-		button.move(100, 190)
-		button.clicked.connect(self.on_click5)
-
-		button = QPushButton('Quit', self)
-		button.setToolTip('Finish with PyCHAM and close this window')
-		button.move(100, 220)		
-		button.clicked.connect(self.on_click6)
-		
-		self.show()
-		return
-		
-
-	@pyqtSlot()
-	def on_click1(self):
-		# prepare by opening default inputs, ready for modification
+def mod_var_read():
+	
+	# inputs: ------------------------------------------
+	# ----------------------------------------------------
+	
+	def read():
+	
+		# prepare by opening existing model variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
+			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -86,71 +26,16 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
-			pk.close()
-			
-		sch_name = self.openFileNameDialog() # get location of chemical scheme file
-		# enforced file selection example
-		#sch_name = str(os.getcwd() + '/PyCHAM/output/GMD_paper_plotting_scripts/fig01_scheme.txt')
+		pk.close()
 		
-		# pickle with new chemical scheme name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
-		with open(input_by_sim, 'wb') as pk:
-			pickle.dump(list_vars, pk) # pickle
-			pk.close() # close
-
-	@pyqtSlot()
-	def on_click2(self):
-		# prepare by opening default inputs, ready for modification
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
-		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedVr,
-			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
-			pk.close()
-		xml_name = self.openFileNameDialog() # get location of xml file
-			
-		# pickle with new xml file name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
-		with open(input_by_sim, 'wb') as pk:
-			pickle.dump(list_vars, pk) # pickle
-			pk.close() # close		
-
-	@pyqtSlot()
-	def on_click3(self):
-
-		# prepare by opening default inputs, ready for modification
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
-		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedVr,
-			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
-			pk.close() # close pickle file
-
-
-		inname = self.openFileNameDialog() # get location of model variables file
-		# enforced selection example
-		#inname = str(os.getcwd() + '/PyCHAM/output/GMD_paper_plotting_scripts/fig01_mod_var.txt')
+		if (inname != ''): # if not using defaults
+			inputs = open(inname, mode= 'r' ) # open model variables file
+			in_list = inputs.readlines() # read file and store everything into a list
+			inputs.close() # close file
+		else: # if using defaults
+			in_list = []
 		
-		inputs = open(inname, mode= 'r' ) # open model variables file
-		in_list = inputs.readlines() # read file and store everything into a list
-		inputs.close() # close file
-			
+		
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 
 			key, value = in_list[i].split('=') # split values from keys
@@ -159,6 +44,7 @@ class PyCHAM(QWidget):
 
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
+				
 
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
 				chem_sch_mark = [str(i).strip() for i in (value.split(','))]
@@ -210,9 +96,9 @@ class PyCHAM(QWidget):
 				sb_cnt = 1 # track number of size bins
 				mode_cnt = 1 # track number of modes
 				for i in value:
-					if i==';':
+					if i == ';':
 						time_cnt += 1 # increase time count
-					if (time_cnt == 1 and i==','):
+					if (time_cnt == 1 and i == ','):
 						sb_cnt += 1 # increase size bin count
 						pmode = 1 # explicitly stated particle concentrations
 					if (time_cnt == 1 and i == ':'):
@@ -306,7 +192,7 @@ class PyCHAM(QWidget):
 
 			if key == 'seed_name' and value.strip(): # name(s) of component(s) comprising seed particles
 				seed_name = [str(i).strip() for i in (value.split(','))]
-
+				
 			if key == 'seed_mw' and value.strip():
 				seed_mw = float(value.strip())
 		
@@ -385,7 +271,7 @@ class PyCHAM(QWidget):
 			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
 
-			if key == 'act_comp' and (value.strip()): # names of componentes with specified activity coefficients
+			if key == 'act_comp' and (value.strip()): # names of components with specified activity coefficients
 				act_comp = [i for i in (((value.strip()).split(',')))]
 
 			if key == 'act_user' and (value.strip()): # activity coefficients (dimensionless set by user)
@@ -458,32 +344,11 @@ class PyCHAM(QWidget):
 				ser_H2O = int(value)
 		
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
-
-
-		
-	@pyqtSlot()	
-	def on_click4(self): # button to run simulation
-		import middle
-		# call on modules to solve problem
-		middle.middle()
-	
-	@pyqtSlot() # button to plot results graphically
-	def on_click5(self):	
-		import plotter
-		print('Plotting and saving standard results graph')
-		plotter.plotter(0) # plot results
-
-	@pyqtSlot() # button to quit software
-	def on_click6(self):
-		QWidget.close(self)
-		
-	def openFileNameDialog(self): # allows opening of system's directory navigator
-		options = QFileDialog.Options()
-		fname, _ = QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
-		return(fname)
+			
+	read() # call on function to read the model variables

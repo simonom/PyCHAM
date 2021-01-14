@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, 
 			inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, testf, p_char, 
-			e_field, num_asb):
+			e_field, num_asb, C_p2w):
 
 	# inputs:----------------------------------------------------------
 	
@@ -23,7 +23,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# Dp - particle diameters (m)
 	# MW - component molecular weight (g/mol)
 	# Varr - volume of single particles per size bin (m3)
-	# sbn - number of size bins
+	# sbn - number of size bins (excluding any wall)
 	# nc - number of species
 	# TEMP - system temperature (K)
 	# t - time that wall loss occurs over (s)
@@ -37,8 +37,11 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# num_asb - number of actual particle size bins
+	# C_p2w - concentration of components on the wall due to 
+	#	particle-wall loss, stacked by component first then by
+	#	size bin (molecules/cc)
 	# ----------------------------------------------------------------
-	if Rader == 0: # manual input of wall loss rate
+	if (Rader == 0): # manual input of wall loss rate
 		
 		Beta = np.zeros((Pn.shape))
 		Beta[Dp<inflectDp, 0] = 10**((np.log10(inflectDp)-
@@ -46,7 +49,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		Beta[Dp>=inflectDp, 0] = 10**((np.log10(Dp[Dp>=inflectDp])-
 								np.log10(inflectDp))*pwl_xpro+np.log10(inflectk))
 		
-	if Rader == 1:
+	if (Rader == 1):
 		# -------------------------------------------------------------------------
 		# McMurry & Rader option McMurry 1985, DOI: 10.1080/02786828508959054
 		# average number of charges per particle (/particle)
@@ -64,13 +67,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		# mass of components in particles (g)
 		ish = np.squeeze(Pn<1.0e-10) # only use size bins where particles available
 		ve[ish] = 0.0
-		mass = np.zeros((sbn-1, nc))
+		mass = np.zeros((sbn, nc))
 		ish = (Pn>1.0e-20)[:, 0] # size bins where particles present
 		
-		mass[ish, :] = ((Cn.reshape(sbn-1, nc)[ish, :]/Pn[ish, 0].reshape(-1, 1))/
+		mass[ish, :] = ((Cn.reshape(sbn, nc)[ish, :]/Pn[ish, 0].reshape(-1, 1))/
 						si.N_A)*MW.reshape(1, nc)
 		# density of particles (g/m3)
-		rho = np.ones((sbn-1))
+		rho = np.ones((sbn))
 		rho[ish] = np.sum(mass[ish, :], 1)/Varr[ish]
 		
 		
@@ -101,10 +104,10 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		z2 = (x-y)
 		
 		# empty array for Debye function results
-		D1 = np.zeros(sbn-1)
-		D11 = np.zeros(sbn-1)
+		D1 = np.zeros(sbn)
+		D11 = np.zeros(sbn)
 		
-		for sbi in range(sbn-1): # size bin loop
+		for sbi in range(sbn): # size bin loop
 			
 			if Pn[sbi]<1.0e-10: # only consider size bins with particles inside
 				continue 
@@ -129,7 +132,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 			D11[sbi] = (1.0/z2[sbi])*a1[0]
 		
 		# first bit of Beta (loss rate to walls (/s)) calculation (eq. 2 Charan (2018))
-		Beta1 = np.zeros((sbn-1))
+		Beta1 = np.zeros((sbn))
 		Beta1[ish] = (3.0*((Ke*Dpi[ish])**(0.5)))/(np.pi*ChamR*x[ish])
 		Beta2 = ((x+y)**2.0)/2.0+(x+y)*D1+(x-y)*D11 # second bit
 	
@@ -155,10 +158,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	ish = Pn<(Beta*Pn)
 	Beta[ish] = 1.0
 		
-	# new particle number concentration and particle-phase concentrations of components
+	# new particle number concentration
 	Pn -= (Beta*Pn)
-	Cn -= (Beta*Cn.reshape(sbn-1, nc)).flatten(order='C')
-			
+	# change in particle-phase concentrations of components
+	delC = (Beta*Cn.reshape(sbn, nc)).flatten(order = 'C')
+	Cn -= delC # new particle-phase concentrations of components (molecules/cc)
+	C_p2w += delC
+	
 	# remove particles and their components if particle number negative
 	ish = np.array((np.where(Pn<1.0e-8)))
 	for i in ish[0, :]:

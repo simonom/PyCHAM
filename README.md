@@ -184,7 +184,7 @@ note that if a variable is irrelevant for your simulation, it can be omitted and
 | nucv1 = | Nucleation parameterisation value 1 to control the total number of newly formed particles|
 | nucv2 = | Nucleation parameterisation value 2 to control the start time of nucleation|
 | nucv3 = | Nucleation parameterisation value 3 to control the duration of nucleation|
-| nuc_comp = | Name of component contributing to nucleation (only one allowed), must correspond to a name in the chemical scheme file.  Deafults to empty.  If empty, the nucleation module (nuc.py) will not be called.|
+| nuc_comp = | Name of component contributing to nucleation (only one allowed), must correspond to a name in the chemical scheme file, or 'core' for a generic zero vapour pressure component.  Defaults to 'core'.|
 | new_partr = | Radius of newly nucleated particles (cm), if empty defaults to 2.0e-7 cm. |
 | inflectDp = | Particle diameter wall deposition rate at inflection point (m). |
 | Grad_pre_inflect = | Negative log10 of the gradient of particle wall deposition rate against the log10 of particle diameter before inflection (/s).  For example, for the rate to decrease by an order of magnitude every order of magnitude increase in particle diameter, set to 1.|

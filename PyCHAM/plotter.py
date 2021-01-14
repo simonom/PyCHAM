@@ -7,54 +7,26 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
-import user_input as ui
 import retr_out
 import numpy as np
 import scipy.constants as si
 
-def plotter(caller):
+def plotter(caller, dir_path):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
 	# --------------------------------------------------------------------------
 
-	# retrieve useful information from pickle file
-	[sav_name, sch_name, indx_plot, Comp0] = ui.share(1)
-
-	if (sav_name == 'default_res_name'):
-		print('Default results name was used, therefore results not saved and nothing to plot')
-		return()
-
-	dir_path = os.getcwd() # current working directory
-	# obtain just part of the path up to PyCHAM home directory
-	for i in range(len(dir_path)):
-		if dir_path[i:i+7] == 'PyCHAM':
-			dir_path = dir_path[0:i+7]
-			break
-	# isolate the scheme name from path to scheme
-	for i in range(len(sch_name)-1, 0, -1):
-		if sch_name[i] == '/':
-			sch_name = sch_name[i+1::]
-			break
-	# remove any file formats
-	for i in range(len(sch_name)-1, 0, -1):
-		if sch_name[i] == '.':
-			sch_name = sch_name[0:i]
-			break
-	
-
-	dir_path = str(dir_path+'/PyCHAM/output/'+sch_name+'/'+sav_name)
-
 	# chamber condition ---------------------------------------------------------
-
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, comp_names, 
-		_, _, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(dir_path)
+		_, _, _, y_MV, _, wall_on, space_mode, indx_plot, comp0, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = num_sb-wall_on
 
-	if caller == 0:
+	if (caller == 0):
 		plt.ion() # show results to screen and turn on interactive mode
 
 	# prepare sub-plots depending on whether particles present
@@ -89,7 +61,7 @@ def plotter(caller):
 		for i in range(len(indx_plot)):
 		
 			ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
-						label=str(str(Comp0[i])))
+						label=str(str(comp0[i]).strip()))
 
 		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -252,9 +224,8 @@ def plotter(caller):
 
 	# end of particle properties sub-plot -----------------------------------
 
-	# save and display
-	plt.savefig(str(dir_path+'/'+sav_name+'_output_plot.png'))
-	if caller == 2:
+	# display
+	if (caller == 2):
 		plt.show()	
 
 	return()

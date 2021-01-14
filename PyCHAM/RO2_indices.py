@@ -5,7 +5,7 @@
 
 import numpy as np
 
-def write_RO2_indices(smiles_array, RO2_names):
+def RO2_indices(smiles_array, RO2_names):
     
     # store the names of RO2 species which are present in the equation file
     # get a list of INDICES of RO2 that present in the equation file 
@@ -16,7 +16,7 @@ def write_RO2_indices(smiles_array, RO2_names):
     
     for name in RO2_names:
         
-        if name in smiles_array:
+        if (name in smiles_array):
             # get the RO2 index
             index0 = RO2_names.index(name)
             RO2_indices0.append(index0)
@@ -24,7 +24,7 @@ def write_RO2_indices(smiles_array, RO2_names):
             index1 = smiles_array.index(name)
             RO2_indices.append(index1)
     
-    # Ensure elements in RO2_indices are int (iterable)
+    # Ensure elements in RO2_indices are integer (iterable)
     RO2_indices0 = (np.asarray(RO2_indices0, dtype=int)).reshape(-1, 1)
     RO2_indices = (np.asarray(RO2_indices, dtype=int)).reshape(-1, 1)
     RO2_indices = np.hstack((RO2_indices0, RO2_indices))

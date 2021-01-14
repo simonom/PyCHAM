@@ -62,6 +62,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		pconcn = np.zeros((1))
 		stdn = [1.e20]
 		mean_radn = [-1.e6]
+		
 	else: # obtain initial information
 		pconcn = pconc[:, i]
 
@@ -103,7 +104,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
 	
-	if num_asb == 0: # create dummy variables if no size bins
+	if (num_asb == 0): # create dummy variables if no size bins
 		N_perbin = np.zeros((1,1))
 		x = np.zeros((1,1))
 		Varr = np.zeros((1,1))
@@ -112,6 +113,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		Vol0 = np.zeros((1,1))
 		rbou = np.zeros((1,1))
 		upper_bin_rad_amp = 1.0e6
+		# empty array for concentration of components on wall due to 
+		# particle deposition to wall (molecules/cc)
+		C_p2w  = 0.
 	
 	# create a number concentration for a lognormal distribution (particles/cc (air))
 	# this is where gas partitioning to wall set up
@@ -184,6 +188,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		rad0[:] = x[:]
 		Vol0 = np.zeros((len(Varr)))
 		Vol0[:] = Varr[:]
+		# empty array for concentration of components on wall due to 
+		# particle deposition to wall (molecules/cc)
+		C_p2w = np.zeros((num_asb*num_comp))
 	
 	if (wall_on > 0):
 		num_asb += 1 # add one to size bin number to account for wall
@@ -216,4 +223,4 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	np_sum = 0.
 	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_asb, nuc_comp, rbou00, 
-			upper_bin_rad_amp, np_sum)
+			upper_bin_rad_amp, np_sum, C_p2w)
