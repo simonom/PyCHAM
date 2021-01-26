@@ -35,9 +35,9 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
 	# ------------------------------------------------------------------------------------
 	
-	if num_sb == 0: # fillers
-		kimt = 0.
-		kelv = 0.
+	if (num_sb == 0): # fillers
+		kimt = np.zeros((num_sb-wall_on, num_comp))
+		kelv_fac = np.zeros((num_sb-wall_on, 1))
 
 		return(kimt, kelv)
 

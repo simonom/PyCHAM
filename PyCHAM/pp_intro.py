@@ -214,10 +214,6 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:,0]))
 			mass_conc -= (y_dens[int(H2Oi), 0]*1.0e-3)*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
 		mass_conc = mass_conc*1.e12 # convert from g/cc (air) to ug/m3 (air)
-		
-		print(str('Total dry (no water) mass concentration of particles at start of simulation is ' + str(mass_conc) + ' ug/m3 (air)'))
-	else: # no particles
-		print('No particle size bins detected, simulation will not include particles')
 
 	# start counter on number concentration of newly nucleated particles (#/cc (air))
 	np_sum = 0.

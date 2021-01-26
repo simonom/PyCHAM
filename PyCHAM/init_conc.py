@@ -101,19 +101,20 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# number of recording steps
 	nrec_steps = int(math.ceil(end_sim_time/save_step)+1)
 
-	# get index of user-specified components for tracking their dydt due to model 
+	# get index of user-specified components for tracking their change tendencies (dydt) due to modeled
 	# mechanisms
-	if len(dydt_trak)>0:
+	if (len(dydt_trak) > 0):
 		
 		dydt_traki = [] # empty list for indices of these components
 		
 		for i in range (len(dydt_trak)):
 			reac_index = [] # indices of reactions involving this species
-			# index of where initial species occurs in SMILE string
+			# index of components in component list
 			y_indx = comp_namelist.index(dydt_trak[i])
 
 			# remember index for plotting gas-phase concentrations later
 			dydt_traki.append(int(y_indx))
+			
 			# search through reactions to see where this component is reactant or product
 			for ri in range(num_eqn):
 				if sum(rindx[ri,0:nreac[ri]]==y_indx)>0:
@@ -125,7 +126,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 			# save reaction indices in dictionary value for this component,
 			# when creating empty rec_array, add two rows onto the end for particle- and 
-			# wall-partitioning, respectively.  Note the extra row to hold the reacion 
+			# wall-partitioning, respectively.  Note the extra row to hold the reaction 
 			# indices
 			rec_array = np.zeros((nrec_steps+1, len(reac_index)+2))
 			rec_array[0, 0:-2] = (reac_index)

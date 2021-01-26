@@ -54,20 +54,6 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_stru, num_sb, pmode, pconc,
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
 	
-	# constrain wall_on marker
-	if (wall_on>=1):
-		wall_on = 1
-	else:
-		wall_on = 0 
-
-	if os.path.isdir(output_by_sim) == True and caller == 0:
-		print('Error: results file name (' +output_by_sim+ ') already exists, please use an alternative')
-		sys.exit()
-
-	# ensure size structure marker is sensible
-	if (siz_stru<0 or siz_stru>1):
-		siz_stru = 0
-	
 	# consistency between number of particle size bins and particle number concentration
 	if num_sb == 0 and (sum(pconc != 0) > 0):
 		pconc[:] = 0.0

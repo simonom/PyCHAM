@@ -28,7 +28,7 @@ def mod_var_read():
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
 		pk.close()
 		
-		if (inname != ''): # if not using defaults
+		if (inname != 'Default'): # if not using defaults
 			inputs = open(inname, mode= 'r' ) # open model variables file
 			in_list = inputs.readlines() # read file and store everything into a list
 			inputs.close() # close file
@@ -350,5 +350,6 @@ def mod_var_read():
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
+		
 			
 	read() # call on function to read the model variables

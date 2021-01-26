@@ -2,6 +2,7 @@ name: PyCHAM
 channels:
   - openbabel
   - defaults
+  - conda-forge
 dependencies:
   - appnope
   - backcall

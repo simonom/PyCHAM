@@ -5,11 +5,13 @@ import os
 import sys
 import numpy as np
 import csv
+from shutil import copyfile
 
 def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, yrec_p2w):
+	indx_plot, comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
+	seedi):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -23,7 +25,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# numsb - number of size bins
 	# dydt_vst - tendency to change of user-specified components
 	# dydt_trak - user-input names of components to track
-	# comp_namelist - names of species given by the equation file
+	# comp_namelist - names of components given by the chemical scheme file
 	# upper_bin_rad_amp - factor upper bin radius found increased by in 
 	#						Size_distributions.py for more than 1 size bin, or in 
 	# 						pp_intro.py for 1 size bin
@@ -31,7 +33,6 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	#				(molecules/cc) per recording time step
 	# time_taken - computer time for entire simulation (s)
 	# seed_name - name of seed component
-	# comp_namelist - chemical scheme names of components 
 	# y_mw - molecular weights (g/mol)
 	# MV - molar volumes (cm3/mol)
 	# time_taken - simulation computer time (s)
@@ -49,9 +50,17 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# yrec_p2w - concentration of components on the wall due to 
 	#	particle-wall loss, stacked by component first then by
 	#	size bin (molecules/cc)
+	# sch_name - path to chemical scheme file
+	# inname - path to model variables file
+	# rel_SMILES - SMILES strings for components in chemical scheme
+	# Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
+	# OC - oxygen to carbon ratio of components
+	# H2Oi - index of water
+	# seedi - index of seed components
 	# ---------------------------------------------------------------
 	
-	if (numsb-wall_on > 0): # correct for changes to size bin radius bounds
+	
+	if ((numsb-wall_on) > 0): # correct for changes to size bin radius bounds
 		rbou_rec[:, 0] = rbou00
 		rbou_rec[:, -1] = rbou_rec[:, -1]/upper_bin_rad_amp
 
@@ -67,6 +76,15 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# create folder to store results
 	os.makedirs(output_by_sim)
 	
+	# create folder to store copies of inputs
+	os.makedirs(str(output_by_sim+'/inputs'))
+	# making a copy of the chemical scheme and model variables input files
+	output_by_sim_ext = str(output_by_sim+'/inputs/'+sch_name.split('/')[-1])
+	copyfile(sch_name, output_by_sim_ext)
+	output_by_sim_ext = str(output_by_sim+'/inputs/'+inname.split('/')[-1])
+	if (inname != 'Default'): # if not in default model variables mode 
+		copyfile(inname, output_by_sim_ext)
+	
 	# saving dictionary
 	# dictionary containing variables for model and components
 	const = {}
@@ -74,12 +92,18 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	const["number_of_components"] = num_comp
 	const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
-	const["component_names"] = comp_namelist
+	const["chem_scheme_names"] = comp_namelist
+	const["SMILES"] = rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
 	const["wall_on_flag_0forNO_1forYES"] = wall_on
 	const["space_mode"] = space_mode
+	const["pure_component_saturation_vapour_pressures_at_298.15K"] = Psat_Pa_rec.tolist()
+	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
+	const["index_of_water"] = H2Oi
+	const["index_of_seed_components"] = seedi.tolist()
+
 	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
@@ -135,7 +159,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 			# get user-input name of this component
 			comp_name = str(dydt_trak[compind] +'_rate_of_change')
 			# save
-			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation) (molecules/cc.s (air))')
+			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), penultimate column is gas-particle partitioning and final column is gas-wall partitioning (molecules/cc.s (air))')
 			compind += 1
 	
 	
@@ -158,7 +182,6 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 		
 	# if save name is the default, then remove to ensure no duplication in future
 	if (savefolder == 'default_res_name'):
-		import shutil
-		print('Note: default name for save folder used, therefore now deleting this folder to avoid future duplication')	
+		import shutil	
 		shutil.rmtree(output_by_sim)
 	return()

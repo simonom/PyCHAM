@@ -12,6 +12,7 @@ import scipy.constants as si
 
 import coag as coag
 
+
 def test_coag(): # define function
 
 
@@ -116,7 +117,7 @@ def test_coag(): # define function
 		sbbound = sbbound.reshape(1, -1)
 		rbou = rbou.reshape(1, -1)
 	# check for mass conservation from semiimplicit
-	print('% change in total mass of particles between start and end of simulation, where a positive means an increase in mass: ', ((y.sum()-ytot0)/ytot0)*100.)
+	print('change in total mass of particles between start and end of simulation, where a positive means an increase in mass: ', ((y.sum()-ytot0)/ytot0)*100.)
 
 	# Smoluchowski analytical solution
 	V0 = 1.e-3 # initial volume in first size bin (assuming monodisperse population)

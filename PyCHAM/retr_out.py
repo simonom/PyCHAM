@@ -30,7 +30,39 @@ def retr_out(output_by_sim):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
-			if str(line.split(',')[0]) == 'component_names' or str(line.split(',')[0]) == 'space_mode':
+			if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K'):
+				i = i.strip('\n')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(float(i))
+			if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
+				i = i.strip('\n')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(float(i))
+			if (str(line.split(',')[0]) == 'index_of_water'):
+				i = i.strip('\n')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(int(i))
+			if (str(line.split(',')[0]) == 'index_of_seed_components'):
+				i = i.strip('\n')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(int(i))
+			if (str(line.split(',')[0]) == 'chem_scheme_names') or (str(line.split(',')[0]) == 'SMILES') or (str(line.split(',')[0]) == 'space_mode'):
 				i = i.strip('\n')
 				i = i.strip('[')
 				i = i.strip(']')
@@ -51,18 +83,27 @@ def retr_out(output_by_sim):
 				i = i.strip(' ')
 				dlist.append(float(i))
 			
+			
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
+	
+	# extract required data from dictionary, note this prepared above
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
 	num_comp = int((const['number_of_components'])[0]) # number of components
 	# conversion factor to change gas-phase concentrations from molecules/cc 
 	# (air) into ppb 
 	Cfactor = const['factor_for_multiplying_ppb_to_get_molec/cm3_with_time']
-	PyCHAM_names = const['component_names']
+	rel_SMILES = const['SMILES']
 	y_MW = const['molecular_weights_g/mol_corresponding_to_component_names']
-	spec_namelist = const['component_names']
+	comp_names = const['chem_scheme_names']
 	wall_on = const['wall_on_flag_0forNO_1forYES'][0]
 	space_mode = const['space_mode'][0]
+	# pure component saturation vapour pressures at 298.15 K (log10(atm))
+	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K']
+	# pure component saturation vapour pressures at 298.15 K (log10(atm))
+	OC = const['oxygen_to_carbon_ratios_of_components']
+	H2Oi = const['index_of_water'] # index of water
+	seedi = const['index_of_seed_components'] # index of seed components
 	
 	try:
 		MV = const["molecular_volumes_cm3/mol"]
@@ -124,6 +165,6 @@ def retr_out(output_by_sim):
 	except:
 		rbou_rec = []
 	
-	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, PyCHAM_names, y_MW, 
-		Nwet, spec_namelist, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w)
+	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
+		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
+		yrec_p2w, PsatPa, OC, H2Oi, seedi)

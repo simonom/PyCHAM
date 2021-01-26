@@ -11,26 +11,33 @@ def def_mod_var(caller): # define function
 	# caller - mark for calling function
 	# -------------------------------------------------------
 
-	# names ---------------------------------------------------------------------------------
-	# name of folder to save results to
-	sav_nam = 'default_res_name'
+	# default input files ------------------------------
+	# default chemical scheme
 	sch_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
-	# markers to isolate sections of chemical scheme based on MCM KPP format
-	chem_sch_mark = ['%', 'RO2', '+', '', '', ';', '+', ';', '', '%', ':', ';']
 	xml_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
 	inname = 'Default' # model variables file name
-
-	# times ----------------------------------------------------------------------------------
+	
+	# general ---------------------------------------------------------------------------------
+	# name of folder to save results to
+	sav_nam = 'default_res_name'
+	# markers to isolate sections of chemical scheme based on MCM KPP format
+	chem_sch_mark = ['%', 'RO2', '+', '', '', ';', '+', ';', '', '%', ':', ';']
 	# time interval between updates to integration inputs (s)
 	update_stp = 1.
 	tot_time = 1. # total time to integrate over (s)
 	save_step = 1. # time interval between saving results (s)
+	if (caller == 0): # called from PyCHAM
+		uman_up = 0 # marker for whether to update the UManSysProp folder
+	if (caller == 1): # called from Travis
+		uman_up = 1
+	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
 	
-	# initial atmosphere -----------------------------------------------------------------
+	# chamber environment -----------------------------------------------------------------
 	temp = np.array((298.15)).reshape(1) # temperature of experiment (K)
 	tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
 	RH = 0.65 # humidity of experiment (fraction of 1)
 	Press = 9.8e4 # air pressure during experiment (Pa)
+	dil_fac = 0. # dilution factor (volume fraction per second)
 	
 	# particle section ----------------------------------------------------------------
 	siz_stru = 0 # size structure (0 for moving-centre, 1 for full-moving)
@@ -60,6 +67,7 @@ def def_mod_var(caller): # define function
 	# and initial condition update to nucleation
 	nuc_ad = 1
 	ser_H2O = 1 # whether to serialise gas-particle partitioning of water
+	coag_on = 1 # whether to model coagulation
 
 	# gas inputs ------------------------------------------------------------
 	# chemical scheme name of components present initially
@@ -81,6 +89,8 @@ def def_mod_var(caller): # define function
 	# concentration(s) (ppb) of component(s) injected instantaneously after 
 	# experiment start
 	Ct = np.zeros((0, 0))
+	# the gas-particle partitioning cutoff (Pa)
+	partit_cutoff = []
 
 	# lights -------------------------------------------------------------------------------
 	light_stat = [0] # light status
@@ -111,7 +121,7 @@ def def_mod_var(caller): # define function
 	p_char = 0. # average number of charges per particle (/particle)
 	e_field = 0. # average electric field inside chamber (g.m/A.s3)
 
-	# miscellaneous ------------------------------------------------------------------------
+	# specific component properties ---------------------------------------------------------
 	# chemical scheme name of components to track the change tendencies of	
 	dydt_trak = []
 	# chemical scheme names of components with densities manually set
@@ -132,16 +142,7 @@ def def_mod_var(caller): # define function
 	accom_comp = []
 	# user-defined accommodation coefficients
 	accom_val = []
-	# the gas-particle partitioning cutoff (Pa)
-	partit_cutoff = []
-
-	if (caller == 0): # called from PyCHAM
-		uman_up = 0 # marker for whether to update the UManSysProp folder
-	if (caller == 1): # called from Travis
-		uman_up = 1
-	int_tol = [1.e-3, 1.e-4]
-	coag_on = 1 # whether to model coagulation
-	dil_fac = 0. # dilution factor
+	
 
 	# prepare for pickling
 	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]

@@ -17531,16 +17531,16 @@
 <species species_number="s5832" species_name="ELVOC">
 <smiles>CCCCC(O)C(O)C(O)C(O)C(O)C(O)CCCCCCCCCC</smiles>
 </species>
-<species species_number="s5832" species_name="ELVOC_o3">
+<species species_number="s5832" species_name="ELVOC_O3">
 <smiles>OCC1=COC(OO)CO2C(OO)C1C2(C(O))COOCC1=CCC2CC1C2(C)C</smiles>
 </species>
-<species species_number="s5832" species_name="SVOC_o3">
+<species species_number="s5832" species_name="SVOC_O3">
 <smiles>OCC1=CC(OO)C2C(OO)C1C2(C)CO</smiles>
 </species>
-<species species_number="s5832" species_name="ELVOC_oh">
+<species species_number="s5832" species_name="ELVOC_OH">
 <smiles>OCC1=COC(OO)CO2C(OO)C1C2(C(O))COOCC1=CC(O)C2C(O)C1C2(C)CO</smiles>
 </species>
-<species species_number="s5832" species_name="SVOC_oh">
+<species species_number="s5832" species_name="SVOC_OH">
 <smiles>OCC1=CC(OO)C2C(OO)C1C2(C)CO</smiles>
 </species>
 <species species_number="s5833" species_name="two-methylglyceric_acid">

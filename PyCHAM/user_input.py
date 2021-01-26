@@ -27,7 +27,7 @@ def share():
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
 		pk.close()
-			
+		
 		# check on inputs
 		[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
 		af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, 
@@ -36,7 +36,7 @@ def share():
 		chem_sch_mark, af_path, int_tol, update_stp, tot_time, 
 		RH, uman_up, light_stat, light_time, injectt, Ct,
 		dens_comp, dens, seed_name, seedVr, seed_diss, partit_cutoff)
-			
+
 	return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
@@ -47,4 +47,4 @@ def share():
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O)
+		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, inname)
