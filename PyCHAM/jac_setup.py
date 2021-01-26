@@ -26,8 +26,6 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# num_asb - number of actual particle size bins (excluding wall) 
 	# ----------------------------------------------------
 
-	print('Preparing Jacobian inputs')
-
 	# rows in Jacobian affected by this equation		 	
 	rowvals = np.empty((0))
 	# indices of rowvals representing each component being 

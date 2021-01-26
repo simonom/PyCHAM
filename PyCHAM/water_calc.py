@@ -15,8 +15,7 @@ def water_calc(TEMP, RH, NA):
 	# gas law, R has units cc.Pa/K.mol
 	H2Oc = (RH*Psat_water)*(NA/(8.3144598e6*TEMP))
 	
-	# convert Psat_water to log10(atm) from Pa to be consistent with vapour pressures 
-	# in volat_calc later on
+	# convert Psat_water to log10(atm) from Pa
 	Psat_water = np.log10(Psat_water/101325.0)
 	H2O_mw = 18.0 # state molecular weight of water (g/mol)
 	

@@ -60,7 +60,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	sbrn = np.int(np.max(sbr.shape))
 	sbn = np.int(np.max(rint.shape)) # number of size bins
 	
-	# call on function to determine the Knudsen no. and therefore flow 
+	# call on function to determine the Knudsen number and therefore flow 
 	# regime of each size bin
 	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr, PInit)
 	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint, PInit)
@@ -69,7 +69,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	[Rei, Vfi] = Reyn_num(sbr, eta_ai, rho_ai, kin_visc, 1.0e6, Kni)
 	[Rej, Vfj] = Reyn_num(rint, eta_aj, rho_aj, kin_visc, 1.0e6, Knj)
 	
-	# repeat Knudsen number over number of size bins
+	# tile Knudsen number over number of size bins
 	Kni_m = np.tile(Kni, (sbn, 1))
 	
 	# Cunningham slip-flow correction (15.30) with constant taken
@@ -82,15 +82,12 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	Dpi = (((si.k*T)/(6.0*np.pi*sbr*(eta_ai*1.0e-3)))*Gi).reshape(sbrn, 1)
 	Dpj = (((si.k*T)/(6.0*np.pi*rint*(eta_aj*1.0e-3)))*Gj).reshape(1, sbn)
 	
-	# repeat Dpi over size bins of j (m2/s)
-	Dp_mi = np.repeat(Dpi, sbn, 1)
-	# repeat Dpj over size bins of i (m2/s)
-	Dp_mj = np.repeat(Dpj, sbrn, 0)
+	# tile Dpi (particle diffusion coefficient) over size bins of j (m2/s)
+	Dp_mi = np.tile(Dpi, (1, sbn))
+	# tile Dpj (particle diffusion coefficient) over size bins of i (m2/s)
+	Dp_mj = np.tile(Dpj, (sbrn, 1))
 	# matrix for sums of Dp in size bins (m2/s)
 	Dp_sum = Dp_mi+Dp_mj
-
-	# zero the upper triangle part of the matrix as only the lower is needed
-# 	Dp_sum[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
 	
 	# Brownian collision kernel (m3/particle.s) (p. 508) 
 	K_B = np.zeros((sbrn, sbn))
@@ -101,29 +98,25 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	sbr2[:,0] = sbr[:]
 	rint2[0,:] = rint[:]
 	
-	# repeat size bin radii over size bins (m)
-	rint2 = np.repeat(rint2, sbrn, 0)
-	sbr_m = np.repeat(sbr2, sbn, 1)
-	# zero the upper triangle part of the matrix as only the lower is needed
-# 	rint2[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
-# 	sbr_m[np.triu_indices(sbrn, 1, m=sbn)] = 0.0
+	# tile size bin radii over size bins (m)
+	rint2 = np.tile(rint2, (sbrn, 1))
+	sbr_m = np.tile(sbr2, (1, sbn))
 	
 	# matrix for size bins sums (m)
 	sbr_sum = sbr_m+rint2
 	
-	
 	# size bins in continuum regime
-	i = ((Kni<1.0).reshape(sbrn,1))
+	i = ((Kni<1.).reshape(sbrn,1))
 	# spread across rint (j)
-	i = np.repeat(i, sbn, 1)
+	i = np.tile(i, (1, sbn))
 	
 	# Brownian collision kernel (15.28) (m3/particle.s) in the continuum regime
 	K_B[i] = 4.0*np.pi*(sbr_sum[i])*(Dp_sum[i])
 	
 	# size bins in free-molecular regime	
-	i = ((Kni>10.0).reshape(sbrn,1))
+	i = ((Kni>10.).reshape(sbrn,1))
 	# spread across rint (j)
-	i = np.repeat(i, sbn, 1)
+	i = np.tile(i, (1, sbn))
 	
 	# single particle mass (g):
 	# first, number of moles per component in a single particle (relating to sbr)
@@ -145,11 +138,14 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# thermal speed of particle (15.32) (m/s) (multiply mass by 1.0e-3 to 
 	# convert from g to kg and therefore be consistent with Boltzmann's 
 	# constant (1.380658e-23kgm2/s2.K.molec))
-	Mpi = np.pi*(Mpi*1.0e-3).reshape(sbrn, 1).repeat(sbn, 1)
+	Mpi = np.pi*(Mpi*1.e-3).reshape(sbrn, 1)
+	Mpi = np.tile(Mpi, (1, sbn)) # tile across j dimension
 	nu_pi = np.zeros((sbrn, sbn))
 	nu_pi[Mpi>0.] = ((8.0*si.k*T)/Mpi[Mpi>0.])**0.5
 	
-	Mpj = np.pi*(Mpj*1.0e-3).reshape(1, sbn).repeat(sbrn, 0)
+	Mpj = np.pi*(Mpj*1.e-3).reshape(1, sbn)
+	Mpj = np.tile(Mpj, (sbrn, 1))# tile across i dimension
+	
 	nu_pj = np.zeros((sbrn, sbn))
 	nu_pj[Mpj>0.] = ((8.0*si.k*T)/Mpj[Mpj>0.])**0.5	
 
@@ -164,8 +160,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	i = (1.0<=Kni) 
 	j = (Kni<=10.0) # size bins in transition regime		
 	i = (i*j).reshape(sbrn, 1)	# size bins in transition regime
-	# spread across rint (j)
-	i = np.repeat(i, sbn, 1)
+	# spread across rint (j dimension)
+	i = np.tile(i, (1, sbn))
 	
 	# particle mean free path (15.34) (m)
 	lam_pi = np.zeros((len(nu_pi[:,0])))
@@ -184,14 +180,14 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	ish = den > 0.
 	
 	sig_pi[ish, 0] = num[ish]/den[ish]	
-	sig_pi = sig_pi.repeat(sbn, 1)
+	sig_pi = np.tile(sig_pi, (1, sbn)) # tile across j dimension
 	
 	num = (2.0*rint+lam_pj)**3.0-(4.0*rint**2.0+lam_pj**2.0)**1.5
 	den = (6.0*rint*lam_pj)-2.0*rint
 	sig_pj = np.zeros((1, len(rint)))
 	ish = den>0.
 	sig_pj[0, ish] = num[ish]/den[ish]
-	sig_pj = sig_pj.repeat(sbrn, 0)
+	sig_pj = np.tile(sig_pj, (sbrn, 1)) # tile across i dimension
 
 	# sum mean distances (m)
 	sig_p_sum = sig_pi**2.0+sig_pj**2.0
@@ -231,23 +227,23 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	Scpi = kin_visc/Dpi
 	Scpj = kin_visc/Dpj
 
-	# repeat Rej over sbrn and Rei over sbn
-	Re_jm = np.repeat(Rej.reshape(1,sbn), sbrn, 0)
-	Re_im = np.repeat(Rei.reshape(sbrn,1), sbn, 1)
-	Scpj_m = np.repeat(Scpj.reshape(1,sbn), sbrn, 0)
-	Scpi_m = np.repeat(Scpi.reshape(sbrn,1), sbn, 1)
+	# tile Rej over sbrn and Rei over sbn
+	Re_jm = np.tile(Rej.reshape(1,sbn), (sbrn, 1))
+	Re_im = np.tile(Rei.reshape(sbrn,1), (1, sbn))
+	Scpj_m = np.tile(Scpj.reshape(1,sbn), (sbrn, 1))
+	Scpi_m = np.tile(Scpi.reshape(sbrn,1), (1, sbn))
 
-	# repeat Reynold number and Schmidt number arrays over size bins
-	i = (Re_jm<=1.0)
-	j = rint2>=sbr2
+	# spread Reynold number and Schmidt number arrays over size bins
+	i = (Re_jm <= 1.)
+	j = (rint2 >= sbr2)
 	i2 = i*j # Rej less than or equal to 1, and rj greater than or equal to ri
-	i3 = (Re_im<=1.0)
-	j2 = rint2<sbr2
+	i3 = (Re_im <= 1.)
+	j2 = (rint2 < sbr2)
 	j3 = i3*j2 # Rei less than or equal to 1 and ri greater than rj
 	
-	i = (Re_jm>1.0)
+	i = (Re_jm > 1.)
 	i3 = i*j # Rej greater than 1 and rj greater than or equal to ri
-	i4 = (Re_im>1.0)
+	i4 = (Re_im > 1.)
 	j4 = i4*j2 # Rei greater than 1 and ri greater than rj
 	
 
@@ -270,13 +266,13 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# Gravitational Collection Kernel:
 	Ecoll = np.zeros((sbrn, sbn))
 	j = rint2>=sbr2
-	Ecoll[j] = ((sbr2.repeat(sbn, 1))[j])**2.0/((sbr_sum[j])**2.0)
+	Ecoll[j] = ((np.tile(sbr2, (1, sbn)))[j])**2./((sbr_sum[j])**2.)
 	j = rint2<sbr2
-	Ecoll[j] = (rint2[j])**2.0/((sbr_sum[j])**2.0)
+	Ecoll[j] = (rint2[j])**2./((sbr_sum[j])**2.)
 	
 	# Gravitational collection kernel (15.37)
 	# difference in terminal fall velocities
-	del_Vf = np.abs(np.repeat(Vfj.reshape(1, sbn), sbrn, 0)-Vfi.reshape(sbrn,1))
+	del_Vf = np.abs(np.tile(Vfj.reshape(1, sbn), (sbrn, 1))-Vfi.reshape(sbrn,1))
 	K_GC = Ecoll*np.pi*((sbr_sum)**2.0)*del_Vf
 	
 	if testf==1:
@@ -469,15 +465,15 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 
 	# matrix with volume of coagulated particles resulting from pairing of k and j 
 	# particles single particle volumes of k and j (m3) 
-	sbVmatk = (sbVi.reshape(-1, 1)).repeat(sbn, 1)
-	sbVmatj = (sbVj.reshape(1, -1)).repeat(sbrn, 0)
+	sbVmatk = np.tile((sbVi.reshape(-1, 1)), (1, sbn))
+	sbVmatj = np.tile((sbVj.reshape(1, -1)), (sbrn, 1))
 	
 	# combined volume of single coagulated particles (m3)
 	coagV = sbVmatk+sbVmatj
 	
-	# matrix for number concentration at t-h in size bins repeated across rows
+	# matrix for number concentration at t-h in size bins tiled across rows
 	num_partj = np.tile(num_part.reshape(1, -1), (sbn, 1))
-	# matrix for volume concentration at t-h in size bins repeated across rows
+	# matrix for volume concentration at t-h in size bins tiled across rows
 	vol_partj = np.tile(vol_part.reshape(1, -1), (sbn, 1))
 	
 	# molecular concentration for k and j particles (# particles /cc (air)), components in

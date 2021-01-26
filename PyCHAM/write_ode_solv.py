@@ -68,7 +68,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# jac_indx - index of Jacobian to place elements per equation (rows)\n')
 	f.write('	# Cinfl_now - influx of components with constant influx \n')
 	f.write('	#		(molecules/cc/s)\n')
-	f.write('	# y_arr - index for matrix used to arrange concentrations, \n')
+	f.write('	# y_arr - index for matrix used to arrange concentrations of gas-phase reactants, \n')
 	f.write('	#	enabling calculation of reaction rate coefficients \n')
 	f.write('	# y_rind - index of y relating to reactants for reaction rate \n')
 	f.write('	# 	coefficient equation\n')

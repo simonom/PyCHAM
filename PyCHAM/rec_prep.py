@@ -21,7 +21,8 @@ def rec_prep(nrec_step,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi):
+	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
+	DStar_org, seedi, C_p2w):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -117,6 +118,8 @@ def rec_prep(nrec_step,
 	# diff_vol - diffusion volume of components according to Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
 	# seedi - index of seed component(s)
+	# C_p2w - concentration of components on the wall due to particle
+	# deposition to wall (molecules/cc)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -129,16 +132,21 @@ def rec_prep(nrec_step,
 	Cfactor_vst[0] = Cfactor
 
 	# arrays to record particle radii and number size distributions	
-	if ((num_sb-wall_on) > 0):
+	if ((num_sb-wall_on) > 0): # if particle size bins present
 		x2 = np.zeros((nrec_step, (num_sb-wall_on)))
 		Nres_dry = np.zeros((nrec_step, (num_sb-wall_on)))
 		Nres_wet = np.zeros((nrec_step, (num_sb-wall_on)))
 		rbou_rec = np.zeros((nrec_step, (num_sb-wall_on+1)))
+		# concentration of components on the wall due to 
+		# particle-wall loss, stacked by component first then by
+		# size bin (molecules/cc)
+		yrec_p2w = np.zeros((nrec_step, (num_sb-wall_on)*num_comp))
 	else:
 		x2 = 0.
 		Nres_dry = 0.
 		Nres_wet = 0.
 		rbou_rec = 0.
+		yrec_p2w = 0.
 
 	# update chamber variables
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
@@ -153,7 +161,7 @@ def rec_prep(nrec_step,
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
 	
 	
-	if (num_sb-wall_on)>0: # if particles present
+	if ((num_sb-wall_on) > 0): # if particles present
 		
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
@@ -186,6 +194,9 @@ def rec_prep(nrec_step,
 			Nres_wet[0, :] = N_perbin[:, 0] # record with water
 		
 		# end of number size distribution part ----------------------------------------
+		
+		# concentration of components on the wall due to particle deposition to wall (molecules/cc)
+		yrec_p2w[0, :] = C_p2w
 
 	else: # fillers
 		kimt = kelv_fac = 0.
@@ -204,4 +215,4 @@ def rec_prep(nrec_step,
 					kimt, kw, Cw, act_coeff, corei)
 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt)
+	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, infx_cnt, yrec_p2w)

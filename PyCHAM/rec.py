@@ -3,12 +3,15 @@
 
 import numpy as np
 import scipy.constants as si
+import dydt_rec
+import importlib
 
 def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
-	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi):
+	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
+	yrec_p2w, C_p2w):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -49,25 +52,34 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	# wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
 	# seedi - index of seed component
+	# yrec_p2w - record of concentration of components on 
+	#	the wall due to particle-wall deposition (molecules/cc)
+	# C_p2w - concentration of components on the wall due to 
+	#	particle-wall deposition, stacked by component first then by
+	#	size bin (molecules/cc)
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)
 	yrec[save_cnt, :] = y # track concentrations (molecules/cc/s)
-	# track conversion factor (ppb/molecules/cc)
+	# track conversion factor for gas phase (ppb/molecules/cc)
 	Cfactor_vst[save_cnt, 0] = Cfactor
 	
 	# single particle radius (um) at size bin centre 
 	# including contribution of water
-	if (num_sb-wall_on > 0):
+	if ((num_sb-wall_on) > 0): # if particle size bins present
 		x2[save_cnt, :] = x
 		# single particle radius boundaries (um) including contribution of water
-		rbou_rec[save_cnt, :] = rbou 
+		rbou_rec[save_cnt, :] = rbou
+		
+		# record component concentrations on the wall due to particle loss to wall
+		# (molecules/cc (air))
+		yrec_p2w[save_cnt, :] = C_p2w
 	
 	# estimate particle number size distributions ----------------------------------
 	Vnew = np.zeros((num_sb-wall_on))
-	ish = pconc[:, 0]>1.0e-10
+	ish = (pconc[:, 0] > 1.e-10)
 	
-	if ish.sum()>0:
+	if (ish.sum() > 0):
 		# rearrange particle concentrations into size bins in rows, components in columns
 		Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
 		# new volume of single particle per size bin (um3) excluding volume of water	
@@ -83,12 +95,12 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	# end of number size distribution part ----------------------------------------
 
 
-	if len(dydt_vst)>0:
+	if (len(dydt_vst) > 0):
+		importlib.reload(dydt_rec)
 		# record any change tendencies of specified components
-		import dydt_rec
 		dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt, 
 					dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 					kimt, kw, Cw, act_coeff, seedi)
 	save_cnt += 1 # track number of recordings 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec)
+	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w)

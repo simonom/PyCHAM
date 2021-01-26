@@ -1,14 +1,15 @@
 '''module for calculating and recording change tendency of components'''
 # changes due to gas-phase photochemistry and partitioning are included
 
-# File Created at 2020-12-15 18:13:17.839200
+# File Created at 2021-01-26 09:48:21.359319
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_speci, pconc, core_diss, Psat, kelv_fac, kimt, kwgt, Cw, act_coeff, seedi):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, seedi):
 	
 	# loop through components to record the tendency of change 
 	for compi in dydt_vst.get('comp_index'): 
+		
 		# open relevant dictionary value 
 		dydt_rec = dydt_vst.get(compi) 
 		# keep count on relevant reactions 
@@ -27,10 +28,11 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] += pstoi[i, stoi_indx]*((gprate))
 			reac_count += 1 
+			
 		# now estimate and record tendency to change due to particle- and wall-partitioning  
 		# particle-partitioning 
 		for ibin in range(num_sb-1): # size bin loop
-			Csit = y[num_speci*(ibin+1):num_speci*(ibin+2)]
+			Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
 			conc_sum = np.zeros((1)) 
 			if any(pconc > 0.): # if seed particles present 
 				conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)
@@ -46,11 +48,11 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			# gas-phase change (molecules/cc/s) 
 			dydt_rec[step+1, reac_count] -= dydt_all 
 		# wall-partitioning 
-		if (kwgt)>1.0e-10: 
+		if (kw)>1.0e-10: 
 			# concentration at wall (molecules/cc (air)) 
-			Csit = y[num_speci*num_sb:num_speci*(num_sb+1)] 
+			Csit = y[num_comp*num_sb:num_comp*(num_sb+1)] 
 			Csit = (Psat[0, :]*(Csit/Cw)*act_coeff[0, compi])
-			dydt_all = (kwgt)*(y[compi]-Csit[compi]) 
+			dydt_all = (kw)*(y[compi]-Csit[compi]) 
 			# gas-phase change (molecules/cc/s) 
 			dydt_rec[step+1, reac_count+1] -= dydt_all 
 		

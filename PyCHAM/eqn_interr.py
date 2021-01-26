@@ -8,16 +8,16 @@ import formatting
 import pybel
 import sys
 
-def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name, 
-		spec_smil, num_sb, wall_on):
-				
+def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name, 
+		comp_smil, num_sb, wall_on):
+	
 	# inputs: ----------------------------------------------------------------------------
 	# num_eqn - number of equations
-	# eqn_list - gas-phase equations in strings
-	# aqeqn_list - aqueous-phase equations in strings
+	# eqn_list - gas-phase equations in list of strings
+	# aqeqn_list - aqueous-phase equations in list of strings
 	# chem_scheme_markers - markers for separating sections of the chemical scheme
-	# spec_name - name string of components in xml file (not SMILES)
-	# spec_smil - SMILES from xml file
+	# comp_name - name string of components in xml file (not SMILES)
+	# comp_smil - SMILES from xml file
 	# num_sb - number of size bins
 	# wall_on - marker for whether to include wall partitioning
 	# ------------------------------------------------------------------------------------
@@ -25,7 +25,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 	# preparatory part ----------------------------------------------------
 	# matrix to record indices of reactants (cols) in each equation (rows)
 	rindx = np.zeros((num_eqn[0], 1)).astype(int)
-	# matrix to arrange concentrations when reaction rate coefficient calculated
+	# matrix of indices to arrange reactant concentrations when 
+	# reaction rate coefficient calculated
 	y_arr = (np.ones((num_eqn[0], 1)).astype(int))*-9999
 	# array to arrange reaction rates so they align with reactant stoichiometries
 	rr_arr = np.empty((0))
@@ -114,13 +115,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 		# record maximum number of products across all equations
 		max_no_prod = np.maximum(len(products), max_no_prod)
 
-		# append columns if needed
-		while max_no_reac > np.minimum(rindx.shape[1], rstoi.shape[1]): 
+		# append columns if needed because maximum number of reactants increases
+		while (max_no_reac > np.minimum(rindx.shape[1], rstoi.shape[1])): 
 			rindx = np.append(rindx, (np.zeros((num_eqn[0], 1))).astype(int), axis=1)
 			rstoi = np.append(rstoi, (np.ones((num_eqn[0], 1))), axis=1)
 			y_arr = np.append(y_arr, (np.ones((num_eqn[0], 1))*-9999).astype(int), axis=1)
-			y_arr_fixer = ((np.arange(0, num_eqn[0], dtype = 'int')).reshape(-1, 1)).repeat(max_no_reac, axis=1)
+			y_arr_fixer = ((np.arange(0, num_eqn[0], dtype = 'int')).reshape(-1, 1))
+			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
 			y_arr[y_arr!=-9999] = y_arr[y_arr!=-9999]+y_arr_fixer[y_arr!=-9999] 
+
 		while max_no_prod > np.minimum(pindx.shape[1], pstoi.shape[1]): 
 			pindx = np.append(pindx, (np.zeros((num_eqn[0], 1))).astype(int), axis=1)
 			pstoi = np.append(pstoi, (np.zeros((num_eqn[0], 1))), axis=1)
@@ -184,10 +187,10 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
-				if (name_only in spec_name):
+				if (name_only in comp_name):
 					# index where xml file name matches reaction component name
-					name_indx = spec_name.index(name_only)
-					name_SMILE = spec_smil[name_indx] # SMILES of component
+					name_indx = comp_name.index(name_only)
+					name_SMILE = comp_smil[name_indx] # SMILES of component
 				else:
 					print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
 					sys.exit()
@@ -202,7 +205,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				comp_num += 1 # number of unique species
 				
 
-			else: # if it's a species already encountered it will be in comp_list
+			else: # if it is a component already encountered it will be in comp_list
 				# existing index
 				name_indx = comp_namelist.index(name_only)
 			
@@ -251,9 +254,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				if name_only in spec_name:
-					name_indx = spec_name.index(name_only)
-					name_SMILE = spec_smil[name_indx]
+				if name_only in comp_name:
+					name_indx = comp_name.index(name_only)
+					name_SMILE = comp_smil[name_indx]
 				else:
 					print('Error: inside eqn_interr, chemical scheme name '+str(name_only)+' not found in xml file')
 					sys.exit()
@@ -299,20 +302,20 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 		pstoi_flat = np.append(pstoi_flat, pstoi[eqn_step, 0:int(product_step)])
 		
 		# now that total number of components (reactants and products) 
-		# in an equation is known, repeat the reactant indices over all 
+		# in an equation is known, replicate the reactant indices over all 
 		# components
 		tot_comp = nreac[eqn_step]+nprod[eqn_step]
 		for i in range(nreac[eqn_step]):
 			jac_den_indx[eqn_step, i*tot_comp:(i+1)*tot_comp] = rindx[eqn_step, i]
-			# also repeat the stoichiometries for every reactant
+			# also replicate the stoichiometries for every reactant
 			if (i > 0):
 				jac_stoi[eqn_step, i*tot_comp:(i+1)*tot_comp] = jac_stoi[eqn_step, 0:tot_comp] 
  		# number of Jacobian elements affected by this equation
 		njac[eqn_step, 0] = tot_comp*nreac[eqn_step]
 	
-	# flatten index for arranging concentrations ready for reaction rate coefficient calculation
-	y_arr_g = y_arr.flatten(order='C')
-	y_arr_g = y_arr[y_arr != -9999] # remove fillers
+	# remove fillers and flatten index for arranging concentrations 
+	# ready for reaction rate coefficient calculation
+	y_arr_g = y_arr[y_arr != -9999]
 	y_rind_g = y_rind.astype(int) # ensure integer type
 	uni_y_rind_g = (np.unique(y_rind)).astype(int) # unique index of reactants
 	y_pind_g = y_pind.astype(int) # ensure integer type
@@ -343,11 +346,12 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 	jac_indx_g = jac_indx
 	jac_indx_g = jac_indx_g.astype(int)
 
-	# repeat for aqueous-phase reactions ----------------------------------
+	# same for aqueous-phase reactions ----------------------------------
 	# preparatory part ----------------------------------------------------
 	# matrix to record indices of reactants (cols) in each equation (rows)
 	rindx = np.zeros((num_eqn[1], 1)).astype(int)
-	# matrix to arrange concentrations when reaction rate coefficient calculated
+	# matrix of indices to arrange reactant concentrations when 
+	# reaction rate coefficient calculated
 	y_arr = (np.ones((num_eqn[1], 1)).astype(int))*-9999
 	# array to arrange reaction rates so they align with reactant stoichiometries
 	rr_arr = np.empty((0))
@@ -434,7 +438,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 			rindx = np.append(rindx, (np.zeros((num_eqn[1], 1))).astype(int), axis=1)
 			rstoi = np.append(rstoi, (np.ones((num_eqn[1], 1))), axis=1)
 			y_arr = np.append(y_arr, (np.ones((num_eqn[1], 1))*-9999).astype(int), axis=1)
-			y_arr_fixer = ((np.arange(0, num_eqn[1], dtype = 'int')).reshape(-1, 1)).repeat(max_no_reac, axis=1)
+			y_arr_fixer = ((np.arange(0, num_eqn[1], dtype = 'int')).reshape(-1, 1))
+			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
 			y_arr[y_arr!=-9999] = y_arr[y_arr!=-9999]+y_arr_fixer[y_arr!=-9999] 
 		while max_no_prod > np.minimum(pindx.shape[1], pstoi.shape[1]): 
 			pindx = np.append(pindx, (np.zeros((num_eqn[1], 1))).astype(int), axis=1)
@@ -499,10 +504,10 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
-				if name_only in spec_name:
+				if name_only in comp_name:
 					# index where xml file name matches reaction component name
-					name_indx = spec_name.index(name_only)
-					name_SMILE = spec_smil[name_indx] # SMILES of component
+					name_indx = comp_name.index(name_only)
+					name_SMILE = comp_smil[name_indx] # SMILES of component
 				else:
 					print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
 					sys.exit()
@@ -566,9 +571,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				if name_only in spec_name:
-					name_indx = spec_name.index(name_only)
-					name_SMILE = spec_smil[name_indx]
+				if name_only in comp_name:
+					name_indx = comp_name.index(name_only)
+					name_SMILE = comp_smil[name_indx]
 				else:
 					print('Error: inside eqn_interr, chemical scheme name '+str(name_only)+' not found in xml file')
 					sys.exit()
@@ -614,12 +619,12 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 		pstoi_flat = np.append(pstoi_flat, pstoi[eqn_step, 0:int(product_step)])
 		
 		# now that total number of components (reactants and products) 
-		# in an equation is known, repeat the reactant indices over all 
+		# in an equation is known, replicate the reactant indices over all 
 		# components
 		tot_comp = nreac[eqn_step]+nprod[eqn_step]
 		for i in range(nreac[eqn_step]):
 			jac_den_indx[eqn_step, i*tot_comp:(i+1)*tot_comp] = rindx[eqn_step, i]
-			# also repeat the stoichiometries for every reactant
+			# also replicate the stoichiometries for every reactant
 			if (i > 0):
 				jac_stoi[eqn_step, i*tot_comp:(i+1)*tot_comp] = jac_stoi[eqn_step, 0:tot_comp] 
  		# number of Jacobian elements affected by this equation
@@ -628,8 +633,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, spec_name,
 	# account for gas-phase in Jacobian denominator index
 	jac_den_indx += (comp_num+2)
 
-	# flatten index for arranging concentrations ready for reaction rate coefficient calculation
-	y_arr_aq = y_arr.flatten(order='C')
+	# remove fillers and flatten index for arranging concentrations ready for reaction rate coefficient calculation
 	y_arr_aq = y_arr[y_arr != -9999] # remove fillers
 	y_rind_aq = y_rind.astype(int) # ensure integer type
 	uni_y_rind_aq = (np.unique(y_rind)).astype(int) # unique index of reactants

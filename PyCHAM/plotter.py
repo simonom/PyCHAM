@@ -7,68 +7,49 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
-import user_input as ui
 import retr_out
 import numpy as np
 import scipy.constants as si
 
-def plotter(caller):
+def plotter(caller, dir_path, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
-	# retrieve useful information from pickle file
-	[sav_name, sch_name, indx_plot, Comp0] = ui.share(1)
-
-	if (sav_name == 'default_res_name'):
-		print('Default results name was used, therefore results not saved and nothing to plot')
-		return()
-
-	dir_path = os.getcwd() # current working directory
-	# obtain just part of the path up to PyCHAM home directory
-	for i in range(len(dir_path)):
-		if dir_path[i:i+7] == 'PyCHAM':
-			dir_path = dir_path[0:i+7]
-			break
-	# isolate the scheme name from path to scheme
-	for i in range(len(sch_name)-1, 0, -1):
-		if sch_name[i] == '/':
-			sch_name = sch_name[i+1::]
-			break
-	# remove any file formats
-	for i in range(len(sch_name)-1, 0, -1):
-		if sch_name[i] == '.':
-			sch_name = sch_name[0:i]
-			break
-	
-
-	dir_path = str(dir_path+'/PyCHAM/output/'+sch_name+'/'+sav_name)
-
 	# chamber condition ---------------------------------------------------------
-
 	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, comp_names, 
-		_, _, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(dir_path)
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
+		comp0, _, PsatPa, OC, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = num_sb-wall_on
 
-	if caller == 0:
+	if (caller == 0):
 		plt.ion() # show results to screen and turn on interactive mode
 
 	# prepare sub-plots depending on whether particles present
 	if (num_asb) == 0: # no particle size bins
 		if not (indx_plot): # check whether there are any gaseous components to plot
-			print('Please note no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
+			mess = str('Please note, no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
+			self.l203a.setText(mess)
 			return()
+		# if there are gaseous component to plot, then prepare figure
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+		mess = str('Please note, no particle size bins were present, therefore the particle-phase standard plot will not be shown')
+		self.l203a.setText(mess)
 
 	if (num_asb > 0): 
 		if not (indx_plot):
-			print('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot will not be shown')
+			mess = str('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot will not be shown')
+			self.l203a.setText(mess)
+			# if there are no gaseous components then prepare figure
 			fig, (ax1) = plt.subplots(1, 1, figsize=(14, 7))
 		else:
+			# if there are both gaseous components and particle size bins then prepare figure
 			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
 		par1 = ax1.twinx() # first parasite axis
@@ -89,7 +70,7 @@ def plotter(caller):
 		for i in range(len(indx_plot)):
 		
 			ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
-						label=str(str(Comp0[i])))
+						label=str(str(comp0[i]).strip()))
 
 		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -108,20 +89,14 @@ def plotter(caller):
 	# particle properties sub-plot --------------------------------------------------
 	if (num_asb > 0): # if particles present		
 
-		if timehr.ndim == 0: # occurs if only one time step saved
+		if (timehr.ndim == 0): # occurs if only one time step saved
 			Ndry = np.array(Ndry.reshape(1, num_asb))
-		if num_asb == 1: # just one particle size bin (wall included in num_sb)
-			Ndry = np.array(Ndry.reshape(len(timehr), num_asb))
-
-		if timehr.ndim == 0: # occurs if only one time step saved
 			x = np.array(x.reshape(1, num_asb))
-		if num_asb == 1: # just one particle size bin (wall included in num_sb)
+			rbou_rec = np.array(rbou_rec.reshape(1, num_sb))
+		if (num_asb == 1): # just one particle size bin (wall included in num_sb)
+			Ndry = np.array(Ndry.reshape(len(timehr), num_asb))
 			x = np.array(x.reshape(len(timehr), num_asb))
 
-		if timehr.ndim==0: # occurs if only one time step saved
-			rbou_rec = np.array(rbou_rec.reshape(1, num_sb))
-
-		
 		# plotting number size distribution --------------------------------------
 	
 		# don't use the first boundary as it's zero, so will error when log10 taken
@@ -139,19 +114,19 @@ def plotter(caller):
 			
 	
 		# number size distribution contours (/cc (air))
-		dNdlog10D = np.zeros((Ndry.shape[0], Ndry.shape[1]))
-		dNdlog10D[:, :] = Ndry[:, :]/dlog10D[:, :]
+		dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
+		dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]
 		# transpose ready for contour plot
 		dNdlog10D = np.transpose(dNdlog10D)
 		
-		# mask the nan values so they're not plotted
+		# mask any nan values so they are not plotted
 		z = np.ma.masked_where(np.isnan(dNdlog10D), dNdlog10D)
 	
 		# customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
-		colors = [(0.60, 0.0, 0.70), (0, 0, 1), (0, 1.0, 1.0), (0, 1.0, 0.0), (1.0, 1.0, 0.0), (1.0, 0.0, 0.0)]  # R -> G -> B
-		n_bin = 100  # Discretizes the colormap interpolation into bins
+		colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), (1., 1., 0.), (1., 0., 0.)]  # R -> G -> B
+		n_bin = 100  # discretizes the colormap interpolation into bins
 		cmap_name = 'my_list'
-		# Create the colormap
+		# create the colormap
 		cm = LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
 	
 		# set contour levels
@@ -159,7 +134,7 @@ def plotter(caller):
 				np.max(z[~np.isnan(z)])))
 	
 		# associate colours and contour levels
-		norm1 = BoundaryNorm(levels, ncolors = cm.N, clip=True)
+		norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
 		
 		# contour plot with times (hours) along x axis and 
 		# particle diameters (nm) along y axis
@@ -170,6 +145,8 @@ def plotter(caller):
 		# logarithmically
 		if space_mode == 'log':
 			ax1.set_yscale("log")
+		# set tick format for vertical axis
+		ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
 		ax1.set_ylabel('Diameter (nm)', size = 14)
 		ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -184,7 +161,7 @@ def plotter(caller):
 		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
 		cb.ax.tick_params(labelsize=14)   
 		# colour bar label
-		cb.set_label('dN/dlog10(D) $\mathrm{(cm^{-3})}$', size=14, rotation=270, labelpad=20)
+		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
 		# ----------------------------------------------------------------------------------------
 		# total particle number concentration #/cm3
@@ -195,66 +172,45 @@ def plotter(caller):
 		Nvs_time = np.zeros((Ndry.shape[0]))
 	
 		for i in range(num_asb): # size bin loop
-			# get the times when bin exceeds 3nm - might be wanted to deal with particle counter detection limits
-# 			ish = x[:, i]>3.0e-3
-# 			Nvs_time[ish] += Ndry[ish, i] # sum number
 			Nvs_time[:] += Ndry[:, i] # sum number
 	
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
-		par1.set_ylabel('N (# $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
+		par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
 		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
 		par1.yaxis.set_tick_params(labelsize=14)
 
-		# SOA mass concentration ---------------------------------------------------------------
-		# array for SOA sum with time
-		SOAvst = np.zeros((1, len(timehr)))
+		# mass concentration of particles ---------------------------------------------------------------
+		# array for mass concentration with time
+		MCvst = np.zeros((1, len(timehr)))
 		
-		final_i = 0
-		# check whether water and/or core is present
-		if comp_names[-2] == 'H2O': # if both present
-			final_i = 2
-		if comp_names[-1] == 'H2O': # if just water
-			final_i = 1
-		# note that the seed component is only registered in init_conc_func if initial
-		# particle concentration (pconc) exceeds zero, therefore particle-phase material 
-		# must be present at start of experiment (row 0 in y)
-		if final_i == 0 and y[0, num_speci:(num_speci*(num_asb+1))].sum()>1.0e-10: 
-			final_i = 1
+		# first obtain just the particle-phase concentrations (molecules/cc)
+		yrp = yrec[:, num_comp:num_comp*(num_asb+1)]
+		# loop through size bins to convert to m
+		for sbi in range(num_asb):
+			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp] /si.N_A)*y_mw)*1.e12
 		
-		for i in range(num_asb): # particle size bin loop
-	
-			# sum of organics in condensed-phase at end of simulation (ug/m3 (air))
-			
-			# to replicate the SMPS results, find the volume of particles then
-			# assume a density of 1.0 g/cm3
-			SOAvst[0, :] += np.sum((yrec[:, ((i+1)*num_comp):((i+2)*num_comp-final_i)]/si.N_A*(y_MV[0:-final_i])*1.0e12), axis = 1)
-
-		# log10 of maximum in SOA
-		if (max(SOAvst[0, :]) > 0):
-			SOAmax = int(np.log10(max(SOAvst[0, :])))
+		MCvst[0, :] = yrp.sum(axis=1)
+		
+		# log10 of maximum in mass concentration
+		if (max(MCvst[0, :]) > 0):
+			MCmax = int(np.log10(max(MCvst[0, :])))
 		else:
-			SOAmax = 0.
-		# transform SOA so no standard notation required
-		SOAvst[0, :] = SOAvst[0, :]
-		
+			MCmax = 0.
 	
-		p5, = par2.plot(timehr, SOAvst[0, :], 'xk', label = '[secondary]')
-		par2.set_ylabel(str('[secondary] ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
-		# set label, tick font and [SOA] vertical axis to red to match scatter plot presentation
+		p5, = par2.plot(timehr, MCvst[0, :], 'xk', label = 'Total Particle Mass Concentration')
+		par2.set_ylabel(str('Mass Concentration ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
+		# set colour of label, tick font and corresponding vertical axis to match scatter plot presentation
 		par2.yaxis.label.set_color('black')
 		par2.tick_params(axis='y', colors='black')
 		par2.spines['right'].set_color('black')
 		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
 		par2.yaxis.set_tick_params(labelsize=16)
-		par2.text((timehr)[0], max(SOAvst[0, :])/2.0, 'assumed particle density = 1.0 $\mathrm{g\, cm^{-3}}$')
 		plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)	
 
 	# end of particle properties sub-plot -----------------------------------
 
-	# save and display
-	plt.savefig(str(dir_path+'/'+sav_name+'_output_plot.png'))
-	if caller == 2:
+	if (caller == 2): # display when in test mode
 		plt.show()	
 
 	return()

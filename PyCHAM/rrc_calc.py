@@ -5,6 +5,8 @@
 
 import numpy as np
 import scipy.constants as si
+import rate_coeffs
+import importlib
 
 
 def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path, 
@@ -32,7 +34,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	if (RO2_indices.size == 0):
 		RO2 = 0
 	else:
-		RO2 = np.sum(y[RO2_indices[:,1]])
+		RO2 = np.sum(y[RO2_indices[:, 1]])
 		
 	# calculate concentrations of third body (M), nitrogen and oxygen
 	# calculate gas-phase concentrations of M, N2 and O2 (molecules/cc (air))
@@ -43,7 +45,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
 	
-	import rate_coeffs
+	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
 	rrc = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
 						act_flux_path, DayOfYear, M_val, N2_val, 
@@ -51,4 +53,3 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 
 		
 	return(rrc)
-
