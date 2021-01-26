@@ -120,6 +120,9 @@ venv.bak/
 /PyCHAM/output/Example_Run/Example_Run_output2
 
 
+# any other input folders
+/PyCHAM/input/APINENE_HOM
+
 # any output for testing parts of PyCHAM other than the example simulation
 
 /PyCHAM/output/AtChem2_apinene_scheme
