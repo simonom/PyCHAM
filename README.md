@@ -96,15 +96,23 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 2. Once [Installation](#Installation) is complete and the appropriate environment has been activated (see [Installation](#Installation)), use the command line to change into the top level directory PyCHAM (the directory above the PyCHAM __main__ file).
 
-3. Run the model from the command line: python PyCHAM
+3. Begin the programme from the command line: python PyCHAM
 
-4. The first three buttons of the GUI allow identification of the input files.  These can be used in any order and if no file is selected for any or all of the buttons, default files will be used (defaults: Chemical Scheme .txt File - example_scheme.txt, Chemical Scheme .xml File - example_xml.xml, Model Variables .txt File - example_model_var.txt) (see below for details on the chemical scheme, xml and model variables input files).
+4. The PyCHAM graphical user interface (GUI) should now display on your screen.  Using the 'Simulate' tab, one can select the folder containing all input files using the 'Select Folder Containing Input Files' button.  This will search the selected folder for the input files (chemical reaction scheme, xml and model variables).  For the chemical scheme file, files with names including 'chem' will be identified.  For the xml files, files with names including 'xml' will be identified.  For the model variables file, files with names including 'var' will be identified.  Any identified files will then be displayed in the GUI (see below for details on the contents of the chemical scheme, xml and model variables input files).
 
-5. The 'Run Model' button starts the simulation - results will be saved in the output folder.  The time through the simulation will be displayed in the console along with updates of programme progress.
+5. To select any of the input files individually, one can use the corresponding GUI button.
 
-6. The 'Plot Results' button produces (and saves in the output folder) two plots: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).  This button will not operate correctly until the simulation is complete.  The simulation is complete when the console says so.
+6. Problems with the input files will be displayed in the GUI - this functionality is under development, meaning that problems can creep through.
 
-7. The 'Quit' button will stop the programme.  If the programme is running and Quit does not work, the ctrl+z key combination in the console window can cease operations safely, though without results being saved and therefore making the 'Plot Results' button redundant.
+7. Once the first simulation is ready (through selection of the desired combination of correct input files described above), the user chooses between a single simulation or adding to batch, with the latter allowing multiple simulations to be queued.
+
+8a.  If the user chooses a single simulation to run, a progress bar will show, which represents the time through the experiment as a fraction of the total experiment time.
+
+8b. If the user chooses to add to batch, then further simulations can be chosen by repeating steps 4-7 above.  When ready, the batch can be run with the start button.  The progress bar then represents individual experiments and the current simulation is shown in the GUI.
+
+9. The 'Plot' tab allows multiple plotting options.  The Standard Results Plot produces two sub-plots in one figure: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
+
+10. The 'Quit' button will stop the programme.  If it does not work, the ctrl+z key combination in the console window can cease operations safely.  In both cases Python will release all memory associated with the simulation.
 
 ## Testing
 
