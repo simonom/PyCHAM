@@ -131,6 +131,7 @@ venv.bak/
 /PyCHAM/output/limonene_simp_scheme
 /PyCHAM/output/limonene_MCM_PRAM
 /PyCHAM/output/moving_centre_scheme
+/PyCHAM/output/apinene_mcm_chem_wHOM
 
 # this file
 .gitignore
