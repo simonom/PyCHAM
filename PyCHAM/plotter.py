@@ -32,7 +32,7 @@ def plotter(caller, dir_path, self):
 		plt.ion() # show results to screen and turn on interactive mode
 
 	# prepare sub-plots depending on whether particles present
-	if (num_asb) == 0: # no particle size bins
+	if (num_asb == 0): # no particle size bins
 		if not (indx_plot): # check whether there are any gaseous components to plot
 			mess = str('Please note, no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
 			self.l203a.setText(mess)
@@ -81,8 +81,12 @@ def plotter(caller, dir_path, self):
 		# find maximum and minimum of plotted concentrations for sub-plot label		
 		maxy = max(yrec[:, indx_plot].flatten())
 		miny = min(yrec[:, indx_plot].flatten())	
-			
-		ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/10., y = maxy+((maxy-miny)/10.), s='a)', size=14)
+		
+		if (num_asb > 0): # if more than one plot
+			# get the location of ticks
+			locs = ax0.get_yticks()
+			maxloc = max(locs)
+			ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/10., y = (maxloc+maxloc/10.), s='a)', size=14)
 
 		# end of gas-phase concentration sub-plot ---------------------------------------
 	
@@ -112,7 +116,6 @@ def plotter(caller, dir_path, self):
 			# assume lower radius bound is ten times smaller than upper
 			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
 			
-	
 		# number size distribution contours (/cc (air))
 		dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
 		dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]

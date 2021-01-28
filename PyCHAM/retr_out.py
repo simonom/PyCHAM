@@ -11,7 +11,6 @@ def retr_out(output_by_sim):
 	
 	# name of file where experiment constants saved
 	fname = str(output_by_sim + '/model_and_component_constants')
-	
 	const_in = open(fname)
 
 	const = {} # prepare to create dictionary
@@ -123,10 +122,6 @@ def retr_out(output_by_sim):
 	# indices of components
 	indx_plot = indx_plot[0].tolist()
 	indx_plot = [int(i) for i in indx_plot]
-	
-	# withdraw the wall concentration of components due to particle deposition to wall
-	fname = str(output_by_sim+'/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
-	yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
 
 	# withdraw times (s)
 	fname = str(output_by_sim+'/time')
@@ -137,10 +132,21 @@ def retr_out(output_by_sim):
 	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
+	# following will only load for certain simulation setups (mostly whether particles included)
+	
+	try:
+		# withdraw the wall concentration of components due to particle deposition to wall
+		fname = str(output_by_sim+'/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
+		yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
+	except:
+		yrec_p2w = []
+	
 	try:
 		# withdraw number-size distributions (# particles/cc (air))
 		fname = str(output_by_sim+'/particle_number_concentration_dry')
 		N = np.loadtxt(fname, delimiter=',', skiprows=1)
+		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
+			N = N.reshape(-1, 1)
 	except:
 		N = []
 	
@@ -148,6 +154,8 @@ def retr_out(output_by_sim):
 		# withdraw number-size distributions (# particles/cc (air))
 		fname = str(output_by_sim+'/particle_number_concentration_wet')
 		Nwet = np.loadtxt(fname, delimiter=',', skiprows=1)
+		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
+			Nwet = Nwet.reshape(-1, 1)
 	except:
 		Nwet = []
 	

@@ -273,6 +273,9 @@ def ode_updater(update_stp,
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w)
 
+	importlib.reload(ode_solv) # import most recent version
+	importlib.reload(ode_solv_wat) # import most recent version
+
 	while (tot_time-sumt) > (tot_time/1.e10):
 		
 		y0[:] = y[:] # remember initial concentrations (molecules/cc (air))
@@ -321,12 +324,10 @@ def ode_updater(update_stp,
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
 		
-		importlib.reload(ode_solv) # import most updated version
-		importlib.reload(ode_solv_wat) # import most updated version
-		
 		# update Jacobian inputs based on particle-phase fractions of components
 		[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 		
+
 		if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 		
 			# call on ode solver for water

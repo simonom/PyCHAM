@@ -115,9 +115,7 @@ def ui_check(sav_nam, sch_name, wall_on, caller, siz_stru, num_sb, pmode, pconc,
 			except:
 				return False
 		# test internet connection
-		if connect():
-			print('Internet connection confirmed and either user has requested cloning of UManSysProp via the model variables input file or no existing UManSysProp folder was found') 
-		else:
+		if connect() == False:
 			print('Error: either user has requested cloning of UManSysProp via the model variables input file or no existing UManSysProp folder has been found, but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
 			sys.exit()
 

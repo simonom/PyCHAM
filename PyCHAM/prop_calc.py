@@ -43,13 +43,11 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# ------------------------------------------------------------
 	
 	
-	
-	if testf==1:
-		return(0,0,0) # return dummies
+	if (testf == 1):
+		return(0, 0, 0) # return dummies
 		
 	cwd = os.getcwd() # address of current working directory
-	if umansysprop_update == 1:
-		print('Cloning latest version of UManSysProp via prop_calc module')
+	if (umansysprop_update == 1):
 		# download latest version of umansysprop
 		
 		# check if there is an existing umansysprop folder

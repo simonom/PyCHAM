@@ -873,15 +873,15 @@ class PyCHAM(QWidget):
 		self.PRIMlayout = QGridLayout() 
 		PRIMTab.setLayout(self.PRIMlayout)
 	
-		b203 = QPushButton('Create Standard Results Plot', self)
-		b203.setToolTip('Create standard results plot (gas-phase concentration temporal profiles of components with specified initial concentrations and particle properties)')
-		b203.clicked.connect(self.on_click203)
-		self.PRIMlayout.addWidget(b203, 0, 0)
+		self.b203 = QPushButton('Create Standard Results Plot', self)
+		self.b203.setToolTip('Create standard results plot (gas-phase concentration temporal profiles of components with specified initial concentrations and particle properties)')
+		self.b203.clicked.connect(self.on_click203)
+		self.PRIMlayout.addWidget(self.b203, 0, 0)
 
 
 		# input bar for names of components to plot temporal profiles of
 		self.e205 = QLineEdit(self)
-		self.e205.setText('Provide the chemical scheme names of components for plotting temporal profile')
+		self.e205.setText('Provide the chemical scheme names of components for plotting the temporal supplied profiles below')
 		# show left most point first
 		self.e205.setStyleSheet('qproperty-cursorPosition : 0')
 		self.PRIMlayout.addWidget(self.e205, 1, 0)
@@ -889,40 +889,35 @@ class PyCHAM(QWidget):
 		# gas-phase concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of gas-phase concentrations
-		b206 = QPushButton('Plot gas-phase concentrations', self)
-		b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
-		b206.clicked.connect(self.on_click206)
-		#b206.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PRIMlayout.addWidget(b206, 2, 0)
+		self.b206 = QPushButton('Plot gas-phase concentrations', self)
+		self.b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
+		self.b206.clicked.connect(self.on_click206)
+		self.PRIMlayout.addWidget(self.b206, 2, 0)
 		
 		 # particle-phase concentrations temporal profiles -------------
 
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		b209 = QPushButton('Plot total particle-phase concentrations', self)
-		b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
-		b209.clicked.connect(self.on_click209)
-		#b209.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PRIMlayout.addWidget(b209, 3, 0)
+		self.b209 = QPushButton('Plot total particle-phase concentrations', self)
+		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
+		self.b209.clicked.connect(self.on_click209)
+		self.PRIMlayout.addWidget(self.b209, 3, 0)
 		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
-		
 		# button to plot temporal profile of total particle-phase concentrations
-		b212 = QPushButton('Plot wall concentrations (from gas-wall partitioning)', self)
-		b212.setToolTip('Plot the temporal profile of wall concentration (from gas-wall partitioning) for the specified components')
-		b212.clicked.connect(self.on_click212)
-		#b212.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PRIMlayout.addWidget(b212, 4, 0)
+		self.b212 = QPushButton('Plot wall concentrations (from gas-wall partitioning)', self)
+		self.b212.setToolTip('Plot the temporal profile of wall concentration (from gas-wall partitioning) for the specified components')
+		self.b212.clicked.connect(self.on_click212)
+		self.PRIMlayout.addWidget(self.b212, 4, 0)
 		
 		# wall (from particle deposition to wall) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		b215 = QPushButton('Plot wall concentrations (from particle deposition to wall)', self)
-		b215.setToolTip('Plot the temporal profile of the wall concentration (from particle deposition to wall) for the specified components')
-		b215.clicked.connect(self.on_click215)
-		#b215.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PRIMlayout.addWidget(b215, 5, 0)
+		self.b215 = QPushButton('Plot wall concentrations (from particle deposition to wall)', self)
+		self.b215.setToolTip('Plot the temporal profile of the wall concentration (from particle deposition to wall) for the specified components')
+		self.b215.clicked.connect(self.on_click215)
+		self.PRIMlayout.addWidget(self.b215, 5, 0)
 		
 		return(PRIMTab)
 	
@@ -939,11 +934,10 @@ class PyCHAM(QWidget):
 		self.SEClayout.addWidget(self.e217, 0, 0)
 		
 		# button to plot temporal profile of change tendencies
-		b218 = QPushButton('Plot change tendencies', self)
-		b218.setToolTip('Plot the rate of change due to relevant processes')
-		b218.clicked.connect(self.on_click218)
-		#b218.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(b218, 1, 0)
+		self.b218 = QPushButton('Plot change tendencies', self)
+		self.b218.setToolTip('Plot the rate of change due to relevant processes')
+		self.b218.clicked.connect(self.on_click218)
+		self.SEClayout.addWidget(self.b218, 1, 0)
 		
 		# volatility basis set ------------------
 		
@@ -954,18 +948,18 @@ class PyCHAM(QWidget):
 		self.SEClayout.addWidget(l219, 2, 0, 1, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
-		b220 = QPushButton('Plot Volatility Basis Set With Water', self)
-		b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
-		b220.clicked.connect(self.on_click220)
-		#b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(b220, 3, 0)
+		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
+		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
+		self.b220.clicked.connect(self.on_click220)
+		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.SEClayout.addWidget(self.b220, 3, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
-		b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
-		b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
-		b221.clicked.connect(self.on_click221)
-		#b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(b221, 4, 0)
+		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
+		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
+		self.b221.clicked.connect(self.on_click221)
+		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.SEClayout.addWidget(self.b221, 4, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -975,12 +969,12 @@ class PyCHAM(QWidget):
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
 		self.SEClayout.addWidget(self.e222, 5, 0)
 		
-		# button to plot temporal profile of volatility basis set mass fractions without water
-		b223 = QPushButton('Plot 2D Volatility Basis Set', self)
-		b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
-		b223.clicked.connect(self.on_click223)
-		#b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(b223, 6, 0)
+		# button to plot 2D VBS
+		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
+		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
+		self.b223.clicked.connect(self.on_click223)
+		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.SEClayout.addWidget(self.b223, 6, 0)
 		
 		# column and row relative lengths---------------------------------
 		
@@ -1455,6 +1449,50 @@ class PyCHAM(QWidget):
 		self.l201.clear() # clear old label
 		self.l201.setText(fol_nme)
 		
+		# check whether required files present here
+		try:
+			# name of file where experiment constants saved
+			fname = str(fol_nme + '/model_and_component_constants')
+			const_in = open(fname)
+			const_in.close()
+			
+			# enable plotting buttons
+			# disable plotting buttons
+			self.b203.setEnabled(True)
+			self.b206.setEnabled(True)
+			self.b209.setEnabled(True)
+			self.b212.setEnabled(True)
+			self.b215.setEnabled(True)
+			self.b218.setEnabled(True)
+			self.b220.setEnabled(True)
+			self.b221.setEnabled(True)
+			self.b223.setEnabled(True)
+			
+			# clear error message
+			self.l203a.setText('')
+			self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+			self.bd_pl = 3
+			
+		except:
+			self.l203a.setText('The required output files cannot be found at this path, please ensure the folder immediately above the output is selected')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			
+			# disable plotting buttons
+			self.b203.setEnabled(False)
+			self.b206.setEnabled(False)
+			self.b209.setEnabled(False)
+			self.b212.setEnabled(False)
+			self.b215.setEnabled(False)
+			self.b218.setEnabled(False)
+			self.b220.setEnabled(False)
+			self.b221.setEnabled(False)
+			self.b223.setEnabled(False)
 		return()
 		
 	@pyqtSlot() # button to plot standard results graphically
