@@ -66,11 +66,16 @@ def plotter(caller, dir_path, self):
 		par2.spines["right"].set_visible(True)	
 
 	if (indx_plot):
+		
+		# start tracking maximum value for plot label
+		ymax = 0.
+		
 		# gas-phase concentration sub-plot ---------------------------------------------	
 		for i in range(len(indx_plot)):
 		
 			ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
 						label=str(str(comp0[i]).strip()))
+			ymax = max(ymax, max(yrec[:, indx_plot[i]]))
 
 		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -86,7 +91,7 @@ def plotter(caller, dir_path, self):
 			# get the location of ticks
 			locs = ax0.get_yticks()
 			maxloc = max(locs)
-			ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/10., y = (maxloc+maxloc/10.), s='a)', size=14)
+			ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/9.5, y = ymax*1.05, s='a)', size=14)
 
 		# end of gas-phase concentration sub-plot ---------------------------------------
 	
@@ -157,8 +162,6 @@ def plotter(caller, dir_path, self):
 		# label according to whether gas-phase plot also displayed		
 		if (indx_plot):
 			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
-		else:
-			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.3, s='a)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
 		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
@@ -172,10 +175,10 @@ def plotter(caller, dir_path, self):
 		# include total number concentration (# particles/cc (air)) on contour plot
 		# first identify size bins with radius exceeding 3nm
 		# empty array for holding total number of particles
-		Nvs_time = np.zeros((Ndry.shape[0]))
+		Nvs_time = np.zeros((Nwet.shape[0]))
 	
 		for i in range(num_asb): # size bin loop
-			Nvs_time[:] += Ndry[:, i] # sum number
+			Nvs_time[:] += Nwet[:, i] # sum number
 	
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
@@ -189,7 +192,7 @@ def plotter(caller, dir_path, self):
 		
 		# first obtain just the particle-phase concentrations (molecules/cc)
 		yrp = yrec[:, num_comp:num_comp*(num_asb+1)]
-		# loop through size bins to convert to m
+		# loop through size bins to convert to ug/m3
 		for sbi in range(num_asb):
 			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp] /si.N_A)*y_mw)*1.e12
 		

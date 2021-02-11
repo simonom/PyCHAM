@@ -15,7 +15,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 
 	# inputs: ----------------------------------------------------------------------------
 	
-	# filename - name of inputs file name
+	# filename - name of model variables file
 	# y_mat - species (columns) concentrations with time (rows) (molecules/cc (air))
 	# Nresult_dry  - number concentration of dry particles per size bin (#/cc (air))
 	# Nresult_wet  - number concentration of dry particles per size bin (#/cc (air))

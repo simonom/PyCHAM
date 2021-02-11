@@ -102,17 +102,19 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 5. To select any of the input files individually, one can use the corresponding GUI button.
 
-6. Problems with the input files will be displayed in the GUI - this functionality is under development, meaning that problems can creep through.
+6. The GUI will display the found inputs provided in the selected model variables file.  For inputs not stated in this file, the displayed variables are default.
 
-7. Once the first simulation is ready (through selection of the desired combination of correct input files described above), the user chooses between a single simulation or adding to batch, with the latter allowing multiple simulations to be queued.
+7. Problems with the input files will be displayed in the GUI - this functionality is under development, meaning that not all problems are currently captured.
 
-8a.  If the user chooses a single simulation to run, a progress bar will show, which represents the time through the experiment as a fraction of the total experiment time.
+8. Once the first simulation is ready (through selection of the desired combination of correct input files described above), the user chooses between a single simulation or adding to batch, with the latter allowing multiple simulations to be queued.
 
-8b. If the user chooses to add to batch, then further simulations can be chosen by repeating steps 4-7 above.  When ready, the batch can be run with the start button.  The progress bar then represents individual experiments and the current simulation is shown in the GUI.
+9a.  If the user chooses a single simulation to run, a progress bar will show, which represents the time through the experiment as a fraction of the total experiment time.
 
-9. The 'Plot' tab allows multiple plotting options.  The Standard Results Plot produces two sub-plots in one figure: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
+9b. If the user chooses to add to batch, then further simulations can be chosen by repeating steps 4-7 above.  When ready, the batch can be run with the start button.  The progress bar then represents individual experiments and the current simulation is shown in the GUI.
 
-10. The 'Quit' button will stop the programme.  If it does not work, the ctrl+z key combination in the console window can cease operations safely.  In both cases Python will release all memory associated with the simulation.
+10. The 'Plot' tab allows multiple plotting options.  The Standard Results Plot produces two sub-plots in one figure: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
+
+11. The 'Quit' button will stop the programme.  If it does not work, the ctrl+z key combination in the console window can cease operations safely.  In both cases Python will release all memory associated with the simulation.
 
 ## Testing
 

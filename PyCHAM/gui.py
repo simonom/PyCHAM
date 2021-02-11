@@ -53,8 +53,8 @@ class PyCHAM(QWidget):
 		# link to EUROCHAMP website
 		bn1 = QPushButton('', self)
 		bn1.setStyleSheet('background : transparent')
-		bn1.setToolTip('Visit the EUROCHAMP website')
-		bn1.clicked.connect(self.on_clickn1)
+		#bn1.setToolTip('Visit the EUROCHAMP website')
+		#bn1.clicked.connect(self.on_clickn1)
 		grid.addWidget(bn1, 0, EUROlogo_hindx)
 		
 		# NCAS logo
@@ -125,7 +125,7 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(l1, 1, ffscn, 1, 2)
 		
 		l2 = QLabel(self)
-		l2.setText("Chemical scheme: ")
+		l2.setText("Chemical \nscheme: ")
 		self.NSlayout.addWidget(l2, 2, ffscn, 1, 1)
 			
 		self.l3 = ScrollLabel(self)
@@ -151,7 +151,7 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(b2, 5, ffscn, 1, 2)
 		
 		l6 = QLabel(self)
-		l6.setText("Model variables: ")
+		l6.setText("Model \nvariables: ")
 		self.NSlayout.addWidget(l6, 6, ffscn, 1, 1)
 			
 		self.l7 = ScrollLabel(self)
@@ -801,6 +801,7 @@ class PyCHAM(QWidget):
 		return(NSTab)
 	
 	def PLtab(self): # Plotting tab
+	
 		PLTab = QWidget()
 		self.PLlayout = QGridLayout() 
 		PLTab.setLayout(self.PLlayout)
@@ -853,8 +854,9 @@ class PyCHAM(QWidget):
 		# include tabs
 		
 		PLtabs = QTabWidget()
-		PLtabs.addTab(self.PRIMtab(), "Primary")
-		PLtabs.addTab(self.SECtab(), "Secondary")
+		PLtabs.addTab(self.PRIMtab(), "Basic")
+		PLtabs.addTab(self.SECtab(), "Detailed")
+		PLtabs.addTab(self.INSTRtab(), "Under Development - do not use (yet)")
 		self.PLlayout.addWidget(PLtabs, 1, 0, 1, 5)
 		
 		# relative stretching (width-wise) of each column in Plot tab
@@ -921,7 +923,7 @@ class PyCHAM(QWidget):
 		
 		return(PRIMTab)
 	
-	def SECtab(self): # secondary plotting tab definition
+	def SECtab(self): # more detailed plotting tab definition
 
 		SECTab = QWidget()
 		self.SEClayout = QGridLayout() 
@@ -996,11 +998,110 @@ class PyCHAM(QWidget):
 		
 		return(SECTab)
 	
-	@pyqtSlot()
-	def on_clickn1(self): # EUROCHAMP website
-		import webbrowser
-		webbrowser.open('https://www.eurochamp.org/Eurochamp2020.aspx')
-		return()
+	def INSTRtab(self): # instrument comparison plotting tab definition
+	
+		INSTRTab = QWidget()
+		self.INSTRlayout = QGridLayout() 
+		INSTRTab.setLayout(self.INSTRlayout)
+		
+		# label to explain what happens on this instrument comparison tab
+		l240 = QLabel(self)
+		l240.setText('Use the tabs on either side to convolve model output into a form comparable with the corresponding instruments')
+		l240.setWordWrap(True)
+		self.INSTRlayout.addWidget(l240, 0, 0, 1, 1)
+		
+		INSTRtabs = QTabWidget()
+		INSTRtabs.addTab(self.CPCtab(), "CPC")
+		INSTRtabs.addTab(self.SMPStab(), "SMPS")
+		INSTRtabs.addTab(self.CIMStab(), "CIMS")
+		self.INSTRlayout.addWidget(INSTRtabs, 1, 0, 1, 1)
+		INSTRtabs.setTabPosition(2)
+		
+		# -------------------------------------------------------------------------
+	
+		return(INSTRTab)
+	
+	def CPCtab(self): # instrument comparison plotting tab definition
+	
+		CPCTab = QWidget()
+		self.CPClayout = QGridLayout() 
+		CPCTab.setLayout(self.CPClayout)
+	
+		# input for minimum particle concentration detectable
+		self.e260 = QTextEdit(self)
+		self.e260.setText('Minimum detectable particle concentration (particles cm<sup>-3</sup>)')
+		self.CPClayout.addWidget(self.e260, 0, 1)
+	
+		return(CPCTab)
+	
+	def SMPStab(self): # instrument comparison plotting tab definition
+	
+		SMPSTab = QWidget()
+		self.SMPSlayout = QGridLayout() 
+		SMPSTab.setLayout(self.SMPSlayout)
+	
+		# input for whether to use wet or dried particles
+		self.e230 = QTextEdit(self)
+		self.e230.setText('Type 0 for dried particles or 1 for not dried particles')
+		self.SMPSlayout.addWidget(self.e230, 0, 0)
+		
+		# input for minimum particle concentration detectable
+		self.e232 = QTextEdit(self)
+		self.e232.setText('Minimum detectable particle concentration (particles cm<sup>-3</sup>)')
+		self.SMPSlayout.addWidget(self.e232, 0, 1)
+		
+		# input for counting efficiency curve of counter
+		self.e233 = QTextEdit(self)
+		self.e233.setText('Particle diameter (nm) at 50 % counting efficiency (>0 nm), factor for counting efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced counting efficiency and assumes a sigmoid function)')
+		self.SMPSlayout.addWidget(self.e233, 0, 2)
+		
+		# input for minimum size particle size range of counter
+		self.e234 = QTextEdit(self)
+		self.e234.setText('Minimum detectable particle diameter (nm)')
+		self.SMPSlayout.addWidget(self.e234, 0, 3)
+		
+		# input for maximum size particle size range of counter
+		self.e235 = QTextEdit(self)
+		self.e235.setText('Maximum detectable particle diameter (nm)')
+		self.SMPSlayout.addWidget(self.e235, 0, 4)
+		
+		# input for number of size bins of counter
+		self.e236 = QTextEdit(self)
+		self.e236.setText('Number of size bins within the detectable particle diameter range (assumed to be logarithmically spaced)')
+		self.SMPSlayout.addWidget(self.e236, 0, 5)
+	
+		# button to plot temporal profile of number size distribution
+		self.b233 = QPushButton('Plot number size distribution', self)
+		self.b233.setToolTip('Plot the number size distribution as observed by a particle counter')
+		self.b233.clicked.connect(self.on_click233)
+		self.SMPSlayout.addWidget(self.b233, 1, 5)
+		
+		# button to plot counting efficiency dependence on particle size 
+		self.b234 = QPushButton('Plot counting efficiency curve', self)
+		self.b234.setToolTip('Plot the counting efficiency dependence on particle size')
+		self.b234.clicked.connect(self.on_click234)
+		self.SMPSlayout.addWidget(self.b234, 1, 2)
+		
+		return(SMPSTab)
+	
+	def CIMStab(self): # instrument comparison plotting tab definition
+	
+		CIMSTab = QWidget()
+		self.CIMSlayout = QGridLayout() 
+		CIMSTab.setLayout(self.CIMSlayout)
+	
+		# input for minimum particle concentration detectable
+		self.e280 = QTextEdit(self)
+		self.e280.setText('Resolution of mass:charge ratio')
+		self.CIMSlayout.addWidget(self.e280, 0, 0)
+	
+		return(CIMSTab)
+	
+	#@pyqtSlot() # eurochamp website under development 10/02/2021
+	#def on_clickn1(self): # EUROCHAMP website
+	#	import webbrowser
+	#	webbrowser.open('https://www.eurochamp.org/Eurochamp2020.aspx')
+	#	return()
 		
 	@pyqtSlot() 
 	def on_clickn1a(self): # NCAS website
@@ -1325,10 +1426,10 @@ class PyCHAM(QWidget):
 				self.l81.deleteLater()
 				self.atb = 0
 			
-			self.act_81() # call on function to simulate
+			self.act_81(output_by_sim) # call on function to simulate
 	
 	@pyqtSlot()		
-	def act_81(self): # action simulation
+	def act_81(self, output_by_sim): # action simulation
 		from middle import middle # prepare to communicate with main programme
 		for prog in middle():
 			self.progress.setValue(prog) # call on modules to solve problem
@@ -1336,9 +1437,12 @@ class PyCHAM(QWidget):
 		
 		# remove the progress bar after each simulation
 		self.progress.deleteLater()
+		
+		# set the path to folder to plot results to the latest simulation results
+		self.l201.setText(output_by_sim)
 	
 	@pyqtSlot()
-	def on_click81sing(self): # once single simulation button pressed
+	def on_click81sing(self): # when single simulation button pressed
 	
 		cs_file = self.l3.text()
 		xml_file = self.l5.text()
@@ -1623,6 +1727,166 @@ class PyCHAM(QWidget):
 		import vol_contr_analys
 		dir_path = self.l201.text() # name of folder with results
 		vol_contr_analys.plotter_2DVBS(0, dir_path, self, t_thro) # plot results
+		return()
+		
+	@pyqtSlot() # button to plot number size distribution replication of particle sizer and counter
+	def on_click233(self):
+		
+		# reset error message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		try: 
+			dryf = int(self.e230.toPlainText()) # whether dry or not
+			
+		except: # give error message
+			self.l203a.setText('Error - whether particles are dried (0) or not (1) should be a single integer')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+		
+		try:
+			cdt = float(self.e232.toPlainText()) # concentration detection limit (particles/cm3)
+			
+		except: # give error message
+			self.l203a.setText('Error - particle number concentration detection limit of counter should be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+		
+		try:
+			# get particle diameter at 50 % counting efficiency and width 
+			# factor for counting efficiency dependence on particle size
+			sdt = ((self.e233.toPlainText()).split(','))
+			sdt = [float(i) for i in sdt] 
+			
+		except: # give error message
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		if (len(sdt) != 2): # if not two numbers show error
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		try:
+			#  minimum particle size of counter
+			min_size = float((self.e234.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Error - minimum detectable particle diameter (nm) should be a single number, e.g. 5')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		try:
+			#  maximum particle size of counter
+			max_size = float((self.e235.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Error - maximum size of particle size range (nm) should be a single number, e.g. 500')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		try:
+			#  number of size bins of counter
+			csbn = int((self.e236.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Error - number of size bins within detectable particle size range (nm) should be a single number, e.g. 128')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		
+			
+		import plotter_counters
+		dir_path = self.l201.text() # name of folder with results
+		plotter_counters.plotter(0, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn) # plot results
+		
+		return()
+
+	@pyqtSlot() # button to plot counting efficiency as a function of particle diameter
+	def on_click234(self):
+		
+		# reset message box
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		try:
+			# get particle diameter at 50 % counting efficiency and width 
+			# factor for counting efficiency dependence on particle size
+			sdt = ((self.e233.toPlainText()).split(','))
+			sdt = [float(i) for i in sdt] 
+			
+		except: # give error message
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		if (len(sdt) != 2): # if not two numbers show error
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+						
+		import plotter_counters
+		dir_path = self.l201.text() # name of folder with results
+		plotter_counters.count_eff_plot(0, dir_path, self, sdt) # plot
+		
+		return()
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 
