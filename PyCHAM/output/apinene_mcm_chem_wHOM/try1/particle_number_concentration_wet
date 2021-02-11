@@ -1,9 +1,0 @@
-# particle number concentration assuming water not removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header
-# 1
-0.000000000000000000e+00
-4.341305632449628320e+03
-2.771267548889738464e+04
-2.780690182128729066e+04
-2.596756059551064754e+04
-2.421172346929003834e+04
-2.257910253824640677e+04
