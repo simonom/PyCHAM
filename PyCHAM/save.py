@@ -11,7 +11,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	seedi):
+	seedi, siz_str):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -57,6 +57,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# OC - oxygen to carbon ratio of components
 	# H2Oi - index of water
 	# seedi - index of seed components
+	# siz_str - the size structure
 	# ---------------------------------------------------------------
 	
 	
@@ -103,6 +104,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = seedi.tolist()
+	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
 
 	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():

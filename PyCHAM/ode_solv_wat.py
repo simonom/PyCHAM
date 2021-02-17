@@ -23,7 +23,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi):
 
 	# inputs: -------------------------------------
-	# y - initial concentrations (moleucles/cm3)
+	# y - initial concentrations (molecules/cm3)
 	# integ_step - the maximum integration time step (s)
 	# rindx - index of reactants per equation
 	# pindx - index of products per equation
@@ -102,12 +102,9 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		# concentrations for all components
 		ymat[:, H2Oi] = y[1::, 0]
 		
-		
 		# total particle-phase concentration per size bin (molecules/cc (air))
 		csum = ((ymat.sum(axis=1)-ymat[:, seedi].sum(axis=1))+((ymat[:, seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
-		
-		# size bins with contents 
-		isb = (csum[:, 0] > 0.)
+		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
 		if (any(isb)): # if particle-phase components present
 			# mole fraction of water at particle surface
@@ -183,9 +180,9 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		
 		return(j)
 	
-	# set ODE solver tolerances
-	atol = 0.001
-	rtol = 0.0001
+	# set ODE solver (integration) tolerances
+	atol = 1.e-4
+	rtol = 1.e-5
 	
 	y0 = y # remember initial component concentrations (molecules/cc (air))
 	

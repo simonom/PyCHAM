@@ -327,9 +327,8 @@ def ode_updater(update_stp,
 		# update Jacobian inputs based on particle-phase fractions of components
 		[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 		
-
 		if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
-		
+			
 			# call on ode solver for water
 			[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
@@ -346,9 +345,13 @@ def ode_updater(update_stp,
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
 			
+			# check on stability of water partitioning
+			if (any(y[H2Oi::num_comp]<0.)):
+				yield ('Error: negative water concentration generated following call to ode_solv_wat module, try reducing the integration tolerances in this module, or log an issue on the GitHub page for PyCHAM')
+				
 			# zero partitioning of water to particles for integration without water gas-particle partitioning
 			kimt[:, H2Oi] = 0.
-
+			
 		# model component concentration changes to get new concentrations
 		# (molecules/cc (air))
 		[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
@@ -365,11 +368,11 @@ def ode_updater(update_stp,
 			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
-
+		
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		
-		if (num_sb-wall_on > 0): # if particle size bins present
+		if ((num_sb-wall_on) > 0): # if particle size bins present
 			# update particle sizes
 			if ((num_sb-wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present
 				
@@ -385,7 +388,7 @@ def ode_updater(update_stp,
 					Vol0, Vbou, rbou)
 			
 			update_count += tnew # time since operator-split processes last called (s)
-
+			
 			# if time met to implement operator-split processes
 			if (update_count>=update_stp*9.999999e-1):
 				if (any(N_perbin > 1.e-10)):
@@ -426,7 +429,6 @@ def ode_updater(update_stp,
 				# reset count to that since original operator-split processes interval met (s)
 				update_count = sumt%t0
 
-		
 		# update the percentage time in the GUI progress bar
 		yield (sumt/tot_time*100.)
 		
@@ -453,5 +455,5 @@ def ode_updater(update_stp,
 		dydt_vst, num_comp, Cfactor_vst, 0, 
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi, seedi)
+		comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi, seedi, siz_str)
 	return()

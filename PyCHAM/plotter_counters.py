@@ -10,9 +10,10 @@ import os
 import retr_out
 import numpy as np
 import scipy.constants as si
+from scipy import interpolate
 import math
 
-def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
+def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_rho):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
@@ -25,6 +26,7 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 	# min_size - minimum size measure by counter (nm)
 	# max_size - maximum size measure by counter (nm)
 	# csbn - number of size bins for counter
+	# p_rho - assumed density of particles (g/cm3)
 	
 	# --------------------------------------------------------------------------
 
@@ -32,7 +34,7 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, _) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, H2Oi, _, siz_str) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -70,12 +72,38 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 		Nuse = Nuse.reshape(-1, 1)
 		x = x.reshape(-1, 1)
 	
-	# size (diameter) bin widths of model (um) (could vary with time depending on size structure)
-	sbwm = rbou_rec[:, 1::]*2-rbou_rec[:, 0:-1]*2
-	
 	# account for minimum particle size detectable by instrument (um)
 	Nuse[x<(min_size*1.e-3)] = 0.
 	
+	# if moving centre used rather than full moving then 
+	# change Nuse, x and rbou_rec to a two-point moving average
+	if (siz_str[0] == 0):
+		# two point moving average number concentration
+		Nuse = (Nuse[:, 0:-1]+Nuse[:, 1::])/2.
+	
+		if (space_mode == 'log'):
+			# two point moving average size (radius) bin centres (um)
+			x = 10.**(np.log10(x[:, 0:-1])+(np.log10(x[:, 1::])-np.log10(x[:, 0:-1]))/2.)
+			# two point moving average size (radius) bin bounds (um)
+			rbou_rec = 10.**(np.log10(rbou_rec[:, 0:-1])+(np.log10(rbou_rec[:, 1::])-np.log10(rbou_rec[:, 0:-1]))/2.)
+			# fixed point centre (radius) of size bins (um)
+			xf = 10.**(np.log10(rbou_rec[:, 0:-1])+(np.log10(rbou_rec[:, 1::])-np.log10(rbou_rec[:, 0:-1]))/2.)
+	
+		if (space_mode == 'lin'):
+			# two point moving average size (radius) bin centres (um)
+			x = x[:, 0:-1]+(x[:, 1::]-x[:, 0:-1])/2.
+			# two point moving average size (radius) bin bounds (um)
+			rbou_rec = rbou_rec[:, 0:-1]+(rbou_rec[:, 1::]-rbou_rec[:, 0:-1])/2.
+			# fixed point centre (radius) of size bins (um)
+			xf = rbou_rec[:, 0:-1]+(rbou_rec[:, 1::]-rbou_rec[:, 0:-1])/2.
+	
+	else: # if using full-moving then set the size bin centre radius (um) as the known
+		xf = x 
+	
+	# difference in the log10 of size (diameter) bin widths of model (um) 
+	# (could vary with time depending on size structure)
+	sbwm = (np.log10(rbou_rec[:, 1::]*2.))-(np.log10(rbou_rec[:, 0:-1]*2.))
+
 	# normalise number concentration by size (diameter) bin width (# particles/cm3/um)
 	Nuse = Nuse/sbwm
 	
@@ -89,16 +117,20 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 	# size bin centres of instrument (diameter) (um)
 	csbc = (10.**(np.log10(csbb[0:-1])+(np.log10(csbb[1::])-np.log10(csbb[0:-1]))/2.))
 	
-	# size (diameter) bin widths of instrument (um)
-	sbwc = (csbb[1::]-csbb[0:-1])
+	# difference in log10 of size bins (diameter) bin widths of instrument (um)
+	sbwc = np.log10(csbb[1::])-np.log10(csbb[0:-1])
+
+	# interpolation based on fixed size bin centres - note that this is preferred over changeable
+	# size bin centres when calculating number size distribution, total particle number 
+	# concentration and total mass concentration, since the area under the
+	# number vs size line is comparable between times with changeable size bin centres, note when
+	# this is not the case, even when a particle grows when using moving centre size structure
+	# the area beneath the curve may decrease because it becomes more jagged, thereby 
+	# unrealistically affecting particle number concentration during interpolation
+	for ti in range(len(timehr)):
+		Nint[ti, :] = np.interp(csbc, xf[ti, :]*2., Nuse[ti, :]) # (# particles/cm3/difference in log 10(size(um)))
+		Nint[ti, :] = Nint[ti, :]*sbwc # correct for size bin width (# particles/cm3)
 	
-	
-	for ti in range(len(timehr)): # loop through times
-		
-		# use linear interpolation to get particle number concentration normalised by size bin width (# particles/cm3/um)
-		Nint[ti, :] = np.interp(csbc, x[ti, :]*2, Nuse[ti, :])
-		# return to particle number concentration (not normalised by size (diameter) bin width) (# particles/cm3)
-		Nint[ti, :] = Nint[ti, :]*sbwc
 	
 	# account for minimum detectable particle concentration (# particles/cm3)
 	Nint[Nint<cdt] = 0.
@@ -108,9 +140,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 	
 	# interpolate counting efficiency (fraction) to instrument size bin centres
 	ce = np.interp(csbc, Dp, ce)
-
 	Nint = Nint*ce # correct for counting efficiency
-	
+
 	# plotting number size distribution --------------------------------------
 	
 	# take log10 of instrument size (diameter) bin boundaries
@@ -160,54 +191,45 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn):
 	# colour bar label
 	cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
-	# ----------------------------------------------------------------------------------------
-	# total particle number concentration #/cm3
+	# total particle number concentration (# particles/cm3) -------------------------
 	
-	# include total number concentration (# particles/cc (air)) on contour plot
-	# first identify size bins with radius exceeding 3nm
-	# empty array for holding total number of particles
-	#Nvs_time = np.zeros((Nint.shape[0]))
+	# include total number concentration (# particles/cm3 (air)) on contour plot
+	Nvs_time = Nint.sum(axis = 1)
 	
-	#for i in range(num_asb): # size bin loop
-	#	Nvs_time[:] += Nint[:, i] # sum number
+	p3, = par1.plot(timehr, Nvs_time, '-+k', label = 'N')
 	
-	#p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
-	
-	#par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
-	#par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
-	#par1.yaxis.set_tick_params(labelsize=14)
+	par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
+	par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
+	par1.yaxis.set_tick_params(labelsize=14)
 
-	# mass concentration of particles ---------------------------------------------------------------
-	# array for mass concentration with time
-	#MCvst = np.zeros((1, len(timehr)))
+	# mass concentration of particles (ug/m3) ---------------------------------------------------------------
 	
-	#MCvst = np.zeros((len(timehr))) # empty array for total mass concentration (ug/m3)
+	MCvst = np.zeros((len(timehr))) # empty array for total mass concentration (ug/m3)
 	
-	# loop through times
-	#for ti in range(len(timehr)):
-		# volume of single particles per size bin at this time step (cm3)
-	#	Vn = ((4./3.)*np.pi)*((x[ti, :]*1.e-4)**3.)
-		# volume of all particles per size bin at this step (cm3/cm3)
-	#	Vn = sum(Nint[ti, :]*Vn)
-		# record total mass concentration of particles (ug/m3), note 
-		# conversion factor for g to ug and /cm3 to /m3
-	#	MCvst[ti] = Vn*(rho)*1.e12
+	# assumed volumes of particles per size bin (um3)
+	Vn = ((4./3.)*np.pi)*((csbc/2.)**3.)
+	Vn = Vn*1.e-12 # convert to cm3
+	Vn = np.tile(Vn, [len(timehr), 1]) # tile over times
+	# convert number concentration to volume concentration (cm3 (particle)/cm3 (air))
+	Vc = Nint*Vn
+	# convert volume concentration to total mass concentration (ug/m3)
+	MCvst = ((Vc*p_rho)*1.e12).sum(axis=1)
 		
 	# log10 of maximum in mass concentration
-	#if (max(MCvst[:]) > 0):
-	#	MCmax = int(np.log10(max(MCvst[:])))
-	#else:
-		#MCmax = 0.
+	if (max(MCvst[:]) > 0):
+		MCmax = int(np.log10(max(MCvst[:])))
+	else:
+		MCmax = 0.
 	
-	#p5, = par2.plot(timehr, MCvst[:], 'xk', label = 'Total Particle Mass Concentration')
-	#par2.set_ylabel(str('Mass Concentration ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
+	p5, = par2.plot(timehr, MCvst[:], '-xk', label = 'Total Particle Mass Concentration')
+	par2.set_ylabel(str('Mass Concentration ($\mathrm{\mu g\, m^{-3}})$'), rotation=270, size=16, labelpad=25)
 	# set colour of label, tick font and corresponding vertical axis to match scatter plot presentation
-	#par2.yaxis.label.set_color('black')
-	#par2.tick_params(axis='y', colors='black')
-	#par2.spines['right'].set_color('black')
-	#par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
-	#par2.yaxis.set_tick_params(labelsize=16)
-	#plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)
+	par2.yaxis.label.set_color('black')
+	par2.tick_params(axis='y', colors='black')
+	par2.spines['right'].set_color('black')
+	par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
+	par2.yaxis.set_tick_params(labelsize=16)
+	plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)
 
 	if (caller == 2): # display when in test mode
 		plt.show()	

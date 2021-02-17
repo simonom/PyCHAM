@@ -1,7 +1,7 @@
 '''module for calculating and recording change tendency of components'''
 # changes due to gas-phase photochemistry and partitioning are included
 
-# File Created at 2021-01-28 15:09:16.666151
+# File Created at 2021-02-17 15:00:33.397284
 
 import numpy as np 
 

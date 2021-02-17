@@ -18,7 +18,6 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	# Vbou - volume bounds between size bins (um3)
 	# rbou - radius bounds (um)
 	# -------------------------------------------------------------
-
 	# particle-phase concentrations	(molecules/cc (air))
 	Cp = np.transpose(Cp.reshape(num_sb, num_comp))
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
@@ -28,11 +27,12 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	nmolC = np.zeros((num_comp, ish.sum())) # empty array for molar concentration
 	# number of moles of each component in a single particle (mol/cc (air))
 	nmolC[:, :] = ((Cp[:, ish]/(NA*n0[ish, 0])))
-
+	
 	Vnew = np.zeros((num_sb)) # empty array for new volumes
 	MVrep = np.repeat(MV, num_sb, axis=1)
 	# new volume of single particle per size bin (um3), including volume of water
 	Vnew[ish] = np.sum(nmolC*MVrep[:, ish], axis=0)
+	
 	
 	# if no particles in a size bin, assign starting volume (um3)
 	Vnew[n0[:, 0]<=1.0e-10] = Vol0[0::][n0[:, 0]<=1.0e-10]
@@ -48,7 +48,7 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 		ind = Vnew_ord.index(Vnew[i]) # new index
 		Cpn[(ind)*num_comp:(ind+1)*num_comp] = Cp[(i)*num_comp:(i+1)*num_comp]
 		nn[ind] = n0[i]
-	
+		
 	Vnew_ord = np.array((Vnew_ord)) # transform list to numpy array
 
 	# new volume bounds (um3) between size bin	
@@ -60,5 +60,5 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	# new radius bounds (um)
 	rbou = ((3.*Vbou)/(4.*np.pi))**(1./3.)
 
-
+	
 	return(Vnew_ord, x, Cpn, nn, Vbou, rbou)

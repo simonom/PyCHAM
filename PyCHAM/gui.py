@@ -12,6 +12,7 @@ import def_mod_var
 import numpy as np
 import re
 import vol_contr_analys
+import importlib
 		
 class PyCHAM(QWidget):
 
@@ -883,7 +884,7 @@ class PyCHAM(QWidget):
 
 		# input bar for names of components to plot temporal profiles of
 		self.e205 = QLineEdit(self)
-		self.e205.setText('Provide the chemical scheme names of components for plotting the temporal supplied profiles below')
+		self.e205.setText('Chemical scheme names of components to be plotted using the buttons below')
 		# show left most point first
 		self.e205.setStyleSheet('qproperty-cursorPosition : 0')
 		self.PRIMlayout.addWidget(self.e205, 1, 0)
@@ -1042,7 +1043,7 @@ class PyCHAM(QWidget):
 	
 		# input for whether to use wet or dried particles
 		self.e230 = QTextEdit(self)
-		self.e230.setText('Type 0 for dried particles or 1 for not dried particles')
+		self.e230.setText('0 for dried particles or 1 for not dried particles')
 		self.SMPSlayout.addWidget(self.e230, 0, 0)
 		
 		# input for minimum particle concentration detectable
@@ -1069,18 +1070,23 @@ class PyCHAM(QWidget):
 		self.e236 = QTextEdit(self)
 		self.e236.setText('Number of size bins within the detectable particle diameter range (assumed to be logarithmically spaced)')
 		self.SMPSlayout.addWidget(self.e236, 0, 5)
-	
-		# button to plot temporal profile of number size distribution
-		self.b233 = QPushButton('Plot number size distribution', self)
-		self.b233.setToolTip('Plot the number size distribution as observed by a particle counter')
-		self.b233.clicked.connect(self.on_click233)
-		self.SMPSlayout.addWidget(self.b233, 1, 5)
+		
+		# input for assumed density of particles
+		self.e237 = QTextEdit(self)
+		self.e237.setText('Assumed density of particles (g cm<sup>-3</sup>)')
+		self.SMPSlayout.addWidget(self.e237, 0, 6)
 		
 		# button to plot counting efficiency dependence on particle size 
 		self.b234 = QPushButton('Plot counting efficiency curve', self)
 		self.b234.setToolTip('Plot the counting efficiency dependence on particle size')
 		self.b234.clicked.connect(self.on_click234)
 		self.SMPSlayout.addWidget(self.b234, 1, 2)
+		
+		# button to plot temporal profile of number size distribution
+		self.b233 = QPushButton('Plot SMPS observations', self)
+		self.b233.setToolTip('Plot the number size distribution as observed by a particle counter')
+		self.b233.clicked.connect(self.on_click233)
+		self.SMPSlayout.addWidget(self.b233, 1, 6)
 		
 		return(SMPSTab)
 	
@@ -1126,9 +1132,11 @@ class PyCHAM(QWidget):
 		if (self.atb == 1): # if showing remove add to batch button
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
-		# remove any old 'Simulation complete' message from previous run
-		if ((self.l81b.text() == 'Simulation complete') or (self.l81b.text() == 'Simulations complete')):
-			self.l81b.setText('')
+		# remove any old message from previous run
+		if (len(self.l81b.text()) > 0):
+			if (self.l81b.text()[0:17] != 'File combinations'):
+				self.l81b.setText('')
+				self.l81b.setStyleSheet(0., '0px', 0., 0.)
 		
 		# prepare by opening existing variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1334,13 +1342,14 @@ class PyCHAM(QWidget):
 				self.output_list = [] # reset list of output paths
 				# return to single simulation mode
 				self.btch_no = 1
-				self.btch_str = ''
+				self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
 				
 				# remove old progress message
 				self.l81b.setText('')
 				# tell user that simulations finished
 				self.l81b.setText(str('Simulations complete'))
-				return()
+				return(err_mess)
+			
 			# --------------------------------------------
 		
 			# reset to default variables to allow any new variables to arise
@@ -1426,13 +1435,56 @@ class PyCHAM(QWidget):
 				self.l81.deleteLater()
 				self.atb = 0
 			
-			self.act_81(output_by_sim) # call on function to simulate
+			# path to error log
+			err_log = str(os.getcwd() + '/PyCHAM/err_log.txt')
+			if (sim_num == 0): # # delete any existing error log and create new log
+				# list upcoming simulation in the error log
+				with open(err_log, 'w') as el:
+					el.write(str(output_by_sim+'\n'))
+					el.close
+			else: # append to existing log
+				# list upcoming simulation in the error log
+				with open(err_log, 'a') as el:
+					el.write(str(output_by_sim+'\n'))
+					el.close
+			
+			# tell numpy what to do if error observed
+			import err_log_code
+			log = err_log_code
+			saved_handler = np.seterrcall(log)
+			save_err = np.seterr(all='log')
+			
+			err_mess = self.act_81(output_by_sim) # call on function to simulate
+
+			if (err_mess != ''): # state error message if any generated
+				self.l81b.setText('') # remove old progress message
+				if (self.btch_no > 1): # in batch mode
+					self.l81b.setText(str('See error message below generated during simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1) + '\n' + err_mess))
+				if (self.btch_no == 1): # in single simulation mode
+					self.l81b.setText(str('See error message below generated during simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(1) + '\n' + err_mess))
+				self.l81b.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.output_list = [] # reset list of output paths
+				self.btch_no = 1 # reset to single simulation run mode (rather than batch) 
+				return(err_mess)
+			
+		# if no error message then return with no error message
+		return(err_mess)
+				
 	
 	@pyqtSlot()		
-	def act_81(self, output_by_sim): # action simulation
+	def act_81(self, output_by_sim): # action the simulation
+	
 		from middle import middle # prepare to communicate with main programme
-		for prog in middle():
-			self.progress.setValue(prog) # call on modules to solve problem
+		
+		for prog in middle(): # call on modules to solve problem
+		
+			if (isinstance(prog, str)): # check if it's an error message
+				err_mess = prog
+				# remove the progress bar
+				self.progress.deleteLater()
+				return(err_mess)
+			
+			self.progress.setValue(prog) # get progress
 			QApplication.processEvents() # allow progress bar to update
 		
 		# remove the progress bar after each simulation
@@ -1440,6 +1492,9 @@ class PyCHAM(QWidget):
 		
 		# set the path to folder to plot results to the latest simulation results
 		self.l201.setText(output_by_sim)
+		# if this point reached then no error message generated
+		err_mess = ''
+		return(err_mess)
 	
 	@pyqtSlot()
 	def on_click81sing(self): # when single simulation button pressed
@@ -1467,17 +1522,19 @@ class PyCHAM(QWidget):
 		self.l81b.setText('') # clear progress message
 		
 		# action to simulate
-		self.on_click81b()
+		err_mess = self.on_click81b()
 		
 		# once all simulations done in single simulation mode, tidy up
 		# clear the list of file combinations for simulations in batch
 		self.output_list = [] # reset list of output paths
 		# return to single simulation mode
 		self.btch_no = 1
-		self.btch_str = ''
-		# tell user that simulations finished
-		self.l81b.setText('')
-		self.l81b.setText(str('Simulation complete'))
+		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
+
+		if (err_mess == ''): # if no error message generated
+			# tell user that simulations finished
+			self.l81b.setText('')
+			self.l81b.setText(str('Simulation complete'))
 	
 	@pyqtSlot()
 	def on_click81(self): # when 'start series of simulation' button pressed
@@ -1499,7 +1556,7 @@ class PyCHAM(QWidget):
 		self.l81b.setText('') # clear any old progress message from previous run
 		
 		# action to simulate
-		self.on_click81b()
+		err_mess = self.on_click81b()
 
 	
 	@pyqtSlot()
@@ -1839,11 +1896,25 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 			return()
 		
-		
+		try:
+			#  assumed density of particles (g/cm3)
+			p_rho = float((self.e237.toPlainText()))
 			
+		except: # give error message
+			self.l203a.setText('Error - assumed density of particles (g/cm3) should be a single number, e.g. 1.3')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
 		import plotter_counters
+		importlib.reload(plotter_counters) # ensure latest version uploaded
 		dir_path = self.l201.text() # name of folder with results
-		plotter_counters.plotter(0, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn) # plot results
+		plotter_counters.plotter(0, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_rho) # plot results
 		
 		return()
 

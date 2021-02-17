@@ -23,7 +23,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# chamber condition ---------------------------------------------------------
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, _, _) = retr_out.retr_out(dir_path)
+		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):

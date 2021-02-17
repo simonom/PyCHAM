@@ -23,7 +23,7 @@ def plotter(caller, dir_path, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, _, _) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = num_sb-wall_on
@@ -79,8 +79,8 @@ def plotter(caller, dir_path, self):
 
 		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
-		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 		ax0.legend(fontsize=14)
 
 		# find maximum and minimum of plotted concentrations for sub-plot label		
@@ -154,10 +154,10 @@ def plotter(caller, dir_path, self):
 		if space_mode == 'log':
 			ax1.set_yscale("log")
 		# set tick format for vertical axis
-		ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e'))
+		ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
 		ax1.set_ylabel('Diameter (nm)', size = 14)
-		ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-		ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+		ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 
 		# label according to whether gas-phase plot also displayed		
 		if (indx_plot):
@@ -183,7 +183,7 @@ def plotter(caller, dir_path, self):
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
 		par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
-		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
+		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par1.yaxis.set_tick_params(labelsize=14)
 
 		# mass concentration of particles ---------------------------------------------------------------
@@ -210,7 +210,7 @@ def plotter(caller, dir_path, self):
 		par2.yaxis.label.set_color('black')
 		par2.tick_params(axis='y', colors='black')
 		par2.spines['right'].set_color('black')
-		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.0e')) # set tick format for vertical axis
+		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par2.yaxis.set_tick_params(labelsize=16)
 		plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)	
 

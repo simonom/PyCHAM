@@ -1,12 +1,12 @@
-res_file_name = try2
-total_model_time = 3600.
+res_file_name = try3
+total_model_time = 7200.
 update_step = 60.
-recording_time_step = 600.
+recording_time_step = 60.
 size_structure = 0
-number_size_bins = 2
+number_size_bins = 16
 lower_part_size = 0.
 upper_part_size = 8.e-2
-space_mode = lin
+space_mode = log
 coag_on = 1
 nucv1 = 31000.
 nucv2 = -55.

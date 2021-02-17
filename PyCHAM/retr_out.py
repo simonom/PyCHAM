@@ -81,6 +81,14 @@ def retr_out(output_by_sim):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
+			if (str(line.split(',')[0]) == 'size_structure_0_for_moving_centre_1_for_full_moving'):
+				i = i.strip('\n')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(int(i))
 			
 			
 		const[str(line.split(',')[0])] = dlist
@@ -103,6 +111,7 @@ def retr_out(output_by_sim):
 	OC = const['oxygen_to_carbon_ratios_of_components']
 	H2Oi = const['index_of_water'] # index of water
 	seedi = const['index_of_seed_components'] # index of seed components
+	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
 	
 	try:
 		MV = const["molecular_volumes_cm3/mol"]
@@ -175,4 +184,4 @@ def retr_out(output_by_sim):
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str)
