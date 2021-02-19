@@ -47,6 +47,8 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		return(0, 0, 0) # return dummies
 		
 	cwd = os.getcwd() # address of current working directory
+	
+	# if update required, note this update flag is set when model variables are checked
 	if (umansysprop_update == 1):
 		# download latest version of umansysprop
 		

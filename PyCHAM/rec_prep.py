@@ -22,7 +22,7 @@ def rec_prep(nrec_step,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
-	DStar_org, seedi, C_p2w):
+	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -120,6 +120,10 @@ def rec_prep(nrec_step,
 	# seedi - index of seed component(s)
 	# C_p2w - concentration of components on the wall due to particle
 	# deposition to wall (molecules/cc)
+	# RH - relative humidities (fraction 0-1)
+	# RHt - times through experiment at which relative humidities reached (s)
+	# tempt_cnt - count on chamber temperatures
+	# RHt_cnt - chamber relative humidity counts
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -151,14 +155,15 @@ def rec_prep(nrec_step,
 	# update chamber variables
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-		gasinj_cnt, DStar_org] = cham_up.cham_up(sumt, temp, tempt, 
+		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt] = cham_up.cham_up(sumt, temp, tempt, 
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
+		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+		DStar_org, RH, RHt, tempt_cnt, RHt_cnt)
 	
 	
 	if ((num_sb-wall_on) > 0): # if particles present

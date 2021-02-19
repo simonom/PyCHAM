@@ -5,6 +5,7 @@ import os
 import sys
 import numpy as np
 import pickle
+import chem_sch_SMILES
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import  *
 from PyQt5.QtCore import *
@@ -19,7 +20,7 @@ def ui_check(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedVr,
@@ -68,6 +69,7 @@ def ui_check(self):
 	
 	# to begin assume no errors, so message is that simulation ready
 	err_mess = 'Model variables fine - simulation ready'
+	em_flag = 0 # flag that no problematic errors detected
 
 	# saving path (copied from saving module) ------------
 	dir_path = os.getcwd() # current working directory
@@ -78,79 +80,82 @@ def ui_check(self):
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
 	# -------------------------------------------------------------------
 	
-	# constrain wall_on marker
-	if (wall_on>=1):
-		wall_on = 1
-	else:
-		wall_on = 0
+	# incorrect wall_on marker
+	if (wall_on != 1 and wall_on != 0):
+		if (em_flag < 2):
+			err_mess = str('Error - wall_on model variable must be either 0 for no wall or 1 for wall, please see the notes on the wall_on model variable in README')
+			em_flag = 2
 	
-	if (os.path.isdir(output_by_sim) == True): # in case proposed results folder already proposed
+	if (os.path.isdir(output_by_sim) == True and em_flag < 2): # in case proposed results folder already proposed
 		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+		em_flag = 2
 	
-	if (output_by_sim in self.output_list): # in case proposed results folder already on computer hard drive
+	if (output_by_sim in self.output_list and em_flag < 2): # in case proposed results folder already on computer hard drive
 		err_mess = str('Error - the proposed results folder path (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
 	#default name used for folder to save to
-	if (sav_nam == 'default_res_name'):
+	if (sav_nam == 'default_res_name' and em_flag < 2):
 		err_mess = str('Note - default name for save folder used, therefore results folder will be automatically deleted at the end of the simulation to avoid future duplication')
-			
+		em_flag = 1
+	
+	# check on particle number concentration inputs ----------------------------------
+	
 	# ensure size structure marker is sensible
-	if (siz_stru<0 or siz_stru>1):
-		siz_stru = 0
+	if (siz_stru<0 or siz_stru>1 and em_flag < 2):
+		err_mess = str('Error - the size structure must be either 0 for moving-centre or 1 for full-moving, see the notes on the size_structure model variable in README')
+		em_flag = 2
 	
 	# consistency between number of particle size bins and particle number concentration
-	if num_sb == 0 and (sum(pconc != 0) > 0):
-		pconc[:] = 0.0
-		err_mess = str('Note that zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')
+	if (num_sb == 0 and (sum(pconc != 0) > 0) and em_flag < 2):
+		err_mess = str('Error - zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')
+		em_flag = 2 # error message flag for error
 	
-	# if lower bound of particle sizes set to 0, this will induce error when taking log10
-	# in pp_intro, so change to very small value (um)
-	if lowsize == 0.:
-		lowsize = 1.e-3
+	# consistency between length of total particle concentration, 
+	# mean particle radius and standard deviation when in modal mode
+	if (num_sb > 0 and em_flag < 2):
+		if (pmode == 0): # particle number concentrations expressed as modes
+			if (mean_rad.shape != pconc.shape and err_mess == 'Model variables fine - simulation ready'):
+				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the mean radius per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and mean_rad model variables in README.')
+				em_flag = 2 # error message flag for error
+			if (std.shape != pconc.shape and err_mess == 'Model variables fine - simulation ready'):
+				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
+				em_flag = 2 # error message flag for error
+	
+	# ensure that if multiple instantaneous injections of particles, that corresponding variables
+	# have the correct shape, specifically that they cover the same number of times
+	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1]):
+		if (em_flag < 2):
+			err_mess = str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.')
+			em_flag = 2 # error message flag for error
 
-	if (num_sb > 0): # if size bins present
-
-		if (pmode == 0): # number concentrations expressed as mode
-			# if mean_rad inconsistent with pconc
-			if (mean_rad.shape != pconc.shape):
-				mean_rad = np.ones((pconc.shape))*-1.e6 # default flag
-			if (std.shape != pconc.shape):
-				std = np.ones((pconc.shape))*1.2 # default value  
-
-	# if radius of newly nucleated particles empty, set to default value of 1 nm (cm)
-	if new_partr == 0:
-		new_partr = 2.e-7
-
-	# convert chamber surface area (m2) to spherical equivalent radius (m)
-	# (below eq. 2 in Charan (2018))
-	chamR = (chamSA/(4.0*np.pi))**0.5
-
-	if (len(chem_sch_mark) == 0): # if empty default to MCM kpp format
-		chem_sch_mark = ['{', 'RO2', '+', 'C(ind_', ')', '', '&', '', '', ':', '}', ';']
-
-	if not af_path: # actinic flux path
-		af_path = str('no')
-
-	if not int_tol: # integration tolerances
-		int_tol = [1.e-3, 1.e-4]
-
-	if not update_stp: # update step (s)
-		update_stp = 6.e1
-
-	if not tot_time: # total experiment time (s)
-		tot_time = 3.6e3*4.
-
-	if (RH > 1.):
+	# check on relative humidity inputs -----------------------------------------
+	if (any(RH > 1.) and em_flag<2):
 		err_mess = str('Note - RH set above 1.; simulation will be attempted, but please note that RH is interpreted as fraction, not a percentage, where 1 represents saturation of water vapour')
+		em_flag = 1 # error message flag for a note
+	
+	if (len(RH) != len(RHt) and em_flag < 2):
+		err_mess = str('Error - the number of relative humidities does not match the number of times through simulation at which relative humidities are reached, please refer to the notes on the rh and rht model variables in README.')
+		em_flag = 2 # error message flag for error
+	
+	if (RHt[0] != 0 and em_flag < 2):
+		err_mess = str('Error - the first time (seconds) through simulation at which a relative humidity time is given is not zero, which represents the start of the experiment, but the model requires the relative humidity at the start of the experiment, please refer to the notes on the rh and rht model variables in README.')
+		em_flag = 2 # error message flag for error
+		
+	# check on UManSysProp ---------------------------------------------------
+
+	# note that whilst conditionally setting uman_up below is required for this section to work, it does not
+	# change the input to the model, rather this is done, if needed (and it's needed when umansysprop 
+	# needs downloading even when the user hasn't specified this), by mod_var_read
 
 	# for UManSysProp if no update requested, check that there 
 	# is an existing UManSysProp folder
-	if uman_up == 0: # check for existing umansysprop folder
-		if not os.path.isdir(os.getcwd() + '/umansysprop'):
+	if (uman_up == 0): # check for existing umansysprop folder
+		if not os.path.isdir(os.getcwd() + '/umansysprop'): # if no existing folder then force update
 			uman_up = 1
 	
-	if uman_up == 1: # test whether UManSysProp can be updated
+	if (uman_up == 1): # test whether UManSysProp can be updated
 		import urllib.request # module for checking internet connection
 		# function for testing internet connection
 		def connect(host='https://github.com/loftytopping/UManSysProp_public.git'):
@@ -160,59 +165,81 @@ def ui_check(self):
 			except:
 				return False
 		# test internet connection
-		if connect() == False:
+		if (connect() == False and em_flag < 2):
 			err_mess = str('Error - either user has requested cloning of UManSysProp via the model variables input file or no existing UManSysProp folder has been found, but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
+			em_flag = 2
+	# ----------------------------------------------------------------------------
 
-	# ensure that if multiple instantaneous injections of particles, that corresponding variables
-	# have the correct shape, specifically that they cover the same number of times
-	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1]):
-		err_mess = str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.')
 	
-	if (len(light_stat) != len(light_time)):
+	
+	if (len(light_stat) != len(light_time) and em_flag < 2):
 		err_mess = str('Error - length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
-
+		em_flag = 2
 	
-	if (light_time[0] != 0): # if no status provided at simulation start default to lights off
-		light_stat = np.concatenate((np.zeros((1)).astype(int), light_stat))
-		light_time = np.concatenate((np.zeros((1)), light_time))
-
+	# if no status provided at simulation start default to lights off, request one
+	if (light_time[0] != 0 and em_flag < 2):		
+		err_mess = str('Error - light status times have been supplied but not at experiment start (0 in the light_time).  Please see notes in README on the light_time and light_status model variables.')
+		em_flag = 2
+		
 	# check consistency between number of times components instantaneously injected and
 	# the number of concentrations given
-	if (len(injectt) != Ct.shape[1]):
+	if (len(injectt) != Ct.shape[1] and em_flag < 2):
 		err_mess = str('Error - number of times given for the instantaneous injection of gas-phase components (injectt in the model variables input file) is inconsistent with the number of concentrations of instantaneous injection provided (Ct in the model variables input file), please see the README for guidance')
-
+		em_flag = 2
+		
 	# check on consistency of manually assigned densities
-	if (len(dens_comp) != len(dens)):
+	if (len(dens_comp) != len(dens) and em_flag < 2):
 		err_mess = str('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
-
+		em_flag = 2
+		
 	# check on consistency of names of seed component(s) and their volume ratio
-	if (len(seed_name) != len(seedVr)):
+	if (len(seed_name) != len(seedVr) and em_flag < 2):
 		if (len(seed_name) > 1) and (len(seedVr) == 1):
 			seedVr = np.ones((len(seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of seed particle component volume ratios (seedVr in model variables input file), please see README for guidance')
+			em_flag = 2
 
 	# check on consistency of names of seed component(s) and their dissociation constant
-	if (len(seed_name) != len(seed_diss)):
+	if (len(seed_name) != len(seed_diss) and em_flag < 2):
 		if (len(seed_name) > 1) and (len(seed_diss) == 1):
 			seed_diss = np.ones((len(seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
+		em_flag = 2
 
-	if (len(partit_cutoff) > 1):
+	if (len(partit_cutoff) > 1 and em_flag < 2):
 		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
+		em_flag = 2
+	
+	# -------------------------------------
+	# check on whether water included in instantaneously injected components, as it should not be, instead it should be
+	# included in the rh model variable input
+	
+	if (em_flag < 2):
+		# get chemical scheme names and SMILE strings of components present in chemical scheme file
+		[comp_namelist, name_SMILE, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
+		if (err_mess_new == '' and em_flag < 2):
+			
+			# check for water presence in components instantaneously injected, note need to call function above to get H2Oi
+			if (comp_namelist[H2Oi] in Compt):
+				err_mess = str('Error - water is included in the components being instantaneously injected via the model variables Ct, Compt and injectt, however changes to water vapour content should be made using the rh and rht model variables.  Please see README for further guidance.')
+				em_flag = 2
+		else: # in case error message produced by function checking the chemical scheme
+			err_mess = err_mess_new
+			em_flag = 2
+	# -------------------------------------
 
 	# store in pickle file
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close
 
-
 	# update model variables message in GUI
-	if (err_mess[0:5] != 'Error'): # if no error message
+	if (em_flag<2): # if no error message
 	
 		self.l80.setText(str('Setup Status: \n' + err_mess))
 		self.l80.setStyleSheet(0., '0px', 0., 0.) # remove any borders

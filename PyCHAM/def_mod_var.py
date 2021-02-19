@@ -35,7 +35,8 @@ def def_mod_var(caller): # define function
 	# chamber environment -----------------------------------------------------------------
 	temp = np.array((298.15)).reshape(1) # temperature of experiment (K)
 	tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
-	RH = 0.65 # humidity of experiment (fraction of 1)
+	RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
+	RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
 	dil_fac = 0. # dilution factor (volume fraction per second)
 	
@@ -78,14 +79,14 @@ def def_mod_var(caller): # define function
 	# influx rate of components with continuous influx (ppb/s)
 	con_infl_C = np.array(())
 	# times of component influx (s)
-	con_infl_t = []	
+	con_infl_t = np.empty(0)
 	# chemical scheme name of components with constant concentration	
 	const_comp = []
 	# Chemical scheme names of components injected instantaneously after start of experiment
 	Compt = []
 	# times at which instantaneous injection of component(s) occur after 
 	# experiment start (s)
-	injectt = []
+	injectt = np.empty(0)
 	# concentration(s) (ppb) of component(s) injected instantaneously after 
 	# experiment start
 	Ct = np.zeros((0, 0))
@@ -93,7 +94,7 @@ def def_mod_var(caller): # define function
 	partit_cutoff = []
 
 	# lights -------------------------------------------------------------------------------
-	light_stat = [0] # light status
+	light_stat = np.zeros((1), dtype='int') # light status
 	light_time = np.zeros((1, 1)) # time that light status attained (s)
 	daytime = 0. # time of day experiment starts (s)
 	lat = 0. # latitude of experiment (degrees)
@@ -145,7 +146,7 @@ def def_mod_var(caller): # define function
 	
 
 	# prepare for pickling
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
 
 	
 	# path to store for variables
@@ -156,4 +157,4 @@ def def_mod_var(caller): # define function
 		f.close() # close
 
 
-	return(sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O)
+	return(sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O)

@@ -35,7 +35,6 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# ------------------------------------------------------------
 
 	f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
-	
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
 	f_open_eqn.close() # close file
@@ -44,7 +43,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
 		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
 	
-	# interrogate xml to list component names and SMILES
+	# interrogate xml to list all component names and SMILES
 	[comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
 
 	# get equation information for chemical reactions

@@ -62,8 +62,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	jac_indx = np.zeros((num_eqn[0], 1))
 	# a new list for the name strings of components presented in the scheme (not SMILES)
 	comp_namelist = []
-	# list for the SMILE strings of components present in the chemical scheme
-	comp_list = []
+	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
 	# list of Pybel objects of components in chemical scheme
 	Pybel_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme
@@ -85,7 +84,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		eqn_start_indx = (re.match(eqn_start, line)).span()[1]
 		rrc_start_indx = (re.match(rrc_start, line)).span()[1]
 		
-		if eqn_start_indx>rrc_start_indx:
+		if (eqn_start_indx>rrc_start_indx):
 			eqn_sec = 1 # equation is second part
 		else:
 			eqn_sec = 0 # equation is first part
@@ -106,9 +105,10 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		
 		eqn_split = eqn.split()
 		eqmark_pos = eqn_split.index('=')
-		# with stoich number; rule out the photon
+		# reactants with stoichiometry number and omit any photon
 		reactants = [i for i in eqn_split[:eqmark_pos] if i != '+' and i != 'hv']
-		products = [t for t in eqn_split[eqmark_pos+1:] if t != '+'] # with stoich number
+		# products with stoichiometry number
+		products = [t for t in eqn_split[eqmark_pos+1:] if t != '+']
 		
 		# record maximum number of reactants across all equations
 		max_no_reac = np.maximum(len(reactants), max_no_reac)
@@ -124,7 +124,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
 			y_arr[y_arr!=-9999] = y_arr[y_arr!=-9999]+y_arr_fixer[y_arr!=-9999] 
 
-		while max_no_prod > np.minimum(pindx.shape[1], pstoi.shape[1]): 
+		while (max_no_prod > np.minimum(pindx.shape[1], pstoi.shape[1])): 
 			pindx = np.append(pindx, (np.zeros((num_eqn[0], 1))).astype(int), axis=1)
 			pstoi = np.append(pstoi, (np.zeros((num_eqn[0], 1))), axis=1)
 		while ((len(reactants)**2.0+len(reactants)*len(products))>jac_indx.shape[1]):
@@ -176,7 +176,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# name with no stoich number
 				name_only = re.sub(stoich_regex, '', reactant)
 			elif (re.findall(stoich_regex, reactant)[0] == ''):
-				stoich_num = 1.0
+				stoich_num = 1.
 				name_only = reactant
 			
 			# store stoichiometry
@@ -187,13 +187,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
-				if (name_only in comp_name):
-					# index where xml file name matches reaction component name
-					name_indx = comp_name.index(name_only)
-					name_SMILE = comp_smil[name_indx] # SMILES of component
-				else:
-					print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
-					sys.exit()
+				# index where xml file name matches reaction component name
+				name_indx = comp_name.index(name_only)
+				name_SMILE = comp_smil[name_indx] # SMILES of component
 			
 				comp_list.append(name_SMILE) # list SMILE names
 				name_indx = comp_num # allocate index to this species
@@ -243,23 +239,20 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				name_only = re.sub(stoich_regex, '', product) # name with no stoich number
 
 			elif (re.findall(stoich_regex, product)[0] == ''):
-				stoich_num = 1.0
+				stoich_num = 1.
 				name_only = product
 			
 			# store stoichiometry
 			pstoi[eqn_step, product_step] = stoich_num
 			jac_stoi[eqn_step, reactant_step+product_step] = 1*stoich_num
+			
 			if name_only not in comp_namelist: # if new component encountered
 				comp_namelist.append(name_only)
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				if name_only in comp_name:
-					name_indx = comp_name.index(name_only)
-					name_SMILE = comp_smil[name_indx]
-				else:
-					print('Error: inside eqn_interr, chemical scheme name '+str(name_only)+' not found in xml file')
-					sys.exit()
+				name_indx = comp_name.index(name_only)
+				name_SMILE = comp_smil[name_indx]
 				
 				comp_list.append(name_SMILE) # list SMILE string of parsed species
 				name_indx = comp_num # allocate index to this species

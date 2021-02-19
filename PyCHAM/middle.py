@@ -20,7 +20,7 @@ def middle(): # define function
 	# get required inputs
 	
 	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
-		comp0, y0, temp, tempt, RH, Pnow, wall_on,
+		comp0, y0, temp, tempt, RH, RHt, Pnow, wall_on,
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
@@ -57,7 +57,7 @@ def middle(): # define function
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
 	pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
-	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil)
+	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES)
 
 	# get component properties
 	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, temp[0], H2Oi, 
@@ -75,7 +75,7 @@ def middle(): # define function
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
 	rbou00, ub_rad_amp, np_sum, C_p2w] = pp_intro.pp_intro(y, num_comp, Pybel_objects, temp[0],
-	 H2Oi, mfp, accom_coeff, y_mw, surfT, RH, siz_str, num_sb, lowsize, 
+	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedVr,
 		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi)
@@ -96,7 +96,7 @@ def middle(): # define function
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-		nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
+		nucv3, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 		uppsize, std, rbou, const_infl_t, MV,

@@ -13,6 +13,7 @@ temperature = 288.
 tempt = 0.
 p_init = 101300
 rh = 0.65
+rht = 0
 act_flux_file = Example_act_flux.csv
 photo_par_file = example_inputs.txt
 ChamSA = 109.85

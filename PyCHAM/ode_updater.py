@@ -37,7 +37,7 @@ def ode_updater(update_stp,
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
 	colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-	nucv3, nuc_comp, nuc_ad, RH, coag_on, inflectDp, pwl_xpre, 
+	nucv3, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 	uppsize, std, rbou, const_infl_t, MV,
@@ -155,7 +155,8 @@ def ode_updater(update_stp,
 	# nuc_comp - the nucleating component
 	# nuc_ad - marker for whether to reduce time step to allow 
 	#	for accurate capture of nucleation
-	# RH - relative humidity
+	# RH - relative humidities (fraction 0-1)
+	# RHt - times through experiment at which relative humidities reached (s)
 	# coag_on - whether coagulation to be modelled
 	# inflectDp - particle diameter at which wall loss inflection occurs (m)
 	# pwl_xpre - x value preceding inflection point
@@ -166,7 +167,7 @@ def ode_updater(update_stp,
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# injectt - time of injection of components (s)
-	# inj_indx - index of component(s) being injected after 
+	# inj_indx - index of components being instantaneously injected after 
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
@@ -245,6 +246,8 @@ def ode_updater(update_stp,
 	else:
 		seedt_cnt = 0
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
+	tempt_cnt = 0 # count on chamber temperatures
+	RHt_cnt = 0 # count on chamber relative humidities
 	save_cnt = 1 # count on recording results
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
@@ -271,7 +274,7 @@ def ode_updater(update_stp,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
-	C_p2w)
+	C_p2w, RH, RHt, tempt_cnt, RHt_cnt)
 
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -283,14 +286,15 @@ def ode_updater(update_stp,
 		# update chamber variables
 		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-			gasinj_cnt, DStar_org] = cham_up.cham_up(sumt, temp, tempt, 
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt] = cham_up.cham_up(sumt, temp, tempt, 
 			Pnow, light_stat, light_time, light_time_cnt, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, DStar_org)
+			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+			DStar_org, RH, RHt, tempt_cnt, RHt_cnt)
 		
 		# ensure end of time interval does not surpass recording time
 		if ((sumt+tnew) > save_stp*save_cnt):
@@ -398,7 +402,7 @@ def ode_updater(update_stp,
 					
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(RH, temp_now, x*1.e-6, 
+						Varr, Vbou, rbou] = coag.coag(RH[RHt_cnt], temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.0e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 

@@ -8,7 +8,7 @@ import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
-		RH, siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
+		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, Psat, core_diss, kgwt, space_mode, seedVr, 
 		spec_namelist, act_coeff, wall_on, partit_cutoff, Press,
@@ -85,6 +85,11 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				mean_radn = [mean_rad[:, i]]
 		except:
 			mean_radn = [mean_rad[:, i]]
+	
+	# if lower bound of particle sizes set to 0, this will cause an error 
+	# when taking log10, so change to very small value (um)
+	if (lowersize == 0.):
+		lowersize = 9.e-4
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
 	if (num_asb > 0):

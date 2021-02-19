@@ -14,7 +14,7 @@ def mod_var_up(self):
 		
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedVr,
@@ -37,7 +37,9 @@ def mod_var_up(self):
 	self.l13_2a.setText((str(uman_up)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l14a.setText((str(temp)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l15a.setText((str(tempt)).replace('\'', '').replace(' ', '')[1:-1])
-	self.l16a.setText((str(RH)).replace('\'', '').replace(' ', ''))
+	
+	self.l16a.setText((str(RH.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l16c.setText((str(RHt.tolist())).replace('\'', '').replace(' ', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l17a.setText((str(Press)).replace('\'', '').replace(' ', ''))
 	self.l17_1a.setText((str(dil_fac)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l18a.setText((str(siz_stru)).replace('\'', '').replace(' ', ''))
@@ -66,13 +68,13 @@ def mod_var_up(self):
 	self.l41a.setText((str(y0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l42a.setText((str(con_infl_nam)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l43a.setText((str(con_infl_C)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l44a.setText((str(con_infl_t)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l44a.setText((str(con_infl_t.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l45a.setText((str(const_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l46a.setText((str(Compt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l47a.setText((str(injectt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l47a.setText((str(injectt.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l48a.setText((str(Ct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l49a.setText((str(light_stat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l50a.setText((str(light_time)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l49a.setText((str(light_stat.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l50a.setText((str(light_time.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l51a.setText((str(daytime)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l52a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l53a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

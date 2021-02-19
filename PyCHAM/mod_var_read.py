@@ -16,7 +16,7 @@ def mod_var_read():
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedVr,
@@ -60,7 +60,7 @@ def mod_var_read():
 
 			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
 				y0 = [float(i) for i in (value.split(','))]
-
+			
 			if key == 'temperature' and (value.strip()): # chamber temperature (K)
 				temp = [float(i) for i in ((value.strip()).split(','))]
 
@@ -68,7 +68,10 @@ def mod_var_read():
 				tempt = [float(i) for i in ((value.strip()).split(','))]
 
 			if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
-				RH = float(value.strip())
+				RH = np.array(([float(i) for i in ((value.strip()).split(','))]))
+				
+			if key == 'rht' and (value.strip()): # times through simulation (s) at which relative humidity reached
+				RHt = np.array(([float(i) for i in ((value.strip()).split(','))]))
 
 			if key == 'p_init' and (value.strip()): # pressure inside chamber
 				Press = float(value.strip())
@@ -343,8 +346,17 @@ def mod_var_read():
 			if key == 'ser_H2O' and (value.strip()): # whether to serialise water gas-particle partitioning
 				ser_H2O = int(value)
 		
+		
+		# UManSysProp check ----------------------------------
+		# for UManSysProp if no update requested, check that there 
+		# is an existing UManSysProp folder
+		if (uman_up == 0): # check for existing umansysprop folder
+			if not os.path.isdir(os.getcwd() + '/umansysprop'): # if no existing folder then force update
+				uman_up = 1
+		# -------------------------------------------
+		
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

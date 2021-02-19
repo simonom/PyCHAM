@@ -24,7 +24,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -40,19 +40,21 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# gas-phase concentration sub-plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
 			
-			try: # will work if provided components were in simulation chemical scheme
-				# get index of this specified component, removing any white space
-				indx_plot = comp_names.index(comp_names_to_plot[i].strip())
-			except:
-				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
-
-				# set border around error message
-				if (self.bd_pl == 1):
-					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-					self.bd_pl = 2
-				else:
-					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-					self.bd_pl = 1
+			if comp_names_to_plot[i].strip() == 'H2O':
+				indx_plot = H2Oi[0]
+			else:
+				try: # will work if provided components were in simulation chemical scheme
+					# get index of this specified component, removing any white space
+					indx_plot = comp_names.index(comp_names_to_plot[i].strip())
+				except:
+					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+					# set border around error message
+					if (self.bd_pl == 1):
+						self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+						self.bd_pl = 2
+					else:
+						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+						self.bd_pl = 1
 
 				plt.ioff() # turn off interactive mode
 				plt.close() # close figure window

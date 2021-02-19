@@ -4,7 +4,7 @@
 
 import pickle
 import os
-import ui_check_again
+import numpy as np
 
 # define function
 def share():
@@ -16,7 +16,7 @@ def share():
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedVr,
@@ -28,17 +28,13 @@ def share():
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
 		pk.close()
 		
-		# check on inputs
-		[wall_on, pconc, lowsize, std, mean_rad, new_partr, chamR, chem_sch_mark, 
-		af_path, int_tol, update_stp, tot_time, siz_str, light_stat, light_time, seedVr, 
-		seed_diss, uman_up] = ui_check_again.ui_check(sav_nam, sch_name,
-		wall_on, 0, siz_stru, num_sb, pmode, pconc, pconct, lowsize, std, mean_rad, new_partr, chamSA, 
-		chem_sch_mark, af_path, int_tol, update_stp, tot_time, 
-		RH, uman_up, light_stat, light_time, injectt, Ct,
-		dens_comp, dens, seed_name, seedVr, seed_diss, partit_cutoff)
+		
+		# convert chamber surface area (m2) to spherical equivalent radius (m)
+		# (below eq. 2 in Charan (2018))
+		chamR = (chamSA/(4.*np.pi))**0.5
 
 	return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, Press, wall_on,
+		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedVr,

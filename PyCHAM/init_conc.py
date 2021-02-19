@@ -7,14 +7,13 @@ import scipy.constants as si
 import math
 from water_calc import water_calc
 import write_dydt_rec
-import pybel
 
 
 def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	testf, pconc, dydt_trak, end_sim_time, save_step, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	comp_namelist, Compt, seed_name, seed_mw,
-	core_diss, nuc_comp, comp_xmlname, comp_smil):
+	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES):
 		
 	# inputs:------------------------------------------------------
 	
@@ -33,14 +32,15 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# end_sim_time - total simulation time (s)
 	# save_step - recording frequency (s)
 	# num_eqn - number of equations
-	# comp_namelist - list of components' names in chemical equation file
+	# comp_namelist - list of names of components as presented in the chemical scheme file
 	# Compt - name of component injected after start of experiment
 	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
 	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
 	# comp_xmlname - component names in xml file
-	# comp_smil - SMILE strings in xml file
+	# comp_smil - all SMILES strings in xml file
+	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
 	# -----------------------------------------------------------
 
 	if testf==1: # testing mode
@@ -143,17 +143,35 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# ------------------------------------------------------------------------------------
 	# account for water's properties
-	H2Oi = num_comp # index for water
-	num_comp += 1 # update number of species to account for water
 	
-	# update gas-phase concentration (molecules/cc (air)) and vapour pressure
+	# get initial gas-phase concentration (molecules/cc (air)) and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH, si.N_A)
+	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH[0], si.N_A)
 	
-	# append empty element to y and y_mw to hold water values
-	y = np.append(y, C_H2O)
-	y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-	comp_namelist.append('H2O') # append water's name to component name list
+	# holder for water index (will be used if not identified in chemical scheme)
+	H2Oi = num_comp # index for water
+	
+	# check for water presence in chemical scheme via its SMILE string
+	# count on components
+	indx = -1
+	for single_chem in rel_SMILES:
+		indx += 1
+		# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
+		# (O is the MCM chemical scheme name for single oxygen))
+		if (single_chem == 'O' and comp_namelist[indx] != 'O'):
+			H2Oi = indx
+			y[H2Oi] = C_H2O # include initial concentration of water (molecules/cm3)
+			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
+	
+	# if not included in chemical scheme file, then add water to end of component list
+	if (H2Oi == num_comp):
+	
+		num_comp += 1 # update number of components to account for water
+		# append empty element to y and y_mw to hold water values
+		y = np.append(y, C_H2O)
+		# append molar weight of water (g/mol)
+		y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
+		comp_namelist.append('H2O') # append water's name to component name list
 
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
@@ -190,7 +208,8 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	if len(Compt)>0:
 		inj_indx = np.zeros((len(Compt)))
 		for i in range(len(Compt)):
-			# index of where initial species occurs in SMILE string
+			# index of where instantaneously injected components 
+			# occur in SMILES string
 			inj_indx[i] = comp_namelist.index(Compt[i])
 	else:
 		inj_indx = np.zeros((1)) # dummy

@@ -7,6 +7,8 @@ import numpy as np
 import os
 import pp_dursim
 import volat_calc
+import scipy.constants as si
+from water_calc import water_calc
 
 # define function
 def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time, 
@@ -15,7 +17,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, DStar_org):
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
+	DStar_org, RH, RHt, tempt_cnt, RHt_cnt):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -47,7 +50,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# injectt - time of instantaneous injections of 
 	#	components (s)
 	# gasinj_cnt - count on injection times of component(s)
-	# inj_indx - index of component(s) being injected after 
+	# inj_indx - index of components being instantaneously injected after 
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
@@ -86,6 +89,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
+	# RH - relative humidities (fraction 0-1)
+	# RHt - times through experiment at which relative humidities reached (s)
+	# tempt_cnt - count on temperatures
+	# RHt_cnt - relative humidity counts
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -153,16 +160,15 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	if len(temp)>1: # because a temperature must be given for experiment start
 	
 		# check whether changes occur at start of this time step
-		if (sumt == tempt[temp_count]):
+		if (sumt == tempt[tempt_cnt]):
 
 			# new temperature (K)
-			temp_now = temp[temp_count]
+			temp_now = temp[tempt_cnt]
 			
-			# update vapour pressure of water (log10(atm)), but don't change 
-			# gas-phase concentration because we assume RH allowed to change with
-			# varying temperature
-			[_, Psat_water, _] = water_calc(temp_now, RH, 6.02214129e+23)
-			
+			# update vapour pressure of water (log10(atm)), and change 
+			# gas-phase concentration of water vapour since 
+			# RH stays as stated in the RH and RHt model variables
+			[y[H2Oi], Psat_water, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
 			# update vapour pressures of all components (molecules/cc and Pa), 
 			# ignore density output
 			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_now, H2Oi,   
@@ -201,7 +207,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# the Taylor (1993) textbook 
 			# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion 
 			# volume for air (19.7) taken from Table 4.1 of Taylor (1993) and mw of 
-			# air converted to g/mol from kg/mol.  This is a replication of the original method 			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
+			# air converted to g/mol from kg/mol.  This is a replication of the original method 			
+			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
 			DStar_org = 1.013e-2*temp_now**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
@@ -213,17 +220,17 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				
 				y[const_compi[:]] = y[const_compi[:]]*(Cfactor/Cfactor0)
 
-			if (temp_count<(len(tempt)-1)):
-				temp_count += 1 # keep count of temperature setting index
+			if (tempt_cnt<(len(tempt)-1)):
+				tempt_cnt += 1 # keep count of temperature setting index
 			else:
-				temp_count = -1 # reached end
+				tempt_cnt = -1 # reached end
 			bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			
 		# check whether temperature changes during proposed integration time step
-		if (sumt+tnew > tempt[temp_count] and temp_count!=-1):
+		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt!=-1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
-			tnew = tempt[temp_count]-sumt
+			tnew = tempt[tempt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 
 	if (len(temp) == 1):
@@ -235,7 +242,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		# check whether changes occur at start of this time step
 		if (sumt == injectt[gasinj_cnt]):
 			# account for change in gas-phase concentration,
-			# convert from ppb/s to molecules/cc.s (air)
+			# convert from ppb to molecules/cm3 (air)
 			y[inj_indx] += Ct[:, gasinj_cnt]*Cfactor-y[inj_indx]
 			if (gasinj_cnt<(Ct.shape[1]-1)):
 				gasinj_cnt += 1 # update count on injections
@@ -249,6 +256,31 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# with change
 			tnew = injectt[gasinj_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
+	
+	# check on instantaneous change in relative humidity ---------------------------------------
+	if (len(RHt)>0 and RHt_cnt>-1): # if any injections occur
+	
+		# check whether changes occur at start of this time step
+		if (sumt == RHt[RHt_cnt]):
+		
+			# update vapour pressure of water (log10(atm)), and change 
+			# gas-phase concentration of water vapour since 
+			# RH stays as stated in the RH and RHt model variables
+			[y[H2Oi], _, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
+			
+			if (RHt_cnt<(RHt.shape[0]-1)):
+				RHt_cnt += 1 # update count on RH
+			else:
+				RHt_cnt = -1 # reached end
+			bc_red = 0 # reset flag for time step reduction due to boundary conditions
+				
+		# check whether changes occur during next proposed integration time step
+		if ((sumt+tnew > RHt[RHt_cnt]) and (RHt_cnt != -1)):
+			# if yes, then reset integration time step so that next step coincides 
+			# with change
+			tnew = RHt[RHt_cnt]-sumt
+			bc_red = 1 # flag for time step reduction due to boundary conditions
+	
 	
 	# check on instantaneous injection of particles --------------------------------------	
 	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if constant influx occurs
@@ -333,4 +365,4 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
-		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org)
+		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt)
