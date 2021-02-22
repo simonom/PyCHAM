@@ -30,7 +30,8 @@ def middle(): # define function
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
-		e_field, dil_fac, partit_cutoff, ser_H2O, inname] = ui.share()
+		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
+		erh_str] = ui.share()
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -48,7 +49,7 @@ def middle(): # define function
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
-	(num_sb+wall_on), const_comp)
+	(num_sb+wall_on), const_comp, drh_str, erh_str)
 	
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
@@ -109,7 +110,7 @@ def middle(): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-		Psat_Pa_rec, OC):
+		Psat_Pa_rec, OC, wat_hist):
 
 		yield prog # update progress bar	
 

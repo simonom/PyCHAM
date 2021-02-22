@@ -11,12 +11,14 @@ import RO2_indices
 import write_dydt_rec
 import write_ode_solv
 import write_rate_file
+import write_hyst_eq
 import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
 def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
-		con_infl_nam, int_tol, wall_on, num_sb, const_comp):
+		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
+		drh_str, erh_str):
 
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
@@ -32,6 +34,10 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# num_sb - number of size bins (including any wall)
 	# const_comp - chemical scheme name of components with 
 	#	constant concentration
+	# drh_str - string from user inputs describing 
+	#	deliquescence RH (fraction 0-1) as function of temperature (K)
+	# erh_str - string from user inputs describing 
+	#	efflorescence RH (fraction 0-1) as function of temperature (K)
 	# ------------------------------------------------------------
 
 	f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
@@ -103,6 +109,10 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# call function to generate module that tracks change tendencies
 	# of certain components
 	write_dydt_rec.write_dydt_rec()
+	
+	# write the module for estimating deliquescence and efflorescence 
+	# relative humidities as a function of temperature
+	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
 	# get index of components in the peroxy radical list
 	RO2_indx = RO2_indices.RO2_indices(comp_namelist, RO2_names)

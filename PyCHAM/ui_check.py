@@ -9,6 +9,9 @@ import chem_sch_SMILES
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import  *
 from PyQt5.QtCore import *
+import write_hyst_eq
+import hyst_eq
+import importlib
 
 def ui_check(self):
 
@@ -29,7 +32,8 @@ def ui_check(self):
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O] = pickle.load(pk)
+		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+		wat_hist, drh_str, erh_str] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -64,7 +68,9 @@ def ui_check(self):
 	# seedVr - volume ratio of component(s) comprising seed particles
 	# seed_diss - dissociation constant for seed particle component(s)
 	# partit_cutoff - product of vapour pressure and activity coefficient
-	# 	above which gas-particle partitioning assumed zero 
+	# 	above which gas-particle partitioning assumed zero
+	# wat_hist - flag for particle-phase history with respect to water 
+	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -229,9 +235,44 @@ def ui_check(self):
 			err_mess = err_mess_new
 			em_flag = 2
 	# -------------------------------------
+	# check on water history
+	if (em_flag < 2):
+		if (wat_hist != 0 and wat_hist != 1):
+			err_mess = str('Error - flag for history of particle-phase with respect to water (H2O_hist model variable) should be 0 or 1, please see notes on H2O_hist in README')
+			em_flag = 2
+	# ------------------------------------
+	
+	# -------------------------------------
+	# check on water-partitioning hysteresis curves
+	if (em_flag < 2):
+		if (drh_str == -1):
+			err_mess = str('Error - the expression for deliquescence relative humidity dependence on temperature could not be converted to a string, please see the README notes on the drh_ft model variable')
+			em_flag = 2
+		if (erh_str == -1):
+			err_mess = str('Error - the expression for efflorescence relative humidity dependence on temperature could not be converted to a string, please see the README notes on the erh_ft model variable')
+			em_flag = 2
+	if (em_flag < 2):
+		# write the module for hysteresis
+		importlib.reload(write_hyst_eq)
+		write_hyst_eq.write_hyst_eq(drh_str, erh_str)
+		# test the module for hysteresis works
+		importlib.reload(hyst_eq)
+		try:
+			drh = hyst_eq.drh(298.15)
+		except:
+			err_mess = str('Error - the expression for deliquescence relative humidity dependence on temperature was unsuccessfully transferred to a module, please see the README notes on the drh_ft model variable')
+			em_flag = 2
+		if (em_flag < 2):
+			try:
+				erh = hyst_eq.erh(298.15)
+			except:
+				err_mess = str('Error - the expression for efflorescence relative humidity dependence on temperature was unsuccessfully transferred to a module, please see the README notes on the erh_ft model variable')
+				em_flag = 2
+	# ------------------------------------
+	
 
 	# store in pickle file
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

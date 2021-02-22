@@ -20,6 +20,7 @@ import ode_solv_wat
 import importlib
 import save
 import time
+import act_coeff_update
 
 
 def ode_updater(update_stp, 
@@ -50,7 +51,7 @@ def ode_updater(update_stp,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
 	sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-	Psat_Pa_rec, OC):
+	Psat_Pa_rec, OC, wat_hist):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -231,6 +232,9 @@ def ode_updater(update_stp,
 	# rel_SMILES - SMILES strings of components in chemical scheme
 	# Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
 	# OC - oxygen to carbon ratio of components
+	# wat_hist - flag for history of particle-phase with respect to water partitioning,
+	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
+	#	(therefore on the efflorescence curve)
 	# ------------------------------------------------------------
 	
 	# start timer
@@ -256,6 +260,9 @@ def ode_updater(update_stp,
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = update_stp # the time to integrate over (s)
+	# remember the gas-phase water concentration from previous 
+	# integration step (molecules/cm3)
+	y_H2O0 = y[H2Oi]
 	
 	# prepare recording matrices, including recording of initial
 	# conditions
@@ -312,12 +319,16 @@ def ode_updater(update_stp,
 			ic_red = 1
 		
 		if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
+			
 			# update partitioning variables
 			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 			y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
 			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
 			Pnow, DStar_org)
-				
+			
+			# update particle-phase activity coefficients
+			[act_coeff, wat_hist] = act_coeff_update.ac_up(y, H2Oi, y_H2O0, temp_now, wat_hist, act_coeff)
+			
 		else: # fillers
 			kimt = np.zeros((num_sb-wall_on, num_comp))
 			kelv_fac = np.zeros((num_sb-wall_on, 1))
@@ -451,6 +462,10 @@ def ode_updater(update_stp,
 			update_stp = t0
 			tnew = update_stp
 			ic_red = 0
+		
+		# remember the gas-phase water concentration from previous 
+		# integration step (molecules/cm3)
+		y_H2O0 = y[H2Oi]
 	
 	time_taken = time.time()-st_time
 
