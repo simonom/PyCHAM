@@ -11,7 +11,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	seedi, siz_str):
+	seedi, siz_str, cham_env):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -58,6 +58,8 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# H2Oi - index of water
 	# seedi - index of seed components
 	# siz_str - the size structure
+	# cham_env - chamber environmental conditions (temperature (K), 
+	# pressure (Pa) and relative humdity
 	# ---------------------------------------------------------------
 	
 	
@@ -144,6 +146,9 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	 
 	# saving time of outputs
 	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
+	
+	# saving environmental conditions (temperature, pressure, relative humidity)
+	np.savetxt(os.path.join(output_by_sim, 'chamber_environmental_conditions'), cham_env, delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa) and third is relative humidity (fraction (0-1))')
 	
 	# saving the index and names of components whose gas-phase temporal profiles can be plotted on the standard results plot
 	fname = os.path.join(output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')

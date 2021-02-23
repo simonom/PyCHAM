@@ -93,7 +93,7 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 					comp_list.append(name_SMILE) # list SMILE names
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
-					return(comp_namelist, name_SMILE, err_mess, H2Oi)
+					return(comp_namelist, comp_list, err_mess, H2Oi)
 		
 		for product in products: # right hand side of equations (gains)
 			
@@ -115,7 +115,7 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 					comp_list.append(name_SMILE) # list SMILE names
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
-					return(comp_namelist, name_SMILE, err_mess, H2Oi)
+					return(comp_namelist, comp_list, err_mess, H2Oi)
 		
 	
 	# check for water presence in chemical scheme via its SMILE string
@@ -132,4 +132,4 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 		H2Oi = len(comp_list)
 		comp_namelist.append('H2O')
 		
-	return(comp_namelist, name_SMILE, err_mess, H2Oi)
+	return(comp_namelist, comp_list, err_mess, H2Oi)

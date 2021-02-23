@@ -24,7 +24,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, _, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
@@ -99,6 +99,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ax0.plot(timehr, crl, label = str('chemical reaction loss '+ comp_name))
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
+		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is treated as negative')
 		ax0.set_xlabel('Time through experiment (hours)')
 		ax0.set_ylabel('Change tendency ($\mathrm{\mu g\, m^{-3}\, s^{-1}}$)')
 		

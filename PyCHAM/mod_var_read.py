@@ -38,7 +38,11 @@ def mod_var_read():
 		
 		
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
-
+			
+			# if commented out continue to next line
+			if  (in_list[i][0] == '#'):
+				continue
+			
 			key, value = in_list[i].split('=') # split values from keys
 			# model variable name - a string with bounding white space removed
 			key = key.strip()

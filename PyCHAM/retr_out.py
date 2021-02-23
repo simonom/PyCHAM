@@ -2,6 +2,7 @@
 # called by PyCHAM plotting codes to obtain the required model outputs for evaluation
 
 import numpy as np
+import os
 
 def retr_out(output_by_sim):
 	
@@ -121,21 +122,32 @@ def retr_out(output_by_sim):
 	try:
 		speed = (const["simulation_computer_time(s)"])[0]
 	except:
-		speed = 10.
+		speed = 0.
 		
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
-	indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
-	# chemical scheme names of components
-	comp0 = indx_plot[1].tolist()
-	# indices of components
-	indx_plot = indx_plot[0].tolist()
-	indx_plot = [int(i) for i in indx_plot]
+	if (os.stat(fname).st_size > 120): # if file contains more than just the header
+		indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
+		# chemical scheme names of components
+		comp0 = indx_plot[1].tolist()
+		# indices of components
+		indx_plot = indx_plot[0].tolist()
+		indx_plot = [int(i) for i in indx_plot]
+	else:
+		comp0 = []
+		indx_plot = []
 
 	# withdraw times (s)
 	fname = str(output_by_sim+'/time')
 	t_array = np.loadtxt(fname, delimiter=',', skiprows=1)
 	timehr = t_array/3600.0 # convert from s to hr
+	
+	try: # this output added on 23/02/2021
+		# withdraw chamber environmental conditions (s)
+		fname = str(output_by_sim+'/chamber_environmental_conditions')
+		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
+	except:
+		cham_env = []
 	
 	# withdraw concentrations
 	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
@@ -184,4 +196,4 @@ def retr_out(output_by_sim):
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env)

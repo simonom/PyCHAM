@@ -138,7 +138,7 @@ def ui_check(self):
 
 	# check on relative humidity inputs -----------------------------------------
 	if (any(RH > 1.) and em_flag<2):
-		err_mess = str('Note - RH set above 1.; simulation will be attempted, but please note that RH is interpreted as fraction, not a percentage, where 1 represents saturation of water vapour')
+		err_mess = str('Note - RH set above 1.; simulation will be attempted, but please note that RH is interpreted as a fraction, not a percentage, where 1 represents saturation of water vapour')
 		em_flag = 1 # error message flag for a note
 	
 	if (len(RH) != len(RHt) and em_flag < 2):
@@ -224,7 +224,7 @@ def ui_check(self):
 	
 	if (em_flag < 2):
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
-		[comp_namelist, name_SMILE, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
+		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
 		if (err_mess_new == '' and em_flag < 2):
 			
 			# check for water presence in components instantaneously injected, note need to call function above to get H2Oi

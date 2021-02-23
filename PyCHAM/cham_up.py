@@ -18,7 +18,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
-	DStar_org, RH, RHt, tempt_cnt, RHt_cnt):
+	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
+	temp_now, Psat):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -93,6 +94,13 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on temperatures
 	# RHt_cnt - relative humidity counts
+	# Pybel_objects - the pybel identifiers for components
+	# nuci - index of nucleating component
+	# nuc_comp - the nucleating component
+	# y_mw - molar weight of components (g/mol)
+	# temp_now - chamber temperature (K) prior to this update
+	# Psat - saturation vapour pressures of components at the current 
+	#	chamber temperature (molecules/cm3)
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -157,7 +165,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			bc_red = 1
 
 	# check on updates to temperature (K) --------------------------------------	
-	if len(temp)>1: # because a temperature must be given for experiment start
+	if (len(temp) > 1): # because a temperature must be given for experiment start
 	
 		# check whether changes occur at start of this time step
 		if (sumt == tempt[tempt_cnt]):
@@ -165,25 +173,24 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# new temperature (K)
 			temp_now = temp[tempt_cnt]
 			
-			# update vapour pressure of water (log10(atm)), and change 
-			# gas-phase concentration of water vapour since 
-			# RH stays as stated in the RH and RHt model variables
-			[y[H2Oi], Psat_water, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
+			# update vapour pressure of water (log10(atm)) of vapour,
+			# but don't update gas-phase concentration of water, since
+			# RH should be allowed to vary with temperature
+			[_, Psat_water, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
 			# update vapour pressures of all components (molecules/cc and Pa), 
 			# ignore density output
 			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_now, H2Oi,   
 							num_comp, Psat_water, [], [], 0, corei, seed_name, 
-							pconc, 0, 0.0, [], 1)
-
-			# note, assume that air pressure inside chamber stays constant despite
-			# varying temperature, therefore total molecular concentration must vary
-			# (molecules/cc (air))
-			ntot = Pnow*(NA/(si.R*temp_now))
-			# remember number of molecules in one billionth of total number prior
-			# to update
-			Cfactor0 = Cfactor
-			# update number of molecules in one billionth of this
-			Cfactor = ntot*1.e-9 # ppb-to-molecules/cc
+							pconc, 0, 0.0, [], 1, nuci, nuc_comp)
+			
+			# now, in preparation for ode solver, repeat over number of size bins
+			if ((num_sb-wall_on) > 0):
+				Psat = np.repeat(Psat.reshape(1, -1), (num_sb-wall_on), axis=0)
+			
+			# according to the ideal gas law, air pressure (Pa) inside chamber
+			# is proportional to temperature, therefore pressure changes by 
+			# the same factor 
+			Pnow = Pnow*(temp_now/temp[tempt_cnt-1])
 			
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_now+120.))*(temp_now/296.16)**1.5)
@@ -212,13 +219,6 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			DStar_org = 1.013e-2*temp_now**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
-			
-			
-			# alter constant concentration (molecules/cc) of any components
-			# with constant gas-phase concentration (ppb)
-			if num_const_compi>0:
-				
-				y[const_compi[:]] = y[const_compi[:]]*(Cfactor/Cfactor0)
 
 			if (tempt_cnt<(len(tempt)-1)):
 				tempt_cnt += 1 # keep count of temperature setting index
@@ -232,6 +232,11 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# with change
 			tnew = tempt[tempt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
+		
+		else: # if no change in temperature, keep the original
+			# ntemperature (K)
+			temp_now = temp[tempt_cnt-1]
+		
 
 	if (len(temp) == 1):
 		temp_now = temp[0] # temperature constant if only one value given
@@ -365,4 +370,5 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
-		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt)
+		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
+		RHt_cnt, Psat)

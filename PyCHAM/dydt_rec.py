@@ -1,7 +1,8 @@
-'''module for calculating and recording change tendency of components'''
-# changes due to gas-phase photochemistry and partitioning are included
+'''module for calculating and recording change tendency (molecules/cm3/s) of components'''
+# changes due to gas-phase photochemistry and partitioning are included; 
+# generated in eqn_pars and treats loss from gas-phase as negative
 
-# File Created at 2021-02-22 17:41:16.273895
+# File Created at 2021-02-23 18:09:46.795964
 
 import numpy as np 
 
@@ -39,16 +40,17 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			else: 
 				conc_sum[0] = Csit.sum() 
 			# prevent numerical error due to division by zero 
-			ish = conc_sum==0.0 
-			conc_sum[ish] = 1.0e-40 
+			ish = (conc_sum == 0.) 
+			conc_sum[ish] = 1.e-40 
 			# particle surface gas-phase concentration (molecules/cc (air)) 
 			Csit = (Csit[compi]/conc_sum)*Psat[0, compi]*kelv_fac[ibin, 0]*act_coeff[0, compi] 
 			# partitioning rate (molecules/cc.s) 
 			dydt_all = kimt[ibin, compi]*(y[compi]-Csit) 
 			# gas-phase change (molecules/cc/s) 
 			dydt_rec[step+1, reac_count] -= dydt_all 
+			
 		# wall-partitioning 
-		if (kw)>1.0e-10: 
+		if (kw > 1.e-10): 
 			# concentration at wall (molecules/cc (air)) 
 			Csit = y[num_comp*num_sb:num_comp*(num_sb+1)] 
 			Csit = (Psat[0, :]*(Csit/Cw)*act_coeff[0, compi])

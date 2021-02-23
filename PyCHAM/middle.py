@@ -97,7 +97,7 @@ def middle(): # define function
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-		nucv3, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
+		nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 		uppsize, std, rbou, const_infl_t, MV,
@@ -110,7 +110,7 @@ def middle(): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-		Psat_Pa_rec, OC, wat_hist):
+		Psat_Pa_rec, OC, wat_hist, Pybel_objects):
 
 		yield prog # update progress bar	
 

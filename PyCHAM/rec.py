@@ -3,21 +3,19 @@
 
 import numpy as np
 import scipy.constants as si
-import dydt_rec
 import importlib
 
-def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
+def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
-	yrec_p2w, C_p2w):
+	yrec_p2w, C_p2w, cham_env, temp_now, Pnow):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
 	# trec - the time through simulation record (s)
 	# yrec - concentration record (molecules/cc (air))
-	# dydt_vst - record of change tendencies (molecules/cc/s)
 	# Cfactor_vst - record of the conversion factor for moleculec/ss 
 	# to ppb
 	# y - concentrations (molecules/cc (air))
@@ -57,6 +55,10 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 	# C_p2w - concentration of components on the wall due to 
 	#	particle-wall deposition, stacked by component first then by
 	#	size bin (molecules/cc)
+	# cham_env - chamber environmental conditions (temperature (K), 
+	# pressure (Pa) and relative humdity
+	# temp_now - chamber temperature (K)
+	# Pnow - chamber pressure (Pa)
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)
@@ -93,14 +95,15 @@ def rec(save_cnt, trec, yrec, dydt_vst, Cfactor_vst, y, sumt,
 		Nres_wet[save_cnt, :] = pconc[:, 0] # record with water
 	
 	# end of number size distribution part ----------------------------------------
+	
+	# chamber environmental conditions ----------------------------------
+	
+	cham_env[save_cnt, 0] = temp_now # temperature (K)
+	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
+	cham_env[save_cnt, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	
+	# --------------------------------------------------------------------------------
 
-
-	if (len(dydt_vst) > 0):
-		importlib.reload(dydt_rec)
-		# record any change tendencies of specified components
-		dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt, 
-					dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff, seedi)
 	save_cnt += 1 # track number of recordings 
 
-	return(trec, yrec, dydt_vst, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w)
+	return(trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w, cham_env)

@@ -100,45 +100,8 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 
 	# number of recording steps
 	nrec_steps = int(math.ceil(end_sim_time/save_step)+1)
-
-	# get index of user-specified components for tracking their change tendencies (dydt) due to modeled
-	# mechanisms
-	if (len(dydt_trak) > 0):
-		
-		dydt_traki = [] # empty list for indices of these components
-		
-		for i in range (len(dydt_trak)):
-			reac_index = [] # indices of reactions involving this species
-			# index of components in component list
-			y_indx = comp_namelist.index(dydt_trak[i])
-
-			# remember index for plotting gas-phase concentrations later
-			dydt_traki.append(int(y_indx))
-			
-			# search through reactions to see where this component is reactant or product
-			for ri in range(num_eqn):
-				if sum(rindx[ri,0:nreac[ri]]==y_indx)>0:
-					reac_index.append(int(ri)) # append reaction index
-			for ri in range(num_eqn): # repeat for products
-				if sum(pindx[ri,0:nprod[ri]]==y_indx)>0:
-					reac_index.append(int(ri)) # append reaction index
-					
 	
-			# save reaction indices in dictionary value for this component,
-			# when creating empty rec_array, add two rows onto the end for particle- and 
-			# wall-partitioning, respectively.  Note the extra row to hold the reaction 
-			# indices
-			rec_array = np.zeros((nrec_steps+1, len(reac_index)+2))
-			rec_array[0, 0:-2] = (reac_index)
-			dydt_vst[y_indx] = rec_array # dictionary entry to hold results
-
-		dydt_vst['comp_index'] = dydt_traki # dictionary entry to hold component names
-		
-		# call on write_dydt_rec to generate the module that will process
-		# the tendency to change during the simulation
-		write_dydt_rec.write_dydt_rec()
-	
-	for i in range(num_comp): # loop through all components
+	for i in range(num_comp): # loop through all components to get molar weights
 		y_mw[i] = Pybel_objects[i].molwt # molecular weight (g/mol)
 	
 	# ------------------------------------------------------------------------------------
@@ -190,7 +153,47 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# calculations)
 	y = np.append(y, 0.)
 	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
+	
+	# --------------------------------------
+	# get index of user-specified components for tracking their change tendencies (dydt) due to modeled
+	# mechanisms
+	if (len(dydt_trak) > 0):
 		
+		dydt_traki = [] # empty list for indices of these components
+		
+		for i in range (len(dydt_trak)):
+			reac_index = [] # indices of reactions involving this species
+			# index of components in component list
+			y_indx = comp_namelist.index(dydt_trak[i])
+
+			# remember index for plotting gas-phase concentrations later
+			dydt_traki.append(int(y_indx))
+			
+			# search through reactions to see where this component is reactant or product
+			for ri in range(num_eqn):
+				if sum(rindx[ri,0:nreac[ri]] == y_indx)>0:
+					reac_index.append(int(ri)) # append reaction index
+			for ri in range(num_eqn): # repeat for products
+				if sum( pindx[ri,0:nprod[ri]]== y_indx)>0:
+					reac_index.append(int(ri)) # append reaction index
+					
+	
+			# save reaction indices in dictionary value for this component,
+			# when creating empty rec_array, add two rows onto the end for particle- and 
+			# wall-partitioning, respectively.  Note the extra row to hold the reaction 
+			# indices
+			rec_array = np.zeros((nrec_steps+1, len(reac_index)+2))
+			rec_array[0, 0:-2] = (reac_index)
+			dydt_vst[y_indx] = rec_array # dictionary entry to hold results
+
+		dydt_vst['comp_index'] = dydt_traki # dictionary entry to hold component names
+		
+		# call on write_dydt_rec to generate the module that will process
+		# the tendency to change during the simulation
+		write_dydt_rec.write_dydt_rec()
+	
+	# --------------------------------------
+	
 	# if nucleating component formed of core component
 	if (nuc_comp[0] == 'core'):
 		nuci = num_comp-1 # index of core component

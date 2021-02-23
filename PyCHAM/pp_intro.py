@@ -52,7 +52,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# seedi - index of seed components
 	# ------------------------------------------
 	
-	if testf==1: # in test mode
+	if (testf == 1): # in test mode
 		return(0,0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
 	# isolate the starting number size distribution information
@@ -205,13 +205,13 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# molar volume (multiply y_dens by 1e-3 to convert from kg/m3 to g/cc and give
 	# MV in units cc/mol)
-	MV = (y_mw/(y_dens*1.0e-3)).reshape(num_comp, 1)
-	if (sum(pconcn) > 0.0): # account for concentration of components comprising seed
+	MV = (y_mw/(y_dens*1.e-3)).reshape(num_comp, 1)
+	if (sum(pconcn) > 0.): # account for concentration of components comprising seed
 		for ci in range(len(seedi)): # loop through indices of seed components
 			# concentration in all size bins (molecules/cc (air)):
-			y[num_comp+seedi[ci]:(num_comp*(num_asb)+seedi[ci]):num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
+			y[num_comp+seedi[ci]:(num_comp*(num_asb)+seedi[ci])+1:num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
 	
-	# print mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
+	# mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
 	# to g/cm3)
 	if (num_asb > 0): # with particles
 		mass_conc = 0. # start cumulation

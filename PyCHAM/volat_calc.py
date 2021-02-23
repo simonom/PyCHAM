@@ -41,7 +41,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	
 	
 	
-	if testf==1:
+	if (testf == 1):
 		return(0,0,0) # return dummies
 		
 	cwd = os.getcwd() # address of current working directory
@@ -84,7 +84,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 			
 			# density estimation ---------------------------------------------------------
 			if i == H2Oi:
-				y_dens[i] = 1.0*1.0E3 # (kg/m3 (particle))
+				y_dens[i] = 1.0*1.e3 # (kg/m3 (particle))
 				continue
 			# core properties
 			if (i == corei[0]):
@@ -92,14 +92,14 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 				continue
 			# nucleating component density, if component is core (kg/m3 (particle))
 			if i == nuci and nuc_comp[0] == 'core': 
-				y_dens[i] = 1.0*1.0E3
+				y_dens[i] = 1.*1.e3
 				continue
 			if spec_list[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
-				y_dens[i] = 1.0e3
+				y_dens[i] = 1.e3
 			else:
 				# density (convert from g/cc to kg/m3)
-				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.0E3
+				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
 			# ----------------------------------------------------------------------------
 	
 	# estimate vapour pressures (log10(atm))
@@ -133,8 +133,8 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 			vol_indx = spec_namelist.index(vol_Comp[i])
 			Psat[vol_indx, 0] = volP[i]
 	# ensure if nucleating component is core that it is involatile
-	if nuc_comp == 'core':
-		Psat[nuci, 0] = 0.0
+	if (nuc_comp[0] == 'core'):
+		Psat[nuci, 0] = 0.
 	
 	Psat_Pa = np.zeros((len(Psat), 1)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[:, 0] = Psat[:, 0]

@@ -1,0 +1,23 @@
+# in the model variables below seed particles are subject first to varying relative humidity at constant temperature, even exceeding saturation; then are subject to a substantial increase in temperature at constant absolute humidity, that will cause relative humidity to decrease to the extent that the efflorescence relative humidity is passed
+res_file_name = rh_change_example_output
+total_model_time = 1200.
+update_step = 1.
+recording_time_step = 20.
+size_structure = 0
+number_size_bins = 12
+lower_part_size = 1.e-3
+upper_part_size = 5.e1
+space_mode = log
+temperature = 275., 276.
+tempt = 0., 700
+p_init = 101300
+rh = 0.65, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002 
+rht = 0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600
+wall_on = 0
+coag_on = 1
+pconct = 0.
+pconc = 5.e3 : 9.5e2 : 4.0
+mean_rad = 0.070 : 0.2 : 1.5
+std = 1.24 : 1.40 : 1.70
+tracked_comp = H2O
+H2O_hist = 1

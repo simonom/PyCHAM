@@ -11,7 +11,7 @@ import importlib
 # define function
 def rec_prep(nrec_step, 
 	y, rindx, 
-	rstoi, pindx, pstoi, nprod, dydt_vst, nreac, 
+	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
@@ -23,7 +23,8 @@ def rec_prep(nrec_step,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
-	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt):
+	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
+	Pybel_objects, nuci, nuc_comp):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -33,7 +34,6 @@ def rec_prep(nrec_step,
 	# pindx - indices of products
 	# pstoi - stoichiometries of products
 	# nprod - number of products
-	# dydt_vst - recording for change tendencies
 	# nreac - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
@@ -125,6 +125,9 @@ def rec_prep(nrec_step,
 	# RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on chamber temperatures
 	# RHt_cnt - chamber relative humidity counts
+	# Pybel_objects - the pybel objects for components
+	# nuci - index of nucleating component
+	# nuc_comp - name of nucleating component
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -156,7 +159,8 @@ def rec_prep(nrec_step,
 	# update chamber variables
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt] = cham_up.cham_up(sumt, temp, tempt, 
+		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
+		Psat] = cham_up.cham_up(sumt, temp, tempt, 
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
@@ -164,7 +168,8 @@ def rec_prep(nrec_step,
 		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
-		DStar_org, RH, RHt, tempt_cnt, RHt_cnt)
+		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
+		y_mw, temp[0], Psat)
 	
 	
 	if ((num_sb-wall_on) > 0): # if particles present
@@ -213,13 +218,16 @@ def rec_prep(nrec_step,
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf)
 
-	if len(dydt_vst)>0:		
-		# record any change tendencies of specified components
-		import dydt_rec
-		dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, 0, 
-					dydt_vst, nreac, num_sb, num_comp, N_perbin, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff, corei)
+	# chamber environmental conditions ----------------------------------
+	# initiate the array for recording chamber temperature (K), pressure (Pa) 
+	# and relative humidity (fraction (0-1))
+	cham_env = np.zeros((nrec_step, 3))
+	
+	cham_env[0, 0] = temp_now # temperature (K)
+	cham_env[0, 1] = Pnow # pressure (Pa)
+	cham_env[0, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	
+	# --------------------------------------------------------------------------------
 
-
-	return(trec, yrec, dydt_vst, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, yrec_p2w)
+	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
+		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat)

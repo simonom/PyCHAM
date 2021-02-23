@@ -899,13 +899,13 @@ class PyCHAM(QWidget):
 		return(PLTab)
 		
 		
-	def PRIMtab(self): # primary plotting tab definition
+	def PRIMtab(self): # basic plotting tab definition
 	
 		PRIMTab = QWidget()
 		self.PRIMlayout = QGridLayout() 
 		PRIMTab.setLayout(self.PRIMlayout)
 	
-		self.b203 = QPushButton('Create Standard Results Plot', self)
+		self.b203 = QPushButton('Standard Results Plot', self)
 		self.b203.setToolTip('Create standard results plot (gas-phase concentration temporal profiles of components with specified initial concentrations and particle properties)')
 		self.b203.clicked.connect(self.on_click203)
 		self.PRIMlayout.addWidget(self.b203, 0, 0)
@@ -945,11 +945,19 @@ class PyCHAM(QWidget):
 		
 		# wall (from particle deposition to wall) concentrations temporal profiles -------------
 		
-		# button to plot temporal profile of total particle-phase concentrations
+		# button to plot temporal profile of wall concentrations (from particle deposition to wall)
 		self.b215 = QPushButton('Plot wall concentrations (from particle deposition to wall)', self)
 		self.b215.setToolTip('Plot the temporal profile of the wall concentration (from particle deposition to wall) for the specified components')
 		self.b215.clicked.connect(self.on_click215)
 		self.PRIMlayout.addWidget(self.b215, 5, 0)
+		
+		# chamber conditions temporal profiles -------------
+		
+		# button to plot temporal profile of chamber environmental variables
+		self.b215_a = QPushButton('Chamber Conditions (T, P, RH)', self)
+		self.b215_a.setToolTip('Plot the temporal profile of chamber variables (temperature, pressure, relative humidity)')
+		self.b215_a.clicked.connect(self.on_click215_a)
+		self.PRIMlayout.addWidget(self.b215_a, 0, 1)
 		
 		return(PRIMTab)
 	
@@ -1752,6 +1760,18 @@ class PyCHAM(QWidget):
 		import plotter_wp_part
 		dir_path = self.l201.text() # name of folder with results
 		plotter_wp_part.plotter(0, dir_path, comp_names, self) # plot results
+	
+	@pyqtSlot() # button to plot temporal profile of chamber conditions
+	# (temperature, pressure, relative humidity)
+	def on_click215_a(self):	
+
+		# clear dialogue message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		import plotter_cham_env
+		dir_path = self.l201.text() # name of folder with results
+		plotter_cham_env.plotter(0, dir_path, self) # plot results
 		
 	@pyqtSlot() # button to plot change tendencies
 	def on_click218(self):

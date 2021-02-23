@@ -51,6 +51,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# arrays to store number of reactants and products in gas-phase equations
 	nreac = np.empty(num_eqn[0], dtype=np.int8)
 	nprod = np.empty(num_eqn[0], dtype=np.int8)
+	# colptrs for sparse matrix
+	reac_col = np.empty(num_eqn[0], dtype=np.int8)
+	prod_col = np.empty(num_eqn[0], dtype=np.int8)
 	# list for equation reaction rate coefficients
 	reac_coef = []
 	# matrix containing index of components who are denominators in the
@@ -68,8 +71,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	comp_num = 0 # count the number of unique components in the chemical scheme
 	# ---------------------------------------------------------------------
 
-	max_no_reac = 0.0 # log maximum number of reactants in a reaction
-	max_no_prod = 0.0 # log maximum number of products in a reaction
+	max_no_reac = 0. # log maximum number of reactants in a reaction
+	max_no_prod = 0. # log maximum number of products in a reaction
 
 	# loop through gas-phase equations line by line and extract the required information
 	for eqn_step in range(num_eqn[0]):
@@ -317,12 +320,13 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	rr_arr_p_g = rr_arr_p.astype(int) # ensure integer type	
 	# colptrs for sparse matrix of the change to reactants per equation
 	reac_col_g = np.cumsum(nreac)-nreac
-	# include final column
-	reac_col_g = np.append(reac_col_g, reac_col_g[-1]+nreac[-1])
 	# colptrs for sparse matrix of the change to products per equation
 	prod_col_g = np.cumsum(nprod)-nprod
-	# include final column
-	prod_col_g = np.append(prod_col_g, prod_col_g[-1]+nprod[-1])
+	if (len(reac_col_g) > 0): # if gas-phase reaction present	
+		# include final columns
+		reac_col_g = np.append(reac_col_g, reac_col_g[-1]+nreac[-1])
+		prod_col_g = np.append(prod_col_g, prod_col_g[-1]+nprod[-1])
+		
 	# tag other gas-phase arrays
 	rindx_g = rindx
 	pindx_g = pindx
@@ -380,8 +384,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	jac_indx = np.zeros((num_eqn[1], 1))
 	# ---------------------------------------------------------------------
 
-	max_no_reac = 0.0 # log maximum number of reactants in a reaction
-	max_no_prod = 0.0 # log maximum number of products in a reaction
+	max_no_reac = 0. # log maximum number of reactants in a reaction
+	max_no_prod = 0. # log maximum number of products in a reaction
 
 	# loop through aqueous-phase equations line by line and extract the required information
 	for eqn_step in range(num_eqn[1]):
