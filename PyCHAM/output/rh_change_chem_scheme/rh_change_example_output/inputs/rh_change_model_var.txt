@@ -1,4 +1,4 @@
-# in the model variables below seed particles are subject first to varying relative humidity at constant temperature, even exceeding saturation; then are subject to a substantial increase in temperature at constant absolute humidity, that will cause relative humidity to decrease to the extent that the efflorescence relative humidity is passed
+# in the model variables below seed particles are subject first to varying relative humidity at constant temperature, even exceeding saturation; then are subject to a substantial increase in temperature at constant absolute humidity, causing relative humidity to decrease to the extent that the efflorescence relative humidity is passed; finally the temperature is decreased, causing relative humidity to increase to the extent that the fluorescence relative humidity is passed
 res_file_name = rh_change_example_output
 total_model_time = 1200.
 update_step = 1.
@@ -8,10 +8,10 @@ number_size_bins = 12
 lower_part_size = 1.e-3
 upper_part_size = 5.e1
 space_mode = log
-temperature = 275., 276.
-tempt = 0., 700
+temperature = 275., 276., 277., 278, 279, 280, 281, 282, 283, 282, 281, 280, 279, 278, 277
+tempt = 	0., 660,   670, 680, 690, 700, 710, 720, 730, 900, 910, 920, 930, 940, 950
 p_init = 101300
-rh = 0.65, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002 
+rh = 0.71, 0.90, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002, 1.002 
 rht = 0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600
 wall_on = 0
 coag_on = 1
@@ -21,3 +21,5 @@ mean_rad = 0.070 : 0.2 : 1.5
 std = 1.24 : 1.40 : 1.70
 tracked_comp = H2O
 H2O_hist = 1
+erh_ft = 0.7
+drh_ft = 0.8

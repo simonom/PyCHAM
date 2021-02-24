@@ -230,4 +230,4 @@ def rec_prep(nrec_step,
 	# --------------------------------------------------------------------------------
 
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat)
+		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat, cham_env[0, 2])

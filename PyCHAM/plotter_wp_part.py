@@ -65,8 +65,20 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = (yrec_p2w[:, indx_plot::num_comp]).sum(axis = 1)
 				
 			else:
-				print('Wall not considered in this simulation')
+				self.l203a.setText(str('Wall not considered in this simulation'))
+				
+				# set border around error message
+				if (self.bd_pl == 1):
+					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+					self.bd_pl = 2
+				if (self.bd_pl >= 2):
+					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+					self.bd_pl = 1
+
+				plt.ioff() # turn off interactive mode
+				plt.close() # close figure window
 				return()
+
 				
 			# concentration in ug/m3
 			conc = ((conc/si.N_A)*y_MW[indx_plot])*1.e12

@@ -26,7 +26,7 @@ def plotter(caller, dir_path, self):
 		comp0, _, PsatPa, OC, _, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
-	num_asb = num_sb-wall_on
+	num_asb = (num_sb-wall_on)
 
 	if (caller == 0):
 		plt.ion() # show results to screen and turn on interactive mode
@@ -52,6 +52,7 @@ def plotter(caller, dir_path, self):
 			# if there are both gaseous components and particle size bins then prepare figure
 			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
+		# parasite axis setup --------------------------------------------------------------
 		par1 = ax1.twinx() # first parasite axis
 		par2 = ax1.twinx() # second parasite axis
 		
@@ -62,8 +63,9 @@ def plotter(caller, dir_path, self):
 		# detached spine is invisible.  First, activate the frame but make the patch
 		# and spines invisible.
 		make_patch_spines_invisible(par2)
-		# Second, show the right spine.
+		# second, show the right spine
 		par2.spines["right"].set_visible(True)	
+		# ----------------------------------------------------------------------------------------
 
 	if (indx_plot):
 		
@@ -212,7 +214,7 @@ def plotter(caller, dir_path, self):
 		par2.spines['right'].set_color('black')
 		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par2.yaxis.set_tick_params(labelsize=16)
-		plt.legend(fontsize=14, handles=[p3, p5] ,loc=4)	
+		plt.legend(fontsize=14, handles=[p3, p5] , loc=4, fancybox=True, framealpha=0.5)	
 
 	# end of particle properties sub-plot -----------------------------------
 

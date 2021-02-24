@@ -263,16 +263,13 @@ def ode_updater(update_stp,
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = update_stp # the time to integrate over (s)
-	# remember the gas-phase water concentration from previous 
-	# integration step (molecules/cm3)
-	y_H2O0 = y[H2Oi]
 	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	yrec_p2w, temp_now, cham_env, Pnow, Psat] = rec_prep.rec_prep(nrec_steps, y, rindx, 
+	yrec_p2w, temp_now, cham_env, Pnow, Psat, RH0] = rec_prep.rec_prep(nrec_steps, y, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
@@ -334,11 +331,12 @@ def ode_updater(update_stp,
 			Pnow, DStar_org)
 			
 			# update particle-phase activity coefficients
-			[act_coeff, wat_hist] = act_coeff_update.ac_up(y, H2Oi, y_H2O0, temp_now, wat_hist, act_coeff)
+			[act_coeff, wat_hist, RH0, y, dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, wat_hist, act_coeff, num_comp, (num_sb-wall_on))
 			
 		else: # fillers
 			kimt = np.zeros((num_sb-wall_on, num_comp))
 			kelv_fac = np.zeros((num_sb-wall_on, 1))
+			dydt_erh_flag = 0
 		
 		# reaction rate coefficient
 		rrc = rrc_calc.rrc_calc(RO2_indx, 
@@ -356,25 +354,27 @@ def ode_updater(update_stp,
 			# record any change tendencies of specified components
 			dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt-1, 
 					dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff, seedi)
+					kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)
 		
 		if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
-			
-			# call on ode solver for water
-			[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
-			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
-			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
-			reac_col, prod_col, rstoi_flat, 
-			pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
-			seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
-			jac_part_indxn,
-			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
-			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
-			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
-			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
-			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
-			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+			# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
+
+			if (wat_hist == 1):			
+				# call on ode solver for water
+				[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+				nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
+				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
+				reac_col, prod_col, rstoi_flat, 
+				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+				num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+				seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+				jac_part_indxn,
+				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
+				nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
+				y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
+				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
+				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
+				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
 			
 			# check on stability of water partitioning
 			if (any(y[H2Oi::num_comp]<0.)):

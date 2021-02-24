@@ -209,8 +209,10 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if (sum(pconcn) > 0.): # account for concentration of components comprising seed
 		for ci in range(len(seedi)): # loop through indices of seed components
 			# concentration in all size bins (molecules/cc (air)):
-			y[num_comp+seedi[ci]:(num_comp*(num_asb)+seedi[ci])+1:num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
-	
+			if (wall_on == 0): # if no wall
+				y[num_comp+seedi[ci]:(num_comp*(num_asb)+seedi[ci])+1:num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
+			else:
+				y[num_comp+seedi[ci]:(num_comp*(num_asb)+seedi[ci]):num_comp] = (NA/MV[seedi[ci]])*(Varr*1.e-12*(seedVr[ci]/sum(seedVr)))*N_perbin[:, 0]
 	# mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
 	# to g/cm3)
 	if (num_asb > 0): # with particles

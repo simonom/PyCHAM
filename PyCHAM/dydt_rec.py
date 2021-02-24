@@ -2,11 +2,11 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in eqn_pars and treats loss from gas-phase as negative
 
-# File Created at 2021-02-23 18:09:46.795964
+# File Created at 2021-02-24 17:15:48.367003
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, seedi):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist):
 	
 	# loop through components to record the tendency of change 
 	for compi in dydt_vst.get('comp_index'): 
@@ -32,23 +32,31 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			
 		# now estimate and record tendency to change due to particle- and wall-partitioning  
 		# particle-partitioning 
-		for ibin in range(num_sb-1): # size bin loop
-			Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
-			conc_sum = np.zeros((1)) 
-			if any(pconc > 0.): # if seed particles present 
-				conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)
+		# if efflorescence has occurred (modelled inside act_coeff_update), then need
+		# to account for the immediate transfer of water from particles to gas
+		if (wat_hist == 0):
+			if (dydt_erh_flag != 0): 
+				dydt_rec[step+1, reac_count] += dydt_erh_flag
 			else: 
-				conc_sum[0] = Csit.sum() 
-			# prevent numerical error due to division by zero 
-			ish = (conc_sum == 0.) 
-			conc_sum[ish] = 1.e-40 
-			# particle surface gas-phase concentration (molecules/cc (air)) 
-			Csit = (Csit[compi]/conc_sum)*Psat[0, compi]*kelv_fac[ibin, 0]*act_coeff[0, compi] 
-			# partitioning rate (molecules/cc.s) 
-			dydt_all = kimt[ibin, compi]*(y[compi]-Csit) 
-			# gas-phase change (molecules/cc/s) 
-			dydt_rec[step+1, reac_count] -= dydt_all 
-			
+				dydt_rec[step+1, reac_count] = 0
+		else:
+			for ibin in range(num_sb-1): # size bin loop
+				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
+				conc_sum = np.zeros((1)) 
+				if any(pconc > 0.): # if seed particles present 
+					conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)
+				else: 
+					conc_sum[0] = Csit.sum() 
+				# prevent numerical error due to division by zero 
+				ish = (conc_sum == 0.) 
+				conc_sum[ish] = 1.e-40 
+				# particle surface gas-phase concentration (molecules/cc (air)) 
+				Csit = (Csit[compi]/conc_sum)*Psat[0, compi]*kelv_fac[ibin, 0]*act_coeff[0, compi] 
+				# partitioning rate (molecules/cc.s) 
+				dydt_all = kimt[ibin, compi]*(y[compi]-Csit) 
+				# gas-phase change (molecules/cc/s) 
+				dydt_rec[step+1, reac_count] -= dydt_all 
+				
 		# wall-partitioning 
 		if (kw > 1.e-10): 
 			# concentration at wall (molecules/cc (air)) 

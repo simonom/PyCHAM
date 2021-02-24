@@ -206,7 +206,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# return to array
 	y_w = y_w.flatten()
 	
-	# implement new water gas- and particle-phase concentrations (molecules/cc (air))
+	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
 	y0[H2Oi:num_comp*(num_asb+1):num_comp] = y_w
 	# updated concentrations (molecules/cc (air))
 	y[:] = y0[:]

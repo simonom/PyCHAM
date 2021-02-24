@@ -235,7 +235,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		
 		else: # if no change in temperature, keep the original
 			# ntemperature (K)
-			temp_now = temp[tempt_cnt-1]
+			if (tempt_cnt != -1): # if not at end
+				temp_now = temp[tempt_cnt-1]
+			else: # if at end
+				temp_now = temp[tempt_cnt]
 		
 
 	if (len(temp) == 1):
