@@ -122,7 +122,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		if (num_asb > 0):
 			dd[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
 		# return to array, note that consistent with the solve_ivp manual, this ensures dd is
-		# a vector rather than matrix, since y0 is a vector
+		# a vector rather than matrix, since y00 is a vector
 		dd = dd.flatten()
 		return (dd)
 
@@ -184,8 +184,6 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	atol = 1.e-4
 	rtol = 1.e-5
 	
-	y0 = y # remember initial component concentrations (molecules/cc (air))
-	
 	# isolate just the water concentrations
 	y_w = y[H2Oi:num_comp*(num_asb+1):num_comp]
 	
@@ -194,7 +192,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# force all components in size bins with no particle to zero
 	ymat[N_perbin[:, 0] == 0, :] = 0.
 	
-	# call on the ODE solver, note y contains the initial condition(s) (molecules/cc (air)) 
+	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) 
 	# and must be 1D even though y in dydt and jac has shape (number of elements, 1)
 	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
 	
@@ -206,10 +204,9 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# return to array
 	y_w = y_w.flatten()
 	
+	# incorporate new water concentrations (molecules/cm3)
 	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
-	y0[H2Oi:num_comp*(num_asb+1):num_comp] = y_w
-	# updated concentrations (molecules/cc (air))
-	y[:] = y0[:]
+	y[H2Oi:num_comp*((num_sb-wall_on)+1):num_comp] = y_w
 	
 	# return concentration(s) and time(s) following integration
 	return(y, sol.t)

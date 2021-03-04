@@ -110,7 +110,7 @@ def retr_out(output_by_sim):
 	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K']
 	# pure component saturation vapour pressures at 298.15 K (log10(atm))
 	OC = const['oxygen_to_carbon_ratios_of_components']
-	H2Oi = const['index_of_water'] # index of water
+	H2Oi = int((const['index_of_water'])[0]) # index of water
 	seedi = const['index_of_seed_components'] # index of seed components
 	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
 	

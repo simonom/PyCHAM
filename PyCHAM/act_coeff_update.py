@@ -14,8 +14,8 @@ def ac_up(y, H2Oi, RH0, TEMP, wat_hist, act_coeff, num_comp, num_asb):
 	# inputs: -------------------------------
 	# y - concentrations of components (molecules/cm3)
 	# H2Oi - index of water
-	# RH0 - relative humidity on previous 
-	#	integration step (molecules/cm3)
+	# RH0 - relative humidity at start of this 
+	#	integration step (fraction (0-1))
 	# TEMP - temperature inside chamber now (K)
 	# wat_hist - flag for history of water (0 if dried and therefore 
 	#	depends on deliquescence relative humidity, 1if wet 

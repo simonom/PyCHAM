@@ -103,8 +103,12 @@ def ui_check(self):
 	# let user know that results will be automatically deleted when 
 	#default name used for folder to save to
 	if (sav_nam == 'default_res_name' and em_flag < 2):
-		err_mess = str('Note - default name for save folder used, therefore results folder will be automatically deleted at the end of the simulation to avoid future duplication')
-		em_flag = 1
+		err_mess_n = str('Note - default name for save folder used, therefore results folder will be automatically deleted at the end of the simulation to avoid future duplication\n')
+		if (em_flag == 0):
+			err_mess = err_mess_n
+		else:
+			err_mess = str(err_mess+err_mess_n)
+		em_flag = 1	
 	
 	# check on particle number concentration inputs ----------------------------------
 	
@@ -134,12 +138,51 @@ def ui_check(self):
 	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1]):
 		if (em_flag < 2):
 			err_mess = str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+') and/or std ('+str(std.shape[1])+').  Please see README for guidance.')
-			em_flag = 2 # error message flag for error
+
+	# check on temperature inputs ----------------------------------------------
+	
+	if (em_flag<2):
+		if (len(temp) != len(tempt)):
+			err_mess = str('Error - length of temperature inputs does not match length of corresponding times for temperatures, and the two must match, please see the README notes on the temperature and tempt model variables for further guidance')
+			em_flag = 2 # error message flag for a note
+		if (len(temp) > 0 and tempt[0] != 0):
+			err_mess = str('Error - no temperature given for the start of the experiment (0 seconds), and one must be provided, please see the README notes on the temperature and tempt model variables for further guidance')
+			em_flag = 2 # error message flag for a note
+		
+	if (em_flag<2):
+		# check on rate of temperature change 
+		if (len(temp) == len(tempt) and len(temp)>1):
+			# maximum change
+			max_change = np.max(np.abs(np.diff(temp)))
+			if (max_change > 1.):
+				err_mess_n = str('Note - the maximum change of chamber temperature exceeds 1 K.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to temperature given in the temperature model variable are limited to 1 K, with their corresponding times given in the tempt model variable (PyCHAM will automatically limit the update step according to the time differences given by the tempt model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as temperature change, and will attempt to rectify the instability by attempting incrementally smaller temperature changes over incrementally smaller time steps.\n')
+				if (em_flag == 0):
+					err_mess = err_mess_n
+				else:
+					err_mess = str(err_mess+err_mess_n)
+				em_flag = 1 # error message flag for a note
+
+	# -------------------------------------------------------------------------------------
 
 	# check on relative humidity inputs -----------------------------------------
-	if (any(RH > 1.) and em_flag<2):
-		err_mess = str('Note - RH set above 1.; simulation will be attempted, but please note that RH is interpreted as a fraction, not a percentage, where 1 represents saturation of water vapour')
+	if (any(RH > 1.) and em_flag < 2):
+		err_mess_n = str('Note - relative humidity set above 1.; simulation will be attempted, but please note that RH is interpreted as a fraction, not a percentage, where 1 represents saturation of water vapour\n')
+		if (em_flag == 0):
+			err_mess = err_mess_n
+		else:
+			err_mess = str(err_mess+err_mess_n)
 		em_flag = 1 # error message flag for a note
+	
+	# check on big jumps in relative humidity
+	if (em_flag<2):
+		if (len(RH) > 1):
+			if (np.max(np.abs(np.diff(RH))) > 0.01):
+				err_mess_n = str('Note - the maximum change of chamber relative humidity exceeds 0.01.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to relative humidity given in the rh model variable are limited to 0.01, with their corresponding times given in the rht model variable (PyCHAM will automatically limit the update step according to the time differences given by the rht model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as relative humidity change, and will attempt to rectify the instability by attempting incrementally smaller relative humidity changes over incrementally smaller time steps.\n')
+				if (em_flag == 0):
+					err_mess = err_mess_n
+				else:
+					err_mess = str(err_mess+err_mess_n)
+				em_flag = 1			
 	
 	if (len(RH) != len(RHt) and em_flag < 2):
 		err_mess = str('Error - the number of relative humidities does not match the number of times through simulation at which relative humidities are reached, please refer to the notes on the rh and rht model variables in README.')
@@ -197,7 +240,7 @@ def ui_check(self):
 	if (len(dens_comp) != len(dens) and em_flag < 2):
 		err_mess = str('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
 		em_flag = 2
-		
+	
 	# check on consistency of names of seed component(s) and their volume ratio
 	if (len(seed_name) != len(seedVr) and em_flag < 2):
 		if (len(seed_name) > 1) and (len(seedVr) == 1):
@@ -212,7 +255,7 @@ def ui_check(self):
 			seed_diss = np.ones((len(seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
-		em_flag = 2
+			em_flag = 2
 
 	if (len(partit_cutoff) > 1 and em_flag < 2):
 		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
@@ -278,7 +321,7 @@ def ui_check(self):
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close
-
+	
 	# update model variables message in GUI
 	if (em_flag<2): # if no error message
 	

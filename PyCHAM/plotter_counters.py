@@ -27,7 +27,6 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# max_size - maximum size measure by counter (nm)
 	# csbn - number of size bins for counter
 	# p_rho - assumed density of particles (g/cm3)
-	
 	# --------------------------------------------------------------------------
 
 	# chamber condition ---------------------------------------------------------
@@ -247,6 +246,95 @@ def fmt(x, pos):
 	a, b = '{:.1e}'.format(x).split('e')
 	b = int(b)
 	return r'${} \times 10^{{{}}}$'.format(a, b)
+
+# condensation particle counter (CPC)
+def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert):
+
+	import rad_resp_hum
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# self - reference to GUI
+	# dryf - relative humidity of aerosol at entrance to condensing unit of CPC (fraction 0-1)
+	# cdt - false background counts (# particles/cm3)
+	# max_dt - maximum detectable concentration (# particles/cm3)
+	# sdt - particle size at 50 % counting efficiency (nm), 
+	# 	width factor for counting efficiency dependence on particle size
+	# max_size - maximum size measure by counter (nm)
+	# uncert - uncertainty (%) around counts by counter
+	# --------------------------------------------------------------------------
+
+	# required outputs ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
+		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _) = retr_out.retr_out(dir_path)
+	# ------------------------------------------------------------------------------
+	
+	# condition wet particles assuming equilibrium with relative humidity at 
+	# entrance to conditioning unit of CPC.  Get new radius at size bin centre (um)
+	xn  = rad_resp_hum.rad_resp_hum(yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], x, dryf, H2Oi, num_comp, (num_sb-wall_on), Nwet, y_MV)
+	
+		
+	# account for size dependent counting efficiency below one
+	# get counting efficiency as a function of particle size (nm)
+	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
+	
+	# empty array to hold counting efficiencies across times and simulation size bins
+	# Dp is in um
+	ce_t = np.zeros((len(timehr), xn.shape[1]))
+	
+	# loop through times
+	for it in range(len(timehr)):
+		# interpolate counting efficiency (fraction) to simulation size bin centres
+		# Dp is in um
+		ce_t[it, :] = np.interp(xn[it, :]*2., Dp, ce)
+		# upper size range of instrument, note conversion of
+		# upper size from nm to um
+		size_indx = (xn[it, :]*2. > max_size*1.e-3)
+		Nwet[it, size_indx] = 0.
+	
+	Nwet = Nwet*ce_t # correct for counting efficiency
+	
+	Nwet = Nwet.sum(axis=1) # sum particle concentrations (# particles/cm3)
+	
+	# account for false background counts 
+	# (minimum detectable particle concentration)  (# particles/cm3)
+	Nwet[Nwet<cdt] = cdt
+	
+	# account for maximum particle concentration (# particles/cm3)
+	Nwet[Nwet>max_dt] = max_dt
+	
+	
+	
+	if (caller == 0): # when called from gui
+		plt.ion() # show results to screen and turn on interactive mode
+	
+	# plot temporal profile of total particle number concentration (# particles/cm3)
+	# prepare figure -------------------------------------------
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	ax0.plot(timehr, Nwet, label = 'uncertainty mid-point')
+	
+	# plot vertical axis logarithmically
+	ax0.set_yscale("log")
+	
+	# include uncertainty region, note conversion of uncertainty from percentage to fraction
+	ax0.fill_between(timehr, Nwet-Nwet*uncert/100., Nwet+Nwet*uncert/100., alpha=0.3, label = 'uncertainty bounds')
+	
+	# set tick format for vertical axis
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize=14)
+	ax0.set_ylabel('Total Number Concentration (#$\mathrm{particles\, cm^{-3}}$)', size = 14)
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
+	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+	ax0.set_title('Simulated total particle concentration convolved to represent \ncondensation particle counter (CPC) measurements')
+	ax0.legend()
+	if (caller == 2): # display when in test mode
+		plt.show()
+	
+	return()
 
 # function to plot counting efficiency as a function of particle size (% vs. nm)
 def count_eff_plot(caller, dir_path, self, sdt):

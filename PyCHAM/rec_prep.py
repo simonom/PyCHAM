@@ -10,7 +10,7 @@ import importlib
 
 # define function
 def rec_prep(nrec_step, 
-	y, rindx, 
+	y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
@@ -24,11 +24,12 @@ def rec_prep(nrec_step,
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
-	Pybel_objects, nuci, nuc_comp):
+	Pybel_objects, nuci, nuc_comp, t0):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
 	# y - initial concentrations (molecules/cc (air))
+	# y0 - component concentrations prior to integration step (molecules/cc (air))
 	# rindx - indices of reactants
 	# rstoi - stoichiometries of reactants
 	# pindx - indices of products
@@ -128,6 +129,7 @@ def rec_prep(nrec_step,
 	# Pybel_objects - the pybel objects for components
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
+	# t0 - initial integration step (s)
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -160,16 +162,16 @@ def rec_prep(nrec_step,
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		Psat] = cham_up.cham_up(sumt, temp, tempt, 
+		Psat, N_perbin, x, pconcn_frac] = cham_up.cham_up(sumt, temp, tempt, 
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-		seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
+		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat)
+		y_mw, temp[0], Psat, 0, t0, x)
 	
 	
 	if ((num_sb-wall_on) > 0): # if particles present

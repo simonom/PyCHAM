@@ -41,7 +41,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		for i in range(len(comp_names_to_plot)):
 			
 			if comp_names_to_plot[i].strip() == 'H2O':
-				indx_plot = H2Oi[0]
+				indx_plot = H2Oi
 			else:
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
@@ -56,9 +56,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 						self.bd_pl = 1
 					
-				plt.ioff() # turn off interactive mode
-				plt.close() # close figure window
-				return()
+					plt.ioff() # turn off interactive mode
+					plt.close() # close figure window
+					return()
 			
 			if (wall_on == 1):
 				# wall-phase concentration (from gas-particle partitioning) (molecules/cc)

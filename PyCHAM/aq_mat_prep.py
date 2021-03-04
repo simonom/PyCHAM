@@ -56,6 +56,14 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 	rstoi_flat = np.tile(rstoi_flat, (1, num_asb))
 	pstoi_flat = np.tile(pstoi_flat, (1, num_asb))
 	
+	# count number of empty elements in rindx (due to not all reactions containing
+	# the maximum number of unique reactants present in a reaction)
+	empty_num = sum(sum(rindx == -2))
+	
+	# now change fillers to zero, and note that although this suggests the first component
+	# it makes no difference as the corresponding stoichiometry is 0
+	rindx[rindx == -2] = 0
+	
 	for sbi in range(num_sb-wall_on): # size bin loop
 		
 		if (sbi == 0): # first size bin - account for gas-phase indices prior
@@ -66,10 +74,13 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 			uni_y_rind = uni_y_rind+(comp_num+2)
 			uni_y_pind = uni_y_pind+(comp_num+2)
 
+		# cumulative number of empty elements in rindx
+		en_cum = empty_num*sbi
+
 		if (sbi > 0): # larger size bin
 			rindx = np.append(rindx, rindx[0:rindxs[0], 0:rindxs[1]]+(sbi)*(comp_num+2), axis=0)
 			pindx = np.append(pindx, pindx[0:pindxs[0], 0:pindxs[1]]+(sbi)*(comp_num+2), axis=0)
-			y_arr = np.append(y_arr, y_arr[0:y_arrl]+(sbi)*(max(y_arr[0:y_arrl])+1), axis=0)
+			y_arr = np.append(y_arr, y_arr[0:y_arrl]+(sbi)*(max(y_arr[0:y_arrl])+1)+en_cum, axis=0)
 			y_rind = np.append(y_rind, y_rind[0:y_rindl]+(sbi)*(comp_num+2))
 			y_pind = np.append(y_pind, y_pind[0:y_pindl]+(sbi)*(comp_num+2))
 			rr_arr = np.append(rr_arr, rr_arr[0:rr_arrl]+(sbi)*(max(rr_arr[0:rr_arrl])+1), axis=0)

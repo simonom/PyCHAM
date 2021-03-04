@@ -40,7 +40,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# matrix to record indices of products (cols) in each equation (rows)
 	pindx = np.zeros((num_eqn[0], 1)).astype(int)
 	# matrix to record stoichiometries of reactants (cols) in each equation (rows)
-	rstoi = np.ones((num_eqn[0], 1))
+	rstoi = np.zeros((num_eqn[0], 1))
 	jac_stoi = np.zeros((num_eqn[0], 1))
 	# 1D array to record stoichiometries of reactants per equarion
 	rstoi_flat = np.empty((0))
@@ -121,7 +121,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		# append columns if needed because maximum number of reactants increases
 		while (max_no_reac > np.minimum(rindx.shape[1], rstoi.shape[1])): 
 			rindx = np.append(rindx, (np.zeros((num_eqn[0], 1))).astype(int), axis=1)
-			rstoi = np.append(rstoi, (np.ones((num_eqn[0], 1))), axis=1)
+			rstoi = np.append(rstoi, (np.zeros((num_eqn[0], 1))), axis=1)
 			y_arr = np.append(y_arr, (np.ones((num_eqn[0], 1))*-9999).astype(int), axis=1)
 			y_arr_fixer = ((np.arange(0, num_eqn[0], dtype = 'int')).reshape(-1, 1))
 			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
@@ -217,7 +217,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				rstoi[eqn_step, exist_indx] += rstoi[eqn_step, reactant_step]
 				jac_stoi[eqn_step, exist_indx] += -1*rstoi[eqn_step, reactant_step]
 				# remove stoichiometry added above
-				rstoi[eqn_step, reactant_step] = 1
+				rstoi[eqn_step, reactant_step] = 0
 				jac_stoi[eqn_step, reactant_step] = 0
 				reactant_step -= 1 # ignore this duplicate
 			else:
@@ -346,7 +346,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# same for aqueous-phase reactions ----------------------------------
 	# preparatory part ----------------------------------------------------
 	# matrix to record indices of reactants (cols) in each equation (rows)
-	rindx = np.zeros((num_eqn[1], 1)).astype(int)
+	rindx = (np.ones((num_eqn[1], 1))*-2).astype(int)
 	# matrix of indices to arrange reactant concentrations when 
 	# reaction rate coefficient calculated
 	y_arr = (np.ones((num_eqn[1], 1)).astype(int))*-9999
@@ -362,11 +362,11 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# matrix to record indices of products (cols) in each equation (rows)
 	pindx = np.zeros((num_eqn[1], 1)).astype(int)
 	# matrix to record stoichiometries of reactants (cols) in each equation (rows)
-	rstoi = np.ones((num_eqn[1], 1))
+	rstoi = np.zeros((num_eqn[1], 1))
 	jac_stoi = np.zeros((num_eqn[1], 1))
-	# 1D array to record stoichiometries of reactants per equarion
+	# 1D array to record stoichiometries of reactants per equation
 	rstoi_flat = np.empty((0))
-	# 1D array to record stoichiometries of products per equarion
+	# 1D array to record stoichiometries of products per equation
 	pstoi_flat = np.empty((0))
 	# matrix to record stoichiometries of products (cols) in each equation (rows)
 	pstoi = np.zeros((num_eqn[1], 1))
@@ -432,8 +432,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 
 		# append columns if needed
 		while max_no_reac > np.minimum(rindx.shape[1], rstoi.shape[1]): 
-			rindx = np.append(rindx, (np.zeros((num_eqn[1], 1))).astype(int), axis=1)
-			rstoi = np.append(rstoi, (np.ones((num_eqn[1], 1))), axis=1)
+			rindx = np.append(rindx, (np.ones((num_eqn[1], 1))*-2).astype(int), axis=1)
+			rstoi = np.append(rstoi, (np.zeros((num_eqn[1], 1))), axis=1)
 			y_arr = np.append(y_arr, (np.ones((num_eqn[1], 1))*-9999).astype(int), axis=1)
 			y_arr_fixer = ((np.arange(0, num_eqn[1], dtype = 'int')).reshape(-1, 1))
 			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
@@ -525,14 +525,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 			
 			# store reactant index
 			# check if index already present - i.e. component appears more than once
-			if sum(rindx[eqn_step, 0:reactant_step]==int(name_indx))>0:
+			# as a reactant in this reaction
+			if sum(rindx[eqn_step, 0:reactant_step] == int(name_indx))>0:
 				# get existing index of this component
 				exist_indx = (np.where(rindx[eqn_step, 0:reactant_step]==(int(name_indx))))[0]
 				# add to existing stoichiometry
 				rstoi[eqn_step, exist_indx] += rstoi[eqn_step, reactant_step]
 				jac_stoi[eqn_step, exist_indx] += -1*rstoi[eqn_step, reactant_step]
 				# remove stoichiometry added above
-				rstoi[eqn_step, reactant_step] = 1
+				rstoi[eqn_step, reactant_step] = 0
 				jac_stoi[eqn_step, reactant_step] = 0
 				reactant_step -= 1 # ignore this duplicate
 			else:

@@ -15,11 +15,11 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	light_time_cnt, light_ad, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
-	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y, N_perbin, 
+	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
-	temp_now, Psat):
+	temp_now, Psat, gpp_stab, t00, x):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -61,7 +61,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# pconct - times of particle injection (s)
 	# seedt_cnt - count on injections of particles
 	# num_comp - number of components
-	# y - concentration of components (molecules/cc (air))
+	# y0 - concentration of components prior to integration (molecules/cc (air))
+	# y - variable concentration of components prior to integration (molecules/cc (air))
 	# N_perbin - concentration of particles (#/cc (air))
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
@@ -101,6 +102,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# temp_now - chamber temperature (K) prior to this update
 	# Psat - saturation vapour pressures of components at the current 
 	#	chamber temperature (molecules/cm3)
+	# gpp_stab - flag for whether to linearly interpolate any change 
+	# 	to chamber conditions (equals -1 if change needed)
+	# t00 - the initial integration step on the current integration step
+	# x - starting sizes of particles (um)
 	# -----------------------------------------------------------------------
 
 	# check on change of light setting --------------------------------------
@@ -151,35 +156,46 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		import zenith
 		# photochemical rate now
 		(secxn, cosxn) = zenith.zenith(sumt, lat, lon, dayOfYear)
-		Jn =1.747E-01*cosxn**(0.155)*np.exp(-1.0*0.125*secxn)
+		Jn =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# photochemical rate after proposed time step
 		(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
-		Jt =1.747E-01*cosxn**(0.155)*np.exp(-1.0*0.125*secxn)
+		Jt =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# iteratively reduce proposed time interval until photochemical
 		# rate changes by acceptable amount
 		while (abs(Jt-Jn) > 5.e-3):
 			tnew = tnew*0.9
 			# photochemical rate after proposed time step
 			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
-			Jt =1.747E-01*cosxt**(0.155)*np.exp(-1.0*0.125*secxt)
+			Jt =1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
 			bc_red = 1
 
 	# check on updates to temperature (K) --------------------------------------	
 	if (len(temp) > 1): # because a temperature must be given for experiment start
 	
 		# check whether changes occur at start of this time step
-		if (sumt == tempt[tempt_cnt]):
+		if (sumt >= tempt[tempt_cnt] and tempt_cnt != -1):
 
 			# new temperature (K)
-			temp_now = temp[tempt_cnt]
+			if (gpp_stab != -1): # if no linear interpolation required
 			
-			# update vapour pressure of water (log10(atm)) of vapour,
+				temp_nown = temp[tempt_cnt] # new temperature (K)
+				if (tempt_cnt < (len(tempt)-1)):
+					tempt_cnt += 1 # keep count of temperature setting index
+				else:
+					tempt_cnt = -1 # reached end
+				bc_red = 0 # reset flag for time step reduction due to boundary conditions
+			else:
+				# new temperature (K)
+				temp_nown = np.interp(tnew, [0, t00], [temp_now, tempt[tempt_cnt]])
+				bc_red = 1 # reset flag for time step reduction due to boundary conditions
+				
+			# update vapour pressure of water (log10(atm)),
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
-			[_, Psat_water, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
+			[_, Psat_water, _] = water_calc(temp_nown, RH[RHt_cnt], si.N_A)
 			# update vapour pressures of all components (molecules/cc and Pa), 
 			# ignore density output
-			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_now, H2Oi,   
+			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_nown, H2Oi,   
 							num_comp, Psat_water, [], [], 0, corei, seed_name, 
 							pconc, 0, 0.0, [], 1, nuci, nuc_comp)
 			
@@ -190,21 +206,21 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# according to the ideal gas law, air pressure (Pa) inside chamber
 			# is proportional to temperature, therefore pressure changes by 
 			# the same factor 
-			Pnow = Pnow*(temp_now/temp[tempt_cnt-1])
+			Pnow = Pnow*(temp_nown/temp_now)
 			
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
-			dyn_visc = 1.8325e-5*((416.16/(temp_now+120.))*(temp_now/296.16)**1.5)
+			dyn_visc = 1.8325e-5*((416.16/(temp_nown+120.))*(temp_nown/296.16)**1.5)
 	
 			ma = 28.966e-3 # molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
 			
 			# air density (kg/m3 (air)), ideal gas law
-			rho_a =  (Pnow*ma)/((si.R)*temp_now)
+			rho_a =  (Pnow*ma)/((si.R)*temp_nown)
 						
 			# update mean free path and thermal speed
 			# mean thermal speed of each molecule (m/s) (11.151 Jacobson 2005)
 			# note that we need the weight of one molecule, which is why y_mw is divided by
 			# Avogadro's constant, and we need it in kg, which is why we multiply by 1e-3
-			therm_sp = ((8.*si.k*temp_now)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
+			therm_sp = ((8.*si.k*temp_nown)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 			
 			# mean free path (m) for each component (15.24 of Jacobson 2005)
 			# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
@@ -216,101 +232,119 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# volume for air (19.7) taken from Table 4.1 of Taylor (1993) and mw of 
 			# air converted to g/mol from kg/mol.  This is a replication of the original method 			
 			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
-			DStar_org = 1.013e-2*temp_now**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+			DStar_org = 1.013e-2*temp_nown**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
-
-			if (tempt_cnt<(len(tempt)-1)):
-				tempt_cnt += 1 # keep count of temperature setting index
-			else:
-				tempt_cnt = -1 # reached end
-			bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			
+			temp_now = temp_nown # update current temperature (K)
+		
 		# check whether temperature changes during proposed integration time step
-		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt!=-1):
+		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = tempt[tempt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 		
-		else: # if no change in temperature, keep the original
-			# ntemperature (K)
-			if (tempt_cnt != -1): # if not at end
-				temp_now = temp[tempt_cnt-1]
-			else: # if at end
-				temp_now = temp[tempt_cnt]
-		
-
 	if (len(temp) == 1):
 		temp_now = temp[0] # temperature constant if only one value given
 
 	# check on instantaneous injection of components ---------------------------------------
-	if len(injectt)>0 and gasinj_cnt>-1: # if any injections occur
+	if (len(injectt) > 0 and gasinj_cnt > -1): # if any injections occur
 	
 		# check whether changes occur at start of this time step
-		if (sumt == injectt[gasinj_cnt]):
+		if (sumt >= injectt[gasinj_cnt] and gasinj_cnt != -1):
+		
+			if (gpp_stab != -1): # if no linear interpolation required
+				Ct_gain = Ct[:, gasinj_cnt]
+				
+				if (gasinj_cnt < (Ct.shape[1]-1)):
+					gasinj_cnt += 1 # update count on injections
+				else:
+					gasinj_cnt = -1 # reached end
+				bc_red = 0 # reset flag for time step reduction due to boundary conditions
+				
+			else:
+				Ct_gain = np. interp(tnew, [0, t00], [Ct[:, gasinj_cnt-1], Ct[:, gasinj_cnt]])
+				bc_red = 1 # reset flag for time step reduction due to boundary conditions
+		
 			# account for change in gas-phase concentration,
 			# convert from ppb to molecules/cm3 (air)
-			y[inj_indx] += Ct[:, gasinj_cnt]*Cfactor-y[inj_indx]
-			if (gasinj_cnt<(Ct.shape[1]-1)):
-				gasinj_cnt += 1 # update count on injections
-			else:
-				gasinj_cnt = -1 # reached end
-			bc_red = 0 # reset flag for time step reduction due to boundary conditions
+			y[inj_indx] += Ct_gain*Cfactor-y0[inj_indx]
 				
 		# check whether changes occur during proposed integration time step
-		if (sumt+tnew > injectt[gasinj_cnt] and gasinj_cnt != -1):
+		# and that time step has not been forced to reduce due to unstable ode solver
+		if (sumt+tnew > injectt[gasinj_cnt] and gasinj_cnt != -1 and gpp_stab != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = injectt[gasinj_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# check on instantaneous change in relative humidity ---------------------------------------
-	if (len(RHt)>0 and RHt_cnt>-1): # if any injections occur
+	if (len(RHt) > 0 and RHt_cnt > -1): # if any injections occur
 	
 		# check whether changes occur at start of this time step
-		if (sumt == RHt[RHt_cnt]):
+		if (sumt >= RHt[RHt_cnt] and RHt_cnt != -1):
+		
+			if (gpp_stab != -1): # if no linear interpolation required
+				RHn = RH[RHt_cnt]
+				
+				if (RHt_cnt < (RHt.shape[0]-1)):
+					RHt_cnt += 1 # update count on RH
+				else:
+					RHt_cnt = -1 # reached end
+				bc_red = 0 # reset flag for time step reduction due to boundary conditions
+				
+			else:
+				RHn = np. interp(tnew, [0, t00], [RH[RHt_cnt-1], RH[RHt_cnt]])
+				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 		
 			# update vapour pressure of water (log10(atm)), and change 
 			# gas-phase concentration of water vapour since 
 			# RH stays as stated in the RH and RHt model variables
-			[y[H2Oi], _, _] = water_calc(temp_now, RH[RHt_cnt], si.N_A)
-			
-			if (RHt_cnt<(RHt.shape[0]-1)):
-				RHt_cnt += 1 # update count on RH
-			else:
-				RHt_cnt = -1 # reached end
-			bc_red = 0 # reset flag for time step reduction due to boundary conditions
+			[y[H2Oi], _, _] = water_calc(temp_now, RHn, si.N_A)
 				
 		# check whether changes occur during next proposed integration time step
-		if ((sumt+tnew > RHt[RHt_cnt]) and (RHt_cnt != -1)):
+		# and that time step has not been forced to reduce due to unstable ode solvers
+		if ((sumt+tnew > RHt[RHt_cnt]) and (RHt_cnt != -1) and gpp_stab != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = RHt[RHt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
-	
-	# check on instantaneous injection of particles --------------------------------------	
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if constant influx occurs
+	# check on instantaneous injection of particles --------------------------------------
+	# filler for fraction of new seed particles injected so far
+	pconcn_frac = 0.
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
 	
 		# check whether changes occur at start of this time step
-		if (sumt == pconct[0, seedt_cnt]):
+		if (sumt >= pconct[0, seedt_cnt]):
+		
+			if (gpp_stab != -1): # if no linear interpolation required
+				pconcn = pconc[:, seedt_cnt]
+				
+				if (seedt_cnt < (pconct.shape[1]-1)):
+					seedt_cnt += 1
+				else:
+					seedt_cnt = -1 # reached end
+				bc_red = 0 # reset flag for time step reduction due to boundary conditions
+				
+			else:
+				pconcn = np.interp(tnew, [0, t00], [pconc[:, seedt_cnt-1], pconc[:, seedt_cnt]])
+				# remember the fraction of the number concentration added so far
+				pconcn_frac = pconcn/pconc[:, seedt_cnt]
+				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 			
 			# account for change in seed particles
-			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, x, 
-					Varr] = pp_dursim.pp_dursim(y[num_comp:num_comp*(num_sb-wall_on+1)], 
+			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
+					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
-					mean_rad[:, seedt_cnt], pmode, pconc[:, seedt_cnt], seedi, seedVr, lowsize, 
+					mean_rad[:, seedt_cnt], pmode, pconcn, seedi, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					std[:, seedt_cnt], y_dens, H2Oi, rbou)
-			if (seedt_cnt<(pconct.shape[1]-1)):
-				seedt_cnt += 1
-			else:
-				seedt_cnt = -1 # reached end
-			bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			
 		# check whether changes occur during proposed integration time step
-		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1): 
+		# and that time step has not been forced to reduce due to unstable ode solvers
+		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = pconct[0, seedt_cnt]-sumt
@@ -335,7 +369,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
 			
 			# update index counter for constant influxes - used in integrator below
-			if (infx_cnt<(Cinfl.shape[1]-1)):
+			if (infx_cnt < (Cinfl.shape[1]-1)):
 				infx_cnt += 1
 			else:
 				infx_cnt = -1 # reached end
@@ -354,16 +388,17 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# check on nucleation ---------------------------------------------------------
 	# if automatic time step adaption to nucleation requested, check whether number of new particles
 	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
-	# the specifiec nucleation event has not yet reached its defined finishing particle number
+	# the specified nucleation event has not yet reached its defined finishing particle number
 	# concentration (#/cc (air))
 	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-wall_on) > 0)):
+	
 		# the time step (s) needed to increase number concentration of nucleated particles by 10 %
 		t_need = (0.1*nucv1+new_part_sum1)
 		t_need = np.log(t_need/nucv1)
 		t_need = np.log(t_need/nucv2)
 		t_need = t_need*nucv3*-1.-sumt
 	
-		if tnew>t_need: # if suggested time step exceeds this, then reduce to required time step 
+		if (tnew > t_need): # if suggested time step exceeds this, then reduce to required time step 
 			tnew = t_need
 			update_stp = t_need
 			update_count = 0.
@@ -374,4 +409,4 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
-		RHt_cnt, Psat)
+		RHt_cnt, Psat, N_perbin, x, pconcn_frac)

@@ -1065,10 +1065,48 @@ class PyCHAM(QWidget):
 		self.CPClayout = QGridLayout() 
 		CPCTab.setLayout(self.CPClayout)
 	
+		# input for equilibrium humidity on reaching the condensing 
+		# section of the condensation particle counter
+		self.e220 = QTextEdit(self)
+		self.e220.setText('Relative humidity (fraction (0-1)) on reaching CPC condensing unit (particles assumed to equilibrate to this)')
+		self.CPClayout.addWidget(self.e220, 0, 0)
+		
 		# input for minimum particle concentration detectable
-		self.e260 = QTextEdit(self)
-		self.e260.setText('Minimum detectable particle concentration (particles cm<sup>-3</sup>)')
-		self.CPClayout.addWidget(self.e260, 0, 1)
+		self.e220_a = QTextEdit(self)
+		self.e220_a.setText('False background counts (used as the minimum detectable particle concentration) (# particles cm<sup>-3</sup>)')
+		self.CPClayout.addWidget(self.e220_a, 0, 1)
+		
+		# input for maximum particle concentration detectable
+		self.e220_b = QTextEdit(self)
+		self.e220_b.setText('Maximum detectable particle concentration (# particles cm<sup>-3</sup>)')
+		self.CPClayout.addWidget(self.e220_b, 0, 2)
+		
+		# input for counting efficiency curve of counter
+		self.e220_c = QTextEdit(self)
+		self.e220_c.setText('Particle diameter (nm) at 50 % counting efficiency (>0 nm), factor for counting efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced counting efficiency and assumes a sigmoid function)')
+		self.CPClayout.addWidget(self.e220_c, 0, 3)
+		
+		# input for maximum detectable size of particle
+		self.e220_d = QTextEdit(self)
+		self.e220_d.setText('Maximum detectable particle diameter (nm)')
+		self.CPClayout.addWidget(self.e220_d, 0, 4)
+		
+		# input for uncertainty in total particle number concentration (%)
+		self.e220_e = QTextEdit(self)
+		self.e220_e.setText('Uncertainty (%) around total particle number concentration')
+		self.CPClayout.addWidget(self.e220_e, 0, 5)
+		
+		# button to plot counting efficiency dependence on particle size 
+		self.b220_0 = QPushButton('Counting efficiency curve', self)
+		self.b220_0.setToolTip('Counting efficiency dependence on particle size')
+		self.b220_0.clicked.connect(self.on_click234_a)
+		self.CPClayout.addWidget(self.b220_0, 1, 3)
+		
+		# button to plot temporal profile of total particle number concentration
+		self.b220_a = QPushButton('CPC observations', self)
+		self.b220_a.setToolTip('Plot the total particle number concentration as observed by a condensation particle counter')
+		self.b220_a.clicked.connect(self.on_click222)
+		self.CPClayout.addWidget(self.b220_a, 1, 5)
 	
 		return(CPCTab)
 	
@@ -1114,13 +1152,13 @@ class PyCHAM(QWidget):
 		self.SMPSlayout.addWidget(self.e237, 0, 6)
 		
 		# button to plot counting efficiency dependence on particle size 
-		self.b234 = QPushButton('Plot counting efficiency curve', self)
-		self.b234.setToolTip('Plot the counting efficiency dependence on particle size')
+		self.b234 = QPushButton('Counting efficiency curve', self)
+		self.b234.setToolTip('Counting efficiency dependence on particle size')
 		self.b234.clicked.connect(self.on_click234)
 		self.SMPSlayout.addWidget(self.b234, 1, 2)
 		
 		# button to plot temporal profile of number size distribution
-		self.b233 = QPushButton('Plot SMPS observations', self)
+		self.b233 = QPushButton('SMPS observations', self)
 		self.b233.setToolTip('Plot the number size distribution as observed by a particle counter')
 		self.b233.clicked.connect(self.on_click233)
 		self.SMPSlayout.addWidget(self.b233, 1, 6)
@@ -1520,13 +1558,18 @@ class PyCHAM(QWidget):
 		for prog in middle(): # call on modules to solve problem
 		
 			if (isinstance(prog, str)): # check if it's an error message
-				err_mess = prog
-				# remove the progress bar
-				self.progress.deleteLater()
-				return(err_mess)
+				mess = prog
+				if (mess[0:5] == 'Error'): # if it's an error message
+					# remove the progress bar
+					self.progress.deleteLater()
+					return(mess)
+				else:
+					self.l81b.setText(mess)
 			
-			self.progress.setValue(prog) # get progress
-			QApplication.processEvents() # allow progress bar to update
+			else:
+				self.progress.setValue(prog) # get progress
+				
+			QApplication.processEvents() # allow progress bar/message panel to update
 		
 		# remove the progress bar after each simulation
 		self.progress.deleteLater()
@@ -1534,8 +1577,8 @@ class PyCHAM(QWidget):
 		# set the path to folder to plot results to the latest simulation results
 		self.l201.setText(output_by_sim)
 		# if this point reached then no error message generated
-		err_mess = ''
-		return(err_mess)
+		mess = ''
+		return(mess)
 	
 	@pyqtSlot()
 	def on_click81sing(self): # when single simulation button pressed
@@ -1838,10 +1881,142 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		vol_contr_analys.plotter_2DVBS(0, dir_path, self, t_thro) # plot results
 		return()
+	
+	@pyqtSlot() # button to plot total particle number concentration replication of particle counter
+	def on_click222(self):
+	
+		# reset error message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
 		
+		try: 
+			dryf = float(self.e220.toPlainText()) # equilibrium humidity (fraction (0-1))
+			
+		except: # give error message
+			self.l203a.setText('Error - relative humidity (fraction (0-1)) on reaching CPC condensing unit should be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+
+		# false background counts ----------------------------------------------------------------
+		try:
+			cdt = float(self.e220_a.toPlainText()) # concentration detection limit (particles/cm3)
+			
+		except: # give error message
+			self.l203a.setText('Error - false background particle number concentration counts (# particles/cm<sup>-3</sup>) of counter should be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+		# ----------------------------------------------------------------------------------------------
+		
+		# maximum detectable particle concentration (# particles/cm3) ------------
+		try:
+			max_dt = float(self.e220_b.toPlainText()) # concentration detection limit (# particles/cm3)
+			
+		except: # give error message
+			self.l203a.setText('Error - maximum detectable particle number concentration (# particles/cm<sup>-3</sup>) of counter should be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+		# ----------------------------------------------------------------------------------------------
+		
+		# diameter at 50 % counting efficiency and width factor for sigmoidal 
+		# curve of counting efficiency against size ---------------------------------
+		try:
+			# get particle diameter at 50 % counting efficiency and width 
+			# factor for counting efficiency dependence on particle size
+			sdt = ((self.e220_c.toPlainText()).split(','))
+			sdt = [float(i) for i in sdt] 
+			
+			
+		except: # give error message
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		if (len(sdt) != 2): # if not two numbers show error
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		# -----------------------------------------------------------------------------------------
+		
+		# maximum particle size -------------------------------------------------------
+		try:
+			#  maximum particle size of counter
+			max_size = float((self.e220_d.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Error - maximum detectable particle diameter (nm) should be a single number, e.g. 3e5')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		# -------------------------------------------------------------------------------------
+		
+		# counter uncertainty (%) -------------------------------------------------------
+		try:
+			#  counter uncertainty (%)
+			uncert = float((self.e220_e.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Error - counter uncertainty (%) around particle number concentration should be a single number, e.g. 10')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		# -------------------------------------------------------------------------------------
+		
+			
+		# plot total particle number concentration (# particles/cm3)
+		import plotter_counters
+		importlib.reload(plotter_counters) # ensure latest version uploaded
+		dir_path = self.l201.text() # name of folder with results
+		plotter_counters.cpc_plotter(0, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert) # plot results
+
+		return()
+	
 	@pyqtSlot() # button to plot number size distribution replication of particle sizer and counter
 	def on_click233(self):
-		
+	
 		# reset error message
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
@@ -1861,6 +2036,7 @@ class PyCHAM(QWidget):
 
 			return()
 		
+		# false background counts ----------------------------------------------------------------
 		try:
 			cdt = float(self.e232.toPlainText()) # concentration detection limit (particles/cm3)
 			
@@ -1875,7 +2051,10 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 
 			return()
+		# ----------------------------------------------------------------------------------------------
 		
+		# diameter at 50 % counting efficiency and width factor for sigmoidal 
+		# curve of counting efficiency against size ---------------------------------
 		try:
 			# get particle diameter at 50 % counting efficiency and width 
 			# factor for counting efficiency dependence on particle size
@@ -1904,6 +2083,8 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 			return()
 		
+		# -----------------------------------------------------------------------------------------
+		
 		try:
 			#  minimum particle size of counter
 			min_size = float((self.e234.toPlainText()))
@@ -1919,6 +2100,7 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 			return()
 		
+		# maximum particle size -------------------------------------------------------
 		try:
 			#  maximum particle size of counter
 			max_size = float((self.e235.toPlainText()))
@@ -1933,6 +2115,7 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
+		# -------------------------------------------------------------------------------------
 		
 		try:
 			#  number of size bins of counter
@@ -1971,17 +2154,62 @@ class PyCHAM(QWidget):
 		
 		return()
 
-	@pyqtSlot() # button to plot counting efficiency as a function of particle diameter
+	# button to plot counting efficiency as a function of particle 
+	# diameter for number size distribution counters
+	@pyqtSlot()
 	def on_click234(self):
 		
 		# reset message box
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		try:
+		try:	
 			# get particle diameter at 50 % counting efficiency and width 
 			# factor for counting efficiency dependence on particle size
 			sdt = ((self.e233.toPlainText()).split(','))
+			sdt = [float(i) for i in sdt] 
+			
+		except: # give error message
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
+		if (len(sdt) != 2): # if not two numbers show error
+			self.l203a.setText('Error - particle diameter (nm) at 50 % counting efficiency and width factor for counting efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+						
+		import plotter_counters
+		dir_path = self.l201.text() # name of folder with results
+		plotter_counters.count_eff_plot(0, dir_path, self, sdt) # plot
+		
+		return()
+
+	# button to plot counting efficiency as a function of particle 
+	# diameter for total particle number concentration counters
+	@pyqtSlot()
+	def on_click234_a(self):
+		
+		# reset message box
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		try:	
+			# get particle diameter at 50 % counting efficiency and width 
+			# factor for counting efficiency dependence on particle size
+			sdt = ((self.e220_c.toPlainText()).split(','))
 			sdt = [float(i) for i in sdt] 
 			
 		except: # give error message

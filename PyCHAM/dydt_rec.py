@@ -2,7 +2,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in eqn_pars and treats loss from gas-phase as negative
 
-# File Created at 2021-02-24 17:15:48.367003
+# File Created at 2021-03-04 19:35:32.605979
 
 import numpy as np 
 

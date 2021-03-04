@@ -66,7 +66,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
 		comp_num] = eqn_interr.eqn_interr(eqn_num, 
 		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on)
-
+		
 	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on))
 	
 	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation

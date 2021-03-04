@@ -248,28 +248,36 @@ def ode_updater(update_stp,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if pconct[0, 0] == 0.: 
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1): 
 		seedt_cnt = 1 # count on injection times of particles
 	else:
 		seedt_cnt = 0
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
+	infx_cnt0 = 0 # remember count at start of integration step
 	tempt_cnt = 0 # count on chamber temperatures
+	tempt_cnt0 = 0 # remember count at start of integration step
 	RHt_cnt = 0 # count on chamber relative humidities
+	RHt_cnt0 = 0 # remember count at start of integration step
 	save_cnt = 1 # count on recording results
+	
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
-	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cc (air))
+	y0 = np.zeros((len(y), 1)) # remember initial concentrations (molecules/cm3 (air))
+	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))# remember initial particle number concentrations (# particles/cm3)
+	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
 	t0 = update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = update_stp # the time to integrate over (s)
+	# fraction of newly injected seed particles
+	pconcn_frac = 0.
 	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	yrec_p2w, temp_now, cham_env, Pnow, Psat, RH0] = rec_prep.rec_prep(nrec_steps, y, rindx, 
+	yrec_p2w, temp_now, cham_env, Pnow, Psat, RHn] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
@@ -283,7 +291,7 @@ def ode_updater(update_stp,
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp)
+	nuc_comp, t0)
 
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -291,101 +299,147 @@ def ode_updater(update_stp,
 
 	while (tot_time-sumt) > (tot_time/1.e10):
 		
-		y0[:] = y[:] # remember initial concentrations (molecules/cc (air))
+		# remembering variables at the start of the integration step ------------------------------------------
+		y0[:, 0] = y[:] # remember initial concentrations (molecules/cm3 (air))
+		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
+		x0[:] = x[:] # remember initial particle sizes (um)
+		temp_now0 = temp_now # remember temperature (K)
+		wat_hist0 = wat_hist # remember water history flag at start of integration step
+		RH0 = RHn # relative humidity at start of integration step
 		
-		# update chamber variables
-		[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+		# remember counts at start of integration step
+		infx_cnt0 = infx_cnt
+		tempt_cnt0 = tempt_cnt
+		RHt_cnt0 = RHt_cnt
+		seedt_cnt0 = seedt_cnt
+		gasinj_cnt0 = gasinj_cnt
+		light_time_cnt0 = light_time_cnt
+		
+		# --------------------------------------------------------------------------------------------------------------------
+		
+		
+		gpp_stab = 0 # flag for stability in gas-particle partitioning
+		lin_int = 0 # flag to linearly interpolate changes to chamber
+		t00 = tnew # remember the initial integration step for this integration step (s)
+		
+		while (gpp_stab != 1): # whilst ode solver flagged as unstable
+
+			# update chamber variables
+			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow, light_stat, light_time, light_time_cnt, light_ad, 
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
+			pconcn_frac] = cham_up.cham_up(sumt, temp, tempt, 
+			Pnow, light_stat, light_time, light_time_cnt0, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
-			af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-			seedt_cnt, num_comp, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
-			lowsize, uppsize, num_sb, MV, rad0, x, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
-			DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now, Psat)
-		
-		# ensure end of time interval does not surpass recording time
-		if ((sumt+tnew) > save_stp*save_cnt):
-			tnew = (save_stp*save_cnt)-sumt
-			ic_red = 1
+			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedVr, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
+			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0)
+			
+			# ensure end of time interval does not surpass recording time
+			if ((sumt+tnew) > save_stp*save_cnt):
+				tnew = (save_stp*save_cnt)-sumt
+				ic_red = 1
 
-		# ensure update step interval not surpassed
-		if (update_count+tnew > update_stp):
-			tnew = (update_stp-update_count)
-			ic_red = 1
+			# ensure update to operator-split processes interval not surpassed
+			if (update_count+tnew > update_stp):
+				tnew = (update_stp-update_count)
+				ic_red = 1
 			
-		# ensure simulation end time not surpassed
-		if (sumt+tnew > tot_time):
-			tnew = (tot_time-sumt)
-			ic_red = 1
+			# ensure simulation end time not surpassed
+			if (sumt+tnew > tot_time):
+				tnew = (tot_time-sumt)
+				ic_red = 1
 		
-		if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
+			if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
 			
-			# update partitioning variables
-			[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
-			y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
-			x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-			Pnow, DStar_org)
+				# update partitioning variables
+				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
+				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
+				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
+				Pnow, DStar_org)
 			
-			# update particle-phase activity coefficients
-			[act_coeff, wat_hist, RH0, y, dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, wat_hist, act_coeff, num_comp, (num_sb-wall_on))
+				# update particle-phase activity coefficients, note the output,
+				# note that if ODE solver unstable, then y resets to y0 via
+				# the cham_up module prior to this call
+				[act_coeff, wat_hist, RHn, y, dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, wat_hist0, act_coeff, num_comp, (num_sb-wall_on))
 			
-		else: # fillers
-			kimt = np.zeros((num_sb-wall_on, num_comp))
-			kelv_fac = np.zeros((num_sb-wall_on, 1))
-			dydt_erh_flag = 0
+			else: # fillers
+				kimt = np.zeros((num_sb-wall_on, num_comp))
+				kelv_fac = np.zeros((num_sb-wall_on, 1))
+				dydt_erh_flag = 0
 		
-		# reaction rate coefficient
-		rrc = rrc_calc.rrc_calc(RO2_indx, 
-			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
-			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, tf)
-		
-		# update Jacobian inputs based on particle-phase fractions of components
-		[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
-		
-		# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-		# estimate and record any change tendencies (molecules/cc/s) resulting from these processes
-		if (len(dydt_vst) > 0):
-		
-			# record any change tendencies of specified components
-			dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt-1, 
-					dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-					kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)
-		
-		if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
-			# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
-
-			if (wat_hist == 1):			
-				# call on ode solver for water
-				[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
-				nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
-				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
-				reac_col, prod_col, rstoi_flat, 
-				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-				num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
-				seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
-				jac_part_indxn,
-				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
-				nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
-				y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
-				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
-				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
-				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+			# reaction rate coefficient
+			rrc = rrc_calc.rrc_calc(RO2_indx, 
+				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
+				lat, lon, af_path, dayOfYear, Pnow, 
+				photo_path, Jlen, tf)
 			
-			# check on stability of water partitioning
-			if (any(y[H2Oi::num_comp]<0.)):
-				yield ('Error: negative water concentration generated following call to ode_solv_wat module, try reducing the integration tolerances in this module, or log an issue on the GitHub page for PyCHAM')
+			# update Jacobian inputs based on particle-phase fractions of components
+			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
+			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, 
+			colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
+		
+			# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
+			# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
+			if (len(dydt_vst) > 0):
+		
+				# record any change tendencies of specified components
+				dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt-1, 
+						dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
+						kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)
+			
+			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 				
-			# zero partitioning of water to particles for integration without water gas-particle partitioning
-			kimt[:, H2Oi] = 0.
+				# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
+				if (wat_hist == 1):
+					
+					# call on ode solver for water
+					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
+					Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
+					reac_col, prod_col, rstoi_flat, 
+					pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+					num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+					seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+					jac_part_indxn,
+					rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
+					nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
+					y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
+					reac_col_aq, prod_col_aq, rstoi_flat_aq, 
+					pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
+					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+
+					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
+					
+						y_H2O = y[H2Oi::num_comp] # isolate just water concentrations (molecules/cm3)
+						# sum the negative concentrations and convert to absolute value (molecules/cm3)
+						neg_H2O = np.abs(sum(y_H2O[y_H2O<0.]))
+						# allow 0.1 % of water concentrations to be negative
+						if (neg_H2O/sum(np.abs(y[H2Oi::num_comp])) > 1.e-4 ):
+				
+							gpp_stab = -1 # maintain unstable flag
+							# tell user what's happening
+							yield (str('Note: negative water concentration generated following call to ode_solv_wat module, the programme assumes this is because of a change in relative humidity in chamber air, and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current update time interval is ' + str(tnew) + ' seconds'))
+						
+							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
+								yield (str('Error: negative concentrations generated following call to ode_solv_wat module, the programme has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the programme has been stopped.')) 
+						
+						else: # if less than 0.1 % negative
+							gpp_stab = 1 # change to stable flag
+						
+					else: # if solution stable, change stability flag to represent this
+						gpp_stab = 1 # change to stable flag
+				
+				# zero partitioning of water to particles for integration without water gas-particle partitioning
+				kimt[:, H2Oi] = 0.
 			
-		# model component concentration changes to get new concentrations
-		# (molecules/cc (air))
-		[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
+			# model component concentration changes to get new concentrations
+			# (molecules/cc (air))
+			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 			reac_col, prod_col, rstoi_flat, 
@@ -399,7 +453,56 @@ def ode_updater(update_stp,
 			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
-		
+			
+			if (any(y < 0.)): # check on stability of integration of processes
+			
+				# identify components with negative concentrations
+				neg_comp_indx = y < 0.
+				# transform into components in columns, locations in rows
+				neg_comp_indx = neg_comp_indx.reshape(num_sb+1, num_comp)
+				# get component indices with negative concentration
+				neg_comp_indx = (np.where(neg_comp_indx == 1))[1]
+				
+				# loop through components with negative concentrations
+				for ci in neg_comp_indx:
+					all_c = y[ci::num_comp]
+					# sum of negative concentrations
+					neg_c = np.abs(sum(all_c[all_c<0.]))
+					# sum of absolute of all concentrations
+					sum_c = sum(np.abs(all_c))
+					
+					# allow 0.1 % to be negative, but any more suggests ODE solver instability
+					if (neg_c/sum_c > 1.e-4):
+						
+						gpp_stab = -1 # maintain unstable flag
+						# tell user what's happening
+						yield (str('Note: negative concentrations generated following call to ode_solv module, the programme assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
+
+						if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
+							yield (str('Error: negative concentrations generated following call to ode_solv module, the programme has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the programme has been stopped.' ))
+						
+						# if negative concentration too great a proportion of total 
+						# concentration then stop loop through components with negative concentrations
+						continue
+					
+					else: # if less than 0.1 % negative
+						gpp_stab = 1 # change to stable flag
+					
+						
+			else: # if solution stable, change stability flag to represent this
+				
+				# account for any partial addition of newly injected seed particles
+				pconc[:, seedt_cnt] -= pconc[:, seedt_cnt]*pconcn_frac
+				# reset fraction of newly injected seed particles
+				pconcn_frac = 0.
+				gpp_stab = 1 # change to stable flag
+			
+			# half the update time step (s) if necessary
+			if (gpp_stab == -1):
+				tnew = tnew/2.
+			
+				
+		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		
