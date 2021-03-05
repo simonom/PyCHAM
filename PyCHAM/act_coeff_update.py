@@ -55,6 +55,7 @@ def ac_up(y, H2Oi, RH0, TEMP, wat_hist, act_coeff, num_comp, num_asb):
 		if (wat_hist == 1):
 			# efflorescence relative humidity at this temperature
 			ERH = hyst_eq.erh(TEMP)
+			
 			if (RHn < ERH):
 				
 				wat_hist = 0
@@ -65,6 +66,6 @@ def ac_up(y, H2Oi, RH0, TEMP, wat_hist, act_coeff, num_comp, num_asb):
 				# all particle-phase water to gas (molecules/cm3)
 				y[H2Oi] += dydt_erh_flag
 				y[num_comp+H2Oi:num_comp*(num_asb+1):num_comp] = 0.
-
+			
 				
 	return(act_coeff, wat_hist, RHn, y, dydt_erh_flag)

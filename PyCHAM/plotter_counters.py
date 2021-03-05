@@ -21,8 +21,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# self - reference to GUI
 	# dryf - whether particles dried (0) or not (1)
 	# cdt - particle number concentration detection limit (particles/cm3)
-	# sdt - particle size at 50 % counting efficiency (nm), 
-	# 	width factor for counting efficiency dependence on particle size
+	# sdt - particle size at 50 % detection efficiency (nm), 
+	# 	width factor for detection efficiency dependence on particle size
 	# min_size - minimum size measure by counter (nm)
 	# max_size - maximum size measure by counter (nm)
 	# csbn - number of size bins for counter
@@ -134,12 +134,12 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# account for minimum detectable particle concentration (# particles/cm3)
 	Nint[Nint<cdt] = 0.
 	
-	# get counting efficiency as a function of particle size (nm)
+	# get detection efficiency as a function of particle size (nm)
 	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
 	
-	# interpolate counting efficiency (fraction) to instrument size bin centres
+	# interpolate detection efficiency (fraction) to instrument size bin centres
 	ce = np.interp(csbc, Dp, ce)
-	Nint = Nint*ce # correct for counting efficiency
+	Nint = Nint*ce # correct for detection efficiency
 
 	# plotting number size distribution --------------------------------------
 	
@@ -259,8 +259,8 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# dryf - relative humidity of aerosol at entrance to condensing unit of CPC (fraction 0-1)
 	# cdt - false background counts (# particles/cm3)
 	# max_dt - maximum detectable concentration (# particles/cm3)
-	# sdt - particle size at 50 % counting efficiency (nm), 
-	# 	width factor for counting efficiency dependence on particle size
+	# sdt - particle size at 50 % detection efficiency (nm), 
+	# 	width factor for detection efficiency dependence on particle size
 	# max_size - maximum size measure by counter (nm)
 	# uncert - uncertainty (%) around counts by counter
 	# --------------------------------------------------------------------------
@@ -277,17 +277,17 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	xn  = rad_resp_hum.rad_resp_hum(yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], x, dryf, H2Oi, num_comp, (num_sb-wall_on), Nwet, y_MV)
 	
 		
-	# account for size dependent counting efficiency below one
-	# get counting efficiency as a function of particle size (nm)
+	# account for size dependent detection efficiency below one
+	# get detection efficiency as a function of particle size (nm)
 	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
 	
-	# empty array to hold counting efficiencies across times and simulation size bins
+	# empty array to hold detection efficiencies across times and simulation size bins
 	# Dp is in um
 	ce_t = np.zeros((len(timehr), xn.shape[1]))
 	
 	# loop through times
 	for it in range(len(timehr)):
-		# interpolate counting efficiency (fraction) to simulation size bin centres
+		# interpolate detection efficiency (fraction) to simulation size bin centres
 		# Dp is in um
 		ce_t[it, :] = np.interp(xn[it, :]*2., Dp, ce)
 		# upper size range of instrument, note conversion of
@@ -295,7 +295,7 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 		size_indx = (xn[it, :]*2. > max_size*1.e-3)
 		Nwet[it, size_indx] = 0.
 	
-	Nwet = Nwet*ce_t # correct for counting efficiency
+	Nwet = Nwet*ce_t # correct for detection efficiency
 	
 	Nwet = Nwet.sum(axis=1) # sum particle concentrations (# particles/cm3)
 	
@@ -306,7 +306,7 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# account for maximum particle concentration (# particles/cm3)
 	Nwet[Nwet>max_dt] = max_dt
 	
-	
+	# 
 	
 	if (caller == 0): # when called from gui
 		plt.ion() # show results to screen and turn on interactive mode
@@ -336,11 +336,11 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	
 	return()
 
-# function to plot counting efficiency as a function of particle size (% vs. nm)
+# function to plot detection efficiency as a function of particle size (% vs. nm)
 def count_eff_plot(caller, dir_path, self, sdt):
 
 	# note that this function assumes a logarithmic (in diameter space) sigmoid
-	# for counting efficiency dependence on particle diameter, which is
+	# for detection efficiency dependence on particle diameter, which is
 	# observed by Niida et al. (1988) doi.org/10.1016/0021-8502(88)90188-7
 	# and is also presented in TSI's documents (which references Niida et al. (1988): 
 	# https://www.tsi.com/getmedia/952fc58b-ec23-4f18-86e4-58d23636e56d/SMPS-003appnote?ext=.pdf
@@ -349,8 +349,8 @@ def count_eff_plot(caller, dir_path, self, sdt):
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# self - reference to GUI
-	# sdt - particle diameter at 50 % counting efficiency (nm), 
-	# 	width factor for counting efficiency dependence on particle size
+	# sdt - particle diameter at 50 % detection efficiency (nm), 
+	# 	width factor for detection efficiency dependence on particle size
 	# --------------------------------------------------------------------------
 	
 	# prepare figure -------------------------------------------
@@ -361,9 +361,9 @@ def count_eff_plot(caller, dir_path, self, sdt):
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	# --------------------------------------------------------------
 	
-	# particle size at 50 % counting efficiency (nm)
+	# particle size at 50 % detection efficiency (nm)
 	b = sdt[0]
-	# width factor for counting efficiency dependence on particle size
+	# width factor for detection efficiency dependence on particle size
 	c = sdt[1]
 	
 	# diameters (without transformation)
@@ -389,7 +389,7 @@ def count_eff_plot(caller, dir_path, self, sdt):
 	if (caller != 3): # if called from something that does not need a plot
 		ax0.semilogx(Dp, ce, '-x') # state plotting points
 		# set axis formats
-		ax0.set_ylabel('Counting efficiency (%)', size = 14)
+		ax0.set_ylabel('Detection efficiency (%)', size = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.set_xlabel(r'Particle diameter (nm)', fontsize=14)
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')

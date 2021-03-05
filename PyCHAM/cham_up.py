@@ -104,7 +104,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	#	chamber temperature (molecules/cm3)
 	# gpp_stab - flag for whether to linearly interpolate any change 
 	# 	to chamber conditions (equals -1 if change needed)
-	# t00 - the initial integration step on the current integration step
+	# t00 - the initial integration step on the current integration step (s)
 	# x - starting sizes of particles (um)
 	# -----------------------------------------------------------------------
 
@@ -186,9 +186,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			else:
 				# new temperature (K)
-				temp_nown = np.interp(tnew, [0, t00], [temp_now, tempt[tempt_cnt]])
+				temp_nown = np.interp(tnew, [0, t00], [temp_now, temp[tempt_cnt]])
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-				
+			
 			# update vapour pressure of water (log10(atm)),
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
@@ -239,7 +239,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			temp_now = temp_nown # update current temperature (K)
 		
 		# check whether temperature changes during proposed integration time step
-		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt != -1):
+		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt != -1 and gpp_stab != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
 			tnew = tempt[tempt_cnt]-sumt

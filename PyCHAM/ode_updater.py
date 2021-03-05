@@ -262,7 +262,7 @@ def ode_updater(update_stp,
 	
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
-	y0 = np.zeros((len(y), 1)) # remember initial concentrations (molecules/cm3 (air))
+	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
 	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))# remember initial particle number concentrations (# particles/cm3)
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
 	t0 = update_stp # remember initial integration step (s)
@@ -300,12 +300,13 @@ def ode_updater(update_stp,
 	while (tot_time-sumt) > (tot_time/1.e10):
 		
 		# remembering variables at the start of the integration step ------------------------------------------
-		y0[:, 0] = y[:] # remember initial concentrations (molecules/cm3 (air))
+		y0[:] = y[:] # remember initial concentrations (molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
 		x0[:] = x[:] # remember initial particle sizes (um)
 		temp_now0 = temp_now # remember temperature (K)
 		wat_hist0 = wat_hist # remember water history flag at start of integration step
 		RH0 = RHn # relative humidity at start of integration step
+		Pnow0 = Pnow # pressure (Pa)
 		
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
@@ -324,12 +325,16 @@ def ode_updater(update_stp,
 		
 		while (gpp_stab != 1): # whilst ode solver flagged as unstable
 
+			# if integration interval decreased, reset concentrations to those at start of interval
+			if (gpp_stab == -1):
+				y[:] = y0[:] # (molecules/cm3)
+
 			# update chamber variables
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow, light_stat, light_time, light_time_cnt0, light_ad, 
+			Pnow0, light_stat, light_time, light_time_cnt0, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -338,7 +343,7 @@ def ode_updater(update_stp,
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0)
-			
+
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > save_stp*save_cnt):
 				tnew = (save_stp*save_cnt)-sumt
@@ -366,7 +371,7 @@ def ode_updater(update_stp,
 				# note that if ODE solver unstable, then y resets to y0 via
 				# the cham_up module prior to this call
 				[act_coeff, wat_hist, RHn, y, dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, wat_hist0, act_coeff, num_comp, (num_sb-wall_on))
-			
+				
 			else: # fillers
 				kimt = np.zeros((num_sb-wall_on, num_comp))
 				kelv_fac = np.zeros((num_sb-wall_on, 1))
@@ -396,7 +401,7 @@ def ode_updater(update_stp,
 				
 				# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-					
+		
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
@@ -412,14 +417,15 @@ def ode_updater(update_stp,
 					reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 					pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
-
+					
 					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
 					
 						y_H2O = y[H2Oi::num_comp] # isolate just water concentrations (molecules/cm3)
 						# sum the negative concentrations and convert to absolute value (molecules/cm3)
 						neg_H2O = np.abs(sum(y_H2O[y_H2O<0.]))
-						# allow 0.1 % of water concentrations to be negative
-						if (neg_H2O/sum(np.abs(y[H2Oi::num_comp])) > 1.e-4 ):
+						
+						# allow a given fraction of water concentrations to be negative
+						if (neg_H2O/sum(np.abs(y[H2Oi::num_comp])) > 0. ):
 				
 							gpp_stab = -1 # maintain unstable flag
 							# tell user what's happening
@@ -471,8 +477,8 @@ def ode_updater(update_stp,
 					# sum of absolute of all concentrations
 					sum_c = sum(np.abs(all_c))
 					
-					# allow 0.1 % to be negative, but any more suggests ODE solver instability
-					if (neg_c/sum_c > 1.e-4):
+					# allow a given fraction to be negative, but any more suggests ODE solver instability
+					if (neg_c/sum_c > 0.):
 						
 						gpp_stab = -1 # maintain unstable flag
 						# tell user what's happening
@@ -501,7 +507,7 @@ def ode_updater(update_stp,
 			if (gpp_stab == -1):
 				tnew = tnew/2.
 			
-				
+			
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
@@ -514,7 +520,10 @@ def ode_updater(update_stp,
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, wall_on)
-					
+				
+				if redt == 1:
+					import ipdb; ipdb.set_trace()
+				
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
@@ -529,16 +538,16 @@ def ode_updater(update_stp,
 				
 					# particle-phase concentration(s) (molecules/cc (air))
 					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp))
-					
+				
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, 
 						Varr, Vbou, rbou] = coag.coag(RH[RHt_cnt], temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
-						y_mw.reshape(-1, 1), x*1.0e-6, 
+						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
-						num_comp, 0, (np.squeeze(y_dens*1.0e-3)), Vol0, rad0, Pnow, 0,
-						Cp, (N_perbin).reshape(1, -1), (Varr*1.0e-18).reshape(1, -1),
+						num_comp, 0, (np.squeeze(y_dens*1.e-3)), Vol0, rad0, Pnow, 0,
+						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, wall_on)
 					
 					if ((McMurry_flag > -1) and (wall_on == 1)): #if particle loss to walls turned on

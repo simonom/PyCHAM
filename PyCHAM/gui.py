@@ -1081,9 +1081,9 @@ class PyCHAM(QWidget):
 		self.e220_b.setText('Maximum detectable particle concentration (# particles cm<sup>-3</sup>)')
 		self.CPClayout.addWidget(self.e220_b, 0, 2)
 		
-		# input for counting efficiency curve of counter
+		# input for detection efficiency curve of counter
 		self.e220_c = QTextEdit(self)
-		self.e220_c.setText('Particle diameter (nm) at 50 % counting efficiency (>0 nm), factor for counting efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced counting efficiency and assumes a sigmoid function)')
+		self.e220_c.setText('Particle diameter (nm) at 50 % detection efficiency (>0 nm), factor for detection efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced detection efficiency and assumes a sigmoid function)')
 		self.CPClayout.addWidget(self.e220_c, 0, 3)
 		
 		# input for maximum detectable size of particle
@@ -1533,7 +1533,7 @@ class PyCHAM(QWidget):
 			saved_handler = np.seterrcall(log)
 			save_err = np.seterr(all='log')
 			
-			err_mess = self.act_81(output_by_sim) # call on function to simulate
+			err_mess = self.act_81(output_by_sim, sim_num) # call on function to simulate
 
 			if (err_mess != ''): # state error message if any generated
 				self.l81b.setText('') # remove old progress message
@@ -1551,13 +1551,16 @@ class PyCHAM(QWidget):
 				
 	
 	@pyqtSlot()		
-	def act_81(self, output_by_sim): # action the simulation
+	def act_81(self, output_by_sim, sim_num): # action the simulation
 	
 		from middle import middle # prepare to communicate with main programme
 		
-		for prog in middle(): # call on modules to solve problem
+		note_messf = 0 # cancel note message flag
 		
-			if (isinstance(prog, str)): # check if it's an error message
+		for prog in middle(): # call on modules to solve problem
+			
+		
+			if (isinstance(prog, str)): # check if it's a message
 				mess = prog
 				if (mess[0:5] == 'Error'): # if it's an error message
 					# remove the progress bar
@@ -1565,8 +1568,21 @@ class PyCHAM(QWidget):
 					return(mess)
 				else:
 					self.l81b.setText(mess)
+					note_messf = 1 # flag that a note message has been generated 
 			
-			else:
+			else: # if no message from model
+			
+				# if there was previously a note message
+				if (note_messf == 1):
+					note_messf = 0 # cancel note message flag
+				
+					if (self.btch_no == 1): # single run mode
+						self.l81b.setText('')
+						self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
+					if (self.btch_no > 1): # batch run mode
+						self.l81b.setText('')
+						self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
+			
 				self.progress.setValue(prog) # get progress
 				
 			QApplication.processEvents() # allow progress bar/message panel to update

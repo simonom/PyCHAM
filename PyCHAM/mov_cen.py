@@ -30,9 +30,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# MV - molar volume (cc/mol)
 	# Psat - saturation vapour pressures (molecules/cm3 (air))
 	# ic_red - flag for time step reduction due to changing initial conditions
-	# res - results from every adaptive time step of ode solver, with time steps in rows
-	# 		and estimated concentrations of components in all phases in columns 
-	#		(molecules/cc (air)) 
+	# res - resulting concentrations from ode solver (molecules/cc (air)) 
 	# solv_time - times at which integration solved (s)
 	# wall_on - flag for whether wall turned on
 	# ---------------------------------------------------------------
@@ -46,7 +44,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	(redt, t, ic_red, Vnew, tsi) = Vchange_check(res, MV, s0, sbn, NA, 
 					n0, nc, solv_time, t, ic_red, Vol0, Psat)
 	
-	if redt == 1: # repeat integration with new smaller time step
+	if (redt == 1): # repeat integration with new smaller time step
 		return(n0, Vol0, C0, x, redt, t, ic_red)
 	
 	y = np.zeros((nc*(sbn+1+wall_on))) # empty array for holding new concentrations
