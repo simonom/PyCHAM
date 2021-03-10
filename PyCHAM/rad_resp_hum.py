@@ -56,5 +56,8 @@ def rad_resp_hum(yrec, x, dryf, H2Oi, num_comp, num_asb, Nwet, y_MV):
 		voln = ((yn[:, (isb*num_comp):((isb+1)*num_comp)]*vol_fac[:, (isb*num_comp):((isb+1)*num_comp)]).sum(axis=1))
 		# new radius of particles (um)
 		xn[:, isb] = voln**(1./3.)
+		
+		# fill radii of size bins without particles with default values (um)
+		xn[:, isb][Nwet[:, isb] < 1.e-3] = x[:, isb][Nwet[:, isb] < 1.e-3] 
 	
-	return(xn)
+	return(xn, yn)
