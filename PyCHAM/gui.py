@@ -921,7 +921,7 @@ class PyCHAM(QWidget):
 		# gas-phase concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of gas-phase concentrations
-		self.b206 = QPushButton('Plot gas-phase concentrations', self)
+		self.b206 = QPushButton('Gas-phase concentrations', self)
 		self.b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
 		self.b206.clicked.connect(self.on_click206)
 		self.PRIMlayout.addWidget(self.b206, 2, 0)
@@ -930,7 +930,7 @@ class PyCHAM(QWidget):
 
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		self.b209 = QPushButton('Plot total particle-phase concentrations', self)
+		self.b209 = QPushButton('Total particle-phase concentrations', self)
 		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
 		self.b209.clicked.connect(self.on_click209)
 		self.PRIMlayout.addWidget(self.b209, 3, 0)
@@ -938,7 +938,7 @@ class PyCHAM(QWidget):
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		self.b212 = QPushButton('Plot wall concentrations (from gas-wall partitioning)', self)
+		self.b212 = QPushButton('Wall concentrations (from gas-wall partitioning)', self)
 		self.b212.setToolTip('Plot the temporal profile of wall concentration (from gas-wall partitioning) for the specified components')
 		self.b212.clicked.connect(self.on_click212)
 		self.PRIMlayout.addWidget(self.b212, 4, 0)
@@ -946,7 +946,7 @@ class PyCHAM(QWidget):
 		# wall (from particle deposition to wall) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of wall concentrations (from particle deposition to wall)
-		self.b215 = QPushButton('Plot wall concentrations (from particle deposition to wall)', self)
+		self.b215 = QPushButton('Wall concentrations (from particle deposition to wall)', self)
 		self.b215.setToolTip('Plot the temporal profile of the wall concentration (from particle deposition to wall) for the specified components')
 		self.b215.clicked.connect(self.on_click215)
 		self.PRIMlayout.addWidget(self.b215, 5, 0)
@@ -1078,59 +1078,78 @@ class PyCHAM(QWidget):
 		
 		# input for maximum particle concentration detectable
 		self.e220_b = QTextEdit(self)
-		self.e220_b.setText('Maximum detectable particle concentration (# particles cm<sup>-3</sup>, defaults to 3e5)')
+		self.e220_b.setText('Maximum detectable particle concentration (# particles cm<sup>-3</sup> (e.g. 3.e5), defaults to -1, which implies no maximum)')
 		self.CPClayout.addWidget(self.e220_b, 0, 2)
+		
+		# input for coincidence correction
+		self.e220_j = QTextEdit(self)
+		self.e220_j.setText('Coincidence inputs: volumetric flow rate through counting unit (cm<sup>3</sup> s<sup>-1</sup>), instrument dead time (s) and upper limit of actual particle concentration (# particles cm<sup>-3</sup>) this can be applied to; should be three numbers separated by a comma (e.g. 5., 2.e-6, 3.e5).  Defaults to -1, -1, -1, which indicates no convolution needed for coincidence (e.g. because coincidence already corrected for by instrument)')
+		self.CPClayout.addWidget(self.e220_j, 0, 3)
 		
 		# input for detection efficiency curve of counter
 		self.e220_c = QTextEdit(self)
 		self.e220_c.setText('Particle diameter (nm) at 50 % detection efficiency (>0 nm), factor for detection efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced detection efficiency and assumes a sigmoid function.  Defaults to 5, 0.5)')
-		self.CPClayout.addWidget(self.e220_c, 0, 3)
+		self.CPClayout.addWidget(self.e220_c, 0, 4)
 		
 		# input for maximum detectable size of particle
 		self.e220_d = QTextEdit(self)
-		self.e220_d.setText('Maximum detectable particle diameter (nm), defaults to 1.e4')
-		self.CPClayout.addWidget(self.e220_d, 0, 4)
+		self.e220_d.setText('Maximum detectable particle diameter (nm), e.g. 3.e5.  Defaults to -1 which implies no maximum')
+		self.CPClayout.addWidget(self.e220_d, 0, 5)
 		
 		# input for uncertainty in total particle number concentration (%)
 		self.e220_e = QTextEdit(self)
 		self.e220_e.setText('Uncertainty (%) around total particle number concentration, defaults to 10')
-		self.CPClayout.addWidget(self.e220_e, 0, 5)
+		self.CPClayout.addWidget(self.e220_e, 0, 6)
 		
 		# input for response time function
 		self.e220_f = QTextEdit(self)
-		self.e220_f.setText('Inputs for accounting for instrument response time and any mixing of particles from different times entering inlet (five inputs in total, all separated by a comma: i) shortest delay (s) in particles reaching counting unit, ii) delay at which weighting of particles at a maximum (s), iii) function of weighting against delay time (s) (use t for time and np for numpy) for particles between the shortest delay (i) and the delay at which weighting at maximum (ii), iv) longest delay (s) in particles reaching counting unit, v) function of weighting against delay time (s)  (use t for time and np for numpy) for particles between the delay at which weighting at maximum (ii) and the longest delay (iv).  For example: 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)).  Note that weighting is normalised by the integral so that the final integral is one.  Defaults to: 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)')
-		self.CPClayout.addWidget(self.e220_f, 0, 6)
+		self.e220_f.setText('Inputs for accounting for instrument response time and any mixing of particles from different times entering inlet (five inputs in total, all separated by a comma: i) shortest delay (s) in particles reaching counting unit, ii) delay at which weighting of particles at a maximum (s), iii) function of weighting against delay time (s) (use t for time and np for numpy) for particles between the shortest delay (i) and the delay at which weighting at maximum (ii), iv) longest delay (s) in particles reaching counting unit, v) function of weighting against delay time (s)  (use t for time and np for numpy) for particles between the delay at which weighting at maximum (ii) and the longest delay (iv).  For example: 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)).  Note that weighting is normalised by the integral so that the final integral is one.  Defaults to: 1., 1., 1.*t, 1., 1.*t, which represents a response time of 1 s with no mixing of particles of different ages.')
+		self.CPClayout.addWidget(self.e220_f, 0, 7)
 		
 		# input for frequency of instrument output
 		self.e220_g = QTextEdit(self)
 		self.e220_g.setText('Frequency of instrument output (Hz), defaults to 1.')
-		self.CPClayout.addWidget(self.e220_g, 0, 7)
+		self.CPClayout.addWidget(self.e220_g, 0, 8)
 		
-		# input for frequency of instrument output
+		# input for particle loss during inlet passage
 		self.e220_h = QTextEdit(self)
-		self.e220_h.setText('Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) (using Dp for diameter (um), np for numpy functions and python match symbols for math functions), time of passage through inlet (s).  Defaults to np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))), 5.')
-		self.CPClayout.addWidget(self.e220_h, 0, 8)
+		self.e220_h.setText('Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) (using Dp for diameter (um), np for numpy functions and python math symbols for math functions); time of passage through inlet (s).  E.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaults to 0., 0., which implies no particle losses in inlet')
+		self.CPClayout.addWidget(self.e220_h, 0, 9)
+		
+		# input for averaging interval (s)
+		self.e220_i = QTextEdit(self)
+		self.e220_i.setText('Averaging interval (s).  Defaults to 1.')
+		self.CPClayout.addWidget(self.e220_i, 0, 10)
 		
 		# button to plot counting efficiency dependence on particle size 
-		self.b220_0 = QPushButton('Counting efficiency \ndependence on size', self)
+		self.b220_0 = QPushButton('Counting \nefficiency \ndependence \non size', self)
 		self.b220_0.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_0.setToolTip('Counting efficiency dependence on particle size')
 		self.b220_0.clicked.connect(self.on_click234_a)
-		self.CPClayout.addWidget(self.b220_0, 1, 3)
+		self.CPClayout.addWidget(self.b220_0, 1, 4)
+		
+		# button to plot weighting as a function of response time
+		self.b220_f = QPushButton('Weighting \ndependency \non response \ntime', self)
+		self.b220_f.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.b220_f.setToolTip('Plot the weighting of particles by age due to the response time function')
+		self.b220_f.clicked.connect(self.on_click222_b)
+		self.CPClayout.addWidget(self.b220_f, 1, 7)
+		
+		# button to plot inlet loss rate as a function of particle diameter
+		self.b220_h = QPushButton('Inlet loss \nrate with \nparticle \ndiameter', self)
+		self.b220_h.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.b220_h.setToolTip('Plot the inlet loss rate as a function of particle diameter')
+		self.b220_h.clicked.connect(self.on_click222_h)
+		self.CPClayout.addWidget(self.b220_h, 1, 9)
 		
 		# button to plot temporal profile of total particle number concentration
 		self.b220_a = QPushButton('CPC \nobservations', self)
 		self.b220_a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_a.setToolTip('Plot the total particle number concentration as observed by a condensation particle counter')
 		self.b220_a.clicked.connect(self.on_click222)
-		self.CPClayout.addWidget(self.b220_a, 1, 8)
+		self.CPClayout.addWidget(self.b220_a, 1, 10)
 		
-		# button to plot weighting as a function of maximum delay
-		self.b220_f = QPushButton('Weighting dependency \non response time', self)
-		self.b220_f.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.b220_f.setToolTip('Plot the weighting of particles by age due to the response time function')
-		self.b220_f.clicked.connect(self.on_click222_b)
-		self.CPClayout.addWidget(self.b220_f, 1, 6)
+		
 	
 		return(CPCTab)
 	
@@ -1900,7 +1919,7 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click223(self):
 		
-		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setStyleSheet(0., '0px dashed magenta', 0., 0.)
 		self.l203a.setText('')
 		
 		try: # get time through experiment (s) at which to plot
@@ -1909,10 +1928,10 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 
 			return()
@@ -1936,10 +1955,10 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Note - relative humidity (fraction (0-1)) on reaching CPC condensing unit should be a single number, defaulting to 0.65')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 				
 			dryf = 0.65 # default
@@ -1952,10 +1971,10 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Note - false background particle number concentration counts (# particles cm<sup>-3</sup>) of counter should be a single number, defaulting to 1.e-2')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 				
 			cdt = 1.e-2 # default
@@ -1966,16 +1985,16 @@ class PyCHAM(QWidget):
 			max_dt = float(self.e220_b.toPlainText()) # concentration detection limit (# particles/cm3)
 			
 		except: # give error message
-			self.l203a.setText('Note - maximum detectable particle number concentration (# particles cm<sup>-3</sup>) of counter should be a single number, defaulting to 3.e5')
+			self.l203a.setText('Note - maximum detectable particle number concentration (# particles cm<sup>-3</sup>) of counter should be a single number, defaulting to -1, which implies no maximum')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
-			max_dt = 3.e5 # default
+			max_dt = -1 # default
 
 		# ----------------------------------------------------------------------------------------------
 		
@@ -1992,10 +2011,10 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Note - particle diameter (nm) at 50 % detection efficiency and factor for detection efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1, defaulting to 5, 0.5')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
 			sdt = [5., 0.5]
@@ -2008,15 +2027,15 @@ class PyCHAM(QWidget):
 			max_size = float((self.e220_d.toPlainText()))
 			
 		except: # give error message
-			self.l203a.setText('Note - maximum detectable particle diameter (nm) should be a single number, e.g. 3e5, defaulting to 1e4')
+			self.l203a.setText('Note - maximum detectable particle diameter (nm) should be a single number, e.g. 3e5, defaulting to -1, which implies no maximum')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
-			max_size = 1.e4
+			max_size = -1
 		# -------------------------------------------------------------------------------------
 		
 		# counter uncertainty (%) -------------------------------------------------------
@@ -2028,10 +2047,10 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Note - counter uncertainty (%) around particle number concentration should be a single number, e.g. 10, defaulting to 10')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
 			uncert = 10.
@@ -2049,17 +2068,41 @@ class PyCHAM(QWidget):
 			wfuncs = [str(ins[2]), str(ins[4])]
 			
 		except: # give error message
-			self.l203a.setText('Note - there must be five inputs for weighting dependency on instrument response, all separated by commas.  The first, second and fourth must be numbers that represent the shortest response time at which particles counted, the response time at which greatest weighting is given to particle counts and the longest response time at which particles counted, respectively, with all these in seconds.  The third and fifth inputs should be the right hand side of the equations for weighting as a function of response time, with the third input providing this function between the shortest response time and the response time at maximum weighting and the fifth input providing this function between the response time at maximum weighting and the longest response time.  These functions should use t to represent response time, np for any numpy functions and python symbols for math functions such as multiply.  Defaulting to 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3))')
+			self.l203a.setText('Note - there must be five inputs for weighting dependency on instrument response, all separated by commas.  The first, second and fourth must be numbers that represent the shortest response time at which particles counted, the response time at which greatest weighting is given to particle counts and the longest response time at which particles counted, respectively, with all these in seconds.  The third and fifth inputs should be the right hand side of the equations for weighting as a function of response time, with the third input providing this function between the shortest response time and the response time at maximum weighting and the fifth input providing this function between the response time at maximum weighting and the longest response time.  These functions should use t to represent response time, np for any numpy functions and python symbols for math functions such as multiply, e.g. 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)).  Defaulting to 1., 1., 1.*t, 1., 1.*t which represents a response time of 1s with no mixing of particles of different ages.')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
-			delays = np.array((0.1, 1.3, 2.5))
-			wfuncs = ['np.exp(t)', 'np.exp(np.flip(t-1.3))']
+			delays = np.array((1., 1., 1.))
+			wfuncs = ['1.*t', '1.*t']
+		# -----------------------------------------------------------------------------------
+		
+		# inlet loss function and time ------------------------------------------------------------
+		try:
+			# get relevant inputs in list form
+			ins = ((self.e220_h.toPlainText()).split(';'))
+			
+			# loss rate (fraction/s) as a function os particle size (um)
+			loss_func_str = str(ins[0])
+			losst = float(ins[1]) # time loss rate applies over (s)
+			
+		except: # give error message
+			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semi-colon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			
+			loss_func_str = str('0.')
+			losst = 0.
 		# -----------------------------------------------------------------------------------
 		
 		# output frequency ------------------------------------------------------------
@@ -2072,46 +2115,63 @@ class PyCHAM(QWidget):
 			
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
 			Hz = 1.
 		# -----------------------------------------------------------------------------------
 		
-		# inlet loss function and time ------------------------------------------------------------
+		# averaging interval (s) ------------------------------------------------------
 		try:
 			# get relevant inputs in list form
-			ins = ((self.e220_h.toPlainText()).split(','))
-			
-			# loss rate (fraction/s) as a function os particle size (um)
-			loss_func_str = str(ins[0])
-			losst = float(ins[1]) # time loss rate applies over (s)
+			av_int = float((self.e220_i.toPlainText()))
 			
 		except: # give error message
-			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python match symbols for math functions) followed by a  number, with the two separated by a comma, defaulting to np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp[]>1.e-1]))), 5.')
+			self.l203a.setText('Note - Averaging interval (s) should be a single number.  Defaulting to 1.')
 			
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
-			loss_func_str = str('np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1])))')
-			losst = 5.
-		# -----------------------------------------------------------------------------------
+			av_int = 1.
 		
+		# averaging interval (s) ------------------------------------------------------
+		try:
+			# get relevant inputs in list form
+			ins = ((self.e220_j.toPlainText()).split(','))
+			Q = float(ins[0])
+			tau = float(ins[1])
+			coi_maxDp = float(ins[2])
+			
+		except: # give error message
+			self.l203a.setText('Note - Coincidence inputs: volumetric flow rate through counting unit (cm<sup>3</sup> s<sup>-1</sup>), instrument dead time (s) and maximum actual particle concentration this can be applied to (# particles cm<sup>-3</sup>); should be three numbers separated by a comma (e.g. 5., 2.e-6, 3.e5).  Defaulting to -1, -1, -1, which indicates no convolution needed for coincidence (e.g. because coincidence already corrected for)')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			
+			Q = -1
+			tau = -1
+			coi_maxDp = -1
+		# ---------------------------------------------------------------------------------
 			
 		# plot total particle number concentration (# particles/cm3)
 		import plotter_counters
 		importlib.reload(plotter_counters) # ensure latest version uploaded
 		dir_path = self.l201.text() # name of folder with results
 		plotter_counters.cpc_plotter(0, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert, 
-			delays, wfuncs, Hz, loss_func_str, losst) # plot results
+			delays, wfuncs, Hz, loss_func_str, losst, av_int, Q, tau, coi_maxDp) # plot results
 
 		return()
 	
@@ -2353,21 +2413,105 @@ class PyCHAM(QWidget):
 			wfuncs = [str(ins[2]), str(ins[4])]
 			
 		except: # give error message
-			self.l203a.setText('Note - there must be five inputs for weighting dependency on instrument response, all separated by commas.  The first, second and fourth must be numbers that represent the shortest response time at which particles counted, the response time at which greatest weighting is given to particle counts and the longest response time at which particles counted, respectively, with all these in seconds.  The third and fifth inputs should be the right hand side of the equations for weighting as a function of response time, with the third input providing this function between the shortest response time and the response time at maximum weighting and the fifth input providing this function between the response time at maximum weighting and the longest response time.  These functions should use t to represent response time, np for any numpy functions and python symbols for math functions such as multiply.  Defaulting to 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3))')
+			self.l203a.setText('Note - there must be five inputs for weighting dependency on instrument response, all separated by commas.  The first, second and fourth must be numbers that represent the shortest response time at which particles counted, the response time at which greatest weighting is given to particle counts and the longest response time at which particles counted, respectively, with all these in seconds.  The third and fifth inputs should be the right hand side of the equations for weighting as a function of response time, with the third input providing this function between the shortest response time and the response time at maximum weighting and the fifth input providing this function between the response time at maximum weighting and the longest response time.  These functions should use t to represent response time, np for any numpy functions and python symbols for math functions such as multiply.  E.g. 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)).  Defaulting to 1., 1., 1.*t, 1., 1.*t, which represents a 1 s response time with no mixing of particles of different ages.')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			
-			delays = np.array((0.1, 1.3, 2.5))
-			wfuncs = ['np.exp(t)', 'np.exp(np.flip(t-1.3))']
+			delays = np.array((1., 1., 1.))
+			wfuncs = ['1*t', '1*t']
 						
 		[w, t] = plotter_counters.resp_time_func(0, delays, wfuncs)
 
 		return()
+
+	# button to plot loss rate of particles during inlet passage
+	@pyqtSlot()
+	def on_click222_h(self):
+
+		import inlet_loss
+		
+		# obtain the relevant inputs
+		# reset message box
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		# particle diameter at 50 % detection efficiency -----------------------------------
+		
+		try:	
+			# get particle diameter at 50 % counting efficiency and width 
+			# factor for counting efficiency dependence on particle size
+			sdt = ((self.e220_c.toPlainText()).split(','))
+			sdt = [float(i) for i in sdt] 
+			
+		except: # give error message
+			self.l203a.setText('Note - particle diameter (nm) at 50 % detection efficiency and factor for detection efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1, defaulting to 5, 0.5')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			
+			sdt = [5., 0.5]
+		
+		# ------------------------------------------------------------------------------------------------
+		
+		# maximum particle size -------------------------------------------------------
+		try:
+			#  maximum particle size of counter
+			max_size = float((self.e220_d.toPlainText()))
+			
+		except: # give error message
+			self.l203a.setText('Note - maximum detectable particle diameter (nm) should be a single number, e.g. 3e5, defaulting to -1, which implies no maximum')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			max_size = -1
+		# -------------------------------------------------------------------------------------
+		
+		# inlet loss function and time ------------------------------------------------------------
+		try:
+			# get relevant inputs in list form
+			ins = ((self.e220_h.toPlainText()).split(';'))
+			
+			# loss rate (fraction/s) as a function os particle size (um)
+			loss_func_str = str(ins[0])
+			losst = float(ins[1]) # time loss rate applies over (s)
+			
+		except: # give error message
+			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semi-colon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			
+			loss_func_str = str('0.')
+			losst = 0.
+		# -----------------------------------------------------------------------------------
+		if (max_size == -1): # if defaulted
+			max_size = 1.e3
+		# radius range (um)
+		xn = np.logspace(np.log10((sdt[0]*1.e-3)/2.), np.log10(max_size/2.), int(1e3))
+		xn = xn.reshape(1, -1)
+		
+		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, [], 0)
+
+		return()
+
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 
   

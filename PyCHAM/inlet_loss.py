@@ -5,9 +5,10 @@ import numpy as np
 import datetime
 import importlib
 
-def inlet_loss(Nwet, xn, yp, loss_func_str, losst, num_comp):
+def inlet_loss(call, Nwet, xn, yp, loss_func_str, losst, num_comp):
 
 	# inputs: -----------------------------------------------
+	# call - the calling module flag
 	# Nwet - number concentration of particles entering the inlet (# particles/cm3)
 	# xn - radii of particles, corrected for relative humidity in inlet (um)
 	# yp - concentrations of components in the particle phase, corrected for 
@@ -50,6 +51,26 @@ def inlet_loss(Nwet, xn, yp, loss_func_str, losst, num_comp):
 	# for all size bins (columns) and times (rows)
 	sd_lrate = inlet_loss_func.inlet_loss_func(xn*2.)
 	
+	if (call == 3): # if button pressed to plot loss rate as a function of diameter
+		import matplotlib.pyplot as plt
+		plt.ion()
+		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+		# plot weighting dependency against response time
+		if ((sd_lrate == 0).any()):
+			ax0.semilogx((xn*2.)[0, :], sd_lrate[0, :], '-k')
+		else:
+			ax0.loglog((xn*2.)[0, :], sd_lrate[0, :], '-k')
+
+		# plot details
+		ax0.set_title('Loss rate of particles during passage through instrument inlet')
+		ax0.set_ylabel('Loss rate (fraction of particles (0-1) s$^{-1}$)', size = 14)
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.set_xlabel('Particle diameter ($\mu\,$m)', fontsize=14)
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		plt.show()
+		return()
+
 	# integrate over entire time in inlet (fraction)
 	sd_lrate = sd_lrate*losst
 	

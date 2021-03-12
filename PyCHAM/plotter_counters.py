@@ -249,8 +249,13 @@ def fmt(x, pos):
 	return r'${} \times 10^{{{}}}$'.format(a, b)
 
 # condensation particle counter (CPC)
+# options for CPC convolution have been guided by the TSI CPC manual:
+# http://webx.ubi.pt/~goa/Manuals/CPC3022A/manual_CPC3022A.pdf
+# and references given below for individual processes
+# the Aerosol Instrument Manager from TSI also provides helpful information:
+# http://webx.ubi.pt/~goa/Manuals/CPC3022A/Aerosol-Instrument-Manager-CPC-EAD-1930062J-Version-900.pdf
 def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert, 
-		delays, wfuncs, Hz, loss_func_str, losst):
+		delays, wfuncs, Hz, loss_func_str, losst, av_int, Q, tau, coi_maxD):
 
 	import rad_resp_hum
 	import inlet_loss
@@ -261,7 +266,7 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# self - reference to GUI
 	# dryf - relative humidity of aerosol at entrance to condensing unit of CPC (fraction 0-1)
 	# cdt - false background counts (# particles/cm3)
-	# max_dt - maximum detectable concentration (# particles/cm3)
+	# max_dt - maximum detectable actual concentration (# particles/cm3)
 	# sdt - particle size at 50 % detection efficiency (nm), 
 	# 	width factor for detection efficiency dependence on particle size
 	# max_size - maximum size measure by counter (nm)
@@ -272,6 +277,11 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# loss_func_str - string stating loss rate (fraction/s) as a 
 	#			function of particle size (um)
 	# losst - time of passage through inlet (s)
+	# av_int - the averaging interval (s)
+	# Q - volumetric flow rate through counting unit (cm3/s)
+	# tau - instrument dead time (s)
+	# coi_maxDp - maximum actual concentration that 
+	# coincidence convolution applies to (# particles/cm3)
 	# --------------------------------------------------------------------------
 
 	# required outputs ---------------------------------------------------------
@@ -286,14 +296,14 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	[xn, yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)]]  = rad_resp_hum.rad_resp_hum(yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], x, dryf, H2Oi, num_comp, (num_sb-wall_on), Nwet, y_MV)
 	
 	# remove particles lost during transit through inlet (# particles/cm3)
-	[Nwet,  yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)]]= inlet_loss.inlet_loss(Nwet, xn, yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], loss_func_str, losst, num_comp)
+	[Nwet,  yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)]]= inlet_loss.inlet_loss(0, Nwet, xn, yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], loss_func_str, losst, num_comp)
 	
 	# all CPC output times, assuming first report is at 0 s through experiment
 	times = np.arange(0, timehr[-1]*3600., 1./Hz)
 	
 	# empty array for holding corrected concentrations (# particles/cm3)
 	Nwetn = np.zeros((len(times), Nwet.shape[1]))
-	xnn = np.zeros((len(times), Nwet.shape[1]))
+	xnn = np.zeros((len(times), Nwet.shape[1])) # empty array for holding corrected diameters (um)
 	
 	# interpolate simulation output to instrument output frequency (# particles/cm3)
 	# loop through size bins
@@ -305,11 +315,11 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	xn = xnn # rename xn (um)
 	
 	# number of simulation outputs within the instrument response time
-	rt_num = (times[1]-times[0])/delays[2]
-	
+	rt_num = delays[2]/(times[1]-times[0])
+
 	# if more than one output within response time, then loop through times to correct
 	# for response time and any mixing of ages of particle
-	if (rt_num > 1):
+	if (rt_num >= 1):
 	
 		# account for response time and mixing of particles of different ages
 		[weight, weightt] = resp_time_func(3, delays, wfuncs)
@@ -327,6 +337,13 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 			xsim = xn[trel, :]
 			# interpolate weights, use flip to align times
 			weightn = np.flip(np.interp(np.flip(tsim), weightt, weight))
+			if (np.diff(weightt) == 0).all(): # if weight is all on one time
+				weightn[:] = 0
+				# identify time closest to response time
+				t_diff = np.abs(tsim - weightt[0])
+				tindx = t_diff == np.min(t_diff)
+				weightn[tindx] = 1.
+
 			# tile across size bins
 			weightn = np.tile(weightn.reshape(-1, 1), [1, num_sb-wall_on])
 			# corrected concentration
@@ -336,6 +353,81 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 		Nwet = Nwetn # rename Nwet
 		xn = xnn # size bin radii (um)
 	
+	# correct for coincidence (only relevant at relatively moderate 
+	# concentrations (# particles/cm3)), using eq. 11 of
+	# https://doi.org/10.1080/02786826.2012.737049
+	# where Q is the volumetric flow (cm3/s) rate and tau is the instrument
+	# dead time (s)
+	# bypass if coincidence flagged to not be considered
+	if ((Q == -1)*(tau == -1)*(coi_maxD == -1) != 1):
+
+		from scipy.special import lambertw
+	
+		# product of actual concentration with volumetric flow rate and instrument dead time
+		Ca = Nwet.sum(axis=1)
+		# cannot invert the Lambert function (eq. 9 of https://doi.org/10.1080/02786826.2012.737049)
+		# directly as do not know the imaginary part, but can identify closest point to real part as we
+		# we know that measure count must lie between blank counts and actual concentration
+		for it in range(len(times)): # time loop
+			
+			# bypass if actual total particle concentration (# particles/cm3)
+			# exceeds maximum that coincidence applicable to or is less than 
+			# blank concentration
+			if (Ca[it] > cdt and Ca[it] < coi_maxD):
+				
+				# the possible measured counts (# particles/cm3)
+				x_poss = np.logspace(np.log10(cdt), np.log10(coi_maxD), int(1e3))
+				# account for volumetric flow rate and dead time
+				x_possn = -x_poss*(Q*tau)
+				# take the Lambert function and obtain just the real part
+				x_possn = (-lambertw(x_possn).real)/(Q*tau)
+				
+				# zero any negatives as these are useless
+				x_possn[x_possn<0] = 0
+				
+				# find point closest to actual concentration (# particles/cm3)
+				# if all possibilities fall below the actual concentration, then 
+				# the instrument will have marked this as a maximum
+				if all(x_possn < Ca[it]):
+					Cm = coi_maxD
+				else:
+					# linear interpolation
+					diff = (Ca[it]-x_possn)
+					indx1 = (diff == np.max(diff[diff<=0.]))
+					indx0 = (diff == np.min(diff[diff>0.]))
+					# the measured concentration (# particles/cm3)
+					diff[indx1] = -1*diff[indx1] # make absolute
+					Cm = (x_poss[indx0]*(diff[indx1])+x_poss[indx1]*(diff[indx0]))/(diff[indx1]+diff[indx0])
+					
+				# get the fraction underestimation due to coincidence
+				frac_un = Cm/Ca[it]
+				
+				# correct across all size bins (# particles/cm3)
+				Nwet[it, :] = Nwet[it, :]*(frac_un)
+	
+	# moving-average over averaging interval
+	# number of outputs within averaging interval
+	# note that using int here means rounding down, which is sensible
+	av_num = int(av_int/times[1]-times[0])
+	if (av_num > 1):
+		
+		# empty array to hold moving averages (# particles/cm3)
+		Nwetn = np.zeros((int(Nwet.shape[0]-(av_num-1)), Nwet.shape[1]))
+		# empty array to hold moving average diameters (um)
+		xnn = np.zeros((int(Nwet.shape[0]-(av_num-1)), Nwet.shape[1]))
+		
+		for avi in range(av_num):
+			# (# particles/cm3)
+			Nwetn[:, :] += Nwet[avi:Nwet.shape[0]-(av_num-avi-1), :]/av_num
+			# (um)
+			xnn[:, :] += xn[avi:Nwet.shape[0]-(av_num-avi-1), :]/av_num
+		
+		# correct time (s)
+		times = times[av_num-1::]
+		
+		# return to working variable names
+		Nwet = Nwetn
+		xn = xnn
 	
 	# account for size dependent detection efficiency below one
 	# get detection efficiency as a function of particle size (nm)
@@ -354,40 +446,11 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 		
 		# correct for upper size range of instrument, note conversion of
 		# upper size from nm to um
-		size_indx = (xn[it, :]*2. > max_size*1.e-3)
-		Nwet[it, size_indx] = 0.
+		if (max_size != -1):
+			size_indx = (xn[it, :]*2. > max_size*1.e-3)
+			Nwet[it, size_indx] = 0.
 	
 	Nwet = Nwet*ce_t # correct for detection efficiency
-	
-	
-	# ------------
-	# sum particle number concentration across size bins
-	Nwet = Nwet.sum(axis=1)
-	
-	plt.ion() # show results to screen and turn on interactive mode
-	
-
-	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-	ax0.plot(times/3600., Nwet, label = 'uncertainty mid-point')
-	
-	# plot vertical axis logarithmically
-	ax0.set_yscale("log")
-	
-	# include uncertainty region, note conversion of uncertainty from percentage to fraction
-	ax0.fill_between(times/3600., Nwet-Nwet*uncert/100., Nwet+Nwet*uncert/100., alpha=0.3, label = 'uncertainty bounds')
-	
-	# set tick format for vertical axis
-	ax0.set_xlabel(r'Time through simulation (hours)', fontsize=14)
-	ax0.set_ylabel('Total Number Concentration (#$\mathrm{particles\, cm^{-3}}$)', size = 14)
-	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
-	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
-	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
-	ax0.set_title('Simulated total particle concentration convolved to represent \ncondensation particle counter (CPC) measurements')
-	ax0.legend()
-	
-	return()
-	# ------------
-	
 	
 	
 	Nwet = Nwet.sum(axis=1) # sum particle concentrations (# particles/cm3)
@@ -396,10 +459,11 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	
 	# account for false background counts 
 	# (minimum detectable particle concentration)  (# particles/cm3)
-	Nwet[Nwet<cdt] = cdt
+	Nwet[Nwet < cdt] = cdt
 	
 	# account for maximum particle concentration (# particles/cm3)
-	Nwet[Nwet>max_dt] = max_dt
+	if (max_dt != -1): # if maximum particle concentration to be considered
+		Nwet[Nwet > max_dt] = max_dt
 	
 	if (caller == 0): # when called from gui
 		plt.ion() # show results to screen and turn on interactive mode
@@ -529,13 +593,19 @@ def resp_time_func(caller, delays, wfuncs):
 	f.write('	sht = %s # shortest delay\n' %(delays[0]))
 	f.write('	resp_timepeak = %s # delay at peak weighting\n' %(delays[1]))
 	f.write('	# time range for increasing weighting (s)\n')
-	f.write('	t = np.arange(sht, (resp_timepeak), (resp_timepeak-sht)/50.)\n')
+	f.write('	if ((resp_timepeak-sht) > 0):\n')
+	f.write('		t = np.arange(sht, (resp_timepeak), (resp_timepeak-sht)/50.)\n')
+	f.write('	if (resp_timepeak == sht):\n')
+	f.write('		t = np.ones((50))*resp_timepeak\n')
 	f.write('	wpre = %s \n' %(wfuncs[0]))
 	f.write('	t_all[0:50] = t[:] \n')
 	f.write('	\n')
 	f.write('	lot = %s # longest delay (s)\n' %(delays[2]))
 	f.write('	# time range for decreasing weighting (s)\n')
-	f.write('	t = np.arange((resp_timepeak+(lot-resp_timepeak)/50.), (lot), (lot-resp_timepeak)/51.)\n')
+	f.write('	if ((lot-resp_timepeak) > 0):\n')
+	f.write('		t = np.arange((resp_timepeak+(lot-resp_timepeak)/50.), (lot), (lot-resp_timepeak)/51.)\n')
+	f.write('	if (resp_timepeak == lot):\n')
+	f.write('		t = np.ones((50))*resp_timepeak\n')
 	f.write('	wpro = %s \n' %(wfuncs[1]))
 	f.write('	t_all[50::] = t[:] \n')
 	f.write('	\n')
@@ -545,7 +615,8 @@ def resp_time_func(caller, delays, wfuncs):
 	f.write('	# integrate weight curve\n')
 	f.write('	area = np.trapz(w, t_all)\n')
 	f.write('	# normalise so that integral is one\n')
-	f.write('	w = w/area\n')
+	f.write('	if (area > 0):\n')
+	f.write('		w = w/area\n')
 	f.write('	\n')
 	f.write('	return(w, t_all)')
 	f.close() # close file
@@ -553,7 +624,6 @@ def resp_time_func(caller, delays, wfuncs):
 	# weighting function over this time
 	importlib.reload(cpc_response_eqs)
 	[w, t] = cpc_response_eqs.cpc_response(delays, wfuncs)
-	
 	
 	# prepare figure -------------------------------------------
 	if (caller == 0): # if calling from gui
@@ -564,12 +634,12 @@ def resp_time_func(caller, delays, wfuncs):
 	# --------------------------------------------------------------
 	
 		# plot weighting dependency against response time
-		ax0.plot(t, w)
+		ax0.plot(t, w, '+k')
 		# plot details
 		ax0.set_title('Weighting of simulated particle ages with instrument response time')
 		ax0.set_ylabel('Weighting (fraction (0-1))', size = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-		ax0.set_xlabel('Response time, with 0 s representing counting of particles \nsimultaneous with presence in atmosphere (s)', fontsize=14)
+		ax0.set_xlabel('Response time (s), with 0 s representing counting of particles \nsimultaneous with presence in atmosphere and \n positive values representing an increasing delay', fontsize=14)
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 
 	return(w, t)
