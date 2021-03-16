@@ -54,8 +54,8 @@ class PyCHAM(QWidget):
 		# link to EUROCHAMP website
 		bn1 = QPushButton('', self)
 		bn1.setStyleSheet('background : transparent')
-		#bn1.setToolTip('Visit the EUROCHAMP website')
-		#bn1.clicked.connect(self.on_clickn1)
+		bn1.setToolTip('Visit the EUROCHAMP website')
+		bn1.clicked.connect(self.on_clickn1)
 		grid.addWidget(bn1, 0, EUROlogo_hindx)
 		
 		# NCAS logo
@@ -1244,11 +1244,11 @@ class PyCHAM(QWidget):
 	
 		return(CIMSTab)
 	
-	#@pyqtSlot() # eurochamp website under development 10/02/2021
-	#def on_clickn1(self): # EUROCHAMP website
-	#	import webbrowser
-	#	webbrowser.open('https://www.eurochamp.org/Eurochamp2020.aspx')
-	#	return()
+	@pyqtSlot() # eurochamp website under development 10/02/2021
+	def on_clickn1(self): # EUROCHAMP website
+		import webbrowser
+		webbrowser.open('https://www.eurochamp.org')
+		return()
 		
 	@pyqtSlot() 
 	def on_clickn1a(self): # NCAS website
