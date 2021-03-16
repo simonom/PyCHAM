@@ -1068,104 +1068,113 @@ class PyCHAM(QWidget):
 	
 	def CPCtab(self): # instrument comparison plotting tab definition
 	
-		CPCTab = QWidget()
+		self.CPCTab = QWidget() # define tab widget
 		self.CPClayout = QGridLayout() 
-		CPCTab.setLayout(self.CPClayout)
+		self.CPCTab.setLayout(self.CPClayout)
+		
+		# create scrollable widget inside tab
+		self.scroll = QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scrollwidget = QWidget()
+		self.CPCscrolllayout  = QGridLayout()
 		
 		# text explaining purpose of CPC tab
 		# label to explain what happens on this instrument comparison tab
 		l220 = QLabel(self)
 		l220.setText('The Condensation Particle Counter instrument or its associated software may have corrected for coincidence (the default setting here assumes this is the case).  Other settings here are essential to fairly compare simulation results with instrument results.  Although all settings have a default, this should be checked against the value for the relevant instrument and its operation.')
 		l220.setWordWrap(True)
-		self.CPClayout.addWidget(l220, 0, 0, 1, 10)
+		self.CPCscrolllayout.addWidget(l220, 0, 0, 1, 10)
 	
 		# input for equilibrium humidity on reaching the condensing 
 		# section of the condensation particle counter
 		self.e220 = QTextEdit(self)
 		self.e220.setText('Relative humidity (fraction (0-1)) on reaching CPC condensing unit (particles assumed to equilibrate to this) (defaults to 0.65)')
-		self.CPClayout.addWidget(self.e220, 1, 0, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220, 1, 0, 1, 3)
 		
 		# input for minimum particle concentration detectable
 		self.e220_a = QTextEdit(self)
 		self.e220_a.setText('False background counts (used as the minimum detectable particle concentration) (# particles cm<sup>-3</sup>, defaults to 1.e-2)')
-		self.CPClayout.addWidget(self.e220_a, 2, 0, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_a, 2, 0, 1, 3)
 		
 		# input for maximum particle concentration detectable
 		self.e220_b = QTextEdit(self)
 		self.e220_b.setText('Maximum detectable particle concentration (# particles cm<sup>-3</sup> (e.g. 3.e5), defaults to -1, which implies no maximum)')
-		self.CPClayout.addWidget(self.e220_b, 3, 0, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_b, 3, 0, 1, 3)
 		
 		# input for coincidence correction
 		self.e220_j = QTextEdit(self)
 		self.e220_j.setText('Coincidence inputs: volumetric flow rate through counting unit (cm<sup>3</sup> s<sup>-1</sup>), instrument dead time (s) and upper limit of actual particle concentration (# particles cm<sup>-3</sup>) this can be applied to; should be three numbers separated by a comma (e.g. 5., 2.e-6, 3.e5).  Defaults to -1, -1, -1, which indicates no convolution needed for coincidence (e.g. because coincidence already corrected for by instrument)')
-		self.CPClayout.addWidget(self.e220_j, 4, 0, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_j, 4, 0, 1, 3)
 		
 		# input for detection efficiency curve of counter
 		self.e220_c = QTextEdit(self)
 		self.e220_c.setText('Particle diameter (nm) at 50 % detection efficiency (>0 nm), factor for detection efficiency dependency on particle size (>0) (determines the range of particle sizes affected by reduced detection efficiency and assumes a sigmoid function.  Defaults to 5, 0.5)')
-		self.CPClayout.addWidget(self.e220_c, 1, 3, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_c, 1, 3, 1, 3)
 		
 		# input for maximum detectable size of particle
 		self.e220_d = QTextEdit(self)
 		self.e220_d.setText('Maximum detectable particle diameter (nm), e.g. 3.e5.  Defaults to -1 which implies no maximum')
-		self.CPClayout.addWidget(self.e220_d, 2, 3, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_d, 2, 3, 1, 3)
 		
 		# input for uncertainty in total particle number concentration (%)
 		self.e220_e = QTextEdit(self)
 		self.e220_e.setText('Uncertainty (%) around total particle number concentration, defaults to 10')
-		self.CPClayout.addWidget(self.e220_e, 3, 3, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_e, 3, 3, 1, 3)
 		
 		# input for response time function
 		self.e220_f = QTextEdit(self)
 		self.e220_f.setText('Inputs for accounting for instrument response time and any mixing of particles from different times entering inlet (five inputs in total, all separated by a comma: i) shortest delay (s) in particles reaching counting unit, ii) delay at which weighting of particles at a maximum (s), iii) function of weighting against delay time (s) (use t for time and np for numpy) for particles between the shortest delay (i) and the delay at which weighting at maximum (ii), iv) longest delay (s) in particles reaching counting unit, v) function of weighting against delay time (s)  (use t for time and np for numpy) for particles between the delay at which weighting at maximum (ii) and the longest delay (iv).  For example: 0.1, 1.3, np.exp(t), 2.5, np.exp(np.flip(t-1.3)).  Note that weighting is normalised by the integral so that the final integral is one.  Defaults to: 1., 1., 1.*t, 1., 1.*t, which represents a response time of 1 s with no mixing of particles of different ages.')
-		self.CPClayout.addWidget(self.e220_f, 4, 3, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_f, 4, 3, 1, 3)
 		
 		# input for frequency of instrument output
 		self.e220_g = QTextEdit(self)
 		self.e220_g.setText('Frequency of instrument output (Hz), defaults to 1.')
-		self.CPClayout.addWidget(self.e220_g, 1, 7, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_g, 1, 7, 1, 3)
 		
 		# input for particle loss during inlet passage
 		self.e220_h = QTextEdit(self)
 		self.e220_h.setText('Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) (using Dp for diameter (um), np for numpy functions and python math symbols for math functions); time of passage through inlet (s).  E.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaults to 0., 0., which implies no particle losses in inlet')
-		self.CPClayout.addWidget(self.e220_h, 2, 7, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_h, 2, 7, 1, 3)
 		
 		# input for averaging interval (s)
 		self.e220_i = QTextEdit(self)
 		self.e220_i.setText('Averaging interval (s).  Defaults to 1.')
-		self.CPClayout.addWidget(self.e220_i, 3, 7, 1, 3)
+		self.CPCscrolllayout.addWidget(self.e220_i, 3, 7, 1, 3)
 		
 		# button to plot counting efficiency dependence on particle size 
 		self.b220_0 = QPushButton('Counting \nefficiency \ndependence \non size', self)
 		self.b220_0.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_0.setToolTip('Counting efficiency dependence on particle size')
 		self.b220_0.clicked.connect(self.on_click234_a)
-		self.CPClayout.addWidget(self.b220_0, 1, 6)
+		self.CPCscrolllayout.addWidget(self.b220_0, 1, 6)
 		
 		# button to plot weighting as a function of response time
 		self.b220_f = QPushButton('Weighting \ndependency \non response \ntime', self)
 		self.b220_f.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_f.setToolTip('Plot the weighting of particles by age due to the response time function')
 		self.b220_f.clicked.connect(self.on_click222_b)
-		self.CPClayout.addWidget(self.b220_f, 4, 6)
+		self.CPCscrolllayout.addWidget(self.b220_f, 4, 6)
 		
 		# button to plot inlet loss rate as a function of particle diameter
 		self.b220_h = QPushButton('Inlet loss \nrate with \nparticle \ndiameter', self)
 		self.b220_h.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_h.setToolTip('Plot the inlet loss rate as a function of particle diameter')
 		self.b220_h.clicked.connect(self.on_click222_h)
-		self.CPClayout.addWidget(self.b220_h, 2, 10)
+		self.CPCscrolllayout.addWidget(self.b220_h, 2, 10)
 		
 		# button to plot temporal profile of total particle number concentration
 		self.b220_a = QPushButton('CPC \nobservations', self)
 		self.b220_a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.b220_a.setToolTip('Plot the total particle number concentration as observed by a condensation particle counter')
 		self.b220_a.clicked.connect(self.on_click222)
-		self.CPClayout.addWidget(self.b220_a, 4, 10)
+		self.CPCscrolllayout.addWidget(self.b220_a, 4, 10)
 		
-		
-	
-		return(CPCTab)
+		# properties of CPC scroll area ----------------
+		self.scrollwidget.setLayout(self.CPCscrolllayout)
+		self.scroll.setWidget(self.scrollwidget)
+		self.CPClayout.addWidget(self.scroll, 0, 0, 1, 1)
+
+		return(self.CPCTab)
 	
 	def SMPStab(self): # instrument comparison plotting tab definition
 	
