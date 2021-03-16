@@ -209,7 +209,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		dd[uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[uni_y_pind_aq])[:, 0]\n')
 		f.write('		\n')
 	
-	if (len(con_infl_indx) == 1): # if a component has a continuous gas-phase influx
+	if (len(con_infl_indx) > 0): # if a component has a continuous gas-phase influx
 		
 		f.write('		# account for components with constant influx\n')	
 		f.write('		dd[[')	

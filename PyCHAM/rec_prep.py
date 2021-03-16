@@ -24,7 +24,7 @@ def rec_prep(nrec_step,
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
-	Pybel_objects, nuci, nuc_comp, t0):
+	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, dil_fac):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -130,6 +130,9 @@ def rec_prep(nrec_step,
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
 	# t0 - initial integration step (s)
+	# pcont - flag for whether particle injection instantaneous or continuous
+	# pcontf - current status of particle injection (instantaneous or continuous)
+	# dil_fac - fraction/s of chamber diluted
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -162,7 +165,7 @@ def rec_prep(nrec_step,
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		Psat, N_perbin, x, pconcn_frac] = cham_up.cham_up(sumt, temp, tempt, 
+		Psat, N_perbin, x, pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
 		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
@@ -171,7 +174,7 @@ def rec_prep(nrec_step,
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x)
+		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, dil_fac)
 	
 	
 	if ((num_sb-wall_on) > 0): # if particles present

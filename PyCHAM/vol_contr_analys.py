@@ -174,7 +174,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	# prepare plot data --------------------------------------
 	# required outputs from full-moving
 	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
-		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, H2Oi, seedi) = retr_out.retr_out(dir_path)
+		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, H2Oi, seedi, _, _) = retr_out.retr_out(dir_path)
 	
 	# subtract recorded times from requested time and absolute
 	t_diff = np.abs(t_thro-(t_array*3600.))

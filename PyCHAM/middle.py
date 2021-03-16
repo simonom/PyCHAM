@@ -31,7 +31,7 @@ def middle(): # define function
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
-		erh_str] = ui.share()
+		erh_str, pcont] = ui.share()
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -66,7 +66,7 @@ def middle(): # define function
 		uman_up, core_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name)
 
-	# prepare for the calcuation of partitioning variables
+	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
 		R_gas, NA, diff_vol, Dstar_org] = partit_var_prep.prep(y_mw, 
 		temp[0], num_comp, 0, Cw, act_comp, act_user, accom_comp, 
@@ -79,7 +79,7 @@ def middle(): # define function
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedVr,
-		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi)
+		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi, pcont)
 	
 	# solve problem
 	for prog in ode_updater.ode_updater(update_stp, 
@@ -110,7 +110,7 @@ def middle(): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-		Psat_Pa_rec, OC, wat_hist, Pybel_objects):
+		Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac):
 
 		yield prog # update progress bar	
 

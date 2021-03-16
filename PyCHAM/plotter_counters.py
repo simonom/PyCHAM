@@ -319,6 +319,9 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 
 	# if more than one output within response time, then loop through times to correct
 	# for response time and any mixing of ages of particle
+	# an explanation of response time and mixing of particles of different ages
+	# due to the parabolic speed distribution in the CPC tubing is
+	# given by Enroth et al. (2018) in: https://doi.org/10.1080/02786826.2018.1460458
 	if (rt_num >= 1):
 	
 		# account for response time and mixing of particles of different ages

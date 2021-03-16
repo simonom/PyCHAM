@@ -26,7 +26,7 @@ def share():
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont] = pickle.load(pk)
 		pk.close()
 		
 		
@@ -45,4 +45,4 @@ def share():
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, inname,
-		wat_hist, drh_str, erh_str)
+		wat_hist, drh_str, erh_str, pcont)

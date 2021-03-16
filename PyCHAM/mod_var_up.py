@@ -24,7 +24,7 @@ def mod_var_up(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont] = pickle.load(pk)
 	pk.close()
 
 	
@@ -35,10 +35,11 @@ def mod_var_up(self):
 	self.l12a.setText((str(update_stp)).replace('\'', '').replace(' ', ''))
 	self.l13a.setText((str(save_step)).replace('\'', '').replace(' ', ''))#
 	self.l13_1a.setText((str(uman_up)).replace('\'', '').replace(' ', ''))
-	self.l13_2a.setText((str(uman_up)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	
+	
 	self.l14a.setText((str(temp)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l15a.setText((str(tempt)).replace('\'', '').replace(' ', '')[1:-1])
-	
 	self.l16a.setText((str(RH.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l16c.setText((str(RHt.tolist())).replace('\'', '').replace(' ', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l17a.setText((str(Press)).replace('\'', '').replace(' ', ''))
@@ -68,6 +69,7 @@ def mod_var_up(self):
 	self.l38_2a.setText((str(wat_hist)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l38_3a.setText((str(drh_str)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l38_4a.setText((str(erh_str)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l38_5a.setText((str(pcont)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	
 	self.l40a.setText((str(comp0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l41a.setText((str(y0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

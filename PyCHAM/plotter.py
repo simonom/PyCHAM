@@ -169,10 +169,10 @@ def plotter(caller, dir_path, self):
 		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
 		cb.ax.tick_params(labelsize=14)   
 		# colour bar label
-		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
+		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
 		# ----------------------------------------------------------------------------------------
-		# total particle number concentration #/cm3
+		# total particle number concentration # particles/cm3
 	
 		# include total number concentration (# particles/cc (air)) on contour plot
 		# first identify size bins with radius exceeding 3nm
@@ -192,7 +192,7 @@ def plotter(caller, dir_path, self):
 		# array for mass concentration with time
 		MCvst = np.zeros((1, len(timehr)))
 		
-		# first obtain just the particle-phase concentrations (molecules/cc)
+		# first obtain just the particle-phase concentrations (molecules/cm3)
 		yrp = yrec[:, num_comp:num_comp*(num_asb+1)]
 		# loop through size bins to convert to ug/m3
 		for sbi in range(num_asb):

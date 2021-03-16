@@ -19,7 +19,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
-	temp_now, Psat, gpp_stab, t00, x):
+	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, dil_fac):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -63,7 +63,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# num_comp - number of components
 	# y0 - concentration of components prior to integration (molecules/cc (air))
 	# y - variable concentration of components prior to integration (molecules/cc (air))
-	# N_perbin - concentration of particles (#/cc (air))
+	# N_perbin - concentration of particles (# particles/cm3 (air))
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
@@ -72,7 +72,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	#	particles
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
-	# num_sb - number of size bins
+	# num_sb - number of size bins (including wall if turned on)
 	# MV - molar volume of components (cc/mol)
 	# rad0 - initial radius at size bin centres (um)
 	# radn - current radius at size bin centres (um)
@@ -106,8 +106,23 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# 	to chamber conditions (equals -1 if change needed)
 	# t00 - the initial integration step on the current integration step (s)
 	# x - starting sizes of particles (um)
+	# pcont - flags for whether particle injection instantaneous or continuous
+	# pcontf - whether current state of particle injection is continuous
+	# dil_fac - chamber dilution factor (fraction of chamber/s)
 	# -----------------------------------------------------------------------
 
+
+	# dilute chamber following an integration time step, e.g. for flow-reactor -----
+	if (sumt > 0):
+	
+		if (wall_on == 1): # if wall on
+			y[0:-num_comp] -= y[0:-num_comp]*(dil_fac*tnew)
+		else: # if no wall
+			y -= y*(dil_fac*tnew)
+		
+		N_perbin -= N_perbin*(dil_fac*tnew)
+		
+	
 	# check on change of light setting --------------------------------------
 
 	# begin by assuming no change to time interval required due to chamber 
@@ -311,7 +326,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			tnew = RHt[RHt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
-	# check on instantaneous injection of particles --------------------------------------
+	# check on instantaneous/continuous injection of particles --------------------------------------
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
 	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
@@ -321,6 +336,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		
 			if (gpp_stab != -1): # if no linear interpolation required
 				pconcn = pconc[:, seedt_cnt]
+				mean_radn = mean_rad[:, seedt_cnt]
+				stdn = std[:, seedt_cnt]
+				pcontf = pcont[0, seedt_cnt]
 				
 				if (seedt_cnt < (pconct.shape[1]-1)):
 					seedt_cnt += 1
@@ -334,13 +352,14 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 			
-			# account for change in seed particles
-			[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
+			# account for instantaneous change in seed particles (continuous change dealt with below)
+			if (pcontf == 0):
+				[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
-					mean_rad[:, seedt_cnt], pmode, pconcn, seedi, seedVr, lowsize, 
+					mean_radn, pmode, pconcn, seedi, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-					std[:, seedt_cnt], y_dens, H2Oi, rbou)
+					stdn, y_dens, H2Oi, rbou)
 			
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
@@ -349,19 +368,42 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# with change
 			tnew = pconct[0, seedt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
+	
+	# if continuous influx of components flagged
+	if (pcontf == 1):
+		
+		if (seedt_cnt != -1): # temporary count change
+			seedt_cnt -= 1
+		
+		# get seed particle properties
+		pconcn = pconc[:, seedt_cnt]*tnew
+		mean_radn = mean_rad[:, seedt_cnt]
+		stdn = std[:, seedt_cnt]
+		
+		if (seedt_cnt != -1): # reverse count change
+			seedt_cnt += 1
+			
+		[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
+					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
+					N_perbin, 
+					mean_radn, pmode, (pconcn), seedi, seedVr, lowsize, 
+					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
+					stdn, y_dens, H2Oi, rbou)
+	# ----------------------------------------------------------------------------------------------------------
 
 	# check on continuous influxes of components ----------------------------------------------
 	if (len(const_infl_t) > 0): # if influx occurs
 	
 		# in case influxes begin after simulation start create a zero array of correct shape
 		if (sumt == 0. and const_infl_t[infx_cnt] != 0.):
-			Cinfl_now = np.zeros((con_infl_C.shape[0], 1))
+			Cinfl_now = np.zeros((Cinfl.shape[0], 1))
 		
 		# if the final input for influxes reached
 		if (infx_cnt == -1):
 			# influx of components now, convert from ppb/s to molecules/cc.s (air)
 			Cinfl_now = (Cinfl[:, infx_cnt]*Cfactor).reshape(-1, 1)
-			
+		
+		
 		# check whether changes occur at start of this time step
 		if (sumt == const_infl_t[infx_cnt] and (infx_cnt != -1)):
 			
@@ -374,7 +416,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			else:
 				infx_cnt = -1 # reached end
 			bc_red = 0 # reset flag for time step reduction due to boundary conditions
-			
+
 		# check whether changes occur during proposed integration time step
 		if (sumt+tnew > const_infl_t[infx_cnt] and (infx_cnt != -1)):
 			# if yes, then reset integration time step so that next step coincides 
@@ -409,4 +451,4 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
-		RHt_cnt, Psat, N_perbin, x, pconcn_frac)
+		RHt_cnt, Psat, N_perbin, x, pconcn_frac, pcontf)

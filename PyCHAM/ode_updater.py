@@ -52,7 +52,7 @@ def ode_updater(update_stp,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
 	sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-	Psat_Pa_rec, OC, wat_hist, Pybel_objects):
+	Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -238,6 +238,8 @@ def ode_updater(update_stp,
 	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
 	#	(therefore on the efflorescence curve)
 	# Pybel_objects - the pybel objects for components
+	# pcont - flag for whether particle injection continuous or instantaneous
+	# dil_fac - chamber dilution factor (fraction of chamber/s)
 	# ------------------------------------------------------------
 	
 	# start timer
@@ -248,16 +250,24 @@ def ode_updater(update_stp,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1): 
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
 		seedt_cnt = 1 # count on injection times of particles
 	else:
 		seedt_cnt = 0
+	
+	# current status of whether injection of particles instantaneous or continuous,
+	# if not stated assume instantaneous
+	pcontf = 0
+	if (pconct[0, 0] == 0 and pcont[0, 0] == 1):
+		pcontf = 1
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	infx_cnt0 = 0 # remember count at start of integration step
 	tempt_cnt = 0 # count on chamber temperatures
 	tempt_cnt0 = 0 # remember count at start of integration step
 	RHt_cnt = 0 # count on chamber relative humidities
 	RHt_cnt0 = 0 # remember count at start of integration step
+	conPin_cnt = 0 # count on continuous influx of seed particles
+	conPin_cnt0 = 0 # remember count at start of integration step
 	save_cnt = 1 # count on recording results
 	
 	# count on time since update to integration initial values/constants last called (s)
@@ -291,7 +301,7 @@ def ode_updater(update_stp,
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp, t0)
+	nuc_comp, t0, pcont, pcontf, dil_fac)
 
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -315,6 +325,7 @@ def ode_updater(update_stp,
 		seedt_cnt0 = seedt_cnt
 		gasinj_cnt0 = gasinj_cnt
 		light_time_cnt0 = light_time_cnt
+		conPin_cnt0 = conPin_cnt
 		
 		# --------------------------------------------------------------------------------------------------------------------
 		
@@ -328,12 +339,12 @@ def ode_updater(update_stp,
 			# if integration interval decreased, reset concentrations to those at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (molecules/cm3)
-
+			
 			# update chamber variables
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
-			pconcn_frac] = cham_up.cham_up(sumt, temp, tempt, 
+			pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
 			Pnow0, light_stat, light_time, light_time_cnt0, light_ad, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
@@ -342,8 +353,9 @@ def ode_updater(update_stp,
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0)
-
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, dil_fac)
+			
+			
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > save_stp*save_cnt):
 				tnew = (save_stp*save_cnt)-sumt
@@ -401,7 +413,7 @@ def ode_updater(update_stp,
 				
 				# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-		
+					
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
@@ -507,7 +519,7 @@ def ode_updater(update_stp,
 			if (gpp_stab == -1):
 				tnew = tnew/2.
 			
-			
+		
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)

@@ -12,7 +12,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, Psat, core_diss, kgwt, space_mode, seedVr, 
 		spec_namelist, act_coeff, wall_on, partit_cutoff, Press,
-		seedi):
+		seedi, pcont):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -50,6 +50,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	#		at which gas-particle partitioning assumed zero (Pa)
 	# Press - pressure inside chamber
 	# seedi - index of seed components
+	# pcont - whether particle injections are instantaneous 
+	#	or continuous (flag)
 	# ------------------------------------------
 	
 	if (testf == 1): # in test mode
@@ -178,6 +180,11 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		Varr[0] = (4./3.)*np.pi*(x[0]**3.0)
 		# radius bounds of size bin (um)
 		rbou = ((Vbou*3.0)/(4.0*np.pi))**(1.0/3.0)
+	
+	# if injection of particles at start of experiment is continuous, then even for the 
+	# start of the experiment, this will be dealt with in cham_up
+	if (sum(i) > 0 and num_asb > 0 and pcont[0, 0] == 1):
+		N_perbin[:, :] = 0
 
 	# set first volume and radius bound to zero, thereby allowing shrinkage to zero in the 
 	# smallest bin

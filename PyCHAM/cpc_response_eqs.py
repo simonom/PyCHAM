@@ -1,6 +1,6 @@
 '''solving the weighting of particles of different ages over response time of instrument'''
 # module to estimate the weighting of particles of different ages during the response time of instrument to represent the mixing of particles of different ages due to differential flow prior to counter 
-# File Created at 2021-03-12 17:40:44.145381
+# File Created at 2021-03-15 11:07:03.307141
 
 import numpy as np
 
@@ -19,7 +19,7 @@ def cpc_response(delays, wfuncs):
 		t = np.arange(sht, (resp_timepeak), (resp_timepeak-sht)/50.)
 	if (resp_timepeak == sht):
 		t = np.ones((50))*resp_timepeak
-	wpre =  1.*t 
+	wpre = 1.*t 
 	t_all[0:50] = t[:] 
 	
 	lot = 1.0 # longest delay (s)
@@ -28,7 +28,7 @@ def cpc_response(delays, wfuncs):
 		t = np.arange((resp_timepeak+(lot-resp_timepeak)/50.), (lot), (lot-resp_timepeak)/51.)
 	if (resp_timepeak == lot):
 		t = np.ones((50))*resp_timepeak
-	wpro =  1.*t 
+	wpro = 1.*t 
 	t_all[50::] = t[:] 
 	
 	# join weighting

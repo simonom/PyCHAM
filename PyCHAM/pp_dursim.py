@@ -58,9 +58,15 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 			# set scale and standard deviation input for lognormal probability distribution 
 			# function, following guidance here: 
 			# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
-			scale = np.exp(np.log(mean_rad[i]))
-			std = np.log(std[i])
-			loc = 0.0 # no shift
+			if np.isscalar(mean_rad):
+				scale = np.exp(np.log(mean_rad))
+			else:
+				scale = np.exp(np.log(mean_rad[i]))
+			if np.isscalar(std):
+				std = np.log(std)
+			else:
+				std = np.log(std[i])
+			loc = 0. # no shift
 		
 			# number fraction-size distribution - enforce high resolution to ensure size
 			# distribution of seed particles fully captured
@@ -102,11 +108,8 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 		# multiply y_dens by 1e-3 to get ug/um3 (particle) from kg/m3, 
 		# then multiplying ug/um3 (particle) by um3/cc (air) gives ug/cc (air)
 		mass_conc += np.sum((y_dens[seedi, 0]*1.0e-9)*Vperbin[i])
-	
-	# scale mass_conc by 1e6 to convert from ug/cm3 (air) to ug/m3 (air) 
-	print(str('Total dry (no water) mass concentration of newly injected seed particles: ' + str(mass_conc*1.e6) + ' ug/m3 (air)'))
 
 	# new radius of single particles (um)
-	radn = ((3.0/(4.0*np.pi))*Varr)**(1.0/3.0)
+	radn = ((3./(4.*np.pi))*Varr)**(1./3.)
 	
 	return(y, N_perbin, radn, Varr)
