@@ -1,6 +1,6 @@
 '''module for calculating photolysis rates'''
-# can use ambient sunlight expression or artificial chamber lights for calculating a
-# photolysis rate that is fixed when the lights are on
+# can use ambient sunlight expression or artificial chamber lights for calculating
+# photolysis rates
 
 import scipy
 import os
@@ -23,14 +23,20 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# tf - the transmission factor (for natural light intensity)
 	# ------------------------------------------------------------------------------------
 	
+	# get solar zenith angle following the equations of 
+	# Chapter 1 ("The Atmosphere and UV-B Radiation at 
+	# Ground Level" by S. Madronich) of the textbook
+	# Environmental UV Photobiology (1993)
 	(secx, cosx) = zenith.zenith(time, lat, lon, DayOfYear)
 	
 	J = np.zeros((Jlen)) # prepare output
     
-	# if using MCM and natural light
 	cwd = os.getcwd() # address of current working directory
-
+	
+	# if using MCM chemical scheme and natural light
 	if (photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no'):
+		# The Hayman (1997) parameterisation for MCM reactions as described in
+		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
 		#J          L           M          N
 		J[1]=6.073E-05*cosx**(1.743)*np.exp(-1.0*0.474*secx)
 		J[2]=4.775E-04*cosx**(0.298)*np.exp(-1.0*0.080*secx)
@@ -90,34 +96,23 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 # 	J[34] = 1.039182783128049e-05
 # 	J[35] = 3.1229494794723276e-05
 # 	J[41] = 0.014555553853016991
+
+	# if a file path for user-supplied absorption cross-sections
+	# and quantum yields are supplied and actinic flux is
+	# based on the Madronich equations for actinic flux from
+	# solar irradiation
 	
-	# if a file path for the chamber's actinic flux is supplied, then use the MCM 
-	# equations for photolysis rates as a function of wavelength-dependent actinic flux
-	# this is done if artificial lights are turned on
+	# if a file path for the chamber's actinic flux is supplied,
+	# this is done if chamber lamps are turned on
+	# note this option is for user-supplied actinic flux and either a
+	# user-supplied absorption cross-section and quantum yield 
+	# file or MCM recommended absorption cross-section and 
+	# quantum yields in combination with MCM photolysis reactions 
+	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	if (act_flux_path != 'no'):
-		# using MCM recommended values
-# 		folder_url = "http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/MCMv3.2photolysis.zip"
-# 		r = requests.get(folder_url) # create HTTP response object
-# 		if r.ok==0: # check object is ready
-# 			print('Photolysis information not found at the folowing URL, please check and update in PhotolysisRates.py: http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/MCMv3.2photolysis.zip')
-# 		z = zipfile.ZipFile(io.BytesIO(r.content)) #  download object
-# 		z.extractall('PyCHAM/MCMphotofiles') # creates folder and stores files there
 		
 		# call on MCM_photo module to process photolysis files and estimate J values
 		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path)
-	
-		# remove photolysis information folder
-# 		cwd = os.getcwd() # address of current working directory
-# 		if os.path.isdir(cwd + '/PyCHAM/MCMphotofiles/' + Photo_name[0]): # check if there is an existing Photo_name folder
-# 			def handleRemoveReadonly(func, path, exc):
-# 				excvalue = exc[1]
-# 				if not os.access(path, os.W_OK):
-# 					# Is the error an access error ?
-# 					os.chmod(path, stat.S_IWUSR)
-# 					func(path)
-# 				else:
-# 					raise
-# 			shutil.rmtree(cwd + '/PyCHAM/MCMphotofiles/' + Photo_name[0], ignore_errors=False, onerror=handleRemoveReadonly) # remove existing folder, onerror will change permission of directory if needed
 
 	
 	return(J)

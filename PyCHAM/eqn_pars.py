@@ -39,6 +39,10 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# erh_str - string from user inputs describing 
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
 	# ------------------------------------------------------------
+	
+	# starting error flag and message (assumes no errors)
+	erf = 0
+	err_mess = ''
 
 	f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
 	# read the file and store everything into a list
@@ -89,13 +93,21 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	con_infl_indx = np.zeros((len(con_infl_nam)))
 	con_C_indx = np.zeros((len(const_comp)))
 	for i in range (len(con_infl_nam)):
-		# index of where constant components occur in list of components
-		con_infl_indx[i] = comp_namelist.index(con_infl_nam[i])
+		try:
+			# index of where components with constant influx occur in list of components
+			con_infl_indx[i] = comp_namelist.index(con_infl_nam[i])
+		except:
+			erf = 1 # raise error
+			err_mess = str('Error: constant influx component with name ' +str(con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
 	for i in range (len(const_comp)):
-		# index of where constant concnetration components occur in list 
-		# of components
-		con_C_indx[i] = comp_namelist.index(const_comp[i])
+		try:
+			# index of where constant concentration components occur in list 
+			# of components
+			con_C_indx[i] = comp_namelist.index(const_comp[i])
+		except:
+			erf = 1 # raise error
+			err_mess = str('Error: constant concentration component with name ' +str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	# ---------------------------------------------------------------------
 
 	# call function to generate ordinary differential equation (ODE)
@@ -131,4 +143,4 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil)
+		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil, erf, err_mess)

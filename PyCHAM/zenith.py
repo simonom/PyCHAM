@@ -1,5 +1,9 @@
 '''estimating the natural light intensity for photochemistry'''
 # equivalent to the method for AtChem2
+# solar zenith angle following the equations of 
+# Chapter 1 ("The Atmosphere and UV-B Radiation at 
+# Ground Level" by S. Madronich) of the textbook
+# Environmental UV Photobiology (1993)
 
 import numpy as np
 
@@ -12,8 +16,8 @@ def zenith(time, lat, lon, DayOfYear):
 	# DayOfYear is the day number of the year (between 1-365)
 	# -------------------------------------------------------------
 
-	pi = 4.0*np.arctan(1.0) # 1pi=180deg=3.14. For future calculation
-	radian = 1.80e+02/pi # 1 unit rad; use this to convert [\deg] to [\rad]
+	pi = 4.*np.arctan(1.) # 1pi=180deg=3.14. For future calculation
+	radian = 1.8e2/pi # 1 unit rad; use this to convert [\deg] to [\rad]
 	dec = 0.41 # solar declination angle (rad), consistent with AtChem2 default
 
 	# latitude conversion from degrees to radian

@@ -46,10 +46,18 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# tf - sunlight transmission factor\n')
 	f.write('	# ------------------------------------------------------------------------\n')
 	f.write('\n')
+	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors')
+	f.write('\n')
 	f.write('	# calculate generic reaction rate coefficients given by chemical scheme\n')
-	# code to calculate rate coefficients given by chemical scheme file
-	for line in rrc:
-		f.write('	%s \n' %line)
+	if rrc:
+		f.write('	try:\n')
+		# code to calculate rate coefficients given by chemical scheme file
+		for line in rrc:
+			f.write('		%s \n' %line)
+		f.write('\n')
+		f.write('	except:\n')
+		f.write('		erf = 1 # flag error\n')
+		f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
 	f.write('\n')
 	f.write('	# estimate and append photolysis rates\n')
 	f.write('	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, tf)\n')
@@ -71,7 +79,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	for eqn_key_aq in range (1, len(reac_coef_aq)+1):
 		f.write('	rate_values[%s] = %s\n' %(eqn_key+eqn_key_aq, reac_coef_aq[eqn_key_aq-1]))
 	f.write('	\n')
-	f.write('	return(rate_values)\n')
+	f.write('	return(rate_values, erf, err_mess)\n')
 	f.close()
 
 	return()

@@ -43,6 +43,10 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
 	# -----------------------------------------------------------
 
+	# start by assuming no error
+	erf = 0
+	err_mess = ''
+	
 	if testf==1: # testing mode
 		# return dummies
 		return(0,0,0,0,0,0,0,0)
@@ -73,26 +77,11 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		# if component not already listed via interpretation of the chemical scheme
 		# then add to list
 		except:
-			print('Note: component specified in initial gas-phase concentrations of model variables has not been registered in the chemical scheme, but will try to be added to the component list inside the module for initialising gas-phase concentrations')
-			comp_namelist.append(Comp0[i]) # add to name list
-			
-			# convert MCM chemical names to SMILES
-			if (Comp0[i] in comp_xmlname):
-				# index where xml file name matches reaction component name
-				name_indx = comp_xmlname.index(Comp0[i])
-				name_SMILE = comp_smil[name_indx] # SMILES of component
-				# Generate pybel
-				Pybel_object = pybel.readstring('smi', name_SMILE)
-				# append to Pybel object list
-				Pybel_objects.append(Pybel_object)
-				
-				comp_num += 1 # number of unique species
-				
-				y_indx = len(comp_namelist)-1
-				y = y.append(np.zeros((1)))
-			else:
-				print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
-				sys.exit()
+			erf = 1
+			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+			return (0, 0, 0, 0, 0, 0, 0, 0, 
+				0, 0, 0,
+				0, 0, 0, 0, erf, err_mess)
 			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
 		# remember index for plotting gas-phase concentrations later
@@ -223,4 +212,4 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 				comp_namelist, inj_indx, core_diss,
-				Psat_water, nuci, nrec_steps, seedi)
+				Psat_water, nuci, nrec_steps, seedi, erf, err_mess)

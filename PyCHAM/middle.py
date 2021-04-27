@@ -47,18 +47,26 @@ def middle(): # define function
 	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil] = eqn_pars.extr_mech(sch_name, 
+	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp, drh_str, erh_str)
+	
+	# if error raised, then tell GUI to display and to stop programme
+	if (erf == 1):
+		yield err_mess
 	
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, seedi] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
+	nuci, nrec_steps, seedi, erf, err_mess] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
 	pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES)
+
+	# if error raised, then tell GUI to display and to stop programme
+	if (erf == 1):
+		yield err_mess
 
 	# get component properties
 	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, temp[0], H2Oi, 

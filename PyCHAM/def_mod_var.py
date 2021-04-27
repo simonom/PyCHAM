@@ -21,7 +21,7 @@ def def_mod_var(caller): # define function
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
-	chem_sch_mark = ['%', 'RO2', '+', '', '', ';', '+', ';', '', '%', ':', ';']
+	chem_sch_mark = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
 	# time interval between updates to integration inputs (s)
 	update_stp = 1.
 	tot_time = 1. # total time to integrate over (s)

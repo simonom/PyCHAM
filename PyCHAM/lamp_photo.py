@@ -9,11 +9,11 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 
 	# --------------------------------------------------------------
 	# inputs
-	# fname - name of folder where photoloysis information stored
-	# J - array of photolysis rate
+	# fname - name of folder where photolysis information stored
+	# J - array of photolysis rates
 	# TEMP - chamber temperature (K)
-	# act_flux_path - path of actinic flux file, 'no' if none given (in which case this
-	# module should not be called)
+	# act_flux_path - path of actinic flux file, equals 'no' if none 
+	# given (in which case this module should not be called)
 	
 	# --------------------------------------------------------------
 	# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
@@ -35,10 +35,25 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 			continue
 	f.close() # close file
 	
-	# determine whether to use MCM estimation for wavelength-dependent absorption 
-	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
+	# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
+	# to ensure correct integration of photolysis rate over full spectrum
+	wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)
+	# unit-resolution wavelength actinic flux (photon/cm2/nm/s)
+	act_chm = np.interp(wl_chm_ref, wl_chm, act_chm)
+	# unit-resolution wavelength wavelength (nm)
+	wl_chm = wl_chm_ref
+	
+	# --------------------------------------------------------------
+	# in the below sections photolysis rates are calculated using either the
+	# user-supplied file of absorption cross-sections and quantum yields
+	# or using those files recommended by MCM 
+	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
+	
 	cwd = os.getcwd() # address of current working directory
 	
+	
+	# determine whether to use MCM estimation for wavelength-dependent absorption 
+	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
 	if fname != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
 		 
 		# open file to read
@@ -57,9 +72,12 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 		xs_rec = 0
 		qy_rec = 0
 		
-		for line in f: # loop through line
+		# loop through lines of file containing absorption cross-sections 
+		# and quantum yields
+		for line in f:
 
-			# know when end reached
+			# know when end reached - see below this section for the arranging
+			# of absorption cross-sections and quantum yields
 			if line.strip() == str('J_'+str(Ji+1) + '_axs') or line.strip() == str('J_'+str(Ji+1) + '_qy') or line.strip() =='J_end':
 
 				# absorption cross section (cm2/molecule) interpolation to wavelengths
@@ -97,16 +115,16 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 				qy_rec = 1
 				continue
 			
-			if xs_rec == 1:
+			if xs_rec == 1: # when looking for absorption cross-sections
 				wl = float(line.split(',')[0])
 				xs = float(line.split(',')[1])
 				wlxs = np.append(wlxs, (np.array(wl)).reshape(1), axis=0)
 				all_xs = np.append(all_xs, (np.array(xs)).reshape(1), axis=0)
 				
 			
-			if qy_rec == 1:
-				wl = float(line.split(',')[0])
-				qy = float(line.split(',')[1])
+			if qy_rec == 1: # when looking for quantum yields
+				wl = float(line.split(',')[0]) # get the wavelength part
+				qy = float(line.split(',')[1]) # get the quantum yield at this wavelength
 				wlqy = np.append(wlqy, (np.array(wl)).reshape(1), axis=0)
 				all_qy = np.append(all_qy, (np.array(xs)).reshape(1), axis=0)
 			
@@ -115,7 +133,11 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 				
 		f.close() # close file
 	
-	if fname == str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using MCM estimates
+	
+	# Using MCM recommended component absorption cross-sections 
+	# and quantum yields (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
+	# in combination with the actinic flux found above
+	if fname == str(cwd+'/PyCHAM/photofiles/MCMv3.2'):
 	
 		# --------------------------------------------------------------
 		# J<1> and J<2> for O3 (ozone) photolysis
@@ -1116,4 +1138,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 		# photolysis rate
 		J[56] = sum(xs*qy*act_chm)
 	
+	#for i in range(len(J)):
+	#	print(i, J[i])
+	#import ipdb; ipdb.set_trace()
 	return J

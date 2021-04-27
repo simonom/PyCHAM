@@ -390,10 +390,13 @@ def ode_updater(update_stp,
 				dydt_erh_flag = 0
 		
 			# reaction rate coefficient
-			rrc = rrc_calc.rrc_calc(RO2_indx, 
+			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
 				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 				lat, lon, af_path, dayOfYear, Pnow, 
 				photo_path, Jlen, tf)
+			
+			if (erf == 1): # if error message from reaction rate calculation
+				yield(err_mess)
 			
 			# update Jacobian inputs based on particle-phase fractions of components
 			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
@@ -533,9 +536,6 @@ def ode_updater(update_stp,
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, wall_on)
 				
-				if redt == 1:
-					import ipdb; ipdb.set_trace()
-				
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
@@ -598,7 +598,7 @@ def ode_updater(update_stp,
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow)		
 		
-		# if time step was temporarily reduced, then return
+		# if time step was temporarily reduced, then reset
 		if (ic_red == 1):
 			update_stp = t0
 			tnew = update_stp

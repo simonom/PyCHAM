@@ -1,4 +1,4 @@
-'''plots results'''
+'''standard graphical representation of simulation results'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt

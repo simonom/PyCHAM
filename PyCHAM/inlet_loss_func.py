@@ -1,6 +1,6 @@
 '''solving the size-dependent loss rate of particles in instrument inlet'''
 # module to estimate loss rate (fraction /s) of particles during passage through an instrument inlet 
-# File Created at 2021-03-16 14:52:15.077156
+# File Created at 2021-03-16 15:58:36.811936
 
 import numpy as np
 

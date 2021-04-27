@@ -24,7 +24,7 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 	pr_flag = 0 # don't collate peroxy radicals until seen
 	RO2_count = 0 # count on number of lines considered in peroxy radical list
 	# -------------------------------------------------------------------------
-
+	
 	# obtain lists for reaction rate coefficients, peroxy radicals and equation reactions
 	# using markers for separating chemical scheme elements
 	for line in total_list_eqn:
@@ -66,6 +66,7 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 					if ((line1.split('=')[0]).strip())[0] != chm_sch_mrk[0]:
 						# don't consider if an aqueous-phase chemical scheme reaction
 						if ((line1.split('=')[0]).strip())[0] != chm_sch_mrk[8]:
+							
 							# remove end characters
 							line2 = line1.replace(str(chm_sch_mrk[7]), '')
 							# remove all white space

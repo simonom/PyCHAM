@@ -5,12 +5,19 @@
 
 import numpy as np
 import scipy.constants as si
-import rate_coeffs
+try:
+	import rate_coeffs
+except:
+	import os
+	if os.path.exists('rate_coeffs'):
+		os.remove(rate_coeffs)
 import importlib
 
 
 def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path, 
 		DayOfYear, PInit, photo_par_file, Jlen, tf):
+
+	import rate_coeffs # in case failure to import previous version using import command above
 
 	# ---------------------------------------------
 	# inputs:
@@ -30,6 +37,10 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# tf - sunlight transmission factor
 	# ---------------------------------------------
 	
+	# start by assuming no error message
+	erf = 0
+	err_mess = ''
+	
 	# calculate total RO2 concentration
 	if (RO2_indices.size == 0):
 		RO2 = 0
@@ -44,12 +55,20 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# N2 and O2 given the same multiplication as in atmosphereFunctions.f90 of AtChem2
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
-	
-	importlib.reload(rate_coeffs) # ensure latest version uploaded
+	try:
+		
+		importlib.reload(rate_coeffs) # ensure latest version uploaded
+
+	except:
+		import os
+		if os.path.exists('rate_coeffs'):
+			os.remove(rate_coeffs)
+		erf = 1
+		err_mess = 'Error: bad reaction rate calculation, please check chemical scheme and associated chemical scheme markers which are stated in the model variables input file'
 	# calculate the new rate coefficient array (/s) 
-	rrc = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
+	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
 						act_flux_path, DayOfYear, M_val, N2_val, 
 						O2_val, photo_par_file, Jlen, tf)
 
 		
-	return(rrc)
+	return(rrc, erf, err_mess)

@@ -1057,8 +1057,8 @@ class PyCHAM(QWidget):
 		
 		INSTRtabs = QTabWidget()
 		INSTRtabs.addTab(self.CPCtab(), "CPC")
-		INSTRtabs.addTab(self.SMPStab(), "Under Development")
-		INSTRtabs.addTab(self.CIMStab(), "Under Development")
+		INSTRtabs.addTab(self.SMPStab(), "SMPS")
+		INSTRtabs.addTab(self.CIMStab(), "CIMS")
 		self.INSTRlayout.addWidget(INSTRtabs, 1, 0, 1, 1)
 		INSTRtabs.setTabPosition(2)
 		
