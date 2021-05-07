@@ -88,7 +88,7 @@ def def_mod_var(caller): # define function
 	y0 = np.array(())	
 	con_infl_nam = [] # chemical scheme names of components with continuous influx
 	# influx rate of components with continuous influx (ppb/s)
-	con_infl_C = np.array(())
+	con_infl_C = np.empty(0)
 	# times of component influx (s)
 	con_infl_t = np.empty(0)
 	# chemical scheme name of components with constant concentration	

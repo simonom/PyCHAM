@@ -267,15 +267,21 @@ def mod_var_read():
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
 				for i in value:
-					if i==';':
+					if (i==';'):
 						comp_count += 1 # record number of components
-						time_count = 1 # reset time count
-					if i==',':
-						time_count += 1
+					if (i==',' and comp_count == 1):
+						time_count += 1 # record number of times
 				con_infl_C = np.zeros((comp_count, time_count))
-				for i in range(comp_count):
-					con_infl_C[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
-
+				
+				try:	
+					for i in range(comp_count): # loop through components
+						for ii in range(time_count): # loop through times
+							con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
+							
+				# in case semicolons and commas messed up on input, note this will invoke an 
+				# error message from the user input check module
+				except:
+					con_infl_C = np.empty(0)
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				dydt_trak = [str(i).strip() for i in (value.split(','))]
 

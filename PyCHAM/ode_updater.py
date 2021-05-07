@@ -330,7 +330,8 @@ def ode_updater(update_stp,
 		# --------------------------------------------------------------------------------------------------------------------
 		
 		
-		gpp_stab = 0 # flag for stability in gas-particle partitioning
+		gpp_stab = 0 # flag for stability in gas-particle partitioning for solver while loop
+		stab_red = 0 # flag for stability in gas-particle partitioning for time interval reset
 		lin_int = 0 # flag to linearly interpolate changes to chamber
 		t00 = tnew # remember the initial integration step for this integration step (s)
 		
@@ -354,7 +355,6 @@ def ode_updater(update_stp,
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, dil_fac)
-			
 			
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > save_stp*save_cnt):
@@ -414,7 +414,8 @@ def ode_updater(update_stp,
 			
 			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 				
-				# if on the deliquescence curve rather than the efflorescence curve in terms of water gas-particle partitioning
+				# if on the deliquescence curve rather than the 
+				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
 					
 					# call on ode solver for water
@@ -492,7 +493,7 @@ def ode_updater(update_stp,
 					# sum of absolute of all concentrations
 					sum_c = sum(np.abs(all_c))
 					
-					# allow a given fraction to be negative, but any more suggests ODE solver instability
+					# if negative, suggests ODE solver instability
 					if (neg_c/sum_c > 0.):
 						
 						gpp_stab = -1 # maintain unstable flag
@@ -506,7 +507,7 @@ def ode_updater(update_stp,
 						# concentration then stop loop through components with negative concentrations
 						continue
 					
-					else: # if less than 0.1 % negative
+					else: # if stable
 						gpp_stab = 1 # change to stable flag
 					
 						
@@ -521,8 +522,8 @@ def ode_updater(update_stp,
 			# half the update time step (s) if necessary
 			if (gpp_stab == -1):
 				tnew = tnew/2.
+				stab_red = 1 # remember that time step temporarily reduced due to instability
 			
-		
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
@@ -599,10 +600,11 @@ def ode_updater(update_stp,
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow)		
 		
 		# if time step was temporarily reduced, then reset
-		if (ic_red == 1):
+		if (ic_red == 1 or stab_red == 1):
 			update_stp = t0
 			tnew = update_stp
-			ic_red = 0
+			ic_red = 0 # reset flag
+			stab_red = 0 # reset flag
 		
 		# remember the gas-phase water concentration from previous 
 		# integration step (molecules/cm3)

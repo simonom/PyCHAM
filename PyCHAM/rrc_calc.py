@@ -9,7 +9,7 @@ try:
 	import rate_coeffs
 except:
 	import os
-	if os.path.exists('rate_coeffs'):
+	if os.path.exists('rate_coeffs'): # remove any bad functions
 		os.remove(rate_coeffs)
 import importlib
 
@@ -55,20 +55,20 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# N2 and O2 given the same multiplication as in atmosphereFunctions.f90 of AtChem2
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
-	try:
+	#try:
 		
-		importlib.reload(rate_coeffs) # ensure latest version uploaded
-
-	except:
-		import os
-		if os.path.exists('rate_coeffs'):
-			os.remove(rate_coeffs)
-		erf = 1
-		err_mess = 'Error: bad reaction rate calculation, please check chemical scheme and associated chemical scheme markers which are stated in the model variables input file'
+	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
-						act_flux_path, DayOfYear, M_val, N2_val, 
-						O2_val, photo_par_file, Jlen, tf)
+					act_flux_path, DayOfYear, M_val, N2_val, 
+					O2_val, photo_par_file, Jlen, tf)
 
-		
+	#except:
+	#	import os
+	#	if os.path.exists('rate_coeffs'):
+	#		os.remove(rate_coeffs)
+	#	erf = 1
+	#	err_mess = 'Error: bad reaction rate calculation, please check chemical scheme and associated chemical scheme markers which are stated in the model variables input file'
+	#	rrc = [] # filler
+	
 	return(rrc, erf, err_mess)

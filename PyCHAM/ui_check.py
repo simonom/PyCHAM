@@ -71,6 +71,9 @@ def ui_check(self):
 	# 	above which gas-particle partitioning assumed zero
 	# wat_hist - flag for particle-phase history with respect to water 
 	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
+	# con_infl_t - times of continuous influx of components
+	# con_infl_nam - chemical scheme names of components with continuous influx
+	# con_infl_C - influx rate of components with continuous influx (ppb/s)
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -261,6 +264,21 @@ def ui_check(self):
 		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
 		em_flag = 2
 	
+	# check on continuous injection of components inputs -----------------------------------------------
+	if (em_flag < 2): # if no other errors
+		try: # note, won't work on the empty con_infl_C default variable
+			if (con_infl_C.shape[0] != len(con_infl_nam)):
+				err_mess = str('Error - input for influx rate (ppb/s) of components with continuous influx does not correspond to the number of component names for continuous influx, note that for the continuous influx rate a semicolon should separate values for different components and commas should separate different times.  Please see README for more guidance.')
+				em_flag = 2
+		except:
+			em_flag = em_flag
+				
+		try: # note, won't work on the empty con_infl_C default variable
+			if (con_infl_C.shape[1] != len(con_infl_t)):
+				err_mess = str('Error - input for influx rate (ppb/s) of components with continuous influx does not correspond to the number of times for continuous influx, note that for the continuous influx rate a comma should separate values for different times and semicolons should separate different components.  Please see README for more guidance.')
+				em_flag = 2
+		except:
+			em_flag = em_flag
 	# -------------------------------------
 	# check on whether water included in instantaneously injected components, as it should not be, instead it should be
 	# included in the rh model variable input

@@ -16,33 +16,47 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 	# given (in which case this module should not be called)
 	
 	# --------------------------------------------------------------
-	# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
-	# from chamber
-	f = open(act_flux_path, 'r')
-	wl_chm = np.empty(0) # chamber wavelengths (nm)
-	act_chm = np.empty(0) # chamber actinic flux
 	
-	for line in f: # loop through line
+	if (act_flux_path != 'nat_act_flux'): # if using actinic fluxes from file
+		# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
+		# from chamber
+		f = open(act_flux_path, 'r')
+		wl_chm = np.empty(0) # chamber wavelengths (nm)
+		act_chm = np.empty(0) # chamber actinic flux
+	
+		for line in f: # loop through line
 		
-		try: # omit headers
-			float((line.strip()).split(',')[0])
-			wl = float((line.strip()).split(',')[0])
-			act = float((line.strip()).split(',')[1])
-			wl_chm = np.append(wl_chm, (np.array(wl)).reshape(1), axis=0)
-			act_chm = np.append(act_chm, (np.array(act)).reshape(1), axis=0)
-			
-		except:
-			continue
-	f.close() # close file
+			try: # omit headers
+				float((line.strip()).split(',')[0])
+				wl = float((line.strip()).split(',')[0])
+				act = float((line.strip()).split(',')[1])
+				wl_chm = np.append(wl_chm, (np.array(wl)).reshape(1), axis=0)
+				act_chm = np.append(act_chm, (np.array(act)).reshape(1), axis=0)
+				
+			except:
+				continue
+		f.close() # close file
 	
-	# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
-	# to ensure correct integration of photolysis rate over full spectrum
-	wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)
-	# unit-resolution wavelength actinic flux (photon/cm2/nm/s)
-	act_chm = np.interp(wl_chm_ref, wl_chm, act_chm)
-	# unit-resolution wavelength wavelength (nm)
-	wl_chm = wl_chm_ref
+		# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
+		# to ensure correct integration of photolysis rate over full spectrum
+		wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)
+		# unit-resolution wavelength actinic flux (photon/cm2/nm/s)
+		act_chm = np.interp(wl_chm_ref, wl_chm, act_chm)
+		# unit-resolution wavelength wavelength (nm)
+		wl_chm = wl_chm_ref
 	
+	if (act_flux_path == 'nat_act_flux'): # if using modelled solar actinic flux
+		
+		import nat_act_flux
+		naff = 4 # flag for calling module
+		# get wavelengths (nm) and their associated actinic fluxes (photon/cm2/nm/s)
+		
+		# cosine of the solar zenith angle which should be in radians
+		mu0 = np.cos(theta)
+		# loop through top-of-the-atmosphere downward actinic flux 
+		# (photon/cm2/nm/s) per wavelength (nm)
+		for F0 in F_dep_wl:
+			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
 	# --------------------------------------------------------------
 	# in the below sections photolysis rates are calculated using either the
 	# user-supplied file of absorption cross-sections and quantum yields
@@ -52,7 +66,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 	cwd = os.getcwd() # address of current working directory
 	
 	
-	# determine whether to use MCM estimation for wavelength-dependent absorption 
+	# determine whether to use MCM-recommended wavelength-dependent absorption 
 	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
 	if fname != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
 		 
@@ -1138,7 +1152,4 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 		# photolysis rate
 		J[56] = sum(xs*qy*act_chm)
 	
-	#for i in range(len(J)):
-	#	print(i, J[i])
-	#import ipdb; ipdb.set_trace()
 	return J

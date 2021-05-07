@@ -86,5 +86,4 @@ def test_zenith():
 
 	return()
 
-# call function
-test_zenith()
+test_zenith() # call function
