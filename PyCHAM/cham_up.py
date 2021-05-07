@@ -286,7 +286,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 					Ct_gain[inj_cntn] = np. interp(tnew, [0, t00], [y0[inj_indxi]/Cfactor, Ct[inj_cntn, gasinj_cnt]])
 					inj_cntn += 1  # keep count on components
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-			print(Ct_gain)
+		
 			# account for change in gas-phase concentration,
 			# convert from ppb to molecules/cm3 (air)
 			y[inj_indx] = Ct_gain*Cfactor
