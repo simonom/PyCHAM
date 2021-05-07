@@ -49,7 +49,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	# -------------------------------------------------------
 	
 	# function for calculating C1 and C2 of Shettle and Weinman (1970) Eqs. 12-15
-	def C_calc(ai, gi, tau, A, mu0, NL, F0): # function definition
+	def C_calc(ai, gi, tau, A, mu0, NL, F0, P_all): # function definition
 		
 		# inputs: -------------
 		# ai - single scattering albedo per vertical layer
@@ -59,6 +59,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 		# mu0 - cosine of the solar zenith angle
 		# NL - number of vertical atmospheric layers
 		# F0 - top-of-the-atmosphere flux (W/m2)
+		# P_all - phase function for downward scattering per vertical layer
 		# -----------------------
 		
 		I0 = I1 = ki = Fdown = Fup = B2 = 0. # fillers for return values
@@ -74,7 +75,6 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 			k_all = np.zeros((NL)) # record for k values per vertical layer
 			alp_all = np.zeros((NL)) # record for alpha values per vertical layer
 			bet_all = np.zeros((NL)) # record for alpha values per vertical layer
-			P_all = np.zeros((NL)) # record phase function output per vertical layer
 		
 			# loop through vertical layers
 			for NLi in range(NL):
@@ -135,7 +135,6 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 						Amat[-2, -4::] = [np.exp(-k2i*tau[NLi-1]), np.exp(k2i*tau[NLi-1]), -np.exp(-ki*tau[NLi-1]), -np.exp(ki*tau[NLi-1])]					
 						Barr[-2] = alp2*np.exp(-tau[NLi-1]/mu0)-alp*np.exp(-tau[NLi-1]/mu0)
 				
-			
 			
 			# get C1 and C2 values for each vertical layer of atmosphere
 			x = np.linalg.solve(Amat, Barr) # solve simultaneous equations of the form Ax = b
@@ -269,14 +268,14 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 		if (a[0] < 1.):
 		
 			# get the values of C1 and C2
-			[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0)
+			[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0, 0)
 
 			# calculate atmospheric albedo using their Eq. 20
 			atmosA = 2.*(C1+C2)/(mu0*F0)-3.*a*mu0*(1.+g-a*g)/(2.*(1.-ki**2.*mu0**2))
 			
 		if (a[0] == 1.):
 			# get the B2 value
-			[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0)
+			[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0, 0)
 			# calculate atmospheric albedo using their Eq. 22
 			atmosA = 1.-(4.*B2/(3.*mu0*F0))
 		
@@ -287,7 +286,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	if (callf == -2 or callf == -3):		
 		
 		# get the B2 value for a conservative atmosphere
-		[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0)
+		[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0, 0)
 		# calculate atmospheric albedo using their Eq. 22
 		atmosA = 1.-(4.*B2/(3.*mu0*F0))
 		
@@ -298,7 +297,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	# doi.org/10.1086/149463
 	if (callf == -9):
 	
-		[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0)
+		[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(a, g, tau, A, mu0, NL, F0, 0)
 			
 		# upward  irradiance at top of atmosphere - the amount
 		# of incoming irradiance that does not reach Earth
@@ -361,9 +360,11 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 
 		
 	if (callf == -10): # Figure 4 Shettle and Weinman (1970)
-			
-		g0 = np.array((0.553, 0.848, 0.708))
-		NL = 300
+		
+		NL = 300 # increase resolution of vertical layers
+		# remember original scattering asymmetry factor
+		g0 = np.zeros((len(g)))
+		g0[:] = g[:]
 		# remember original contribution of tau from each layer
 		tau0 = np.zeros((len(tau)))
 		tau0[:] = tau[:]
@@ -385,8 +386,8 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 				indx = tau>=np.sum(tau0[0:zindx])
 						
 			gi[indx] = g0[zindx]
-			ai[indx] = ai0[zindx]
-			
+			ai[indx] = ai0[zindx] # single scattering albedo for this layer
+		
 		# phase function for scattering as a function of scattering angle
 		# Eq. 3 of Shettle and Weinman (1970),
 		# note we use the solar zenith angle as this equals the 
@@ -394,28 +395,16 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 		# note also that Shettle and Weinman (1970) don't state these
 		# phase functions directly, so the values here for each layer
 		# have been derived by fitting to Fig. 4 of Shettle and Weinman (1970)
-		if gi[NLi] == 0.553:
-			P_all[NLi] = 1.7
-		if gi[NLi] == 0.848:
-			P_all[NLi] = 0.3
-		if gi[NLi] == 0.708:
-			P_all[NLi] = 1.+ai[NLi]*np.cos(theta)
-				
-				
-		if (NLi < NL-1):
-			# need result for next layer down too
-			# note that Shettle and Weinman (1970) don't state these
-			# phase functions directly, so the values here for each layer
-			# have been derived by fitting to Fig. 4 of Shettle and Weinman (1970)
-			if gi[NLi+1] == 0.553:
-				P_all[NLi+1] = 1.7
-			if gi[NLi+1] == 0.848:
-				P_all[NLi+1] = 0.3
-			if gi[NLi+1] == 0.708:
-				P_all[NLi+1] = 1.+ai[NLi]*np.cos(theta)
-			
-									
-	if (callf == -10):
+		P_all = np.zeros((len(tau)))
+		indx =  (gi == 0.553)
+		P_all[indx] = 1.7
+		indx =  (gi == 0.848)
+		P_all[indx] = 0.3
+		indx =  (gi == 0.708)
+		P_all[indx] = 1.+ai[indx]*np.cos(theta)
+		
+		# get fluxes
+		[I0, I1, C1, C2, ki, Fdown, Fup, B2] = C_calc(ai, gi, tau, A, mu0, NL, F0, P_all)
 			
 		return(Fdown, Fup, tau)
 	

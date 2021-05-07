@@ -267,39 +267,80 @@ def test_nat_act_flux():
 	# Figure 4 of Shettle and Weinman (1970) ------------------------------
 	callfi = -10 # caller identity
 	A = 0.02 # first wavelength (0.76mu) ocean albedo Table 2 Shettle and Weinman (1970)
+	gi = np.array((0.553, 0.848, 0.708))
 	ai = np.array((0.124, 0.997, 0.434))
 	F0 = 1370 # incoming solar radiance (Wm-2)
+	NL = 3 # number of vertical atmosphere layer boundaries
+	tau = np.array((0.492, 20., 0.370)) # contribution of each layer to optical depth
+	
 	# solar zenith angle from Figure 4 of Shettle and Weinman (1970)
 	# note, this should be changed to the corresponding value in Fig. 4
 	theta0 = np.arccos(0.2)
-	tau = np.array((0.492, 20., 0.370)) # contribution of each layer to optical depth
 	mu0 = np.cos(theta0)
 	
-	NL = 3 # number of vertical atmosphere layer boundaries
 	# call function to get downward and upward diffuse irradiances at each vertical layer
 	# and the total global downward directed irradiance
-	[Fdown, Fup, tau] = nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL)
+	[Fdown02, Fup02, tau02] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
 	
 	# Eq. 26 of Shettle and Weinman (1970)
-	Gdown = Fdown+mu0*np.pi*F0*np.exp(-tau/mu0)
+	Gdown02 = Fdown02+mu0*np.pi*F0*np.exp(-tau02/mu0)
 	
 	# normalisation factor
 	norm = mu0*np.pi*F0
 
 	# convert optical depth to altitude
-	alt = np.zeros((len(tau)))
-	indx = tau<0.492 # top layer index
-	alt[indx] = np.interp(tau[indx], [0., 0.492], [5., 4.])
-	indx = tau>=0.492 # top layer index
-	indx = indx*(tau<0.492+20.)
-	alt[indx] = np.interp(tau[indx], [0.492, 0.492+20.], [4., 3.])
-	indx = (tau>=0.492+20.)
-	alt[indx] = np.interp(tau[indx], [0.492+20., 0.492+20.+0.370], [3., 0.])
+	alt = np.zeros((len(tau02)))
+	indx = tau02<0.492 # top layer index
+	alt[indx] = np.interp(tau02[indx], [0., 0.492], [5., 4.])
+	indx = tau02>=0.492 # top layer index
+	indx = indx*(tau02<0.492+20.)
+	alt[indx] = np.interp(tau02[indx], [0.492, 0.492+20.], [4., 3.])
+	indx = (tau02>=0.492+20.)
+	alt[indx] = np.interp(tau02[indx], [0.492+20., 0.492+20.+0.370], [3., 0.])
 	
 	ig, ax0 = plt.subplots() # prepare plot
-	ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	ax0.plot(Fup/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fdown02/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown02/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup02/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	
+	# next solar zenith angle for Figure 4
+	# solar zenith angle from Figure 4 of Shettle and Weinman (1970)
+	# note, this should be changed to the corresponding value in Fig. 4
+	theta0 = np.arccos(0.6)
+	mu0 = np.cos(theta0)
+	
+	# call function to get downward and upward diffuse irradiances at each vertical layer
+	# and the total global downward directed irradiance
+	[Fdown06, Fup06, tau06] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
+	
+	# Eq. 26 of Shettle and Weinman (1970)
+	Gdown06 = Fdown06+mu0*np.pi*F0*np.exp(-tau02/mu0)
+	
+	norm = mu0*np.pi*F0 # normalisation factor
+	
+	ax0.plot(Fdown06/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown06/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup06/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+
+	# next solar zenith angle for Figure 4
+	# solar zenith angle from Figure 4 of Shettle and Weinman (1970)
+	# note, this should be changed to the corresponding value in Fig. 4
+	theta0 = np.arccos(1.)
+	mu0 = np.cos(theta0)
+	
+	# call function to get downward and upward diffuse irradiances at each vertical layer
+	# and the total global downward directed irradiance
+	[Fdown1, Fup1, tau1] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
+	
+	# Eq. 26 of Shettle and Weinman (1970)
+	Gdown1 = Fdown1+mu0*np.pi*F0*np.exp(-tau02/mu0)
+	
+	norm = mu0*np.pi*F0 # normalisation factor
+	
+	ax0.plot(Fdown1/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown1/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup1/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+
 	ax0.legend(loc = 'lower right')
 	ax0.set_title('Reproduction of Figure 4 of Shettle and Weinman (1970)\nto test non-conservative atmosphere case')
 	ax0.set_ylabel(r'Altitude (km)')

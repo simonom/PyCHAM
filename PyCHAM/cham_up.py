@@ -279,13 +279,18 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				bc_red = 0 # reset flag for time step reduction due to boundary conditions
 				
 			else:
-				Ct_gain = np. interp(tnew, [0, t00], [Ct[:, gasinj_cnt-1], Ct[:, gasinj_cnt]])
+				# loop through components with instantaneous injection
+				inj_cntn = 0 # keep count on components
+				Ct_gain = np.zeros((len(inj_indx))) # empty results
+				for inj_indxi in inj_indx:
+					Ct_gain[inj_cntn] = np. interp(tnew, [0, t00], [y0[inj_indxi]/Cfactor, Ct[inj_cntn, gasinj_cnt]])
+					inj_cntn += 1  # keep count on components
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-		
+			print(Ct_gain)
 			# account for change in gas-phase concentration,
 			# convert from ppb to molecules/cm3 (air)
-			y[inj_indx] += Ct_gain*Cfactor-y0[inj_indx]
-				
+			y[inj_indx] = Ct_gain*Cfactor
+			
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solver
 		if (sumt+tnew > injectt[gasinj_cnt] and gasinj_cnt != -1 and gpp_stab != -1):
