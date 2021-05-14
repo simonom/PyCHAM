@@ -2,7 +2,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in eqn_pars and treats loss from gas-phase as negative
 
-# File Created at 2021-05-07 17:43:27.809087
+# File Created at 2021-05-14 10:34:13.415702
 
 import numpy as np 
 
@@ -44,7 +44,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
 				conc_sum = np.zeros((1)) 
 				if any(pconc > 0.): # if seed particles present 
-					conc_sum[0] = ((Csit.sum()-Csit[seedi])+Csit[seedi]*core_diss)
+					conc_sum[0] = ((Csit.sum()-sum(Csit[seedi]))+sum(Csit[seedi]*core_diss))
 				else: 
 					conc_sum[0] = Csit.sum() 
 				# prevent numerical error due to division by zero 

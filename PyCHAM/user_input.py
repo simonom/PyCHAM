@@ -19,14 +19,14 @@ def share():
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedVr,
+		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
 		pk.close()
 		
 		
@@ -38,11 +38,11 @@ def share():
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedVr,
+		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, inname,
-		wat_hist, drh_str, erh_str, pcont)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat)

@@ -348,170 +348,379 @@ def test_nat_act_flux():
 	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
 	ax0.tick_params(direction = 'in', which = 'both')
 	plt.show() # Fig.4 of Shettle and Weinman (1970) reproduction
+	
+	
+	
+	# Figure 5 of Shettle and Weinman (1970) ---------------------------------------------
+	
+	callfi = -10 # caller identity
+	A = 0.75 # first wavelength (0.76mu) snow albedo Table 2 Shettle and Weinman (1970)
+	gi = np.array((0.553, 0.848, 0.708))
+	ai = np.array((0.124, 0.997, 0.434))
+	F0 = 1370 # incoming solar radiance (Wm-2)
+	NL = 3 # number of vertical atmosphere layer boundaries
+	tau = np.array((0.492, 20., 0.370)) # contribution of each layer to optical depth
+	
+	# solar zenith angle from Figure 4 of Shettle and Weinman (1970)
+	# note, this should be changed to the corresponding value in Fig. 4
+	theta0 = np.arccos(0.2)
+	mu0 = np.cos(theta0)
+	
+	# call function to get downward and upward diffuse irradiances at each vertical layer
+	# and the total global downward directed irradiance
+	[Fdown02, Fup02, tau02] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
+	
+	# Eq. 26 of Shettle and Weinman (1970)
+	Gdown02 = Fdown02+mu0*np.pi*F0*np.exp(-tau02/mu0)
+	
+	# normalisation factor
+	norm = mu0*np.pi*F0
 
-	# Figure 6 of Shettle and Weinman (1970) ------------------------
+	# convert optical depth to altitude
+	alt = np.zeros((len(tau02)))
+	indx = tau02<0.492 # top layer index
+	alt[indx] = np.interp(tau02[indx], [0., 0.492], [5., 4.])
+	indx = tau02>=0.492 # top layer index
+	indx = indx*(tau02<0.492+20.)
+	alt[indx] = np.interp(tau02[indx], [0.492, 0.492+20.], [4., 3.])
+	indx = (tau02>=0.492+20.)
+	alt[indx] = np.interp(tau02[indx], [0.492+20., 0.492+20.+0.370], [3., 0.])
+	
+	ig, ax0 = plt.subplots() # prepare plot
+	ax0.plot(Fdown02/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown02/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup02/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	
+	# next solar zenith angle for Figure 5
+	# solar zenith angle from Figure 5 of Shettle and Weinman (1970)
+	# note, this should be changed to the corresponding value in Fig. 4
+	theta0 = np.arccos(0.6)
+	mu0 = np.cos(theta0)
+	
+	# call function to get downward and upward diffuse irradiances at each vertical layer
+	# and the total global downward directed irradiance
+	[Fdown06, Fup06, tau06] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
+	
+	# Eq. 26 of Shettle and Weinman (1970)
+	Gdown06 = Fdown06+mu0*np.pi*F0*np.exp(-tau06/mu0)
+	
+	norm = mu0*np.pi*F0 # normalisation factor
+	
+	ax0.plot(Fdown06/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown06/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup06/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+
+	# next solar zenith angle for Figure 5
+	# solar zenith angle from Figure 5 of Shettle and Weinman (1970)
+	# note, this should be changed to the corresponding value in Fig. 4
+	theta0 = np.arccos(1.)
+	mu0 = np.cos(theta0)
+	
+	# call function to get downward and upward diffuse irradiances at each vertical layer
+	# and the total global downward directed irradiance
+	[Fdown1, Fup1, tau1] = nat_act_flux.nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL, gi, Pfunc_text)
+	
+	# Eq. 26 of Shettle and Weinman (1970)
+	Gdown1 = Fdown1+mu0*np.pi*F0*np.exp(-tau1/mu0)
+	
+	norm = mu0*np.pi*F0 # normalisation factor
+	
+	ax0.plot(Fdown1/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Gdown1/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+	ax0.plot(Fup1/norm, alt, '--', label = str(r'$F\uparrow(\lambda$ = 0.76$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+
+	ax0.legend(loc = 'lower right')
+	ax0.set_title('Reproduction of Figure 5 of Shettle and Weinman (1970)\nto test non-conservative atmosphere case')
+	ax0.set_ylabel(r'Altitude (km)')
+	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$ and $F\uparrow/\mu_{0} \pi F_{0}$')
+	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
+	ax0.tick_params(direction = 'in', which = 'both')
+	plt.show() # Fig. 5 of Shettle and Weinman (1970) reproduction
+
+
+		# Figure 6 of Shettle and Weinman (1970) blue (0.4mu) wavelength -------------------------------------------
 	
 	theta0s= [np.arccos(1.), np.arccos(0.6), np.arccos(0.2)]
-	#ig, ax0 = plt.subplots() # prepare plot (Fig. 6 Shettle and Weinman (1970) reproduction) for blue wavelength (red wavelength after)
+	ig, ax0 = plt.subplots() # prepare plot (Fig. 6 Shettle and Weinman (1970) reproduction) for blue wavelength (red wavelength after)
+	
 	for theta0 in theta0s: # loop through solar zenith angles given in Figure 6
 	
 		callfi = -12 # caller identity
 		A = 0.09 # 0.4mu wavelength ocean albedo Table 2 Shettle and Weinman (1970)
 		ai = np.array((1., 1., 1.))
+		#0.4mu column of Table 2 Shettle and Weinman (1970)
+		gi = np.array((0.180, 0.848, 0.507))
 		F0 = 1370 # incoming solar radiance (Wm-2)
 		tau = np.array((0.291, 20., 0.346)) # contribution of each layer to optical depth
 		mu0 = np.cos(theta0)
 	
 		NL = 3 # number of vertical atmosphere layer boundaries
+		
+		# increase vertical resolution
+		# new number of vertical atmosphere layers
+		NLn = 300
+		gin = np.zeros((NLn))
+		ain = np.zeros((NLn))
+		# new optical depth per vertical layer
+		taun = np.diff(np.arange(0., np.sum(tau)*1.00001, np.sum(tau)/NLn))
+	
+		indx = np.cumsum(taun)<tau[0] # original top layer
+		gin[indx] = gi[0]
+		ain[indx] = ai[0]
+		indx = np.cumsum(taun)>=tau[0] # original middle layer
+		indx = indx*(np.cumsum(taun)<(tau[0]+tau[1])) # original middle layer
+		gin[indx] = gi[1]
+		ain[indx] = ai[1]
+		indx = np.cumsum(taun)>=(tau[0]+tau[1]) # original bottom layer
+		gin[indx] = gi[2]
+		ain[indx] = ai[2]
+		
 		# call function to get downward and upward diffuse irradiances at each vertical layer
 		# and the total global downward directed irradiance
-		[Fdown, Gdown, tau] = nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL)
+		[Fdown, Fup, taun] = nat_act_flux.nat_act_flux(A, ain, F0, theta0, taun, callfi, mu0, NLn, gin, Pfunc_text)
+		
+		# Eq. 26 of Shettle and Weinman (1970)
+		Gdown = Fdown+mu0*np.pi*F0*np.exp(-taun/mu0)
+		
 		# normalisation factor
 		norm = mu0*np.pi*F0
 	
 		# convert optical depth to altitude
-		alt = np.zeros((len(tau)))
-		indx = tau<0.291 # top layer index
-		alt[indx] = np.interp(tau[indx], [0., 0.291], [5., 4.])
-		indx = tau>=0.291 # top layer index
-		indx = indx*(tau<20.291)
-		alt[indx] = np.interp(tau[indx], [0.291, 20.291], [4., 3.])
-		indx = (tau>=20.291)
-		alt[indx] = np.interp(tau[indx], [20.291, 20.291+0.346], [3., 0.])
+		alt = np.zeros((len(taun)))
+		indx = taun<0.291 # top layer index
+		alt[indx] = np.interp(taun[indx], [0., 0.291], [5., 4.])
+		indx = taun>=0.291 # top layer index
+		indx = indx*(taun<20.291)
+		alt[indx] = np.interp(taun[indx], [0.291, 20.291], [4., 3.])
+		indx = (taun>=20.291)
+		alt[indx] = np.interp(taun[indx], [20.291, 20.291+0.346], [3., 0.])
 	
-	#	ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.legend(loc = 'lower right')
-	#	ax0.set_title('Reproduction of Figure 6 of Shettle and Weinman (1970)\nto test three layer atmosphere case for blue wavelength, red wavelength in next figure')
-	#	ax0.set_ylabel(r'Altitude (km)')
-	#	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
-	#	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
-	#	ax0.tick_params(direction = 'in', which = 'both')
+		ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		
+	ax0.legend(loc = 'lower right')
+	ax0.set_title('Reproduction of Figure 6 of Shettle and Weinman (1970)\nto test three layer atmosphere case for blue wavelength,\nred wavelength in next figure')
+	ax0.set_ylabel(r'Altitude (km)')
+	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
+	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
+	ax0.tick_params(direction = 'in', which = 'both')
 		
 	# show reproduction of Fig. 6 of Shettle and Weinman (1970) for blue wavelength
-	#plt.show()
+	plt.show()
+
+
+	# Figure 6 of Shettle and Weinman (1970) red (0.7mu) wavelength -------------------------------------------
 	
-	#ig, ax0 = plt.subplots() # prepare plot (Fig. 6 Shettle and Weinman (1970) reproduction) for red wavelength (blue wavelength above)
+	theta0s= [np.arccos(1.), np.arccos(0.6), np.arccos(0.2)]
+	ig, ax0 = plt.subplots() # prepare plot (Fig. 6 Shettle and Weinman (1970) reproduction) for red wavelength (blue wavelength above)
+	
 	for theta0 in theta0s: # loop through solar zenith angles given in Figure 6
 	
-		callfi = -13 # caller identity
+		callfi = -12 # caller identity
 		A = 0.02 # 0.7mu wavelength ocean albedo Table 2 Shettle and Weinman (1970)
 		ai = np.array((1., 1., 1.))
+		#0.4mu column of Table 2 Shettle and Weinman (1970)
+		gi = np.array((0.511, 0.848, 0.701))
 		F0 = 1370 # incoming solar radiance (Wm-2)
 		tau = np.array((0.069, 20., 0.169)) # contribution of each layer to optical depth
 		mu0 = np.cos(theta0)
 	
 		NL = 3 # number of vertical atmosphere layer boundaries
+		
+		# increase vertical resolution
+		# new number of vertical atmosphere layers
+		NLn = 300
+		gin = np.zeros((NLn))
+		ain = np.zeros((NLn))
+		# new optical depth per vertical layer
+		taun = np.diff(np.arange(0., np.sum(tau)*1.00001, np.sum(tau)/NLn))
+		
+		indx = np.cumsum(taun)<tau[0] # original top layer
+		gin[indx] = gi[0]
+		ain[indx] = ai[0]
+		indx = np.cumsum(taun)>=tau[0] # original middle layer
+		indx = indx*(np.cumsum(taun)<(tau[0]+tau[1])) # original middle layer
+		gin[indx] = gi[1]
+		ain[indx] = ai[1]
+		indx = np.cumsum(taun)>=(tau[0]+tau[1]) # original bottom layer
+		gin[indx] = gi[2]
+		ain[indx] = ai[2]
+		
 		# call function to get downward and upward diffuse irradiances at each vertical layer
 		# and the total global downward directed irradiance
-		[Fdown, Gdown, tau] = nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL)
+		[Fdown, Fup, taun] = nat_act_flux.nat_act_flux(A, ain, F0, theta0, taun, callfi, mu0, NLn, gin, Pfunc_text)
+		
+		# Eq. 26 of Shettle and Weinman (1970)
+		Gdown = Fdown+mu0*np.pi*F0*np.exp(-taun/mu0)
+		
 		# normalisation factor
 		norm = mu0*np.pi*F0
 	
 		# convert optical depth to altitude
-		alt = np.zeros((len(tau)))
-		indx = tau<0.069 # top layer index
-		alt[indx] = np.interp(tau[indx], [0., 0.069], [5., 4.])
-		indx = tau>=0.069 # top layer index
-		indx = indx*(tau<20.069)
-		alt[indx] = np.interp(tau[indx], [0.069, 20.069], [4., 3.])
-		indx = (tau>=20.069)
-		alt[indx] = np.interp(tau[indx], [20.069, 20.069+0.169], [3., 0.])
+		alt = np.zeros((len(taun)))
+		indx = taun<0.069 # top layer index
+		alt[indx] = np.interp(taun[indx], [0., 0.069], [5., 4.])
+		indx = taun>=0.069 # middle layer index
+		indx = indx*(taun<20.069)
+		alt[indx] = np.interp(taun[indx], [0.069, 20.069], [4., 3.])
+		indx = (taun>=20.069) # bottom layer index
+		alt[indx] = np.interp(taun[indx], [20.069, 20.069+0.169], [3., 0.])
 	
-	#	ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.legend(loc = 'lower right')
-	#	ax0.set_title('Reproduction of Figure 6 of Shettle and Weinman (1970)\nto test three layer atmosphere case for red wavelength, blue wavelength in previous figure')
-	#	ax0.set_ylabel(r'Altitude (km)')
-	#	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
-	#	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
-	#	ax0.tick_params(direction = 'in', which = 'both')
+		ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		
+	ax0.legend(loc = 'lower right')
+	ax0.set_title('Reproduction of Figure 6 of Shettle and Weinman (1970)\nto test three layer atmosphere case for red wavelength,\nblue wavelength in previous figure')
+	ax0.set_ylabel(r'Altitude (km)')
+	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
+	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
+	ax0.tick_params(direction = 'in', which = 'both')
 		
 	# show reproduction of Fig. 6 of Shettle and Weinman (1970) for red wavelength
-	#plt.show()
+	plt.show()
+
 	
-	
-	# Figure 7 of Shettle and Weinman (1970)
+	# Figure 7 of Shettle and Weinman (1970) blue (0.4mu) wavelength -------------------------------------------
 	
 	theta0s= [np.arccos(1.), np.arccos(0.6), np.arccos(0.2)]
-	#ig, ax0 = plt.subplots() # prepare plot (Fig. 7 Shettle and Weinman (1970) reproduction) for blue wavelength (red wavelength after)
+	ig, ax0 = plt.subplots() # prepare plot (Fig. 7 Shettle and Weinman (1970) reproduction) for blue wavelength (red wavelength below)
+	
 	for theta0 in theta0s: # loop through solar zenith angles given in Figure 7
 	
 		callfi = -12 # caller identity
 		A = 0.78 # 0.4mu wavelength snow albedo Table 2 Shettle and Weinman (1970)
 		ai = np.array((1., 1., 1.))
+		#0.4mu column of Table 2 Shettle and Weinman (1970)
+		gi = np.array((0.180, 0.848, 0.507))
 		F0 = 1370 # incoming solar radiance (Wm-2)
 		tau = np.array((0.291, 20., 0.346)) # contribution of each layer to optical depth
 		mu0 = np.cos(theta0)
 	
 		NL = 3 # number of vertical atmosphere layer boundaries
+		
+		# increase vertical resolution
+		# new number of vertical atmosphere layers
+		NLn = 300
+		gin = np.zeros((NLn))
+		ain = np.zeros((NLn))
+		# new optical depth per vertical layer
+		taun = np.diff(np.arange(0., np.sum(tau)*1.00001, np.sum(tau)/NLn))
+		
+		indx = np.cumsum(taun)<tau[0] # original top layer
+		gin[indx] = gi[0]
+		ain[indx] = ai[0]
+		indx = np.cumsum(taun)>=tau[0] # original middle layer
+		indx = indx*(np.cumsum(taun)<(tau[0]+tau[1])) # original middle layer
+		gin[indx] = gi[1]
+		ain[indx] = ai[1]
+		indx = np.cumsum(taun)>=(tau[0]+tau[1]) # original bottom layer
+		gin[indx] = gi[2]
+		ain[indx] = ai[2]
+		
 		# call function to get downward and upward diffuse irradiances at each vertical layer
 		# and the total global downward directed irradiance
-		[Fdown, Gdown, tau] = nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL)
+		[Fdown, Fup, taun] = nat_act_flux.nat_act_flux(A, ain, F0, theta0, taun, callfi, mu0, NLn, gin, Pfunc_text)
+		
+		# Eq. 26 of Shettle and Weinman (1970)
+		Gdown = Fdown+mu0*np.pi*F0*np.exp(-taun/mu0)
+		
 		# normalisation factor
 		norm = mu0*np.pi*F0
 	
 		# convert optical depth to altitude
-		alt = np.zeros((len(tau)))
-		indx = tau<0.291 # top layer index
-		alt[indx] = np.interp(tau[indx], [0., 0.291], [5., 4.])
-		indx = tau>=0.291 # top layer index
-		indx = indx*(tau<20.291)
-		alt[indx] = np.interp(tau[indx], [0.291, 20.291], [4., 3.])
-		indx = (tau>=20.291)
-		alt[indx] = np.interp(tau[indx], [20.291, 20.291+0.346], [3., 0.])
+		alt = np.zeros((len(taun)))
+		indx = taun<0.291 # top layer index
+		alt[indx] = np.interp(taun[indx], [0., 0.291], [5., 4.])
+		indx = taun>=0.291 # middle layer index
+		indx = indx*(taun<20.291)
+		alt[indx] = np.interp(taun[indx], [0.291, 20.291], [4., 3.])
+		indx = (taun>=20.291) # bottom layer index
+		alt[indx] = np.interp(taun[indx], [20.291, 20.291+0.346], [3., 0.])
 	
-	#	ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.legend(loc = 'lower right')
-	#	ax0.set_title('Reproduction of Figure 7 of Shettle and Weinman (1970)\nto test three layer atmosphere case for blue wavelength, red wavelength in next figure')
-	#	ax0.set_ylabel(r'Altitude (km)')
-	#	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
-	#	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
-	#	ax0.tick_params(direction = 'in', which = 'both')
+		ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.4$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		
+	ax0.legend(loc = 'lower right')
+	ax0.set_title('Reproduction of Figure 7 of Shettle and Weinman (1970)\nto test three layer atmosphere case for blue wavelength,\nred wavelength in next figure')
+	ax0.set_ylabel(r'Altitude (km)')
+	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
+	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
+	ax0.tick_params(direction = 'in', which = 'both')
 		
 	# show reproduction of Fig. 7 of Shettle and Weinman (1970) for blue wavelength
-	#plt.show()
+	plt.show()
 	
+	
+	# Figure 7 of Shettle and Weinman (1970) red (0.7mu) wavelength -------------------------------------------
+	
+	theta0s= [np.arccos(1.), np.arccos(0.6), np.arccos(0.2)]
 	ig, ax0 = plt.subplots() # prepare plot (Fig. 7 Shettle and Weinman (1970) reproduction) for red wavelength (blue wavelength above)
+	
 	for theta0 in theta0s: # loop through solar zenith angles given in Figure 7
 	
-		callfi = -13 # caller identity
-		A = 0.75 # 0.7mu wavelength ocean albedo Table 2 Shettle and Weinman (1970)
+		callfi = -12 # caller identity
+		A = 0.78 # 0.4mu wavelength snow albedo Table 2 Shettle and Weinman (1970)
 		ai = np.array((1., 1., 1.))
+		#0.4mu column of Table 2 Shettle and Weinman (1970)
+		gi = np.array((0.511, 0.848, 0.701))
 		F0 = 1370 # incoming solar radiance (Wm-2)
 		tau = np.array((0.069, 20., 0.169)) # contribution of each layer to optical depth
 		mu0 = np.cos(theta0)
 	
 		NL = 3 # number of vertical atmosphere layer boundaries
+		
+		# increase vertical resolution
+		# new number of vertical atmosphere layers
+		NLn = 300
+		gin = np.zeros((NLn))
+		ain = np.zeros((NLn))
+		# new optical depth per vertical layer
+		taun = np.diff(np.arange(0., np.sum(tau)*1.00001, np.sum(tau)/NLn))
+		
+		indx = np.cumsum(taun)<tau[0] # original top layer
+		gin[indx] = gi[0]
+		ain[indx] = ai[0]
+		indx = np.cumsum(taun)>=tau[0] # original middle layer
+		indx = indx*(np.cumsum(taun)<(tau[0]+tau[1])) # original middle layer
+		gin[indx] = gi[1]
+		ain[indx] = ai[1]
+		indx = np.cumsum(taun)>=(tau[0]+tau[1]) # original bottom layer
+		gin[indx] = gi[2]
+		ain[indx] = ai[2]
+		
 		# call function to get downward and upward diffuse irradiances at each vertical layer
 		# and the total global downward directed irradiance
-		[Fdown, Gdown, tau] = nat_act_flux(A, ai, F0, theta0, tau, callfi, mu0, NL)
+		[Fdown, Fup, taun] = nat_act_flux.nat_act_flux(A, ain, F0, theta0, taun, callfi, mu0, NLn, gin, Pfunc_text)
+		
+		# Eq. 26 of Shettle and Weinman (1970)
+		Gdown = Fdown+mu0*np.pi*F0*np.exp(-taun/mu0)
+		
 		# normalisation factor
 		norm = mu0*np.pi*F0
 	
 		# convert optical depth to altitude
-		alt = np.zeros((len(tau)))
-		indx = tau<0.069 # top layer index
-		alt[indx] = np.interp(tau[indx], [0., 0.069], [5., 4.])
-		indx = tau>=0.069 # top layer index
-		indx = indx*(tau<20.069)
-		alt[indx] = np.interp(tau[indx], [0.069, 20.069], [4., 3.])
-		indx = (tau>=20.069)
-		alt[indx] = np.interp(tau[indx], [20.069, 20.069+0.169], [3., 0.])
+		alt = np.zeros((len(taun)))
+		indx = taun<0.069 # top layer index
+		alt[indx] = np.interp(taun[indx], [0., 0.069], [5., 4.])
+		indx = taun>=0.069 # middle layer index
+		indx = indx*(taun<20.069)
+		alt[indx] = np.interp(taun[indx], [0.069, 20.069], [4., 3.])
+		indx = (taun>=20.069) # bottom layer index
+		alt[indx] = np.interp(taun[indx], [20.069, 20.069+0.169], [3., 0.])
 	
-	#	ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
-	#	ax0.legend(loc = 'lower right')
-	#	ax0.set_title('Reproduction of Figure 7 of Shettle and Weinman (1970)\nto test three layer atmosphere case for red wavelength, blue wavelength in previous figure')
-	#	ax0.set_ylabel(r'Altitude (km)')
-	#	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
-	#	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
-	#	ax0.tick_params(direction = 'in', which = 'both')
+		ax0.plot(Fdown/norm, alt, label = str(r'$F\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		ax0.plot(Gdown/norm, alt, '--', label = str(r'$G\downarrow(\lambda$ = 0.7$\mu,\, \mu_0=$' +str(np.around(mu0, decimals=1)) + ')' ))
+		
+	ax0.legend(loc = 'lower right')
+	ax0.set_title('Reproduction of Figure 7 of Shettle and Weinman (1970)\nto test three layer atmosphere case for red wavelength,\nblue wavelength in previous figure')
+	ax0.set_ylabel(r'Altitude (km)')
+	ax0.set_xlabel(r'$F\downarrow/\mu_{0} \pi F_{0}$ and $G\downarrow/\mu_{0} \pi F_{0}$')
+	ax0.xaxis.set_major_formatter(FormatStrFormatter('% 1.2f')) # x axis tick labels at two decimal places	
+	ax0.tick_params(direction = 'in', which = 'both')
 		
 	# show reproduction of Fig. 7 of Shettle and Weinman (1970) for red wavelength
-	#plt.show()
-	else:
-		[L, A] = nat_act_flux(A, a, F0, theta0, tau, callf, mu0) # call function
+	plt.show()
+	
+	
 
 test_nat_act_flux() # call function

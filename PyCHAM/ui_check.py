@@ -26,14 +26,14 @@ def ui_check(self):
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedVr,
+		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -65,7 +65,7 @@ def ui_check(self):
 	# manually assigned
 	# dens - manually assigned densities (g/cc)
 	# seed_name - name of component(s) comprising seed particles
-	# seedVr - volume ratio of component(s) comprising seed particles
+	# seedx - mole fraction of dry seed components
 	# seed_diss - dissociation constant for seed particle component(s)
 	# partit_cutoff - product of vapour pressure and activity coefficient
 	# 	above which gas-particle partitioning assumed zero
@@ -74,6 +74,10 @@ def ui_check(self):
 	# con_infl_t - times of continuous influx of components
 	# con_infl_nam - chemical scheme names of components with continuous influx
 	# con_infl_C - influx rate of components with continuous influx (ppb/s)
+	# Vwat_inc - flag for whether (1) or not (0) the number size 
+	# distribution of seed particles includes the volume of water
+	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
+	# seeds before experiment starts
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -88,6 +92,12 @@ def ui_check(self):
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
 	# -------------------------------------------------------------------
+	
+	# incorrect seed molecular weight
+	if seed_mw[0] == 'fail':
+		if (em_flag < 2):
+			err_mess = str('Error - the molecular weight of seed particle component (seed_mw in model variables input file) could not be interpreted, please check it adheres to the guidelines in README')
+		em_flag = 2
 	
 	# incorrect wall_on marker
 	if (wall_on != 1 and wall_on != 0):
@@ -244,12 +254,22 @@ def ui_check(self):
 		err_mess = str('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
 		em_flag = 2
 	
-	# check on consistency of names of seed component(s) and their volume ratio
-	if (len(seed_name) != len(seedVr) and em_flag < 2):
-		if (len(seed_name) > 1) and (len(seedVr) == 1):
-			seedVr = np.ones((len(seed_name)))
+	# check on consistency of names of seed components, number of size bins and the mole fraction of dry seed components, note components in rows and size bins in columns
+	if (len(seed_name) != seedx.shape[0] and em_flag < 2):
+		
+		# if seedx is equal to the default value, then assume equal mole fractions of dry seed components
+		if ((len(seed_name) > 1) and (seedx.shape[0] == 1) and (seedx[0, 0] == 1)):
+			seedx = np.ones((len(seed_name), 1))
+			seedx[:, 0] = 1./len(seed_name)
 		else:
-			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of seed particle component volume ratios (seedVr in model variables input file), please see README for guidance')
+			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of mole fractions of dry (excluding water) seed particle components (seedx in model variables input file), please see README for guidance')
+			em_flag = 2
+	
+	# check on consistency of dry seed component mole fractions and number of size bins
+	# note that mole fraction size bins vary with columns
+	if (seedx.shape[1] > 1): # if size bins stated explicitly
+		if (seedx.shape[1] != num_sb): # if inconsistent
+			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
 
 	# check on consistency of names of seed component(s) and their dissociation constant
@@ -333,7 +353,7 @@ def ui_check(self):
 	
 
 	# store in pickle file
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

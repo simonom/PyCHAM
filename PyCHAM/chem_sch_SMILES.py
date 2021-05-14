@@ -93,6 +93,7 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 					comp_list.append(name_SMILE) # list SMILE names
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
+					H2Oi = 0 # filler
 					return(comp_namelist, comp_list, err_mess, H2Oi)
 		
 		for product in products: # right hand side of equations (gains)

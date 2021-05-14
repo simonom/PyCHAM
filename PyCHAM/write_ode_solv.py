@@ -53,7 +53,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
-	f.write('	# y - initial concentrations (moleucles/cm3)\n')
+	f.write('	# y - initial concentrations (molecules/cm3)\n')
 	f.write('	# integ_step - the maximum integration time step (s)\n')
 	f.write('	# rindx - index of reactants per equation\n')
 	f.write('	# pindx - index of products per equation\n')

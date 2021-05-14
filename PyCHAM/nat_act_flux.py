@@ -34,7 +34,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	# F0 - solar irradiance at top of atmosphere (W/m2)
 	# theta - solar zenith angle (angle between the perpendicular to planet surface 
 	#	and incident solar radiance at top of atmosphere) (radians)
-	# tau - optical depth of atmosphere (natural logarithm 
+	# tau - optical depth of each vertical layer of atmosphere (not cumulative) (natural logarithm 
 	# 	of ratio of incident radiation/transmitted radiation)
 	# callf - flag for the calling function (0 for unit testing)
 	# mu0 - cosine of the angle between the perpendicular of the 
@@ -359,7 +359,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	mu = np.cos(theta) # page 1 of Shettle and Weinman (1970)
 
 		
-	if (callf == -10): # Figure 4 Shettle and Weinman (1970)
+	if (callf == -10): # Figure 4 and 5 Shettle and Weinman (1970)
 		
 		NL = 300 # increase resolution of vertical layers
 		# remember original scattering asymmetry factor
@@ -415,72 +415,32 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	# a singular matrix that cannot be inverted
 	if (np.any(a == 1)):
 	
-		if (callf == -12): # Figure 6/7 of Shettle and Weinman (1970) # blue wavelength
-			tau_sum = np.cumsum(tau) # cumulative optical depth through atmosphere
-			#0.4mu column of Table 2 Shettle and Weinman (1970)
-			g = np.array((0.180, 0.848, 0.507))
-			T = np.sum((1.-g)*tau) # Eq. 18 of Shettle and Weinman (1970)
-			
-			B2 = (3.*mu0*F0*(1.-A)*(2.+3.*mu0+(2.-3.*mu0)*np.exp(-tau_sum[-1]/mu0)))/(4.*(4.+3.*(1.-A)*T))
-
-		if (callf == -13): # Figure 6/7 of Shettle and Weinman (1970) # red wavelength
-			tau_sum = np.cumsum(tau) # cumulative optical depth through atmosphere
-			#0.7mu column of Table 2 Shettle and Weinman (1970)
-			g = np.array((0.511, 0.848, 0.701))
-			T = np.sum((1.-g)*tau) # Eq. 18 of Shettle and Weinman (1970)
-			
-			B2 = (3.*mu0*F0*(1.-A)*(2.+3.*mu0+(2.-3.*mu0)*np.exp(-tau_sum[-1]/mu0)))/(4.*(4.+3.*(1.-A)*T))
-			
-		if (callf != -12 and callf != -13):
-			T = (1.-g)*tau # Eq. 18 of Shettle and Weinmann (1970)
+		tau_sum = np.cumsum(tau) # cumulative optical depth through atmosphere
 		
-			# Eq. 17a of Shettle and Weinmann (1970)
-			B2 = (3.*mu0*F0*(1.-A)*(2.+3.*mu0+(2.-3.*mu0)*np.exp(-tau/mu0)))/(4.*(4.+3.*(1.-A)*T))
+		T = ((1.-g)*tau) # Eq. 18 of Shettle and Weinman (1970)
+		T = np.cumsum(T) # integrate over atmosphere depth
 		
+		# Eq. 17a of Shettle and Weinman (1970)
+		B2 = (3.*mu0*F0*(1.-A)*(2.+3.*mu0+(2.-3.*mu0)*np.exp(-tau_sum[-1]/mu0)))/(4.*(4.+3.*(1.-A)*T[-1]))
 		
-		if (callf == -12 or callf == -13): # Figure 6/7 of Shettle and Weinman (1970)
-			tau = np.arange(0., tau_sum[-1]*1.0001, tau_sum[-1]/100.)
-			
-			gn = np.zeros((len(tau)))
-			
-			li = 0 # layer count
-			for gi in g: # loop through layers
-				
-				if (li == 0): # top layer
-					gn[tau<tau_sum[li]] = gi
-				if (li == len(g)-1): # bottom layer
-					gn[tau>tau_sum[li-1]] = gi
-				if (li != 0 and li != (len(g)-1)): # middle layers
-					indxn = tau>tau_sum[li-1]
-					indxn = indxn*(tau<tau_sum[li])
-					gn[indxn] = gi
-				li += 1 # layer count
-			
-			T = np.zeros((len(tau)))
-			T[1:] = np.cumsum((1.-gn[1:])*(np.diff(tau[:]))) # Eq. 18 of Shettle and Weinmann (1970)
-			
-			# Eq. 16a of Shettle and Weinmann (1970) for radiance
-			I0 = B1-(3./4.)*mu0**2.*F0*np.exp(-tau/mu0)-B2*T
-			
-			# Eq. 16b of Shettle and Weinmann (1970) for radiance
-			I1 = B2-(3./4.)*mu0*F0*np.exp(-tau/mu0)
+		# Eq. 17b of Shettle and Weinman (1970)
+		B1 = ((3.*mu0**2.)/4.+mu0/2.)*F0-2.*B2/3.
 		
-		else:
-			# Eq. 16a of Shettle and Weinmann (1970) for radiance
-			I0 = B1-(3./4.)*mu0**2.*F0*np.exp(-tau/mu0)-B2*T
-		
-			# Eq. 16b of Shettle and Weinmann (1970) for radiance
-			I1 = B2-(3./4.)*mu0*F0*np.exp(-tau/mu0)
+		# Eq. 16a of Shettle and Weinmann (1970) for radiance
+		I0 = B1-(3./4.)*mu0**2.*F0*np.exp(-tau_sum/mu0)-B2*T
+			
+		# Eq. 16b of Shettle and Weinmann (1970) for radiance
+		I1 = B2-(3./4.)*mu0*F0*np.exp(-tau_sum/mu0)
 		
 		# Eq. 8 of Shettle and Weinmann (1970)
 		# total downward diffuse irradiance
-		F = np.pi*(I0+2.*I1/3.)
+		Fdown = np.pi*(I0+2.*I1/3.)
 		
-		if (callf == -12 or callf == -13): # Figure 6/7 of Shettle and Weinman (1970)
-			
-			# Eq. 26 Shettle and Weinman (1970)
-			Gdown = F+mu0*np.pi*F0*np.exp(-tau/mu0)
-			return(F, Gdown, tau)
+		# downward diffuse irradiance at Earth surface from Eq. 8 
+		# of Shettle and Weinman (1970)
+		Fup = np.pi*(I0-2./3.*I1)
+		
+		return(Fdown, Fup, tau_sum)
 		
 		
 		

@@ -19,14 +19,14 @@ def mod_var_read():
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedVr,
+			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
 			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -214,16 +214,38 @@ def mod_var_read():
 				seed_name = [str(i).strip() for i in (value.split(','))]
 				
 			if key == 'seed_mw' and value.strip():
-				seed_mw = float(value.strip())
+				try:
+					seed_mw =  [float(i) for i in (value.split(','))]
+					seed_mw =  np.array((seed_mw))
+				except:
+					seed_mw = ['fail']
 		
 			if key == 'seed_diss' and value.strip(): # dissociation constant of seed material
 				seed_diss = [float(i) for i in (value.split(','))]
 
 			if key == 'seed_dens' and value.strip():
-				seed_dens = float(value.strip())
+				seed_dens = [float(i) for i in (value.split(','))]
+				seed_dens = np.array((seed_dens))
 
-			if key == 'seedVr' and value.strip(): # volume ratio of components in seed particles
-				seedVr = [float(i) for i in (value.split(','))]
+			if key == 'seedx' and value.strip(): # mole fraction of components in dry seed particles
+				comp_count = 1 # count number of components
+				sb_count = 1 # track number of size bins
+				for i in value:
+					if i==';':
+						comp_count += 1 # record number of components
+						sb_count = 1 # reset size bin count
+					if i==',':
+						sb_count += 1 # size bin count
+				seedx = np.zeros((comp_count, sb_count))
+				for i in range(comp_count):
+					seedx[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+			
+			if key == 'Vwat_inc' and value.strip(): # whether number size distribution includes volume of water
+				Vwat_inc = int(value.strip())
+			
+			# whether to allow water to equilibrate with seed prior to experiment
+			if key == 'seed_eq_wat' and value.strip():
+				seed_eq_wat = int(value.strip())
 
 			if key == 'light_status' and value.strip(): # status of lights (on or off)
 				light_stat = [int(i) for i in (value.split(','))]
@@ -395,7 +417,7 @@ def mod_var_read():
 		# -------------------------------------------
 		
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedVr, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
