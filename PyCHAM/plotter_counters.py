@@ -34,7 +34,7 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -288,7 +288,7 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _, _) = retr_out.retr_out(dir_path)
 	# ------------------------------------------------------------------------------
 	
 	# condition wet particles assuming equilibrium with relative humidity at 

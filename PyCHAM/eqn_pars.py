@@ -127,8 +127,10 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
 	# get index of components in the peroxy radical list
+	
+	
 	RO2_indx = RO2_indices.RO2_indices(comp_namelist, RO2_names)
-
+	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(photo_path)
 

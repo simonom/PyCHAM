@@ -931,46 +931,56 @@ class PyCHAM(QWidget):
 		self.b203.clicked.connect(self.on_click203)
 		self.PRIMlayout.addWidget(self.b203, 0, 0)
 
+		# label for input line that receives component names to plot temporal profiles of
+		self.l203 = QLabel(self)
+		self.l203.setText('Write the chemical scheme names of components you want plotted in the box below (use H2O for water and RO2 for organic peroxy radicals)')
+		self.l203.setWordWrap(True)
+		self.PRIMlayout.addWidget(self.l203, 1, 0, 1, 1)
 
 		# input bar for names of components to plot temporal profiles of
 		self.e205 = QLineEdit(self)
-		self.e205.setText('Chemical scheme names of components to be plotted using the buttons below (use H2O for water)')
 		# show left most point first
 		self.e205.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PRIMlayout.addWidget(self.e205, 1, 0)
+		self.PRIMlayout.addWidget(self.e205, 2, 0)
 
 		# gas-phase concentrations temporal profiles -------------
 		
-		# button to plot temporal profile of gas-phase concentrations
-		self.b206 = QPushButton('Gas-phase concentrations', self)
+		# button to plot temporal profile of gas-phase concentrations in ug/m3
+		self.b206 = QPushButton(str('Gas-phase concentrations ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
 		self.b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
 		self.b206.clicked.connect(self.on_click206)
-		self.PRIMlayout.addWidget(self.b206, 2, 0)
+		self.PRIMlayout.addWidget(self.b206, 3, 0)
+		
+		# button to plot temporal profile of gas-phase concentrations in ppb
+		self.b206ppb = QPushButton(str('Gas-phase concentrations (ppb)'), self)
+		self.b206ppb.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
+		self.b206ppb.clicked.connect(self.on_click206ppb)
+		self.PRIMlayout.addWidget(self.b206ppb, 3, 1)
 		
 		 # particle-phase concentrations temporal profiles -------------
 
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		self.b209 = QPushButton('Total particle-phase concentrations', self)
+		self.b209 = QPushButton(str('Total particle-phase concentrations ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
 		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
 		self.b209.clicked.connect(self.on_click209)
-		self.PRIMlayout.addWidget(self.b209, 3, 0)
+		self.PRIMlayout.addWidget(self.b209, 4, 0)
 		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		self.b212 = QPushButton('Wall concentrations (from gas-wall partitioning)', self)
+		self.b212 = QPushButton('Wall concentrations (from gas-wall partitioning) ('+u'\u03BC'+'g/m'+u'\u00B3'+')', self)
 		self.b212.setToolTip('Plot the temporal profile of wall concentration (from gas-wall partitioning) for the specified components')
 		self.b212.clicked.connect(self.on_click212)
-		self.PRIMlayout.addWidget(self.b212, 4, 0)
+		self.PRIMlayout.addWidget(self.b212, 5, 0)
 		
 		# wall (from particle deposition to wall) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of wall concentrations (from particle deposition to wall)
-		self.b215 = QPushButton('Wall concentrations (from particle deposition to wall)', self)
+		self.b215 = QPushButton('Wall concentrations (from particle deposition to wall) ('+u'\u03BC'+'g/m'+u'\u00B3'+')', self)
 		self.b215.setToolTip('Plot the temporal profile of the wall concentration (from particle deposition to wall) for the specified components')
 		self.b215.clicked.connect(self.on_click215)
-		self.PRIMlayout.addWidget(self.b215, 5, 0)
+		self.PRIMlayout.addWidget(self.b215, 6, 0)
 		
 		# chamber conditions temporal profiles -------------
 		
@@ -1253,8 +1263,24 @@ class PyCHAM(QWidget):
 	
 		# input for minimum particle concentration detectable
 		self.e280 = QTextEdit(self)
-		self.e280.setText('Resolution of mass:charge ratio')
+		self.e280.setText('Resolution of molar mass:charge ratio (g/mol/charge)')
 		self.CIMSlayout.addWidget(self.e280, 0, 0)
+		
+		# input for time to show mass spectrum for
+		self.e281 = QTextEdit(self)
+		self.e281.setText('Time through experiment to show mass spectrum for (s)')
+		self.CIMSlayout.addWidget(self.e281, 1, 0)
+		
+		# type of ionisation source
+		self.e282 = QTextEdit(self)
+		self.e282.setText('Ionisation source (I for iodide, N for nitrate)')
+		self.CIMSlayout.addWidget(self.e282, 2, 0)
+	
+		# button to plot temporal profile of number size distribution
+		self.b290 = QPushButton('CIMS observations', self)
+		self.b290.setToolTip('Plot the mass spectrum as observed by a chemical ionisation mass spectrometer')
+		self.b290.clicked.connect(self.on_click290)
+		self.CIMSlayout.addWidget(self.b290, 3, 0)
 	
 		return(CIMSTab)
 	
@@ -1844,7 +1870,7 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name folder with results
 		plotter.plotter(0, dir_path, self) # plot results
 	
-	@pyqtSlot() # button to plot gas-phase concentration temporal profile
+	@pyqtSlot() # button to plot gas-phase concentration (ug/m3) temporal profile
 	def on_click206(self):	
 		
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
@@ -1856,6 +1882,19 @@ class PyCHAM(QWidget):
 		import plotter_gp
 		dir_path = self.l201.text() # name folder with results
 		plotter_gp.plotter(0, dir_path, comp_names, self) # plot results
+	
+	@pyqtSlot() # button to plot gas-phase concentration (ppb) temporal profile
+	def on_click206ppb(self):	
+		
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		# get names of components to plot
+		comp_names = [str(i) for i in self.e205.text(). split(',')]
+		
+		import plotter_gp
+		dir_path = self.l201.text() # name folder with results
+		plotter_gp.plotter(1, dir_path, comp_names, self) # plot results
 	
 	# button to plot total particle-phase concentration for individual components temporal profile
 	@pyqtSlot()
@@ -2546,6 +2585,28 @@ class PyCHAM(QWidget):
 		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, [], 0)
 
 		return()
+
+	@pyqtSlot() # button to plot mass spectrum replication of chemical ionisation mass spectrometer
+	def on_click290(self):
+	
+		# reset error message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		dir_path = self.l201.text() # name of folder with results
+		
+		# get resolution of mass:charge ratio
+		mcr_res = float((self.e280.toPlainText()))
+		
+		# get time to plot
+		tn = float((self.e281.toPlainText()))
+		
+		# get ioniser type
+		iont = ((self.e282.toPlainText()))
+		
+		# import required plotting function
+		import plotter_CIMS
+		plotter_CIMS.plotter_CIMS(dir_path, mcr_res, tn, iont)
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

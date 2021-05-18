@@ -38,6 +38,15 @@ def retr_out(output_by_sim):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
+			if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):
+				i = i.strip('\n')
+				i = i.strip(' ')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				dlist.append(int(i))
 			if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
 				i = i.strip('\n')
 				i = i.strip('[[')
@@ -111,6 +120,7 @@ def retr_out(output_by_sim):
 	# pure component saturation vapour pressures at 298.15 K (log10(atm))
 	OC = const['oxygen_to_carbon_ratios_of_components']
 	H2Oi = int((const['index_of_water'])[0]) # index of water
+	
 	seedi = const['index_of_seed_components'] # index of seed components
 	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
 	
@@ -123,7 +133,12 @@ def retr_out(output_by_sim):
 		speed = (const["simulation_computer_time(s)"])[0]
 	except:
 		speed = 0.
-		
+	
+	try: # indices of organic peroxy radical components
+		RO2i = const['organic_peroxy_radical_index']
+	except:
+		RO2i = []
+	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
 	if (os.stat(fname).st_size > 120): # if file contains more than just the header
@@ -196,4 +211,4 @@ def retr_out(output_by_sim):
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, RO2i)

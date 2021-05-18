@@ -41,13 +41,13 @@ try: # if calling from the PyCHAM home directory
 	output_by_sim = str(cwd + '/PyCHAM/output/GMD_paper_plotting_scripts/fig11_data/nuc_vsobs_output_fm_n1_2e4_n2_-4e2_n3_1e2')
 	# required outputs
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, time_array, comp_names, 
-		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(output_by_sim)
+		_, N, _, y_MV, _, wall_on, space_mode, _) = retr_out.retr_out(output_by_sim)
 
 except: # if calling from the GMD paper Results folder
 	output_by_sim = str(cwd + '/fig11_data/nuc_vsobs_output_fm_n1_2e4_n2_-4e2_n3_1e2')
 	# required outputs
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, xfm, time_array, comp_names, 
-		_, N, _, y_MV, _, wall_on, space_mode) = retr_out.retr_out(output_by_sim)
+		_, N, _, y_MV, _, wall_on, space_mode, _) = retr_out.retr_out(output_by_sim)
 
 	
 dlog10D = np.log10(rbou_rec[:, 1::]*2.0)-np.log10(rbou_rec[:, 0:-1]*2.0)

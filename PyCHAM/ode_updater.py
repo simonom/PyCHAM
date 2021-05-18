@@ -618,5 +618,5 @@ def ode_updater(update_stp,
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
 		comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi, seedi, 
-		siz_str, cham_env)
+		siz_str, cham_env, RO2_indx[:, 1])
 	return()

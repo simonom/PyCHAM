@@ -114,5 +114,11 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 		# call on MCM_photo module to process photolysis files and estimate J values
 		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path)
 
+	# in case a print out of photolysis rate to command line needed
+	#Jcn = 1
+	#for Jn in J:
+	#	print(Jcn, Jn)
+	#	Jcn += 1
+	#import ipdb; ipdb.set_trace()
 	
 	return(J)
