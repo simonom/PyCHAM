@@ -16,8 +16,8 @@ def retr_out(output_by_sim):
 
 	const = {} # prepare to create dictionary
 	for line in const_in.readlines():
-		# convert to python list
-		dlist = []
+		
+		dlist = [] # prepare to convert to python list
 		for i in line.split(',')[1::]:
 			
 			if str(line.split(',')[0]) == 'number_of_size_bins':
@@ -212,3 +212,90 @@ def retr_out(output_by_sim):
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
 		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, RO2i)
+
+def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
+	
+	import netCDF4 as nc # for EASY outputs
+	
+	# inputs: -------------------------------
+	# output_by_sim - name of folders requested by the calling code to be looked at
+	# comp_of_int - components of interest
+	# ---------------------------------------
+	
+	# if a .dat file used (e.g. FACSIMILE output)
+	if (output_by_sim[-4::] == '.dat'):
+	
+		datafile = open(output_by_sim)
+	
+		# flag stating whether column titles yet reached
+		col_title = 0
+		data_cnt = -1 # count on lines of data
+		
+		# prepare to create dictionary containing component names, times and concentrations
+		data_dic = {}
+		for line in datafile.readlines():
+		
+			dlist = [] # prepare to convert to python list
+		
+			if (col_title == 2): # ready to read in concentrations and times
+				data_cnt += 1 # count on lines of data
+		
+			# loop through sections of line separated by a space
+			for i in line.split(' '):
+				
+				if (i == ''): # ignore spaces
+					continue
+				if (i == 'PRINT'): # identifier for header
+					break # skip header
+				if (i == 'TIME'): # column titles
+					col_title = 1 # flag that column titles being read
+				if (col_title == 1):
+					if str(i)[-1::] == '\n': # in case new line symbol included
+						i = str(i)[0:-1]
+					dlist.append(str(i)) # list column headers
+				if (col_title == 2): # ready to read in concentrations and times
+					dlist.append(float(i))
+			
+			if (col_title == 2):
+				data_dic[str('data'+str(data_cnt))] = dlist
+			if (col_title == 1):
+				data_dic['col_title'] = dlist
+				col_title = 2 # ready to read in concentrations and times
+			
+	
+		# extract times (s), component names and concentrations with time (molecules/cm3)
+		# from dictionary
+		comp_names = [i for i in data_dic['col_title'][1::]]
+	
+		Crec = np.zeros((data_cnt+1, len(comp_names))) # empty array for concentrations with time (molecules/cm3)
+		time_s = np.zeros((data_cnt+1, 1)) # empty array for times (s)
+	
+		for key in data_dic: # loop through dictionary keys
+			if (key[0:4] == 'data'): # if this a useful entry
+				rn = int(key[4::])# get row number
+				time_s[rn] = data_dic[key][0] # times (s)
+				Crec[rn, :] = data_dic[key][1::] # concentrations with time (molecules/cm3)
+	
+		
+		return(time_s, comp_names, Crec)
+	
+	# if a .nc file used (e.g. EASY output)
+	if (output_by_sim[-3::] == '.nc'):
+		
+		ds = nc.Dataset(output_by_sim) # open file
+		
+		time_s = ds['time'][:] # get time (seconds)
+		
+		# empty array ready for component concentrations (molecules/cm3)
+		Crec = np.zeros((len(time_s), len(comp_of_int)))
+		
+		# retrieve concentrations (molecules/cm3) of components of interest
+		c_cnt = 0 # count on components
+		for comp_name in comp_of_int:
+			Crec[:, c_cnt] = ds[str(comp_name+'_0')][:]
+			c_cnt += 1 # count on components
+			
+		return(time_s, comp_of_int, Crec)
+		
+	else: # if file type unrecognised return fillers
+		return([], [], [])

@@ -53,6 +53,7 @@ dependencies:
   - matplotlib
   - metis
   - ncurses
+  - netcdf4
   - numba
   - numpy
   - openbabel

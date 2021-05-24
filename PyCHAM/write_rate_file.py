@@ -32,7 +32,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest using one tab
-	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, tf):\n')
+	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, tf, NO, HO2, NO3):\n')
 	f.write('\n')
 	f.write('	# inputs: ------------------------------------------------------------------\n')
 	f.write('	# RO2 - names of components included in peroxy radical list\n')	
@@ -44,6 +44,9 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# reaction rate coefficients and their names parsed in eqn_parser.py \n')
 	f.write('	# Jlen - number of photolysis reactions\n')
 	f.write('	# tf - sunlight transmission factor\n')
+	f.write('	# NO - NO concentration (molecules/cc (air))\n')
+	f.write('	# HO2 - HO2 concentration (molecules/cc (air))\n')
+	f.write('	# NO3 - NO3 concentration (molecules/cc (air))\n')
 	f.write('	# ------------------------------------------------------------------------\n')
 	f.write('\n')
 	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors')

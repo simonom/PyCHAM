@@ -45,6 +45,7 @@ dependencies:
   - mkl_fft
   - mkl_random
   - ncurses
+  - netcdf4
   - numpy
   - numpy-base
   - openbabel

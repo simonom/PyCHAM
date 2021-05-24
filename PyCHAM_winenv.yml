@@ -37,6 +37,7 @@ dependencies:
   - matplotlib
   - matplotlib-base
   - mkl-service
+  - netcdf4
   - numpy
   - pandas
   - parso

@@ -59,7 +59,7 @@ def middle(): # define function
 	# set initial concentrations (molecules/cc)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, seedi, erf, err_mess] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
+	nuci, nrec_steps, seedi, erf, err_mess, NOi, HO2i, NO3i] = init_conc.init_conc(comp_num, comp0, y0, temp[0], RH, 
 	Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, save_step, rindx_g, 
 	pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
@@ -120,7 +120,8 @@ def middle(): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-		Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac):
+		Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
+		HO2i, NO3i):
 
 		yield prog # update progress bar	
 

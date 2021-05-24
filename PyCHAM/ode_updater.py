@@ -52,7 +52,8 @@ def ode_updater(update_stp,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
 	sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
-	Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac):
+	Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
+	HO2i, NO3i):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -240,6 +241,9 @@ def ode_updater(update_stp,
 	# Pybel_objects - the pybel objects for components
 	# pcont - flag for whether particle injection continuous or instantaneous
 	# dil_fac - chamber dilution factor (fraction of chamber/s)
+	# NOi - NO index
+	# HO2i - HO2 index
+	# NO3i - NO3 index
 	# ------------------------------------------------------------
 	
 	# start timer
@@ -301,7 +305,7 @@ def ode_updater(update_stp,
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp, t0, pcont, pcontf, dil_fac)
+	nuc_comp, t0, pcont, pcontf, dil_fac, NOi, HO2i, NO3i)
 
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -393,7 +397,7 @@ def ode_updater(update_stp,
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
 				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 				lat, lon, af_path, dayOfYear, Pnow, 
-				photo_path, Jlen, tf)
+				photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i])
 			
 			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)

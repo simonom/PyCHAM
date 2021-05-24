@@ -1,0 +1,17 @@
+res_file_name = KFPANx10lKRO2HO2x10KRO2NOx10l
+total_model_time = 14400.
+update_step = 60.
+recording_time_step = 120.
+size_structure = 0
+number_size_bins = 0
+wall_on = 0
+temperature = 293.15
+tempt = 0.
+p_init = 103556.72
+rh = 0.65
+C0 = 0., 300., 11.6, 28.6
+Comp0 = O3, APINENE, NO, NO2 
+tracked_comp = NO,NO2
+light_status = 1
+light_time = 0
+act_flux_file = MAC_Actinic_Flux_Spectrum.csv

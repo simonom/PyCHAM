@@ -210,6 +210,22 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	inj_indx = inj_indx.astype('int')
 	corei = np.array((corei)).astype('int')
 	
+	# get indices of NO, HO2 and NO3 (for reaction rate calculations)
+	
+	try:
+		NOi = comp_namelist.index(NO)
+	except:
+		NOi = 0 # filler
+	try:
+		HO2i = comp_namelist.index(HO2)
+	except:
+		HO2i = 0 # filler
+	try:
+		NO3i = comp_namelist.index(NO3)
+	except:
+		NO3i = 0 # filler
+		
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 				comp_namelist, inj_indx, core_diss,
-				Psat_water, nuci, nrec_steps, seedi, erf, err_mess)
+				Psat_water, nuci, nrec_steps, seedi, erf, err_mess, NOi, 
+				HO2i, NO3i)

@@ -132,5 +132,10 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 	else: # if not in chemical scheme, water would be the next component appended to component list
 		H2Oi = len(comp_list)
 		comp_namelist.append('H2O')
-		
+	
+	# if no error message but no equations identified then tell user the chemical scheme markers is probably wrong
+	if (err_mess == '' and eqn_num[0] == 0):
+		err_mess = 'Error: no gas-phase reactions seen, this could be due to the chemical scheme marker input (chem_scheme_markers in the model variables input) not corresponding to the chemical scheme file, please see README for more guidance.'
+	
+	
 	return(comp_namelist, comp_list, err_mess, H2Oi)

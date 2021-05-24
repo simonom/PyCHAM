@@ -1421,6 +1421,12 @@ class PyCHAM(QWidget):
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
 	
+		# running check on model variables ---------------------------------------------------------------
+		import ui_check # module for checking on model variables
+		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
+		ui_check.ui_check(self)
+		# finished check on model variables --------------------------------------------------------------
+	
 	@pyqtSlot()
 	def on_click3(self): # when different xml file requires selection
 	

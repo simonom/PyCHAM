@@ -219,7 +219,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	
 	part_cnt = 0 # count on jac_part_indx inputs
 	
-	if (num_asb>0): # if particle size bins are present
+	if (num_asb > 0): # if particle size bins are present
 
 		# loop through components in the gas-phase (add two 
 		# to account for water and seed material)
@@ -407,16 +407,16 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 			rowvals = np.append(rowvals, new_el)
 			colptrs[(comp_num+2)*(num_asb+1)+compi+1::] += 1
 			wall_cnt += 1
+			
 	# end of wall influence on Jacobian part ---------------------------------------------------
-		 		
-	if (num_sb == 0): # if no particle size bins and no wall
+	if ((num_sb == 0) and len(rowvals)>=1): # if no particle size bins and no wall
 
 		# if the Jacobian matrix has an empty final row, then
 		# an error will be displayed during ODE solver call, so 
 		# input a filler on this row;
 		# add two to the number of unique components counted here to
-		# acount for water and seed material
-		if max(rowvals)<=(comp_num+2)-1:
+		# account for water and seed material
+		if (max(rowvals) <= (comp_num+2)-1):
 			# index for final row of Jacobian
 			rowvals = np.append(rowvals, (comp_num+2)-1)
 			# number of columns currently short of final column

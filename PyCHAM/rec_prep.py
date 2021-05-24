@@ -24,7 +24,8 @@ def rec_prep(nrec_step,
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
-	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, dil_fac):
+	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, dil_fac, 
+	NOi, HO2i, NO3i):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -133,6 +134,9 @@ def rec_prep(nrec_step,
 	# pcont - flag for whether particle injection instantaneous or continuous
 	# pcontf - current status of particle injection (instantaneous or continuous)
 	# dil_fac - fraction/s of chamber diluted
+	# NOi - index of NO
+	# HO2i - index of HO2
+	# NO3i - index of NO3
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -221,7 +225,7 @@ def rec_prep(nrec_step,
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, tf)
+			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i])
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 

@@ -302,10 +302,11 @@ def ui_check(self):
 	# -------------------------------------
 	# check on whether water included in instantaneously injected components, as it should not be, instead it should be
 	# included in the rh model variable input
-	
-	if (em_flag < 2):
+	if (em_flag < 2 and sch_name != 'Not found'): # if a chemical scheme has been identified
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
 		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
+		
+		
 		if (err_mess_new == '' and em_flag < 2):
 			
 			# check for water presence in components instantaneously injected, note need to call function above to get H2Oi
@@ -315,6 +316,15 @@ def ui_check(self):
 		else: # in case error message produced by function checking the chemical scheme
 			err_mess = err_mess_new
 			em_flag = 2
+	
+	if (em_flag < 2 and sch_name == 'Not found'): # if a chemical scheme has not been identified
+	
+		err_mess_n = str('Note - a new chemical scheme has not been identified automatically.  For PyCHAM to identify automatically the chemical scheme file must be inside the selected folder and its file name must contain the string \'chem\'.  Alternatively use the relevant button to select the chemical scheme individually.\n')
+		if (em_flag == 0):
+			err_mess = err_mess_n
+		else:
+			err_mess = str(err_mess+err_mess_n)
+		em_flag = 1
 	# -------------------------------------
 	# check on water history
 	if (em_flag < 2):
