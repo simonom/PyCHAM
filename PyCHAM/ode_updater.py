@@ -37,7 +37,7 @@ def ode_updater(update_stp,
 	y_rind, 
 	uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
-	colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou,
+	colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
@@ -146,6 +146,8 @@ def ode_updater(update_stp,
 	# 	partitioning
 	# jac_part_indx - index of inputs to Jacobian from particle
 	#	partitioning
+	# jac_extr_indx - index of inputs to Jacobian from extraction
+	#	of chamber air
 	# Vbou - volume boundary of size bins (um3)
 	# N_perbin - number concentration of particles per size bin 
 	#	(#/cc (air))
@@ -305,7 +307,7 @@ def ode_updater(update_stp,
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp, t0, pcont, pcontf, dil_fac, NOi, HO2i, NO3i)
+	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i)
 
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -358,7 +360,7 @@ def ode_updater(update_stp,
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, dil_fac)
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf)
 			
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > save_stp*save_cnt):
@@ -472,13 +474,14 @@ def ode_updater(update_stp,
 			pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
 			num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
 			seedi, core_diss, kelv_fac, kimt, (num_sb-wall_on), 
-			jac_part_indxn,
+			jac_part_indxn, jac_extr_indx,
 			rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 			nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
 			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
 			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
-			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi)
+			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
+			H2Oi, dil_fac)
 			
 			if (any(y < 0.)): # check on stability of integration of processes
 			
@@ -531,6 +534,12 @@ def ode_updater(update_stp,
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
+		
+		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
+		# note that concentrations of components inside particles (and in the gas-phase) will have been
+		# reduced due to dilution inside the ODE solver
+		if (dil_fac > 0):
+			N_perbin -= N_perbin*(dil_fac*tnew)
 		
 		if ((num_sb-wall_on) > 0): # if particle size bins present
 			# update particle sizes

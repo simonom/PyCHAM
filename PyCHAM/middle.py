@@ -41,7 +41,7 @@ def middle(): # define function
 	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, comp_num, RO2_indx, rel_SMILES, Pybel_objects, eqn_num, 
+	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, rel_SMILES, Pybel_objects, eqn_num, 
 	comp_namelist, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
@@ -50,7 +50,7 @@ def middle(): # define function
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
-	(num_sb+wall_on), const_comp, drh_str, erh_str)
+	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac)
 	
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):
@@ -105,7 +105,7 @@ def middle(): # define function
 		y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
-		colptrs, wall_on, jac_wall_indx, jac_part_indx, Vbou, 
+		colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 		nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 

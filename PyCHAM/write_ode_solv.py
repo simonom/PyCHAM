@@ -9,7 +9,7 @@ import datetime
 # function to generate the ordinary differential equation (ODE)
 # solver file
 def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
-		num_asb, con_C_indx, testf, eqn_num):
+		num_asb, con_C_indx, testf, eqn_num, dil_fac):
 	
 	# inputs: ------------------------------------------------
 	# con_infl_indx - indices of components with constant influx
@@ -23,6 +23,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	#	concentration
 	# testf - marker for whether in test mode or not
 	# eqn_num - number of gas- and particle-phase reactions
+	# dil_fac - fraction of chamber air extracted/s
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
@@ -44,13 +45,14 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	rowvals, colptrs, num_comp, num_sb,\n')
 	f.write('	wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,\n') 
 	f.write('	seedi, core_diss, kelv_fac, kimt, num_asb,\n')
-	f.write('	jac_part_indx,\n')
+	f.write('	jac_part_indx, jac_extr_indx,\n')
 	f.write('	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,\n')
 	f.write('	nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq,\n')
 	f.write('	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq,\n')
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
-	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi):\n')
+	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
+	f.write('	H2Oi, dil_fac):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
 	f.write('	# y - initial concentrations (molecules/cm3)\n')
@@ -100,6 +102,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# kimt - mass transfer coefficient for gas-particle partitioning (s)\n')
 	f.write('	# num_asb - number of actual size bins (excluding wall)\n')
 	f.write('	# jac_part_indx - index for sparse Jacobian for particle influence \n')
+	f.write('	# jac_extr_indx - index for sparse Jacobian for air extraction influence \n')
 	f.write('	# eqn_num - number of gas- and aqueous-phase reactions \n')
 	f.write('	# jac_mod_len - modification length due to high fraction of component(s)\n')
 	f.write('	# 	in particle phase\n')
@@ -110,6 +113,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# jac_part_H2O_indx - sparse Jacobian indices for the effect of\n')
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
+	f.write('	# dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
 	f.write('	# ---------------------------------------------\n')
 	f.write('\n')
 	
@@ -219,15 +223,13 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 				f.write('%d, ' %int(con_infl_indx[Ci]))
 			else: # last component in the continuous influx group
 				f.write('%d], 0] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
-		f.write('		\n')
 		
-	if (len(con_C_indx) > 0): # if any components have a constant gas-phase concentration
-		f.write('		dd[[')
-		for Ci in range(len(con_C_indx)):
-			if Ci<len(con_C_indx)-1:
-				f.write('%d, ' %int(con_C_indx[Ci]))
-			else:
-				f.write('%d], 0] = 0. \n' %int(con_C_indx[Ci]))
+	if (dil_fac > 0): # if chamber air being extracted
+		f.write('		# account for continuous extraction of chamber air\n')
+		f.write('		if (wall_on == 1): # if wall on\n')
+		f.write('			dd[0:-num_comp, 0] -= y[0:-num_comp, 0]*1.*dil_fac\n')
+		f.write('		if (wall_on == 0): # if wall off\n')
+		f.write('			dd[0::, 0] -= y[0::, 0]*1.*dil_fac\n')
 		f.write('		\n')
 		
 	# note the following needs two indents (as for the reaction section), so that it
@@ -341,9 +343,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('		return (dd)\n')
 	f.write('\n')
 	
-	# testing with 16 size bins and the MCM alpha-pinene chemical scheme
-	# showed that defining the Jacobian gave a 10 % reduction in processing
-	# time, therefore this set by default
+	# set the Jacobian
 	f.write('	def jac(t, y): # define the Jacobian\n')
 	f.write('		\n')
 	f.write('		# inputs: ----------------\n')
@@ -476,6 +476,9 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('			# effect of wall on wall\n')
 		f.write('			wall_eff[%s+1:%s:2] = -kw*(Psat[0,:]*act_coeff[0, :]/Cw) \n' %(num_comp*2, num_comp*4))
 		f.write('			data[jac_wall_indx] += wall_eff\n')
+		f.write('		\n')
+	if (dil_fac > 0): # include extraction of chamber air in ode solver Jacobian
+		f.write('		data[jac_extr_indx] -= 1.*dil_fac\n')
 		f.write('		\n')
 
 	f.write('		# create Jacobian\n')

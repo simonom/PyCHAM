@@ -19,7 +19,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
-	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, dil_fac):
+	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -108,20 +108,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# x - starting sizes of particles (um)
 	# pcont - flags for whether particle injection instantaneous or continuous
 	# pcontf - whether current state of particle injection is continuous
-	# dil_fac - chamber dilution factor (fraction of chamber/s)
 	# -----------------------------------------------------------------------
-
-
-	# dilute chamber following an integration time step, e.g. for flow-reactor -----
-	if (sumt > 0):
-	
-		if (wall_on == 1): # if wall on
-			y[0:-num_comp] -= y[0:-num_comp]*(dil_fac*tnew)
-		else: # if no wall
-			y -= y*(dil_fac*tnew)
-		
-		N_perbin -= N_perbin*(dil_fac*tnew)
-		
 	
 	# check on change of light setting --------------------------------------
 
@@ -222,6 +209,12 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			# is proportional to temperature, therefore pressure changes by 
 			# the same factor 
 			Pnow = Pnow*(temp_nown/temp_now)
+			
+			# update ppb to molecules/cc conversion factor concentrations
+			# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
+			ntot = Pnow*(si.N_A/((si.R*1.e6)*temp_nown))
+			# one billionth of number of molecules in chamber unit volume
+			Cfactor = ntot*1.e-9 # ppb to molecules/cc conversion factor
 			
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_nown+120.))*(temp_nown/296.16)**1.5)

@@ -24,7 +24,7 @@ def rec_prep(nrec_step,
 	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
-	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, dil_fac, 
+	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i):
 	
 	# inputs: --------------------------------------------------------
@@ -133,7 +133,6 @@ def rec_prep(nrec_step,
 	# t0 - initial integration step (s)
 	# pcont - flag for whether particle injection instantaneous or continuous
 	# pcontf - current status of particle injection (instantaneous or continuous)
-	# dil_fac - fraction/s of chamber diluted
 	# NOi - index of NO
 	# HO2i - index of HO2
 	# NO3i - index of NO3
@@ -178,7 +177,7 @@ def rec_prep(nrec_step,
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, dil_fac)
+		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf)
 	
 	
 	if ((num_sb-wall_on) > 0): # if particles present

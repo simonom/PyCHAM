@@ -18,7 +18,7 @@ import aq_mat_prep
 # define function to extract the chemical mechanism
 def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
 		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
-		drh_str, erh_str):
+		drh_str, erh_str, dil_fac):
 
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
@@ -38,6 +38,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	#	deliquescence RH (fraction 0-1) as function of temperature (K)
 	# erh_str - string from user inputs describing 
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
+	# dil_fac - fraction of chamber air extracted/s
 	# ------------------------------------------------------------
 	
 	# starting error flag and message (assumes no errors)
@@ -71,7 +72,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		comp_num] = eqn_interr.eqn_interr(eqn_num, 
 		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on)
 		
-	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on))
+	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on), dil_fac)
 	
 	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation
 	if (eqn_num[1] > 0): # if aqueous-phase reactions present
@@ -113,7 +114,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), con_C_indx, 0, eqn_num)
+			(num_sb-wall_on), con_C_indx, 0, eqn_num, dil_fac)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)
@@ -138,7 +139,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, comp_num, RO2_indx, comp_list, 
+		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx, comp_list, 
 		Pybel_objects, eqn_num, comp_namelist, Jlen, 
 		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 		nreac_aq, nprod_aq, jac_stoi_aq, 

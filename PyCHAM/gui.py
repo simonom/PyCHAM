@@ -1010,27 +1010,45 @@ class PyCHAM(QWidget):
 		self.b218.clicked.connect(self.on_click218)
 		self.SEClayout.addWidget(self.b218, 1, 0)
 		
+		# input bar for atom or functional group to plot contributions from
+		self.e218a = QLineEdit(self)
+		self.e218a.setText('Provide the SMILES names of atoms or functional groups for plotting component contributions')
+		self.e218a.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e218a, 2, 0)
+		
+		# input bar for top number of components containing the relevant atom or functional groups
+		self.e218b = QLineEdit(self)
+		self.e218b.setText('Provide the number of components (in ascending order) containing the atom/functional group to plot')
+		self.e218b.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e218b, 2, 1)
+		
+		# button to plot temporal profile of component contributions
+		self.b218b = QPushButton('Plot component contributions (mole fraction)', self)
+		self.b218b.setToolTip('Plot the contributions to this atom/functional group by component (mole fraction)')
+		self.b218b.clicked.connect(self.on_click218b)
+		self.SEClayout.addWidget(self.b218b, 3, 0)
+		
 		# volatility basis set ------------------
 		
 		# label for names of components to plot tracked change tendencies
 		l219 = QLabel(self)
 		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
 		l219.setWordWrap(True)
-		self.SEClayout.addWidget(l219, 2, 0, 1, 1)
+		self.SEClayout.addWidget(l219, 4, 0, 1, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
 		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
 		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b220.clicked.connect(self.on_click220)
 		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b220, 3, 0)
+		self.SEClayout.addWidget(self.b220, 5, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
 		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b221, 4, 0)
+		self.SEClayout.addWidget(self.b221, 6, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -1038,14 +1056,14 @@ class PyCHAM(QWidget):
 		self.e222 = QLineEdit(self)
 		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e222, 5, 0)
+		self.SEClayout.addWidget(self.e222, 7, 0)
 		
 		# button to plot 2D VBS
 		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b223, 6, 0)
+		self.SEClayout.addWidget(self.b223, 8, 0)
 		
 		# column and row relative lengths---------------------------------
 		
@@ -1967,11 +1985,28 @@ class PyCHAM(QWidget):
 		self.l203a.setText('')
 			
 		# get names of components to plot
-		comp_names = [str(i) for i in self.e217.text(). split(',')]
+		comp_names = [str(i) for i in self.e217.text().split(',')]
 		
 		import plotter_ct
 		dir_path = self.l201.text() # name of folder with results
 		plotter_ct.plotter(0, dir_path, comp_names, self) # plot results
+	
+	@pyqtSlot() # button to plot change tendencies
+	def on_click218b(self):
+
+		# clear dialogue message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+			
+		# get SMILE string names of atom/functional group
+		atom_name = str(self.e218a.text())
+		
+		# get number of components to plot
+		atom_num = int(self.e218b.text())
+		
+		import plotter_atom_frac
+		dir_path = self.l201.text() # name of folder with results
+		plotter_atom_frac.plotter(0, dir_path, atom_name, atom_num, self) # plot results
 	
 	# button to plot volatility basis set mass fractions with water
 	@pyqtSlot()

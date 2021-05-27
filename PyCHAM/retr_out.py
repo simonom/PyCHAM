@@ -46,7 +46,10 @@ def retr_out(output_by_sim):
 				i = i.strip('[')
 				i = i.strip(']')
 				i = i.strip(' ')
-				dlist.append(int(i))
+				try:
+					dlist.append(int(i))
+				except:
+					continue
 			if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
 				i = i.strip('\n')
 				i = i.strip('[[')

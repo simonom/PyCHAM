@@ -19,7 +19,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# num_comp - number of unique components
 	# Comp0 - chemical scheme names of components present at start of experiment
-	# init_conc - initial concentrations of components (molecules/cc)	
+	# init_conc - initial concentrations of components (ppb)	
 	# TEMP - temperature in chamber at start of experiment (K)
 	# RH - relative humidity in chamber (dimensionless fraction 0-1)
 	# PInit - initial pressure (Pa)
@@ -60,10 +60,9 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# convert concentrations
 	# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
-	ntot = PInit*(NA/(8.3144598e6*TEMP))
+	ntot = PInit*(NA/((si.R*1.e6)*TEMP))
 	# one billionth of number of molecules in chamber unit volume
-	Cfactor = ntot*1.0e-9 # ppb-to-molecules/cc
-	
+	Cfactor = ntot*1.e-9 # ppb to molecules/cc conversion factor
 
 	# prepare dictionary for tracking tendency to change of user-specified components
 	dydt_vst = {}
@@ -84,6 +83,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 				0, 0, 0, 0, erf, err_mess)
 			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
+		
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
 
