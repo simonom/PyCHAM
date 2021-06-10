@@ -21,21 +21,27 @@ def plotter(caller, dir_path, atom_name, atom_num, self): # define function
 	
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, SMILES, 
 		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, _, _, _, _, RO2i) = retr_out.retr_out(dir_path)
 	
 	# empty lists to contain results
 	cnt_list = []
 	ind_list = []
 	
-	cn = 0 # count on components
-	for ci in SMILES: # loop through component names
-		at_cnt = ci.count(atom_name)
-		if (at_cnt > 0): # if a contributor
-			cnt_list.append(at_cnt)
-			ind_list.append(int(cn))
-			
-		cn += 1
+	if (atom_name != 'RO2'): # if not organic peroxy radicals
 	
+		cn = 0 # count on components
+		for ci in SMILES: # loop through component names
+			at_cnt = ci.count(atom_name)
+			if (at_cnt > 0): # if a contributor
+				cnt_list.append(at_cnt)
+				ind_list.append(int(cn))
+			
+			cn += 1
+	else: # if organic peroxy radicals
+		
+		cnt_list = [1]*len(RO2i)
+		ind_list = RO2i
+		
 	# empty results array for contributing component index and number of occurrences
 	res = np.zeros((len(cnt_list), 2))
 	res[:, 0] = np.array((ind_list)) # index in first column

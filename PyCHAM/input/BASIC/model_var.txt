@@ -1,0 +1,15 @@
+res_file_name = KRO2NOa*1e-3_KRO2NO*1e-1_KBPAN*1e1_KAPNO*1e-2_KRO2HO2*1e2_70a76a1OOa105a118a206a
+total_model_time = 14400.
+update_step = 60.
+recording_time_step = 120.
+wall_on = 0
+temperature = 297.15
+tempt = 0.
+p_init = 103556.72
+rh = 0.5
+C0 = 0.223, 309., 11.59, 28.61, 0., 0., 0.
+Comp0 = O3, APINENE, NO, NO2, HNO3, OH, HO2
+light_status = 1
+light_time = 0
+act_flux_file = MAC_Actinic_Flux_Spectrum.csv
+tracked_comp = NO, NO2, O3, O, HO2, C107O2

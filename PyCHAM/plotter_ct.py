@@ -110,3 +110,102 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			 
 
 	return()
+	
+# plot change tendency due to individual chemical reactions
+def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# comp_names_to_plot - chemical scheme names of components to plot
+	#  top_num - top number of chemical reactions to plot
+	# self - reference to GUI
+	# --------------------------------------------------------------------------
+
+	# chamber condition ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, _, _, _, _, _) = retr_out.retr_out(dir_path)
+	
+	# loop through components to plot to check they are available
+	for comp_name in (comp_names_to_plot):
+		
+		fname = str(dir_path+ '/' +comp_name +'_rate_of_change')
+		try: # try to open
+			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 0) # skiprows = 0 skips first header	
+		except:
+			mess = str('Please note, a change tendency record for the component ' + str(comp_name) + ' was not found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+			self.l203a.setText(mess)
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			
+			plt.ioff() # turn off interactive mode
+			plt.close() # close figure window
+			
+			return()
+	
+	
+	# if all files are available, then proceed without error message
+	mess = str('')
+	self.l203a.setText(mess)
+			
+	if (self.bd_pl < 3):
+		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
+		self.bd_pl == 3
+	
+	
+	# prepare figure
+	plt.ion() # display figure in interactive mode
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	
+	for comp_name in (comp_names_to_plot): # loop through components to plot
+		
+		ci = comp_names.index(comp_name) # get index of this component
+		
+		# note that penultimate column in dydt is gas-particle 
+		# partitioning and final column is gas-wall partitioning, whilst
+		# the first row contains chemical reaction numbers
+		
+		# prepare to store results of change tendency due to chemical reactions
+		res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
+		res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
+		
+		# convert change tendencies from molecules/cc/s to ug/m3/s
+		res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[ci])*1.e12
+		
+		# identify most active chemical reactions
+		# first sum total change tendency (molecules/cc/s)
+		res_sum = np.abs(np.sum(res[1::, :], axis=0))
+		 
+		# sort in ascending order
+		res_sort = np.sort(res_sum)
+		
+		for cnum in range(top_num[0]): # loop through chemical reactions
+			
+			# identify this chemical reaction
+			cindx = np.where((res_sort[-(cnum+1)] ==  res_sum) == 1)[0]
+			for indx_two in (cindx):
+				# plot, note the +1 in the label to bring label into MCM index
+				ax0.plot(timehr, res[1::, indx_two], label = str(int(res[0, indx_two])+1))
+		
+		ax0.yaxis.set_tick_params(direction = 'in')
+		
+		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
+		ax0.set_xlabel('Time through experiment (hours)')
+		ax0.set_ylabel('Change tendency ($\mathrm{\mu g\, m^{-3}\, s^{-1}}$)')
+		
+		ax0.yaxis.set_tick_params(direction = 'in')
+		ax0.xaxis.set_tick_params(direction = 'in')
+		
+		ax0.legend()
+			 
+
+	return()

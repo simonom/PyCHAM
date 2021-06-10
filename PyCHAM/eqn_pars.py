@@ -94,6 +94,10 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	con_infl_indx = np.zeros((len(con_infl_nam)))
 	con_C_indx = np.zeros((len(const_comp)))
 	for i in range (len(con_infl_nam)):
+		# water not included explicitly in chemical schemes but accounted for later in init_conc
+		if (con_infl_nam[i] == 'H2O'):
+			con_infl_indx[i] = comp_num
+			continue
 		try:
 			# index of where components with constant influx occur in list of components
 			con_infl_indx[i] = comp_namelist.index(con_infl_nam[i])

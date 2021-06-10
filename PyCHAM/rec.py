@@ -101,7 +101,6 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
 	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
 	cham_env[save_cnt, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
-	
 	# --------------------------------------------------------------------------------
 
 	save_cnt += 1 # track number of recordings 

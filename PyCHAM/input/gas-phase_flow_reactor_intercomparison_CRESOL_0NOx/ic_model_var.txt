@@ -1,4 +1,4 @@
-res_file_name = Flow_Reactor_gas_phase_Intercomparison_Ocres_0NOx
+res_file_name = Flow_Reactor_gas_phase_Intercomparison_Ocres_0NOx_fH2O
 total_model_time = 3600.
 update_step = 60.
 recording_time_step = 60.
@@ -12,9 +12,9 @@ rht = 0
 act_flux_file = MAC_Actinic_Flux_Spectrumx10.csv
 C0 = 20., 20., 0., 0., 0.
 Comp0 = CRESOL, H2O2, NO, NO2, OH
-const_infl = H2O2, CRESOL, NO, NO2, OH
+const_infl = H2O2, CRESOL, NO, NO2, OH, H2O
 const_infl_t = 0.
-Cinfl = 0.02; 0.02; 0.000; 0.000; 0.
+Cinfl = 0.02; 0.02; 0.000; 0.000; 0.; 1.1694e4
 dil_fac = 1.e-3
 light_time = 0.
 light_status = 1

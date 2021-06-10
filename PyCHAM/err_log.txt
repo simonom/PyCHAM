@@ -1,4 +1,4 @@
-/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/APINENE_chem_scheme/standard
+/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/basic_chem_schem/KRO2NOa*1e-3_KRO2NO*1e-1_KBPAN*1e1_KAPNO*1e-2_KRO2HO2*1e2_70a76a1OOa105a118a206a
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

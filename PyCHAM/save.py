@@ -59,7 +59,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# seedi - index of seed components
 	# siz_str - the size structure
 	# cham_env - chamber environmental conditions (temperature (K), 
-	# pressure (Pa) and relative humdity
+	# pressure (Pa) and relative humidity
 	# opri - organic peroxy radical indices
 	# ---------------------------------------------------------------
 	

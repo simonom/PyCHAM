@@ -179,6 +179,7 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 		else:
 			
 			marker = str('^\\' +  chm_sch_mrk[8])
+		
 			if (re.match(marker, line1) != None):
 				# second check is whether markers for starting reaction rate coefficients
 				# part, and markers for end of equation lines, are present

@@ -86,7 +86,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 			# plot this component
 			if (comp_names_to_plot[i].strip() != 'RO2'): # if not the sum of organic peroxy radicals
+				# log10 y axis
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+				# linear y axis
+				#ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+				
 			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
 
@@ -102,8 +106,45 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 
-	# display
-	if (caller == 2):
+	if (caller <= 2): # display
 		plt.show()	
 
 	return()
+
+def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# comp_names_to_plot - chemical scheme names of components to plot
+	# self - reference to GUI
+	# --------------------------------------------------------------------------
+	
+	# get required information from EASY
+	[Etime_s, Ecomp_names, ECrec, TEMP, PRESS] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
+	
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	TEMP = 293.15 # chamber temperature (K)
+	PRESS = 1.e5 # chamber pressure (Pa)
+	ntot = PRESS*(si.N_A/((si.R*1.e6)*TEMP))
+	# one billionth of number of molecules in chamber unit volume
+	Cfac = (ntot*1.e-9) # ppb to molecules/cc conversion factor
+	
+	if (comp_names_to_plot): # if component names specified
+	
+		# gas-phase concentration sub-plot ---------------------------------------------	
+		for i in range(len(comp_names_to_plot)):
+			
+			Ei = Ecomp_names.index(comp_names_to_plot[i]) # EASY index
+			ax0.plot(Etime_s/3600., (ECrec[:, Ei]/Cfac), '-x', linewidth = 2., label = str(comp_names_to_plot[i]))
+		
+	
+	ax0.set_ylabel(r'Concentration (ppb)', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
+	if (caller <= 2): # display
+		plt.show()	

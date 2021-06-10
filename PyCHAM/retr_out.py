@@ -237,27 +237,33 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		# prepare to create dictionary containing component names, times and concentrations
 		data_dic = {}
 		for line in datafile.readlines():
-		
+			
 			dlist = [] # prepare to convert to python list
-		
+			
+			# identify whether tabs used to separate columns (if not then spaces are)
+			if '\t' in line:
+				sep = '\t'
+			if ' ' in line:
+				sep = ' '
+			
 			if (col_title == 2): # ready to read in concentrations and times
 				data_cnt += 1 # count on lines of data
-		
-			# loop through sections of line separated by a space
-			for i in line.split(' '):
+			
+			# loop through sections of line separated by a space and/or tab
+			for i in line.split(sep):
 				
 				if (i == ''): # ignore spaces
 					continue
-				if (i == 'PRINT'): # identifier for header
+				if (i.strip() == 'PRINT'): # identifier for header
 					break # skip header
-				if (i == 'TIME'): # column titles
+				if (i.strip()[0:4] == 'TIME'): # column titles
 					col_title = 1 # flag that column titles being read
 				if (col_title == 1):
 					if str(i)[-1::] == '\n': # in case new line symbol included
 						i = str(i)[0:-1]
 					dlist.append(str(i)) # list column headers
 				if (col_title == 2): # ready to read in concentrations and times
-					dlist.append(float(i))
+					dlist.append(float(i.strip()))
 			
 			if (col_title == 2):
 				data_dic[str('data'+str(data_cnt))] = dlist
@@ -280,7 +286,7 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 				Crec[rn, :] = data_dic[key][1::] # concentrations with time (molecules/cm3)
 	
 		
-		return(time_s, comp_names, Crec)
+		return(time_s, comp_names, Crec, [], [])
 	
 	# if a .nc file used (e.g. EASY output)
 	if (output_by_sim[-3::] == '.nc'):
@@ -298,7 +304,7 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 			Crec[:, c_cnt] = ds[str(comp_name+'_0')][:]
 			c_cnt += 1 # count on components
 			
-		return(time_s, comp_of_int, Crec)
+		return(time_s, comp_of_int, Crec, [], [])
 		
 	else: # if file type unrecognised return fillers
-		return([], [], [])
+		return([], [], [], [], [])

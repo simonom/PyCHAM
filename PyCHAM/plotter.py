@@ -110,7 +110,7 @@ def plotter(caller, dir_path, self):
 
 		# plotting number size distribution --------------------------------------
 	
-		# don't use the first boundary as it's zero, so will error when log10 taken
+		# don't use the first boundary as it could be zero, which will error when log10 taken
 		log10D = np.log10(rbou_rec[:, 1::]*2.)
 		if (num_asb > 1) :
 			# note, can't append zero to start of log10D to cover first size bin as the log10 of the

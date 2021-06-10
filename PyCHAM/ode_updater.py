@@ -541,6 +541,7 @@ def ode_updater(update_stp,
 		if (dil_fac > 0):
 			N_perbin -= N_perbin*(dil_fac*tnew)
 		
+		
 		if ((num_sb-wall_on) > 0): # if particle size bins present
 			# update particle sizes
 			if ((num_sb-wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present

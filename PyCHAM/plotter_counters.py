@@ -496,6 +496,316 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	
 	return()
 
+# scanning mobility particle spectrometer (SMPS)
+# options for SMPS convolution have been guided by the TSI SMPS manual and notes
+# the Aerosol Instrument Manager from TSI also provides helpful information:
+# http://webx.ubi.pt/~goa/Manuals/CPC3022A/Aerosol-Instrument-Manager-CPC-EAD-1930062J-Version-900.pdf
+def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert, 
+		delays, wfuncs, Hz, loss_func_str, losst, av_int, Q, tau, coi_maxD, csbn):
+
+	import rad_resp_hum
+	import inlet_loss
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# self - reference to GUI
+	# dryf - relative humidity of aerosol at entrance to condensing unit of CPC (fraction 0-1)
+	# cdt - false background counts (# particles/cm3)
+	# max_dt - maximum detectable actual concentration (# particles/cm3)
+	# sdt - particle size at 50 % detection efficiency (nm), 
+	# 	width factor for detection efficiency dependence on particle size
+	# max_size - minimum and maximum size measured (nm)
+	# uncert - uncertainty (%) around counts by counter
+	# delays - the significant response times for counter
+	# wfuncs - the weighting as a function of time for particles of different age
+	# Hz - temporal frequency of output
+	# loss_func_str - string stating loss rate (fraction/s) as a 
+	#			function of particle size (um)
+	# losst - time of passage through inlet (s)
+	# av_int - the averaging interval (s)
+	# Q - volumetric flow rate through counting unit (cm3/s)
+	# tau - instrument dead time (s)
+	# coi_maxDp - maximum actual concentration that 
+	# coincidence convolution applies to (# particles/cm3)
+	# csbn - the number of channels per decade of particle size
+	# --------------------------------------------------------------------------
+
+	# required outputs ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
+		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _, _) = retr_out.retr_out(dir_path)
+	# ------------------------------------------------------------------------------
+	
+	# condition wet particles assuming equilibrium with relative humidity inside instrument.  
+	# Get new radius at size bin centre (um)
+	[xn, yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)]]  = rad_resp_hum.rad_resp_hum(yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], x, dryf, H2Oi, num_comp, (num_sb-wall_on), Nwet, y_MV)
+	
+	# remove particles lost during transit through instrument (# particles/cm3)
+	[Nwet,  yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)]]= inlet_loss.inlet_loss(0, Nwet, xn, yrec[:, num_comp:(num_sb-wall_on+1)*(num_comp)], loss_func_str, losst, num_comp)
+	
+	# all instrument output times, assuming first report is at 0 s through experiment
+	times = np.arange(0, timehr[-1]*3600., 1./Hz)
+	
+	# empty array for holding corrected concentrations (# particles/cm3)
+	Nwetn = np.zeros((len(times), Nwet.shape[1]))
+	xnn = np.zeros((len(times), Nwet.shape[1])) # empty array for holding corrected radii (um)
+	
+	# interpolate simulation output to instrument output frequency (# particles/cm3)
+	# loop through size bins
+	for sbi in range(num_sb-wall_on):
+		Nwetn[:, sbi] = np.interp(times, timehr*3600., Nwet[:, sbi])
+		xnn[:, sbi] = np.interp(times, timehr*3600., xn[:, sbi])
+	
+	Nwet = Nwetn # rename Nwet (# particles/cm3)
+	xn = xnn # rename xn (um)
+	
+	# number of simulation outputs within the instrument response time
+	rt_num = delays[2]/(times[1]-times[0])
+
+	# if more than one output within response time, then loop through times to correct
+	# for response time and any mixing of ages of particle
+	# an explanation of response time and mixing of particles of different ages
+	# due to the parabolic speed distribution in instrument tubing is
+	# given by Enroth et al. (2018) in: https://doi.org/10.1080/02786826.2018.1460458
+	if (rt_num >= 1):
+	
+		# account for response time and mixing of particles of different ages
+		[weight, weightt] = resp_time_func(3, delays, wfuncs)
+	
+		# empty array for holding corrected concentrations (# particles/cm3)
+		Nwetn = np.zeros((Nwet.shape[0], Nwet.shape[1]))
+		xnn = np.zeros((Nwet.shape[0], Nwet.shape[1]))
+	
+		for it in range(1, len(times)): # loop through times
+			# number of time points to consider
+			trel = (times >= (times[it]-delays[2]))*(times <= times[it])
+			tsim = times[trel] # extract relevant time points (s)
+			tsim = np.abs(tsim-tsim[-1]) # time difference with present (s)
+			Nsim = Nwet[trel, :] # extract relevant number concentrations (# particles/cm3)
+			xsim = xn[trel, :]
+			# interpolate weights, use flip to align times
+			weightn = np.flip(np.interp(np.flip(tsim), weightt, weight))
+			if (np.diff(weightt) == 0).all(): # if weight is all on one time
+				weightn[:] = 0
+				# identify time closest to response time
+				t_diff = np.abs(tsim - weightt[0])
+				tindx = t_diff == np.min(t_diff)
+				weightn[tindx] = 1.
+
+			# tile across size bins
+			weightn = np.tile(weightn.reshape(-1, 1), [1, num_sb-wall_on])
+			# corrected concentration
+			Nwetn[it, :] = np.sum(Nsim*weightn, axis=0)
+			xnn[it, :] = np.sum(xsim*weightn, axis=0)
+		
+		Nwet = Nwetn # rename Nwet
+		xn = xnn # size bin radii (um)
+	
+	# correct for coincidence (only relevant at relatively moderate 
+	# concentrations (# particles/cm3)), using eq. 11 of
+	# https://doi.org/10.1080/02786826.2012.737049
+	# where Q is the volumetric flow (cm3/s) rate and tau is the instrument
+	# dead time (s)
+	# bypass if coincidence flagged to not be considered
+	if ((Q == -1)*(tau == -1)*(coi_maxD == -1) != 1):
+
+		from scipy.special import lambertw
+	
+		# product of actual concentration with volumetric flow rate and instrument dead time
+		Ca = Nwet.sum(axis=1)
+		# cannot invert the Lambert function (eq. 9 of https://doi.org/10.1080/02786826.2012.737049)
+		# directly as do not know the imaginary part, but can identify closest point to real part as we
+		# we know that measure count must lie between blank counts and actual concentration
+		for it in range(len(times)): # time loop
+			
+			# bypass if actual total particle concentration (# particles/cm3)
+			# exceeds maximum that coincidence applicable to or is less than 
+			# blank concentration
+			if (Ca[it] > cdt and Ca[it] < coi_maxD):
+				
+				# the possible measured counts (# particles/cm3)
+				x_poss = np.logspace(np.log10(cdt), np.log10(coi_maxD), int(1e3))
+				# account for volumetric flow rate and dead time
+				x_possn = -x_poss*(Q*tau)
+				# take the Lambert function and obtain just the real part
+				x_possn = (-lambertw(x_possn).real)/(Q*tau)
+				
+				# zero any negatives as these are useless
+				x_possn[x_possn<0] = 0
+				
+				# find point closest to actual concentration (# particles/cm3)
+				# if all possibilities fall below the actual concentration, then 
+				# the instrument will have marked this as a maximum
+				if all(x_possn < Ca[it]):
+					Cm = coi_maxD
+				else:
+					# linear interpolation
+					diff = (Ca[it]-x_possn)
+					indx1 = (diff == np.max(diff[diff<=0.]))
+					indx0 = (diff == np.min(diff[diff>0.]))
+					# the measured concentration (# particles/cm3)
+					diff[indx1] = -1*diff[indx1] # make absolute
+					Cm = (x_poss[indx0]*(diff[indx1])+x_poss[indx1]*(diff[indx0]))/(diff[indx1]+diff[indx0])
+					
+				# get the fraction underestimation due to coincidence
+				frac_un = Cm/Ca[it]
+				
+				# correct across all size bins (# particles/cm3)
+				Nwet[it, :] = Nwet[it, :]*(frac_un)
+	
+	# moving-average over averaging interval
+	# number of outputs within averaging interval
+	# note that using int here means rounding down, which is sensible
+	av_num = int(av_int/times[1]-times[0])
+	if (av_num > 1):
+		
+		# empty array to hold moving averages (# particles/cm3)
+		Nwetn = np.zeros((int(Nwet.shape[0]-(av_num-1)), Nwet.shape[1]))
+		# empty array to hold moving average radii (um)
+		xnn = np.zeros((int(Nwet.shape[0]-(av_num-1)), Nwet.shape[1]))
+		
+		for avi in range(av_num):
+			# (# particles/cm3)
+			Nwetn[:, :] += Nwet[avi:Nwet.shape[0]-(av_num-avi-1), :]/av_num
+			# radii (um)
+			xnn[:, :] += xn[avi:Nwet.shape[0]-(av_num-avi-1), :]/av_num
+		
+		# correct time (s)
+		times = times[av_num-1::]
+		
+		# return to working variable names
+		Nwet = Nwetn
+		xn = xnn
+	
+	# prepare for interpolating concentrations of simulated sizes to instrument size bins ---------------------------
+	Nwetn = np.zeros((Nwet.shape[0], csbn))
+	
+	# total number of decades of particle size for instrument
+	dec = (np.log10(max_size[1])-np.log10(max_size[0]))
+	# total number of size bins
+	nsb_ins = dec/csbn 
+	
+	# instrument size bin bounds (for diameters) (nm)
+	ins_sizbb = np.logspace(np.log10(max_size[1]), np.log10(max_size[0]), num = (nsb_ins+1), base = 10.)
+	# instrument size bin centres (diameter) (nm)
+	ins_sizc = ins_sizbb[0:-1]+np.diff(ins_sizbb)
+	
+	# difference (nm) between simulated size bins (diameter)
+	sim_diff = np.diff(rbou_rec*2.e3, axis = 1)
+	# difference (nm) between measurement size bins (diameter)
+	ins_diff = np.diff(ins_sizbb)
+	
+	# normalise simulated particle number concentrations by size bin width (diameters) (# particles/cm3/nm)
+	Nwet = Nwet/sim_diff
+	
+	# account for size dependent detection efficiency below one
+	# get detection efficiency as a function of particle size (diameter) (nm)
+	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
+	
+	# empty array to hold detection efficiencies across times and simulation size bins
+	# Dp is in um
+	ce_t = np.zeros((len(times), xn.shape[1]))
+	
+	# loop through times
+	for it in range(len(times)):
+	
+		# distribute normalised simulated particle concentrations across instrument size array (# particles/cm3/nm)
+		insNwet = np.interp(ins_sizc, xn[it, :]*2.e3, Nwet[it, :])
+		
+		# correct to width of instrument size bins (# particles/cm3)
+		Nwetn[it, :] = insNwet*ins_diff
+		
+		# interpolate detection efficiency (fraction) to instrument size bin centres
+		# Dp is in um
+		ce_t[it, :] = np.interp(ins_sizc, Dp, ce)
+		
+		# correct for upper size range of instrument, note conversion of
+		# upper size from nm to um
+		if (max_size[-1] != -1):
+			size_indx = (xn[it, :]*2. > max_size*1.e-3)
+			Nwet[it, size_indx] = 0.
+	
+	
+	Nwetn = Nwetn*ce_t # correct for detection efficiency
+	
+	# rename Nwetn variable
+	Nwet = np.zeros((Nwetn.shape[0], Nwetn.shape[1]))
+	Nwet[:, :] = Nwetn[:, :]
+	
+	# account for false background counts 
+	# (minimum detectable particle concentration)  (# particles/cm3)
+	Nwet[Nwet < cdt] = cdt
+	
+	# account for maximum particle concentration (# particles/cm3)
+	if (max_dt != -1): # if maximum particle concentration to be considered
+		Nwet[Nwet > max_dt] = max_dt
+	
+	if (caller == 0): # when called from gui
+		plt.ion() # show results to screen and turn on interactive mode
+	
+	# plot temporal profile of particle number size distribution (# particles/cm3/log10(Dp))
+	# prepare figure -------------------------------------------
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	# the difference in log10 of size bin boundaries (diameters (nm))
+	dlog10D = np.diff(np.log10(ins_sizbb))
+	
+	# number size distribution contours (/cc (air))
+	dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
+	dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]
+	# transpose ready for contour plot
+	dNdlog10D = np.transpose(dNdlog10D)
+		
+	# mask any nan values so they are not plotted
+	z = np.ma.masked_where(np.isnan(dNdlog10D), dNdlog10D)
+	
+	# customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
+	colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), (1., 1., 0.), (1., 0., 0.)]  # R -> G -> B
+	n_bin = 100  # discretizes the colormap interpolation into bins
+	cmap_name = 'my_list'
+	# create the colormap
+	cm = LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
+	
+	# set contour levels
+	levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
+			np.max(z[~np.isnan(z)])))
+	
+	# associate colours and contour levels
+	norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
+		
+	# contour plot with times (hours) along x axis and 
+	# particle diameters (nm) along y axis
+	p1 = ax0.pcolormesh(times/3600.0, ins_sizbb, z[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
+	
+	ax1.set_yscale("log") # set vertical axis to logarithmic spacing
+			
+	# set tick format for vertical axis
+	ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+	ax1.set_ylabel('Diameter (nm)', size = 14)
+	ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')	
+	
+	cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
+	cb.ax.tick_params(labelsize=14)   
+	# colour bar label
+	cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{nm}$))', size=14, rotation=270, labelpad=20)
+	
+	# set tick format for vertical axis
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize=14)
+	ax0.set_ylabel('Diameter (nm)', size = 14)
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
+	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+	ax0.set_title('Simulated particle number concentration convolved to represent \nscanning mobility particle spectrometer (SMPS) measurements')
+	ax0.legend()
+	
+	if (caller == 2): # display when in test mode
+		plt.show()
+	
+	return()
+
 # function to plot detection efficiency as a function of particle size (% vs. nm)
 def count_eff_plot(caller, dir_path, self, sdt):
 
