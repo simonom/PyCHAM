@@ -1,6 +1,6 @@
 '''solving the weighting of particles of different ages over response time of instrument'''
 # module to estimate the weighting of particles of different ages during the response time of instrument to represent the mixing of particles of different ages due to differential flow prior to counter 
-# File Created at 2021-03-16 15:58:36.852870
+# File Created at 2021-06-22 12:03:18.449557
 
 import numpy as np
 

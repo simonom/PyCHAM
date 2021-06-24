@@ -1187,7 +1187,7 @@ class PyCHAM(QWidget):
 		
 		# input for particle loss during inlet passage
 		self.e220_h = QTextEdit(self)
-		self.e220_h.setText('Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) (using Dp for diameter (um), np for numpy functions and python math symbols for math functions); time of passage through inlet (s).  E.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaults to 0., 0., which implies no particle losses in inlet')
+		self.e220_h.setText('Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) (using Dp for diameter (um), np for numpy functions and python math symbols for math functions); time of passage through inlet (s).  E.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaults to 0.; 0., which implies no particle losses in inlet')
 		self.CPCscrolllayout.addWidget(self.e220_h, 2, 7, 1, 3)
 		
 		# input for averaging interval (s)
@@ -1350,26 +1350,48 @@ class PyCHAM(QWidget):
 		self.CIMSlayout = QGridLayout() 
 		CIMSTab.setLayout(self.CIMSlayout)
 	
+		# create scrollable widget inside tab
+		self.scroll = QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scrollwidget = QWidget()
+		self.CIMSscrolllayout  = QGridLayout()
+	
 		# input for minimum particle concentration detectable
 		self.e280 = QTextEdit(self)
 		self.e280.setText('Resolution of molar mass:charge ratio (g/mol/charge)')
-		self.CIMSlayout.addWidget(self.e280, 0, 0)
+		self.CIMSscrolllayout.addWidget(self.e280, 0, 0)
 		
 		# input for time to show mass spectrum for
 		self.e281 = QTextEdit(self)
 		self.e281.setText('Time through experiment to show mass spectrum for (s)')
-		self.CIMSlayout.addWidget(self.e281, 1, 0)
+		self.CIMSscrolllayout.addWidget(self.e281, 1, 0)
 		
 		# type of ionisation source
 		self.e282 = QTextEdit(self)
 		self.e282.setText('Ionisation source (I for iodide, N for nitrate)')
-		self.CIMSlayout.addWidget(self.e282, 2, 0)
+		self.CIMSscrolllayout.addWidget(self.e282, 2, 0)
+		
+		# sensitivity dependence on molar mass
+		self.e283 = QTextEdit(self)
+		self.e283.setText('Sensitivity (Hz/ppt) dependence on molar mass (g/mol), use y_MW to denote molar mass (g/mol) of components.  Defaults to 1.0 which implies no dependency on molar mass.')
+		self.CIMSscrolllayout.addWidget(self.e283, 3, 0)
+		
+		# button to plot sensitivity dependence on molar mass
+		self.b290_a = QPushButton('Sensitivity', self)
+		self.b290_a.setToolTip('Plot the sensitivity to molar mass')
+		self.b290_a.clicked.connect(self.on_click290_a)
+		self.CIMSscrolllayout.addWidget(self.b290_a, 3, 1)
 	
-		# button to plot temporal profile of number size distribution
+		# button to plot mass spectrum
 		self.b290 = QPushButton('CIMS observations', self)
 		self.b290.setToolTip('Plot the mass spectrum as observed by a chemical ionisation mass spectrometer')
 		self.b290.clicked.connect(self.on_click290)
-		self.CIMSlayout.addWidget(self.b290, 3, 0)
+		self.CIMSscrolllayout.addWidget(self.b290, 4, 0)
+		
+		# properties of CIMS scroll area ----------------
+		self.scrollwidget.setLayout(self.CIMSscrolllayout)
+		self.scroll.setWidget(self.scrollwidget)
+		self.CIMSlayout.addWidget(self.scroll, 0, 0, 1, 1)
 	
 		return(CIMSTab)
 	
@@ -2297,7 +2319,7 @@ class PyCHAM(QWidget):
 			losst = float(ins[1]) # time loss rate applies over (s)
 			
 		except: # give error message
-			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semi-colon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
+			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semicolon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
 			
 			# set border around error message
 			if (self.bd_pl == 1):
@@ -2441,7 +2463,7 @@ class PyCHAM(QWidget):
 			ins = ((self.e220_e.toPlainText()).split(','))
 			Q = float(ins[0])
 			tau = float(ins[1])
-			coi_maxDp = float(ins[2])
+			coi_maxD = float(ins[2])
 			
 		except: # give error message
 			self.l203a.setText('Note - Coincidence inputs: volumetric flow rate through counting unit (cm<sup>3</sup> s<sup>-1</sup>), instrument dead time (s) and maximum actual particle concentration this can be applied to (# particles cm<sup>-3</sup>); should be three numbers separated by a comma (e.g. 5., 2.e-6, 3.e5).  Defaulting to -1, -1, -1, which indicates no convolution needed for coincidence (e.g. because coincidence already corrected for)')
@@ -2456,7 +2478,7 @@ class PyCHAM(QWidget):
 			
 			Q = -1
 			tau = -1
-			coi_maxDp = -1
+			coi_maxD = -1
 
 		# diameter at 50 % counting efficiency and width factor for sigmoidal 
 		# curve of counting efficiency against size ---------------------------------
@@ -2485,7 +2507,7 @@ class PyCHAM(QWidget):
 		try:
 			#  maximum and minimum particle sizes
 			max_size = ((self.e230_g.toPlainText()).split(','))
-			max_size = [float(i) for i in sdt] 
+			max_size = [float(i) for i in max_size] 
 			
 		except: # give error message
 			self.l203a.setText('Note - maximum and minimum detectable particle diameter (nm) should be two numbers separated by a comman, e.g. 1.0, 3e5, defaulting to -1, -1, which implies no minimum or maximum')
@@ -2625,7 +2647,8 @@ class PyCHAM(QWidget):
 		import plotter_counters
 		importlib.reload(plotter_counters) # ensure latest version uploaded
 		dir_path = self.l201.text() # name of folder with results
-		plotter_counters.smps_plotter(0, dir_path, self, dryf, cdt, sdt, max_size, csbn, p_rho) # plot results
+		
+		plotter_counters.smps_plotter(0, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert, delays, wfuncs, Hz, loss_func_str, losst, av_int, Q, tau, coi_maxD, csbn) # plot SMPS results
 		
 		return()
 
@@ -2641,7 +2664,7 @@ class PyCHAM(QWidget):
 		try:	
 			# get particle diameter at 50 % counting efficiency and width 
 			# factor for counting efficiency dependence on particle size
-			sdt = ((self.e230_e.toPlainText()).split(','))
+			sdt = ((self.e230_f.toPlainText()).split(','))
 			sdt = [float(i) for i in sdt] 
 			
 		except: # give error message
@@ -2784,27 +2807,25 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		# particle diameter at 50 % detection efficiency -----------------------------------
+		# ------------------------------------------------------------------------------------------------
 		
 		try:	
 			# get particle diameter at 50 % counting efficiency and width 
 			# factor for counting efficiency dependence on particle size
-			sdt = ((self.e230_e.toPlainText()).split(','))
+			sdt = ((self.e230_f.toPlainText()).split(','))
 			sdt = [float(i) for i in sdt] 
 			
 		except: # give error message
 			self.l203a.setText('Note - particle diameter (nm) at 50 % detection efficiency and factor for detection efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1, defaulting to 5, 0.5')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			
 			sdt = [5., 0.5]
-		
-		# ------------------------------------------------------------------------------------------------
 		
 		# maximum particle size -------------------------------------------------------
 		try:
@@ -2826,14 +2847,15 @@ class PyCHAM(QWidget):
 		# inlet loss function and time ------------------------------------------------------------
 		try:
 			# get relevant inputs in list form
-			ins = ((self.e230_j.toPlainText()).split(';'))
-			
+			ins = ((self.e230_k.toPlainText()).split(';'))
+			print(ins)
 			# loss rate (fraction/s) as a function os particle size (um)
 			loss_func_str = str(ins[0])
+
 			losst = float(ins[1]) # time loss rate applies over (s)
 			
 		except: # give error message
-			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semi-colon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
+			self.l203a.setText('Note - Loss rate (fraction s<sup>-1</sup>) as a function of particle size (um) and time of passage through inlet (s), should be a string (using Dp for diameter (um), np for numpy functions and python math symbols for math functions) followed by a  number, with the two separated by a semicolon, e.g.: np.append(10.**(-5.5-0.5*np.log10(Dp[Dp<=1.e-1])), 10.**(-4.2+0.8*np.log10(Dp[Dp>1.e-1]))); 5..  Defaulting to 0., 0. which implies no particle losses in inlet.')
 			
 			# set border around error message
 			if (self.bd_pl == 1):
@@ -2852,23 +2874,21 @@ class PyCHAM(QWidget):
 		xn = np.logspace(np.log10((sdt[0]*1.e-3)/2.), np.log10(max_size/2.), int(1e3))
 		xn = xn.reshape(1, -1)
 		
-		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, [], 0)
+		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, losst, 0)
 
 		return()
 
 
-	# button to plot loss rate of particles during inlet passage in CPC
+	# button to plot loss rate of particles during inlet passage
 	@pyqtSlot()
 	def on_click222_h(self):
-
+		
 		import inlet_loss
 		
 		# obtain the relevant inputs
 		# reset message box
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
-		
-		# particle diameter at 50 % detection efficiency -----------------------------------
 		
 		try:	
 			# get particle diameter at 50 % counting efficiency and width 
@@ -2880,15 +2900,13 @@ class PyCHAM(QWidget):
 			self.l203a.setText('Note - particle diameter (nm) at 50 % detection efficiency and factor for detection efficiency dependence on particle size should be two numbers separated by a comma, e.g.: 5, 1, defaulting to 5, 0.5')
 			# set border around error message
 			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
 				self.bd_pl = 2
 			else:
-				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			
 			sdt = [5., 0.5]
-		
-		# ------------------------------------------------------------------------------------------------
 		
 		# maximum particle size -------------------------------------------------------
 		try:
@@ -2935,11 +2953,33 @@ class PyCHAM(QWidget):
 		# radius range (um)
 		xn = np.logspace(np.log10((sdt[0]*1.e-3)/2.), np.log10(max_size/2.), int(1e3))
 		xn = xn.reshape(1, -1)
-		
-		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, [], 0)
+
+		inlet_loss.inlet_loss(3, [], xn, [], loss_func_str, losst, 0)
 
 		return()
 
+	@pyqtSlot() # button to plot sensitivity to molar mass
+	def on_click290_a(self):
+		# reset error message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		dir_path = self.l201.text() # name of folder with results
+		
+		y_MW = np.arange(1000.)
+		
+		# get sensitivity (Hz/ppt) dependence on molar mass
+		try:
+			sensit = str((self.e283.toPlainText()))
+		except:
+			sensit = 'np.ones(len(y_MW))' # default
+		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+			sensit = 'np.ones(len(y_MW))'
+		
+		import plotter_CIMS
+		
+		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MW)
+		
 	@pyqtSlot() # button to plot mass spectrum replication of chemical ionisation mass spectrometer
 	def on_click290(self):
 	
@@ -2950,17 +2990,34 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		
 		# get resolution of mass:charge ratio
-		mcr_res = float((self.e280.toPlainText()))
-		
+		try:
+			mcr_res = float((self.e280.toPlainText()))
+		except:
+			mcr_res = 1. # default
+			
 		# get time to plot
-		tn = float((self.e281.toPlainText()))
+		try:
+			tn = float((self.e281.toPlainText()))
+		except:
+			tn = 0. # default
 		
 		# get ioniser type
-		iont = ((self.e282.toPlainText()))
+		try:
+			iont = ((self.e282.toPlainText()))
+		except:
+			iont = 'I' # default
+			
+		# get sensitivity (Hz/ppt) dependence on molar mass
+		try:
+			sensit = str((self.e283.toPlainText()))
+		except:
+			sensit = '1.' # default
+		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+			sensit = '1.' # default
 		
 		# import required plotting function
 		import plotter_CIMS
-		plotter_CIMS.plotter_CIMS(dir_path, mcr_res, tn, iont)
+		plotter_CIMS.plotter_CIMS(dir_path, mcr_res, tn, iont, sensit)
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

@@ -526,7 +526,7 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	# av_int - the averaging interval (s)
 	# Q - volumetric flow rate through counting unit (cm3/s)
 	# tau - instrument dead time (s)
-	# coi_maxDp - maximum actual concentration that 
+	# coi_maxD - maximum actual concentration that 
 	# coincidence convolution applies to (# particles/cm3)
 	# csbn - the number of channels per decade of particle size
 	# --------------------------------------------------------------------------
@@ -551,15 +551,21 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	# empty array for holding corrected concentrations (# particles/cm3)
 	Nwetn = np.zeros((len(times), Nwet.shape[1]))
 	xnn = np.zeros((len(times), Nwet.shape[1])) # empty array for holding corrected radii (um)
+	rbou_recn = np.zeros((len(times), Nwet.shape[1]+1))# empty array for holding corrected size bin boundaries
 	
 	# interpolate simulation output to instrument output frequency (# particles/cm3)
 	# loop through size bins
-	for sbi in range(num_sb-wall_on):
-		Nwetn[:, sbi] = np.interp(times, timehr*3600., Nwet[:, sbi])
-		xnn[:, sbi] = np.interp(times, timehr*3600., xn[:, sbi])
+	for sbi in range(num_sb-wall_on+1):
+		if (sbi == (num_sb-wall_on+1)-1): # only consider size bin boundary for final step
+			rbou_recn[:, sbi] = np.interp(times, timehr*3600., rbou_rec[:, sbi])
+		else: # otherwise consider all arrays
+			Nwetn[:, sbi] = np.interp(times, timehr*3600., Nwet[:, sbi])
+			xnn[:, sbi] = np.interp(times, timehr*3600., xn[:, sbi])
+			rbou_recn[:, sbi] = np.interp(times, timehr*3600., rbou_rec[:, sbi])
 	
 	Nwet = Nwetn # rename Nwet (# particles/cm3)
 	xn = xnn # rename xn (um)
+	rbou_rec = rbou_recn # rename size bin boundary (um) array
 	
 	# number of simulation outputs within the instrument response time
 	rt_num = delays[2]/(times[1]-times[0])
@@ -680,15 +686,21 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 		xn = xnn
 	
 	# prepare for interpolating concentrations of simulated sizes to instrument size bins ---------------------------
-	Nwetn = np.zeros((Nwet.shape[0], csbn))
+	
+	# if no maximum or minimum size given, then assume same limits as simulation
+	if (max_size[0] == -1): # no minimum diameter given (nm)
+		max_size[0] = np.min(np.min(xn[xn>0.]*2.e3))
+	if (max_size[1] == -1): # no maximum diameter given (nm)
+		max_size[1] = np.max(np.max(xn*2.e3))	
 	
 	# total number of decades of particle size for instrument
 	dec = (np.log10(max_size[1])-np.log10(max_size[0]))
 	# total number of size bins
-	nsb_ins = dec/csbn 
+	nsb_ins = int(dec*csbn) 
 	
 	# instrument size bin bounds (for diameters) (nm)
-	ins_sizbb = np.logspace(np.log10(max_size[1]), np.log10(max_size[0]), num = (nsb_ins+1), base = 10.)
+	ins_sizbb = np.logspace(np.log10(max_size[0]), np.log10(max_size[1]), num = (nsb_ins+1), base = 10.)
+	
 	# instrument size bin centres (diameter) (nm)
 	ins_sizc = ins_sizbb[0:-1]+np.diff(ins_sizbb)
 	
@@ -700,13 +712,16 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	# normalise simulated particle number concentrations by size bin width (diameters) (# particles/cm3/nm)
 	Nwet = Nwet/sim_diff
 	
-	# account for size dependent detection efficiency below one
-	# get detection efficiency as a function of particle size (diameter) (nm)
-	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
+	# empty array for holding particle concentrations in instrument size bins (# particles/cm3)
+	Nwetn = np.zeros((Nwet.shape[0], nsb_ins))
 	
+	# account for size dependent detection efficiency below one
+	# get detection efficiency as a function of particle size (diameter) (um)
+	[Dp, ce] = count_eff_plot(3, 0, self, sdt)
+
 	# empty array to hold detection efficiencies across times and simulation size bins
 	# Dp is in um
-	ce_t = np.zeros((len(times), xn.shape[1]))
+	ce_t = np.zeros((len(times), nsb_ins))
 	
 	# loop through times
 	for it in range(len(times)):
@@ -718,14 +733,14 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 		Nwetn[it, :] = insNwet*ins_diff
 		
 		# interpolate detection efficiency (fraction) to instrument size bin centres
-		# Dp is in um
-		ce_t[it, :] = np.interp(ins_sizc, Dp, ce)
+		# Dp is in um, so convert to nm
+		ce_t[it, :] = np.interp(ins_sizc, Dp*1.e3, ce)
 		
 		# correct for upper size range of instrument, note conversion of
 		# upper size from nm to um
 		if (max_size[-1] != -1):
-			size_indx = (xn[it, :]*2. > max_size*1.e-3)
-			Nwet[it, size_indx] = 0.
+			size_indx = (ins_sizc > max_size[-1])
+			Nwetn[it, size_indx] = 0.
 	
 	
 	Nwetn = Nwetn*ce_t # correct for detection efficiency
@@ -750,13 +765,16 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
 	# the difference in log10 of size bin boundaries (diameters (nm))
-	dlog10D = np.diff(np.log10(ins_sizbb))
+	dlog10D = (np.diff(np.log10(ins_sizbb))).reshape(1, -1)
 	
 	# number size distribution contours (/cc (air))
 	dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
+	
 	dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]
+	
 	# transpose ready for contour plot
 	dNdlog10D = np.transpose(dNdlog10D)
+	
 		
 	# mask any nan values so they are not plotted
 	z = np.ma.masked_where(np.isnan(dNdlog10D), dNdlog10D)
@@ -772,22 +790,23 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
 			np.max(z[~np.isnan(z)])))
 	
+	# fix upper value of contours
+	#levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
+			1.63e5))
+	
 	# associate colours and contour levels
 	norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
 		
 	# contour plot with times (hours) along x axis and 
 	# particle diameters (nm) along y axis
-	p1 = ax0.pcolormesh(times/3600.0, ins_sizbb, z[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
+	p1 = ax0.pcolormesh(times/3600.0, ins_sizbb, z, cmap = cm, norm = norm1, shading = 'auto')
 	
-	ax1.set_yscale("log") # set vertical axis to logarithmic spacing
+	ax0.set_yscale("log") # set vertical axis to logarithmic spacing
 			
 	# set tick format for vertical axis
-	ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
-	ax1.set_ylabel('Diameter (nm)', size = 14)
-	ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-	ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')	
+	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))	
 	
-	cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
+	cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt))
 	cb.ax.tick_params(labelsize=14)   
 	# colour bar label
 	cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{nm}$))', size=14, rotation=270, labelpad=20)
@@ -799,7 +818,6 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which= 'both')
 	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
 	ax0.set_title('Simulated particle number concentration convolved to represent \nscanning mobility particle spectrometer (SMPS) measurements')
-	ax0.legend()
 	
 	if (caller == 2): # display when in test mode
 		plt.show()
