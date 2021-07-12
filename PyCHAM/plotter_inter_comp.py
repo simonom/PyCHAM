@@ -108,7 +108,7 @@ def plotter_inter_comp():
 	Cfac = (np.array(Cfac)).reshape(-1, 1)# convert to numpy array from list
 
 	# FACSIMILE ----------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/CRESOLwithoutNOx.dat'
+	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/CRESOLwithoutNOx_orig.dat'
 	
 	# get required information from facsimile
 	[Ftime_s, Fcomp_names, FCrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
@@ -220,11 +220,11 @@ def plotter_inter_comp():
 		if (i != 'RO2'): # individual components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-x', linewidth = 2., label = str('E_'+i))
 			Pi = comp_names.index(i) # PyCHAM index
-			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi], '--+', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '--+', linewidth = 2., label = str('P_'+i))
 		if (i == 'RO2'): # sum of organic peroxy radical components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-^', linewidth = 2., label = str('E_'+i))
 			PCrecn =  np.sum(PCrec[:, RO2i], axis=1)# PyCHAM index
-			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei], '--^', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei]*100., '--^', linewidth = 2., label = str('P_'+i))
 			
 	# details of plot
 	ax0.set_ylabel(r'% Deviation from FACSIMILE', fontsize = 14)
@@ -293,11 +293,11 @@ def plotter_inter_comp():
 		if (i != 'RO2'): # individual components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-x', linewidth = 2., label = str('E_'+i))
 			Pi = comp_names.index(i) # PyCHAM index
-			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi], '--+', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '--+', linewidth = 2., label = str('P_'+i))
 		if (i == 'RO2'): # sum of organic peroxy radical components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-^', linewidth = 2., label = str('E_'+i))
 			PCrecn =  np.sum(PCrec[:, RO2i], axis=1)# PyCHAM index
-			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei], '--^', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei]*100., '--^', linewidth = 2., label = str('P_'+i))
 			
 	# details of plot
 	ax0.set_ylabel(r'% Deviation from FACSIMILE', fontsize = 14)
@@ -311,7 +311,7 @@ def plotter_inter_comp():
 	# alpha-pinene dark with N2O5 ----------------------------------------------------
 	
 	# list containing components of interest
-	comp_of_int = ['APINENE', 'NO2', 'NO', 'RO2', 'N2O5']
+	comp_of_int = ['APINENE', 'H2O2', 'OH', 'RO2', 'N2O5']
 
 	# PyCHAM --------------------------------------
 	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20N2O5_dark'
@@ -365,12 +365,16 @@ def plotter_inter_comp():
 		
 		if (i != 'RO2'): # individual components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-x', linewidth = 2., label = str('E_'+i))
+			#ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]), '-x', linewidth = 2., label = str('E_'+i))
+			#ax0.plot(Ftime_s[1::]/3600., (FCrec[1::, Fi]), '-x', linewidth = 2., label = str('F_'+i))
+
 			Pi = comp_names.index(i) # PyCHAM index
-			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi], '--+', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrec[1::, Pi]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '--+', linewidth = 2., label = str('P_'+i))
+			#ax0.plot(timehr[1::], (PCrec[1::, Pi]), '--+', linewidth = 2., label = str('P_'+i))
 		if (i == 'RO2'): # sum of organic peroxy radical components
 			ax0.plot(Etime_s[1::]/3600., (ECrec[1::, Ei]-FCrec[1::, Fi])/FCrec[1::, Fi]*100., '-^', linewidth = 2., label = str('E_'+i))
 			PCrecn =  np.sum(PCrec[:, RO2i], axis=1)# PyCHAM index
-			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei], '--^', linewidth = 2., label = str('P_'+i))
+			ax0.plot(timehr[1::], (PCrecn[1::]-ECrec[1::, Ei])/ECrec[1::, Ei]*100., '--^', linewidth = 2., label = str('P_'+i))
 			
 	# details of plot
 	ax0.set_ylabel(r'% Deviation from FACSIMILE', fontsize = 14)

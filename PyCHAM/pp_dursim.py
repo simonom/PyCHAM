@@ -42,17 +42,18 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
-	if num_sb == 1:
+	if (num_sb == 1):
+		
 		N_perbin += np.array((pconc)) # (# particles/cc (air))
 		pconc_new = pconc
-
+		
 	# number concentration stated per size bin in multi size bin simulation
-	if (pmode == 1): 
+	if (pmode == 1 and num_sb > 1): 
 		N_perbin += np.array((pconc)) # (# particles/cc (air))
 		pconc_new = pconc
 
 	# total number concentration per mode stated in multi size bin simulation
-	if (pmode == 0):
+	if (pmode == 0 and num_sb > 1):
 		
 		for i in range(len(pconc)): # loop through modes
 			# set scale and standard deviation input for lognormal probability distribution 
@@ -85,8 +86,8 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedVr, lowersize, upp
 	# molecular concentration of seed required to comprise these additional seed particle
 	# (molecules/cc (air)):
 	
-	# volume concentration of seed particles (um3/cc (air))
-	Vperbin = ((pconc_new*(4.0/3.0)*np.pi*(radn)**3.0))
+	# volume concentration of new seed particles (um3/cc (air))
+	Vperbin = ((pconc_new*(4./3.)*np.pi*(radn)**3.))
 
 	if (sum(pconc_new) > 0.): # account for concentration of component(s) comprising seed
 		for ci in range(len(seedi)): # loop through indices of seed components 

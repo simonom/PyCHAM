@@ -151,7 +151,13 @@ def ui_check(self):
 	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1] or pcont.shape[1] != pconct.shape[1]):
 		if (em_flag < 2):
 			err_mess = str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+'), ('+str(std.shape[1])+') and/or ('+str(pcont.shape[1])+').  Please see README for guidance.')
-
+			em_flag = 2 # error message flag for error
+	# ensure only one particle concentration given at start of experiment
+	if (sum(sum(pconct == 0.)) > 1):
+		if (em_flag < 2):
+			err_mess = str('Error: only one initial (pconct = 0.0 s) number size distribution is allowed, but for the input pconct variable, time = 0.0 s has been detected more than once.  If you wish to have injection of particles after experiment start but close to time = 0 s please use a pconct value that is greater than 0.0 s but small compared to the recording time step.')
+			em_flag = 2 # error message flag for error
+			
 	# check on temperature inputs ----------------------------------------------
 	
 	if (em_flag<2):

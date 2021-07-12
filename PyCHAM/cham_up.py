@@ -324,7 +324,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			tnew = RHt[RHt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
-	# check on instantaneous/continuous injection of particles --------------------------------------
+	# get whether next/current injection of seed is instantaneous or continuous
+	pcontf = pcont[0, seedt_cnt]
+	
+	# check on instantaneous injection of particles --------------------------------------
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
 	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
@@ -336,15 +339,16 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				pconcn = pconc[:, seedt_cnt]
 				mean_radn = mean_rad[:, seedt_cnt]
 				stdn = std[:, seedt_cnt]
-				pcontf = pcont[0, seedt_cnt]
 				
 				if (seedt_cnt < (pconct.shape[1]-1)):
 					seedt_cnt += 1
 				else:
 					seedt_cnt = -1 # reached end
+					
 				bc_red = 0 # reset flag for time step reduction due to boundary conditions
-				
-			else:
+			
+			# if linear interpolation required and instantaneous injection of seed
+			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
 				pconcn = np.interp(tnew, [0, t00], [pconc[:, seedt_cnt-1], pconc[:, seedt_cnt]])
 				# remember the fraction of the number concentration added so far
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
@@ -367,7 +371,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			tnew = pconct[0, seedt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
-	# if continuous influx of components flagged
+	# if continuous influx of particles flagged
 	if (pcontf == 1):
 		
 		if (seedt_cnt != -1): # temporary count change
@@ -380,13 +384,14 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		
 		if (seedt_cnt != -1): # reverse count change
 			seedt_cnt += 1
-			
+		
 		[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
 					N_perbin, 
 					mean_radn, pmode, (pconcn), seedi, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou)
+		
 	# ----------------------------------------------------------------------------------------------------------
 
 	# check on continuous influxes of components ----------------------------------------------

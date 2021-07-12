@@ -258,6 +258,9 @@ def ode_updater(update_stp,
 	gasinj_cnt = 0 # count on injection times of components
 	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
 		seedt_cnt = 1 # count on injection times of particles
+		if (len(pconct[0, :]) == 2): # if at the final seed particle injection
+			seedt_cnt = -1
+			
 	else:
 		seedt_cnt = 0
 	

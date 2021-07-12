@@ -15,10 +15,10 @@ import scipy.constants as si
 def plotter_inter_comp():
 
 	# list containing components of interest
-	comp_of_int = ['CRESO2', 'CRESOOH', 'HO2', 'OH']
+	comp_of_int = ['APINENE']
 	
 	# PyCHAM --------------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_Ocres_0NOx'
+	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20N2O5_dark'
 	# get required information from PyCHAM
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
@@ -32,7 +32,7 @@ def plotter_inter_comp():
 	Cfac = (np.array(Cfac)).reshape(-1, 1)# convert to numpy array from list
 
 	# FACSIMILE ----------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/CRESOLwithoutNOx.dat'
+	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/APINENElightoff.dat'
 	
 	# get required information from facsimile
 	[Ftime_s, Fcomp_names, FCrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
@@ -42,14 +42,14 @@ def plotter_inter_comp():
 	Ftime_s = np.append(Ftime_s[0::60], 3600.)
 	
 	# EASY --------------------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/data.CRESOLnoNOx.CS.nc'
+	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/data.APINENEdark.CS.nc'
 	
 	# get required information from EASY
 	[Etime_s, Ecomp_names, ECrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
 	
 	# convert EASY to 60 s intervals
-	ECrec = np.append(ECrec[0::60, :], ECrec[-1, :].reshape(1, -1), axis = 0)
-	Etime_s = np.append(Etime_s[0::60], 3600.)
+	#ECrec = np.append(ECrec[0::60, :], ECrec[-1, :].reshape(1, -1), axis = 0)
+	#Etime_s = np.append(Etime_s[0::60], 3600.)
 	# -----------------------------------------------------------------
 	
 	

@@ -75,7 +75,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	else: # obtain initial information
 		pconcn = pconc[:, i]
 
-		try: # if mean_rad already an array
+		try: # if std already an array
 			if (std[:, i].ndim > 1):
 				stdn = std[:, i]
 			if (std[:, i].ndim == 1):
@@ -102,6 +102,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
 	if (num_asb > 0):
+		
 		if (any(mrn == -1.e6 for mrn in mean_radn)):
 			if (lowersize > 0.):
 				mean_radn[mean_radn == -1.e6] = [10**((np.log10(lowersize)+np.log10(uppersize))/2.0)]
