@@ -1752,6 +1752,9 @@ class PyCHAM(QWidget):
 			import err_log_code
 			log = err_log_code
 			saved_handler = np.seterrcall(log)
+			# note that error messages saved to the log file are less verbose than 
+			# those printed to the command line, to get the command line version 
+			# change 'log' below to 'warn'
 			save_err = np.seterr(all='log')
 			
 			err_mess = self.act_81(output_by_sim, sim_num) # call on function to simulate

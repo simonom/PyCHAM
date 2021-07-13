@@ -160,7 +160,6 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		
 		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_asb, 
 			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode)
-		
 
 		if (testf == 2):
 			print('finished with Size_distributions.lognormal')
@@ -348,6 +347,5 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# start counter on number concentration of newly nucleated particles (#/cc (air))
 	np_sum = 0.
 
-	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_asb, nuc_comp, rbou00, 
 			upper_bin_rad_amp, np_sum, C_p2w)

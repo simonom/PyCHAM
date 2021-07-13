@@ -15,10 +15,10 @@ import scipy.constants as si
 def plotter_inter_comp():
 
 	# list containing components of interest
-	comp_of_int = ['APINENE']
+	comp_of_int = ['APINENE', 'H2O2', 'NO', 'NO2', 'OH', 'RO2']
 	
 	# PyCHAM --------------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20N2O5_dark'
+	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20N2O5_dark'
 	# get required information from PyCHAM
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
@@ -32,7 +32,7 @@ def plotter_inter_comp():
 	Cfac = (np.array(Cfac)).reshape(-1, 1)# convert to numpy array from list
 
 	# FACSIMILE ----------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/APINENElightoff.dat'
+	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/FACSIMILE_new/APINENElightoffupdate.dat'
 	
 	# get required information from facsimile
 	[Ftime_s, Fcomp_names, FCrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
@@ -42,11 +42,15 @@ def plotter_inter_comp():
 	Ftime_s = np.append(Ftime_s[0::60], 3600.)
 	
 	# EASY --------------------------------------------
-	dir_path = '/Users/Simon_OMeara/Documents/Manchester/postdoc/box/PyCHAM_v301/PyCHAM/PyCHAM/output/ic_chem_scheme/data.APINENEdark.CS.nc'
+	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/EASY/data.APINENEdark.CS.nc'
 	
 	# get required information from EASY
 	[Etime_s, Ecomp_names, ECrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
 	
+	# remove repition of final time from EASY
+	ECrec = ECrec[0:-1, :]
+	Etime_s = Etime_s[0:-1]
+
 	# convert EASY to 60 s intervals
 	#ECrec = np.append(ECrec[0::60, :], ECrec[-1, :].reshape(1, -1), axis = 0)
 	#Etime_s = np.append(Etime_s[0::60], 3600.)
@@ -57,7 +61,7 @@ def plotter_inter_comp():
 	PCrec = PCrec*Cfac[0]
 
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7)) # prepare plot
-
+	
 	for i in comp_of_int: # loop through components of interest
 		
 		Fi = Fcomp_names.index(i) # FACSIMILE index
@@ -65,21 +69,23 @@ def plotter_inter_comp():
 		
 		
 		if (i != 'RO2'): # individual components
-			ax0.plot(Ftime_s[:]/3600., FCrec[:, Fi], '-x', linewidth = 2., label = str('F_'+i))
-			ax0.plot(Etime_s[:]/3600., ECrec[:, Ei], '-x', linewidth = 2., label = str('E_'+i))
 			Pi = comp_names.index(i) # PyCHAM index
-			ax0.plot(timehr[:], PCrec[:, Pi], '--+', linewidth = 2., label = str('P_'+i))
+			Ti = FCrec[:, Fi] > 0. # allowed values
+			ax0.plot(Ftime_s[Ti]/3600., ((PCrec[Ti, Pi]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('P_'+i))
+			ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('E_'+i))
+			
 		if (i == 'RO2'): # sum of organic peroxy radical components
-			ax0.plot(Ftime_s[:]/3600., FCrec[:, Fi], '-^', linewidth = 2., label = str('F_'+i))
-			ax0.plot(Etime_s[:]/3600., ECrec[:, Ei], '-x', linewidth = 2., label = str('E_'+i))
+			Ti = FCrec[:, Fi] > 0. # allowed values
+			ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--x', linewidth = 2., label = str('E_'+i))
 			PCrecn =  np.sum(PCrec[:, RO2i], axis=1)# PyCHAM index
-			ax0.plot(timehr[:], PCrecn[:], '--^', linewidth = 2., label = str('P_'+i))
+			ax0.plot(Ftime_s[Ti]/3600., ((PCrecn[Ti]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--^', linewidth = 2., label = str('P_'+i))
 			
 	# details of plot
-	ax0.set_ylabel(r'Component Concentrations', fontsize = 14)
+	ax0.set_ylabel(r'Deviation ((((PyCHAM or EASY)-FACSIMILE)/FACSIMILE)*100) (%)', fontsize = 10)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.set_title(r'Deviation from FACSIMILE for EASY and PyCHAM when alpha-pinene 20 ppb, N2O5 20 ppb, dark', fontsize = 14)
 	ax0.legend(fontsize = 14, loc = 'lower right')
 	plt.show()
 	

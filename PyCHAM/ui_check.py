@@ -157,7 +157,12 @@ def ui_check(self):
 		if (em_flag < 2):
 			err_mess = str('Error: only one initial (pconct = 0.0 s) number size distribution is allowed, but for the input pconct variable, time = 0.0 s has been detected more than once.  If you wish to have injection of particles after experiment start but close to time = 0 s please use a pconct value that is greater than 0.0 s but small compared to the recording time step.')
 			em_flag = 2 # error message flag for error
-			
+	
+	# ensure std greater than 1.0
+	if (em_flag < 2 and sum(sum(std <= 1.0)) > 0):
+		err_mess = str('Error: a standard deviation for particle number size distribution modes (std model variable) less than or equal to 1.0 has been detected, but values must exceed 1.0.  See sdt in the model variables section of README for more details.')
+		em_flag = 2 # error message flag for error
+
 	# check on temperature inputs ----------------------------------------------
 	
 	if (em_flag<2):

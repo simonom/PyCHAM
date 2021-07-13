@@ -11,7 +11,8 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 4. [Testing](#Testing)
 5. [Inputs](#Inputs)
 6. [Photochemistry](#Photochemistry)
-7. [Acknowledgements](#Acknowledgements)
+7. [Frequently Asked Questions](#Frequently Asked Questions)
+8. [Acknowledgements](#Acknowledgements)
 
 ## Documentation
 
@@ -43,7 +44,9 @@ The following steps are at the command line:
 
 6. Activate the environment with the command: conda activate PyCHAM
 
-Install is complete, to run PyCHAM please see [Running](#Running).
+7. For Windows (please skip this step if on Linux or Mac) it has been noted that when following the above steps openbabel does not always link to its data directory.  You can test this by looking for open babel warning messages when running the PyCHAM examples (to run PyCHAM please see [Running](#Running)).  A message such as 'the aromatic.txt file could not be found' indicates the data library is not set.  To set, go search for Control Panel in the Windows search bar then User Accounts and User Accounts again.  Then select 'Change my environment variables' for User variables select New then create the new variable with Variable name 'BABEL_DATADIR' and with Variable value set as the path to the relevant open babel data directory, you should look for the open babel folder containing aromatic.txt at a location such as: C:\Users\your_account_name\.conda\pkgs\openbabel-2.4.1-py37_5\share\openbabel.  Once the path is suppled to the Variable value box select OK to create the variable then open a new anaconda prompt to restart PyCHAM.
+
+8. Install is complete for Linux, Mac and Windows; to run PyCHAM please see [Running](#Running).  
 
 ## Install via pip
 
@@ -235,7 +238,7 @@ note that if a variable is irrelevant for your simulation, it can be omitted and
 | Vwat_inc = | Flag to say whether (set to 1) or not (set to 0) water volume is accounted for in the seed particle number size distribution.  Default is 1. |
 | mean_rad = | Mean radius of particles (um).  mean_rad should represent the mean radius of the lognormal size distribution per mode (modes separated by a colon).  Defaults to mean radius of the particle size bin radius bounds given by lower_part_size and upper_part_size inputs.  If seed particles are introduced at more than one time, then mean_rad for the different times should be separated by a semicolon.  For example, if seed particle with a mean_rad of 1.0e-2 um introduced at start and with mean_rad of 1.0e-1 um introduced after 120 s, the mean_rad input is: mean_rad = 1.0e-2; 1.0e-1 and the pconct input is pconct = 0; 120 |
 | seed_eq_wat = | If water is not included in the provided seed particle number size distribution (determined by the Vwat_inc model variable), this variable determines whether (1) or not (0) to allow water vapour in chamber (determined by the relative humidity) to equilibrate with seed particles prior to the experiment starting.  Defaults to 1 which allows equilibrium. |
-| std = | Geometric mean standard deviation of seed particle number concentration (dimensionless) when total particle number concentrations per mode provided in pconc variable.  If more than one mode, separate modes with a colon.  Role explained online in scipy.stats.lognorm page, under pdf method: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html.  If left empty defaults to 1.2.  If seed particles introduced after the experiment start, then separate std for different times using a semicolon.  For example, if seed particle with a standard deviation of 1.2 introduced at start and with standard deviation of 1.3 introduced after 120 s, the std input is: std = 1.2; 1.3 and the pconct input is: pconct = 0; 120 |
+| std = | Geometric mean standard deviation of seed particle number concentration (dimensionless) when total particle number concentrations per mode provided in pconc variable.  If more than one mode, separate modes with a colon.  Role explained online in scipy.stats.lognorm page, under pdf method: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html.  If left empty defaults to 1.2.  If seed particles introduced after the experiment start, then separate std for different times using a semicolon.  For example, if seed particle with a standard deviation of 1.2 introduced at start and with standard deviation of 1.3 introduced after 120 s, the std input is: std = 1.2; 1.3 and the pconct input is: pconct = 0; 120.  Note that std must be greater than 1.0, with wider distributions given by greater values.  Will error if a number less than or equal to 1.0 supplied.|
 | seed_diss = | Dissociation constant(s) for seed component(s) (dimensionless), if empty defaults to one.  If more than one component comprising seed particles please separate their dissociation constants with a comma and ensure that number of constants matches number of components named in seed_name input. |
 | light_time = | Times (s) for light status, corresponding to the elements of light_status (below), if empty defaults to lights off for whole experiment.  Use this setting regardless of whether light is natural or artificial (chamber lamps).  For example, for a 4 hour experiment, with lights on for first half and lights off for second, use: light_time = 0.0, 7200.0 light_status = 1, 0. light_time must include 0 (experiment start) and a corresponding light status in the light_status model variable. |
 | light_status = | 1 for lights on and 0 for lights off, with times given in light_time (above), if empty defaults to lights off for whole experiment.  Setting to off (0) means that even if variables defining light intensity above, the simulation will be dark.  Use this variable for both natural and artificial (chamber lamps) light.  The setting for a particular time is recognised when the time through experiment reached the time given in light_time.  For example, for a 4 hour experiment, with lights on for first half and lights off for second, use: light_time = 0.0, 7200.0 light_status = 1, 0.  If status not given for the experiment start (0.0 s), default is lights off at experiment start. |
@@ -261,7 +264,10 @@ Photolysis rate is the product of actinic flux, component absorption cross-secti
 
 For photolysis reactions in chemical schemes other than Master Chemical Mechanism, the user can supply their own file for component absorption cross-section and quantum yield (the values are to be contained in the same file).  The file name should be stated in the photo_par_file model variable and the file should be stored in PyCHAM/photofiles.  A short example is given in the photofiles folder, called example_inputs.txt.  File must be of .txt format with the formatting: <br> J_n_axs <br> wv_m, axs_m <br> J_n_qy <br> wv_M, qy_m <br> J_end <br> where n is the photochemical reaction number, axs represents the absorption cross-section (cm2/molecule), wv is wavelength (nm), _m is the wavelength number, and qy represents quantum yield (fraction).  J_end marks the end of the photolysis file.
 
-		
+## Frequently Asked Questions
+
+Why does PyCHAM crash without an error message?
+This has been observed using the conda install on a Windows 10 operating system with a Intel(R) Core(TM) i7-8500y CPU @ 1.50Ghz processor with processor speed 1400 MHz.  Checking the Event Viewer application on Windows, under the Windows Logs/Application tab, showed that libblas was crashing.  To correct the PyCHAM virtual environment was activated in the command line, then from the command line conda was used to uninstall libblas and its dependents, then conda was used to install libblas again followed by its dependents.  This solved the issue.
 
 ## Acknowledgements
 This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 730997.  Simon O'Meara received funding support from the Natural Environment Research Council through the National Centre for Atmospheric Science.

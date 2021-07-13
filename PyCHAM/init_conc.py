@@ -224,7 +224,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		NO3i = comp_namelist.index(NO3)
 	except:
 		NO3i = 0 # filler
-		
+	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 				comp_namelist, inj_indx, core_diss,
 				Psat_water, nuci, nrec_steps, seedi, erf, err_mess, NOi, 

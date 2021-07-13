@@ -27,8 +27,8 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 	# ---------------------------------
     
 	# volume in largest and smallest size bin (um3)
-	vNb = (4.0/3.0)*np.pi*uppersize**3.0
-	v1 = (4.0/3.0)*np.pi*lowersize**3.0
+	vNb = (4./3.)*np.pi*uppersize**3.
+	v1 = (4./3.)*np.pi*lowersize**3.
 	
 	# constant volume ratio method --------------
 	# constant volume ratio (13.3 Jacobson 2005)
@@ -83,7 +83,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# contribute the number concentration of all size bins in 
 			# this mode (# particle/cc (air))
 			Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
-	
+		
 	# if number concentration (#/cc (air)) explicitly stated in inputs
 	if (pmode == 1):
 		Nperbin = np.array((pconc))

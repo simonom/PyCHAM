@@ -250,7 +250,7 @@ def ode_updater(update_stp,
 	
 	# start timer
 	st_time = time.time()
-	
+
 	step_no = 0 # track number of time steps
 	sumt = 0.0 # track time through simulation (s)
 	# counters on updates
@@ -411,7 +411,7 @@ def ode_updater(update_stp,
 			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
 			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, 
 			colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
-		
+			
 			# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 			# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
 			if (len(dydt_vst) > 0):
@@ -422,7 +422,7 @@ def ode_updater(update_stp,
 						kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)
 			
 			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
-				
+
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
@@ -464,12 +464,13 @@ def ode_updater(update_stp,
 						
 					else: # if solution stable, change stability flag to represent this
 						gpp_stab = 1 # change to stable flag
-				
+					
 				# zero partitioning of water to particles for integration without water gas-particle partitioning
 				kimt[:, H2Oi] = 0.
 			
 			# model component concentration changes to get new concentrations
 			# (molecules/cc (air))
+			
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
