@@ -80,7 +80,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 			return (0, 0, 0, 0, 0, 0, 0, 0, 
 				0, 0, 0,
-				0, 0, 0, 0, erf, err_mess)
+				0, 0, 0, 0, erf, err_mess, 0, 0, 0)
 			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
 		

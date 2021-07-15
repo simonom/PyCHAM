@@ -1,25 +1,4 @@
-C:\Users\Psymo\Documents\PyCHAM_vW\PyCHAM\PyCHAM/output\api_iso_ch4_mechHOM_scheme\2019_#1
-Warning: invalid value encountered in true_divide
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
+C:\Users\Psymo\Documents\PyCHAM_vW\PyCHAM\PyCHAM/output\ic_chem_scheme\Flow_Reactor_gas_phase_Intercomparison_APINENE_20NOx_100s
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
