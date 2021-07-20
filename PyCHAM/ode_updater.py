@@ -282,7 +282,7 @@ def ode_updater(update_stp,
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
-	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))# remember initial particle number concentrations (# particles/cm3)
+	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1])) # remember initial particle number concentrations (# particles/cm3)
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
 	t0 = update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
@@ -311,7 +311,7 @@ def ode_updater(update_stp,
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i)
-
+	
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
@@ -364,7 +364,7 @@ def ode_updater(update_stp,
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf)
-			
+
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > save_stp*save_cnt):
 				tnew = (save_stp*save_cnt)-sumt

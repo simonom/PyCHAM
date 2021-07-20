@@ -56,17 +56,16 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# 1.0e-6 converts from molecules/m3 to molecules/cc
 	# R and Avogadro's constant set the same as in atmosphereFunctions.f90 of AtChem2
 	M_val = (PInit/(8.3144621*TEMP)*si.N_A)*1.e-6
+	#print(TEMP)
 	# N2 and O2 given the same multiplication as in atmosphereFunctions.f90 of AtChem2
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
-	#try:
 		
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
 					act_flux_path, DayOfYear, M_val, N2_val, 
 					O2_val, photo_par_file, Jlen, tf, NO, HO2, NO3)
-
 	#except:
 	#	import os
 	#	if os.path.exists('rate_coeffs'):

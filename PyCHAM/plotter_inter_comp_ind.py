@@ -15,10 +15,10 @@ import scipy.constants as si
 def plotter_inter_comp():
 
 	# list containing components of interest
-	comp_of_int = ['APINENE', 'H2O2', 'NO', 'NO2', 'OH', 'RO2']
+	comp_of_int = ['HO2']
 	
 	# PyCHAM --------------------------------------
-	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20N2O5_dark'
+	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/Flow_Reactor_gas_phase_Intercomparison_APINENE_20NOx'
 	# get required information from PyCHAM
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
@@ -32,17 +32,17 @@ def plotter_inter_comp():
 	Cfac = (np.array(Cfac)).reshape(-1, 1)# convert to numpy array from list
 
 	# FACSIMILE ----------------------------------
-	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/FACSIMILE_new/APINENElightoffupdate.dat'
+	#dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/FACSIMILE_new/APINENEwithNOxupdate.dat'
 	
 	# get required information from facsimile
-	[Ftime_s, Fcomp_names, FCrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
+	#[Ftime_s, Fcomp_names, FCrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
 	
 	# convert FACSIMILE to 60 s intervals
-	FCrec = np.append(FCrec[0::60, :], FCrec[-1, :].reshape(1, -1), axis = 0)
-	Ftime_s = np.append(Ftime_s[0::60], 3600.)
+	#FCrec = np.append(FCrec[0::60, :], FCrec[-1, :].reshape(1, -1), axis = 0)
+	#Ftime_s = np.append(Ftime_s[0::60], 3600.)
 	
 	# EASY --------------------------------------------
-	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/EASY/data.APINENEdark.CS.nc'
+	dir_path = '/Users/Psymo/Documents/PyCHAM_vW/PyCHAM/PyCHAM/output/ic_chem_scheme/EASY/data.APINENE.CS.nc'
 	
 	# get required information from EASY
 	[Etime_s, Ecomp_names, ECrec, [], []] = retr_out.retr_out_noncsv(dir_path, comp_of_int)
@@ -64,21 +64,36 @@ def plotter_inter_comp():
 	
 	for i in comp_of_int: # loop through components of interest
 		
-		Fi = Fcomp_names.index(i) # FACSIMILE index
+		#Fi = Fcomp_names.index(i) # FACSIMILE index
 		Ei = Ecomp_names.index(i) # EASY index
 		
 		
 		if (i != 'RO2'): # individual components
 			Pi = comp_names.index(i) # PyCHAM index
-			Ti = FCrec[:, Fi] > 0. # allowed values
-			ax0.plot(Ftime_s[Ti]/3600., ((PCrec[Ti, Pi]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('P_'+i))
-			ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('E_'+i))
+			#Ti = FCrec[:, Fi] > 0. # allowed values
+
+			# plot absolute values			
+			#ax0.plot(Ftime_s, (FCrec[:, Fi]), '-x', linewidth = 2., label = str('F_'+i))
+			ax0.plot(timehr*3600., (PCrec[:, Pi]), '-x', linewidth = 2., label = str('P_'+i))
+			ax0.plot(Etime_s, (ECrec[:, Ei]), '-x', linewidth = 2., label = str('E_'+i))
+
+			# plot deviation
+			#ax0.plot(Ftime_s[Ti]/3600., ((PCrec[Ti, Pi]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('P_'+i))
+			#ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '-x', linewidth = 2., label = str('E_'+i))
 			
 		if (i == 'RO2'): # sum of organic peroxy radical components
 			Ti = FCrec[:, Fi] > 0. # allowed values
-			ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--x', linewidth = 2., label = str('E_'+i))
+			# plot deviation
+			# ax0.plot(Etime_s[Ti]/3600., ((ECrec[Ti, Ei]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--x', linewidth = 2., label = str('E_'+i))
 			PCrecn =  np.sum(PCrec[:, RO2i], axis=1)# PyCHAM index
-			ax0.plot(Ftime_s[Ti]/3600., ((PCrecn[Ti]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--^', linewidth = 2., label = str('P_'+i))
+			
+			# plot absolute values			
+			ax0.plot(Ftime_s, (FCrec[:, Fi]), '-x', linewidth = 2., label = str('F_'+i))
+			ax0.plot(timehr*3600., (PCrecn), '-x', linewidth = 2., label = str('P_'+i))
+			ax0.plot(Etime_s, (ECrec[:, Ei]), '-x', linewidth = 2., label = str('E_'+i))
+			
+			# plot deviation
+			#ax0.plot(Ftime_s[Ti]/3600., ((PCrecn[Ti]-FCrec[Ti, Fi])/FCrec[Ti, Fi])*100., '--^', linewidth = 2., label = str('P_'+i))
 			
 	# details of plot
 	ax0.set_ylabel(r'Deviation ((((PyCHAM or EASY)-FACSIMILE)/FACSIMILE)*100) (%)', fontsize = 10)

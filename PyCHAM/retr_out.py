@@ -294,7 +294,9 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		ds = nc.Dataset(output_by_sim) # open file
 		
 		time_s = ds['time'][:] # get time (seconds)
-		
+
+		# in case want to see what variables are present
+		#print(ds.variables); import ipdb; ipdb.set_trace()
 		# empty array ready for component concentrations (molecules/cm3)
 		Crec = np.zeros((len(time_s), len(comp_of_int)))
 		

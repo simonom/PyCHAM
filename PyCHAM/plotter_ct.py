@@ -182,7 +182,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
 		res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[ci])*1.e12
 		
 		# identify most active chemical reactions
-		# first sum total change tendency (molecules/cc/s)
+		# first sum total change tendency over time (ug/m3/s)
 		res_sum = np.abs(np.sum(res[1::, :], axis=0))
 		 
 		# sort in ascending order

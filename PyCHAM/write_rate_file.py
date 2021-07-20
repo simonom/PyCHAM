@@ -65,8 +65,12 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# estimate and append photolysis rates\n')
 	f.write('	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, tf)\n')
 	f.write('\n')
-	f.write('	if lightm == 0:\n')
+	f.write('	if (lightm == 0):\n')
 	f.write('		J = [0]*len(J)\n')
+	# in case investigating reaction rate coefficients
+	#f.write('	print(KMT09, K90, F9, NC9, KR9, K9I, FC9)\n')
+	# in case of indexing error when prescribing photolysis rates
+	#f.write('	J[1::] = J[0:-1]; J[0] = 0.\n')
 
 	# calculate the rate coefficient for each equation
 	f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))

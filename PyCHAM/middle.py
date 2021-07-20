@@ -90,7 +90,7 @@ def middle(): # define function
 		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedx,
 		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi, 
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat)
-
+	
 	# solve problem
 	for prog in ode_updater.ode_updater(update_stp, 
 		tot_time, save_step, y, rindx_g, 

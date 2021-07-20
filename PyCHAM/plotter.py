@@ -166,7 +166,7 @@ def plotter(caller, dir_path, self):
 			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
-		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
+		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
 		cb.ax.tick_params(labelsize=14)   
 		# colour bar label
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)

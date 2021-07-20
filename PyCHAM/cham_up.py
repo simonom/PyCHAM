@@ -372,9 +372,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# if continuous influx of particles flagged
-	if (pcontf == 1):
+	if ((pcontf == 1) and (sumt >= pconct[0, seedt_cnt])):
 		
-		if (seedt_cnt != -1): # temporary count change
+		if (seedt_cnt != -1): # temporary change to count
 			seedt_cnt -= 1
 		
 		# get seed particle properties
@@ -391,7 +391,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 					mean_radn, pmode, (pconcn), seedi, seedVr, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou)
-		
+
 	# ----------------------------------------------------------------------------------------------------------
 
 	# check on continuous influxes of components ----------------------------------------------

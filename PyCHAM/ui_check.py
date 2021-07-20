@@ -46,6 +46,7 @@ def ui_check(self):
 	# pconc - number concentration of particles
 	# pconct - times of particle injection (s)
 	# lowsize - lower bound of particle sizes (um)
+	# uppsize - upper bound of particle sizes (um)
 	# std - standard deviation for particle sizes
 	# mean_rad - mean radius of particle size distributions (um)
 	# new_partr - radius of newly nucleated particles (cm)
@@ -146,12 +147,24 @@ def ui_check(self):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
 				em_flag = 2 # error message flag for error
 	
+	# ensure that the mean radius of modes (mean_rad) is consistent with the particle size range
+	if (num_sb > 0 and em_flag < 2):
+		
+		if (pmode == 0): # particle number concentrations expressed as modes
+			if (sum(sum(mean_rad < lowsize)) > 0 and sum(sum(mean_rad == -1.e6)) == 0):
+				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is smaller than the particle size range (determined by the lower_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
+				em_flag = 2 # error message flag for error
+			if (sum(sum(mean_rad > uppsize)) > 0):
+				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is greater than the particle size range (determined by the upper_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
+				em_flag = 2 # error message flag for error
+
 	# ensure that if multiple instantaneous injections of particles, that corresponding variables
 	# have the correct shape, specifically that they cover the same number of times
 	if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != std.shape[1] or pconc.shape[1] != mean_rad.shape[1] or pconct.shape[1] != std.shape[1] or pconct.shape[1] != std.shape[1] or std.shape[1] != mean_rad.shape[1] or pcont.shape[1] != pconct.shape[1]):
 		if (em_flag < 2):
 			err_mess = str('Error: inconsistent number of times for instantaneous injection of particles represented by model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+'), ('+str(std.shape[1])+') and/or ('+str(pcont.shape[1])+').  Please see README for guidance.')
 			em_flag = 2 # error message flag for error
+
 	# ensure only one particle concentration given at start of experiment
 	if (sum(sum(pconct == 0.)) > 1):
 		if (em_flag < 2):
@@ -283,7 +296,12 @@ def ui_check(self):
 			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
 
-	# check on consistency of names of seed component(s) and their dissociation constant
+	# check consistency between names of initial components and their concentrations ------------------
+	if (len(comp0) != len(y0) and em_flag < 2):
+		err_mess = str('Error - the number of gas-phase components present at simulation start (the Comp0 model variable) is different to the number of initial concentrations of these components (the C0 model variable), and they must be the same length.  Please see README for guidance')
+		em_flag = 2	
+
+	# check on consistency of names of seed component(s) and their dissociation constant --------------
 	if (len(seed_name) != len(seed_diss) and em_flag < 2):
 		if (len(seed_name) > 1) and (len(seed_diss) == 1):
 			seed_diss = np.ones((len(seed_name)))

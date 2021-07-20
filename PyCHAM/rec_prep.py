@@ -179,7 +179,6 @@ def rec_prep(nrec_step,
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf)
 	
-	
 	if ((num_sb-wall_on) > 0): # if particles present
 		
 		# update partitioning variables
