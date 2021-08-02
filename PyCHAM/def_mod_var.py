@@ -81,7 +81,10 @@ def def_mod_var(caller): # define function
 	# string describing the efflorescence relative humidity (fraction 0-1) dependence on 
 	# temperature
 	erh_str = str('0.*TEMP')
-	
+	# fraction of total gas-particle partitioning coefficient below which the 
+	# partitioning coefficient is set to zero, e.g. because surface area of a size bin
+	# is relatively very small
+	z_prt_coeff = 1.e-9
 
 	# gas inputs ------------------------------------------------------------
 	# chemical scheme name of components present initially
@@ -159,7 +162,20 @@ def def_mod_var(caller): # define function
 	
 
 	# prepare for pickling
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			seedx, light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
+			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+			z_prt_coeff]
 
 	
 	# path to store for variables
@@ -182,4 +198,4 @@ def def_mod_var(caller): # define function
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat)
+		Vwat_inc, seed_eq_wat, z_prt_coeff)

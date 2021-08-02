@@ -1,9 +1,8 @@
-'''module to set up particle phase part of box model, calls on init_water_partit to initiate water partitioning with seed particles and wall'''
+'''module to set up particle phase part of box model'''
 # using the user-defined or default values, the initial number size distribution is determined here
 
 import numpy as np
 import size_distr # custom library - see source code
-from init_water_partit import init_water_partit
 import scipy.constants as si
 
 def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
@@ -239,7 +238,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				kelv = np.exp((2.e0*sum(seed_mw)/len(seed_mw)*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[seedi[:], 0])/len(seedi))))
 				
 				# equilibrium mole fraction of water per size bin
-				# from the ode solver equation for vapour-particle partitioning
+				# from the ode solver equation for vapour-particle partitioning of water
 				xwat = y[H2Oi]/(Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
 				
 				# allow for mole fraction of water in mole fraction of non-water seed components

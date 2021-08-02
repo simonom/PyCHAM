@@ -107,9 +107,10 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
 		if (any(isb)): # if particle-phase components present
+
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
-			# gas-phase concentration of water at particle surface (molecules/cc (air))
+			# gas-phase concentration of water at particle surface (molecules/cc (air), core_diss)
 			Csit = Csit*Psat[isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[isb, H2Oi]
 			# partitioning rate (molecules/cc/s)
 			dd_all = (kimt[isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
@@ -124,6 +125,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		# return to array, note that consistent with the solve_ivp manual, this ensures dd is
 		# a vector rather than matrix, since y00 is a vector
 		dd = dd.flatten()
+	
 		return (dd)
 
 	def jac(t, y): # define the Jacobian
@@ -194,6 +196,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	
 	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) 
 	# and must be 1D even though y in dydt and jac has shape (number of elements, 1)
+	# as stated in GMD paper, BDF method used as this known to deal with stiff problems well
 	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
 	
 	# force all components in size bins with no particle to zero

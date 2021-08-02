@@ -25,8 +25,8 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 	RO2_count = 0 # count on number of lines considered in peroxy radical list
 	# -------------------------------------------------------------------------
 	
-	# obtain lists for reaction rate coefficients, peroxy radicals and equation reactions
-	# using markers for separating chemical scheme elements
+	# obtain lists for reaction rate coefficients, peroxy radicals 
+	# and equation reactions using markers for separating chemical scheme elements
 	for line in total_list_eqn:
 		
 		line1 = line.strip() # remove bounding white space
@@ -81,14 +81,14 @@ def sch_interr(total_list_eqn, chm_sch_mrk):
 			
 		# --------------------------------------------------------------------------------
 		# peroxy radical part
-		# now start logging peroxy radicals
+		# start logging peroxy radicals
 		RO2_start_mark = str('^' + chm_sch_mrk[1])
 		
 		# if starting marker for peroxy radical list seen, flag that recording needed
 		if (re.match(RO2_start_mark, line1) != None):
 			
 			# to double check that recording needed for peroxy radicals (in case 
-			# chm_sch_mrk[1] is not unique
+			# chm_sch_mrk[1] is not unique)
 			
 			# first check whether the RO2 list comprises just one line, as this will
 			# mean its end marker is present

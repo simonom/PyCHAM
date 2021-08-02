@@ -118,7 +118,16 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(b0, 0, ffscn, 1, 2)
 		
 		# default variables for all required input model variables -------------------------
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = def_mod_var.def_mod_var(0)
+		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, 
+		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, 
+		daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
+		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
+		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
+		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		Vwat_inc, seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
 		
 		# listing input files -----------------------------------------------------------
 		l1 = QLabel(self)
@@ -501,13 +510,20 @@ class PyCHAM(QWidget):
 		self.l38_5a = QLabel(self)
 		self.l38_5a.setText((str(pcont)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l38_5a, par_row+28, 1)
+
+		l38_6 = QLabel(self)
+		l38_6.setText('Fraction of total gas-particle \npartitioning coefficient below \nwhich partitioning is zero: ')
+		self.varbox.addWidget(l38_6, par_row+29, 0)
+		self.l38_6a = QLabel(self)
+		self.l38_6a.setText((str(z_prt_coeff)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.varbox.addWidget(self.l38_6a, par_row+29, 1)
 		
 		# gas inputs ----------------
 		
 		l39a = QLabel(self)
 		l39a.setText('Gas')
 		l39a.setFont(QFont("Arial", 13, QFont.Bold))
-		gas_row = par_row+29
+		gas_row = par_row+30
 		self.varbox.addWidget(l39a, gas_row+0, 0)
 		
 		l40 = QLabel(self)
@@ -1432,7 +1448,16 @@ class PyCHAM(QWidget):
 		
 		# prepare by enforcing default variables
 		# default variables for all required input model variables -------------------------
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = def_mod_var.def_mod_var(0)
+		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, 
+		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, 
+		daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
+		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
+		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
+		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		Vwat_inc, seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1448,7 +1473,8 @@ class PyCHAM(QWidget):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 			pk.close()
 		
 		# button to get path to folder containing relevant files
@@ -1474,7 +1500,21 @@ class PyCHAM(QWidget):
 				inname = str(fol_nme+'/'+i)
 		
 		# pickle with new file names	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+				seedx, light_stat, light_time, daytime, lat, lon, af_path, 
+				dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+				con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+				volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
+				int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
+				coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+				Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+				z_prt_coeff]
+
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1497,8 +1537,8 @@ class PyCHAM(QWidget):
 		import ui_check # module for checking on model variables
 		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
 		ui_check.ui_check(self)
-		# finished check on model variables --------------------------------------------------------------
-		
+		# finished check on model variables --------------------------------------------------------------		
+
 		return()
 		
 	@pyqtSlot()
@@ -1518,7 +1558,8 @@ class PyCHAM(QWidget):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 			pk.close()
 	
 		sch_name, _ = QFileDialog.getOpenFileName(self, "Select Chemical Scheme File", "./PyCHAM/input/") # get path of file
@@ -1527,7 +1568,18 @@ class PyCHAM(QWidget):
 		self.l3.show()
 
 		# pickle with new chemical scheme name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, 
+			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, 
+			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
+			light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, 
+			dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, 
+			uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
+			p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1555,7 +1607,8 @@ class PyCHAM(QWidget):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, 
+			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 			pk.close()
 	
 		xml_name, _ = QFileDialog.getOpenFileName(self, "Select xml File", "./PyCHAM/input/") # get path of file
@@ -1564,7 +1617,18 @@ class PyCHAM(QWidget):
 		self.l5.show()
 		
 		# pickle with new chemical scheme name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
+			std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, 
+			seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, 
+			lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
+			act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
+			new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, 
+			pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
+			partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
+			seed_eq_wat, z_prt_coeff]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1597,7 +1661,9 @@ class PyCHAM(QWidget):
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
+			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+			z_prt_coeff] = pickle.load(pk)
 			pk.close() # close pickle file
 
 		# user chooses path of file to model variables file
@@ -1611,7 +1677,18 @@ class PyCHAM(QWidget):
 		self.l7.show()
 
 		# pickle with new file name	
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, 
+				comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, 
+				num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, 
+				mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, 
+				seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, 
+				lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+				con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
+				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, 
+				nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
+				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
+				seed_eq_wat, z_prt_coeff]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1628,7 +1705,7 @@ class PyCHAM(QWidget):
 		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
 		ui_check.ui_check(self)
 		# finished check on model variables --------------------------------------------------------------
-		
+
 		return()
 			
 	
@@ -1656,7 +1733,19 @@ class PyCHAM(QWidget):
 		
 			# reset to default variables to allow any new variables to arise
 			# from the current model variables file only
-			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = def_mod_var.def_mod_var(0)
+			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
+			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, 
+			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, 
+			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
+			light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
+			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
+			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
+			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
+			seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -1679,7 +1768,20 @@ class PyCHAM(QWidget):
 			inname = txtn[2]
 				
 			# pickle with new file names	
-			list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+			list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, 
+				update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, 
+				wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, 
+				lowsize, uppsize, space_mode, std, mean_rad, save_step, 
+				const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
+				seed_diss, seed_dens, seedx, light_stat, light_time, 
+				daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
+				light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
+				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
+				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+				Vwat_inc, seed_eq_wat, z_prt_coeff]
 				
 			# path to pickle file
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1705,9 +1807,13 @@ class PyCHAM(QWidget):
 				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 				pk.close() # close pickle file
 			
+			# run another check on inputs - means any changes made by default are set
+			import ui_check; ui_check.ui_check(self)
+
 			# saving path - copied from saving module
 			dir_path = os.getcwd() # current working directory
 			output_root = 'PyCHAM/output'
@@ -1726,6 +1832,7 @@ class PyCHAM(QWidget):
 			# disable then remove start simulation button
 			self.b81.setEnabled(False)
 			self.b81.deleteLater()
+			self.fab = 0
 			
 			# if showing, disable then remove add to batch button
 			if (self.atb == 1): 

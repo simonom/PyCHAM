@@ -1,5 +1,5 @@
-'''code to open saved PyCHAM files and return useful variables'''
-# called by PyCHAM plotting codes to obtain the required model outputs for evaluation
+'''code to open saved files and return useful variables'''
+# e.g. called by PyCHAM plotting codes to obtain the required model outputs for evaluation
 
 import numpy as np
 import os
@@ -39,6 +39,18 @@ def retr_out(output_by_sim):
 				i = i.strip(' ')
 				dlist.append(float(i))
 			if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):
+				i = i.strip('\n')
+				i = i.strip(' ')
+				i = i.strip('[[')
+				i = i.strip(']]')
+				i = i.strip('[')
+				i = i.strip(']')
+				i = i.strip(' ')
+				try:
+					dlist.append(int(i))
+				except:
+					continue
+			if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index'):
 				i = i.strip('\n')
 				i = i.strip(' ')
 				i = i.strip('[[')
@@ -137,10 +149,19 @@ def retr_out(output_by_sim):
 	except:
 		speed = 0.
 	
+	# empty dictionary to contain indices of certain groups of components
+	group_indx = {}
+
 	try: # indices of organic peroxy radical components
-		RO2i = const['organic_peroxy_radical_index']
+		group_indx['RO2i'] = const['organic_peroxy_radical_index']
+		
 	except:
-		RO2i = []
+		group_indx['RO2i'] = []
+
+	try: # indices of organic alkoxy radical components
+		group_indx['ROi'] = const['organic_alkoxy_radical_index']
+	except:
+		group_indx['ROi'] = []
 	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
@@ -214,7 +235,7 @@ def retr_out(output_by_sim):
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, RO2i)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
 	

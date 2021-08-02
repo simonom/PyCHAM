@@ -1,0 +1,68 @@
+# File created at 2021-08-02 14:43:45.678252
+
+Gas and particle-phase concentrations of water prior to solver (molecules/cm3) with size bin numbers starting at 1: 
+Gas: 3.981563378565503e+17
+Size bin 1: 6.616741013215541e-110
+Size bin 2: 1.5062746679055954e-69
+Size bin 3: 2.323026007168469e-37
+Size bin 4: 2.6588531194848976e-13
+Size bin 5: 2117.1210538893342
+Size bin 6: 118510767517.4034
+Size bin 7: 46927314630.81874
+Size bin 8: 131.75256563324177
+
+Gas and particle-phase concentrations of water following solver (molecules/cm3) with size bin numbers starting at 1: 
+Gas: 3.981563378565503e+17
+Size bin 1: -1.6232876409458272e-107
+Size bin 2: -1.2153562923738034e-68
+Size bin 3: 1.3324847207665747e-38
+Size bin 4: 2.288637850087666e-13
+Size bin 5: 2070.7338592167307
+Size bin 6: 118140907057.08078
+Size bin 7: 46909628820.53937
+Size bin 8: 131.74730105902094
+
+Gas-phase reaction fluxes with equation numbers starting at 1 (# molecules/cm3/s):
+Eq. 1 reac: [27777516.39768286 27777516.39768286]
+Eq. 1 prod: [27777516.39768286]
+
+Particle-phase reaction fluxes with both size bin numbers and equation numbers starting at 1 (# molecules/cm3/s):
+size bin 1, eq. 1, reac: [0. 0.]
+size bin 1, eq. 1, prod: [0.]
+size bin 1, eq. 2, reac: [0.]
+size bin 1, eq. 2, prod: [0.]
+size bin 2, eq. 1, reac: [0. 0.]
+size bin 2, eq. 1, prod: [0.]
+size bin 2, eq. 2, reac: [0.]
+size bin 2, eq. 2, prod: [0.]
+size bin 3, eq. 1, reac: [0. 0.]
+size bin 3, eq. 1, prod: [0.]
+size bin 3, eq. 2, reac: [0.]
+size bin 3, eq. 2, prod: [0.]
+size bin 4, eq. 1, reac: [0. 0.]
+size bin 4, eq. 1, prod: [0.]
+size bin 4, eq. 2, reac: [0.]
+size bin 4, eq. 2, prod: [0.]
+size bin 5, eq. 1, reac: [0. 0.]
+size bin 5, eq. 1, prod: [0.]
+size bin 5, eq. 2, reac: [0.]
+size bin 5, eq. 2, prod: [0.]
+size bin 6, eq. 1, reac: [0. 0.]
+size bin 6, eq. 1, prod: [0.]
+size bin 6, eq. 2, reac: [0.]
+size bin 6, eq. 2, prod: [0.]
+size bin 7, eq. 1, reac: [0. 0.]
+size bin 7, eq. 1, prod: [0.]
+size bin 7, eq. 2, reac: [0.]
+size bin 7, eq. 2, prod: [0.]
+size bin 8, eq. 1, reac: [0. 0.]
+size bin 8, eq. 1, prod: [0.]
+size bin 8, eq. 2, reac: [0.]
+size bin 8, eq. 2, prod: [0.]
+
+Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall
+H2O : -398156337856550.25
+
+Gas-particle partitioning fluxes (molecules/cm3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.
+H2O: [2.05857668e-100 1.72524373e-061 2.76569903e-030 4.67583576e-007
+ 5.85872387e+008 4.67135451e+015 2.23372592e+014 6.64918128e+004]

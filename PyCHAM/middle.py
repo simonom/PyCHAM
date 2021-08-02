@@ -31,8 +31,7 @@ def middle(): # define function
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
-		erh_str, pcont, Vwat_inc, seed_eq_wat] = ui.share()
-	
+		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = ui.share()
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -41,7 +40,7 @@ def middle(): # define function
 	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, rel_SMILES, Pybel_objects, eqn_num, 
+	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, rel_SMILES, Pybel_objects, eqn_num, 
 	comp_namelist, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
@@ -95,7 +94,7 @@ def middle(): # define function
 	for prog in ode_updater.ode_updater(update_stp, 
 		tot_time, save_step, y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
-		jac_den_indx_g, jac_indx_g, RO2_indx, H2Oi, temp, tempt, 
+		jac_den_indx_g, jac_indx_g, RO2_indx, RO_indx, H2Oi, temp, tempt, 
 		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
 		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
@@ -121,7 +120,7 @@ def middle(): # define function
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 		Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
-		HO2i, NO3i):
+		HO2i, NO3i, z_prt_coeff):
 
 		yield prog # update progress bar	
 

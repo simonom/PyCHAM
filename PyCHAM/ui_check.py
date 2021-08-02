@@ -33,7 +33,7 @@ def ui_check(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -79,6 +79,9 @@ def ui_check(self):
 	# distribution of seed particles includes the volume of water
 	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
 	# seeds before experiment starts
+	# z_prt_coeff - fraction of total gas-particle partitioning coefficient
+	#	below which partitioning treated as negligible, e.g. because a 
+	#	size bin has relatively very small surface area
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -132,7 +135,7 @@ def ui_check(self):
 		em_flag = 2
 	
 	# consistency between number of particle size bins and particle number concentration
-	if (num_sb == 0 and (sum(pconc != 0) > 0) and em_flag < 2):
+	if (num_sb == 0 and (sum(sum(pconc != 0)) > 0) and em_flag < 2):
 		err_mess = str('Error - zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')
 		em_flag = 2 # error message flag for error
 	
@@ -389,10 +392,38 @@ def ui_check(self):
 				err_mess = str('Error - the expression for efflorescence relative humidity dependence on temperature was unsuccessfully transferred to a module, please see the README notes on the erh_ft model variable')
 				em_flag = 2
 	# ------------------------------------
+	# check on manually assigned vapour pressure of seed component
+
+	if (seed_name.count('core') < len(seed_name)):
+		for seedi in seed_name: # loop through seed components
+			# check whether this seed component is not core 
+			# and it has not been allocated a vapour pressure manually
+			if (seedi != 'core' and vol_comp.count(seedi) == 0 and em_flag < 2):
+				# add component to manually assigned vapour pressures
+				vol_comp.append(seedi)
+				# assume low volatility for this seed component (Pa)
+				volP.append(1.e-20)
+				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver, therefore a vapour pressure of 1.e-20 Pa has been assumed.  To change this setting, specify the vapour pressure of the seed components using the vol_Comp and volP model variables.  Please see README for more guidance.')
+				em_flag = 1
+				
+	# ------------------------------------
 	
 
 	# store in pickle file
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			seedx, light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
+			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+			z_prt_coeff]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

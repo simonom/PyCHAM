@@ -69,7 +69,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 		rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
-		comp_num] = eqn_interr.eqn_interr(eqn_num, 
+		comp_num, RO_indx] = eqn_interr.eqn_interr(eqn_num, 
 		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on)
 		
 	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on), dil_fac)
@@ -132,8 +132,6 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
 	# get index of components in the peroxy radical list
-	
-	
 	RO2_indx = RO2_indices.RO2_indices(comp_namelist, RO2_names)
 	
 	# get number of photolysis equations
@@ -143,8 +141,8 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx, comp_list, 
-		Pybel_objects, eqn_num, comp_namelist, Jlen, 
+		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, 
+		comp_list, Pybel_objects, eqn_num, comp_namelist, Jlen, 
 		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 		nreac_aq, nprod_aq, jac_stoi_aq, 
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				

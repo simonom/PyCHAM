@@ -8,7 +8,8 @@ import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
 		y_dens, N_perbin, radius, Psat, therm_sp,
-		H2Oi, act_coeff, wall_on, caller, partit_cutoff, Press, DStar_org):
+		H2Oi, act_coeff, wall_on, caller, partit_cutoff, Press, DStar_org,
+		z_prt_coeff):
 	
 	# inputs:---------------------------------------------------------------------------
 	
@@ -33,6 +34,9 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# 		partitioning assumed zero (Pa)
 	# Press - air pressure (Pa)
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
+	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
+	#	below which partitioning to a particle size bin is treated as zero,
+	#	e.g. because surface area of that size bin is tiny
 	# ------------------------------------------------------------------------------------
 	
 	if (num_sb == 0): # fillers
@@ -89,6 +93,14 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# eq. 16.2 of Jacobson (2005) and eq. 5 Zaveri et al. (2008)
 	# components in rows and size bins in columns (/s)
 	kimt = (4.*np.pi*(radius*1.e2)*N_perbin.reshape(1, -1))*kimt
+
+	# zero partitioning coefficient for particle size bins with 
+	# such little number concentration or radius that partitioning 
+	# is relatively tiny
+	
+	if (z_prt_coeff > 0.):
+		kimt[:, np.sum(kimt, axis = 0)/np.sum(np.sum(kimt)) < z_prt_coeff] = 0.
+
 	# transpose kimt ready for multiplication inside ode solver, so size bins
 	# in rows and components in columns
 	kimt = np.transpose(kimt)
@@ -102,10 +114,5 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		highVPi = (Psat*act_coeff) > partit_cutoff_Pa
 		highVPi[:, H2Oi] = 0 # mask water to allow its partitioning
 		kimt[highVPi] = 0.
-
-	# zero partitioning coefficient for size bins where no particles - enables significant
-	# computation time acceleration and is physically realistic
-	ish = N_perbin[:, 0]<=1.e-10
-	kimt[ish, :] = 0.
 	
 	return(kimt, kelv)

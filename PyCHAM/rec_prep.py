@@ -25,7 +25,7 @@ def rec_prep(nrec_step,
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i):
+	NOi, HO2i, NO3i, z_prt_coeff):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -136,6 +136,9 @@ def rec_prep(nrec_step,
 	# NOi - index of NO
 	# HO2i - index of HO2
 	# NO3i - index of NO3
+	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
+	#	below which partitioning to a particle size bin is treated as zero,
+	#	e.g. because surface area of that size bin is tiny 
 	# ----------------------------------------------------------------
 
 	# array to record time through simulation (s)
@@ -185,7 +188,7 @@ def rec_prep(nrec_step,
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-		Pnow, DStar_org)
+		Pnow, DStar_org, z_prt_coeff)
 		
 		# single particle radius (um) at size bin centre 
 		# including contribution of water

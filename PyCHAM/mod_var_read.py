@@ -26,7 +26,7 @@ def mod_var_read():
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -247,6 +247,11 @@ def mod_var_read():
 			if key == 'seed_eq_wat' and value.strip():
 				seed_eq_wat = int(value.strip())
 
+			# fraction below which gas-particle partitioning coefficient treated as zero,
+			# e.g. because size bin has relatively very small surface area
+			if key == 'z_prt_coeff'  and value.strip():
+				z_prt_coeff = float(value.strip())			
+
 			if key == 'light_status' and value.strip(): # status of lights (on or off)
 				light_stat = [int(i) for i in (value.split(','))]
 				light_stat = np.array((light_stat))
@@ -417,7 +422,19 @@ def mod_var_read():
 		# -------------------------------------------
 		
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat]
+		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+				seedx, light_stat, light_time, daytime, lat, lon, af_path, 
+				dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, 
+				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
+				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
+				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
+				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
+				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
