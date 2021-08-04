@@ -315,7 +315,7 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		ds = nc.Dataset(output_by_sim) # open file
 		
 		time_s = ds['time'][:] # get time (seconds)
-
+		
 		# in case want to see what variables are present
 		#print(ds.variables); import ipdb; ipdb.set_trace()
 		# empty array ready for component concentrations (molecules/cm3)
@@ -324,6 +324,9 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		# retrieve concentrations (molecules/cm3) of components of interest
 		c_cnt = 0 # count on components
 		for comp_name in comp_of_int:
+			#if comp_name == 'OCRESOL':
+			#	Crec[:, c_cnt] = ds[str(comp_name[1::]+'_0_0')][:]
+			#else:
 			Crec[:, c_cnt] = ds[str(comp_name+'_0')][:]
 			c_cnt += 1 # count on components
 			

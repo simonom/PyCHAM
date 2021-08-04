@@ -17,9 +17,10 @@ PyCHAM is an open-access computer code (written in Python) for simulating aeroso
 
 ## Documentation
 
-The README file you are now viewing serves as the PyCHAM manual, explaining how to setup the software and use it.
+The README file you are now viewing serves as the PyCHAM manual, explaining how to setup the software and use it.  As an additional resource, we also provide an [introductory video](https://www.youtube.com/watch?v=W8NbcU8WHeg&t=506s).
 
 The [article](https://doi.org/10.21105/joss.01918) published in the Journal for Open Source Software explains the underlying mechanisms of PyCHAM and its purpose.  This article was reviewed using v0.2.4 of PyCHAM.  Additionally, the [article](https://doi.org/10.5194/gmd-14-675-2021) published in Geophysical Model Development provides a detailed introduction of PyCHAM and its use.  This article was reviewed using v2.1.1 of PyCHAM    The DOI for all PyCHAM releases is: [10.5281/zenodo.3752676](https://www.doi.org/10.5281/zenodo.3752676).
+
 
 
 Version numbers of PyCHAM try to adhere to the semantics described by [semver](https://semver.org).

@@ -188,7 +188,13 @@ def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
 		# sort in ascending order
 		res_sort = np.sort(res_sum)
 		
-		for cnum in range(top_num[0]): # loop through chemical reactions
+		if (len(res_sort) < top_num[0]):
+
+			# if less reactions are present than the number requested inform user
+			mess = str('Please note that ' + str(len(res_sort)) + ' relevant reactions were found, although a maximum of ' + str(top_num[0]) + ' were requested by the user.')
+			self.l203a.setText(mess)
+
+		for cnum in range(np.min([top_num[0], len(res_sort)])): # loop through chemical reactions
 			
 			# identify this chemical reaction
 			cindx = np.where((res_sort[-(cnum+1)] ==  res_sum) == 1)[0]
