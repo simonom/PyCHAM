@@ -50,7 +50,6 @@ def mod_var_read():
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
 				
-
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
 				chem_sch_mark = [str(i).strip() for i in (value.split(','))]
 

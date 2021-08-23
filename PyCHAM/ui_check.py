@@ -87,7 +87,7 @@ def ui_check(self):
 	# to begin assume no errors, so message is that simulation ready
 	err_mess = 'Model variables fine - simulation ready'
 	em_flag = 0 # flag that no problematic errors detected
-
+	
 	# saving path (copied from saving module) ------------
 	dir_path = os.getcwd() # current working directory
 	output_root = 'PyCHAM/output'
@@ -118,7 +118,7 @@ def ui_check(self):
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
-	#default name used for folder to save to
+	# default name used for folder to save to
 	if (sav_nam == 'default_res_name' and em_flag < 2):
 		err_mess_n = str('Note - default name for save folder used, therefore results folder will be automatically deleted at the end of the simulation to avoid future duplication\n')
 		if (em_flag == 0):
@@ -231,7 +231,7 @@ def ui_check(self):
 	if (RHt[0] != 0 and em_flag < 2):
 		err_mess = str('Error - the first time (seconds) through simulation at which a relative humidity time is given is not zero, which represents the start of the experiment, but the model requires the relative humidity at the start of the experiment, please refer to the notes on the rh and rht model variables in README.')
 		em_flag = 2 # error message flag for error
-		
+	
 	# check on UManSysProp ---------------------------------------------------
 
 	# note that whilst conditionally setting uman_up below is required for this section to work, it does not
@@ -331,9 +331,8 @@ def ui_check(self):
 				em_flag = 2
 		except:
 			em_flag = em_flag
-	# -------------------------------------
-	# check on whether water included in instantaneously injected components, as it should not be, instead it should be
-	# included in the rh model variable input
+	
+	# chemical scheme check-------------------------------------
 	if (em_flag < 2 and sch_name != 'Not found'): # if a chemical scheme has been identified
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
 		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
@@ -345,7 +344,14 @@ def ui_check(self):
 			if (comp_namelist[H2Oi] in Compt):
 				err_mess = str('Error - water is included in the components being instantaneously injected via the model variables Ct, Compt and injectt, however changes to water vapour content should be made using the rh and rht model variables.  Please see README for further guidance.')
 				em_flag = 2
-		else: # in case error message produced by function checking the chemical scheme
+		
+		# in case of note message
+		if (err_mess_new[0:4] == 'Note' and em_flag < 2):
+			err_mess = err_mess_new
+			em_flag = 1
+
+		# in case error message produced by function checking the chemical scheme
+		if (err_mess_new[0:5] == 'Error' and em_flag < 2):
 			err_mess = err_mess_new
 			em_flag = 2
 	
@@ -357,6 +363,7 @@ def ui_check(self):
 		else:
 			err_mess = str(err_mess+err_mess_n)
 		em_flag = 1
+	
 	# -------------------------------------
 	# check on water history
 	if (em_flag < 2):
@@ -405,7 +412,7 @@ def ui_check(self):
 				volP.append(1.e-20)
 				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver, therefore a vapour pressure of 1.e-20 Pa has been assumed.  To change this setting, specify the vapour pressure of the seed components using the vol_Comp and volP model variables.  Please see README for more guidance.')
 				em_flag = 1
-				
+		
 	# ------------------------------------
 	
 
@@ -481,7 +488,7 @@ def ui_check(self):
 	else: # if there is a message
 		
 		# update error message
-		self.l80.setText(str('Setup Status: \n' +err_mess))
+		self.l80.setText(str('Setup Status: \n' + err_mess))
 		# change border accordingly
 		if (self.bd_st == 1):
 			self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)

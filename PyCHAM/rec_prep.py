@@ -25,7 +25,7 @@ def rec_prep(nrec_step,
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i, z_prt_coeff):
+	NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -138,9 +138,27 @@ def rec_prep(nrec_step,
 	# NO3i - index of NO3
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
 	#	below which partitioning to a particle size bin is treated as zero,
-	#	e.g. because surface area of that size bin is tiny 
+	#	e.g. because surface area of that size bin is tiny
+	# Cinfl_now - rate of influx of components with continuous influx (ppb/s)
 	# ----------------------------------------------------------------
 
+	# note that instaneous changes occur before recording --------------------
+	# update chamber variables
+	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
+		Psat, N_perbin, x, pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
+		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
+		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
+		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
+		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
+		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
+		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
+		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
+		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, Cinfl_now)
+
+	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)
 	trec = np.zeros((nrec_step))
 	# array to record concentrations with time (molecules/cc/s)
@@ -166,21 +184,6 @@ def rec_prep(nrec_step,
 		Nres_wet = 0.
 		rbou_rec = 0.
 		yrec_p2w = 0.
-
-	# update chamber variables
-	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
-		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		Psat, N_perbin, x, pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
-		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
-		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
-		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
-		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
-		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf)
 	
 	if ((num_sb-wall_on) > 0): # if particles present
 		
@@ -199,7 +202,7 @@ def rec_prep(nrec_step,
 		
 		# estimate particle number size distributions ----------------------------------
 		Vnew = np.zeros((num_sb-wall_on))
-		ish = N_perbin[:, 0]>1.0e-10
+		ish = N_perbin[:, 0] > 1.e-10
 		
 		if ish.sum()>0:
 			# rearrange particle concentrations into size bins in rows, components in columns
@@ -235,6 +238,7 @@ def rec_prep(nrec_step,
 	
 	cham_env[0, 0] = temp_now # temperature (K)
 	cham_env[0, 1] = Pnow # pressure (Pa)
+	#import ipdb; ipdb.set_trace()
 	cham_env[0, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	
 	# --------------------------------------------------------------------------------

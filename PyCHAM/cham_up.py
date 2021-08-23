@@ -1,7 +1,8 @@
 '''update the chamber variables depending on time'''
 # based on the user inputs and time through simulation,
 # chamber variables are updated before calling the 
-# ODE solver
+# ODE solver, so they are present at the start of the 
+# integration interval
 
 import numpy as np
 import os
@@ -19,7 +20,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
-	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf):
+	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -108,6 +109,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# x - starting sizes of particles (um)
 	# pcont - flags for whether particle injection instantaneous or continuous
 	# pcontf - whether current state of particle injection is continuous
+	# Cinfl_now - influx rate of components with continuous influx (ppb/s)
 	# -----------------------------------------------------------------------
 	
 	# check on change of light setting --------------------------------------
@@ -116,7 +118,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# condition/nucleation
 	bc_red = 0
 	
-	if (len(light_time))>0:
+	if ((len(light_time)) > 0):
 	
 		# whether lights on (1) or off (0) during this step
 		lightm = light_stat[int(sum(light_time<=sumt)-1)]
@@ -449,8 +451,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			update_count = 0.
 			bc_red = 1
 			
-	# nucleation check end -------------------------------------------------------------------------	
-
+	# nucleation check end -------------------------------------------------------------------------
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 

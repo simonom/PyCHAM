@@ -1,4 +1,7 @@
-res_file_name = ins_inj_Output
+# model variables exemplifying instantaneous injection of gas-phase components 
+# to produce a relatively stiff problem that causes PyCHAM (in Simon O'Meara's 
+# experience) to reduce the intergration time interval
+res_file_name = ins_inj_output2
 total_model_time = 1200.
 update_step = 60.
 recording_time_step = 60.

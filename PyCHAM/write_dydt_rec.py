@@ -56,7 +56,7 @@ def write_dydt_rec(): # define function
 	f.write('			for ibin in range(num_sb-1): # size bin loop\n')
 	f.write('				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]\n')
 	f.write('				conc_sum = np.zeros((1)) \n')
-	f.write('				if any(pconc > 0.): # if seed particles present \n')
+	f.write('				if (sum(sum(pconc > 0.)) > 0): # if seed particles present \n')
 	f.write('					conc_sum[0] = ((Csit.sum()-sum(Csit[seedi]))+sum(Csit[seedi]*core_diss))\n')
 	f.write('				else: \n')
 	f.write('					conc_sum[0] = Csit.sum() \n')

@@ -790,9 +790,9 @@ def smps_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncer
 	levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
 			np.max(z[~np.isnan(z)])))
 	
-	# fix upper value of contours
+	# fix upper value of contours, e.g. when trying to compare plots
 	#levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
-			1.63e5))
+	#		1.89e5))
 	
 	# associate colours and contour levels
 	norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)

@@ -151,6 +151,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		dydt_traki = [] # empty list for indices of these components
 		
 		for i in range (len(dydt_trak)):
+
 			reac_index = [] # indices of reactions involving this species
 			# index of components in component list
 			y_indx = comp_namelist.index(dydt_trak[i])
@@ -168,10 +169,9 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 					
 	
 			# save reaction indices in dictionary value for this component,
-			# when creating empty rec_array, add two rows onto the end for particle- and 
-			# wall-partitioning, respectively.  Note the extra row to hold the reaction 
-			# indices
-			rec_array = np.zeros((nrec_steps+1, len(reac_index)+2))
+			# when creating empty rec_array, add two columns onto the end for particle- and 
+			# wall-partitioning, respectively
+			rec_array = np.zeros((nrec_steps, len(reac_index)+2))
 			rec_array[0, 0:-2] = (reac_index)
 			dydt_vst[y_indx] = rec_array # dictionary entry to hold results
 

@@ -103,6 +103,6 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	cham_env[save_cnt, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	# --------------------------------------------------------------------------------
 
-	save_cnt += 1 # track number of recordings 
+	save_cntf = 1 # flag for increasing number of recordings 
 
-	return(trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w, cham_env)
+	return(trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w, cham_env)

@@ -26,6 +26,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
 		_, _, _, PsatPa, OC, _, _, _, _, _) = retr_out.retr_out(dir_path)
 	
+	# no record of change tendency for final experiment time point
+	timehr = timehr[0:-1]
+
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
 		

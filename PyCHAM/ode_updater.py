@@ -284,7 +284,9 @@ def ode_updater(update_stp,
 	RHt_cnt0 = 0 # remember count at start of integration step
 	conPin_cnt = 0 # count on continuous influx of seed particles
 	conPin_cnt0 = 0 # remember count at start of integration step
-	save_cnt = 1 # count on recording results
+	# count on recording results, note starting on two because results at t=0 already stored
+	save_cnt = 2
+	Cinfl_now = 0. # filler for rate of influx of components with continuous influx (ppb/s)
 	
 	
 	# count on time since update to integration initial values/constants last called (s)
@@ -298,11 +300,12 @@ def ode_updater(update_stp,
 	tnew = update_stp # the time to integrate over (s)
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
-	comp_namelist_np = np.array(comp_namelist)# numpy array version of chemical scheme names
+	comp_namelist_np = np.array(comp_namelist) # numpy array version of chemical scheme names
+	save_cnt_chck = 1 # counting recording steps for time interval check
 	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
-	# in this call but are below
+	# in this call but are recorded below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
 	yrec_p2w, temp_now, cham_env, Pnow, Psat, RHn] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
@@ -319,7 +322,7 @@ def ode_updater(update_stp,
 	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff)
+	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now)
 	
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -352,6 +355,7 @@ def ode_updater(update_stp,
 		stab_red = 0 # flag for stability in gas-particle partitioning for time interval reset
 		lin_int = 0 # flag to linearly interpolate changes to chamber
 		t00 = tnew # remember the initial integration step for this integration step (s)
+		save_cntf = 0 # flag for updating count on number of recordings
 		
 		while (gpp_stab != 1): # whilst ode solver flagged as unstable
 
@@ -372,11 +376,17 @@ def ode_updater(update_stp,
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf)
-
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now)
+			
+			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
-			if ((sumt+tnew) > save_stp*save_cnt):
-				tnew = (save_stp*save_cnt)-sumt
+			if ((sumt+tnew) > save_stp*(save_cnt_chck)):
+				tnew = (save_stp*(save_cnt_chck))-sumt
+				# temporarily set the update step for operator-split processes
+				# to align with recording time step, this ensures that
+				# recording and operator-split intervals don't fall out of sync
+				update_stp = tnew
+				update_count = 0.
 				ic_red = 1
 			
 			# ensure update to operator-split processes interval not surpassed
@@ -388,7 +398,8 @@ def ode_updater(update_stp,
 			if (sumt+tnew > tot_time):
 				tnew = (tot_time-sumt)
 				ic_red = 1
-		
+			# ------------------------------------------------------------------		
+	
 			if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
 			
 				# update partitioning variables
@@ -400,7 +411,9 @@ def ode_updater(update_stp,
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
 				# the cham_up module prior to this call
-				[act_coeff, wat_hist, RHn, y, dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, wat_hist0, act_coeff, num_comp, (num_sb-wall_on))
+				[act_coeff, wat_hist, RHn, y, 
+				dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
+				wat_hist0, act_coeff, num_comp, (num_sb-wall_on))
 				
 			else: # fillers
 				kimt = np.zeros((num_sb-wall_on, num_comp))
@@ -421,14 +434,40 @@ def ode_updater(update_stp,
 			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, 
 			colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 			
-			# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-			# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
-			if (len(dydt_vst) > 0):
-		
-				# record any change tendencies of specified components
-				dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, save_cnt-1, 
+			
+			# for change tendencies, do want to save from t=0
+			# record any change tendencies of specified components
+			if (len(dydt_vst) > 0 and save_cntf == 0):
+				if (sumt == 0. or (sumt-(save_stp*(save_cnt-1)) > -1.e-10)):
+					if (sumt == 0.):
+						dydt_cnt = save_cnt-2
+					if (sumt-(save_stp*(save_cnt-1)) > -1.e-10):
+						dydt_cnt = save_cnt-1
+					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
+					# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
+					dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
 						dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 						kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)
+			
+			# record output if on the first attempt at solving this time interval, 
+			# note that recording here in this way means we include any
+			# instantaneous changes at this time step without interpolation to
+			# smaller instantaneous changes (when interpolation forced due to 
+			# instability)
+			if (save_cntf == 0 and (sumt-(save_stp*(save_cnt-1)) > -1.e-10)):
+				
+				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
+				x2, rbou_rec, yrec_p2w, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
+				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
+				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
+				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
+				yrec_p2w, C_p2w, cham_env, temp_now, Pnow)
+				# prepare for recording next point
+				save_cnt += 1
+
+				
+			
 			
 			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
@@ -499,7 +538,6 @@ def ode_updater(update_stp,
 			
 			# model component concentration changes to get new concentrations
 			# (molecules/cc (air))
-			
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
@@ -575,6 +613,8 @@ def ode_updater(update_stp,
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
+		if (sumt % save_stp == 0.): # get remainder
+			save_cnt_chck += 1 # if need to move up count on interval check to
 		
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been
@@ -643,17 +683,15 @@ def ode_updater(update_stp,
 		# update the percentage time in the GUI progress bar
 		yield (sumt/tot_time*100.)
 		
-		
-		# record output
-		if ((sumt-(save_stp*save_cnt) > -1.e-10) or (sumt >= (tot_time-tot_time/1.e10))):
+		if (sumt >= (tot_time-tot_time/1.e10)): # record output at experiment end
 			
-			[trec, yrec, Cfactor_vst, save_cnt, 
-				Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w, cham_env] = rec.rec(save_cnt, trec, yrec, 
-				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
-				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
-				yrec_p2w, C_p2w, cham_env, temp_now, Pnow)		
+			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
+			x2, rbou_rec, yrec_p2w, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
+			Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
+			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
+			Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
+			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
+			yrec_p2w, C_p2w, cham_env, temp_now, Pnow)		
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):

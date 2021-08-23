@@ -165,13 +165,19 @@ def retr_out(output_by_sim):
 	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
-	if (os.stat(fname).st_size > 120): # if file contains more than just the header
+	# check file size (bytes) to see if file contains more than just the header
+	if (os.stat(fname).st_size > 123):
 		indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
-		# chemical scheme names of components
-		comp0 = indx_plot[1].tolist()
-		# indices of components
-		indx_plot = indx_plot[0].tolist()
-		indx_plot = [int(i) for i in indx_plot]
+		# chemical scheme names of components to plot
+		try: # in case components with initial concentrations provided
+			comp0 = indx_plot[1].tolist()
+			# indices of components
+			indx_plot = indx_plot[0].tolist()
+			indx_plot = [int(i) for i in indx_plot]
+		except: # in case components with initial concentrations not provided
+			comp0 = []
+			indx_plot = []
+		
 	else:
 		comp0 = []
 		indx_plot = []

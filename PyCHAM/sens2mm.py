@@ -1,6 +1,6 @@
 '''solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)'''
 # module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2021-06-22 13:08:16.956276
+# File Created at 2021-08-17 09:48:23.443697
 
 import numpy as np
 
@@ -13,7 +13,9 @@ def sens2mm(caller, y_MW):
 	# ---------------------------
 	
 	fac_per_comp = y_MW/1000. # sensitivity (Hz/ppt) per molar mass (g/mol) 
-	fac_per_comp = np.array((fac_per_comp)).reshape(-1, 1) # reshape 
+	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape 
+	if (len(fac_per_comp) == 1): # if just a single value then tile across components 
+		fac_per_comp = np.tile(fac_per_comp, len(y_MW)) # if just a single value then tile across components 
 	
 	if (caller == 3): # called on to plot sensitivity to molar mass
 		import matplotlib.pyplot as plt 

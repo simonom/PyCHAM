@@ -36,22 +36,31 @@ def inlet_loss(call, Nwet, xn, yp, loss_func_str, losst, num_comp):
 	f.write('	# -----------------------------\n')
 	f.write('	\n')
 	f.write('	sd_lrate = np.zeros((Dp_all.shape[0], Dp_all.shape[1]))\n')
-	f.write('	# estimate loss rate (fraction/s)\n')
-	f.write('	for it in range(Dp_all.shape[0]):\n')
-	f.write('		Dp = Dp_all[it, :]\n')
-	f.write('		sd_lrate[it, :] = %s\n' %(loss_func_str))
+	f.write('	try: # in case loss function string is acceptable\n')
+	f.write('		# estimate loss rate (fraction/s)\n')
+	f.write('		for it in range(Dp_all.shape[0]):\n')
+	f.write('			Dp = Dp_all[it, :]\n')
+	f.write('			sd_lrate[it, :] = %s\n' %(loss_func_str))
+	f.write('	except: # in case of issue\n')
+	f.write('		sd_lrate = \'Error, function of loss rate of particles during passage through inlet failed, please revise\'\n')
 	f.write('	\n')
 	f.write('	return(sd_lrate)')
 	f.close()
 	
 	import inlet_loss_func
 	importlib.reload(inlet_loss_func)
+		
 
 	# size-dependent rates of particles lost over entire inlet passage (fraction /s)
 	# for all size bins (columns) and times (rows)
 	sd_lrate = inlet_loss_func.inlet_loss_func(xn*2.)
 	
 	if (call == 3): # if button pressed to plot loss rate as a function of diameter
+
+		if isinstance(sd_lrate, str):
+			if (sd_lrate[0:5] == 'Error'):
+				return(sd_lrate)		
+
 		import matplotlib.pyplot as plt
 		plt.ion()
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
@@ -69,7 +78,7 @@ def inlet_loss(call, Nwet, xn, yp, loss_func_str, losst, num_comp):
 		ax0.set_xlabel('Particle diameter ($\mu\,$m)', fontsize=14)
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 		plt.show()
-		return()
+		return([])
 
 	# integrate over entire time in inlet (fraction)
 	sd_lrate = sd_lrate*losst
