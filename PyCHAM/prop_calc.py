@@ -213,5 +213,4 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			# convert from log10(atm) to Pa
 			Psat_Pa_rec[i] = (10.**Psat_Pa_rec[i])*101325.
 	
-	
 	return(Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC)

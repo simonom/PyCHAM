@@ -98,7 +98,7 @@ def ode_updater(update_stp,
 	# seedx - mole ratio of components comprising seed material
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
-	# 	(molecules/cc (air))
+	# 	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
 	# accom_coeff - accommodation coefficient
 	# y_mw - molecular weight (g/mol)

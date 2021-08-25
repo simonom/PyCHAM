@@ -42,7 +42,7 @@ def rec_prep(nrec_step,
 	# N_perbin - particle concentration per size bin (#/cc (air))
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
-	#	(molecules/cm3 (air))
+	#	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
 	# accom_coeff - accommodation coefficient
 	# y_mw - molecular weight (g/mol)

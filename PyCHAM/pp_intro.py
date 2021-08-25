@@ -169,10 +169,13 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		N_perbin = np.array((sum(pconcn))).reshape(-1, 1) # (# particles/cc (air) at experiment start)
 		x = np.zeros(1) # radii at size bin centre
 		# mean radius of this one size bin (um)
-		if (len(mean_radn[0]) == 1): # if a scalar
-			meansize = mean_radn[0][0]
-		else : # if an array
-			meansize = sum(mean_radn)/len(mean_radn)
+		try: # if mean_radn an array
+			if (len(mean_radn[0]) == 1): # if a scalar
+				meansize = mean_radn[0][0]
+			else : # if an array
+				meansize = sum(mean_radn)/len(mean_radn)
+		except: # if mean_radn a scalar
+			meansize = mean_radn
 			
 		x[0] = meansize
 
