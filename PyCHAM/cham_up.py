@@ -17,10 +17,11 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
-	mean_rad, corei, seedVr, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
+	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
-	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now):
+	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
+	seed_eq_wat, Vwat_inc):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -68,7 +69,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
-	# seedVr - volume ratio of component(s) comprising seed particles
+	# seedx - mole ratio of non-water components comprising seed particles
 	# seed_name - name(s) of component(s) comprising seed 
 	#	particles
 	# lowsize - lower size bin boundary (um)
@@ -102,7 +103,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# y_mw - molar weight of components (g/mol)
 	# temp_now - chamber temperature (K) prior to this update
 	# Psat - saturation vapour pressures of components at the current 
-	#	chamber temperature (molecules/cm3)
+	#	chamber temperature (# molecules/cm3)
 	# gpp_stab - flag for whether to linearly interpolate any change 
 	# 	to chamber conditions (equals -1 if change needed)
 	# t00 - the initial integration step on the current integration step (s)
@@ -110,6 +111,10 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# pcont - flags for whether particle injection instantaneous or continuous
 	# pcontf - whether current state of particle injection is continuous
 	# Cinfl_now - influx rate of components with continuous influx (ppb/s)
+	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
+	# act_coeff - activity coefficient of components
+	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# -----------------------------------------------------------------------
 	
 	# check on change of light setting --------------------------------------
@@ -332,8 +337,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# check on instantaneous injection of particles --------------------------------------
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
 	
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
+		
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
 		
@@ -351,20 +357,25 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			
 			# if linear interpolation required and instantaneous injection of seed
 			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
-				pconcn = np.interp(tnew, [0, t00], [pconc[:, seedt_cnt-1], pconc[:, seedt_cnt]])
+				pconcn = np.zeros((pconc.shape[0])) # empty results array
+				# loop through size bins for interpolation since interpolation is one dimensional
+				for i in range(num_sb-wall_on):
+					pconcn[i] = np.interp(tnew, [0, t00], [pconc[i, seedt_cnt-1], pconc[i, seedt_cnt]])
 				# remember the fraction of the number concentration added so far
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-			
+				mean_radn = mean_rad[:, seedt_cnt] # mean radius now
+				stdn = std[:, seedt_cnt] # standard deviation now
+
 			# account for instantaneous change in seed particles (continuous change dealt with below)
 			if (pcontf == 0):
 				[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
-					N_perbin, 
-					mean_radn, pmode, pconcn, seedi, seedVr, lowsize, 
+					N_perbin, mean_radn, pmode, pconcn, seedi, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-					stdn, y_dens, H2Oi, rbou)
-			
+					stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
+					seed_eq_wat, Vwat_inc)
+		
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
 		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
@@ -388,11 +399,11 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			seedt_cnt += 1
 		
 		[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
-					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
-					N_perbin, 
-					mean_radn, pmode, (pconcn), seedi, seedVr, lowsize, 
-					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-					stdn, y_dens, H2Oi, rbou)
+			_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
+			N_perbin, mean_radn, pmode, (pconcn), seedi, seedx, lowsize, 
+			uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
+			stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
+			seed_eq_wat, Vwat_inc)
 
 	# ----------------------------------------------------------------------------------------------------------
 

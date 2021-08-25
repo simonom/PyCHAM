@@ -71,10 +71,17 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# high resolution size bin radii (um)
 			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), int(num_bins*1.e2)))
 			# probability distribution function
-			if (len(std[0]) > 1): # extract array from list
-				std = std[0]
-			if (len(scale[0]) > 1): # extract array from list
-				scale = scale[0]
+			try: # if std is an array
+				if (len(std[0]) > 1): # extract array from list
+					std = std[0]
+			except: # if std is single number
+				 std = std
+			try: # if scale is an array
+				if (len(scale[0]) > 1): # extract array from list
+					scale = scale[0]
+			except: # if scale is single number
+				 scale = scale
+
 			pdf_output = stats.lognorm.pdf(hires, std[i], loc, scale[i])
 			# remove any excess dimensions
 			pdf_output = np.squeeze(pdf_output)

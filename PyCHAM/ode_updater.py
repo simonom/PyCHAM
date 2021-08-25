@@ -33,30 +33,27 @@ def ode_updater(update_stp,
 	jac_den_indx, jac_indx, RO2_indx, RO_indx, H2Oi, temp, tempt, 
 	Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
 	dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
-	dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedVr, 
+	dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
-	y_rind, 
-	uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
+	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
 	colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-	uppsize, std, rbou, const_infl_t, MV,
-	rindx_aq, 
+	uppsize, std, rbou, const_infl_t, MV, rindx_aq, 
 	pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
-	jac_den_indx_aq, jac_indx_aq, y_arr_aq,
-	y_rind_aq, 
+	jac_den_indx_aq, jac_indx_aq, y_arr_aq, y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
 	sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 	Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
-	HO2i, NO3i, z_prt_coeff):
+	HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -96,9 +93,9 @@ def ode_updater(update_stp,
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
-	# seedi - index of component(s) comprising seed material
-	# seed_name - name(s) of component(s) comprising seed particles
-	# seedVr - volume ratio of component(s) comprising seed material
+	# seedi - index of components comprising seed material
+	# seed_name - names of components comprising seed particles
+	# seedx - mole ratio of components comprising seed material
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
 	# 	(molecules/cc (air))
@@ -252,7 +249,11 @@ def ode_updater(update_stp,
 	# NO3i - NO3 index
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
 	#	below which partitioning to a particle size bin is treated as zero,
-	#	e.g. because surface area of that size bin is tiny  
+	#	e.g. because surface area of that size bin is tiny 
+	# con_C_indx - index of components with constant 
+	# 	gas-phase concentration (# molecules/cm3)
+	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# ------------------------------------------------------------
 	
 	# start timer
@@ -265,9 +266,6 @@ def ode_updater(update_stp,
 	gasinj_cnt = 0 # count on injection times of components
 	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
 		seedt_cnt = 1 # count on injection times of particles
-		if (len(pconct[0, :]) == 2): # if at the final seed particle injection
-			seedt_cnt = -1
-			
 	else:
 		seedt_cnt = 0
 	
@@ -319,10 +317,11 @@ def ode_updater(update_stp,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	seed_name, seedVr, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
+	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, seedi, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
-	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now)
+	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now,
+	seed_eq_wat, Vwat_inc)
 	
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
@@ -361,7 +360,7 @@ def ode_updater(update_stp,
 
 			# if integration interval decreased, reset concentrations to those at start of interval
 			if (gpp_stab == -1):
-				y[:] = y0[:] # (molecules/cm3)
+				y[:] = y0[:] # (# molecules/cm3)
 			
 			# update chamber variables
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
@@ -372,11 +371,12 @@ def ode_updater(update_stp,
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
-			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedVr, seed_name, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now)
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			act_coeff, seed_eq_wat, Vwat_inc)
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
@@ -399,7 +399,7 @@ def ode_updater(update_stp,
 				tnew = (tot_time-sumt)
 				ic_red = 1
 			# ------------------------------------------------------------------		
-	
+			
 			if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
 			
 				# update partitioning variables
@@ -466,9 +466,6 @@ def ode_updater(update_stp,
 				# prepare for recording next point
 				save_cnt += 1
 
-				
-			
-			
 			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 
@@ -553,7 +550,10 @@ def ode_updater(update_stp,
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 			H2Oi, dil_fac)
-			
+
+			if (con_C_indx): # if any components set to have constant gas-phase concentration
+				y[con_C_indx] = y0[con_C_indx] # (# molecules/cm3)
+
 			if (any(y < 0.)): # check on stability of integration of processes
 			
 				# identify components with negative concentrations
@@ -573,35 +573,35 @@ def ode_updater(update_stp,
 					# sum of absolute of all concentrations
 					sum_c = sum(np.abs(all_c))
 					
-					# if negative, suggests ODE solver instability
-					if (neg_c/sum_c > 0.):
+				# if negative, suggests ODE solver instability
+				if (neg_c/sum_c > 0.):
 						
-						gpp_stab = -1 # maintain unstable flag
-						# tell user what's happening
-						yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
+					gpp_stab = -1 # maintain unstable flag
+					# tell user what's happening
+					yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
 
-						if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
-							# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
-							ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
-								y_rind, rstoi, pstoi, rrc, nreac, nprod, wall_on, 
-								num_comp, (num_sb-wall_on), Cw, Psat, act_coeff, kw, 
-								neg_comp_indx, N_perbin, seedi, core_diss, kelv_fac, 
-								kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
-								rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 1, H2Oi, y)
+					if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
+						# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
+						ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
+							y_rind, rstoi, pstoi, rrc, nreac, nprod, wall_on, 
+							num_comp, (num_sb-wall_on), Cw, Psat, act_coeff, kw, 
+							neg_comp_indx, N_perbin, seedi, core_diss, kelv_fac, 
+							kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
+							rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 1, H2Oi, y)
 
-							yield (str('Error: negative concentrations generated following call to ode_solv module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
+						yield (str('Error: negative concentrations generated following call to ode_solv module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
 						
-						# half the update and integration time step (s) if necessary	
-						tnew = tnew/2.
-						stab_red = 1 # remember that time step temporarily reduced due to instability
+					# half the update and integration time step (s) if necessary	
+					tnew = tnew/2.
+					stab_red = 1 # remember that time step temporarily reduced due to instability
 
-						# if negative concentration too great a proportion of total 
-						# concentration then stop loop through components with negative concentrations
-						continue
+					# if negative concentration too great a proportion of total 
+					# concentration then stop loop through components with negative concentrations
+					continue
 					
-					else: # if stable
-						gpp_stab = 1 # change to stable flag
-			
+				else: # if stable
+					gpp_stab = 1 # change to stable flag
+				
 			else: # if solution stable, change stability flag to represent this
 				
 				# account for any partial addition of newly injected seed particles

@@ -9,7 +9,7 @@ import datetime
 # function to generate the ordinary differential equation (ODE)
 # solver file
 def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
-		num_asb, con_C_indx, testf, eqn_num, dil_fac):
+		num_asb, testf, eqn_num, dil_fac):
 	
 	# inputs: ------------------------------------------------
 	# con_infl_indx - indices of components with constant influx
@@ -19,8 +19,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	# 	partitioning
 	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
-	# con_C_indx - index of components with constant gas-phase 
-	#	concentration
 	# testf - marker for whether in test mode or not
 	# eqn_num - number of gas- and particle-phase reactions
 	# dil_fac - fraction of chamber air extracted/s

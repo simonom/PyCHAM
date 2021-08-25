@@ -83,8 +83,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
 	kelv = np.zeros((num_sb-wall_on, 1))
 	kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*1.e2*tot_rho[ish]))
-
-
+	
 	# ------------------------------------------------
 	# gas phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
 	# eq. 5 Zaveri et al. (2008)

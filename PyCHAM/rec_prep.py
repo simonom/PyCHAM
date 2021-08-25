@@ -21,11 +21,11 @@ def rec_prep(nrec_step,
 	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	seed_name, seedVr, lowsize, uppsize, rad0, radn, std, rbou, 
+	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now):
+	NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now, seed_eq_wat, Vwat_inc):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -100,9 +100,8 @@ def rec_prep(nrec_step,
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
-	# seedVr - volume ration of component(s) comprising seed particles
 	# seed_name - name(s) of component(s) comprising seed particles
-	# seedVr - volume ratio of component(s) comprising seed particles
+	# seedx - mole ratio of components comprising seed particles
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
 	# rad0 - initial radius at size bin centres (um)
@@ -140,6 +139,8 @@ def rec_prep(nrec_step,
 	#	below which partitioning to a particle size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny
 	# Cinfl_now - rate of influx of components with continuous influx (ppb/s)
+	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# ----------------------------------------------------------------
 
 	# note that instaneous changes occur before recording --------------------
@@ -152,11 +153,12 @@ def rec_prep(nrec_step,
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedVr, seed_name, 
+		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, Cinfl_now)
+		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, Cinfl_now, surfT, act_coeff,
+		seed_eq_wat, Vwat_inc)
 
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)

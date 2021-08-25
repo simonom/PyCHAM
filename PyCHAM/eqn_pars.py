@@ -92,7 +92,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# get index of components with constant influx/concentration -----------
 	# empty array for storing index of components with constant influx
 	con_infl_indx = np.zeros((len(con_infl_nam)))
-	con_C_indx = np.zeros((len(const_comp)))
+	con_C_indx = np.zeros((len(const_comp))).astype('int')
 	for i in range (len(con_infl_nam)):
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
 		if (con_infl_nam[i] == 'H2O'):
@@ -113,12 +113,13 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		except:
 			erf = 1 # raise error
 			err_mess = str('Error: constant concentration component with name ' +str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+	
 	# ---------------------------------------------------------------------
 
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), con_C_indx, 0, eqn_num, dil_fac)
+			(num_sb-wall_on), 0, eqn_num, dil_fac)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)
@@ -148,4 +149,4 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil, erf, err_mess)
+		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil, erf, err_mess, con_C_indx)

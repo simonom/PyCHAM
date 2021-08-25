@@ -47,7 +47,8 @@ def middle(): # define function
 	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess] = eqn_pars.extr_mech(sch_name, 
+	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
+	con_C_indx] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac)
 	
@@ -100,8 +101,7 @@ def middle(): # define function
 		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g,
-		y_rind_g, 
+		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g, y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 
@@ -120,7 +120,7 @@ def middle(): # define function
 		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 		Psat_Pa_rec, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
-		HO2i, NO3i, z_prt_coeff):
+		HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc):
 
 		yield prog # update progress bar	
 

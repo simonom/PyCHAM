@@ -1891,7 +1891,7 @@ class PyCHAM(QWidget):
 	@pyqtSlot()		
 	def act_81(self, output_by_sim, sim_num): # start the simulation
 	
-		from middle import middle # prepare to communicate with main programme
+		from middle import middle # prepare to communicate with main program
 		
 		note_messf = 0 # cancel note message flag
 		
@@ -2039,7 +2039,7 @@ class PyCHAM(QWidget):
 	@pyqtSlot() # button to quit software
 	def on_click89(self):
 		QWidget.close(self)
-		sys.exit() # end programme and release all memory
+		sys.exit() # end program and release all memory
 		
 	# plot functions -----------------------------------------
 	
