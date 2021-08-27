@@ -105,7 +105,7 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 3. Begin the programme from the command line: python PyCHAM
 
-4. The PyCHAM graphical user interface (GUI) should now display on your screen.  Using the 'Simulate' tab, one can select the folder containing all input files using the 'Select Folder Containing Input Files' button.  This will search the selected folder for the input files (chemical reaction scheme, xml and model variables).  For the chemical scheme file, files with names including 'chem' will be identified.  For the xml files, files with names including 'xml' will be identified.  For the model variables file, files with names including 'var' will be identified.  Any identified files will then be displayed in the GUI (see below for details on the contents of the chemical scheme, xml and model variables input files).
+4. The PyCHAM graphical user interface (GUI) should now display on your screen.  Using the 'Simulate' tab, one can select the folder containing all input files using the 'Select Folder Containing Input Files' button.  This will search the selected folder for the input files (chemical reaction scheme, xml and model variables).  For the chemical scheme, files with filenames including 'chem' will be identified.  For the xml, files with filenames including 'xml' will be identified.  For the model variables, files with filenames including 'var' will be identified.  Any identified files will then be displayed in the GUI (see below for details on the contents of the chemical scheme, xml and model variables input files).
 
 5. To select any of the input files individually, one can use the corresponding GUI button.
 

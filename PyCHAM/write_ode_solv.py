@@ -272,10 +272,11 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		# as do not need the repetitions over size bins\n')
 		f.write('		if (Cw > 0.):\n')
 		f.write('			Csit = Psat[0, :]*(Csit/Cw)*act_coeff[0, :]\n')
-		f.write('			# rate of transfer (molecules/cc/s)\n')
+		f.write('			# rate of transfer (molecules/cm3/s)\n')
 		f.write('			dd_all = kw*(y[0:num_comp, 0]-Csit)\n')
 		f.write('			dd[0:num_comp, 0] -= dd_all # gas-phase change\n')
 		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1), 0] += dd_all # wall change\n')
+		
 		f.write('		\n')
 	
 	# non-vectorised code for use with numba compiler

@@ -223,7 +223,7 @@ def ode_updater(update_stp,
 	# corei - index of core component
 	# ser_H2O - whether to serialise the gas-particle partitioning of water
 	# C_p2w - concentration of components on the wall due to particle
-	# deposition to wall (molecules/cc)
+	# deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# sch_name - path to chemical scheme
 	# sav_nam - name of folder to save in
@@ -255,9 +255,17 @@ def ode_updater(update_stp,
 	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# ------------------------------------------------------------
-	
+
 	# start timer
 	st_time = time.time()
+
+	# if simulating the JPAC experiments
+	#if ('JPAC' in sav_nam):
+	#	kwn = np.zeros((num_comp))
+	#	kwn[RO2_indx[:, 1]] = kw
+	#	kwn[comp_namelist.index('HO2')] = kw
+	#	kwn[comp_namelist.index('OH')] = kw
+	#	kw = kwn
 
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
@@ -330,7 +338,7 @@ def ode_updater(update_stp,
 	while (tot_time-sumt) > (tot_time/1.e10):
 		
 		# remembering variables at the start of the integration step ------------------------------------------
-		y0[:] = y[:] # remember initial concentrations (molecules/cm3 (air))
+		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
 		x0[:] = x[:] # remember initial particle sizes (um)
 		temp_now0 = temp_now # remember temperature (K)
@@ -534,7 +542,7 @@ def ode_updater(update_stp,
 				kimt[:, H2Oi] = 0.
 			
 			# model component concentration changes to get new concentrations
-			# (molecules/cc (air))
+			# (# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
@@ -550,8 +558,9 @@ def ode_updater(update_stp,
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 			H2Oi, dil_fac)
-
-			if (con_C_indx): # if any components set to have constant gas-phase concentration
+			
+			# if any components set to have constant gas-phase concentration
+			if (any(con_C_indx)):
 				y[con_C_indx] = y0[con_C_indx] # (# molecules/cm3)
 
 			if (any(y < 0.)): # check on stability of integration of processes
@@ -684,6 +693,23 @@ def ode_updater(update_stp,
 		yield (sumt/tot_time*100.)
 		
 		if (sumt >= (tot_time-tot_time/1.e10)): # record output at experiment end
+
+			# update chamber variables, note this ensures that any changes made
+			# coincidentally with the experiment end are captured
+			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
+			pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
+			Pnow0, light_stat, light_time, light_time_cnt0, light_ad, 
+			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
+			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
+			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
+			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			act_coeff, seed_eq_wat, Vwat_inc)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, yrec_p2w, cham_env] = rec.rec(save_cnt-1, trec, yrec, 

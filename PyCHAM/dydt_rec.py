@@ -2,7 +2,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in eqn_pars and treats loss from gas-phase as negative
 
-# File Created at 2021-08-25 17:04:51.452836
+# File Created at 2021-08-27 09:31:28.731281
 
 import numpy as np 
 
@@ -25,6 +25,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			stoi_indx = (np.where(rindx[i, 0:nreac[i]]==compi))[0]
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] -= rstoi[i, stoi_indx]*((gprate))
+			
 			stoi_indx = (np.where(pindx[i, 0:nprod[i]]==compi))[0]
 			if len(stoi_indx)>0: 
 				dydt_rec[step+1, reac_count] += pstoi[i, stoi_indx]*((gprate))

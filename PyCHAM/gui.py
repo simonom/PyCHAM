@@ -947,6 +947,13 @@ class PyCHAM(QWidget):
 		self.b203.clicked.connect(self.on_click203)
 		self.PRIMlayout.addWidget(self.b203, 0, 0)
 
+		# drop down button for units
+		self.b203a = QComboBox(self)
+		self.b203a.addItem('ppb')
+		self.b203a.addItem(str(u'\u03BC' + 'g/m' +u'\u00B3'))
+		self.b203a.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3'))
+		self.PRIMlayout.addWidget(self.b203a, 0, 1, 1, 1)
+
 		# label for input line that receives component names to plot temporal profiles of
 		self.l203 = QLabel(self)
 		self.l203.setText('Write the chemical scheme names of components you want plotted in the box below (use H2O for water and RO2 for organic peroxy radicals)')
@@ -972,10 +979,9 @@ class PyCHAM(QWidget):
 		self.b206ppb.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
 		self.b206ppb.clicked.connect(self.on_click206ppb)
 		self.PRIMlayout.addWidget(self.b206ppb, 3, 1)
-		
-		 # particle-phase concentrations temporal profiles -------------
 
-		
+		# particle-phase concentrations temporal profiles -------------
+
 		# button to plot temporal profile of total particle-phase concentrations
 		self.b209 = QPushButton(str('Total particle-phase concentrations ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
 		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
@@ -1004,7 +1010,7 @@ class PyCHAM(QWidget):
 		self.b215_a = QPushButton('Chamber Conditions (T, P, RH)', self)
 		self.b215_a.setToolTip('Plot the temporal profile of chamber variables (temperature, pressure, relative humidity)')
 		self.b215_a.clicked.connect(self.on_click215_a)
-		self.PRIMlayout.addWidget(self.b215_a, 0, 1)
+		self.PRIMlayout.addWidget(self.b215_a, 0, 2)
 		
 		return(PRIMTab)
 	
@@ -1037,6 +1043,13 @@ class PyCHAM(QWidget):
 		self.b218aa.setToolTip('Plot the rate of change of this component due to individual chemical reactions')
 		self.b218aa.clicked.connect(self.on_click218aa)
 		self.SEClayout.addWidget(self.b218aa, 1, 1)
+
+		# drop down button to select units for change tendencies
+		self.b218aaa = QComboBox(self)
+		self.b218aaa.addItem('ppb/s')
+		self.b218aaa.addItem(str(u'\u03BC' + 'g/m' +u'\u00B3' + '/s'))
+		self.b218aaa.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3' + '/s'))
+		self.SEClayout.addWidget(self.b218aaa, 1, 2, 1, 1)
 		
 		# input bar for atom or functional group to plot contributions from
 		self.e218a = QLineEdit(self)
@@ -2106,8 +2119,18 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		dir_path = self.l201.text() # name folder with results
-		plotter.plotter(0, dir_path, self) # plot results
+		dir_path = self.l201.text() # name of folder containing results
+		gp_units = self.b203a.currentText() # gas-phase concentration units
+		
+		# convert units into number option
+		if (gp_units[0] == 'p'):
+			uc = 0
+		if (gp_units[1] == 'g'):
+			uc = 1
+		if (gp_units[2] == 'm'):
+			uc = 2
+
+		plotter.plotter(0, dir_path, uc, self) # plot results
 	
 	@pyqtSlot() # button to plot gas-phase concentration (ug/m3) temporal profile
 	def on_click206(self):	
@@ -2221,10 +2244,19 @@ class PyCHAM(QWidget):
 		
 		# get top number of chemical reactions to plot
 		top_num = [int(i) for i in self.e217a.text().split(',')]
+
+		ct_units = self.b218aaa.currentText() # change tendency units
+		# convert units into number option
+		if (ct_units[0] == 'p'):
+			uc = 0
+		if (ct_units[1] == 'g'):
+			uc = 1
+		if (ct_units[2] == 'm'):
+			uc = 2
 		
 		import plotter_ct
 		dir_path = self.l201.text() # name of folder with results
-		plotter_ct.plotter_ind(0, dir_path, comp_names, top_num, self) # plot results
+		plotter_ct.plotter_ind(0, dir_path, comp_names, top_num, uc, self) # plot results
 	
 	@pyqtSlot() # button to plot component contributions
 	def on_click218b(self):

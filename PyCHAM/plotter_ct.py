@@ -61,7 +61,6 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
 		self.bd_pl == 3
 	
-	
 	# prepare figure
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
@@ -115,13 +114,14 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	return()
 	
 # plot change tendency due to individual chemical reactions
-def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
+def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
-	#  top_num - top number of chemical reactions to plot
+	# top_num - top number of chemical reactions to plot
+	# uc - units to use for change tendency
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
@@ -163,11 +163,9 @@ def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
 		self.bd_pl == 3
 	
-	
 	# prepare figure
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-	
 	
 	for comp_name in (comp_names_to_plot): # loop through components to plot
 		
@@ -181,8 +179,19 @@ def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
 		res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
 		res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
 		
-		# convert change tendencies from molecules/cc/s to ug/m3/s
-		res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[ci])*1.e12
+		if (uc == 0):
+			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+			# convert change tendencies from molecules/cc/s to ppb
+			res[1::, :] = (res[1::, :]/Cfaca[1::])
+			ct_units = str('(ppb/s)')
+		if (uc == 1):			
+			# convert change tendencies from molecules/cc/s to ug/m3/s
+			res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[ci])*1.e12
+			ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
+		if (uc == 2):
+			# keep change tendencies as molecules/cc/s
+			res[1::, :] = res[1::, :]
+			ct_units = str('\n(' + u'\u0023' + ' molecules/cm' +u'\u00B3' + '/s)')
 		
 		# identify most active chemical reactions
 		# first sum total change tendency over time (ug/m3/s)
@@ -203,13 +212,13 @@ def plotter_ind(caller, dir_path, comp_names_to_plot,  top_num, self):
 			cindx = np.where((res_sort[-(cnum+1)] ==  res_sum) == 1)[0]
 			for indx_two in (cindx):
 				# plot, note the +1 in the label to bring label into MCM index
-				ax0.plot(timehr, res[1::, indx_two], label = str(int(res[0, indx_two])+1))
+				ax0.plot(timehr[0:-1], res[1::, indx_two], label = str(int(res[0, indx_two])+1))
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
 		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
 		ax0.set_xlabel('Time through experiment (hours)')
-		ax0.set_ylabel('Change tendency ($\mathrm{\mu g\, m^{-3}\, s^{-1}}$)')
+		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		ax0.xaxis.set_tick_params(direction = 'in')

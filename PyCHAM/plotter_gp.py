@@ -27,7 +27,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		_, _, _, PsatPa, OC, H2Oi, _, _, _, RO2i) = retr_out.retr_out(dir_path)
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
-	Cfac = (np.array(Cfac)).reshape(-1, 1)# convert to numpy array from list
+	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)

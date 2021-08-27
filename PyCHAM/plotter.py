@@ -11,11 +11,12 @@ import retr_out
 import numpy as np
 import scipy.constants as si
 
-def plotter(caller, dir_path, self):
+def plotter(caller, dir_path, uc, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
+	# uc - number representing the units to be used for gas-phase concentrations
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
@@ -69,17 +70,36 @@ def plotter(caller, dir_path, self):
 
 	if (indx_plot):
 		
-		# start tracking maximum value for plot label
-		ymax = 0.
 		
+		ymax = 0. # start tracking maximum value for plot label
+		
+		# action units for gas-phase concentrations
+		if (uc == 0): # ppb
+			gp_conc = yrec[:, 0:num_comp] # ppb is original units
+			gpunit = '(ppb)'
+		if (uc == 1 or uc == 2): # ug/m3 or # molecules/cm3
+
+			y_MW = np.array(y_mw) # convert to numpy array from list
+			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+			
+			gp_conc = yrec[:, 0:num_comp] 
+
+			# # molecules/cm3
+			gp_conc = gp_conc.reshape(yrec.shape[0], num_comp)*Cfaca
+			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' +u'\u00B3' + ')')
+
+			if (uc == 1): # ug/m3
+				gp_conc = ((gp_conc/si.N_A)*y_MW)*1.e12
+				gpunit = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + ')')
+
 		# gas-phase concentration sub-plot ---------------------------------------------	
 		for i in range(len(indx_plot)):
 		
-			ax0.semilogy(timehr, yrec[:, indx_plot[i]], '+',linewidth=4.0, 
+			ax0.semilogy(timehr, gp_conc[:, indx_plot[i]], '+',linewidth=4.0, 
 						label=str(str(comp0[i]).strip()))
 			ymax = max(ymax, max(yrec[:, indx_plot[i]]))
 
-		ax0.set_ylabel(r'Gas-phase concentration (ppb)', fontsize = 14)
+		ax0.set_ylabel(r'Gas-phase concentration ' + gpunit, fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')

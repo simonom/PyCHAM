@@ -145,6 +145,7 @@ def rec_prep(nrec_step,
 
 	# note that instaneous changes occur before recording --------------------
 	# update chamber variables
+	
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
@@ -159,7 +160,7 @@ def rec_prep(nrec_step,
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, Cinfl_now, surfT, act_coeff,
 		seed_eq_wat, Vwat_inc)
-
+	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)
 	trec = np.zeros((nrec_step))

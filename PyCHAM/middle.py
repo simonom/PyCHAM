@@ -74,7 +74,7 @@ def middle(): # define function
 		num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name)
-
+	
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
 		R_gas, NA, diff_vol, Dstar_org] = partit_var_prep.prep(y_mw, 
