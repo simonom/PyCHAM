@@ -9,7 +9,7 @@ import datetime
 # function to generate the ordinary differential equation (ODE)
 # solver file
 def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
-		num_asb, testf, eqn_num, dil_fac):
+		num_asb, testf, eqn_num, dil_fac, sav_nam):
 	
 	# inputs: ------------------------------------------------
 	# con_infl_indx - indices of components with constant influx
@@ -22,6 +22,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	# testf - marker for whether in test mode or not
 	# eqn_num - number of gas- and particle-phase reactions
 	# dil_fac - fraction of chamber air extracted/s
+	# sav_nam - name of file to save results to
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
@@ -50,10 +51,10 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
-	f.write('	H2Oi, dil_fac):\n')
+	f.write('	H2Oi, dil_fac, RO2_indx, comp_namelist):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
-	f.write('	# y - initial concentrations (molecules/cm3)\n')
+	f.write('	# y - initial concentrations (# molecules/cm3)\n')
 	f.write('	# integ_step - the maximum integration time step (s)\n')
 	f.write('	# rindx - index of reactants per equation\n')
 	f.write('	# pindx - index of products per equation\n')
@@ -113,6 +114,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
 	f.write('	# dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
+	f.write('	# RO2_indx - index of organic peroxy radicals\n')
+	f.write('	# comp_namelist - chemical scheme names of components\n')
 	f.write('	# ---------------------------------------------\n')
 	f.write('\n')
 	
@@ -150,7 +153,9 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	def dydt(t, y): # define the ODE(s)\n')
 	f.write('		\n')
 	f.write('		# inputs: ----------------\n')
-	f.write('		# y - concentrations (molecules/cc), note when using scipy integrator solve_ivp, this should have shape (number of elements, 1)\n')
+	f.write('		# y - concentrations (# molecules/cm3), note when using\n')
+	f.write('		#	scipy integrator solve_ivp, this should have shape\n')
+	f.write('		#	(number of elements, 1)\n')
 	f.write('		# t - time interval to integrate over (s)\n')
 	f.write('		# ---------------------------------------------\n')
 	f.write('		\n')
@@ -184,7 +189,15 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		# register gain of products\n')
 		f.write('		dd[uni_y_pind, 0] += np.array((loss.sum(axis = 1))[uni_y_pind])[:, 0]\n')
 		f.write('		\n')
-		
+
+	if ('JPAC' in sav_nam): # wall losses for the Julich Plant and Atmosphere Chamber
+
+		f.write('		dd[RO2_indx] -= y[RO2_indx]*(1./120.) \n')
+		f.write('		dd[comp_namelist.index(\'HO2\')] -= y[comp_namelist.index(\'HO2\')]*(1./120.) \n')
+		f.write('		dd[comp_namelist.index(\'SA\')] -= y[comp_namelist.index(\'SA\')]*(1./120.) \n')
+		f.write('		dd[comp_namelist.index(\'OH\')] -= y[comp_namelist.index(\'OH\')]*(4.) \n')
+		f.write('		\n')
+
 	if (eqn_num[1] > 0): # if particle-phase reactions present
 		f.write('		# particle-phase reactions -------------------------\n')
 		f.write('		\n')

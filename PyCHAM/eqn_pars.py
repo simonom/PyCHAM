@@ -18,7 +18,7 @@ import aq_mat_prep
 # define function to extract the chemical mechanism
 def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
 		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
-		drh_str, erh_str, dil_fac):
+		drh_str, erh_str, dil_fac, sav_nam):
 
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
@@ -39,6 +39,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# erh_str - string from user inputs describing 
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
 	# dil_fac - fraction of chamber air extracted/s
+	# sav_nam - name of folder to save results to
 	# ------------------------------------------------------------
 	
 	# starting error flag and message (assumes no errors)
@@ -119,7 +120,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), 0, eqn_num, dil_fac)
+			(num_sb-wall_on), 0, eqn_num, dil_fac, sav_nam)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)

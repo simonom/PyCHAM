@@ -91,7 +91,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# this mode (# particle/cc (air))
 			Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
 		
-	# if number concentration (#/cc (air)) explicitly stated in inputs
+	# if number concentration (# particles/cm3 (air)) explicitly stated in inputs
 	if (pmode == 1):
 		Nperbin = np.array((pconc))
 	

@@ -232,7 +232,7 @@ def rec_prep(nrec_step,
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i])
+			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 0.)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 

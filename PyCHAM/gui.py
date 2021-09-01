@@ -832,8 +832,15 @@ class PyCHAM(QWidget):
 		# --------------------------------------------------------------------
 		# label to let user know preparedness of simulation - displayed text updated in ui_check module below
 		self.l80 = ScrollLabel(self)
-		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 2)
 		self.bd_st = 2 # border status
+
+		# --------------------------------------------------------------------
+		# button to let users view the provided number size distributions of particles
+		self.b80 = QPushButton('Particle Number Size Distributions', self)
+		self.b80.setToolTip('See the seed particle number size distributions to be used')
+		self.b80.clicked.connect(self.on_clickb80)
+		self.NSlayout.addWidget(self.b80, 4, self.mvpn+2, 1, 1)
 		
 		# label to let users know file combinations included in batch
 		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
@@ -1540,7 +1547,11 @@ class PyCHAM(QWidget):
 			
 		# read in model variables of this model variables file and store to pickle
 		import mod_var_read
-		mod_var_read.mod_var_read()
+		mod_var_read.mod_var_read(self)
+
+		# end this function if an error thrown by reading of model variables
+		if (self.bd_st == 1 or self.bd_st == 2):
+			return()
 			
 		# updating scroll labels showing path to files
 		self.l3.setText(sch_name)
@@ -1714,7 +1725,11 @@ class PyCHAM(QWidget):
 	
 		# read in model variables of this model variables file and store to pickle
 		import mod_var_read
-		mod_var_read.mod_var_read()
+		mod_var_read.mod_var_read(self)
+		
+		# end this function if an error thrown by reading of model variables
+		if (self.bd_st == 1 or self.bd_st == 2):
+			return()
 	
 		import mod_var_up # update displayed model variables to those of the selected model variables file
 		mod_var_up.mod_var_up(self)
@@ -1811,8 +1826,12 @@ class PyCHAM(QWidget):
 			# read in model variables of this model variables file 
 			# (as identified by the inname variable of the pickle file) and store to pickle
 			import mod_var_read
-			mod_var_read.mod_var_read()
+			mod_var_read.mod_var_read(self)
 			
+			# end this function if an error thrown by reading of model variables
+			if (self.bd_st == 1 or self.bd_st == 2):
+				return()
+
 			# get the save path name variables
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
@@ -1843,10 +1862,10 @@ class PyCHAM(QWidget):
 			# display the progress label, including the name of the saving path
 			if (self.btch_no == 1): # single run mode
 				self.l81b.setText('')
-				self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
+				self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
 			if (self.btch_no > 1): # batch run mode
 				self.l81b.setText('')
-				self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
+				self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
 			
 			# if showing, disable then remove start simulation button
 			if (self.fab == 1):
@@ -1929,10 +1948,10 @@ class PyCHAM(QWidget):
 				
 					if (self.btch_no == 1): # single run mode
 						self.l81b.setText('')
-						self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
+						self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
 					if (self.btch_no > 1): # batch run mode
 						self.l81b.setText('')
-						self.l81b.setText(str('Progress through simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
+						self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
 			
 				self.progress.setValue(prog) # get progress
 				
@@ -3253,6 +3272,34 @@ class PyCHAM(QWidget):
 		# import required plotting function
 		import plotter_CIMS
 		plotter_CIMS.plotter_CIMS(dir_path, res_in, tn, iont, sensit)
+
+	@pyqtSlot() # button to plot supplied particle number size distributions
+	def on_clickb80(self):
+
+		import plotter_nsd # for plotting supplied number size distributions
+		
+		# path for pickle file
+		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+
+		# get the most recent model variables
+		with open(input_by_sim, 'rb') as pk:
+			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
+			std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
+			seed_mw, seed_diss, seed_dens, seedx,
+			light_stat, light_time, daytime, lat, lon, af_path, 
+			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			pk.close()
+		
+		# call on plotting script
+		plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
+		space_mode, 0, pconct)
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

@@ -449,7 +449,7 @@ def ui_check(self):
 		pk.close() # close
 	
 	# update model variables message in GUI
-	if (em_flag<2): # if no error message
+	if (em_flag < 2): # if no error message
 	
 		self.l80.setText(str('Setup Status: \n' + err_mess))
 		self.l80.setStyleSheet(0., '0px', 0., 0.) # remove any borders
@@ -505,6 +505,7 @@ def ui_check(self):
 			self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
 		if (self.bd_st >= 2):
 			self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
+
 		self.bd_st += 2 # prepare for change to border status
 		# change border status
 		if (self.bd_st == 3):

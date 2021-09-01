@@ -5,7 +5,7 @@
 import numpy as np
 import os
 
-def lamp_photo(fname, J, TEMP, act_flux_path):
+def lamp_photo(fname, J, TEMP, act_flux_path, sumt):
 
 	# --------------------------------------------------------------
 	# inputs
@@ -57,6 +57,43 @@ def lamp_photo(fname, J, TEMP, act_flux_path):
 		# (photon/cm2/nm/s) per wavelength (nm)
 		for F0 in F_dep_wl:
 			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
+	
+	if ('JPAC' in act_flux_path): # possibly allow UV-C gap to change	(affecting 254nm wavelength)
+		if (sumt<5.e4):
+			act_chm[0] = 0.
+		if (sumt>=5.e4 and sumt<7.5e4):
+			act_chm[0] = act_chm[0]*(27./43.)
+		if (sumt>=7.5e4 and sumt<9.0e4):
+			act_chm[0] = act_chm[0]*(20./43.)
+		if (sumt>=9.0e4 and sumt<1.0e5):
+			act_chm[0] = act_chm[0]*(7./43.)
+		if (sumt>=1.0e5 and sumt<1.5e5):
+			act_chm[0] = act_chm[0]*(2./43.)
+		if (sumt>=1.5e5 and sumt<1.6e5):
+			act_chm[0] = act_chm[0]*(12./43.)
+		if (sumt>=1.6e5 and sumt<1.75e5):
+			act_chm[0] = act_chm[0]*(25./43.)
+		if (sumt>=1.75e5 and sumt<1.90e5):
+			act_chm[0] = act_chm[0]*(33./43.)
+		if (sumt>=1.90e5 and sumt<2.30e5):
+			act_chm[0] = act_chm[0]*(37./43.)
+		if (sumt>=2.30e5 and sumt<2.50e5):
+			act_chm[0] = act_chm[0]*(43./43.)
+		if (sumt>=2.50e5 and sumt<2.80e5):
+			act_chm[0] = act_chm[0]*(27./43.)
+		if (sumt>=2.80e5 and sumt<3.25e5):
+			act_chm[0] = act_chm[0]*(0./43.)
+		if (sumt>=3.25e5 and sumt<3.40e5):
+			act_chm[0] = act_chm[0]*(27./43.)
+		if (sumt>=3.40e5 and sumt<3.70e5):
+			act_chm[0] = act_chm[0]*(0./43.)
+		if (sumt>=3.70e5 and sumt<4.10e5):
+			act_chm[0] = act_chm[0]*(27./43.)
+		if (sumt>=4.10e5 and sumt<4.40e5):
+			act_chm[0] = act_chm[0]*(0./43.)
+		if (sumt>=4.40e5 and sumt<4.60e5):
+			act_chm[0] = act_chm[0]*(27./43.)
+	
 	# --------------------------------------------------------------
 	# in the below sections photolysis rates are calculated using either the
 	# user-supplied file of absorption cross-sections and quantum yields

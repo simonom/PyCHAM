@@ -110,9 +110,9 @@ def ode_updater(update_stp,
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
 	# act_coeff - activity coefficient
-	# Cw - effective absorbing mass of wall (molecules/cc (air))
+	# Cw - effective absorbing mass of wall (# molecules/cm3 (air))
 	# kw - gas-wall mass transfer coefficient (/s)
-	# Cfactor - conversion factor for concentrations (ppb/molecules/cc)
+	# Cfactor - conversion factor for concentrations (ppb/# molecules/cm3)
 	# tf - transmission factor for natural sunlight
 	# light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
@@ -140,9 +140,6 @@ def ode_updater(update_stp,
 	# colptrs - indices of  rowvals corresponding to each column of
 	# 	the Jacobian
 	# wall_on - marker for whether wall partitioning turned on
-	# Cw - effective absorbing mass concentration of wall 
-	#	(molecules/cc (air))
-	# kw - mass transfer coefficient of wall partitioning (/s)
 	# jac_wall_indx - index of inputs to Jacobian from wall 
 	# 	partitioning
 	# jac_part_indx - index of inputs to Jacobian from particle
@@ -259,14 +256,6 @@ def ode_updater(update_stp,
 	# start timer
 	st_time = time.time()
 
-	# if simulating the JPAC experiments
-	#if ('JPAC' in sav_nam):
-	#	kwn = np.zeros((num_comp))
-	#	kwn[RO2_indx[:, 1]] = kw
-	#	kwn[comp_namelist.index('HO2')] = kw
-	#	kwn[comp_namelist.index('OH')] = kw
-	#	kw = kwn
-
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
 	# counters on updates
@@ -314,7 +303,8 @@ def ode_updater(update_stp,
 	# in this call but are recorded below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	yrec_p2w, temp_now, cham_env, Pnow, Psat, RHn] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
+	yrec_p2w, temp_now, cham_env, Pnow, Psat, 
+	RHn] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
@@ -432,7 +422,7 @@ def ode_updater(update_stp,
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
 				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 				lat, lon, af_path, dayOfYear, Pnow, 
-				photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i])
+				photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], sumt)
 			
 			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)
@@ -451,6 +441,7 @@ def ode_updater(update_stp,
 						dydt_cnt = save_cnt-2
 					if (sumt-(save_stp*(save_cnt-1)) > -1.e-10):
 						dydt_cnt = save_cnt-1
+					
 					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 					# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
 					dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
@@ -543,6 +534,7 @@ def ode_updater(update_stp,
 			
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
+			
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 			nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 			Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
@@ -557,7 +549,7 @@ def ode_updater(update_stp,
 			reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 			pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-			H2Oi, dil_fac)
+			H2Oi, dil_fac, RO2_indx[:, 1], comp_namelist)
 			
 			# if any components set to have constant gas-phase concentration
 			if (any(con_C_indx)):
@@ -693,7 +685,7 @@ def ode_updater(update_stp,
 		yield (sumt/tot_time*100.)
 		
 		if (sumt >= (tot_time-tot_time/1.e10)): # record output at experiment end
-
+			
 			# update chamber variables, note this ensures that any changes made
 			# coincidentally with the experiment end are captured
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 

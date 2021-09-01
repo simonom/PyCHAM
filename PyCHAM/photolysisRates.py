@@ -11,7 +11,7 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, tf):
+							Jlen, tf, sumt):
 
 	# inputs:-----------------------------------------------------------------------------	
 	# act_flux_path - name of path to file containing known actinic flux (only used if 
@@ -112,7 +112,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	if (act_flux_path != 'no'):
 		
 		# call on MCM_photo module to process photolysis files and estimate J values
-		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path)
+		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0

@@ -40,8 +40,8 @@ def middle(): # define function
 	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, rel_SMILES, Pybel_objects, eqn_num, 
-	comp_namelist, Jlen, 
+	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, rel_SMILES, 
+	Pybel_objects, eqn_num, comp_namelist, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
 	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
@@ -50,7 +50,7 @@ def middle(): # define function
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
 	con_C_indx] = eqn_pars.extr_mech(sch_name, 
 	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
-	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac)
+	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac, sav_nam)
 	
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):

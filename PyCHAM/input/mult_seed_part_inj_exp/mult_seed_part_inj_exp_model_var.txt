@@ -1,0 +1,21 @@
+# to test the model's ability to deal with multiple injections of seed particles
+# as expressed with explicit number size distribution
+# including plotting their number size distribution
+res_file_name = mult_seed_part_inj
+total_model_time = 4.e3
+update_step = 4.e1
+recording_time_step = 4.e1
+number_size_bins = 8
+lower_part_size = 1.e-3
+upper_part_size = 5.e1
+space_mode = log
+temperature = 275.
+tempt = 	0.
+p_init = 101300
+rh = 0.71
+rht =   0
+wall_on = 0
+coag_on = 1
+pconct = 0.; 3600.
+pconc = 1., 3., 5., 3., 1., 2., 3., 1.; 2., 6., 10., 6., 2., 4., 6., 2.
+pcont = 0 ; 0

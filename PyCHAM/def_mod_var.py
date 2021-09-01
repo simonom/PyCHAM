@@ -127,7 +127,7 @@ def def_mod_var(caller): # define function
 	# deposition of particles and vapours to wall ------------------------------------------
 	wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	Cw = 0. # effective absorbing mass of wall (g/m3 (air))
-	kw = 0. # gas-wall mass transfer coefficient (/s)
+	kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
 
 	inflectDp = 0. # diameter of deposition function inflection
 	pwl_xpre = 0. # gradient before inflection

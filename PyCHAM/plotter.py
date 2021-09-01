@@ -38,7 +38,8 @@ def plotter(caller, dir_path, uc, self):
 			mess = str('Please note, no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
 			self.l203a.setText(mess)
 			return()
-		# if there are gaseous component to plot, then prepare figure
+
+		# if there are gaseous components to plot, then prepare figure
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 		mess = str('Please note, no particle size bins were present, therefore the particle-phase standard plot will not be shown')
 		self.l203a.setText(mess)
@@ -86,7 +87,7 @@ def plotter(caller, dir_path, uc, self):
 
 			# # molecules/cm3
 			gp_conc = gp_conc.reshape(yrec.shape[0], num_comp)*Cfaca
-			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' +u'\u00B3' + ')')
+			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
 
 			if (uc == 1): # ug/m3
 				gp_conc = ((gp_conc/si.N_A)*y_MW)*1.e12

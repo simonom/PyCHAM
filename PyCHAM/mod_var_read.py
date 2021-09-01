@@ -4,10 +4,11 @@ import pickle
 import numpy as np
 import os
 
-def mod_var_read():
+def mod_var_read(self):
 	
 	# inputs: ------------------------------------------
-	# ----------------------------------------------------
+	# self - reference to PyCHAM
+	# --------------------------------------------------
 	
 	def read():
 	
@@ -36,7 +37,9 @@ def mod_var_read():
 		else: # if using defaults
 			in_list = []
 		
-		
+		err_mess = '' # initial (blank) error message
+		self.bd_st = 3 # change border/error message status to ready for change
+
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 			
 			# if commented out continue to next line
@@ -57,7 +60,10 @@ def mod_var_read():
 				update_stp = float(value.strip())
 
 			if key == 'total_model_time' and (value.strip()):
-				tot_time = float(value.strip())
+				try:
+					tot_time = float(value.strip())
+				except:
+					err_mess = 'Could not convert string to float for total_model_time model variable, please check model variables file and see README for guidance'
 
 			if key == 'Comp0' and (value.strip()): # names of components present at experiment start
 				comp0 = [str(i).strip() for i in (value.split(','))]			
@@ -90,7 +96,13 @@ def mod_var_read():
 				Cw = float(value.strip())
 
 			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
-				kw = float(value.strip())
+				kw_in = float(value.strip())
+				try:
+					kw = np.zeros((len(kw_in)))
+					kw[:] = kw_in
+				except:
+					kw = np.zeros((1))
+					kw[0] = kw_in
 
 			if key == 'size_structure' and (value.strip()): # the size structure
 				siz_stru = int(value.strip())
@@ -158,10 +170,14 @@ def mod_var_read():
 				time_cnt = 1 # track of number of times
 				mode_cnt =1 # track number of modes 
 				for i in value:
-					if i==';':
+					if (i==';'):
 						time_cnt += 1 # increase time count
-					if i==':':
+						# reset mode count
+						mode_cnt = 1 # track number of modes
+
+					if (i==':'):
 						mode_cnt += 1 # increase mode count
+
 				std = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
 					std[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
@@ -170,9 +186,11 @@ def mod_var_read():
 				time_cnt = 1 # track of number of times
 				mode_cnt = 1 # track number of modes
 				for i in value:
-					if i==';':
+					if (i==';'):
 						time_cnt += 1 # increase time count
-					if i==':':
+						# reset mode count
+						mode_cnt = 1 # track number of modes
+					if (i==':'):
 						mode_cnt += 1 # increase mode count
 				
 				mean_rad = np.zeros((mode_cnt, time_cnt))
@@ -420,6 +438,23 @@ def mod_var_read():
 				uman_up = 1
 		# -------------------------------------------
 		
+		# update model variables message in GUI
+		if (err_mess != ''): # if error message occurs
+			# update error message
+			self.l80.setText(str('Setup Status: \n' + err_mess))
+			# change border accordingly
+			if (self.bd_st == 1):
+				self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
+			if (self.bd_st >= 2):
+				self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
+
+			self.bd_st += 2 # prepare for change to border status
+			# change border status
+			if (self.bd_st == 3):
+				self.bd_st = 2
+			if (self.bd_st >= 4):
+				self.bd_st = 1		
+
 		# prepare for pickling
 		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
 				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
