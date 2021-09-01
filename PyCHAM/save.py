@@ -130,11 +130,11 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 		if i == 0:
 			end = '_g'
 		if ((i > 0) and (i < numsb)):
-			end = '_p'
-			x2_header = str(x2_header+str(i))
+			end = str('_p' + str(i))
+			x2_header = str(x2_header + str(i))
 		if (i == numsb):
 			if (wall_on == 0):
-				end = '_p'
+				end = str('_p'  + str(i))
 				x2_header = str(x2_header+str(np.repeat(i, num_comp)))
 			else:
 				end = '_w'
@@ -143,10 +143,10 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 				start = ''
 			else:
 				start = ', '
-			y_header = str(y_header+str(start+comp_namelist[ii])+end)
+			y_header = str(y_header + str(start + comp_namelist[ii]) + end)
 			
 	# saving both gas, particle and wall concentrations of components
-	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cc (air)) and _w is the wall phase (molecules/cc (air))\n'+y_header)) 		
+	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cc (air)) and _w is the wall phase (molecules/cc (air))\n' + y_header)) 		
 	 
 	# saving time of outputs
 	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
@@ -177,7 +177,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	if ((numsb-wall_on) > 0): # if particles present
 	
 		# saving the concentration of components on the wall due to particle deposition to wall
-		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (molecules/cc (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header)) 
+		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (molecules/cc (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
 	
 		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
 				header=('particle number concentration assuming water removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
