@@ -30,7 +30,7 @@ def plotter_inter_comp():
 	# get required information from PyCHAM
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, cham_env, RO2i) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, cham_env, RO2i, _) = retr_out.retr_out(dir_path)
 	
 
 	# reshape so that time in rows and components per size bin in columns

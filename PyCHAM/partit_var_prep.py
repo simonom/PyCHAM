@@ -140,7 +140,7 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 		act_coeff = np.repeat(act_coeff, num_asb, axis=0)
 
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
-	# molecules/cc (air), assuming a molecular weight of 200g/mol (*1.0e-6 to convert from
+	# # molecules/cm3 (air), assuming a molecular weight of 200 g/mol (*1.e-6 to convert from
 	# /m3 (air) to /cm3 (air))
 	Cw = ((Cw*1.e-6)/200.)*si.N_A
 	

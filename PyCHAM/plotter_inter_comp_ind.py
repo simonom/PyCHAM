@@ -22,7 +22,7 @@ def plotter_inter_comp():
 	# get required information from PyCHAM
 	#(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 	#	y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-	#	_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx) = retr_out.retr_out(dir_path)
+	#	_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _) = retr_out.retr_out(dir_path)
 	
 	#RO2i = group_indx['RO2i']
 
@@ -38,7 +38,7 @@ def plotter_inter_comp():
 	# get required information from PyCHAM
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _) = retr_out.retr_out(dir_path)
 	
 	RO2i = group_indx['RO2i']
 

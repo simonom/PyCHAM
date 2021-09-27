@@ -24,7 +24,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, RO2i) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _) = retr_out.retr_out(dir_path)
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
@@ -47,9 +47,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				indx_plot = [H2Oi]
 				indx_plot = np.array((indx_plot))
 			if (comp_names_to_plot[i].strip() == 'RO2'):
-				indx_plot = np.array((RO2i))
+				indx_plot = (np.array((group_indx['RO2i'])))
+			if (comp_names_to_plot[i].strip() == 'RO'):
+				indx_plot = (np.array((group_indx['ROi'])))
 				
-			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2'):
+			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
 					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
@@ -70,7 +72,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 			if (caller == 0): # ug/m3 plot
 			
-				# gas-phase concentration (molecules/cc)
+				# gas-phase concentration (# molecules/cm3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
 
 				# gas-phase concentration (ug/m3)
@@ -85,7 +87,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = np.sum(conc, axis=1) # sum multiple components
 			
 			# plot this component
-			if (comp_names_to_plot[i].strip() != 'RO2'): # if not the sum of organic peroxy radicals
+			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'): # if not the sum of organic peroxy radicals
 				# log10 y axis
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				# linear y axis
@@ -93,6 +95,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				
 			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
+			
+			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
+				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
 
 		if (caller == 0): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)

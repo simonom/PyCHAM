@@ -127,7 +127,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
 		
 		# listing input files -----------------------------------------------------------
 		l1 = QLabel(self)
@@ -428,7 +428,7 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(self.l31a, par_row+16, 1)
 		
 		l32 = QLabel(self)
-		l32.setText('Radius (um) of newly nucleated \nparticles: ')
+		l32.setText('Radius (cm) of newly nucleated \nparticles: ')
 		self.varbox.addWidget(l32, par_row+17, 0)
 		self.l32a = QLabel(self)
 		self.l32a.setText((str(new_partr)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
@@ -667,12 +667,21 @@ class PyCHAM(QWidget):
 		self.l58a.setText((str(light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l58a, light_row+10, 1)
 		
+		l58b = QLabel(self)
+		l58b.setText('Transmission factor for \n254 nm wavelength light: ')
+		self.varbox.addWidget(l58b, light_row+10, 0)
+		self.l58bb = QLabel(self)
+		self.l58bb.setText((str(tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.varbox.addWidget(self.l58bb, light_row+11, 1)
+		
+		
+		
 		# wall inputs ---------------------------
 		
 		l59b = QLabel(self)
 		l59b.setText('Walls')
 		l59b.setFont(QFont("Arial", 13, QFont.Bold))
-		wall_row = light_row+11
+		wall_row = light_row+12
 		self.varbox.addWidget(l59b, wall_row+0, 0)
 		
 		l59 = QLabel(self)
@@ -902,7 +911,7 @@ class PyCHAM(QWidget):
 		
 		# label for name of dialogue box:
 		l202a = QLabel(self)
-		l202a.setText('Messages from plotting scripts: ')
+		l202a.setText('Messages from scripts: ')
 		l202a.setWordWrap(True)
 		self.PLlayout.addWidget(l202a, 0, 3)
 		
@@ -930,6 +939,7 @@ class PyCHAM(QWidget):
 		PLtabs = QTabWidget()
 		PLtabs.addTab(self.PRIMtab(), "Basic")
 		PLtabs.addTab(self.SECtab(), "Detailed")
+		PLtabs.addTab(self.PARtab(), "Particle") # for particle-phase things
 		PLtabs.addTab(self.INSTRtab(), "Instrument Comparison")
 		self.PLlayout.addWidget(PLtabs, 1, 0, 1, 5)
 		
@@ -989,11 +999,18 @@ class PyCHAM(QWidget):
 
 		# particle-phase concentrations temporal profiles -------------
 
-		# button to plot temporal profile of total particle-phase concentrations
-		self.b209 = QPushButton(str('Total particle-phase concentrations ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
+		# button to plot temporal profile of total particle-phase concentration of supplied components
+		self.b209 = QPushButton(str('Total particle-phase concentrations \n('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
 		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
 		self.b209.clicked.connect(self.on_click209)
 		self.PRIMlayout.addWidget(self.b209, 4, 0)
+
+		# button to plot temporal profile of total particle-phase concentration excluding seed and water 
+		self.b209a = QPushButton(str('Total particle-phase concentrations \n('+u'\u03BC'+'g/m'+u'\u00B3'+') excluding seed and water'), self)
+		self.b209a.setToolTip('Plot total particle-phase concentration of all components except for seed and water')
+		self.b209a.clicked.connect(self.on_click209a)
+		#self.b209a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PRIMlayout.addWidget(self.b209a, 4, 1)
 		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
@@ -1037,7 +1054,7 @@ class PyCHAM(QWidget):
 		self.e217a = QLineEdit(self)
 		self.e217a.setText('Provide the number of chemical reactions to plot (arranged in descending order)')
 		self.e217a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e217a, 0, 1, 1, 1)
+		self.SEClayout.addWidget(self.e217a, 0, 2, 1, 1)
 		
 		# button to plot temporal profile of change tendencies
 		self.b218 = QPushButton('Plot change tendencies', self)
@@ -1049,54 +1066,78 @@ class PyCHAM(QWidget):
 		self.b218aa = QPushButton('Plot change tendency due to each chemical reaction', self)
 		self.b218aa.setToolTip('Plot the rate of change of this component due to individual chemical reactions')
 		self.b218aa.clicked.connect(self.on_click218aa)
-		self.SEClayout.addWidget(self.b218aa, 1, 1)
+		self.SEClayout.addWidget(self.b218aa, 1, 2)
 
 		# drop down button to select units for change tendencies
 		self.b218aaa = QComboBox(self)
 		self.b218aaa.addItem('ppb/s')
 		self.b218aaa.addItem(str(u'\u03BC' + 'g/m' +u'\u00B3' + '/s'))
 		self.b218aaa.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3' + '/s'))
-		self.SEClayout.addWidget(self.b218aaa, 1, 2, 1, 1)
+		self.SEClayout.addWidget(self.b218aaa, 1, 3, 1, 1)
+
+		# horizontal separator line -------------------------------
+		self.separatorLine2 = QFrame()
+		self.separatorLine2.setFrameShape(QFrame.HLine)
+		self.separatorLine2.setFrameShadow(QFrame.Raised)
+		self.SEClayout.addWidget(self.separatorLine2, 2, 0, 1, 3)
+		self.separatorLine2.show()
+
+		# ---------------------------------------------------------
 		
 		# input bar for atom or functional group to plot contributions from
 		self.e218a = QLineEdit(self)
 		self.e218a.setText('Provide the SMILES names of atoms or functional groups for plotting component contributions (use RO2 for organic peroxy radicals)')
 		self.e218a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218a, 2, 0)
+		self.SEClayout.addWidget(self.e218a, 3, 0)
 		
 		# input bar for top number of components containing the relevant atom or functional groups
 		self.e218b = QLineEdit(self)
 		self.e218b.setText('Provide the number of components (in descending order) containing the atom/functional group to plot')
 		self.e218b.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218b, 2, 1)
+		self.SEClayout.addWidget(self.e218b, 3, 2)
 		
 		# button to plot temporal profile of component contributions
 		self.b218b = QPushButton('Plot component contributions (mole fraction)', self)
 		self.b218b.setToolTip('Plot the contributions to this atom/functional group by component (mole fraction)')
 		self.b218b.clicked.connect(self.on_click218b)
-		self.SEClayout.addWidget(self.b218b, 3, 0, 1, 2)
+		self.SEClayout.addWidget(self.b218b, 4, 2, 1, 1)
+
+		# horizontal separator line -------------------------------
+		self.separatorLine3 = QFrame()
+		self.separatorLine3.setFrameShape(QFrame.HLine)
+		self.separatorLine3.setFrameShadow(QFrame.Raised)
+		self.SEClayout.addWidget(self.separatorLine3, 5, 0, 1, 3)
+		self.separatorLine3.show()
 		
+
+		# vertical separator line -------------------------------
+		self.separatorLine4 = QFrame()
+		self.separatorLine4.setFrameShape(QFrame.VLine)
+		self.separatorLine4.setFrameShadow(QFrame.Raised)
+		self.SEClayout.addWidget(self.separatorLine4, 5, 1, 6, 1)
+		self.separatorLine4.show()
+
 		# volatility basis set ------------------
 		
 		# label for names of components to plot tracked change tendencies
 		l219 = QLabel(self)
 		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
 		l219.setWordWrap(True)
-		self.SEClayout.addWidget(l219, 4, 0, 1, 1)
+		self.SEClayout.addWidget(l219, 6, 0, 1, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
 		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
 		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b220.clicked.connect(self.on_click220)
 		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b220, 5, 0)
+		self.SEClayout.addWidget(self.b220, 7, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
 		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b221, 6, 0)
+		self.SEClayout.addWidget(self.b221, 8, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -1104,15 +1145,49 @@ class PyCHAM(QWidget):
 		self.e222 = QLineEdit(self)
 		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e222, 7, 0)
+		self.SEClayout.addWidget(self.e222, 9, 0)
 		
 		# button to plot 2D VBS
 		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b223, 8, 0)
+		self.SEClayout.addWidget(self.b223, 10, 0)
 		
+		# ----------------------------------------------------------------
+
+		# input bar for component to estimate consumption for
+		self.e224 = QLineEdit(self)
+		self.e224.setText('Provide the chemical scheme name of the component to view consumption/yield for (result displayed in message box above)')
+		self.e224.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e224, 6, 2)
+
+		# input bar for starting time to estimate consumption for
+		self.e224a = QLineEdit(self)
+		self.e224a.setText('Provide the starting time to calculate consumption for (hours)')
+		self.e224a.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e224a, 7, 2)
+
+		# input bar for finshing time to estimate consumption for
+		self.e224b = QLineEdit(self)
+		self.e224b.setText('Provide the finishing time to calculate consumption for (hours)')
+		self.e224b.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e224b, 8, 2)
+
+		# button to estimate consumption
+		self.b224 = QPushButton(str('Consumption (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
+		self.b224.setToolTip('For the component specified above show the mass concentration consumed throughout the whole simulation in the message box above')
+		self.b224.clicked.connect(self.on_click224)
+		#self.b224.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.SEClayout.addWidget(self.b224, 9, 2)
+
+		# button to estimate SOA yield
+		self.b225 = QPushButton(str('SOA yield (fraction 0-1)'))
+		self.b225.setToolTip('Show the SOA yield from the component given in the box above by the end of the simulation in the message box above')
+		self.b225.clicked.connect(self.on_click225)
+		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.SEClayout.addWidget(self.b225, 10, 2)
+
 		# column and row relative lengths---------------------------------
 		
 		# relative stretching (height-wise) of each row in Plot tab
@@ -1132,6 +1207,41 @@ class PyCHAM(QWidget):
 		#self.PLlayout.setRowStretch(13, 1)
 		
 		return(SECTab)
+
+	def PARtab(self): # more detailed particle-phase plotting tab definition
+
+		PARTab = QWidget()
+		self.PARlayout = QGridLayout() 
+		PARTab.setLayout(self.PARlayout)
+		
+		# input bar for number of components contributing
+		# to particle-phase concentration
+		self.e300 = QLineEdit(self)
+		self.e300.setText('Provide the top number of components contributing to particle-phase')
+		self.e300.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e300, 0, 0, 1, 1)
+	
+		# button to plot particle-phase contributions
+		self.b300 = QPushButton(str('Particle-phase contributions (%)'))
+		self.b300.setToolTip('Show the contribution to particle-phase by the top contributors (number given in box above)')
+		self.b300.clicked.connect(self.on_click300)
+		#self.b300.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b300, 1, 0)
+
+		# button to plot particle-phase surface concentration
+		self.b301 = QPushButton(str('Particle surface area'))
+		self.b301.setToolTip('Graph the temporal profile of particle surface area')
+		self.b301.clicked.connect(self.on_click301)
+		#self.b301.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b301, 2, 0)
+
+		# drop down button for type of surface area
+		self.b301a = QComboBox(self)
+		self.b301a.addItem('All components')
+		self.b301a.addItem('Seed Only')
+		self.PARlayout.addWidget(self.b301a, 2, 1, 1, 1)
+
+		return(PARTab)
 	
 	def INSTRtab(self): # instrument comparison plotting tab definition
 	
@@ -1483,7 +1593,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1500,7 +1610,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 			pk.close()
 		
 		# button to get path to folder containing relevant files
@@ -1539,7 +1649,7 @@ class PyCHAM(QWidget):
 				coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 				Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-				z_prt_coeff]
+				z_prt_coeff, tf_UVC]
 
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
@@ -1589,7 +1699,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 			pk.close()
 	
 		sch_name, _ = QFileDialog.getOpenFileName(self, "Select Chemical Scheme File", "./PyCHAM/input/") # get path of file
@@ -1609,7 +1719,7 @@ class PyCHAM(QWidget):
 			uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 			p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff]
+			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1638,7 +1748,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, 
-			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 			pk.close()
 	
 		xml_name, _ = QFileDialog.getOpenFileName(self, "Select xml File", "./PyCHAM/input/") # get path of file
@@ -1658,7 +1768,7 @@ class PyCHAM(QWidget):
 			new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, 
 			pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 			partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff]
+			seed_eq_wat, z_prt_coeff, tf_UVC]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1693,7 +1803,7 @@ class PyCHAM(QWidget):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff] = pickle.load(pk)
+			z_prt_coeff, tf_UVC] = pickle.load(pk)
 			pk.close() # close pickle file
 
 		# user chooses path of file to model variables file
@@ -1718,7 +1828,7 @@ class PyCHAM(QWidget):
 				nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-				seed_eq_wat, z_prt_coeff]
+				seed_eq_wat, z_prt_coeff, tf_UVC]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1779,7 +1889,7 @@ class PyCHAM(QWidget):
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff] = def_mod_var.def_mod_var(0)
+			seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -1815,7 +1925,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-				Vwat_inc, seed_eq_wat, z_prt_coeff]
+				Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
 				
 			# path to pickle file
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1846,7 +1956,7 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 				pk.close() # close pickle file
 			
 			# run another check on inputs - means any changes made by default are set
@@ -2174,7 +2284,7 @@ class PyCHAM(QWidget):
 		self.l203a.setText('')
 		
 		# get names of components to plot
-		comp_names = [str(i) for i in self.e205.text(). split(',')]
+		comp_names = [str(i) for i in self.e205.text().split(',')]
 		
 		import plotter_gp
 		dir_path = self.l201.text() # name folder with results
@@ -2194,6 +2304,67 @@ class PyCHAM(QWidget):
 		import plotter_pp
 		dir_path = self.l201.text() # name of folder with results
 		plotter_pp.plotter(0, dir_path, comp_names, self) # plot results
+
+	# button to plot temporal profile of total particle-phase concentration
+	# excluding seed and water
+	@pyqtSlot()
+	def on_click209a(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		# get names of components to plot
+		comp_names = []
+		
+		import plotter_pp
+		dir_path = self.l201.text() # name of folder with results
+		plotter_pp.plotter(3, dir_path, comp_names, self) # plot results
+
+	# button to plot temporal profile of particle-phase contribution 
+	# by top contributors to particle-phase concentration
+	@pyqtSlot()
+	def on_click300(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		# get names of components (filler)
+		comp_names = []
+	
+		# get number of components to plot
+		try:
+			self.e300r = float(self.e205.text())
+		except: # default
+			self.e300r = 10
+
+		import plotter_pp
+		dir_path = self.l201.text() # name of folder with results
+		plotter_pp.plotter(4, dir_path, comp_names, self) # plot results
+
+	# graph the surface area concentration (m2/m3) of particles
+	@pyqtSlot()
+	def on_click301(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		sa_type = self.b301a.currentText() # surface area to consider
+		
+		# convert units into number option
+		if (sa_type[0] == 'A'):
+			caller = 5
+		if (sa_type[0] == 'S'):
+			caller = 6
+		
+		# get names of components (filler)
+		comp_names = []
+
+		import plotter_pp
+		dir_path = self.l201.text() # name of folder with results
+		plotter_pp.plotter(caller, dir_path, comp_names, self) # plot results
 	
 	@pyqtSlot() # button to plot temporal profile of total concentration of 
 	# components that have gas-wall partitioned to wall
@@ -3294,12 +3465,82 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 			pk.close()
 		
 		# call on plotting script
 		plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
 		space_mode, 0, pconct)
+
+	@pyqtSlot() # button to retrieve and report component consumption
+	def on_click224(self):
+	
+		dir_path = self.l201.text() # name of folder with results
+
+		# get component name
+		try:
+			comp_chem_schem_name = str((self.e224.text()))
+
+		except: # give error message
+			self.l203a.setText('Error - could not read chemical scheme name of component to estimate consumption of from box above')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		try:
+			# get starting time (hours)
+			self.tmin = float((self.e224a.text()))
+		except:
+			self.tmin = 0.
+		try:
+			# get finishing time (hours)
+			self.tmax = float((self.e224b.text()))
+		except:
+			self.tmax = 1.
+
+		import consumption # function to estimate consumption
+		consumption.cons(comp_chem_schem_name, dir_path, self, 0)
+
+	@pyqtSlot() # button to retrieve and report yield
+	def on_click225(self):
+	
+		dir_path = self.l201.text() # name of folder with results
+
+		# get component name
+		try:
+			comp_chem_schem_name = str((self.e224.text()))
+
+		except: # give error message
+			self.l203a.setText('Error - could not read chemical scheme name of component to estimate yield of from box above')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		# get time range to estimate yield over
+		try:
+			# get starting time (hours)
+			self.tmin = float((self.e224a.text()))
+		except:
+			self.tmin = 0.
+		try:
+			# get finishing time (hours)
+			self.tmax = float((self.e224b.text()))
+		except:
+			self.tmax = 1.
+
+		import consumption # function to estimate consumption
+		consumption.cons(comp_chem_schem_name, dir_path, self, 1)
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

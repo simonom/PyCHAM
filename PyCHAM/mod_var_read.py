@@ -27,7 +27,7 @@ def mod_var_read(self):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -296,6 +296,9 @@ def mod_var_read(self):
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
 				tf = float(value.strip())
+				
+			if key == 'tf_UVC' and (value.strip()): # transmission factor for 254 nm light
+				tf_UVC = float(value.strip())
 
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				light_ad = int(value.strip())
@@ -326,6 +329,7 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					con_infl_C = np.empty(0)
+					
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				dydt_trak = [str(i).strip() for i in (value.split(','))]
 
@@ -468,7 +472,7 @@ def mod_var_read(self):
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
 				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff]
+				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

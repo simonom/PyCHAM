@@ -18,7 +18,7 @@ import aq_mat_prep
 # define function to extract the chemical mechanism
 def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
 		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
-		drh_str, erh_str, dil_fac, sav_nam):
+		drh_str, erh_str, dil_fac, sav_nam, pcont):
 
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
@@ -40,6 +40,8 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
 	# dil_fac - fraction of chamber air extracted/s
 	# sav_nam - name of folder to save results to
+	# pcont - flag for whether seed particle injection is 
+	#	instantaneous (0) or continuous (1)
 	# ------------------------------------------------------------
 	
 	# starting error flag and message (assumes no errors)
@@ -113,14 +115,14 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 			con_C_indx[i] = comp_namelist.index(const_comp[i])
 		except:
 			erf = 1 # raise error
-			err_mess = str('Error: constant concentration component with name ' +str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+			err_mess = str('Error: constant concentration component with name ' + str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
 	# ---------------------------------------------------------------------
 
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), 0, eqn_num, dil_fac, sav_nam)
+			(num_sb-wall_on), 0, eqn_num, dil_fac, sav_nam, pcont)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)

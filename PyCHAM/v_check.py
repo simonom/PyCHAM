@@ -5,13 +5,12 @@
 import numpy as np
 from compl_evap import compl_evap as compl_evap
 
-def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, Psat):
+def Vchange_check(res, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, Psat, MV):
 
 	# inputs: ---------------------------------
 	
 	# res - concentrations (molecules/cc (air)) of all components in all phases (columns) 
 	#		at the adaptive time steps set by the ode solver
-	# MV - molar volume of components (cc/mol)
 	# sbb - fixed volume bounds (um3) of size bins
 	# sbn - number of size bins
 	# NA - Avogadro's number (molecules/mol)
@@ -22,7 +21,8 @@ def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, P
 	# ts0 - original time step passed to integrator (s)
 	# bc_red - flag for whether boundary conditions have caused a change to time step
 	# Vol0 - default volume per size bin (um3), volume at centre of size bin bounds
-	# Psat - saturation vapour pressure of components (molecules/cm3 (air))
+	# Psat - saturation vapour pressure of components (# molecules/cm3 (air))
+	# MV - molar volume of components (cm3/mol)
 	# -----------------------------------------
 	
 	# flag for breaking condition of volume change, updated once volumes checked below
@@ -46,11 +46,11 @@ def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, P
 			if n0[sbi]<1.0e-10: # if no particles, assign the default volume (um3)
 				Vnew[sbi] = Vol0[sbi]
 				continue # onto next size bin
-			# concentration of components in this size bin (molecules/cc (air))
+			# concentration of components in this size bin (molecules/cm3 (air))
 			Cnow = ytest[(sbi+1)*nc:(sbi+2)*nc]
-			# molar concentration of components in one particle (mol/cc (air))
+			# molar concentration of components in one particle (mol/cm3 (air))
 			Cnow = Cnow/(NA*n0[sbi])
-			# new volume (um3) of single particles, note MV has units cc/mol, so needs 
+			# new volume (um3) of single particles, note MV has units cm3/mol, so needs 
 			# conversion to um3/mol
 			Vnew[sbi] = sum(Cnow*(MV[:, 0]*1.e12))
 			
@@ -105,5 +105,6 @@ def Vchange_check(res, MV, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, P
 				t = solv_time[-tsi] # new time for integration on next step (s)
 				redt = 2 # flag for time step reduction due to volume change
 			Vchang_flag = 0 # will exit while loop for volume condition not met
-			
+	
+	
 	return(redt, t, bc_red, Vnew, tsi)

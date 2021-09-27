@@ -33,7 +33,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# save_step - recording frequency (s)
 	# num_eqn - number of equations
 	# comp_namelist - list of names of components as presented in the chemical scheme file
-	# Compt - name of component injected after start of experiment
+	# Compt - name of components injected instantaneously after start of experiment
 	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
@@ -61,8 +61,8 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# convert concentrations
 	# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
 	ntot = PInit*(NA/((si.R*1.e6)*TEMP))
-	# one billionth of number of molecules in chamber unit volume
-	Cfactor = ntot*1.e-9 # ppb to molecules/cc conversion factor
+	# one billionth of number of # molecules in chamber unit volume
+	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 
 	# prepare dictionary for tracking tendency to change of user-specified components
 	dydt_vst = {}
@@ -82,7 +82,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 				0, 0, 0,
 				0, 0, 0, 0, erf, err_mess, 0, 0, 0)
 			
-		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to molecules/cc (air)
+		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3 (air)
 		
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
@@ -226,6 +226,6 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		NO3i = 0 # filler
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
-				comp_namelist, inj_indx, core_diss,
-				Psat_water, nuci, nrec_steps, seedi, erf, err_mess, NOi, 
-				HO2i, NO3i)
+			comp_namelist, inj_indx, core_diss,
+			Psat_water, nuci, nrec_steps, seedi, erf, err_mess, NOi, 
+			HO2i, NO3i)

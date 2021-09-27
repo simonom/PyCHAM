@@ -26,9 +26,9 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# tmax - maximum integration time (s)
 	# tinc_count - count on number of time steps since time interval last required 
 	# decreasing
-	# C0 - original concentrations (molecules/cc (air))
-	# MV - molar volume (cc/mol)
-	# Psat - saturation vapour pressures (molecules/cm3 (air))
+	# C0 - original concentrations (# molecules/cm3 (air))
+	# MV - molar volume of all components (cm3/mol)
+	# Psat - saturation vapour pressures (# molecules/cm3 (air))
 	# ic_red - flag for time step reduction due to changing initial conditions
 	# res - resulting concentrations from ode solver (molecules/cc (air)) 
 	# solv_time - times at which integration solved (s)
@@ -41,8 +41,8 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	
 	# get new volumes of single particles per size bin and
 	# check whether volume change is acceptable
-	(redt, t, ic_red, Vnew, tsi) = Vchange_check(res, MV, s0, sbn, NA, 
-					n0, nc, solv_time, t, ic_red, Vol0, Psat)
+	(redt, t, ic_red, Vnew, tsi) = Vchange_check(res, s0, sbn, NA, 
+					n0, nc, solv_time, t, ic_red, Vol0, Psat, MV)
 	
 	if (redt == 1): # repeat integration with new smaller time step
 		return(n0, Vol0, C0, x, redt, t, ic_red)
@@ -74,10 +74,10 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# total volume of components 
 	# ((um3 (all particles)/cc (air))/(particle number/cc (air))) 
 	# calculation is:
-	# divide number of molecules/cc (air) by Na to get moles/cc(air), then 
-	# multiply by um3/mol (MV*1.e12) to get ug3 (of each component)/cc (air),
-	# then sum volume of components per size bin to get ug3 (all particles)/cc (air)
-	ish = N_perbin[:, 0]> 0.0
+	# divide number of molecules/cc (air) by Na to get moles/cm3 (air), then 
+	# multiply by um3/mol (MV*1.e12) to get ug3 (of each component)/cm3 (air),
+	# then sum volume of components per size bin to get ug3 (all particles)/cm3 (air)
+	ish = N_perbin[:, 0]> 0.
 	Vsing = np.zeros((sbn))
 	
 	for sbi in range(sbn): # size bin loop

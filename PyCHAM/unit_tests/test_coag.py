@@ -33,9 +33,9 @@ def test_coag(): # define function
 	# molecular concentration (molecules/cc (air)), arranged by component in rows and size 
 	# bins (sbr) in columns
 	num_molec = ((rho*1.0e6)*((1.0/M)*si.N_A))*sbVi*num_part
-	# concentration of particles per size bin (sbr) (particle/cc (air))
+	# concentration of particles per size bin (sbr) (# particle/cm3 (air))
 	num_part_rint = np.ones((1, len(rint)))
-	# molecular concentration (molecules/cc (air)), arranged by component in rows and size 
+	# molecular concentration (# molecules/cm3 (air)), arranged by component in rows and size 
 	# bins (sbr) in columns
 	num_molec_rint = ((rho*1.0e6)*((1.0/M)*si.N_A))*((4.0/3.0)*np.pi*rint**3.0)*num_part_rint
 	tint = 1. # time interval coagulation occurs over (s)
@@ -54,10 +54,10 @@ def test_coag(): # define function
 	siz_str = 0 # size structure flag
 	wall_on = 0 # whether the wall is considered
 
-	# call on coagulation module
-	#coag.coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
-		#num_comp, vdWon, rho, sbVi, rad0, PInit, testf, num_molec_rint, num_part_rint, 
-		#sbVj, coag_on, siz_str, wall_on)
+	# call on coagulation module to complete kernel testing
+	coag.coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
+		num_comp, vdWon, rho, sbVi, rad0, PInit, testf, num_molec_rint, num_part_rint, 
+		sbVj, coag_on, siz_str, wall_on)
 	
 	print('end of coagulation kernel testing part, now moving onto Smoluchowski analytical solution test')
 		

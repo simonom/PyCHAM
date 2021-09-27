@@ -11,7 +11,7 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, tf, sumt):
+							Jlen, tf, sumt, tf_UVC):
 
 	# inputs:-----------------------------------------------------------------------------	
 	# act_flux_path - name of path to file containing known actinic flux (only used if 
@@ -21,6 +21,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# 					absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
 	# tf - the transmission factor (for natural light intensity)
+	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ------------------------------------------------------------------------------------
 	
 	# get solar zenith angle following the equations of 
@@ -112,7 +113,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	if (act_flux_path != 'no'):
 		
 		# call on MCM_photo module to process photolysis files and estimate J values
-		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt)
+		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, tf_UVC)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0

@@ -238,10 +238,19 @@ def retr_out(output_by_sim):
 		rbou_rec = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
 		rbou_rec = []
+
+	try: # in case this output is saved for a given simulation
+		# withdraw consumptions (ug/m3)
+		fname = str(output_by_sim+'/total_concentration_of_injected_components')
+		tot_in_res = np.loadtxt(fname, delimiter=',', skiprows=1) # ug/m3
+	except: # in case not saved, e.g. for older outputs
+		tot_in_res = []
+	
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx, 
+		tot_in_res)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
 	

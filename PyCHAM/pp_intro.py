@@ -156,8 +156,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# append particle and wall concentrations of components to y (molecules/cc (air))
 	y = np.append(y, np.zeros((num_sb*num_comp)))
 	
-	# molar volume of components (multiply y_dens by 1e-3 to convert from kg/m3 to g/cc and give
-	# MV in units cc/mol)
+	# molar volume of components (multiply y_dens by 1e-3 to convert from kg/m3 to g/cm3 and give
+	# MV in units cm3/mol)
 	MV = (y_mw/(y_dens*1.e-3)).reshape(num_comp, 1)
 
 	# number of size bins, excluding wall
@@ -200,7 +200,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					seedxn = seedx*(1.-xwat)
 				
 					# average molar volume of seed components (cc/mol) for all size bins
-					avMV = (sum(seedxn*MV[seedi[:]])+xwat*MV[H2Oi])
+					avMV = (sum(seedxn*MV[seedi[:], 0])+xwat*MV[H2Oi, 0])
 				
 					# total molecular concentration of seed components including water (molecules/cm3) per size bin,
 					# note that volume multiplied by 1e-12 to convert from um3 to cm3
@@ -249,7 +249,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 				
 				# average molar volume of dry (no water) seed components (cc/mol) for all size bins
-				avMV = (sum(seedx*MV[seedi[:]]))
+				avMV = (sum(seedx*MV[seedi[:], 0]))
 				
 				# total molecular concentration of dry (no water) seed components 
 				# including water (molecules/cm3) per size bin, 
@@ -272,7 +272,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			# will try to equilibrate with particles through the ODE solver		
 			
 			# mole-fraction weighted molar volume (cm3/mole) (average molar volume of particles)
-			mfwMV = sum(MV[seedi[:]]*(seedx/sum(seedx)))
+			mfwMV = sum(MV[seedi[:], 0]*(seedx/sum(seedx)))
 			# convert to molecular volume (cm3/molecule)
 			mfwMV = mfwMV/NA
 			# total molecular concentration of seed components per size bin (molecules/cm3)
@@ -290,12 +290,12 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if (num_aasb > 0): # with particles
 		mass_conc = 0. # start cumulation
 		for i in range(num_aasb): # as size bin now account for wall too
-			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:,0]))
+			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:, 0]))
 			mass_conc -= (y_dens[int(H2Oi), 0]*1.e-3)*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
 		mass_conc = mass_conc*1.e12 # convert from g/cc (air) to ug/m3 (air)
 
 	# start counter on number concentration of newly nucleated particles (# particles/cm3(air))
 	np_sum = 0.
-
+	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
 			upper_bin_rad_amp, np_sum, C_p2w)

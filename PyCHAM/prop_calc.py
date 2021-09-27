@@ -175,7 +175,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	Psat_Pa = np.zeros((1, num_comp)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[0, :] = Psat[0, :]
     
-	# convert saturation vapour pressures from Pa to molecules/cc (air) using ideal
+	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
 	# gas law, R has units cc.Pa/K.mol
 	Psat = Psat*(NA/((si.R*1.e6)*TEMP))
 	# now, in preparation for ode solver, repeat over number of size bins
@@ -212,5 +212,5 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 						boiling_points.nannoolal(Pybel_objects[i]))))
 			# convert from log10(atm) to Pa
 			Psat_Pa_rec[i] = (10.**Psat_Pa_rec[i])*101325.
-	
+
 	return(Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC)

@@ -11,15 +11,15 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	seedi, siz_str, cham_env, opri, oari):
+	seedi, siz_str, cham_env, opri, oari, tot_in_res_ft):
 
 	# inputs: ----------------------------------------------------------------------------
 	
 	# filename - name of model variables file
-	# y_mat - species (columns) concentrations with time (rows) (molecules/cc (air))
-	# Nresult_dry  - number concentration of dry particles per size bin (#/cc (air))
-	# Nresult_wet  - number concentration of dry particles per size bin (#/cc (air))
-	# Cfactor - conversion factor to change gas-phase concentrations from molecules/cc 
+	# y_mat - species (columns) concentrations with time (rows) (# molecules/cm3 (air))
+	# Nresult_dry  - number concentration of dry particles per size bin (# particles/cm3 (air))
+	# Nresult_wet  - number concentration of dry particles per size bin (# particles/cm3 (air))
+	# Cfactor - conversion factor to change gas-phase concentrations from # molecules/cm3 
 	# (air) into ppb
 	# testf - flag to show whether in normal mode (0) or test mode (1)
 	# numsb - number of size bins
@@ -34,7 +34,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# time_taken - computer time for entire simulation (s)
 	# seed_name - name of seed component
 	# y_mw - molecular weights (g/mol)
-	# MV - molar volumes (cm3/mol)
+	# MV - molar volumes of all components (cm3/mol)
 	# time_taken - simulation computer time (s)
 	# seed_name - chemical scheme name of component comprising seed particles
 	# x2 - record of size bin radii (um)
@@ -62,6 +62,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# pressure (Pa) and relative humidity
 	# opri - organic peroxy radical indices
 	# oari - organic alkoxy radical indices
+	# tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
 	# ---------------------------------------------------------------
 	
 	
@@ -116,7 +117,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
 	
-	# convert gas-phase concentrations from molecules/cc (air) into ppb
+	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle-phase concentrations as molecules/cc (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
 	
@@ -190,7 +191,11 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	
 		np.savetxt(os.path.join(output_by_sim, 'size_bin_bounds'), rbou_rec, delimiter=',',
 				header=str('particle size bin bounds (um), with size bins represented by columns and their number (starting at 1 and in line with the lower bound) given in second line of header, per time step which is is represented by rows and corresponding times given in the time output file \n'+x2_header))		
-		
+	
+	
+	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), tot_in_res_ft, delimiter=',',
+				header=str('the total concentration (ug/m3) of injected (through initial gas-phase concentration, instantaneous and/or continuous gas-phase influx) components, with component index (relative to all components) in the first row and its cumulative injected concentrations in following rows'))
+
 	# if save name is the default, then remove to ensure no duplication in future
 	if (savefolder == 'default_res_name'):
 		import shutil	

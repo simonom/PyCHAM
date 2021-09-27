@@ -24,7 +24,7 @@ def plotter(caller, dir_path, uc, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, _, _, _, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -195,14 +195,14 @@ def plotter(caller, dir_path, uc, self):
 		# ----------------------------------------------------------------------------------------
 		# total particle number concentration # particles/cm3
 	
-		# include total number concentration (# particles/cc (air)) on contour plot
+		# include total number concentration (# particles/cm3 (air)) on contour plot
 		# first identify size bins with radius exceeding 3nm
 		# empty array for holding total number of particles
 		Nvs_time = np.zeros((Nwet.shape[0]))
 	
 		for i in range(num_asb): # size bin loop
 			Nvs_time[:] += Nwet[:, i] # sum number
-	
+		
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
 		par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
