@@ -14,7 +14,7 @@ import scipy.constants as si
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
-	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb) or tests (2) are the calling module
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
@@ -82,6 +82,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 				# gas-phase concentration (ppb)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
+
+			if (caller == 3): # # molecules/cm3 plot
+			
+				# gas-phase concentration (# molecules/cm3)
+				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
 			
 			if (len(indx_plot) > 1):
 				conc = np.sum(conc, axis=1) # sum multiple components
@@ -102,7 +107,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		if (caller == 0): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		if (caller == 1): # ppb plot
-			ax0.set_ylabel(r'Concentration (ppb)', fontsize = 14)
+			ax0.set_ylabel(r'Mixing ratio (ppb)', fontsize = 14)
+		if (caller == 3): # # molecules/cm3 plot
+			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
+			ax0.set_ylabel(r'Concentration ' + gpunit, fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -119,7 +127,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
-	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb) or tests (2) are the calling module
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI

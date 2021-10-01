@@ -15,8 +15,9 @@ import stat
 from water_calc import water_calc
 
 def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
-				volP, testf, corei, pconc, umansysprop_update, core_dens, spec_namelist,
-				ode_gen_flag, nuci, nuc_comp, num_asb, dens_comp, dens, seed_name):
+			volP, testf, corei, pconc, umansysprop_update, core_dens, spec_namelist,
+			ode_gen_flag, nuci, nuc_comp, num_asb, dens_comp, dens, seed_name,
+			y_mw):
 
 	# inputs: ------------------------------------------------------------
 	# rel_SMILES - array of SMILE strings for components 
@@ -30,7 +31,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# corei - index of seed particle component
 	# pconc - initial number concentration of particles (#/cc (air))
 	# umansysprop_update - marker for cloning UManSysProp so that latest version used
-	# core_dens - density of core material (g/cc (liquid/solid density))
+	# core_dens - density of core material (g/cm3 (liquid/solid density))
 	# spec_namelist - list of component names in chemical equation file
 	# ode_gen_flag - whether or not called from middle or ode_gen
 	# nuci - index of nucleating component
@@ -40,6 +41,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# 	densities
 	# dens - manually assigned densities (g/cc)
 	# seed_name - chemical scheme name(s) of component(s) comprising seed particles
+	# y_mw - molar mass of components (g/mol)
 	# ------------------------------------------------------------
 	
 	
@@ -101,7 +103,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				# liquid density code does not like H2, so manually input kg/m3
 				y_dens[i] = 1.0e3
 			else:
-				# density (convert from g/cc to kg/m3)
+				# density (convert from g/cm3 to kg/m3)
 				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.0E3
 			# ----------------------------------------------------------------------------
 		
@@ -151,6 +153,31 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	Psat = (10.**Psat)*101325. # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
 	Psat[ish] = 0.
+	
+
+	# code for estimating vapour pressures of HOMs following the Eq. 11 of
+	# doi.org/10.5194/acp-20-649-2020
+	indx = 0
+	for name in spec_namelist:
+		if 'api_' in name or 'API_' in name:
+			Ccnt = rel_SMILES[indx].count('C')
+			Ocnt = rel_SMILES[indx].count('O')
+			Ncnt = rel_SMILES[indx].count('N')
+			try:
+				Hi = (Pybel_objects[indx].formula).index('H')
+				Hcnt = -1
+			except:
+				Hcnt = 0.0
+			if (Hcnt == -1):
+				try:
+					Hcnt = float(Pybel_objects[indx].formula[Hi+1:Hi+3])
+				except:
+					Hcnt = float(Pybel_objects[indx].formula[Hi+1:Hi+2])
+			
+			Cstar_to_Pa = ((10.0**(0.18*Ccnt-0.14*Hcnt-0.38*Ocnt+0.80*Ncnt+3.1))*8.314*302.)/(1.e6*y_mw[indx, 0])
+			Psat[0, indx] = Cstar_to_Pa
+		indx += 1
+
 	
 	# for records, estimate and list the pure component saturation vapour 
 	# pressures (Pa) at standard temperature (298.15 K)

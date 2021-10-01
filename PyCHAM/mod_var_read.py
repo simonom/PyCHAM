@@ -69,7 +69,10 @@ def mod_var_read(self):
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 
 			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
-				y0 = [float(i) for i in (value.split(','))]
+				try:
+					y0 = [float(i) for i in (value.split(','))]
+				except:
+					err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
 			
 			if key == 'temperature' and (value.strip()): # chamber temperature (K)
 				temp = [float(i) for i in ((value.strip()).split(','))]

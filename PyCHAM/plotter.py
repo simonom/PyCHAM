@@ -99,8 +99,10 @@ def plotter(caller, dir_path, uc, self):
 			ax0.semilogy(timehr, gp_conc[:, indx_plot[i]], '+',linewidth=4.0, 
 						label=str(str(comp0[i]).strip()))
 			ymax = max(ymax, max(yrec[:, indx_plot[i]]))
-
-		ax0.set_ylabel(r'Gas-phase concentration ' + gpunit, fontsize = 14)
+		if (uc == 1 or uc == 2): # ug/m3 or # molecules/cm3
+			ax0.set_ylabel(r'Gas-phase concentration ' + gpunit, fontsize = 14)
+		if (uc == 0): # ppb
+			ax0.set_ylabel(r'Gas-phase mixing ratio ' + gpunit, fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')

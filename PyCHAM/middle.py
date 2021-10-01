@@ -58,7 +58,7 @@ def middle(): # define function
 	if (erf == 1):
 		yield err_mess
 	
-	# set initial concentrations (molecules/cc)
+	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, seedi, erf, err_mess, NOi, HO2i, NO3i] = init_conc.init_conc(comp_num, 
@@ -75,7 +75,7 @@ def middle(): # define function
 	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		temp[0], H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
-		seed_name)
+		seed_name, y_mw)
 	
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 

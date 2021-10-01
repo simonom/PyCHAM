@@ -113,8 +113,8 @@ def ui_check(self):
 		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
-	if (output_by_sim in self.output_list and em_flag < 2): # in case proposed results folder already on computer hard drive
-		err_mess = str('Error - the proposed results folder path (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num == 1): # in case proposed results folder already on computer hard drive
+		err_mess = str('Error - the proposed path for the results folder (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 

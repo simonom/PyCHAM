@@ -868,6 +868,9 @@ class PyCHAM(QWidget):
 		self.output_list = [] # begin list of output paths
 		
 		# running check on default model variables ---------------------------------------------------------------
+		# let checking module know this is a first call
+		self.chck_num = 1
+
 		import ui_check # module for checking on model variables
 		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
 		ui_check.ui_check(self)
@@ -985,17 +988,18 @@ class PyCHAM(QWidget):
 
 		# gas-phase concentrations temporal profiles -------------
 		
-		# button to plot temporal profile of gas-phase concentrations in ug/m3
-		self.b206 = QPushButton(str('Gas-phase concentrations ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
+		# button to plot temporal profile of gas-phase concentrations
+		self.b206 = QPushButton(str('Gas-phase concentrations'), self)
 		self.b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
 		self.b206.clicked.connect(self.on_click206)
 		self.PRIMlayout.addWidget(self.b206, 3, 0)
 		
-		# button to plot temporal profile of gas-phase concentrations in ppb
-		self.b206ppb = QPushButton(str('Gas-phase concentrations (ppb)'), self)
-		self.b206ppb.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
-		self.b206ppb.clicked.connect(self.on_click206ppb)
-		self.PRIMlayout.addWidget(self.b206ppb, 3, 1)
+		# drop down button for units
+		self.b206b = QComboBox(self)
+		self.b206b.addItem('ppb')
+		self.b206b.addItem(str(u'\u03BC' + 'g/m' +u'\u00B3'))
+		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3'))
+		self.PRIMlayout.addWidget(self.b206b, 3, 1, 1, 1)
 
 		# particle-phase concentrations temporal profiles -------------
 
@@ -1959,8 +1963,14 @@ class PyCHAM(QWidget):
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
 				pk.close() # close pickle file
 			
+			# let check know this is a second call
+			self.chck_num = 2
+
 			# run another check on inputs - means any changes made by default are set
 			import ui_check; ui_check.ui_check(self)
+
+			# reset check number to a first call
+			self.chck_num = 1
 
 			# saving path - copied from saving module
 			dir_path = os.getcwd() # current working directory
@@ -2261,7 +2271,7 @@ class PyCHAM(QWidget):
 
 		plotter.plotter(0, dir_path, uc, self) # plot results
 	
-	@pyqtSlot() # button to plot gas-phase concentration (ug/m3) temporal profile
+	@pyqtSlot() # button to plot gas-phase concentration temporal profile
 	def on_click206(self):	
 		
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
@@ -2270,25 +2280,23 @@ class PyCHAM(QWidget):
 		# get names of components to plot
 		comp_names = [str(i) for i in self.e205.text(). split(',')]
 		
+		gp_units = self.b206b.currentText() # gas-phase concentration units
+		
+		# convert units into number option
+		if (gp_units[0] == 'p'):
+			caller = 1
+		if (gp_units[1] == 'g'):
+			caller = 0
+		if (gp_units[2] == 'm'):
+			caller = 3
+
 		import plotter_gp
 		dir_path = self.l201.text() # name folder with results
 		if (dir_path[-4::] != '.nc'):
-			plotter_gp.plotter(0, dir_path, comp_names, self) # plot results
+			plotter_gp.plotter(caller, dir_path, comp_names, self) # plot results
 		if (dir_path[-3::] == '.nc'):
-			plotter_gp.plotter_noncsv(0, dir_path, comp_names, self) # plot results
+			plotter_gp.plotter_noncsv(caller, dir_path, comp_names, self) # plot results
 	
-	@pyqtSlot() # button to plot gas-phase concentration (ppb) temporal profile
-	def on_click206ppb(self):	
-		
-		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
-		self.l203a.setText('')
-		
-		# get names of components to plot
-		comp_names = [str(i) for i in self.e205.text().split(',')]
-		
-		import plotter_gp
-		dir_path = self.l201.text() # name folder with results
-		plotter_gp.plotter(1, dir_path, comp_names, self) # plot results
 	
 	# button to plot total particle-phase concentration for individual components temporal profile
 	@pyqtSlot()
