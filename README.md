@@ -291,8 +291,11 @@ Particle mass concentration (whether total of all components or excluding certai
 
 ## Frequently Asked Questions
 
-Why does PyCHAM crash without an error message?
+**Why does PyCHAM crash without an error message?**
 This has been observed using the conda install on a Windows 10 operating system with a Intel(R) Core(TM) i7-8500y CPU @ 1.50Ghz processor with processor speed 1400 MHz.  Checking the Event Viewer application on Windows, under the Windows Logs/Application tab, showed that libblas was crashing.  To correct, the PyCHAM virtual environment was activated in the command line, then from the command line conda was used to uninstall libblas and its dependents, then conda was used to install libblas again followed by its dependents.  This solved the issue.
+
+**How are seed component concentrations initialised?**
+The concentration of seed particles is based on the seed particle properties supplied by the user in the model variable file.  The molar volume (cm3/mol) of the seed component is calculated using: (g/mol)/(g/cm3) or (molar mass)/(component density), where density is estimated from the Girolami method of UManSysProp.  The volume of seed particles per size bin is calculated from the number size distribution stated in the model variable file.  Seed particle volumes per size bin are then divided by the molar volume of seed components to estimate the concentration of the seed components per size bin: # molecules/cm3 (seed components per size bin) = (cm3/cm3 (seed particle per size bin)/(cm3/mol) (seed components))*Avogadro's constant.
 
 ## Acknowledgements
 This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No 730997.  Simon O'Meara received funding support from the Natural Environment Research Council through the National Centre for Atmospheric Science.
