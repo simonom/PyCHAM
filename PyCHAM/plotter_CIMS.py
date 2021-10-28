@@ -25,7 +25,7 @@ def plotter_CIMS(dir_path, res_in, tn, iont, sens_func):
 	# includes wall if wall turned on
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, RO2i, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, RO2i, _, _) = retr_out.retr_out(dir_path)
 	
 	# convert to 2D numpy array
 	y_MW = np.array((y_MW)).reshape(-1, 1)

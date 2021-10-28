@@ -19,7 +19,6 @@ def middle(): # define function
 	# ---------------------------------------------------------------
 	
 	# get required inputs
-	
 	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
 		comp0, y0, temp, tempt, RH, RHt, Pnow, wall_on,
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
@@ -32,8 +31,9 @@ def middle(): # define function
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
-		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = ui.share()
-	
+		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+		testf, chamSA, chamV] = ui.share()
+
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
 	[rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, 
@@ -41,7 +41,8 @@ def middle(): # define function
 	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, rel_SMILES, 
+	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, 
+	HOMRO2_indx, rel_SMILES, 
 	Pybel_objects, eqn_num, comp_namelist, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
@@ -54,7 +55,15 @@ def middle(): # define function
 	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac, sav_nam,
 	pcont)
 	
-	# if error raised, then tell GUI to display and to stop programme
+	# if needed then run operations to produce variable checker plot 
+	# from the simulate tab
+	if (testf >= 4):
+		import var_checker
+		[err_mess, erf] = var_checker.var_checker(testf, light_stat, light_time, daytime, lat, 
+			lon, temp, tempt, tot_time, af_path, dayOfYear, photo_path, Jlen, tf, 
+			tf_UVC, update_stp, err_mess, erf)
+	
+	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
 		yield err_mess
 	
@@ -65,7 +74,8 @@ def middle(): # define function
 	comp0, y0, temp[0], RH, Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, 
 	save_step, rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
-	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES)
+	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
+	RO2_indx, HOMRO2_indx, rstoi_g, pstoi_g)
 
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):
@@ -79,10 +89,13 @@ def middle(): # define function
 	
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
-		R_gas, NA, diff_vol, Dstar_org] = partit_var_prep.prep(y_mw, 
-		temp[0], num_comp, 0, Cw, act_comp, act_user, accom_comp, 
+		R_gas, NA, diff_vol, Dstar_org, err_mess] = partit_var_prep.prep(y_mw, 
+		temp[0], num_comp, testf, Cw, act_comp, act_user, accom_comp, 
 		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow, 
 		Pybel_objects, comp_smil)
+
+	if (err_mess != ''): # if error raised or in testing mode then stop
+		yield err_mess
 	
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
@@ -128,7 +141,8 @@ def middle(): # define function
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 		HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
-		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC):
+		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, 
+		chamV):
 
 		yield prog # update progress bar	
 

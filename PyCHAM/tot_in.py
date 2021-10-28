@@ -52,7 +52,7 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw, con_infl_nam,
 			Compti.append(tot_in_res_indx.index(comp_namelist.index(cnam)))
 			continue
 		else:
-			Compti.append(len(tot_in_res_nam))
+			Compti.append(len(tot_in_res_indx))
 			tot_in_res_indx.append(comp_namelist.index(cnam))
 			tot_in_res_con.append(0.)
 

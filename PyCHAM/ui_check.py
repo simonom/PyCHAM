@@ -33,7 +33,8 @@ def ui_check(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		tf_UVC, testf, chamV] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -82,6 +83,7 @@ def ui_check(self):
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient
 	#	below which partitioning treated as negligible, e.g. because a 
 	#	size bin has relatively very small surface area
+	# testf - flag for testing and plotting checks of inputs
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -441,7 +443,7 @@ def ui_check(self):
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, tf_UVC]
+			z_prt_coeff, tf_UVC, testf, chamV]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

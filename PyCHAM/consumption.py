@@ -19,7 +19,8 @@ def cons(comp_chem_schem_name, dir_path, self, caller):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_mw, Nwet, comp_names, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, seedi, _, _, _, tot_in_res) = retr_out.retr_out(dir_path)
+		comp0, _, PsatPa, OC, H2Oi, seedi, _, _, _, tot_in_res, 
+		_) = retr_out.retr_out(dir_path)
 
 	try:
 		# get index of component of interest

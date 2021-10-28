@@ -180,9 +180,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 			tnew = tnew*0.9
 			# photochemical rate after proposed time step
 			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
-			Jt =1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
+			Jt = 1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
 			bc_red = 1
-
+			
 	# check on updates to temperature (K) --------------------------------------	
 	if (len(temp) > 1): # because a temperature must be given for experiment start
 	
@@ -476,7 +476,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# if automatic time step adaption to nucleation requested, check whether number of new particles
 	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
 	# the specified nucleation event has not yet reached its defined finishing particle number
-	# concentration (#/cc (air))
+	# concentration (# particles/cm3 (air))
 	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-wall_on) > 0)):
 	
 		# the time step (s) needed to increase number concentration of nucleated particles by 10 %

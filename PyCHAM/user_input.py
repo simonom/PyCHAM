@@ -26,12 +26,13 @@ def share():
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		tf_UVC, testf, chamV] = pickle.load(pk)
 		pk.close()
 		
 		
 		# convert chamber surface area (m2) to spherical equivalent radius (m)
-		# (below eq. 2 in Charan (2018))
+		# (below eq. 2 in Charan et al. 2018, doi.org/10.1080/02786826.2018.1474167)
 		chamR = (chamSA/(4.*np.pi))**0.5
 
 	return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
@@ -45,4 +46,5 @@ def share():
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, inname,
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+		testf, chamSA, chamV)

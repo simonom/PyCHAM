@@ -29,7 +29,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# corei - index of seed particle component
-	# pconc - initial number concentration of particles (#/cc (air))
+	# pconc - initial number concentration of particles (# particles/cm3 (air))
 	# umansysprop_update - marker for cloning UManSysProp so that latest version used
 	# core_dens - density of core material (g/cm3 (liquid/solid density))
 	# spec_namelist - list of component names in chemical equation file
@@ -39,7 +39,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# num_asb - number of actual size bins (excluding wall)
 	# dens_comp - chemical scheme names of components with manually assigned 
 	# 	densities
-	# dens - manually assigned densities (g/cc)
+	# dens - manually assigned densities (g/cm3)
 	# seed_name - chemical scheme name(s) of component(s) comprising seed particles
 	# y_mw - molar mass of components (g/mol)
 	# ------------------------------------------------------------
@@ -93,7 +93,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			
 			# density estimation ---------------------------------------------------------
 			if (i == H2Oi): # liquid-phase density of water
-				y_dens[i] = 1.*1.E3 # (kg/m3 (particle))
+				y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
 				continue
 			# core component properties
 			if (i == corei[0]): # density of core
@@ -101,10 +101,10 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				continue
 			if rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
-				y_dens[i] = 1.0e3
+				y_dens[i] = 1.e3
 			else:
 				# density (convert from g/cm3 to kg/m3)
-				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.0E3
+				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
 			# ----------------------------------------------------------------------------
 		
 	# account for any manually assigned component densities (kg/m3)
@@ -113,6 +113,13 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			# index of component in list of components
 			dens_indx = spec_namelist.index(dens_comp[i])
 			y_dens[dens_indx] = dens[i]
+
+	# for records (e.g. plotting volatility basis set), 
+	# estimate and list the pure component saturation vapour 
+	# pressures (Pa) at standard temperature (298.15 K), though note that
+	# any manually assigned vapour pressures overwrite these later in
+	# this module
+	Psat_Pa_rec = np.zeros((num_comp))
 	
 	# estimate vapour pressures (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
@@ -133,14 +140,43 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		# and water not included in Pybel_objects
 		if (i == H2Oi):
 			Psat[0, i] = Psat_water
+			if (TEMP == 298.15):
+				Psat_Pa_rec[i] = Psat[0, i]
+			else:
+				[_, Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
 			OC[0, i] = 0.
 			continue
 		
-		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
-		# that equation given by eq. 7 of same reference)
-		Psat[0, i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
+		if (spec_namelist[i] == 'O3'):
+			# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
+			Psat[0, i] =  np.log10((8.25313-(814.941587/TEMP)-0.001966943*TEMP)*1.31579e-3)
+			if (TEMP == 298.15):
+				Psat_Pa_rec[i] = Psat[0, i]
+			else:
+				Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
+			OC[0, i] = 0.
+			continue
+
+		# use EVAPORATION method for vapour pressure (log10(atm)) of HOMs
+		if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:	
+			Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], TEMP, boiling_points.nannoolal(Pybel_objects[i]))))
+			
+			if (TEMP == 298.15):
+				Psat_Pa_rec[i] = Psat_Pa[0, i]
+			else: 
+				Psat_Pa_rec[i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], 298.15, boiling_points.nannoolal(Pybel_objects[i]))))
+		else:
+			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
+			# that equation given by eq. 7 of same reference)
+			Psat[0, i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
 						boiling_points.nannoolal(Pybel_objects[i]))))
-		
+			
+			if (TEMP == 298.15):
+				Psat_Pa_rec[i] = Psat_Pa[0, i]
+			else: 
+				Psat_Pa_rec[i] = ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
+						boiling_points.nannoolal(Pybel_objects[i]))))
+
 		# O:C ratio determined from SMILES string
 		if (rel_SMILES[i].count( 'C') > 0):
 			OC[0, i] = (rel_SMILES[i].count( 'O'))/(rel_SMILES[i].count( 'C'))
@@ -151,37 +187,9 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	ish = (Psat == 0.)
 	
 	Psat = (10.**Psat)*101325. # convert to Pa from atm
+	Psat_Pa_rec = (10.**Psat_Pa_rec)*101325 # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
 	Psat[ish] = 0.
-	
-
-	# code for estimating vapour pressures of HOMs following the Eq. 11 of
-	# doi.org/10.5194/acp-20-649-2020
-	indx = 0
-	for name in spec_namelist:
-		if 'api_' in name or 'API_' in name:
-			Ccnt = rel_SMILES[indx].count('C')
-			Ocnt = rel_SMILES[indx].count('O')
-			Ncnt = rel_SMILES[indx].count('N')
-			try:
-				Hi = (Pybel_objects[indx].formula).index('H')
-				Hcnt = -1
-			except:
-				Hcnt = 0.0
-			if (Hcnt == -1):
-				try:
-					Hcnt = float(Pybel_objects[indx].formula[Hi+1:Hi+3])
-				except:
-					Hcnt = float(Pybel_objects[indx].formula[Hi+1:Hi+2])
-			
-			Cstar_to_Pa = ((10.0**(0.18*Ccnt-0.14*Hcnt-0.38*Ocnt+0.80*Ncnt+3.1))*8.314*302.)/(1.e6*y_mw[indx, 0])
-			Psat[0, indx] = Cstar_to_Pa
-		indx += 1
-
-	
-	# for records, estimate and list the pure component saturation vapour 
-	# pressures (Pa) at standard temperature (298.15 K)
-	Psat_Pa_rec = np.zeros((num_comp))
 	
 	# list to remember which components have vapour pressures specified
 	vi_rec = []
@@ -209,35 +217,4 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	if (num_asb > 0):
 		Psat = np.repeat(Psat, num_asb, axis=0)
 	
-	
-	if (TEMP == 298.15):
-		Psat_Pa_rec[:] = Psat_Pa[0, :]
-	else:
-		# estimate vapour pressures (log10(atm))
-		for i in range (num_comp):
-		
-			# if vapour pressure manually specified then continue, as
-			# these accounted for above
-			if i in vi_rec:
-				continue
-		
-			if (i == corei[0]): # if this component is 'core'
-				# core component not included in Pybel_objects, continuing
-				# here means its vapour pressure is 0 Pa, which is fine, if a 
-				# different vapour pressure is specified it is accounted for below
-				continue
-		
-			if (i == H2Oi): # water vapour pressure
-				[_, Psat_water, _] = water_calc(298.15, 0.5, si.N_A)
-				# convert to Pa and store
-				Psat_Pa_rec[i] = (10.**Psat_water)*101325.
-				continue # water not included in Pybel_objects
-		
-			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
-			# that equation given by eq. 7 of same reference)
-			Psat_Pa_rec[i] = ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
-						boiling_points.nannoolal(Pybel_objects[i]))))
-			# convert from log10(atm) to Pa
-			Psat_Pa_rec[i] = (10.**Psat_Pa_rec[i])*101325.
-
 	return(Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC)

@@ -85,11 +85,11 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# create folder to store copies of inputs
 	os.makedirs(str(output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
-	output_by_sim_ext = str(output_by_sim+'/inputs/'+sch_name.split('/')[-1])
-	copyfile(sch_name, output_by_sim_ext)
-	output_by_sim_ext = str(output_by_sim+'/inputs/'+inname.split('/')[-1])
+	output_by_sim_sch_ext = str(output_by_sim+'/inputs/'+sch_name.split('/')[-1])
+	copyfile(sch_name, output_by_sim_sch_ext)
+	output_by_sim_mv_ext = str(output_by_sim+'/inputs/'+inname.split('/')[-1])
 	if (inname != 'Default'): # if not in default model variables mode 
-		copyfile(inname, output_by_sim_ext)
+		copyfile(inname, output_by_sim_mv_ext)
 	
 	# saving dictionary
 	# dictionary containing variables for model and components
@@ -112,6 +112,8 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = seedi.tolist()
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
+	const["output_by_sim_sch_ext"] = output_by_sim_sch_ext
+	const["output_by_sim_mv_ext"] = output_by_sim_mv_ext
 
 	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():
@@ -163,10 +165,11 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# and save the tendency record for each of these (%/hour)
 	if (len(dydt_vst) > 0):
 		compind = 0
+		dydtnames = dydt_vst['comp_names'] # get names of tracked components
 		# loop through components to record the tendency of change \n')
-		for compi in dydt_vst.get('comp_index'):
+		for comp_name in dydtnames:
 			# open relevant dictionary value, to get the 2D numpy array for saving
-			dydt_rec = np.array(dydt_vst.get(compi))
+			dydt_rec = np.array(dydt_vst[str(str(comp_name) + '_res')])
 			
 			# get user-input name of this component
 			comp_name = str(dydt_trak[compind] +'_rate_of_change')

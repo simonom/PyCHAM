@@ -27,7 +27,8 @@ def mod_var_read(self):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+			tf_UVC, testf, chamV] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -42,14 +43,15 @@ def mod_var_read(self):
 
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 			
+			# ----------------------------------------------------
 			# if commented out continue to next line
-			if  (in_list[i][0] == '#'):
+			if (in_list[i][0] == '#'):
 				continue
 			
 			key, value = in_list[i].split('=') # split values from keys
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
-
+			# ----------------------------------------------------
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
 				
@@ -106,6 +108,12 @@ def mod_var_read(self):
 				except:
 					kw = np.zeros((1))
 					kw[0] = kw_in
+
+			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
+				chamSA = float(value.strip())
+
+			if key == 'chamV' and (value.strip()): # chamber volume (m3)
+				chamV = float(value.strip())
 
 			if key == 'size_structure' and (value.strip()): # the size structure
 				siz_stru = int(value.strip())
@@ -475,7 +483,8 @@ def mod_var_read(self):
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
 				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
+				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+				testf, chamV]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

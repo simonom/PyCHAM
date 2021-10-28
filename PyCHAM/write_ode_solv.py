@@ -321,14 +321,14 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		
 	if (wall_on > 0): # include gas-wall partitioning in ode solver
 		f.write('		# gas-wall partitioning ----------------\n')
-		f.write('		# concentration on wall (molecules/cc (air))\n')
+		f.write('		# concentration on wall (# molecules/cm3 (air))\n')
 		f.write('		Csit = y[num_comp*(num_asb+1):num_comp*(num_asb+2), 0]\n')
 		f.write('		# saturation vapour pressure on wall (molecules/cc (air))\n')
 		f.write('		# note, just using the top rows of Psat and act_coeff\n')
 		f.write('		# as do not need the repetitions over size bins\n')
 		f.write('		if (Cw > 0.):\n')
 		f.write('			Csit = Psat[0, :]*(Csit/Cw)*act_coeff[0, :]\n')
-		f.write('			# rate of transfer (molecules/cm3/s)\n')
+		f.write('			# rate of transfer (# molecules/cm3/s)\n')
 		f.write('			dd_all = kw*(y[0:num_comp, 0]-Csit)\n')
 		f.write('			dd[0:num_comp, 0] -= dd_all # gas-phase change\n')
 		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1), 0] += dd_all # wall change\n')

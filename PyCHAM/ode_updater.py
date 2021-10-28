@@ -59,7 +59,8 @@ def ode_updater(update_stp,
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 	HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
-	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC):
+	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, 
+	chamV):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -154,7 +155,7 @@ def ode_updater(update_stp,
 	#	of chamber air
 	# Vbou - volume boundary of size bins (um3)
 	# N_perbin - number concentration of particles per size bin 
-	#	(#/cc (air))
+	#	(# particles/cm3 (air))
 	# Vol0 - initial single particle volumes per size bin (um3)
 	# rad0 - initial radius at particle centres (um)
 	# np_sum - number concentration of newly nucleated particles 
@@ -264,7 +265,8 @@ def ode_updater(update_stp,
 	# cont_inf_i - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# tf_UVC - transmission factor for 254 nm wavelength light
-
+	# chamSA - chamber surface area (m2)
+	# chamV - chamber volume (m3)
 	# ------------------------------------------------------------
 
 	# start timer
@@ -310,6 +312,14 @@ def ode_updater(update_stp,
 	comp_namelist_np = np.array(comp_namelist) # numpy array version of chemical scheme names
 	save_cnt_chck = 1 # counting recording steps for time interval check
 	
+	# find out what to do with the gas-wall partitioning coefficient
+	if (kw == -1):
+		kwf = -1 # Huang et al. 2018 treatment
+	else:
+		# standard PyCHAM (GMD paper) treatment with same gas-wall 
+		# partitioning coefficient for all components
+		kwf = kw
+		
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are recorded below
@@ -332,7 +342,7 @@ def ode_updater(update_stp,
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
-	cont_inf_i, tot_in_res_indx, tf_UVC)
+	cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, chamV, kwf)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -414,13 +424,13 @@ def ode_updater(update_stp,
 				ic_red = 1
 			# ------------------------------------------------------------------		
 			
-			if ((num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if particles present
+			if ((num_sb-wall_on) > 0 or wall_on == 1): # if particles present
 			
 				# update partitioning variables
-				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
+				[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
 				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-				Pnow, DStar_org, z_prt_coeff)
+				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf)
 			
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
@@ -460,7 +470,7 @@ def ode_updater(update_stp,
 						dydt_cnt = save_cnt-1
 					
 					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-					# estimate and record any change tendencies (molecules/cm3/s) resulting from these processes
+					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
 					dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
 						dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 						kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist)

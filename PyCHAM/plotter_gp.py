@@ -10,6 +10,7 @@ import os
 import retr_out
 import numpy as np
 import scipy.constants as si
+import pybel
 
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
@@ -24,7 +25,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path)
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
@@ -32,7 +33,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
-	if (caller == 0):
+	if (caller == 0 or caller == 1 or caller == 3):
 		plt.ion() # show results to screen and turn on interactive mode
 		
 	# prepare plot
@@ -50,8 +51,17 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				indx_plot = (np.array((group_indx['RO2i'])))
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
-				
-			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'):
+			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
+				indx_plot = []
+				cindn = 0 # number of components
+				for cind in comp_names:
+					if 'API_' in cind or 'api_' in cind:
+						if 'RO2' in cind:
+							indx_plot.append(cindn)
+					cindn += 1
+				indx_plot = np.array(indx_plot)
+
+			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
 					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
@@ -92,7 +102,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = np.sum(conc, axis=1) # sum multiple components
 			
 			# plot this component
-			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'): # if not the sum of organic peroxy radicals
+			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'): # if not the sum of organic peroxy radicals
 				# log10 y axis
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				# linear y axis
@@ -104,6 +114,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
 				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
 
+			if (comp_names_to_plot[i].strip() == 'HOMRO2'): # if is the sum of HOM organic peroxy radicals
+				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
+
 		if (caller == 0): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		if (caller == 1): # ppb plot
@@ -111,6 +124,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		if (caller == 3): # # molecules/cm3 plot
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
 			ax0.set_ylabel(r'Concentration ' + gpunit, fontsize = 14)
+
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -119,10 +133,88 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 
-	if (caller <= 2): # display
+	if (caller == 2): # display
 		plt.show()	
 
 	return()
+
+
+# for time series of the average organic peroxy radical molecule
+def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
+	
+	# inputs: ------------------------------------------------------------------
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
+	# dir_path - path to folder containing results files to plot
+	# comp_names_to_plot - chemical scheme names of components to plot
+	# self - reference to GUI
+	# --------------------------------------------------------------------------
+
+	# chamber condition ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
+		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path)
+	
+	y_MW = np.array(y_MW) # convert to numpy array from list
+	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+
+	if (caller == 0):
+		plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+
+	# get RO2 indices		
+	indx_plot = (np.array((group_indx['RO2i'])))
+
+	# gas-phase concentration (# molecules/cm3)
+	conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
+
+	# sum of concentrations (# molecules/cm3)
+	conc_sum = np.sum(conc, axis = 1)
+
+	# get SMILES of RO2 componenets
+	rel_SMILES = rel_SMILES[indx_plot]
+
+	# number of carbons and oxygens in each component
+	Ccnt = []
+	Ocnt = []
+	Hcnt = []
+	for i in rel_SMILES:
+		Ccnt.append(i.count('C')+i.count('c'))
+		Ocnt.append(i.count('O'))
+		# generate pybel object
+		Pybel_object = pybel.readstring('smi', i)
+		try:
+			Hi = (Pybel_objects[indx].formula).index('H')
+			Hcnt = -1
+		except:
+			Hcnt = 0.0
+		if (Hcnt == -1):
+			try:
+				Hcnt.append(float(Pybel_objects[indx].formula[Hi+1:Hi+3]))
+			except:
+				Hcnt.append(float(Pybel_objects[indx].formula[Hi+1:Hi+2]))
+	Ccnt = np.tile(((np.array((Ccnt))).reshape(1, -1)), (conc.shape[0], 1))
+	Ocnt = np.tile(((np.array((Ocnt))).reshape(1, -1)), (conc.shape[0], 1))
+	Hcnt = np.tile(((np.array((Hcnt))).reshape(1, -1)), (conc.shape[0], 1))
+	
+	# average carbon number of organic peroxy radicals (RO2) in gas-phase at each time step
+	Cav_cnt = ((np.sum(Ccnt*conc, axis = 1))/conc_sum)
+	# average oxygen number of organic peroxy radicals (RO2) in gas-phase at each time step
+	Oav_cnt = ((np.sum(Ocnt*conc, axis = 1))/conc_sum)
+	# average hydrogen number of organic peroxy radicals (RO2) in gas-phase at each time step
+	Hav_cnt = ((np.sum(Hcnt*conc, axis = 1))/conc_sum)
+
+	ax0.plot(timehr, Cav_cnt, '-+', linewidth = 4., label = 'Carbon number')
+	ax0.plot(timehr, Oav_cnt, '-+', linewidth = 4., label = 'Oxygen number')
+	ax0.plot(timehr, Hav_cnt, '-+', linewidth = 4., label = 'Hydrogen number')
+	
+	ax0.set_ylabel(r'Average number of atoms per RO2 molecule', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
 
 def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 	

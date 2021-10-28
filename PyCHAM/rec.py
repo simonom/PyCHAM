@@ -30,7 +30,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# nreac - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
-	# pconc - particle concentrations now (#/cc (air))
+	# pconc - particle concentrations now (# particles/cm3 (air))
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
 	#	(molecules/cm3 (air))

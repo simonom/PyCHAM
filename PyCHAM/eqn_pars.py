@@ -23,7 +23,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
 	# chem_sch_mrk - markers to identify different sections of 
-	# 			the chemical scheme
+	# 	the chemical scheme
 	# xml_name - name of xml file
 	# photo_path - path to file containing absorption 
 	# 	cross-sections and quantum yields
@@ -138,6 +138,9 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# get index of components in the peroxy radical list
 	RO2_indx = RO2_indices.RO2_indices(comp_namelist, RO2_names)
 	
+	# get index of HOM-RO2 radicals
+	HOMRO2_indx = RO2_indices.HOMRO2_indices(comp_namelist)
+	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(photo_path)
 
@@ -145,8 +148,9 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx, 
-		comp_list, Pybel_objects, eqn_num, comp_namelist, Jlen, 
+		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx, RO_indx,
+		HOMRO2_indx, comp_list, 
+		Pybel_objects, eqn_num, comp_namelist, Jlen, 
 		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 		nreac_aq, nprod_aq, jac_stoi_aq, 
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				

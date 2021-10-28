@@ -127,7 +127,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
 		
 		# listing input files -----------------------------------------------------------
 		l1 = QLabel(self)
@@ -255,6 +255,12 @@ class PyCHAM(QWidget):
 		self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l13_2a, gen_row+7, 1)
 		
+		l13_2 = QLabel(self)
+		l13_2.setText('Absolute and relative integration \ntolerances: ')
+		self.varbox.addWidget(l13_2, gen_row+7, 0)
+		self.l13_2a = QLabel(self)
+		self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.varbox.addWidget(self.l13_2a, gen_row+7, 1)
 		
 		# Chamber Environment ----------
 		
@@ -739,27 +745,34 @@ class PyCHAM(QWidget):
 		self.l66a = QLabel(self)
 		self.l66a.setText((str(chamSA)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l66a, wall_row+8, 1)
+
+		l66aa = QLabel(self)
+		l66aa.setText('Chamber volume (m3) : ')
+		self.varbox.addWidget(l66aa, wall_row+9, 0)
+		self.l66aaa = QLabel(self)
+		self.l66aaa.setText((str(chamV)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.varbox.addWidget(self.l66aaa, wall_row+9, 1)
 		
 		l67 = QLabel(self)
 		l67.setText('Whether particle deposition to \nwall treated by Rader and \nMcMurry (1) or customised (0): ')
-		self.varbox.addWidget(l67, wall_row+9, 0)
+		self.varbox.addWidget(l67, wall_row+10, 0)
 		self.l67a = QLabel(self)
 		self.l67a.setText((str(Rader)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-		self.varbox.addWidget(self.l67a, wall_row+9, 1)
+		self.varbox.addWidget(self.l67a, wall_row+10, 1)
 		
 		l68 = QLabel(self)
 		l68.setText('Average number of charges per \nparticle (/particle): ')
-		self.varbox.addWidget(l68, wall_row+10, 0)
+		self.varbox.addWidget(l68, wall_row+11, 0)
 		self.l68a = QLabel(self)
 		self.l68a.setText((str(p_char)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-		self.varbox.addWidget(self.l68a, wall_row+10, 1)
+		self.varbox.addWidget(self.l68a, wall_row+11, 1)
 		
 		l69 = QLabel(self)
 		l69.setText('Average electric field inside chamber \n(g.m/A.s3): ')
-		self.varbox.addWidget(l69, wall_row+11, 0)
+		self.varbox.addWidget(l69, wall_row+12, 0)
 		self.l69a = QLabel(self)
 		self.l69a.setText((str(e_field)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-		self.varbox.addWidget(self.l69a, wall_row+11, 1)
+		self.varbox.addWidget(self.l69a, wall_row+12, 1)
 		
 		# specific component properties ----------------------
 		
@@ -841,16 +854,27 @@ class PyCHAM(QWidget):
 		# --------------------------------------------------------------------
 		# label to let user know preparedness of simulation - displayed text updated in ui_check module below
 		self.l80 = ScrollLabel(self)
-		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 2)
+		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 3)
 		self.bd_st = 2 # border status
 
 		# --------------------------------------------------------------------
-		# button to let users view the provided number size distributions of particles
-		self.b80 = QPushButton('Particle Number Size Distributions', self)
-		self.b80.setToolTip('See the seed particle number size distributions to be used')
-		self.b80.clicked.connect(self.on_clickb80)
-		self.NSlayout.addWidget(self.b80, 4, self.mvpn+2, 1, 1)
+		# drop down button to let users view a variety of variables 
+		# determined by model variables
+		self.b80s = QComboBox(self)
+		self.b80s.addItem('Photolysis rates')
+		self.b80s.addItem('Particle number size distributions')
+		self.b80s.addItem('Gas-phase diffusion coefficients')
+		self.b80s.addItem('Gas-phase mean thermal speeds')
+		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
 		
+		# button to run checks on variables selected in drop down button
+		self.b80 = QPushButton('Check Values', self)
+		self.b80.setToolTip('See the values of the variables selected in the drop down button to the left')
+		self.b80.clicked.connect(self.on_clickb80)
+		self.NSlayout.addWidget(self.b80, 7, self.mvpn+2, 1, 1)
+
+		# -------------------------------------------------------------------
+
 		# label to let users know file combinations included in batch
 		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
 		# begin count on number of simulations in batch
@@ -872,7 +896,8 @@ class PyCHAM(QWidget):
 		self.chck_num = 1
 
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
+		# check on inputs - note this loads the last saved pickle file and saves 
+		# any change to this pickle file
 		ui_check.ui_check(self)
 		# finished check on model variables -------------------------------------------------------------------------
 		
@@ -1054,7 +1079,7 @@ class PyCHAM(QWidget):
 		self.e217.setStyleSheet('qproperty-cursorPosition : 0')
 		self.SEClayout.addWidget(self.e217, 0, 0, 1, 1)
 		
-		# input bar for names of components to plot change tendencies
+		# input bar for top number of reactions to consider
 		self.e217a = QLineEdit(self)
 		self.e217a.setText('Provide the number of chemical reactions to plot (arranged in descending order)')
 		self.e217a.setStyleSheet('qproperty-cursorPosition : 0')
@@ -1079,46 +1104,30 @@ class PyCHAM(QWidget):
 		self.b218aaa.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3' + '/s'))
 		self.SEClayout.addWidget(self.b218aaa, 1, 3, 1, 1)
 
-		# horizontal separator line -------------------------------
-		self.separatorLine2 = QFrame()
-		self.separatorLine2.setFrameShape(QFrame.HLine)
-		self.separatorLine2.setFrameShadow(QFrame.Raised)
-		self.SEClayout.addWidget(self.separatorLine2, 2, 0, 1, 3)
-		self.separatorLine2.show()
+		# input bar for time period to consider production over
+		self.e217aa = QLineEdit(self)
+		self.e217aa.setText('Time to start production calculation at (hours), time to finish production calculation at (hours)')
+		self.e217aa.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e217aa, 2, 0, 1, 1)
 
-		# ---------------------------------------------------------
-		
-		# input bar for atom or functional group to plot contributions from
-		self.e218a = QLineEdit(self)
-		self.e218a.setText('Provide the SMILES names of atoms or functional groups for plotting component contributions (use RO2 for organic peroxy radicals)')
-		self.e218a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218a, 3, 0)
-		
-		# input bar for top number of components containing the relevant atom or functional groups
-		self.e218b = QLineEdit(self)
-		self.e218b.setText('Provide the number of components (in descending order) containing the atom/functional group to plot')
-		self.e218b.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218b, 3, 2)
-		
-		# button to plot temporal profile of component contributions
-		self.b218b = QPushButton('Plot component contributions (mole fraction)', self)
-		self.b218b.setToolTip('Plot the contributions to this atom/functional group by component (mole fraction)')
-		self.b218b.clicked.connect(self.on_click218b)
-		self.SEClayout.addWidget(self.b218b, 4, 2, 1, 1)
+		# button to estimate production integrated over stated period 
+		self.b218ab = QPushButton('Production over this period', self)
+		self.b218ab.setToolTip('Show production integrated over stated time period in the message box above')
+		self.b218ab.clicked.connect(self.on_click218ab)
+		self.SEClayout.addWidget(self.b218ab, 2, 2)
 
 		# horizontal separator line -------------------------------
 		self.separatorLine3 = QFrame()
 		self.separatorLine3.setFrameShape(QFrame.HLine)
 		self.separatorLine3.setFrameShadow(QFrame.Raised)
-		self.SEClayout.addWidget(self.separatorLine3, 5, 0, 1, 3)
+		self.SEClayout.addWidget(self.separatorLine3, 3, 0, 1, 4)
 		self.separatorLine3.show()
 		
-
 		# vertical separator line -------------------------------
 		self.separatorLine4 = QFrame()
 		self.separatorLine4.setFrameShape(QFrame.VLine)
 		self.separatorLine4.setFrameShadow(QFrame.Raised)
-		self.SEClayout.addWidget(self.separatorLine4, 5, 1, 6, 1)
+		self.SEClayout.addWidget(self.separatorLine4, 3, 1, 7, 1)
 		self.separatorLine4.show()
 
 		# volatility basis set ------------------
@@ -1127,21 +1136,21 @@ class PyCHAM(QWidget):
 		l219 = QLabel(self)
 		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
 		l219.setWordWrap(True)
-		self.SEClayout.addWidget(l219, 6, 0, 1, 1)
+		self.SEClayout.addWidget(l219, 4, 0, 2, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
 		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
 		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b220.clicked.connect(self.on_click220)
 		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b220, 7, 0)
+		self.SEClayout.addWidget(self.b220, 6, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
 		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b221, 8, 0)
+		self.SEClayout.addWidget(self.b221, 7, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -1149,48 +1158,35 @@ class PyCHAM(QWidget):
 		self.e222 = QLineEdit(self)
 		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e222, 9, 0)
+		self.SEClayout.addWidget(self.e222, 8, 0)
 		
 		# button to plot 2D VBS
 		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b223, 10, 0)
+		self.SEClayout.addWidget(self.b223, 9, 0)
 		
-		# ----------------------------------------------------------------
 
-		# input bar for component to estimate consumption for
-		self.e224 = QLineEdit(self)
-		self.e224.setText('Provide the chemical scheme name of the component to view consumption/yield for (result displayed in message box above)')
-		self.e224.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e224, 6, 2)
-
-		# input bar for starting time to estimate consumption for
-		self.e224a = QLineEdit(self)
-		self.e224a.setText('Provide the starting time to calculate consumption for (hours)')
-		self.e224a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e224a, 7, 2)
-
-		# input bar for finshing time to estimate consumption for
-		self.e224b = QLineEdit(self)
-		self.e224b.setText('Provide the finishing time to calculate consumption for (hours)')
-		self.e224b.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e224b, 8, 2)
-
-		# button to estimate consumption
-		self.b224 = QPushButton(str('Consumption (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
-		self.b224.setToolTip('For the component specified above show the mass concentration consumed throughout the whole simulation in the message box above')
-		self.b224.clicked.connect(self.on_click224)
-		#self.b224.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b224, 9, 2)
-
-		# button to estimate SOA yield
-		self.b225 = QPushButton(str('SOA yield (fraction 0-1)'))
-		self.b225.setToolTip('Show the SOA yield from the component given in the box above by the end of the simulation in the message box above')
-		self.b225.clicked.connect(self.on_click225)
-		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b225, 10, 2)
+		# ---------------------------------------------------------
+		
+		# input bar for atom or functional group to plot contributions from
+		self.e218a = QLineEdit(self)
+		self.e218a.setText('Provide the SMILES names of atoms or functional groups for plotting component contributions (use RO2 for organic peroxy radicals)')
+		self.e218a.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e218a, 6, 2, 1, 1)
+		
+		# input bar for top number of components containing the relevant atom or functional groups
+		self.e218b = QLineEdit(self)
+		self.e218b.setText('Provide the number of components (in descending order) containing the atom/functional group to plot')
+		self.e218b.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e218b, 7, 2, 1, 1)
+		
+		# button to plot temporal profile of component contributions
+		self.b218b = QPushButton('Plot component contributions (mole fraction)', self)
+		self.b218b.setToolTip('Plot the contributions to this atom/functional group by component (mole fraction)')
+		self.b218b.clicked.connect(self.on_click218b)
+		self.SEClayout.addWidget(self.b218b, 8, 2, 1, 1)
 
 		# column and row relative lengths---------------------------------
 		
@@ -1232,6 +1228,12 @@ class PyCHAM(QWidget):
 		#self.b300.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PARlayout.addWidget(self.b300, 1, 0)
 
+		# drop down button for type of contributors
+		self.b300a = QComboBox(self)
+		self.b300a.addItem('All components')
+		self.b300a.addItem('Excluding Seed and Water')
+		self.PARlayout.addWidget(self.b300a, 1, 1, 1, 1)
+
 		# button to plot particle-phase surface concentration
 		self.b301 = QPushButton(str('Particle surface area'))
 		self.b301.setToolTip('Graph the temporal profile of particle surface area')
@@ -1244,6 +1246,54 @@ class PyCHAM(QWidget):
 		self.b301a.addItem('All components')
 		self.b301a.addItem('Seed Only')
 		self.PARlayout.addWidget(self.b301a, 2, 1, 1, 1)
+
+		# button to plot particle-phase mass contribution by different 
+		# generations of oxidised organic molecules
+		self.b302 = QPushButton(str('Organic molecule \ncontribution by generation'))
+		self.b302.setToolTip('See the particle-phase mass contribution by different generations of oxidised organic molecules')
+		self.b302.clicked.connect(self.on_click302)
+		self.b302.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b302, 0, 2, 1, 1)
+
+		# horizontal separator line -------------------------------
+		self.separatorLine5 = QFrame()
+		self.separatorLine5.setFrameShape(QFrame.HLine)
+		self.separatorLine5.setFrameShadow(QFrame.Raised)
+		self.PARlayout.addWidget(self.separatorLine5, 3, 0, 1, 2)
+		self.separatorLine5.show()
+	
+		# section for consumption and yield calculations ------------------------------
+		# input bar for component to estimate consumption for
+		self.e224 = QLineEdit(self)
+		self.e224.setText('Provide the chemical scheme name of the component to view consumption/yield for (result displayed in message box above)')
+		self.e224.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e224, 4, 0, 1, 2)
+
+		# input bar for starting time to estimate consumption for
+		self.e224a = QLineEdit(self)
+		self.e224a.setText('Provide the starting time to calculate consumption for (hours)')
+		self.e224a.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e224a, 5, 0, 1, 2)
+
+		# input bar for finshing time to estimate consumption for
+		self.e224b = QLineEdit(self)
+		self.e224b.setText('Provide the finishing time to calculate consumption for (hours)')
+		self.e224b.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e224b, 6, 0, 1, 2)
+
+		# button to estimate consumption
+		self.b224 = QPushButton(str('Consumption (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
+		self.b224.setToolTip('For the component specified above show the mass concentration consumed throughout the whole simulation in the message box above')
+		self.b224.clicked.connect(self.on_click224)
+		#self.b224.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b224, 7, 0, 1, 1)
+
+		# button to estimate SOA yield
+		self.b225 = QPushButton(str('SOA yield (fraction 0-1)'))
+		self.b225.setToolTip('In the message box above show the SOA yield from the component given in the box above between the times stated in the boxes above.')
+		self.b225.clicked.connect(self.on_click225)
+		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b225, 7, 1, 1, 1)
 
 		return(PARTab)
 	
@@ -1577,7 +1627,7 @@ class PyCHAM(QWidget):
 			self.b81.deleteLater()
 			self.l81.deleteLater()
 			self.fab = 0 # remember that single simulation widgets not showing
-		if (self.atb == 1): # if showing remove add to batch button
+		if (self.atb == 1): # if showing then remove add to batch button
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
 		# remove any old message from previous run
@@ -1597,7 +1647,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1614,7 +1664,8 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			testf, chamV] = pickle.load(pk)
 			pk.close()
 		
 		# button to get path to folder containing relevant files
@@ -1653,7 +1704,7 @@ class PyCHAM(QWidget):
 				coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 				Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-				z_prt_coeff, tf_UVC]
+				z_prt_coeff, tf_UVC, testf, chamV]
 
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
@@ -1703,7 +1754,8 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			testf, chamV] = pickle.load(pk)
 			pk.close()
 	
 		sch_name, _ = QFileDialog.getOpenFileName(self, "Select Chemical Scheme File", "./PyCHAM/input/") # get path of file
@@ -1723,7 +1775,7 @@ class PyCHAM(QWidget):
 			uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 			p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
+			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1752,7 +1804,8 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, 
-			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			testf, chamV] = pickle.load(pk)
 			pk.close()
 	
 		xml_name, _ = QFileDialog.getOpenFileName(self, "Select xml File", "./PyCHAM/input/") # get path of file
@@ -1772,7 +1825,7 @@ class PyCHAM(QWidget):
 			new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, 
 			pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 			partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, tf_UVC]
+			seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1785,7 +1838,7 @@ class PyCHAM(QWidget):
 			self.b81.deleteLater()
 			self.l81.deleteLater()
 			self.fab = 0 # remember that single simulation widgets not showing
-		if (self.atb == 1): # if showing remove add to batch button
+		if (self.atb == 1): # if showing then remove add to batch button
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
 		# remove any old 'Simulation complete' message from previous run
@@ -1807,7 +1860,7 @@ class PyCHAM(QWidget):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, tf_UVC] = pickle.load(pk)
+			z_prt_coeff, tf_UVC, testf, chamV] = pickle.load(pk)
 			pk.close() # close pickle file
 
 		# user chooses path of file to model variables file
@@ -1832,7 +1885,7 @@ class PyCHAM(QWidget):
 				nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-				seed_eq_wat, z_prt_coeff, tf_UVC]
+				seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1893,7 +1946,7 @@ class PyCHAM(QWidget):
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, tf_UVC] = def_mod_var.def_mod_var(0)
+			seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -1914,7 +1967,7 @@ class PyCHAM(QWidget):
 			sch_name = txtn[0]
 			xml_name = txtn[1]
 			inname = txtn[2]
-				
+			
 			# pickle with new file names	
 			list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, 
 				update_stp, tot_time, comp0, y0, temp, tempt, RH, RHt, Press, 
@@ -1929,7 +1982,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-				Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC]
+				Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
 				
 			# path to pickle file
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1960,7 +2013,8 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+				testf, chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
 			# let check know this is a second call
@@ -2000,6 +2054,10 @@ class PyCHAM(QWidget):
 				# remove or label
 				self.l81.deleteLater()
 				self.atb = 0
+			
+			# hide checking inputs buttons
+			self.b80.hide()
+			self.b80s.hide()
 			
 			# path to error log
 			err_log = str(os.getcwd() + '/PyCHAM/err_log.txt')
@@ -2125,6 +2183,10 @@ class PyCHAM(QWidget):
 		# return to single simulation mode
 		self.btch_no = 1
 		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
+		
+		# show checking inputs buttons
+		self.b80.show()
+		self.b80s.show()
 
 		if (err_mess == ''): # if no error message generated
 			# tell user that simulations finished
@@ -2153,6 +2215,9 @@ class PyCHAM(QWidget):
 		# action to simulate series of simulations
 		err_mess = self.on_click81b()
 		
+		# show checking inputs buttons
+		self.b80.show()
+		self.b80s.show()
 	
 	@pyqtSlot()
 	def on_click82(self): # when button to add to batch pressed
@@ -2343,13 +2408,20 @@ class PyCHAM(QWidget):
 	
 		# get number of components to plot
 		try:
-			self.e300r = float(self.e205.text())
+			self.e300r = int(self.e300.text())
 		except: # default
 			self.e300r = 10
 
+		comp2cons = self.b300a.currentText() # components to consider
+		# convert units into number option
+		if (comp2cons[0] == 'A'):
+			caller = 4
+		if (comp2cons[0] == 'E'):
+			caller = 7
+
 		import plotter_pp
 		dir_path = self.l201.text() # name of folder with results
-		plotter_pp.plotter(4, dir_path, comp_names, self) # plot results
+		plotter_pp.plotter(caller, dir_path, comp_names, self) # plot results
 
 	# graph the surface area concentration (m2/m3) of particles
 	@pyqtSlot()
@@ -2367,7 +2439,25 @@ class PyCHAM(QWidget):
 		if (sa_type[0] == 'S'):
 			caller = 6
 		
-		# get names of components (filler)
+		# names of components (filler)
+		comp_names = []
+
+		import plotter_pp
+		dir_path = self.l201.text() # name of folder with results
+		plotter_pp.plotter(caller, dir_path, comp_names, self) # plot results
+
+	# graph the particle-phase mass contribution from different generations of
+	# oxidised organic molecules
+	@pyqtSlot()
+	def on_click302(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		caller = 8
+		
+		# names of components (filler)
 		comp_names = []
 
 		import plotter_pp
@@ -2456,6 +2546,33 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		plotter_ct.plotter_ind(0, dir_path, comp_names, top_num, uc, self) # plot results
 	
+	@pyqtSlot() # button to show production
+	def on_click218ab(self):
+
+		# clear dialogue message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+			
+		# get names of relevant components
+		comp_names = [str(i) for i in self.e217.text().split(',')]
+		
+		# get times to integrate between (hours)
+		tp = [float(i) for i in self.e217aa.text().split(',')]
+
+		ct_units = self.b218aaa.currentText() # change tendency units
+		# convert units into number option
+		if (ct_units[0] == 'p'):
+			uc = 0
+		if (ct_units[1] == 'g'):
+			uc = 1
+		if (ct_units[2] == 'm'):
+			uc = 2
+		
+		import plotter_ct
+		dir_path = self.l201.text() # name of folder with results
+		plotter_ct.plotter_prod(0, dir_path, comp_names, tp, uc, self) # plot results
+	
+
 	@pyqtSlot() # button to plot component contributions
 	def on_click218b(self):
 
@@ -3452,33 +3569,50 @@ class PyCHAM(QWidget):
 		import plotter_CIMS
 		plotter_CIMS.plotter_CIMS(dir_path, res_in, tn, iont, sensit)
 
-	@pyqtSlot() # button to plot supplied particle number size distributions
+	@pyqtSlot() # button to check supplied values
 	def on_clickb80(self):
-
-		import plotter_nsd # for plotting supplied number size distributions
 		
-		# path for pickle file
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		# get values to check from drop down button
+		input_check_text = self.b80s.currentText() # drop down selection
 
-		# get the most recent model variables
-		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-			std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedx,
-			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC] = pickle.load(pk)
-			pk.close()
+		if input_check_text == 'Photolysis rates':
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_taf(self)
+
+		if input_check_text == 'Particle number size distributions':
+			import plotter_nsd # for plotting supplied number size distributions
 		
-		# call on plotting script
-		plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
-		space_mode, 0, pconct)
+			# path for pickle file
+			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+
+			# get the most recent model variables
+			with open(input_by_sim, 'rb') as pk:
+				[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
+				std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
+				seed_mw, seed_diss, seed_dens, seedx,
+				light_stat, light_time, daytime, lat, lon, af_path, 
+				dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+				tf_UVC, testf, chamV] = pickle.load(pk)
+				pk.close()
+		
+			# call on plotting script
+			plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
+			space_mode, 0, pconct)
+
+		if input_check_text == 'Gas-phase diffusion coefficients':
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_gpdc(self)
+
+		if input_check_text == 'Gas-phase mean thermal speeds':
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_gpmts(self)
 
 	@pyqtSlot() # button to retrieve and report component consumption
 	def on_click224(self):

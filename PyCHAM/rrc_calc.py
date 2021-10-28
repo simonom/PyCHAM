@@ -54,7 +54,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 		RO2 = np.sum(y[RO2_indices[:, 1]])
 		
 	# calculate concentrations of third body (M), nitrogen and oxygen
-	# calculate gas-phase concentrations of M, N2 and O2 (molecules/cc (air))
+	# calculate gas-phase concentrations of M, N2 and O2 (# molecules/cm3 (air))
 	# 1.0e-6 converts from molecules/m3 to molecules/cc
 	# R and Avogadro's constant set the same as in atmosphereFunctions.f90 of AtChem2
 	M_val = (PInit/(8.3144621*TEMP)*si.N_A)*1.e-6

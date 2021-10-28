@@ -12,8 +12,9 @@ PyCHAM is an open-source computer code (written in Python) for simulating aeroso
 5. [Inputs](#Inputs)
 6. [Photochemistry](#Photochemistry)
 7. [Numerical Considerations](#Numerical-Considerations)
-8. [Frequently Asked Questions](#Frequently-Asked-Questions)
-9. [Acknowledgements](#Acknowledgements)
+8. [Basic Plotting Tab](#Basic-Plotting-Tab)
+9. [Frequently Asked Questions](#Frequently-Asked-Questions)
+10. [Acknowledgements](#Acknowledgements)
 
 ## Documentation
 
@@ -117,7 +118,7 @@ Install is complete, to run PyCHAM please see [Running](#Running).
 
 9a.  If the user chooses a single simulation to run, a progress bar will show, which represents the time through the experiment as a fraction of the total experiment time.
 
-9b. If the user chooses to add to batch, then further simulations can be chosen by repeating steps 4-7 above.  When ready, the batch can be run with the start series of simulations button.  The progress bar then represents individual experiments and the current simulation is shown in the GUI.  Note that when adding to batch input files should be located in different folders (rather than changing the inputs inside a folder already selected for simulation between selecting simulations to add to batch).
+9b. If the user chooses to add to batch, then further simulations can be chosen by repeating steps 4-7 above.  When ready, the batch can be run with the start series of simulations button.  The progress bar then represents individual experiments and the current simulation is shown in the GUI.  Note that when adding to batch input files should be located in different folders (rather than changing the inputs inside a folder already selected for batch between adding to batch).
 
 10. The 'Plot' tab allows multiple plotting options.  The Standard Results Plot produces two sub-plots in one figure: one with the particle number distribution, secondary aerosol mass, and particle number concentration against time, and another plot that shows the gas-phase concentrations of specified components with time (the specified components are those with initial concentrations given in the model variables file).
 
@@ -272,15 +273,21 @@ For photolysis reactions in chemical schemes other than Master Chemical Mechanis
 ## Numerical Considerations
 In this section aspects of PyCHAM affecting numerical stability and computation time speed-up are discussed.
 
-Speed-up of computation time can be achieved through solving water partitioning between vapour and particles separately to other processes.  For a system with ~1000 chemical reactions and 32 particle size bins a speed-up of a factor ~500 was seen when this separation was instroduced.  Separation is done by default but can be turned off by setting the ser_H2O model variable to 0.
+Speed-up of computation time can be achieved through solving water partitioning between vapour and particles separately to other processes.  For a system with ~1000 chemical reactions and 32 particle size bins a speed-up of a factor ~500 was seen when this separation was introduced.  Separation is done by default but can be turned off by setting the ser_H2O model variable to 0.
 
 The Ordinary Differential Equation (ODE) solver package is [solve_ivp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html) from Scipy.  For the integration of the vapour-particle partitioning of water problem the Radau integration method is used as testing indicates this gives least computation time.  For integration of other processes (vapour-particle partitioning of non-water components and chemistry) problems, the backward differentiation formula (BDF) method is used as it is well suited to stiff problems.
+
+The user can supply their own integration tolerances (int_tol) in the model variables file.  By default PyCHAM uses tolerances that were found to suit the problems presented in the GMD software decription paper (cited above).  However, non-stiff problems can be solved with less computation using higher integration tolerances, whilst stiffer problems may become unstable unless lower tolerances are used.
 
 The ODE solver can fail to find a stable solution.  Sometimes this is due to a problem being too stiff.  If this occurs a message is printed to the PyCHAM GUI.  The initial message describes that instability has been noted and a smaller integration time step is being tried to improve stability.  Below a certain small time step the message changes and the simulation stops.  It has been decided that a stable solution cannot be found.  In this situation, to help the user identify the cause of instability, a file called ODE_solver_break_relevant_fluxes is produced which contains the fluxes of components with negative concentrations output by the ODE solver (where negative concentrations are physically unrealistic and therefore indicative of causing/resulting from integration instability).  The user could identify small or large fluxes (relative to other fluxes in this file) to gain indication of the processes causing instability and therefore determine whether a change of inputs is possible or whether PyCHAM is unsuitable for the problem in question.
 
 If the user-supplied model variables includes a seed component that is volatile then it may evaporate.  This can cause instability in the ODE solver.  Because this scenario is (in our experimental experience) unlikely in reality, PyCHAM automatically makes seed components non-volatile.  However, this can be over-ridden by specifying a pure component saturation vapour pressure for seed components in the user-supplied model variables. 
 
 Computation time speed-up and ODE solver stability may be gained by increasing the value of the user-supplied model variable z_prt_coeff.  This variable determines for which size bins gas-particle partitioning of components (including water) is allowed.  If the gas-particle partitioning coefficient of a particle size bin is sufficiently low that it comprises less than this fraction of the total gas-particle partitioning coefficient, then for this size bin partitioning is treated as zero.  If a size bin represents a relatively very small fraction of total partitioning the partitioning problem can become too stiff and prevent the ODE solver from concluding.
+
+## Basic Plotting Tab
+
+Particle mass concentration (whether total of all components or excluding certain components) is calculated based on the concentration of components and their molecular weight.  At a given time, for a given component in a given particle size bin (note that the concentration of a component represents the sum over all particles present in a size bin) the formula is: ((# molecules/cm3)/(Avogadro's Number (# molecules/mol)))*(g/mol)*1.e12 = ug/m3.  This equation can be extended over certain size bins and certain groupings of components to attain the desired particle-phase mass concentration.
 
 ## Frequently Asked Questions
 
