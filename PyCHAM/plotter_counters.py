@@ -1,3 +1,24 @@
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''plots a replication of number size distribution as reported by a Scanning Mobility Particle Spectrometer (SMPS)'''
 # simulation results are represented graphically
 
@@ -906,7 +927,27 @@ def resp_time_func(caller, delays, wfuncs):
 
 	# create new  file - will contain module response time weighting function
 	f = open('PyCHAM/cpc_response_eqs.py', mode='w')
-
+	f.write('##########################################################################################\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('##########################################################################################\n')
 	f.write('\'\'\'solving the weighting of particles of different ages over response time of instrument\'\'\'\n')
 	f.write('# module to estimate the weighting of particles of different ages during the response time of instrument to represent the mixing of particles of different ages due to differential flow prior to counter \n')
 	f.write('# File Created at %s\n' %(datetime.datetime.now()))	

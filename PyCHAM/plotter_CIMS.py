@@ -1,3 +1,24 @@
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''plots a replication of mass spectrum as reported by a chemical ionisation mass spectrometer (CIMS)'''
 # simulation results are represented graphically
 
@@ -106,7 +127,27 @@ def write_sens2mm(caller, sens_func, y_MW):
 
 	# create new  file
 	f = open('PyCHAM/sens2mm.py', mode='w')
-
+	f.write('##########################################################################################\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('##########################################################################################\n')
 	f.write('\'\'\'solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)\'\'\'\n')
 	f.write('# module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer\n')
 	f.write('# File Created at %s\n' %(datetime.datetime.now()))	
@@ -160,7 +201,27 @@ def write_mzres(caller, res_in, y_mw):
 
 	# create new  file
 	f = open('PyCHAM/mzres.py', mode='w')
-
+	f.write('##########################################################################################\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('##########################################################################################\n')
 	f.write('\'\'\'solving probability density function of mass:charge resolution\'\'\'\n')
 	f.write('# module to estimate the probability density function that is demonstrative of an instrument\'s mass:charge resolution, for example a Chemical Ionisiation Mass Spectrometer\n')
 	f.write('# File Created at %s\n' %(datetime.datetime.now()))	

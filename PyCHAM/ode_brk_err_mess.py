@@ -1,3 +1,24 @@
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''edits the output file if the ODE solver fails to solve within the minimum integration time interval'''
 # if the ODE solver can't produce positive results within the minimum integration 
 # time interval then this module writes a file that contains the fluxes through 
@@ -59,7 +80,28 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 
 	# create new  file to store fluxes
 	f = open('PyCHAM/ODE_solver_break_relevant_fluxes.txt', mode='w')
-	f.write('# File created at %s\n' %(datetime.datetime.now()))
+	f.write('##########################################################################################\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('##########################################################################################\n')
+	f.write('# File created at %s by ode_brk_err_mess\n' %(datetime.datetime.now()))
 
 	if (call == 0): # if called after ode_solv_wat
 		# record gas and particle-phase concentrations of water (molecules/cm3/s)
