@@ -24,7 +24,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, yrec_p2w, PsatPa, OC, H2Oi, _, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, yrec_p2w, PsatPa, OC, H2Oi, _, _, _, _, _, _) = retr_out.retr_out(dir_path)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)

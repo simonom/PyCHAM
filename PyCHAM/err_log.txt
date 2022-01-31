@@ -1,31 +1,9 @@
-C:\Users\Psymo\Documents\PyCHAM_vW\PyCHAM\PyCHAM/output\ex_chem_scheme\Example_Run_Output2
-Warning: invalid value encountered in true_divide
+C:\Users\Psymo\OneDrive - The University of Manchester\PyCHAM_vW\PyCHAM\PyCHAM/output\api_iso_ch4_mechHOM_scheme\Autumn1_MAC_ref_lowNOx
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
+Warning: invalid value encountered in subtract
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

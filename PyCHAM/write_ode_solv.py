@@ -9,10 +9,10 @@ import datetime
 # function to generate the ordinary differential equation (ODE)
 # solver file
 def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
-		num_asb, testf, eqn_num, dil_fac, sav_nam):
+		num_asb, testf, eqn_num, dil_fac, sav_nam, pcont):
 	
 	# inputs: ------------------------------------------------
-	# con_infl_indx - indices of components with constant influx
+	# con_infl_indx - indices of components with continuous influx
 	# int_tol - integration tolerances
 	# rowvals - indices of rows for Jacobian
 	# wall_on - marker for whether to consider wall 
@@ -23,6 +23,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	# eqn_num - number of gas- and particle-phase reactions
 	# dil_fac - fraction of chamber air extracted/s
 	# sav_nam - name of file to save results to
+	# pcont - flag for whether seed particle injection is 
+	#	instantaneous (0) or continuous (1)
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
@@ -51,7 +53,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
-	f.write('	H2Oi, dil_fac, RO2_indx, comp_namelist):\n')
+	f.write('	H2Oi, dil_fac, RO2_indx, comp_namelist, Psat_Pa, Cinfl_nowp_indx,\n')
+	f.write('	Cinfl_nowp):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
 	f.write('	# y - initial concentrations (# molecules/cm3)\n')
@@ -67,8 +70,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# njac - number of Jacobian elements affected per equation\n')
 	f.write('	# jac_den_indx - index of component denominators for Jacobian\n')
 	f.write('	# jac_indx - index of Jacobian to place elements per equation (rows)\n')
-	f.write('	# Cinfl_now - influx of components with constant influx \n')
-	f.write('	#		(molecules/cc/s)\n')
+	f.write('	# Cinfl_now - influx of components with continuous influx \n')
+	f.write('	#		(# molecules/cm3/s)\n')
 	f.write('	# y_arr - index for matrix used to arrange concentrations of gas-phase reactants, \n')
 	f.write('	#	enabling calculation of reaction rate coefficients \n')
 	f.write('	# y_rind - index of y relating to reactants for reaction rate \n')
@@ -116,6 +119,11 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
 	f.write('	# RO2_indx - index of organic peroxy radicals\n')
 	f.write('	# comp_namelist - chemical scheme names of components\n')
+	f.write('	# Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
+	f.write('	#	temperature of chamber\n')
+	f.write('	# Cinfl_nowp_indx - index of particle-phase components with continuous influx \n')
+	f.write('	# Cinfl_nowp - concentration (# molecules/cm3/s) of particle-phase components with\n')
+	f.write('	#	continuous influx\n')
 	f.write('	# ---------------------------------------------\n')
 	f.write('\n')
 	
@@ -191,11 +199,39 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		\n')
 
 	if ('JPAC' in sav_nam): # wall losses for the Julich Plant and Atmosphere Chamber
+		#f.write('		try:\n')
+		f.write('		lr = 1./1200. # first order loss rate to wall (/s)\n')
+		f.write('		lrnr = 1200. # first order loss rate to wall of non-radical ELVOC and LVOC (/s)\n')
+		
+		#f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
+		#f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
+		
+		#f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
+		#f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
+		
+		f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')
+		f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')		
 
-		f.write('		dd[RO2_indx] -= y[RO2_indx]*(1./120.) \n')
-		f.write('		dd[comp_namelist.index(\'HO2\')] -= y[comp_namelist.index(\'HO2\')]*(1./120.) \n')
-		f.write('		dd[comp_namelist.index(\'SA\')] -= y[comp_namelist.index(\'SA\')]*(1./120.) \n')
-		f.write('		dd[comp_namelist.index(\'OH\')] -= y[comp_namelist.index(\'OH\')]*(4.) \n')
+		f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
+		f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
+		
+		f.write('		dd[0:num_comp][Psat_Pa[0, :] <= 3.8e-10] -= y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
+		f.write('		dd[(num_comp*num_sb)::][Psat_Pa[0, :] <= 3.8e-10] += y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
+		
+		f.write('		dd[RO2_indx] -= y[RO2_indx]*(lr) # RO2 components following Silvia thesis\n')
+		f.write('		dd[(num_comp*num_sb)+RO2_indx] += y[RO2_indx]*(lr) # RO2 components following Silvia thesis\n')
+
+		f.write('		dd[comp_namelist.index(\'HO2\')] -= y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
+		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'HO2\')] += y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
+		
+		f.write('		dd[comp_namelist.index(\'SA\')] -= y[comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
+		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'SA\')] += y[comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
+		
+		f.write('		dd[comp_namelist.index(\'OH\')] -= y[comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
+		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'OH\')] += y[comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
+		
+		#f.write('		except:\n')
+		#f.write('			dd[:] = dd[:]\n')
 		f.write('		\n')
 
 	if (eqn_num[1] > 0): # if particle-phase reactions present
@@ -227,7 +263,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	
 	if (len(con_infl_indx) > 0): # if a component has a continuous gas-phase influx
 		
-		f.write('		# account for components with constant influx\n')	
+		f.write('		# account for components with continuous gas-phase influx\n')	
 		f.write('		dd[[')	
 		for Ci in range(len(con_infl_indx)):
 			# components prior to the last in the continuous influx group
@@ -235,7 +271,14 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 				f.write('%d, ' %int(con_infl_indx[Ci]))
 			else: # last component in the continuous influx group
 				f.write('%d], 0] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
+
+	#if ((pcont == 1).any()): # if there is continuous influx of seed particles
 		
+	#	f.write('		# account for components with continuous particle-phase influx\n')
+	#	f.write('		if (len(Cinfl_nowp_indx) > 0): # if index available\n')	
+	#	f.write('			dd[Cinfl_nowp_indx, 0] += Cinfl_nowp[:]\n')	
+	#	f.write('		\n')
+
 	if (dil_fac > 0): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
 		f.write('		if (wall_on == 1): # if wall on\n')
@@ -278,14 +321,14 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		
 	if (wall_on > 0): # include gas-wall partitioning in ode solver
 		f.write('		# gas-wall partitioning ----------------\n')
-		f.write('		# concentration on wall (molecules/cc (air))\n')
+		f.write('		# concentration on wall (# molecules/cm3 (air))\n')
 		f.write('		Csit = y[num_comp*(num_asb+1):num_comp*(num_asb+2), 0]\n')
 		f.write('		# saturation vapour pressure on wall (molecules/cc (air))\n')
 		f.write('		# note, just using the top rows of Psat and act_coeff\n')
 		f.write('		# as do not need the repetitions over size bins\n')
 		f.write('		if (Cw > 0.):\n')
 		f.write('			Csit = Psat[0, :]*(Csit/Cw)*act_coeff[0, :]\n')
-		f.write('			# rate of transfer (molecules/cm3/s)\n')
+		f.write('			# rate of transfer (# molecules/cm3/s)\n')
 		f.write('			dd_all = kw*(y[0:num_comp, 0]-Csit)\n')
 		f.write('			dd[0:num_comp, 0] -= dd_all # gas-phase change\n')
 		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1), 0] += dd_all # wall change\n')

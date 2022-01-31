@@ -6,6 +6,11 @@
 import numpy as np
 
 def RO2_indices(comp_namelist, RO2_names):
+
+	# inputs: -----------------------------------------------------------------------------------------
+	# comp_namelist - all chemical scheme names
+	# RO2_names - all RO2 (non-HOM) names
+	# ---------------------------------------------------------------------------------------------------
     
 	# store the names of RO2 species which are present in the equation file
 	# get a list of INDICES of RO2 that present in the equation file 
@@ -30,3 +35,29 @@ def RO2_indices(comp_namelist, RO2_names):
 	RO2_indices = np.hstack((RO2_indices0, RO2_indices))
     
 	return (RO2_indices)
+	
+def HOMRO2_indices(comp_namelist):
+
+	# inputs: -----------------------------------------------------------------------------------------
+	# comp_namelist - all chemical scheme names
+	# ---------------------------------------------------------------------------------------------------
+    
+	# store the names of HOMRO2 species which are present in the equation file
+	# get a list of INDICES of RO2 that present in the equation file 
+	# (or total species dict)
+	# empty list for HOMRO2 indices
+	HOMRO2_indices = []
+    
+	cin = 0 # count on components
+	for name in comp_namelist: # loop through names of all components
+        
+		if ('API_' in name) or ('api_' in name):
+			if ('RO2 in name'):
+				# store the HOMRO2 index
+				HOMRO2_indices.append(cin)
+				
+		cin += 1 # count on components
+	# ensure elements in HOMRO2_indices are integer (iterable)
+	HOMRO2_indices = (np.asarray(HOMRO2_indices, dtype=int)).reshape(-1, 1)
+    
+	return (HOMRO2_indices)

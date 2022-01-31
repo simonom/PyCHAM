@@ -25,12 +25,14 @@ def rec_prep(nrec_step,
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
 	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i, z_prt_coeff, Cinfl_now, seed_eq_wat, Vwat_inc):
+	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
+	tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, 
+	tot_in_res_indx, tf_UVC, chamSA, chamV, kwf):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
-	# y - initial concentrations (molecules/cc (air))
-	# y0 - component concentrations prior to integration step (molecules/cc (air))
+	# y - initial concentrations (# molecules/cm3 (air))
+	# y0 - component concentrations prior to integration step (# molecules/cm3 (air))
 	# rindx - indices of reactants
 	# rstoi - stoichiometries of reactants
 	# pindx - indices of products
@@ -138,19 +140,35 @@ def rec_prep(nrec_step,
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
 	#	below which partitioning to a particle size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny
-	# Cinfl_now - rate of influx of components with continuous influx (ppb/s)
 	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# tot_in_res - record of total input of injected components (ug/m3)
+	# Compti - index for total injection record for instantaneously injected components
+	# tot_time - total experiment time (s)
+	# cont_inf_reci - index of components with continuous influx in record
+	# cont_inf_i - index of components with continuous influx in concentration array
+	# tot_in_res_indx - index of components with recorded influx
+	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
+	# chamSA - chamber surface area (m2)
+	# chamV - chamber volume (m3)
+	# kwf - flag for treatment of gas-wall partitioning coefficient
 	# ----------------------------------------------------------------
 
 	# note that instaneous changes occur before recording --------------------
 	# update chamber variables
 	
+	# array to record cumulative influxes of influxing components
+	tot_in_res_ft = np.zeros((nrec_step+1, len(tot_in_res)))
+	# index of components being stored for influx
+	tot_in_res_ft[0, :] = tot_in_res_indx
+	tot_in_res_ft[1, :] = tot_in_res # influx at start
+
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		Psat, N_perbin, x, pconcn_frac,  pcontf] = cham_up.cham_up(sumt, temp, tempt, 
-		Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
+		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
+		Cinfl_nowp] = cham_up.cham_up(sumt, 
+		temp, tempt, Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
@@ -158,15 +176,16 @@ def rec_prep(nrec_step,
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, Cinfl_now, surfT, act_coeff,
-		seed_eq_wat, Vwat_inc)
+		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
+		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
+		cont_inf_i)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)
 	trec = np.zeros((nrec_step))
-	# array to record concentrations with time (molecules/cc/s)
+	# array to record concentrations with time (# molecules/cm3)
 	yrec = np.zeros((nrec_step, len(y)))
-	yrec[0, :] = y # record initial concentrations (molecules/cc/s)
+	yrec[0, :] = y # record initial concentrations (# molecules/cm3)
 	# array to record conversion factor
 	Cfactor_vst = np.zeros((nrec_step, 1))
 	Cfactor_vst[0] = Cfactor
@@ -188,14 +207,15 @@ def rec_prep(nrec_step,
 		rbou_rec = 0.
 		yrec_p2w = 0.
 	
-	if ((num_sb-wall_on) > 0): # if particles present
+	if ((num_sb-wall_on) > 0 or wall_on == 1): # if particles or wall present
 		
 		# update partitioning variables
-		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
+		[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-		Pnow, DStar_org, z_prt_coeff)
+		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf)
 		
+	if (num_sb-wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 
 		# including contribution of water
 		x2[0, :] = x
@@ -222,7 +242,7 @@ def rec_prep(nrec_step,
 		
 		# end of number size distribution part ----------------------------------------
 		
-		# concentration of components on the wall due to particle deposition to wall (molecules/cc)
+		# concentration of components on the wall due to particle deposition to wall (# molecules/cm3)
 		yrec_p2w[0, :] = C_p2w
 
 	else: # fillers
@@ -232,7 +252,8 @@ def rec_prep(nrec_step,
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 0.)
+			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 
+			0., tf_UVC)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 
@@ -241,10 +262,10 @@ def rec_prep(nrec_step,
 	
 	cham_env[0, 0] = temp_now # temperature (K)
 	cham_env[0, 1] = Pnow # pressure (Pa)
-	#import ipdb; ipdb.set_trace()
 	cham_env[0, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	
 	# --------------------------------------------------------------------------------
 
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat, cham_env[0, 2])
+		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat, cham_env[0, 2], 
+		Cinfl_now, tot_in_res_ft)

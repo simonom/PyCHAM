@@ -33,7 +33,8 @@ def ui_check(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		tf_UVC, testf, chamV] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -82,6 +83,7 @@ def ui_check(self):
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient
 	#	below which partitioning treated as negligible, e.g. because a 
 	#	size bin has relatively very small surface area
+	# testf - flag for testing and plotting checks of inputs
 	# --------------------------------------------------------------------
 	
 	# to begin assume no errors, so message is that simulation ready
@@ -113,8 +115,8 @@ def ui_check(self):
 		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
-	if (output_by_sim in self.output_list and em_flag < 2): # in case proposed results folder already on computer hard drive
-		err_mess = str('Error - the proposed results folder path (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num == 1): # in case proposed results folder already on computer hard drive
+		err_mess = str('Error - the proposed path for the results folder (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
@@ -441,7 +443,7 @@ def ui_check(self):
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff]
+			z_prt_coeff, tf_UVC, testf, chamV]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

@@ -94,6 +94,7 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
 					H2Oi = 0 # filler
+					
 					return(comp_namelist, comp_list, err_mess, H2Oi)
 		
 		for product in products: # right hand side of equations (gains)
@@ -116,21 +117,22 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 					comp_list.append(name_SMILE) # list SMILE names
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
+					H2Oi = 0 # filler
+					
 					return(comp_namelist, comp_list, err_mess, H2Oi)
 		
 	
 	# check for water presence in chemical scheme via its SMILE string
-	# count on components
-	indx = -1
+	indx = -1 # count on components
+	H2Oi = len(comp_list) # assume not in list to start with
 	for single_chem in comp_list:
 		indx += 1
 		# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
 		# (O is the MCM chemical scheme name for single oxygen))
 		if (single_chem == 'O' and comp_namelist[indx] != 'O'):
-				H2Oi = indx
+			H2Oi = indx
 				
-	else: # if not in chemical scheme, water would be the next component appended to component list
-		H2Oi = len(comp_list)
+	if H2Oi == len(comp_list): # if not in chemical scheme, water would be the next component appended to component list
 		comp_namelist.append('H2O')
 	
 	# if no error message but no equations identified then tell user

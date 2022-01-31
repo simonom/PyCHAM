@@ -21,7 +21,7 @@ def plotter(caller, dir_path, atom_name, atom_num, self): # define function
 	
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, SMILES, 
 		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, RO2i) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, _, _, _, _, RO2i, _, _) = retr_out.retr_out(dir_path)
 	
 	# empty lists to contain results
 	cnt_list = []

@@ -11,9 +11,13 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, tf, sumt):
+							Jlen, tf, sumt, tf_UVC):
 
-	# inputs:-----------------------------------------------------------------------------	
+	# inputs:-----------------------------------------------------------------------------
+	# time - time of day (for natural light photolysis)
+	# lat - latitude
+	# lon - longitude
+	# TEMP - temperature inside chamber (K)
 	# act_flux_path - name of path to file containing known actinic flux (only used if 
 	#				lights on inside chamber)
 	# DayOfYear - number of days through the calendar year
@@ -21,13 +25,9 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# 					absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
 	# tf - the transmission factor (for natural light intensity)
+	# sumt - total time through experiment (s)
+	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ------------------------------------------------------------------------------------
-	
-	# get solar zenith angle following the equations of 
-	# Chapter 1 ("The Atmosphere and UV-B Radiation at 
-	# Ground Level" by S. Madronich) of the textbook
-	# Environmental UV Photobiology (1993)
-	(secx, cosx) = zenith.zenith(time, lat, lon, DayOfYear)
 	
 	J = np.zeros((Jlen)) # prepare output
     
@@ -35,44 +35,51 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	
 	# if using MCM chemical scheme and natural light
 	if (photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no'):
+	
+		# get solar zenith angle following the equations of 
+		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
+		# Ground Level" by S. Madronich) of the textbook
+		# Environmental UV Photobiology (1993)
+		(secx, cosx) = zenith.zenith(time, lat, lon, DayOfYear)
+		
 		# The Hayman (1997) parameterisation for MCM reactions as described in
 		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
 		#J          L           M          N
-		J[1]=6.073E-05*cosx**(1.743)*np.exp(-1.0*0.474*secx)
-		J[2]=4.775E-04*cosx**(0.298)*np.exp(-1.0*0.080*secx)
-		J[3]=1.041E-05*cosx**(0.723)*np.exp(-1.0*0.279*secx)
-		J[4]=1.165E-02*cosx**(0.244)*np.exp(-1.0*0.267*secx)
-		J[5]=2.485E-02*cosx**(0.168)*np.exp(-1.0*0.108*secx)
-		J[6]=1.747E-01*cosx**(0.155)*np.exp(-1.0*0.125*secx)
-		J[7]=2.644E-03*cosx**(0.261)*np.exp(-1.0*0.288*secx)
-		J[8]=9.312E-07*cosx**(1.230)*np.exp(-1.0*0.307*secx)
-		J[11]=4.642E-05*cosx**(0.762)*np.exp(-1.0*0.353*secx)
-		J[12]=6.853E-05*cosx**(0.477)*np.exp(-1.0*0.323*secx)
-		J[13]=7.344E-06*cosx**(1.202)*np.exp(-1.0*0.417*secx)
-		J[14]=2.879E-05*cosx**(1.067)*np.exp(-1.0*0.358*secx)
-		J[15]=2.792E-05*cosx**(0.805)*np.exp(-1.0*0.338*secx)
-		J[16]=1.675E-05*cosx**(0.805)*np.exp(-1.0*0.338*secx)
-		J[17]=7.914E-05*cosx**(0.764)*np.exp(-1.0*0.364*secx)
-		J[18]=1.140E-05*cosx**(0.396)*np.exp(-1.0*0.298*secx)
-		J[19]=1.140E-05*cosx**(0.396)*np.exp(-1.0*0.298*secx)
-		J[21]=7.992E-07*cosx**(1.578)*np.exp(-1.0*0.271*secx)
-		J[22]=5.804E-06*cosx**(1.092)*np.exp(-1.0*0.377*secx)
-		J[23]=1.836E-05*cosx**(0.395)*np.exp(-1.0*0.296*secx)
-		J[24]=1.836E-05*cosx**(0.395)*np.exp(-1.0*0.296*secx)
-		J[31]=6.845E-05*cosx**(0.130)*np.exp(-1.0*0.201*secx)
-		J[32]=1.032E-05*cosx**(0.130)*np.exp(-1.0*0.201*secx)
-		J[33]=3.802E-05*cosx**(0.644)*np.exp(-1.0*0.312*secx)
-		J[34]=1.537E-04*cosx**(0.170)*np.exp(-1.0*0.208*secx)
-		J[35]=3.326E-04*cosx**(0.148)*np.exp(-1.0*0.215*secx)
-		J[41]=7.649E-06*cosx**(0.682)*np.exp(-1.0*0.279*secx)
-		J[51]=1.588E-06*cosx**(1.154)*np.exp(-1.0*0.318*secx)
-		J[52]=1.907E-06*cosx**(1.244)*np.exp(-1.0*0.335*secx)
-		J[53]=2.485E-06*cosx**(1.196)*np.exp(-1.0*0.328*secx)
-		J[54]=4.095E-06*cosx**(1.111)*np.exp(-1.0*0.316*secx)
-		J[55]=1.135E-05*cosx**(0.974)*np.exp(-1.0*0.309*secx)
-		J[56]=7.549E-06*cosx**(1.015)*np.exp(-1.0*0.324*secx)
-		J[57]=3.363E-06*cosx**(1.296)*np.exp(-1.0*0.322*secx)
-		J[61]=7.537E-04*cosx**(0.499)*np.exp(-1.0*0.266*secx)
+		J[1] = 6.073E-05*cosx**(1.743)*np.exp(-1.0*0.474*secx)
+		J[2] = 4.775E-04*cosx**(0.298)*np.exp(-1.0*0.080*secx)
+		J[3] = 1.041E-05*cosx**(0.723)*np.exp(-1.0*0.279*secx)
+		J[4] = 1.165E-02*cosx**(0.244)*np.exp(-1.0*0.267*secx)
+		J[5] = 2.485E-02*cosx**(0.168)*np.exp(-1.0*0.108*secx)
+		J[6] = 1.747E-01*cosx**(0.155)*np.exp(-1.0*0.125*secx)
+		J[7] = 2.644E-03*cosx**(0.261)*np.exp(-1.0*0.288*secx)
+		J[8] = 9.312E-07*cosx**(1.230)*np.exp(-1.0*0.307*secx)
+		J[11] = 4.642E-05*cosx**(0.762)*np.exp(-1.0*0.353*secx)
+		J[12] = 6.853E-05*cosx**(0.477)*np.exp(-1.0*0.323*secx)
+		J[13] = 7.344E-06*cosx**(1.202)*np.exp(-1.0*0.417*secx)
+		J[14] = 2.879E-05*cosx**(1.067)*np.exp(-1.0*0.358*secx)
+		J[15] = 2.792E-05*cosx**(0.805)*np.exp(-1.0*0.338*secx)
+		J[16] = 1.675E-05*cosx**(0.805)*np.exp(-1.0*0.338*secx)
+		J[17] = 7.914E-05*cosx**(0.764)*np.exp(-1.0*0.364*secx)
+		J[18] = 1.140E-05*cosx**(0.396)*np.exp(-1.0*0.298*secx)
+		J[19] = 1.140E-05*cosx**(0.396)*np.exp(-1.0*0.298*secx)
+		J[21] = 7.992E-07*cosx**(1.578)*np.exp(-1.0*0.271*secx)
+		J[22] = 5.804E-06*cosx**(1.092)*np.exp(-1.0*0.377*secx)
+		J[23] = 1.836E-05*cosx**(0.395)*np.exp(-1.0*0.296*secx)
+		J[24] = 1.836E-05*cosx**(0.395)*np.exp(-1.0*0.296*secx)
+		J[31] = 6.845E-05*cosx**(0.130)*np.exp(-1.0*0.201*secx)
+		J[32] = 1.032E-05*cosx**(0.130)*np.exp(-1.0*0.201*secx)
+		J[33] = 3.802E-05*cosx**(0.644)*np.exp(-1.0*0.312*secx)
+		J[34] = 1.537E-04*cosx**(0.170)*np.exp(-1.0*0.208*secx)
+		J[35] = 3.326E-04*cosx**(0.148)*np.exp(-1.0*0.215*secx)
+		J[41] = 7.649E-06*cosx**(0.682)*np.exp(-1.0*0.279*secx)
+		J[51] = 1.588E-06*cosx**(1.154)*np.exp(-1.0*0.318*secx)
+		J[52] = 1.907E-06*cosx**(1.244)*np.exp(-1.0*0.335*secx)
+		J[53] = 2.485E-06*cosx**(1.196)*np.exp(-1.0*0.328*secx)
+		J[54] = 4.095E-06*cosx**(1.111)*np.exp(-1.0*0.316*secx)
+		J[55] = 1.135E-05*cosx**(0.974)*np.exp(-1.0*0.309*secx)
+		J[56] = 7.549E-06*cosx**(1.015)*np.exp(-1.0*0.324*secx)
+		J[57] = 3.363E-06*cosx**(1.296)*np.exp(-1.0*0.322*secx)
+		J[61] = 7.537E-04*cosx**(0.499)*np.exp(-1.0*0.266*secx)
 
 		J = J*tf
 
@@ -111,8 +118,8 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	if (act_flux_path != 'no'):
 		
-		# call on MCM_photo module to process photolysis files and estimate J values
-		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt)
+		# call on module to process photolysis files and estimate J values
+		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, tf_UVC)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0

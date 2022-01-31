@@ -10,13 +10,14 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
-	yrec_p2w, C_p2w, cham_env, temp_now, Pnow):
+	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
+	tot_in_res_ft):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
 	# trec - the time through simulation record (s)
-	# yrec - concentration record (molecules/cc (air))
-	# Cfactor_vst - record of the conversion factor for moleculec/ss 
+	# yrec - concentration record (# molecules/cm3 (air))
+	# Cfactor_vst - record of the conversion factor for # molecules/cm3 
 	# to ppb
 	# y - concentrations (molecules/cc (air))
 	# sumt - cumulative time through simulation (s)
@@ -29,7 +30,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# nreac - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
-	# pconc - particle concentrations now (#/cc (air))
+	# pconc - particle concentrations now (# particles/cm3 (air))
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
 	#	(molecules/cm3 (air))
@@ -43,7 +44,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# Nres_wet - number size distributions including water (#/cc (air))
 	# x2 - radii of single particle (um)
 	# x - radii of single particles per size bin now (um)
-	# MV - molar volume of components (um3/mol)
+	# MV - molar volume of components (cm3/mol)
 	# H2Oi - index for water
 	# Vbou - volume boundaries per size bin (um3)
 	# rbou - size bin radius boundaries (um)
@@ -59,11 +60,14 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# pressure (Pa) and relative humdity
 	# temp_now - chamber temperature (K)
 	# Pnow - chamber pressure (Pa)
+	# tot_in_res - cumulative influx of injected components (ug/m3)
+	# tot_in_res_ft - record of continuous influx of injected 
+	#	components (ug/m3)
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)
-	yrec[save_cnt, :] = y # track concentrations (molecules/cc/s)
-	# track conversion factor for gas phase (ppb/molecules/cc)
+	yrec[save_cnt, :] = y # track concentrations (# molecules/cm3/s)
+	# track conversion factor for gas phase (ppb/# molecules/cm3)
 	Cfactor_vst[save_cnt, 0] = Cfactor
 	
 	# single particle radius (um) at size bin centre 
@@ -86,9 +90,9 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 		Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
 		# new volume of single particle per size bin (um3) excluding volume of water	
 		Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*pconc[ish]))*MV[:, 0]*1.e12, 1)-
-				((Cn[ish, H2Oi]/(si.N_A*pconc[ish, 0]))*MV[H2Oi]*1.e12))
+				((Cn[ish, H2Oi]/(si.N_A*pconc[ish, 0]))*MV[H2Oi, 0]*1.e12))
 		# loop through size bins to find number of particles in each 
-		# (# particle/cc (air))
+		# (# particle/cm3 (air))
 		for Ni in range(0, (num_sb-wall_on)):
 			ish = (Vnew>=Vbou[Ni])*(Vnew<Vbou[Ni+1])
 			Nres_dry[save_cnt, Ni] = pconc[ish, 0].sum()
@@ -103,6 +107,10 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	cham_env[save_cnt, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	# --------------------------------------------------------------------------------
 
+	# cumulative influx of injected components (ug/m3)
+	tot_in_res_ft[save_cnt+1, :] += tot_in_res
+
 	save_cntf = 1 # flag for increasing number of recordings 
 
-	return(trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, x2, rbou_rec, yrec_p2w, cham_env)
+	return(trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, x2, rbou_rec, 
+		yrec_p2w, cham_env, tot_in_res_ft)

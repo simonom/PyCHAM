@@ -27,7 +27,8 @@ def mod_var_read(self):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+			tf_UVC, testf, chamV] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -42,14 +43,15 @@ def mod_var_read(self):
 
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 			
+			# ----------------------------------------------------
 			# if commented out continue to next line
-			if  (in_list[i][0] == '#'):
+			if (in_list[i][0] == '#'):
 				continue
 			
 			key, value = in_list[i].split('=') # split values from keys
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
-
+			# ----------------------------------------------------
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
 				
@@ -69,7 +71,10 @@ def mod_var_read(self):
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 
 			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
-				y0 = [float(i) for i in (value.split(','))]
+				try:
+					y0 = [float(i) for i in (value.split(','))]
+				except:
+					err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
 			
 			if key == 'temperature' and (value.strip()): # chamber temperature (K)
 				temp = [float(i) for i in ((value.strip()).split(','))]
@@ -103,6 +108,12 @@ def mod_var_read(self):
 				except:
 					kw = np.zeros((1))
 					kw[0] = kw_in
+
+			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
+				chamSA = float(value.strip())
+
+			if key == 'chamV' and (value.strip()): # chamber volume (m3)
+				chamV = float(value.strip())
 
 			if key == 'size_structure' and (value.strip()): # the size structure
 				siz_stru = int(value.strip())
@@ -296,6 +307,9 @@ def mod_var_read(self):
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
 				tf = float(value.strip())
+				
+			if key == 'tf_UVC' and (value.strip()): # transmission factor for 254 nm light
+				tf_UVC = float(value.strip())
 
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				light_ad = int(value.strip())
@@ -326,6 +340,7 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					con_infl_C = np.empty(0)
+					
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				dydt_trak = [str(i).strip() for i in (value.split(','))]
 
@@ -468,7 +483,8 @@ def mod_var_read(self):
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
 				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff]
+				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+				testf, chamV]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

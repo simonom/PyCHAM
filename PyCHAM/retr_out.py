@@ -17,11 +17,13 @@ def retr_out(output_by_sim):
 	const = {} # prepare to create dictionary
 	for line in const_in.readlines():
 		
-		dlist = [] # prepare to convert to python list
+		dlist = [] # empty list to hold values
 		for i in line.split(',')[1::]:
 			
 			if str(line.split(',')[0]) == 'number_of_size_bins':
 				dlist.append(int(i))
+			if str(line.split(',')[0]) == 'output_by_sim_sch_ext' or str(line.split(',')[0]) == 'output_by_sim_mv_ext':
+				dlist.append(str(i))
 			if str(line.split(',')[0]) == 'number_of_components' or str(line.split(',')[0]) == 'wall_on_flag_0forNO_1forYES':
 				dlist.append(int(i))
 			if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol' or  str(line.split(',')[0]) == 'molar_volumes_cm3/mol':
@@ -115,7 +117,6 @@ def retr_out(output_by_sim):
 				i = i.strip(' ')
 				dlist.append(int(i))
 			
-			
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
 	
@@ -148,6 +149,15 @@ def retr_out(output_by_sim):
 		speed = (const["simulation_computer_time(s)"])[0]
 	except:
 		speed = 0.
+
+	try:
+		output_by_sim_sch_ext = (const["output_by_sim_sch_ext"])[0][0:-1]
+	except:
+		output_by_sim_sch_ext = 0.
+	try:
+		output_by_sim_mv_ext = (const["output_by_sim_mv_ext"])[0][0:-1]
+	except:
+		output_by_sim_mv_ext = 0.
 	
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
@@ -238,10 +248,26 @@ def retr_out(output_by_sim):
 		rbou_rec = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
 		rbou_rec = []
+
+	try: # in case this output is saved for a given simulation
+		# withdraw consumptions (ug/m3)
+		fname = str(output_by_sim+'/total_concentration_of_injected_components')
+		tot_in_res = np.loadtxt(fname, delimiter=',', skiprows=1) # ug/m3
+	except: # in case not saved, e.g. for older outputs
+		tot_in_res = []
+	
+	# create a class to hold outputs
+	class ro_outputs:
+		sp = output_by_sim_sch_ext # chemical scheme path
+		vp = output_by_sim_mv_ext # model variables path
+		gi = group_indx # indices of groups of components
+
+	ro_obj = ro_outputs() # create object to hold outputs
 	
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx)
+		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx, 
+		tot_in_res, ro_obj)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
 	

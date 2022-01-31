@@ -79,8 +79,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# particle diffusion coefficient (15.29) (m2/s)
 	# multiply eta_a by 1.0e-3 to convert from g/m.s to kg/m.s
 	# this makes it consistent with the units of Boltzmann constant
-	Dpi = (((si.k*T)/(6.0*np.pi*sbr*(eta_ai*1.0e-3)))*Gi).reshape(sbrn, 1)
-	Dpj = (((si.k*T)/(6.0*np.pi*rint*(eta_aj*1.0e-3)))*Gj).reshape(1, sbn)
+	Dpi = (((si.k*T)/(6.*np.pi*sbr*(eta_ai*1.0e-3)))*Gi).reshape(sbrn, 1)
+	Dpj = (((si.k*T)/(6.*np.pi*rint*(eta_aj*1.0e-3)))*Gj).reshape(1, sbn)
 	
 	# tile Dpi (particle diffusion coefficient) over size bins of j (m2/s)
 	Dp_mi = np.tile(Dpi, (1, sbn))
@@ -193,7 +193,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	sig_p_sum = sig_pi**2.0+sig_pj**2.0
 		
 	# kernel numerator
-	K_Bnum = 4.0*np.pi*sbr_sum[i]*Dp_sum[i]
+	K_Bnum = 4.*np.pi*sbr_sum[i]*Dp_sum[i]
 
 	# left term kernel denominator
 	K_Blden = (sbr_sum[i]/(sbr_sum[i]+(sig_p_sum[i])**0.5))
@@ -207,8 +207,6 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	
 	# collision kernel (15.33) (m3/particle.s)
 	K_B[i] = (K_Bnum/(K_Blden+K_Brden))
-	
-
 	
 	if (testf == 1): # testing flag on
 		fig, (ax0,ax1) = plt.subplots(1, 2, figsize=(12,6))
@@ -260,8 +258,6 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	if testf==1:
 		ax0.loglog(sbr*10**6, K_DE[:,0]*10**6, label='Diff. Enhancement')
 		ax1.loglog(sbr*10**6, K_DE[:,1]*10**6, label='Diff. Enhancement')
-	
-
 	
 	# Gravitational Collection Kernel:
 	Ecoll = np.zeros((sbrn, sbn))
@@ -431,7 +427,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# by a dimensionless coalescence efficiency.  For particles under 2um this should be
 	# close to unity it says in the coalescence efficiency section.
 	Beta = (K_B+K_DE+K_GC+K_TI+K_TS+K_V)
-	
+
 	if (testf == 1): # plot to compare to Fig. 15.7 of Jacobson (2005)
 		ax0.loglog(sbr*10**6, Beta[:,0]*10**6, label='Total')
 		ax1.loglog(sbr*10**6, Beta[:,1]*10**6, label='Total')

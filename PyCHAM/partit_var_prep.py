@@ -8,15 +8,16 @@ import scipy.constants as si
 import diff_vol_est
 
 def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp, 
-			accom_coeff_user, spec_namelist, num_sb, num_asb, Pnow, 
-			Pybel_object, name_SMILE):
+	accom_coeff_user, spec_namelist, num_sb, num_asb, Pnow, 
+	Pybel_object, name_SMILE):
 	
 	# ------------------------------------------------------------------
 	# inputs:
 	# y_mw - molecular weight of components (g/mol) (num_speci,1)
 	# TEMP - temperature of chamber at start of experiment (K)
 	# num_speci - number of components
-	# testf - flag for whether in normal mode (0) or testing mode (1)
+	# testf - flag for whether in normal mode (0) or testing mode (1) or 
+	#	plotting of gas-phase diffusion coefficients mode (2)
 	# Cw - effective absorbing mass of wall (g/m3 (air))
 	# act_comp - names of components (corresponding to chemical scheme name) with 
 	# 			activity coefficient stated in act_user
@@ -32,8 +33,11 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	# name_SMILE - SMILE strings of components
 	# -----------------------------------------------------------------
 	
+	# start by assuming no error message
+	err_mess = ''
+
 	if testf == 1: # if in testing mode (for test_front.py)
-		return(0,0,0,0,0,0,0) # return dummies
+		return(0,0,0,0,0,0,0, err_mess) # return dummies
 	
 	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
 	
@@ -72,6 +76,44 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 	
 	# convert to cm2/s
 	Dstar_org = Dstar_org*1.e4
+
+	if (testf == 2):
+		import matplotlib.pyplot as plt
+		from matplotlib.colors import BoundaryNorm
+		from matplotlib.ticker import MaxNLocator
+		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+		plt.ion() # allow plotting
+		# prepare plot
+		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+		# plot gas-phase diffusion coefficients (cm2/s)
+		ax0.plot(np.arange(len(spec_namelist)), Dstar_org, '+')
+		ax0.set_ylabel(r'Gas-phase diffusion coeffiecient (cm$\rm{^{2}}\,$s$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_xlabel(r'Component name', fontsize = 14)
+		# set location of x ticks
+		ax0.set_xticks(np.arange(len(spec_namelist)))
+		ax0.set_xticklabels(spec_namelist, rotation = 90)
+		ax0.set_title(str('Gas-phase diffusion coeffiecients at ' + str(TEMP) + ' K and ' + str(Pnow) + ' Pa'), fontsize = 14)
+		err_mess = 'Stop'
+
+	if (testf == 3):
+		import matplotlib.pyplot as plt
+		from matplotlib.colors import BoundaryNorm
+		from matplotlib.ticker import MaxNLocator
+		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+		plt.ion() # allow plotting
+		# prepare plot
+		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+		# plot gas-phase diffusion coefficients (cm2/s)
+		ax0.plot(np.arange(len(spec_namelist)), therm_sp, '+')
+		ax0.set_ylabel(r'Gas-phase mean thermal speed (m$\,$s$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_xlabel(r'Component name', fontsize = 14)
+		# set location of x ticks
+		ax0.set_xticks(np.arange(len(spec_namelist)))
+		ax0.set_xticklabels(spec_namelist, rotation = 90)
+		ax0.set_title(str('Gas-phase mean thermal speeds at ' + str(TEMP) + ' K'), fontsize = 14)
+		err_mess = 'Stop'
 	
 	# accommodation coefficient of components in each size bin
 	accom_coeff = np.ones((num_speci, num_sb))*1.e0
@@ -140,11 +182,11 @@ def prep(y_mw, TEMP, num_speci, testf, Cw, act_comp, act_user, acc_comp,
 		act_coeff = np.repeat(act_coeff, num_asb, axis=0)
 
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
-	# molecules/cc (air), assuming a molecular weight of 200g/mol (*1.0e-6 to convert from
+	# # molecules/cm3 (air), assuming a molecular weight of 200 g/mol (*1.e-6 to convert from
 	# /m3 (air) to /cm3 (air))
 	Cw = ((Cw*1.e-6)/200.)*si.N_A
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)
 
-	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, diff_vol, Dstar_org)
+	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, diff_vol, Dstar_org, err_mess)

@@ -12,20 +12,20 @@ def fullmov(num_sb, n0, num_comp, Cp, MV, Vol0, Vbou, rbou): # define module
 	# num_sb - number of size bins excluding wall (if present)
 	# n0 - particle number concentration per size bin
 	# num_comp - number of components
-	# Cp - particle-phase component concentrations (molecules/cc (air))
+	# Cp - particle-phase component concentrations (# molecules/cm3 (air))
 	# MV - molar volume per component (um3/mol)
 	# Vol0 - initial volume per size bin at bin centre (um3)
 	# Vbou - volume bounds between size bins (um3)
 	# rbou - radius bounds (um)
 	# -------------------------------------------------------------
-	# particle-phase concentrations	(molecules/cc (air))
+	# particle-phase concentrations	(# molecules/cc (air))
 	Cp = np.transpose(Cp.reshape(num_sb, num_comp))
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	ish = n0[:, 0]>0. # size bins containing particles
 
 
 	nmolC = np.zeros((num_comp, ish.sum())) # empty array for molar concentration
-	# number of moles of each component in a single particle (mol/cc (air))
+	# number of moles of each component in a single particle (mol/cm3 (air))
 	nmolC[:, :] = ((Cp[:, ish]/(NA*n0[ish, 0])))
 	
 	Vnew = np.zeros((num_sb)) # empty array for new volumes

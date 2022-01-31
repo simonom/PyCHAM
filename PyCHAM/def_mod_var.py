@@ -31,6 +31,7 @@ def def_mod_var(caller): # define function
 	if (caller == 1): # called from Travis
 		uman_up = 1
 	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
+	testf = 0 # whether in testing mode or not
 	
 	# chamber environment -----------------------------------------------------------------
 	temp = np.array((298.15)).reshape(1) # temperature of experiment (K)
@@ -123,6 +124,7 @@ def def_mod_var(caller): # define function
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
 	light_ad = 1
+	tf_UVC = 1. # transmission factor for 254 nm wavelength artificial light
 
 	# deposition of particles and vapours to wall ------------------------------------------
 	wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
@@ -133,7 +135,8 @@ def def_mod_var(caller): # define function
 	pwl_xpre = 0. # gradient before inflection
 	pwl_xpro = 0. # gradient after inflection
 	inflectk = 0. # rate at inflection
-	chamSA = 42. # chamber surface area (m2) 
+	chamSA = 42. # chamber surface area (m2)
+	chamV = 18. # chamber volume (m3, set to MAC value)
 	Rader = -1 # flag for deposition to wall treatment (0 for customised, 1 for Rader and McMurry (1985))
 	p_char = 0. # average number of charges per particle (/particle)
 	e_field = 0. # average electric field inside chamber (g.m/A.s3)
@@ -175,7 +178,7 @@ def def_mod_var(caller): # define function
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff]
+			z_prt_coeff, tf_UVC, testf, chamV]
 
 	
 	# path to store for variables
@@ -198,4 +201,4 @@ def def_mod_var(caller): # define function
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV)
