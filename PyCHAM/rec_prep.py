@@ -48,7 +48,7 @@ def rec_prep(nrec_step,
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, 
-	tot_in_res_indx, tf_UVC, chamSA, chamV, kwf):
+	tot_in_res_indx, chamSA, chamV, kwf, self):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -169,10 +169,10 @@ def rec_prep(nrec_step,
 	# cont_inf_reci - index of components with continuous influx in record
 	# cont_inf_i - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
-	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
 	# kwf - flag for treatment of gas-wall partitioning coefficient
+	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ----------------------------------------------------------------
 
 	# note that instaneous changes occur before recording --------------------
@@ -274,7 +274,7 @@ def rec_prep(nrec_step,
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
 			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 
-			0., tf_UVC)
+			0., self)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 

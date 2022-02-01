@@ -80,8 +80,8 @@ def ode_updater(update_stp,
 	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 	HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
-	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, 
-	chamV):
+	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
+	chamV, self):
 	
 	# inputs: ----------------------------------------------------
 	# update_stp - interval at which to update integration 
@@ -285,9 +285,9 @@ def ode_updater(update_stp,
 	# cont_inf_reci - index of components with continuous influx in record
 	# cont_inf_i - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
-	# tf_UVC - transmission factor for 254 nm wavelength light
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
+	# self.tf_UVC - transmission factor for 254 nm wavelength light
 	# ------------------------------------------------------------
 
 	# start timer
@@ -295,6 +295,7 @@ def ode_updater(update_stp,
 
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
+	self.sumt = 0. # track time through simulation (s)
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
@@ -363,7 +364,7 @@ def ode_updater(update_stp,
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
-	cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, chamV, kwf)
+	cont_inf_i, tot_in_res_indx, chamSA, chamV, kwf, self)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -470,7 +471,7 @@ def ode_updater(update_stp,
 				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 				lat, lon, af_path, dayOfYear, Pnow, 
 				photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 
-				sumt, tf_UVC)
+				sumt, self)
 			
 			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)
@@ -662,6 +663,7 @@ def ode_updater(update_stp,
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
+		self.sumt += tnew
 		if (sumt % save_stp == 0.): # get remainder
 			save_cnt_chck += 1 # if need to move up count on interval check to
 		

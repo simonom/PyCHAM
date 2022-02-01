@@ -49,7 +49,7 @@ def mod_var_read(self):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-			tf_UVC, testf, chamV] = pickle.load(pk)
+			testf, chamV] = pickle.load(pk)
 		pk.close()
 		
 		if (inname != 'Default'): # if not using defaults
@@ -329,8 +329,11 @@ def mod_var_read(self):
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
 				tf = float(value.strip())
 				
-			if key == 'tf_UVC' and (value.strip()): # transmission factor for 254 nm light
-				tf_UVC = float(value.strip())
+			if key == 'tf_UVC' and (value.strip()): # transmission factors for 254 nm light
+				self.tf_UVC = [float(i.strip()) for i in (value.split(','))]
+				
+			if key == 'tf_UVCt' and (value.strip()): # transmission factor times for 254 nm light
+				self.tf_UVCt = np.array(([float(i.strip()) for i in (value.split(','))]))
 
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				light_ad = int(value.strip())
@@ -504,7 +507,7 @@ def mod_var_read(self):
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
 				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 				testf, chamV]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')

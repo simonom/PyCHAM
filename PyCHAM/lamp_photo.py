@@ -26,7 +26,7 @@
 import numpy as np
 import os
 
-def lamp_photo(fname, J, TEMP, act_flux_path, sumt, tf_UVC):
+def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 
 	# --------------------------------------------------------------
 	# inputs
@@ -35,7 +35,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, tf_UVC):
 	# TEMP - chamber temperature (K)
 	# act_flux_path - path of actinic flux file, equals 'no' if none 
 	# given (in which case this module should not be called)
-	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
+	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# --------------------------------------------------------------
 	
 	if (act_flux_path != 'nat_act_flux'): # if using actinic fluxes from file
@@ -115,8 +115,12 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, tf_UVC):
 	#	if (sumt>=4.40e5 and sumt<4.60e5):
 	#		act_chm[0] = act_chm[0]*(27./43.)
 	
-	if (254 in wl_chm and tf_UVC < 1):
-		act_chm[wl_chm == 254.] = act_chm[wl_chm == 254.]*tf_UVC
+	# get UV-C transmission factor now
+	
+	tf_UVCn = self.tf_UVC[sum(self.tf_UVCt>=self.sumt)-1]
+	if (254 in wl_chm and tf_UVCn != 1):
+		act_chm[wl_chm == 254.] = act_chm[wl_chm == 254.]*tf_UVCn
+
 	# --------------------------------------------------------------
 	# in the below sections photolysis rates are calculated using either the
 	# user-supplied file of absorption cross-sections and quantum yields

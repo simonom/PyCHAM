@@ -34,9 +34,10 @@ import os
 import ode_updater
 import tot_in # preparing record of gas-phase influxes
 
-def middle(): # define function
+def middle(self): # define function
 
-	# inputs: -----------------------------------------------------
+	# inputs: -------------------------------------------------------
+	# self - reference to program
 	# ---------------------------------------------------------------
 	
 	# get required inputs
@@ -52,7 +53,7 @@ def middle(): # define function
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
-		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		testf, chamSA, chamV] = ui.share()
 
 	# parse the chemical scheme equation file to convert equations
@@ -82,7 +83,7 @@ def middle(): # define function
 		import var_checker
 		[err_mess, erf] = var_checker.var_checker(testf, light_stat, light_time, daytime, lat, 
 			lon, temp, tempt, tot_time, af_path, dayOfYear, photo_path, Jlen, tf, 
-			tf_UVC, update_stp, err_mess, erf)
+			update_stp, err_mess, erf, self)
 	
 	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
@@ -162,8 +163,8 @@ def middle(): # define function
 		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 		HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
-		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, tf_UVC, chamSA, 
-		chamV):
+		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
+		chamV, self):
 
 		yield prog # update progress bar	
 

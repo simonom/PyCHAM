@@ -55,7 +55,7 @@ def ui_check(self):
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-		tf_UVC, testf, chamV] = pickle.load(pk)
+		testf, chamV] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: ------------------------------------------------------------
@@ -464,7 +464,7 @@ def ui_check(self):
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, tf_UVC, testf, chamV]
+			z_prt_coeff, testf, chamV]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling

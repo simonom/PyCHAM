@@ -73,7 +73,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest using one tab
-	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, tf, NO, HO2, NO3, sumt, tf_UVC):\n')
+	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, tf, NO, HO2, NO3, sumt, self):\n')
 	f.write('\n')
 	f.write('	# inputs: ------------------------------------------------------------------\n')
 	f.write('	# RO2 - names of components included in peroxy radical list\n')	
@@ -88,7 +88,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# NO - NO concentration (# molecules/cm3 (air))\n')
 	f.write('	# HO2 - HO2 concentration (# molecules/cm3 (air))\n')
 	f.write('	# NO3 - NO3 concentration (# molecules/cm3 (air))\n')
-	f.write('	# tf_UVC - transmission factor for 254 nm wavelength light (0-1) \n')
+	f.write('	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1) \n')
 	f.write('	# ------------------------------------------------------------------------\n')
 	f.write('\n')
 	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors')
@@ -105,7 +105,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 		f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
 	f.write('\n')
 	f.write('	# estimate and append photolysis rates\n')
-	f.write('	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, tf_UVC)\n')
+	f.write('	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, self)\n')
 	f.write('\n')
 	f.write('	if (lightm == 0):\n')
 	f.write('		J = [0]*len(J)\n')

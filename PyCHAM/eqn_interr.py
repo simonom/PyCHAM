@@ -626,7 +626,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)
-				
+
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'C' in name_SMILE):
@@ -713,7 +713,6 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	njac_aq = njac.astype(int)
 	jac_indx_aq = jac_indx
 	jac_indx_aq = jac_indx_aq.astype(int)
-
 
 	return(rindx_g, rstoi_g, pindx_g, pstoi_g, reac_coef_g, 
 			nreac_g, nprod_g, jac_stoi_g, 

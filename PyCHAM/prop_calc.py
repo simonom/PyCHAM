@@ -190,13 +190,13 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 			# that equation given by eq. 7 of same reference)
 			Psat[0, i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
-						boiling_points.nannoolal(Pybel_objects[i]))))
+						boiling_points.nannoolal(Pybel_objects[i]))))[0]
 			
 			if (TEMP == 298.15):
 				Psat_Pa_rec[i] = Psat_Pa[0, i]
 			else: 
 				Psat_Pa_rec[i] = ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
-						boiling_points.nannoolal(Pybel_objects[i]))))
+						boiling_points.nannoolal(Pybel_objects[i]))))[0]
 
 		# O:C ratio determined from SMILES string
 		if (rel_SMILES[i].count( 'C') > 0):

@@ -148,7 +148,8 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, 
+		self] = def_mod_var.def_mod_var(0, self)
 		
 		# listing input files -----------------------------------------------------------
 		l1 = QLabel(self)
@@ -696,10 +697,17 @@ class PyCHAM(QWidget):
 		
 		l58b = QLabel(self)
 		l58b.setText('Transmission factor for \n254 nm wavelength light: ')
-		self.varbox.addWidget(l58b, light_row+10, 0)
+		self.varbox.addWidget(l58b, light_row+11, 0)
 		self.l58bb = QLabel(self)
-		self.l58bb.setText((str(tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l58bb.setText((str(self.tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l58bb, light_row+11, 1)
+
+		l58c = QLabel(self)
+		l58c.setText('Transmission factor for \n254 nm wavelength light times (s): ')
+		self.varbox.addWidget(l58c, light_row+12, 0)
+		self.l58cc = QLabel(self)
+		self.l58cc.setText((str(self.tf_UVCt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.varbox.addWidget(self.l58cc, light_row+12, 1)
 		
 		
 		
@@ -708,7 +716,7 @@ class PyCHAM(QWidget):
 		l59b = QLabel(self)
 		l59b.setText('Walls')
 		l59b.setFont(QFont("Arial", 13, QFont.Bold))
-		wall_row = light_row+12
+		wall_row = light_row+13
 		self.varbox.addWidget(l59b, wall_row+0, 0)
 		
 		l59 = QLabel(self)
@@ -986,10 +994,12 @@ class PyCHAM(QWidget):
 		# include tabs
 		
 		PLtabs = QTabWidget()
-		PLtabs.addTab(self.PRIMtab(), "Basic")
-		PLtabs.addTab(self.SECtab(), "Detailed")
+		PLtabs.addTab(self.PRIMtab(), "Quick")
+		PLtabs.addTab(self.SECtab(), "Flux")
+		PLtabs.addTab(self.VOLtab(), "Volatility")
 		PLtabs.addTab(self.PARtab(), "Particle") # for particle-phase things
-		PLtabs.addTab(self.INSTRtab(), "Instrument Comparison")
+		PLtabs.addTab(self.INSTRtab(), "Convolution")
+		PLtabs.addTab(self.OBStab(), "Observed")
 		self.PLlayout.addWidget(PLtabs, 1, 0, 1, 5)
 		
 		# relative stretching (width-wise) of each column in Plot tab
@@ -1151,44 +1161,6 @@ class PyCHAM(QWidget):
 		self.SEClayout.addWidget(self.separatorLine4, 3, 1, 7, 1)
 		self.separatorLine4.show()
 
-		# volatility basis set ------------------
-		
-		# label for names of components to plot tracked change tendencies
-		l219 = QLabel(self)
-		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
-		l219.setWordWrap(True)
-		self.SEClayout.addWidget(l219, 4, 0, 2, 1)
-		
-		# button to plot temporal profile of volatility basis set mass fractions with water
-		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
-		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
-		self.b220.clicked.connect(self.on_click220)
-		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b220, 6, 0)
-		
-		# button to plot temporal profile of volatility basis set mass fractions without water
-		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
-		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
-		self.b221.clicked.connect(self.on_click221)
-		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b221, 7, 0)
-		
-		# two-dimensional volatility basis set ------------------
-		
-		# input bar for time through experiment to plot the 2D VBS for
-		self.e222 = QLineEdit(self)
-		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
-		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e222, 8, 0)
-		
-		# button to plot 2D VBS
-		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
-		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
-		self.b223.clicked.connect(self.on_click223)
-		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.SEClayout.addWidget(self.b223, 9, 0)
-		
-
 		# ---------------------------------------------------------
 		
 		# input bar for atom or functional group to plot contributions from
@@ -1228,6 +1200,51 @@ class PyCHAM(QWidget):
 		#self.PLlayout.setRowStretch(13, 1)
 		
 		return(SECTab)
+
+	def VOLtab(self): # more detailed plotting tab definition
+
+		VOLTab = QWidget()
+		self.VOLlayout = QGridLayout() 
+		VOLTab.setLayout(self.VOLlayout)
+
+		# volatility basis set ------------------
+		
+		# label for names of components to plot tracked change tendencies
+		l219 = QLabel(self)
+		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
+		l219.setWordWrap(True)
+		self.VOLlayout.addWidget(l219, 4, 0, 2, 1)
+		
+		# button to plot temporal profile of volatility basis set mass fractions with water
+		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
+		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
+		self.b220.clicked.connect(self.on_click220)
+		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.VOLlayout.addWidget(self.b220, 6, 0)
+		
+		# button to plot temporal profile of volatility basis set mass fractions without water
+		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
+		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
+		self.b221.clicked.connect(self.on_click221)
+		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.VOLlayout.addWidget(self.b221, 7, 0)
+		
+		# two-dimensional volatility basis set ------------------
+		
+		# input bar for time through experiment to plot the 2D VBS for
+		self.e222 = QLineEdit(self)
+		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
+		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
+		self.VOLlayout.addWidget(self.e222, 8, 0)
+		
+		# button to plot 2D VBS
+		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
+		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
+		self.b223.clicked.connect(self.on_click223)
+		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.VOLlayout.addWidget(self.b223, 9, 0)
+
+		return(VOLTab)
 
 	def PARtab(self): # more detailed particle-phase plotting tab definition
 
@@ -1622,6 +1639,34 @@ class PyCHAM(QWidget):
 	
 		return(CIMSTab)
 	
+	def OBStab(self): # comparing with observations
+
+		OBSTab = QWidget()
+		self.OBSlayout = QGridLayout() 
+		OBSTab.setLayout(self.OBSlayout)
+
+		# show path to observations file --------------------------------------------------------
+		self.l401 = ScrollLabel(self)
+		cwd = os.getcwd() # current working directory
+		path = str(cwd + '/PyCHAM/output/26_10.xlsx')
+		self.l401.setText(path)
+		self.OBSlayout.addWidget(self.l401, 0, 0, 1, 1)
+
+		# select observations file --------------------------------------------------------------
+		b400 = QPushButton('Select File Containing Observations', self)
+		b400.setToolTip('Select the file containing the required observations')
+		b400.clicked.connect(self.on_click400)
+		self.OBSlayout.addWidget(b400, 0, 1, 1, 1)
+
+		# plot observations and model results
+		# select observations file --------------------------------------------------------------
+		b401 = QPushButton('Observed && Modelled', self)
+		b401.setToolTip('Plot Observations and Model Results as Described in Quick tab')
+		b401.clicked.connect(self.on_click401)
+		self.OBSlayout.addWidget(b401, 1, 0, 1, 1)
+		
+		return(OBSTab)
+
 	@pyqtSlot() # eurochamp website under development 10/02/2021
 	def on_clickn1(self): # EUROCHAMP website
 		import webbrowser
@@ -1668,7 +1713,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1685,7 +1730,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 			testf, chamV] = pickle.load(pk)
 			pk.close()
 		
@@ -1725,7 +1770,7 @@ class PyCHAM(QWidget):
 				coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 				Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-				z_prt_coeff, tf_UVC, testf, chamV]
+				z_prt_coeff, testf, chamV]
 
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
@@ -1775,7 +1820,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 			testf, chamV] = pickle.load(pk)
 			pk.close()
 	
@@ -1796,7 +1841,7 @@ class PyCHAM(QWidget):
 			uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 			p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
+			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1825,7 +1870,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, 
-			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+			drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 			testf, chamV] = pickle.load(pk)
 			pk.close()
 	
@@ -1846,7 +1891,7 @@ class PyCHAM(QWidget):
 			new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, 
 			pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 			partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
+			seed_eq_wat, z_prt_coeff, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1881,7 +1926,7 @@ class PyCHAM(QWidget):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, tf_UVC, testf, chamV] = pickle.load(pk)
+			z_prt_coeff, testf, chamV] = pickle.load(pk)
 			pk.close() # close pickle file
 
 		# user chooses path of file to model variables file
@@ -1906,7 +1951,7 @@ class PyCHAM(QWidget):
 				nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-				seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
+				seed_eq_wat, z_prt_coeff, testf, chamV]
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1967,7 +2012,7 @@ class PyCHAM(QWidget):
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV] = def_mod_var.def_mod_var(0)
+			seed_eq_wat, z_prt_coeff, testf, chamV, self] = def_mod_var.def_mod_var(0, self)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -2003,7 +2048,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 				pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 				partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-				Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV]
+				Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV]
 				
 			# path to pickle file
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -2034,7 +2079,7 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, 
+				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 				testf, chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
@@ -2126,7 +2171,7 @@ class PyCHAM(QWidget):
 		
 		note_messf = 0 # cancel note message flag
 		
-		for prog in middle(): # call on modules to solve problem
+		for prog in middle(self): # call on modules to solve problem
 			
 		
 			if (isinstance(prog, str)): # check if it's a message
@@ -2377,7 +2422,7 @@ class PyCHAM(QWidget):
 			caller = 3
 
 		import plotter_gp
-		dir_path = self.l201.text() # name folder with results
+		dir_path = self.l201.text() # name of folder with model results
 		if (dir_path[-4::] != '.nc'):
 			plotter_gp.plotter(caller, dir_path, comp_names, self) # plot results
 		if (dir_path[-3::] == '.nc'):
@@ -3620,7 +3665,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-				tf_UVC, testf, chamV] = pickle.load(pk)
+				testf, chamV] = pickle.load(pk)
 				pk.close()
 		
 			# call on plotting script
@@ -3704,6 +3749,33 @@ class PyCHAM(QWidget):
 
 		import consumption # function to estimate consumption
 		consumption.cons(comp_chem_schem_name, dir_path, self, 1)
+
+	@pyqtSlot()
+	def on_click400(self): # when observation file requires selection
+
+		# button to get path to folder containing relevant files
+		options = QFileDialog.Options()
+		fil_nme = QFileDialog.getOpenFileName(self, "Select File Containing Required Observations", "./PyCHAM/output/")[0]
+		self.l401.clear() # clear old label
+		self.l401.setText(fil_nme) # set new label
+		
+		return()
+	
+	@pyqtSlot()
+	def on_click401(self): # when observations and model results to be plotted
+
+		# get path to observations
+		self.xls_path = self.l401.text()
+		# get path to model results
+		self.mod_path = dir_path = self.l201.text()
+		# get names of gas-phase components to plot
+		self.gp_names = [str(i) for i in self.e205.text(). split(',')]
+		# gas-phase concentration units
+		self.gp_units = self.b206b.currentText()
+		
+		import plotter_xls
+		plotter_xls.plotter_gp_mod_n_obs(self)		
+		return()
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

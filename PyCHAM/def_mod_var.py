@@ -26,10 +26,11 @@ import numpy as np
 import os
 import pickle # used for storing values
 
-def def_mod_var(caller): # define function
+def def_mod_var(caller, self): # define function
 
 	# inputs: -----------------------------------------------
 	# caller - mark for calling function
+	# self - reference to program
 	# -------------------------------------------------------
 
 	# default input files ------------------------------
@@ -145,7 +146,8 @@ def def_mod_var(caller): # define function
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
 	light_ad = 1
-	tf_UVC = 1. # transmission factor for 254 nm wavelength artificial light
+	self.tf_UVC = 1. # transmission factor for 254 nm wavelength artificial light
+	self.tf_UVCt = 0. # time (s) for transmission factor for 254 nm wavelength artificial light
 
 	# deposition of particles and vapours to wall ------------------------------------------
 	wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
@@ -199,7 +201,7 @@ def def_mod_var(caller): # define function
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, tf_UVC, testf, chamV]
+			z_prt_coeff, testf, chamV]
 
 	
 	# path to store for variables
@@ -222,4 +224,4 @@ def def_mod_var(caller): # define function
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, tf_UVC, testf, chamV)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, self)

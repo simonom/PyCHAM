@@ -32,7 +32,7 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, tf, sumt, tf_UVC):
+							Jlen, tf, sumt, self):
 
 	# inputs:-----------------------------------------------------------------------------
 	# time - time of day (for natural light photolysis)
@@ -47,7 +47,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# Jlen - number of photolysis reactions
 	# tf - the transmission factor (for natural light intensity)
 	# sumt - total time through experiment (s)
-	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
+	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ------------------------------------------------------------------------------------
 	
 	J = np.zeros((Jlen)) # prepare output
@@ -140,7 +140,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	if (act_flux_path != 'no'):
 		
 		# call on module to process photolysis files and estimate J values
-		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, tf_UVC)
+		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, self)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0

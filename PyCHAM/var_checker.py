@@ -27,8 +27,8 @@
 import numpy as np # for math and array handling
 
 def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, tot_time, 
-	act_flux_path, DayOfYear, photo_par_file, Jlen, tf, tf_UVC, update_stp, 
-	err_mess, erf): # define function
+	act_flux_path, DayOfYear, photo_par_file, Jlen, tf, update_stp, 
+	err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
 	# testf - flag for whether in checking mode and what to check
@@ -46,10 +46,10 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 	# 	cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
 	# tf - sunlight transmission factor
-	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# tstep - suggested interval between integrations (s)
 	# err_mess - any existing error mesages
 	# erf -any existing error flags
+	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ---------------------------------------------------------------------------------
 
 	if (testf == 4): # checking on estimated photolysis rates throughout simulation
@@ -58,7 +58,8 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 		import photolysisRates
 		
 		sumt = 0 # time through experiment (s)
-		
+		self.sumt = 0.
+
 		# ensure numpy arrays
 		tempt = np.array(tempt)
 		temp = np.array(temp)
@@ -79,15 +80,15 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 			
 				# estimate and append photolysis rates
 				J = photolysisRates.PhotolysisCalculation(daytime+sumt, lat, lon, TEMP, 
-					act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, tf_UVC)
+					act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, self)
 			
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)
 					Jres = J.reshape(1, -1)
 				else:
 					Jres = np.concatenate((Jres, J.reshape(1, -1)), axis = 0)
 					
-			sumt += update_stp # time through experiment
-		
+			sumt += update_stp # time through experiment (s)
+			self.sumt += update_stp # time through experiment (s)
 		import matplotlib.pyplot as plt
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
