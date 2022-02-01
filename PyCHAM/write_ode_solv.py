@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -52,7 +52,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f = open('PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
