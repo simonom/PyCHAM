@@ -38,7 +38,7 @@ def plotter_gp_mod_n_obs(self):
 	
 	# open xls file
 	wb = openpyxl.load_workbook(filename = self.xls_path)
-	obs = wb.active # get first sheet
+	obs = wb['PyCHAM'] # get first sheet
 	# empty list to hold information on handling observation data
 	obs_setup = []
 	# loop through columns to get information required for 
@@ -75,7 +75,42 @@ def plotter_gp_mod_n_obs(self):
 		
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	# legend labels of observed components
+	llab = [lli for lli in obs_setup[9].split(',')]
+
+	# loop through observed components to plot in order to plot
 	for i in range(yce-ycs+1):
-		plt.plot(obsx, obsy[:, i])
-	print(obsx[0:10], obsy[0, 0:10])
+		if (self.gp_units[-4::] == 'near'): # linear y-axis
+			ax0.plot(obsx, obsy[:, i], label = llab[i])
+		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis
+			ax0.semilogy(obsx, obsy[:, i], label = llab[i])
+	
+	# ----------------------------------------------------------
+	# deal with model results
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.mod_path)
+
+	# loop through modelled components
+	for mci in range(len(self.gp_names)):
+		indx_plt = comp_names.index(self.gp_names[mci].strip())
+		if (self.gp_units[-4::] == 'near'): # linear y-axis
+			ax0.plot(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))
+		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis
+			ax0.semilogy(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))
+	
+	# x-axis title
+	ax0.set_xlabel(obs_setup[3], fontsize = 14)
+	# y-axis title
+	ax0.set_ylabel(obs_setup[8], fontsize = 14)
+	# set label font size
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	# include legend
+	ax0.legend(fontsize = 14)
+
+	# -----------------------------------------------------------
+
 	return()

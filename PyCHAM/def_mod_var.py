@@ -68,7 +68,7 @@ def def_mod_var(caller, self): # define function
 	num_sb = 0 # number of particle size bins
 	# whether particle number concentrations expressed by modes (0) or explicitly	
 	pmode = 0
-	# concentration of particles (# particles/cc (air))
+	# concentration of particles (# particles/cm3 (air))
 	pconc = np.zeros((1, 1))
 	pconct = np.zeros((1, 1)) # times of particle injection (s)
 	pcont = np.zeros((1, 1), dtype=int) # whether particle injection instantaneous or continuous
@@ -146,9 +146,9 @@ def def_mod_var(caller, self): # define function
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
 	light_ad = 1
-	self.tf_UVC = 1. # transmission factor for 254 nm wavelength artificial light
-	self.tf_UVCt = 0. # time (s) for transmission factor for 254 nm wavelength artificial light
-
+	self.tf_UVC = np.ones((1, 1)) # transmission factor for 254 nm wavelength artificial light
+	self.tf_UVCt = np.zeros((1, 1)) # time (s) for transmission factor for 254 nm wavelength artificial light
+	
 	# deposition of particles and vapours to wall ------------------------------------------
 	wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	Cw = 0. # effective absorbing mass of wall (g/m3 (air))

@@ -116,9 +116,8 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 	#		act_chm[0] = act_chm[0]*(27./43.)
 	
 	# get UV-C transmission factor now
-	
-	tf_UVCn = self.tf_UVC[sum(self.tf_UVCt>=self.sumt)-1]
-	if (254 in wl_chm and tf_UVCn != 1):
+	tf_UVCn = self.tf_UVC[(sum(self.tf_UVCt<=self.sumt)-1)[0]]
+	if (254 in wl_chm and tf_UVCn != 1.):
 		act_chm[wl_chm == 254.] = act_chm[wl_chm == 254.]*tf_UVCn
 
 	# --------------------------------------------------------------

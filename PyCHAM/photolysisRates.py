@@ -138,7 +138,6 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# quantum yields in combination with MCM photolysis reactions 
 	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	if (act_flux_path != 'no'):
-		
 		# call on module to process photolysis files and estimate J values
 		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, self)
 	

@@ -1,24 +1,4 @@
-C:\Users\Psymo\Documents\PyCHAM_vW\PyCHAM\PyCHAM/output\mcm_CH4_scheme\26_10_040UVC
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
+C:\Users\Psymo\Documents\PyCHAM_vW\PyCHAM\PyCHAM/output\mcm_APINENE_CH4_scheme\22_11_HONOin_HCHOinflux_HO2loss_015UVC
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

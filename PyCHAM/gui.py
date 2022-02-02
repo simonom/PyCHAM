@@ -1052,9 +1052,12 @@ class PyCHAM(QWidget):
 		
 		# drop down button for units
 		self.b206b = QComboBox(self)
-		self.b206b.addItem('ppb')
-		self.b206b.addItem(str(u'\u03BC' + 'g/m' +u'\u00B3'))
-		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' +u'\u00B3'))
+		self.b206b.addItem('ppb linear')
+		self.b206b.addItem(str(u'\u03BC' + 'g/m' + u'\u00B3' + ' linear'))
+		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' + u'\u00B3' + ' linear'))
+		self.b206b.addItem('ppb log.')
+		self.b206b.addItem(str(u'\u03BC' + 'g/m' + u'\u00B3' + ' log.'))
+		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' + u'\u00B3' + ' log.'))
 		self.PRIMlayout.addWidget(self.b206b, 3, 1, 1, 1)
 
 		# particle-phase concentrations temporal profiles -------------
