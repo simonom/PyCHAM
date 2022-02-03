@@ -47,8 +47,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 	
 		for line in f: # loop through line
 		
-			try: # omit headers
-				float((line.strip()).split(',')[0])
+			try: # omit any headers
 				wl = float((line.strip()).split(',')[0])
 				act = float((line.strip()).split(',')[1])
 				wl_chm = np.append(wl_chm, (np.array(wl)).reshape(1), axis=0)
@@ -57,7 +56,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 			except:
 				continue
 		f.close() # close file
-	
+		
 		# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
 		# to ensure correct integration of photolysis rate over full spectrum
 		wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)
@@ -116,7 +115,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 	#		act_chm[0] = act_chm[0]*(27./43.)
 	
 	# get UV-C transmission factor now
-	tf_UVCn = self.tf_UVC[(sum(self.tf_UVCt<=self.sumt)-1)[0]]
+	tf_UVCn = self.tf_UVC[(np.sum(self.tf_UVCt<=self.sumt)-1)]
 	if (254 in wl_chm and tf_UVCn != 1.):
 		act_chm[wl_chm == 254.] = act_chm[wl_chm == 254.]*tf_UVCn
 
