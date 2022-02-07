@@ -2417,12 +2417,18 @@ class PyCHAM(QWidget):
 		gp_units = self.b206b.currentText() # gas-phase concentration units
 		
 		# convert units into number option
-		if (gp_units[0] == 'p'):
+		if (gp_units[0] == 'p' and gp_units[-1] == 'r'):
 			caller = 1
-		if (gp_units[1] == 'g'):
+		if (gp_units[1] == 'g' and gp_units[-1] == 'r'):
 			caller = 0
-		if (gp_units[2] == 'm'):
+		if (gp_units[2] == 'm' and gp_units[-1] == 'r'):
 			caller = 3
+		if (gp_units[0] == 'p' and gp_units[-1] == '.'):
+			caller = 4
+		if (gp_units[1] == 'g' and gp_units[-1] == '.'):
+			caller = 5
+		if (gp_units[2] == 'm' and gp_units[-1] == '.'):
+			caller = 6
 
 		import plotter_gp
 		dir_path = self.l201.text() # name of folder with model results

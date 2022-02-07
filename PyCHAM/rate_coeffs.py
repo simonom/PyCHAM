@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2022-02-03 16:27:29.642721
+# created at 2022-02-07 16:30:56.907219
 
 import numpy
 import photolysisRates
@@ -202,7 +202,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 
 	if (lightm == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((944))
+	rate_values = numpy.zeros((946))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
@@ -1148,8 +1148,10 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	rate_values[939] = J[34]
 	rate_values[940] = J[35]
 	rate_values[941] = 0.0
-	rate_values[942] = 6.0e-4
-	rate_values[943] = 1.0e1
+	rate_values[942] = 1.0e-16
+	rate_values[943] = 3.0e-16
+	rate_values[944] = 1.0e-15
+	rate_values[945] = 2.0e-4
 	
 	# aqueous-phase reactions
 	

@@ -101,7 +101,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.close() # close figure window
 					return()
 			
-			if (caller == 0): # ug/m3 plot
+			if (caller == 0  or caller == 5): # ug/m3 plot
 			
 				# gas-phase concentration (# molecules/cm3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
@@ -109,12 +109,12 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				# gas-phase concentration (ug/m3)
 				conc = ((conc/si.N_A)*y_MW[indx_plot])*1.e12
 			
-			if (caller == 1): # ppb plot
+			if (caller == 1 or caller == 4): # ppb plot
 			
 				# gas-phase concentration (ppb)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
 
-			if (caller == 3): # # molecules/cm3 plot
+			if (caller == 3  or caller == 6): # # molecules/cm3 plot
 			
 				# gas-phase concentration (# molecules/cm3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
@@ -124,20 +124,27 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 			# plot this component
 			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'): # if not the sum of organic peroxy radicals
-				# log10 y axis
-				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
-				# linear y axis
-				#ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+				if (caller == 4 or caller == 5 or caller == 6): # log10 y axis
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				
 			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
-				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
-			
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
 			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
-				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
-
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
 			if (comp_names_to_plot[i].strip() == 'HOMRO2'): # if is the sum of HOM organic peroxy radicals
-				ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
-
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
+					
 		if (caller == 0): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		if (caller == 1): # ppb plot
