@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2022-02-07 16:30:56.907219
+# created at 2022-02-09 15:51:45.086798
 
 import numpy
 import photolysisRates
@@ -192,6 +192,12 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 		KNO3=KRO2NO3*NO3 
 		KTR=KNO+KHO2+KRO2+KNO3 
 		K16ISOM=(KTR*5.18e-04*numpy.exp(1308/TEMP))+(2.76e07*numpy.exp(-6759/TEMP)) 
+		#%4.0e-4:NO2=NO 
+		#%5.0e-16:NO2+NO2=HONO+HNO3 
+		#%0.0e-16:HONO+HONO=NO+NO2 
+		#%2.0e-14:HONO+HNO3=NO+NO 
+		#%1.0e-3:HNO3=HONO+O 
+		#%0.0e0:HO2= 
 
 	except:
 		erf = 1 # flag error
@@ -202,7 +208,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 
 	if (lightm == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((946))
+	rate_values = numpy.zeros((942))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
@@ -1148,10 +1154,6 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	rate_values[939] = J[34]
 	rate_values[940] = J[35]
 	rate_values[941] = 0.0
-	rate_values[942] = 1.0e-16
-	rate_values[943] = 3.0e-16
-	rate_values[944] = 1.0e-15
-	rate_values[945] = 2.0e-4
 	
 	# aqueous-phase reactions
 	

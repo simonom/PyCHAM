@@ -48,7 +48,7 @@ def plotter_taf(self): # define function for total actinic flux
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 		ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV] = pickle.load(pk)
+		z_prt_coeff, testf, chamV] = pickle.load(pk)
 		pk.close() # close pickle file
 	
 	testf = 4 # modify test flag value
@@ -67,7 +67,7 @@ def plotter_taf(self): # define function for total actinic flux
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 		Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV]
+		z_prt_coeff, testf, chamV]
 
 	with open(input_by_sim, 'wb') as pk:
 		pickle.dump(list_vars, pk) # pickle
@@ -78,7 +78,7 @@ def plotter_taf(self): # define function for total actinic flux
 		
 	note_messf = 0 # cancel note message flag
 		
-	for prog in middle(): # call on modules to solve problem
+	for prog in middle(self): # call on modules to solve problem
 			
 		
 		if (isinstance(prog, str)): # check if it's a message

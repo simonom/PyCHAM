@@ -1165,24 +1165,37 @@ class PyCHAM(QWidget):
 		self.separatorLine4.show()
 
 		# ---------------------------------------------------------
+		# input bar for reaction numbers (starting from 1), to get ratios for
+		self.e220a = QLineEdit(self)
+		self.e220a.setText('Reaction numbers (starting from 1) for numerator/reaction numbers for denominator (separate reactions with a comma and the numerator from denominator with a /)')
+		self.e220a.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e220a, 4, 0, 1, 1)
+
+		# button to calculate and plot reaction rate ratios
+		self.b220b = QPushButton('Reaction ratios', self)
+		self.b220b.setToolTip('')
+		self.b220b.clicked.connect(self.on_click220b)
+		self.SEClayout.addWidget(self.b220b, 5, 0, 1, 1)
+
+		# ---------------------------------------------------------
 		
 		# input bar for atom or functional group to plot contributions from
 		self.e218a = QLineEdit(self)
 		self.e218a.setText('Provide the SMILES names of atoms or functional groups for plotting component contributions (use RO2 for organic peroxy radicals)')
 		self.e218a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218a, 6, 2, 1, 1)
+		self.SEClayout.addWidget(self.e218a, 4, 2, 1, 1)
 		
 		# input bar for top number of components containing the relevant atom or functional groups
 		self.e218b = QLineEdit(self)
 		self.e218b.setText('Provide the number of components (in descending order) containing the atom/functional group to plot')
 		self.e218b.setStyleSheet('qproperty-cursorPosition : 0')
-		self.SEClayout.addWidget(self.e218b, 7, 2, 1, 1)
+		self.SEClayout.addWidget(self.e218b, 5, 2, 1, 1)
 		
 		# button to plot temporal profile of component contributions
 		self.b218b = QPushButton('Plot component contributions (mole fraction)', self)
 		self.b218b.setToolTip('Plot the contributions to this atom/functional group by component (mole fraction)')
 		self.b218b.clicked.connect(self.on_click218b)
-		self.SEClayout.addWidget(self.b218b, 8, 2, 1, 1)
+		self.SEClayout.addWidget(self.b218b, 6, 2, 1, 1)
 
 		# column and row relative lengths---------------------------------
 		
@@ -2665,6 +2678,26 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		plotter_atom_frac.plotter(0, dir_path, atom_name, atom_num, self) # plot results
 	
+	@pyqtSlot() # button to plot reaction ratios
+	def on_click220b(self):
+		
+		try: # in case nunmerator numbers supplied
+			# get numerator reaction numbers
+			self.num_reac_num = np.array(([float(i) for i in self.e220a.text().split('/')[0].split(',')]))
+		except:
+			self.num_reac_num = []
+
+		try: # in case denominator numbers supplied
+			# get denominator reaction numbers
+			self.den_reac_num = np.array(([float(i) for i in self.e220a.text().split('/')[1].split(',')]))
+		except:
+			self.den_reac_num = []
+		self.dir_path = self.l201.text() # name of folder with results
+
+		# call on plotter for reaction rate ratios
+		import plotter_ct
+		plotter_ct.plotter_reac_ratios(self)
+		
 	# button to plot volatility basis set mass fractions with water
 	@pyqtSlot()
 	def on_click220(self):

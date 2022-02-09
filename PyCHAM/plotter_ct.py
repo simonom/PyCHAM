@@ -460,3 +460,56 @@ def plotter_prod(caller, dir_path, comp_names_to_plot, tp, uc, self):
 		return() # return now
 
 	return()
+
+def plotter_reac_ratios(self):
+	
+	# inputs: ------------------------------------------------------------------
+	# self - reference to PyCHAM
+	# --------------------------------------------------------------------------
+
+	# chamber condition ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(self.dir_path)
+
+
+	# prepare figure
+	plt.ion() # display figure in interactive mode
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))	
+	
+	# empty results array for numerator and denominator
+	num = np.zeros((len(timehr), 1))
+	den = np.zeros((len(timehr), 1))
+
+	# loop through file names in results path
+	for fnamei in os.listdir(self.dir_path):
+		if (fnamei[-15::] == '_rate_of_change' and np.sum(self.num_reac_num != -1.e6)+np.sum(self.den_reac_num != -1.e6)>0 ):
+			
+			dydt = np.loadtxt(str(self.dir_path + '/' + fnamei), delimiter = ',', skiprows = 1) # skiprows = 1 omits header
+			res = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
+			# transform recation numbers from starting at 0 to (pythonic) to starting at 1 (user-supplied)
+			res[0, :] += 1
+
+			rn_cnt = 0 # count on numerator reaction numbers
+			for reac_num in self.num_reac_num:
+				
+				if sum(res[0, :] == reac_num) == 1:
+					# add to numerator
+					num[:, :] += np.abs(res[:, res[0, :] == reac_num])
+					# remove this reaction from list
+					self.num_reac_num[rn_cnt] = -1.e6
+				rn_cnt += 1 # count on reaction number
+
+			rn_cnt = 0 # count on denominator reaction numbers
+			for reac_num in self.den_reac_num:
+				if sum(res[0, :] == reac_num) == 1:
+					# add to denominator
+					den[:, :] += np.abs(res[:, res[0, :] == reac_num])
+					# remove this reaction from list
+					self.den_reac_num[rn_cnt] = -1.e6
+				rn_cnt += 1 # count on reaction number
+
+	# plot
+	ax0.plot(timehr[den[:,0]>0.], num[den>0.]/den[den>0.])
+	return()

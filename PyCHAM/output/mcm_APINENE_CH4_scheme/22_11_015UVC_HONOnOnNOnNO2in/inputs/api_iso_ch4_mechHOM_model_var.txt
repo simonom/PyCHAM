@@ -1,0 +1,61 @@
+# inputs for autumn 2021 campaign in MAC, see notes in shared document:
+# https://docs.google.com/document/d/1jHl7bvWDBzzsnV0T16OSkaOMe6Uy31MV1T34ghqGzKE/edit#
+res_file_name = 22_11_015UVC_HONOnOnNOnNO2in
+total_model_time = 1.8e4
+update_step = 360.
+recording_time_step = 360.
+light_status = 1
+light_time = 0.
+tf_UVC = 0.15
+act_flux_file = MAC_Actinic_Flux_Spectrum_wUVC.csv
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.6
+# for background (based on observation): NO is 5 ppb, NO2 is 2.5 pb, CO 130 ppb, CH4 2 ppm
+# for reference case, APINENE is 40 ppb, O3 is 10 ppb
+# using MCMv3.3.1
+# for +CO case, APINENE is 40 ppb, O3 is 0 ppb, CO is 9360.0 ppb (x234)
+# because at 293.15 K and 101325 Pa:
+# Reaction rate a-pinene with OH: 1.2D-11*EXP(440/TEMP) = 5.38e-11 cm3/molecule/s
+# KMT05 (for CO with OH: KMT05 = 1.44D-13*(1+(M/4.2D+19)) and M (at 293.15 and 101325 Pa) =
+# M_val = (PInit/(8.3144621*TEMP)*si.N_A)*1.e-6 = 2.5034761899869045e19
+# giving a reaction rate coefficient of 2.30e-13 /molecule s, 
+# finally: 5.38e-11/2.30e-13 = 234
+# for CH4 case, APINENE is 40 ppb, O3 is 10 ppb, CH4 is 371040.0 ppb (x9276)
+# because at 293.15 K and 101325 Pa:
+# Reaction rate a-pinene with OH: 1.2D-11*EXP(440/TEMP) = 5.38e-11 /molecule s
+# for CH4 with OH 1.85D-12*EXP(-1690/TEMP) : OH + CH4 = CH3O2 ;
+# giving a reaction rate coefficient of 5.80e-15 cm3/molecule/s, 
+# finally: 5.38e-11/5.80e-15 = 9276
+C0 =   0.,     36.0,     0.0, 1.4e2, 2.0e3,    30.19, 2.0,  1.2, 0.
+Comp0 = O3, APINENE,     OH,  CO,     CH4,        NO, NO2, HONO, HCHO
+const_infl = HONO, O, NO, NO2
+Cinfl = 2.0e-3, 2.0e-3, 2.0e-3, 1.0e-3; 0.0e-3, 0.0e-3, 0.0e-3, 4.0e-3; 1.5e-3, 6.0e-3, 1.1e-2, 1.2e-2; -2.0e-3, -7.0e-3, -1.0e-2, -1.0e-2
+const_infl_t = 0.0, 1800., 3600., 7200.
+chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
+number_size_bins = 2
+coag_on = 1
+space_mode = log
+lower_part_size = 5.e-3
+upper_part_size = 5.e-1
+mean_rad = 2.5e-2
+std = 1.1
+pconct = 0.
+pconc = 1.2e5
+pcont = 0
+seed_name = AMM_SUL
+Vwat_inc = 1
+wall_on = 1
+# set to -1 to invoke Huang et al. 2018 treatment of gas-wall partitioning coefficient
+mass_trans_coeff = 1.e-3
+# based on observed loss of ozone and alpha-pinene in control experiments
+eff_abs_wall_massC = 1.e0
+McMurry_flag = 0
+inflectDp = 1.e-6
+Grad_pre_inflect = 0.1
+Grad_post_inflect = 0.1
+Rate_at_inflect = 6.e-6
+vol_Comp = AMM_SUL
+volP = 0.
+tracked_comp = NO2, HONO, NO, HNO3, APINENE, OH, O3, O, O1D, HO2, HCHO
