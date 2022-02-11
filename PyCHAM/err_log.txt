@@ -1,4 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\mcm_APINENE_CH4_scheme\22_11_0015UVC_HONOin
+/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/mcm_APINENE_CH4_scheme/22_11_0015UVC_HONOtest
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

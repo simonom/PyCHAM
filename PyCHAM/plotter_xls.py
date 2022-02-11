@@ -82,7 +82,10 @@ def plotter_gp_mod_n_obs(self):
 	# loop through observed components to plot in order to plot
 	for i in range(yce-ycs+1):
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
-			ax0.plot(obsx, obsy[:, i], label = llab[i])
+			eby = obsy[:, i]*0.20 # error bar array
+			markers, caps, bars = ax0.errorbar(obsx, obsy[:, i], yerr = eby, label = llab[i])
+			# loop through error bars to set transparency
+			[bar.set_alpha(0.1) for bar in bars]
 		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis
 			ax0.semilogy(obsx, obsy[:, i], label = llab[i])
 	
