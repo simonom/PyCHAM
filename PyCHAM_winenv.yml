@@ -39,6 +39,7 @@ dependencies:
   - mkl-service
   - netcdf4
   - numpy
+  - openpyxl
   - pandas
   - parso
   - pickleshare

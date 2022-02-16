@@ -49,6 +49,7 @@ dependencies:
   - numpy
   - numpy-base
   - openbabel
+  - openpyxl
   - openssl
   - pandas
   - parso
