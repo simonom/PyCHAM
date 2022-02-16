@@ -98,6 +98,8 @@ def plotter_gp_mod_n_obs(self):
 
 	# loop through modelled components
 	for mci in range(len(self.gp_names)):
+		if (self.gp_names[mci].strip() == ''): # if empty
+			continue
 		indx_plt = comp_names.index(self.gp_names[mci].strip())
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
 			ax0.plot(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))

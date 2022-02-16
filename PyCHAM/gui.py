@@ -3801,6 +3801,14 @@ class PyCHAM(QWidget):
 		self.l401.clear() # clear old label
 		self.l401.setText(fil_nme) # set new label
 		
+		self.l203a.setText('')
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '0px dashed magenta', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '0px solid magenta', 0., 0.)
+			self.bd_pl = 1
+
 		return()
 	
 	@pyqtSlot()
@@ -3815,6 +3823,36 @@ class PyCHAM(QWidget):
 		# gas-phase concentration units
 		self.gp_units = self.b206b.currentText()
 		
+		# check on inputs and provide message for user if anything missing
+		if (self.xls_path == ''):
+			self.l203a.setText('Error - no path to observations selected')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		if (self.mod_path == ''):
+			self.l203a.setText('Error - no path to model results selected')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		print(self.gp_names)
+		if (self.gp_names == ['']):
+			self.l203a.setText('Note, no components specified to be plotted for model results')
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
 		import plotter_xls
 		plotter_xls.plotter_gp_mod_n_obs(self)		
 		return()
