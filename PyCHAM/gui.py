@@ -3844,7 +3844,7 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
-		print(self.gp_names)
+		
 		if (self.gp_names == ['']):
 			self.l203a.setText('Note, no components specified to be plotted for model results')
 			if (self.bd_pl == 1):
