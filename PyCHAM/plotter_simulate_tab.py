@@ -24,7 +24,7 @@
 # (plotter_nsd module), this module plots the requested checks on
 # PyCHAM inputs as selected from the PyCHAM GUI simulate tab
 
-def plotter_taf(self): # define function for total actinic flux
+def plotter_taf(self): # define function for photolysis stuff
 
 	import os
 	import pickle # for storing inputs
@@ -42,7 +42,7 @@ def plotter_taf(self): # define function for total actinic flux
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -60,7 +60,7 @@ def plotter_taf(self): # define function for total actinic flux
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		dayOfYear, photo_path, con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -106,7 +106,7 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -124,7 +124,7 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		dayOfYear, photo_path, con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -172,7 +172,7 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -190,7 +190,7 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		dayOfYear, photo_path, con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 

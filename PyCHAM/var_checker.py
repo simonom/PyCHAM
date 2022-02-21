@@ -81,7 +81,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 				# estimate and append photolysis rates
 				J = photolysisRates.PhotolysisCalculation(daytime+sumt, lat, lon, TEMP, 
 					act_flux_path, DayOfYear, photo_par_file, Jlen, sumt, self)
-			
+				
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)
 					Jres = J.reshape(1, -1)
 				else:
@@ -89,6 +89,10 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 					
 			sumt += update_stp # time through experiment (s)
 			self.sumt += update_stp # time through experiment (s)
+
+		# ignore first column of Jres as this left empty by photolysisRates
+		Jres = Jres[:, 1::]
+		Jlen = Jres.shape[1] # total number of equations
 		import matplotlib.pyplot as plt
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
@@ -101,7 +105,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 		thr = (np.arange(0.0, sumt, update_stp))/3600.0
 		
 		# number of plots
-		nplot = math.ceil(Jlen/10.)
+		nplot = math.ceil((Jlen)/10.)
 		
 		for spi in range(nplot):
 			# prepare plot
@@ -114,8 +118,8 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 				prn = (np.arange(spi*10, Jlen)).astype(int)
 			
 			# loop through each of these photolysis reactions
-			for pri in prn: 
-		
+			for pri in prn:
+
 				# plot photolysis rates (/s), note reaction number label starts from 1 
 				# (not pythonic counting)
 				ax0.plot(thr, Jres[:, pri], label = str('Photolysis Reaction # ' + str(pri+1)))
@@ -123,7 +127,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 			ax0.set_xlabel(r'Time through experiment (hr)', fontsize = 14)
 			ax0.set_ylabel('Photolysis rate ($\mathrm{s^{-1}}$)', fontsize = 14)
 			# set location of x ticks
-			ax0.set_title('Note that reaction numbers start from 1', fontsize = 14)
+			ax0.set_title('Reaction numbers in legend start from 1 and \ntherefore align directly with MCM photolysis numbers', fontsize = 14)
 			ax0.legend()
 		
 		err_mess = 'Stop'
