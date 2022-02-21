@@ -32,7 +32,7 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, tf, sumt, self):
+							Jlen, sumt, self):
 
 	# inputs:-----------------------------------------------------------------------------
 	# time - time of day (for natural light photolysis)
@@ -45,7 +45,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# photo_par_file - name of file containing estimates for wavelength-dependent
 	# 					absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
-	# tf - the transmission factor (for natural light intensity)
+	# self.tf - the transmission factor (for natural light intensity)
 	# sumt - total time through experiment (s)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ------------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 		J[57] = 3.363E-06*cosx**(1.296)*np.exp(-1.0*0.322*secx)
 		J[61] = 7.537E-04*cosx**(0.499)*np.exp(-1.0*0.266*secx)
 
-		J = J*tf
+		J = J*self.tf
 
 	# from MAC spectral analysis and Mainz database (xsproc.py)
 # 	J[1] = 2.3706768705670786e-05

@@ -62,7 +62,7 @@ def ode_updater(update_stp,
 	dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-	x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr, 
+	x, Varr, act_coeff, Cw, kw, Cfactor, y_arr, 
 	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
 	colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
@@ -141,8 +141,8 @@ def ode_updater(update_stp,
 	# Cw - effective absorbing mass of wall (# molecules/cm3 (air))
 	# kw - gas-wall mass transfer coefficient (/s)
 	# Cfactor - conversion factor for concentrations (ppb/# molecules/cm3)
-	# tf - transmission factor for natural sunlight
-	# light_ad - marker for whether to adapt time interval for 
+	# self.tf - transmission factor for natural sunlight
+	# self.light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
 	# y_arr - index for arranging concentrations into matrix that 
 	# 	allows reaction rate coefficient calculation
@@ -355,8 +355,8 @@ def ode_updater(update_stp,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
 	RO2_indx, sumt, Pnow, light_stat, light_time, 
 	light_time_cnt, daytime, lat, lon, af_path, 
-	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
-	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, 
+	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
@@ -412,7 +412,7 @@ def ode_updater(update_stp,
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow0, light_stat, light_time, light_time_cnt0, light_ad, 
+			Pnow0, light_stat, light_time, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -422,7 +422,7 @@ def ode_updater(update_stp,
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
-			cont_inf_reci, cont_inf_i)
+			cont_inf_reci, cont_inf_i, self)
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
@@ -470,7 +470,7 @@ def ode_updater(update_stp,
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
 				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 				lat, lon, af_path, dayOfYear, Pnow, 
-				photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 
+				photo_path, Jlen, y[NOi], y[HO2i], y[NO3i], 
 				sumt, self)
 			
 			if (erf == 1): # if error message from reaction rate calculation
@@ -742,7 +742,7 @@ def ode_updater(update_stp,
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow0, light_stat, light_time, light_time_cnt0, light_ad, 
+			Pnow0, light_stat, light_time, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 			af_path, injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -752,7 +752,7 @@ def ode_updater(update_stp,
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
-			cont_inf_reci, cont_inf_i)
+			cont_inf_reci, cont_inf_i, self)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 

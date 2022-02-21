@@ -40,7 +40,7 @@ def mod_var_up(self):
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -113,8 +113,8 @@ def mod_var_up(self):
 	self.l54a.setText((str(af_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l55a.setText((str(photo_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l56a.setText((str(dayOfYear)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l57a.setText((str(tf)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l58a.setText((str(light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l57a.setText((str(self.tf)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l58a.setText((str(self.light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58bb.setText((str(self.tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58cc.setText((str(self.tf_UVCt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l59a.setText((str(wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

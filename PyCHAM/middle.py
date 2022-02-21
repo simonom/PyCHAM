@@ -47,7 +47,7 @@ def middle(self): # define function
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, 
-		lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		lon, af_path, dayOfYear, photo_path, con_infl_nam, 
 		const_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
@@ -82,7 +82,7 @@ def middle(self): # define function
 	if (testf >= 4):
 		import var_checker
 		[err_mess, erf] = var_checker.var_checker(testf, light_stat, light_time, daytime, lat, 
-			lon, temp, tempt, tot_time, af_path, dayOfYear, photo_path, Jlen, tf, 
+			lon, temp, tempt, tot_time, af_path, dayOfYear, photo_path, Jlen, 
 			update_stp, err_mess, erf, self)
 	
 	# if error raised, then tell GUI to display and to stop program
@@ -143,7 +143,7 @@ def middle(self): # define function
 		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-		x, Varr, act_coeff, Cw, kw, Cfactor, tf, light_ad, y_arr_g, y_rind_g, 
+		x, Varr, act_coeff, Cw, kw, Cfactor, y_arr_g, y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 

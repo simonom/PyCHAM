@@ -21,12 +21,12 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2022-02-16 18:36:30.322561
+# created at 2022-02-21 10:32:43.186341
 
 import numpy
 import photolysisRates
 
-def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, tf, NO, HO2, NO3, sumt, self):
+def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, NO, HO2, NO3, sumt, self):
 
 	# inputs: ------------------------------------------------------------------
 	# RO2 - names of components included in peroxy radical list
@@ -37,7 +37,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	# lightm: given by the user and is 0 for lights off and 1 for on
 	# reaction rate coefficients and their names parsed in eqn_parser.py 
 	# Jlen - number of photolysis reactions
-	# tf - sunlight transmission factor
+	# self.tf - sunlight transmission factor
 	# NO - NO concentration (# molecules/cm3 (air))
 	# HO2 - HO2 concentration (# molecules/cm3 (air))
 	# NO3 - NO3 concentration (# molecules/cm3 (air))
@@ -192,7 +192,6 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 		KNO3=KRO2NO3*NO3 
 		KTR=KNO+KHO2+KRO2+KNO3 
 		K16ISOM=(KTR*5.18e-04*numpy.exp(1308/TEMP))+(2.76e07*numpy.exp(-6759/TEMP)) 
-		#%4.0e-4:NO2=NO 
 		#%5.0e-16:NO2+NO2=HONO+HNO3 
 		#%0.0e-16:HONO+HONO=NO+NO2 
 		#%2.0e-14:HONO+HNO3=NO+NO 
@@ -204,11 +203,11 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 		err_mess = 'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file' # error message
 
 	# estimate and append photolysis rates
-	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, self)
+	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, sumt, self)
 
 	if (lightm == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((944))
+	rate_values = numpy.zeros((946))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
@@ -1156,6 +1155,8 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 	rate_values[941] = 0.0
 	rate_values[942] = 1.0e-6
 	rate_values[943] = 2.0e-6
+	rate_values[944] = 4.0e-4
+	rate_values[945] = 4.0e-4
 	
 	# aqueous-phase reactions
 	

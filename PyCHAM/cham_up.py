@@ -34,7 +34,7 @@ from water_calc import water_calc
 
 # define function
 def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time, 
-	light_time_cnt, light_ad, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
 	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
@@ -42,7 +42,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i):
+	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, self):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -52,7 +52,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# light_stat - status of lights
 	# light_time - times that light attain status (s)
 	# light_time_cnt - light status counter
-	# light_ad - marker for whether to change time interval 
+	# self.light_ad - marker for whether to change time interval 
 	#	in response to changing natural light intensity
 	# tnew - time interval between chamber updates (s)
 	# nuc_ad - flag for whether user wants time step adapted 
@@ -182,7 +182,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# if using natural light
 	cwd = os.getcwd() # address of current working directory
 
-	if (lightm == 1 and photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no' and light_ad == 1):	
+	if (lightm == 1 and photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no' and self.light_ad == 1):	
 		# check time step required to limit change to rate of 
 		# MCM photochemical equation number 6 (python index 5), 
 		# which the unit test for

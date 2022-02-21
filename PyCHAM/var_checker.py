@@ -27,7 +27,7 @@
 import numpy as np # for math and array handling
 
 def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, tot_time, 
-	act_flux_path, DayOfYear, photo_par_file, Jlen, tf, update_stp, 
+	act_flux_path, DayOfYear, photo_par_file, Jlen, update_stp, 
 	err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
@@ -45,7 +45,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 	# photo_par_file - name of file with with estimates for photolysis absorption
 	# 	cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
-	# tf - sunlight transmission factor
+	# self.tf - sunlight transmission factor
 	# tstep - suggested interval between integrations (s)
 	# err_mess - any existing error mesages
 	# erf -any existing error flags
@@ -80,7 +80,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 			
 				# estimate and append photolysis rates
 				J = photolysisRates.PhotolysisCalculation(daytime+sumt, lat, lon, TEMP, 
-					act_flux_path, DayOfYear, photo_par_file, Jlen, tf, sumt, self)
+					act_flux_path, DayOfYear, photo_par_file, Jlen, sumt, self)
 			
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)
 					Jres = J.reshape(1, -1)

@@ -38,8 +38,8 @@ def rec_prep(nrec_step,
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	RO2_indx, sumt, Pnow, light_stat, light_time, 
 	light_time_cnt, daytime, lat, lon, af_path, 
-	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, tf, 
-	light_ad, wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, 
+	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
@@ -95,8 +95,8 @@ def rec_prep(nrec_step,
 	# Cw - effective absorbing mass of wall (molecules/cc (air))
 	# kw - gas-wall partitioning coefficient (/s)
 	# Cfactor - conversion factor (ppb/molecules/cc)
-	# tf - transmission factor for natural sunlight
-	# light_ad - marker for whether to adapt time interval to 
+	# self.tf - transmission factor for natural sunlight
+	# self.light_ad - marker for whether to adapt time interval to 
 	#		changing natural light intensity
 	# wall_on - marker for whether wall present
 	# Vbou - volume boundary of particle size bins (um3)
@@ -189,7 +189,7 @@ def rec_prep(nrec_step,
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
 		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 		Cinfl_nowp] = cham_up.cham_up(sumt, 
-		temp, tempt, Pnow, light_stat, light_time, light_time_cnt, light_ad, 0, 
+		temp, tempt, Pnow, light_stat, light_time, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
 		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
@@ -199,7 +199,7 @@ def rec_prep(nrec_step,
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
-		cont_inf_i)
+		cont_inf_i, self)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)
@@ -273,7 +273,7 @@ def rec_prep(nrec_step,
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
 			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, tf, y[NOi], y[HO2i], y[NO3i], 
+			photo_path, Jlen, y[NOi], y[HO2i], y[NO3i], 
 			0., self)
 
 	# chamber environmental conditions ----------------------------------

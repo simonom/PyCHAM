@@ -43,7 +43,7 @@ def mod_var_read(self):
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -327,7 +327,7 @@ def mod_var_read(self):
 				photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
-				tf = float(value.strip())
+				self.tf = float(value.strip())
 				
 			if key == 'tf_UVC' and (value.strip()): # transmission factors for 254 nm light
 				self.tf_UVC = [float(i.strip()) for i in (value.split(','))]
@@ -336,7 +336,7 @@ def mod_var_read(self):
 				self.tf_UVCt = np.array(([float(i.strip()) for i in (value.split(','))]))
 
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
-				light_ad = int(value.strip())
+				self.light_ad = int(value.strip())
 
 			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
 				con_infl_nam = [str(i).strip() for i in (value.split(','))]
@@ -501,7 +501,7 @@ def mod_var_read(self):
 				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-				dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, 
+				dayOfYear, photo_path, con_infl_nam, con_infl_t, 
 				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 

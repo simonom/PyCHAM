@@ -36,7 +36,7 @@ import importlib
 
 
 def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path, 
-		DayOfYear, PInit, photo_par_file, Jlen, tf, NO, HO2, NO3, sumt, 
+		DayOfYear, PInit, photo_par_file, Jlen, NO, HO2, NO3, sumt, 
 		self):
 
 	import rate_coeffs # in case failure to import previous version using import command above
@@ -57,7 +57,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# photo_par_file - name of file with with estimates for photolysis absorption
 	# 					cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
-	# tf - sunlight transmission factor
+	# self.tf - sunlight transmission factor
 	# NO - concentration of NO (# molecules/cm3)
 	# HO2 - concentration of HO2 (# molecules/cm3)
 	# NO3 - concentration of NO3 (# molecules/cm3)
@@ -88,7 +88,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, act_flux_path,
 	# calculate the new rate coefficient array (/s) 
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
 					act_flux_path, DayOfYear, M_val, N2_val, 
-					O2_val, photo_par_file, Jlen, tf, NO, HO2, NO3, sumt, 
+					O2_val, photo_par_file, Jlen, NO, HO2, NO3, sumt, 
 					self)
 	#except:
 	#	import os

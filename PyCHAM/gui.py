@@ -143,7 +143,7 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, 
-		daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		daytime, lat, lon, af_path, dayOfYear, photo_path, con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
@@ -685,14 +685,14 @@ class PyCHAM(QWidget):
 		l57.setText('Transmission factor for natural \nsunlight (0-1 fraction): ')
 		self.varbox.addWidget(l57, light_row+9, 0)
 		self.l57a = QLabel(self)
-		self.l57a.setText((str(tf)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l57a.setText((str(self.tf)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l57a, light_row+9, 1)
 		
 		l58 = QLabel(self)
 		l58.setText('Whether to (1) or not to (0) adapt \nintegration time interval and initial \ncondition update to changing \nnatural light intensity: ')
 		self.varbox.addWidget(l58, light_row+10, 0)
 		self.l58a = QLabel(self)
-		self.l58a.setText((str(light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l58a.setText((str(self.light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l58a, light_row+10, 1)
 		
 		l58b = QLabel(self)
@@ -1724,7 +1724,7 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, 
-		daytime, lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+		daytime, lat, lon, af_path, dayOfYear, photo_path, con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
@@ -1741,7 +1741,7 @@ class PyCHAM(QWidget):
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -1779,7 +1779,7 @@ class PyCHAM(QWidget):
 				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-				dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+				dayOfYear, photo_path, con_infl_nam, 
 				con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 				volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 				int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -1831,7 +1831,7 @@ class PyCHAM(QWidget):
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -1851,13 +1851,14 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, 
-			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
-			light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, 
+			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, 
+			con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, 
 			dens, vol_comp, volP, act_comp, act_user, accom_comp, accom_val, 
 			uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 			p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 			erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV]
+
 		with open(input_by_sim, 'wb') as pk:
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
@@ -1881,7 +1882,7 @@ class PyCHAM(QWidget):
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -1901,7 +1902,7 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 			std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, 
 			seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, 
-			lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+			lat, lon, af_path, dayOfYear, photo_path, con_infl_nam, 
 			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
 			act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 			new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, 
@@ -1936,7 +1937,7 @@ class PyCHAM(QWidget):
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -1961,7 +1962,7 @@ class PyCHAM(QWidget):
 				num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, 
 				mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name, 
 				seed_mw, seed_diss, seed_dens, seedx, light_stat, light_time, daytime, 
-				lat, lon, af_path, dayOfYear, photo_path, tf, light_ad, con_infl_nam, 
+				lat, lon, af_path, dayOfYear, photo_path, con_infl_nam, 
 				con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, 
 				nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
@@ -2021,8 +2022,8 @@ class PyCHAM(QWidget):
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, light_stat, 
-			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
-			light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
+			light_time, daytime, lat, lon, af_path, dayOfYear, photo_path, 
+			con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
 			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -2057,8 +2058,8 @@ class PyCHAM(QWidget):
 				lowsize, uppsize, space_mode, std, mean_rad, save_step, 
 				const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
 				seed_diss, seed_dens, seedx, light_stat, light_time, 
-				daytime, lat, lon, af_path, dayOfYear, photo_path, tf, 
-				light_ad, con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
+				daytime, lat, lon, af_path, dayOfYear, photo_path, 
+				con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
 				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
@@ -2090,7 +2091,7 @@ class PyCHAM(QWidget):
 				save_step, const_comp, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				light_stat, light_time, daytime, lat, lon, af_path, 
-				dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+				dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -3701,7 +3702,7 @@ class PyCHAM(QWidget):
 				std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				light_stat, light_time, daytime, lat, lon, af_path, 
-				dayOfYear, photo_path, tf, light_ad, con_infl_nam, con_infl_t, con_infl_C, 
+				dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
 				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
