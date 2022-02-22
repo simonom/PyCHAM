@@ -37,8 +37,8 @@ def rec_prep(nrec_step,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	RO2_indx, sumt, Pnow, light_stat, light_time, 
-	light_time_cnt, daytime, lat, lon, af_path, 
-	dayOfYear, photo_path, Jlen, Cw, kw, Cfactor, 
+	light_time_cnt, daytime, lat, lon, 
+	Jlen, Cw, kw, Cfactor, 
 	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
@@ -88,9 +88,9 @@ def rec_prep(nrec_step,
 	# daytime - start time of simulation (s)
 	# lat - latitude
 	# lon - longitude
-	# af_path - path to actinic flux file
-	# dayOfYear - day of year
-	# photo_path - path to photochemistry file
+	# self.af_path - path to actinic flux file
+	# self.dayOfYear - day of year
+	# self.photo_path - path to photochemistry file
 	# Jlen - length of photochemistry equations
 	# Cw - effective absorbing mass of wall (molecules/cc (air))
 	# kw - gas-wall partitioning coefficient (/s)
@@ -191,8 +191,8 @@ def rec_prep(nrec_step,
 		Cinfl_nowp] = cham_up.cham_up(sumt, 
 		temp, tempt, Pnow, light_stat, light_time, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-		update_stp, update_count, lat, lon, dayOfYear, photo_path, 
-		af_path, injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
+		update_stp, update_count, lat, lon, 
+		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
@@ -272,8 +272,8 @@ def rec_prep(nrec_step,
 	# update reaction rate coefficients
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
 			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
-			lat, lon, af_path, dayOfYear, Pnow, 
-			photo_path, Jlen, y[NOi], y[HO2i], y[NO3i], 
+			lat, lon, Pnow, 
+			Jlen, y[NOi], y[HO2i], y[NO3i], 
 			0., self)
 
 	# chamber environmental conditions ----------------------------------

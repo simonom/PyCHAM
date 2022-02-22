@@ -37,16 +37,16 @@ import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
-def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path, 
+def extr_mech(sch_name, chem_sch_mrk, xml_name, 
 		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
-		drh_str, erh_str, dil_fac, sav_nam, pcont):
+		drh_str, erh_str, dil_fac, sav_nam, pcont, self):
 
 	# inputs: ----------------------------------------------------
 	# sch_name - file name of chemical scheme
 	# chem_sch_mrk - markers to identify different sections of 
 	# 	the chemical scheme
 	# xml_name - name of xml file
-	# photo_path - path to file containing absorption 
+	# self.photo_path - path to file containing absorption 
 	# 	cross-sections and quantum yields
 	# con_infl_nam - chemical scheme names of components with 
 	# 		constant influx
@@ -63,6 +63,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	# sav_nam - name of folder to save results to
 	# pcont - flag for whether seed particle injection is 
 	#	instantaneous (0) or continuous (1)
+	# self - reference to PyCHAM program
 	# ------------------------------------------------------------
 	
 	# starting error flag and message (assumes no errors)
@@ -79,7 +80,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
 	
 	# interrogate xml to list all component names and SMILES
-	[comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
+	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
 
 	# get equation information for chemical reactions
 	[rindx_g, rstoi_g, pindx_g, pstoi_g, reac_coef_g, 
@@ -163,7 +164,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name, photo_path,
 	HOMRO2_indx = RO2_indices.HOMRO2_indices(comp_namelist)
 	
 	# get number of photolysis equations
-	Jlen = photo_num.photo_num(photo_path)
+	Jlen = photo_num.photo_num(self.photo_path)
 
 	return(rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, 
 		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,

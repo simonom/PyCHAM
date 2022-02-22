@@ -27,8 +27,7 @@
 import numpy as np # for math and array handling
 
 def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, tot_time, 
-	act_flux_path, DayOfYear, photo_par_file, Jlen, update_stp, 
-	err_mess, erf, self): # define function
+	Jlen, update_stp, err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
 	# testf - flag for whether in checking mode and what to check
@@ -40,9 +39,9 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 	# temp - temperatures inside chamber (K)
 	# tempt - times through experiment (s) temperatures correspond to
 	# tot_time - total time to run experiment for (s)
-	# act_flux_path - path to file stating actinic flux
-	# DayOfYear - day number of the year (1-365)
-	# photo_par_file - name of file with with estimates for photolysis absorption
+	# self.af_path - path to file stating actinic flux
+	# self.DayOfYear - day number of the year (1-365)
+	# self.photo_file - name of file with with estimates for photolysis absorption
 	# 	cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
 	# self.tf - sunlight transmission factor
@@ -80,7 +79,7 @@ def var_checker(testf, light_stat, light_time, daytime, lat, lon, temp, tempt, t
 			
 				# estimate and append photolysis rates
 				J = photolysisRates.PhotolysisCalculation(daytime+sumt, lat, lon, TEMP, 
-					act_flux_path, DayOfYear, photo_par_file, Jlen, sumt, self)
+					Jlen, sumt, self)
 				
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)
 					Jres = J.reshape(1, -1)

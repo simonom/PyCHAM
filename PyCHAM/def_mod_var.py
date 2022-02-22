@@ -138,10 +138,10 @@ def def_mod_var(caller, self): # define function
 	daytime = 0. # time of day experiment starts (s)
 	lat = 0. # latitude of experiment (degrees)
 	lon = 0. # longitude of experiment (degrees)
-	af_path = 'no' # path to customised (non-MCM) actinic flux file
+	self.af_path = 'no' # path to customised (non-MCM) actinic flux file
 	# path to file containing absorption cross-sections and quantum yields
-	photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
-	dayOfYear = 1 # number of days since 31st December that experiment conducted
+	self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
+	self.dayOfYear = 1 # number of days since 31st December that experiment conducted
 	self.tf = 1. # transmission factor for natural sunlight (0-1 fraction)
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
@@ -193,8 +193,8 @@ def def_mod_var(caller, self): # define function
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, con_infl_nam, 
+			seedx, light_stat, light_time, daytime, lat, lon, 
+			con_infl_nam, 
 			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -217,8 +217,8 @@ def def_mod_var(caller, self): # define function
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, save_step, const_comp, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		light_stat, light_time, daytime, lat, lon, af_path, dayOfYear, 
-		photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+		light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 

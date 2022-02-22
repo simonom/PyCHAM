@@ -35,8 +35,8 @@ from water_calc import water_calc
 # define function
 def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time, 
 	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	new_part_sum1, update_stp, update_count, lat, lon, dayOfYear,
-	photo_par_file, act_flux_path, injectt, gasinj_cnt, inj_indx, 
+	new_part_sum1, update_stp, update_count, lat, lon,
+	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
@@ -68,9 +68,9 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	#	updated (s)
 	# lat - latitude (degrees)
 	# lon - longitude (degrees)
-	# dayOfYear - number of days since 31st December
-	# photo_par_file - photochemistry parameter file
-	# act_flux_path - actinic flux file
+	# self.dayOfYear - number of days since 31st December
+	# self.photo_path - photochemistry parameter file
+	# self.af_path - actinic flux file
 	# injectt - time of instantaneous injections of 
 	#	components (s)
 	# gasinj_cnt - count on injection times of component(s)
@@ -182,7 +182,7 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# if using natural light
 	cwd = os.getcwd() # address of current working directory
 
-	if (lightm == 1 and photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no' and self.light_ad == 1):	
+	if (lightm == 1 and self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no' and self.light_ad == 1):	
 		# check time step required to limit change to rate of 
 		# MCM photochemical equation number 6 (python index 5), 
 		# which the unit test for
@@ -190,17 +190,17 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		# other photochemical equations)
 		import zenith
 		# photochemical rate now
-		(secxn, cosxn) = zenith.zenith(sumt, lat, lon, dayOfYear)
+		(secxn, cosxn) = zenith.zenith(sumt, lat, lon, self.dayOfYear)
 		Jn =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# photochemical rate after proposed time step
-		(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
+		(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, self.dayOfYear)
 		Jt =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# iteratively reduce proposed time interval until photochemical
 		# rate changes by acceptable amount
 		while (abs(Jt-Jn) > 5.e-3):
 			tnew = tnew*0.9
 			# photochemical rate after proposed time step
-			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, dayOfYear)
+			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, self.dayOfYear)
 			Jt = 1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
 			bc_red = 1
 			

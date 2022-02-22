@@ -49,8 +49,12 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_scheme_markers)
 	
 	# interrogate xml to list all component names and SMILES
-	[comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
+	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
 	
+	# in case error given by xml_interr
+	if err_mess_new[0:5] == 'Error':
+		return([], [], err_mess_new, [])
+
 	comp_namelist = [] # list for chemical scheme names of components in the chemical scheme
 	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
 

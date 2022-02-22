@@ -39,8 +39,8 @@ def mod_var_up(self):
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+		light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -110,9 +110,9 @@ def mod_var_up(self):
 	self.l51a.setText((str(daytime)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l52a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l53a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l54a.setText((str(af_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l55a.setText((str(photo_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l56a.setText((str(dayOfYear)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l54a.setText((str(self.af_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l55a.setText((str(self.photo_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l56a.setText((str(self.dayOfYear)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l57a.setText((str(self.tf)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58a.setText((str(self.light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58bb.setText((str(self.tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

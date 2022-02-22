@@ -42,8 +42,8 @@ def mod_var_read(self):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			light_stat, light_time, daytime, lat, lon, af_path, 
-			dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+			light_stat, light_time, daytime, lat, lon, 
+			con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -52,7 +52,7 @@ def mod_var_read(self):
 			testf, chamV] = pickle.load(pk)
 		pk.close()
 		
-		if (inname != 'Default'): # if not using defaults
+		if (inname != 'Default' and inname != 'Not found'): # if not using defaults
 			inputs = open(inname, mode= 'r' ) # open model variables file
 			in_list = inputs.readlines() # read file and store everything into a list
 			inputs.close() # close file
@@ -316,15 +316,15 @@ def mod_var_read(self):
 				if (value.strip()): lon = float(value.strip())
 
 			if key == 'act_flux_file' and (value.strip()): # for indoor actinic flux
-				af_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
+				self.af_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 
 			if key == 'DayOfYear' and (value.strip()):
-				dayOfYear = int(value.strip())		
+				self.dayOfYear = int(value.strip())		
 			
 			# name of file with wavelength-dependent absorption cross-section and quantum yield 
 			# calculations
 			if key == 'photo_par_file' and (value.strip()):
-				photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
+				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
 				self.tf = float(value.strip())
@@ -500,8 +500,8 @@ def mod_var_read(self):
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-				seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-				dayOfYear, photo_path, con_infl_nam, con_infl_t, 
+				seedx, light_stat, light_time, daytime, lat, lon, 
+				con_infl_nam, con_infl_t, 
 				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 

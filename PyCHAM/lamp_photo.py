@@ -26,22 +26,22 @@
 import numpy as np
 import os
 
-def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
+def lamp_photo(J, TEMP, sumt, self):
 
 	# --------------------------------------------------------------
 	# inputs
-	# fname - name of folder where photolysis information stored
+	# self.photo_path - name of folder where photolysis information stored
 	# J - array of photolysis rates
 	# TEMP - chamber temperature (K)
-	# act_flux_path - path of actinic flux file, equals 'no' if none 
+	# self.af_path - path of actinic flux file, equals 'no' if none 
 	# given (in which case this module should not be called)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# --------------------------------------------------------------
 	
-	if (act_flux_path != 'nat_act_flux'): # if using actinic fluxes from file
+	if (self.af_path != 'nat_act_flux'): # if using actinic fluxes from file
 		# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
 		# from chamber
-		f = open(act_flux_path, 'r')
+		f = open(self.af_path, 'r')
 		wl_chm = np.empty(0) # chamber wavelengths (nm)
 		act_chm = np.empty(0) # chamber actinic flux
 	
@@ -65,7 +65,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# unit-resolution wavelength wavelength (nm)
 		wl_chm = wl_chm_ref
 	
-	if (act_flux_path == 'nat_act_flux'): # if using modelled solar actinic flux
+	if (self.af_path == 'nat_act_flux'): # if using modelled solar actinic flux
 		
 		import nat_act_flux
 		naff = 4 # flag for calling module
@@ -130,10 +130,10 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 	
 	# determine whether to use MCM-recommended wavelength-dependent absorption 
 	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
-	if fname != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
+	if self.photo_path != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
 		 
 		# open file to read
-		f = open(fname, 'r')
+		f = open(self.photo_path, 'r')
 		
 		# keep count on photolysis reactions, note Fortran indexing to be consistent with 
 		# MCM photochemical reaction numbers
@@ -213,12 +213,12 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 	# Using MCM recommended component absorption cross-sections 
 	# and quantum yields (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	# in combination with the actinic flux found above
-	if fname == str(cwd+'/PyCHAM/photofiles/MCMv3.2'):
+	if self.photo_path == str(cwd+'/PyCHAM/photofiles/MCMv3.2'):
 	
 		# --------------------------------------------------------------
 		# J<1> and J<2> for O3 (ozone) photolysis
 		# cross-section file
-		f = open(str(fname+'/O3/o3_molina86_cs.txt'), 'r')
+		f = open(str(self.photo_path+'/O3/o3_molina86_cs.txt'), 'r')
 		wlO3xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xsO3 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 	
@@ -238,7 +238,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xsO3 = np.interp(wl_chm, wlO3xs, xsO3)
 		
 		# same for J<1> quantum yield O3=O(1D)
-		f = open(str(fname+'/O3/o3_o1d_matsumi02_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/O3/o3_o1d_matsumi02_qy_298.txt'), 'r')
 		wlO3qy = np.empty(0) # will contain wavelengths for qy (nm)
 		qyO3 = np.empty(0) # will contain qy (dimensionless fraction (0-1))
 		
@@ -259,7 +259,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		
 		
 		# same for J<2> quantum yield O3=O
-		f = open(str(fname+'/O3/o3_o3p_matsumi02_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/O3/o3_o3p_matsumi02_qy_298.txt'), 'r')
 		wlO3Pqy = np.empty(0) # will contain wavelengths for qy (nm)
 		qyO3P = np.empty(0) # will contain qy (dimensionless fraction (0-1))
 		
@@ -286,7 +286,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<3> for H2O2 (hydrogen peroxide) photolysis: H2O2 = OH + OH
 		# cross-section file
-		f = open(str(fname+'/H2O2/h2o2_iupac2003_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/H2O2/h2o2_iupac2003_cs_298.txt'), 'r')
 		wlH2O2xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xsH2O2 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 	
@@ -315,7 +315,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<4> for NO2 (nitrogen dioxide) photolysis: NO2 = NO + O
 		# cross-section file
-		f = open(str(fname+'/NO2/no2_iupac03_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NO2/no2_iupac03_cs_298.txt'), 'r')
 		wlNO2xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xsNO2 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -335,7 +335,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xsNO2 = np.interp(wl_chm, wlNO2xs, xsNO2)
 		
 		# same for J<4> quantum yield: NO2 = NO + O
-		f = open(str(fname+'/NO2/no2_iupac03_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NO2/no2_iupac03_qy_298.txt'), 'r')
 		wlNO2qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qyNO2 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -360,7 +360,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<5> for NO3 (nitrate radical) photolysis: NO3 = NO ;
 		# cross-section file
-		f = open(str(fname+'/NO3/no3_iupac03_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NO3/no3_iupac03_cs_298.txt'), 'r')
 		wlNO3xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xsNO3 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -380,7 +380,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xsNO3 = np.interp(wl_chm, wlNO3xs, xsNO3)
 		
 		# J<5> quantum yield: NO3 = NO
-		f = open(str(fname+'/NO3/no3_no_o2_johnson96_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NO3/no3_no_o2_johnson96_qy_298.txt'), 'r')
 		wlNO3qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qyNO3 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -403,7 +403,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		J[5] = sum(xsNO3*qyNO3*act_chm)
 		
 		# J<6> quantum yield: NO3 = NO2 + O
-		f = open(str(fname+'/NO3/no3_no2_o_johnson96_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NO3/no3_no2_o_johnson96_qy_298.txt'), 'r')
 		wlNO3qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qyNO3 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -429,7 +429,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<7> for HONO (nitrous acid) photolysis: HONO = OH + NO ;
 		# cross-section file
-		f = open(str(fname+'/HONO/hono_bongartz91_94_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/HONO/hono_bongartz91_94_cs_298.txt'), 'r')
 		wlHONOxs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xsHONO = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -458,7 +458,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<8> for HNO3 (nitric acid) photolysis: HNO3 = OH + NO2;
 		# cross-section file
-		f = open(str(fname+'/HNO3/hno3_burkholder93_cs.txt'), 'r')
+		f = open(str(self.photo_path+'/HNO3/hno3_burkholder93_cs.txt'), 'r')
 		wl_xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -488,7 +488,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<11> for HCHO (formaldehyde) photolysis: HCHO = CO + HO2 + HO2;
 		# cross-section file
-		f = open(str(fname+'/HCHO/hcho_meller00_cs.txt'), 'r')
+		f = open(str(self.photo_path+'/HCHO/hcho_meller00_cs.txt'), 'r')
 		wl_xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -510,7 +510,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl_xs, xs)
 		
 		# J<11> and J<12> quantum yield: HCHO = CO + HO2 + HO2 and HCHO = H2 + CO
-		f = open(str(fname+'/HCHO/hcho_iupac03_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/HCHO/hcho_iupac03_qy_298.txt'), 'r')
 		wl_qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qy = np.empty(0) # will contain quantum yields (cm2/molecule)
 		qy2 = np.empty(0) # will contain quantum yields (cm2/molecule)
@@ -540,7 +540,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# -------------------------------------------------------------------
 		# J<13> for → CH3 + HCO
 		# cross-section file
-		f = open(str(fname+'/CH3CHO/ch3cho_iupac03_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3CHO/ch3cho_iupac03_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -558,7 +558,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield file
-		f = open(str(fname+'/CH3CHO/ch3cho_iupac03_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3CHO/ch3cho_iupac03_qy_298.txt'), 'r')
 		wl_qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qy = np.empty(0) # will contain quantum yields (cm2/molecule)
 		
@@ -580,7 +580,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# -------------------------------------------------------------------
 		# J<14> for → C2H5 + HCO
 		# cross-section file
-		f = open(str(fname+'/C2H5CHO/c2h5cho_iupac03_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/C2H5CHO/c2h5cho_iupac03_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		
@@ -598,7 +598,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield file
-		f = open(str(fname+'/C2H5CHO/c2h5cho_chen&zhu01_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/C2H5CHO/c2h5cho_chen&zhu01_qy_298.txt'), 'r')
 		wl_qy = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qy = np.empty(0) # will contain quantum yields (cm2/molecule)
 		
@@ -620,7 +620,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<15> for multiple photolysis
 		# cross-section file
-		f = open(str(fname+'/n_C3H7CHO/n_c3h7cho_iupac05_cs_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/n_C3H7CHO/n_c3h7cho_iupac05_cs_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -658,7 +658,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<17> for multiple photolysis
 		# cross-section file
-		f = open(str(fname+'/i_C3H7CHO/i-c3h7cho_martinez92_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/i_C3H7CHO/i-c3h7cho_martinez92_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -677,7 +677,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield file
-		f = open(str(fname+'/i_C3H7CHO/i_c3h7cho_chen02_hco _qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/i_C3H7CHO/i_c3h7cho_chen02_hco _qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths (nm)
 		qy = np.empty(0) # will contain quantum yields (fractions)
 		for line in f: # loop through line
@@ -701,7 +701,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<18> for → CH2=CCH3 + HCO and J<19> for → CH2=C(CH3)CO + H
 		# cross-section file
-		f = open(str(fname+'/MACR/macr_iupac05_cs_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/MACR/macr_iupac05_cs_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -732,7 +732,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<20> for → CH3C(CHO)=CHCH2O + OH
 		# cross-section file
-		f = open(str(fname+'/C5HPALD1/C5HPALD_cs_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/C5HPALD1/C5HPALD_cs_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -761,7 +761,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<21> for CH3COCH3 (acetone) photolysis: CH3COCH3 = CH3CO3 + CH3O2;
 		# cross-section file
-		f = open(str(fname+'/CH3COCH3/ch3coch3_iupac05_cs.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3COCH3/ch3coch3_iupac05_cs.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -783,7 +783,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl, xs)
 		
-		f = open(str(fname+'/CH3COCH3/ch3coch3_iupac05_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3COCH3/ch3coch3_iupac05_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths (nm)
 		qy = np.empty(0) # will contain quantum yields
 		for line in f: # loop through lines
@@ -807,7 +807,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<22> for → CH3CO + C2H5
 		# cross-section file
-		f = open(str(fname+'/MEK/ch3coc2h5_iupac05_cs_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/MEK/ch3coc2h5_iupac05_cs_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -835,7 +835,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<23> for → CH3CH=CH2 + CO and J<24> for → CH3CO + CH2=CH
 		# cross-section file
-		f = open(str(fname+'/MVK/mvk_iupac05_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/MVK/mvk_iupac05_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -854,7 +854,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield file
-		f = open(str(fname+'/MVK/mvk_iupac05_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/MVK/mvk_iupac05_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		qy = np.empty(0) # will contain quantum yields for J<23> (fraction)
 		qy24 = np.empty(0) # will contain quantum yields for J<24> (fraction)
@@ -885,7 +885,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<31>, J<32>, J<33> for glyoxal photolysis
 		# cross-section file
-		f = open(str(fname+'/CHOCHO/chocho_volkamer05_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CHOCHO/chocho_volkamer05_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -903,7 +903,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl, xs)
 		
-		f = open(str(fname+'/CHOCHO/chocho_tadic06_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CHOCHO/chocho_tadic06_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths (nm)
 		qy = np.empty(0) # will contain quantum yields
 		qy2 = np.empty(0) # will contain quantum yields
@@ -937,7 +937,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<34> for → CH3CO + HCO
 		# cross-section file
-		f = open(str(fname+'/CH3COCHO/ch3cocho_jpl_iupac05_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3COCHO/ch3cocho_jpl_iupac05_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -956,7 +956,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield
-		f = open(str(fname+'/CH3COCHO/ch3cocho_iupac05_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3COCHO/ch3cocho_iupac05_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths (nm)
 		qy = np.empty(0) # will contain quantum yields
 	
@@ -981,7 +981,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<35> for → CH3CO + CH3CO
 		# cross-section file
-		f = open(str(fname+'/BIACET/biacet_horowitz01_cs_plum83_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/BIACET/biacet_horowitz01_cs_plum83_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1009,7 +1009,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<41> for → CH3O + OH
 		# cross-section file
-		f = open(str(fname+'/CH3OOH/ch3ooh_iupac05_cs_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3OOH/ch3ooh_iupac05_cs_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1037,7 +1037,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<51> for → CH3O + NO2
 		# cross-section file
-		f = open(str(fname+'/CH3ONO2/ch3ono2_iupac05_cs_qy.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3ONO2/ch3ono2_iupac05_cs_qy.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1067,7 +1067,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<52> for → C2H5O + NO2
 		# cross-section file
-		f = open(str(fname+'/CH3CH2ONO2/ch3ch2ono2_iupac05_cs_qy.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3CH2ONO2/ch3ch2ono2_iupac05_cs_qy.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1097,7 +1097,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<53> for → n-C3H7O + NO2
 		# cross-section file
-		f = open(str(fname+'/NOA/noa_barnes93_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NOA/noa_barnes93_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1116,7 +1116,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		xs = np.interp(wl_chm, wl, xs)
 		
 		# quantum yield
-		f = open(str(fname+'/NOA/noa_estimated_qy_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NOA/noa_estimated_qy_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths (nm)
 		qy = np.empty(0) # will contain quantum yields
 	
@@ -1141,7 +1141,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<54> for → CH3C(O.)CH3 + NO2
 		# cross-section file
-		f = open(str(fname+'/CH3CH2ONO2/ch3ch2ono2_iupac05_cs_qy.txt'), 'r')
+		f = open(str(self.photo_path+'/CH3CH2ONO2/ch3ch2ono2_iupac05_cs_qy.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line
@@ -1189,7 +1189,7 @@ def lamp_photo(fname, J, TEMP, act_flux_path, sumt, self):
 		# --------------------------------------------------------------
 		# J<56> for → CH3C(O)CH2(O.) + NO2 and → CH3CO + HCHO + NO2
 		# cross-section file
-		f = open(str(fname+'/NOA/noa_barnes93_cs_298.txt'), 'r')
+		f = open(str(self.photo_path+'/NOA/noa_barnes93_cs_298.txt'), 'r')
 		wl = np.empty(0) # will contain wavelengths for cross-sections (nm)
 		xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 		for line in f: # loop through line

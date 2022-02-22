@@ -21,12 +21,12 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2022-02-21 11:55:18.938984
+# created at 2022-02-22 11:43:03.231453
 
 import numpy
 import photolysisRates
 
-def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfYear, M, N2, O2, photo_par_file, Jlen, NO, HO2, NO3, sumt, self):
+def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):
 
 	# inputs: ------------------------------------------------------------------
 	# RO2 - names of components included in peroxy radical list
@@ -203,7 +203,7 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, act_flux_path, DayOfY
 		err_mess = 'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file' # error message
 
 	# estimate and append photolysis rates
-	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file, Jlen, sumt, self)
+	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self)
 
 	if (lightm == 0):
 		J = [0]*len(J)

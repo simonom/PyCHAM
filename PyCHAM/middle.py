@@ -47,7 +47,7 @@ def middle(self): # define function
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, light_stat, light_time, daytime, lat, 
-		lon, af_path, dayOfYear, photo_path, con_infl_nam, 
+		lon, con_infl_nam, 
 		const_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
@@ -73,16 +73,16 @@ def middle(self): # define function
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
 	con_C_indx] = eqn_pars.extr_mech(sch_name, 
-	chem_sch_mrk, xml_name, photo_path, con_infl_nam, int_tol, wall_on, 
+	chem_sch_mrk, xml_name, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac, sav_nam,
-	pcont)
+	pcont, self)
 	
 	# if needed then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (testf >= 4):
 		import var_checker
 		[err_mess, erf] = var_checker.var_checker(testf, light_stat, light_time, daytime, lat, 
-			lon, temp, tempt, tot_time, af_path, dayOfYear, photo_path, Jlen, 
+			lon, temp, tempt, tot_time, Jlen, 
 			update_stp, err_mess, erf, self)
 	
 	# if error raised, then tell GUI to display and to stop program
@@ -138,8 +138,8 @@ def middle(self): # define function
 		tot_time, save_step, y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
 		jac_den_indx_g, jac_indx_g, RO2_indx, RO_indx, H2Oi, temp, tempt, 
-		Pnow, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, Jlen, con_infl_C, nrec_steps, 
+		Pnow, light_stat, light_time, daytime, lat, lon, 
+		Jlen, con_infl_C, nrec_steps, 
 		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 

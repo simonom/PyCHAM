@@ -41,8 +41,8 @@ def plotter_taf(self): # define function for photolysis stuff
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+		light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -59,8 +59,8 @@ def plotter_taf(self): # define function for photolysis stuff
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, 
+		seedx, light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -105,14 +105,14 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+		light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 		ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV] = pickle.load(pk)
+		z_prt_coeff, testf, chamV] = pickle.load(pk)
 		pk.close() # close pickle file
 	
 	testf = 2 # modify test flag value
@@ -123,15 +123,15 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, 
+		seedx, light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 		Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV]
+		z_prt_coeff, testf, chamV]
 
 	with open(input_by_sim, 'wb') as pk:
 		pickle.dump(list_vars, pk) # pickle
@@ -142,7 +142,7 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 		
 	note_messf = 0 # cancel note message flag
 		
-	for prog in middle(): # call on modules to solve problem
+	for prog in middle(self): # call on modules to solve problem
 			
 		
 		if (isinstance(prog, str)): # check if it's a message
@@ -171,14 +171,14 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, con_infl_t, con_infl_C, 
+		light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 		ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV] = pickle.load(pk)
+		z_prt_coeff, testf, chamV] = pickle.load(pk)
 		pk.close() # close pickle file
 	
 	testf = 3 # modify test flag value
@@ -189,15 +189,15 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 		Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx, light_stat, light_time, daytime, lat, lon, af_path, 
-		dayOfYear, photo_path, con_infl_nam, 
+		seedx, light_stat, light_time, daytime, lat, lon, 
+		con_infl_nam, 
 		con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 		Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-		z_prt_coeff, tf_UVC, testf, chamV]
+		z_prt_coeff, testf, chamV]
 
 	with open(input_by_sim, 'wb') as pk:
 		pickle.dump(list_vars, pk) # pickle
@@ -208,7 +208,7 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 		
 	note_messf = 0 # cancel note message flag
 		
-	for prog in middle(): # call on modules to solve problem
+	for prog in middle(self): # call on modules to solve problem
 			
 		
 		if (isinstance(prog, str)): # check if it's a message

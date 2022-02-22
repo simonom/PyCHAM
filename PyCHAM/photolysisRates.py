@@ -31,18 +31,17 @@ import shutil
 from lamp_photo import lamp_photo
 import zenith
 
-def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_par_file,
-							Jlen, sumt, self):
+def PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self):
 
 	# inputs:-----------------------------------------------------------------------------
 	# time - time of day (for natural light photolysis)
 	# lat - latitude
 	# lon - longitude
 	# TEMP - temperature inside chamber (K)
-	# act_flux_path - name of path to file containing known actinic flux (only used if 
+	# self.af_path - name of path to file containing known actinic flux (only used if 
 	#				lights on inside chamber)
-	# DayOfYear - number of days through the calendar year
-	# photo_par_file - name of file containing estimates for wavelength-dependent
+	# self.DayOfYear - number of days through the calendar year
+	# self.photo_path - name of file containing estimates for wavelength-dependent
 	# 					absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
 	# self.tf - the transmission factor (for natural light intensity)
@@ -55,7 +54,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	cwd = os.getcwd() # address of current working directory
 	
 	# if using MCM chemical scheme and natural light
-	if (photo_par_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and act_flux_path == 'no'):
+	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no'):
 	
 		# get solar zenith angle following the equations of 
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
@@ -137,9 +136,9 @@ def PhotolysisCalculation(time, lat, lon, TEMP, act_flux_path, DayOfYear, photo_
 	# file or MCM recommended absorption cross-section and 
 	# quantum yields in combination with MCM photolysis reactions 
 	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
-	if (act_flux_path != 'no'):
+	if (self.af_path != 'no'):
 		# call on module to process photolysis files and estimate J values
-		J = lamp_photo(photo_par_file, J, TEMP, act_flux_path, sumt, self)
+		J = lamp_photo(J, TEMP, sumt, self)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0
