@@ -48,7 +48,6 @@ def ui_check(self):
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, 
 		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -80,8 +79,8 @@ def ui_check(self):
 	# tot_time - total experiment time (s)
 	# RH - relative humidity (0-1)
 	# uman_up - marker for whether to update UManSysProp folder
-	# light_stat - marker for whether lights on or off
-	# light_time - time that lights attain status
+	# self.light_stat - marker for whether lights on or off
+	# self.light_time - time that lights attain status
 	# injectt - times of instantaneous injections of gas-phase components (s)
 	# Ct - concentrations of components instantaneously injected (ppb)
 	# dens_comp - chemical scheme names of components with density 
@@ -295,12 +294,12 @@ def ui_check(self):
 
 	
 	
-	if (len(light_stat) != len(light_time) and em_flag < 2):
+	if (len(self.light_stat) != len(self.light_time) and em_flag < 2):
 		err_mess = str('Error - length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
 		em_flag = 2
 	
 	# if no status provided at simulation start default to lights off, request one
-	if (light_time[0] != 0 and em_flag < 2):		
+	if (self.light_time[0] != 0 and em_flag < 2):		
 		err_mess = str('Error - light status times have been supplied but not at experiment start (0 in the light_time).  Please see notes in README on the light_time and light_status model variables.')
 		em_flag = 2
 		
@@ -457,8 +456,7 @@ def ui_check(self):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, light_stat, light_time, daytime, lat, lon, 
-			con_infl_nam, 
+			seedx, con_infl_nam, 
 			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 

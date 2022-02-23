@@ -39,7 +39,6 @@ def mod_var_up(self):
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		light_stat, light_time, daytime, lat, lon, 
 		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -105,11 +104,11 @@ def mod_var_up(self):
 	self.l46a.setText((str(Compt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l47a.setText((str(injectt.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l48a.setText((str(Ct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l49a.setText((str(light_stat.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l50a.setText((str(light_time.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l51a.setText((str(daytime)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l52a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l53a.setText((str(lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l49a.setText((str(self.light_stat.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l50a.setText((str(self.light_time.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l51a.setText((str(self.daytime)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l52a.setText((str(self.lat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l53a.setText((str(self.lon)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l54a.setText((str(self.af_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l55a.setText((str(self.photo_path)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l56a.setText((str(self.dayOfYear)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

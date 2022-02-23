@@ -133,11 +133,11 @@ def def_mod_var(caller, self): # define function
 	partit_cutoff = []
 
 	# lights -------------------------------------------------------------------------------
-	light_stat = np.zeros((1), dtype='int') # light status
-	light_time = np.zeros((1, 1)) # time that light status attained (s)
-	daytime = 0. # time of day experiment starts (s)
-	lat = 0. # latitude of experiment (degrees)
-	lon = 0. # longitude of experiment (degrees)
+	self.light_stat = np.zeros((1), dtype='int') # light status
+	self.light_time = np.zeros((1, 1)) # time that light status attained (s)
+	self.daytime = 0. # time of day experiment starts (s)
+	self.lat = 0. # latitude of experiment (degrees)
+	self.lon = 0. # longitude of experiment (degrees)
 	self.af_path = 'no' # path to customised (non-MCM) actinic flux file
 	# path to file containing absorption cross-sections and quantum yields
 	self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
@@ -193,8 +193,7 @@ def def_mod_var(caller, self): # define function
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, light_stat, light_time, daytime, lat, lon, 
-			con_infl_nam, 
+			seedx, con_infl_nam, 
 			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
@@ -216,8 +215,7 @@ def def_mod_var(caller, self): # define function
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, save_step, const_comp, Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		light_stat, light_time, daytime, lat, lon, 
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
 		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 

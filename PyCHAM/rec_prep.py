@@ -36,8 +36,7 @@ def rec_prep(nrec_step,
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
-	RO2_indx, sumt, Pnow, light_stat, light_time, 
-	light_time_cnt, daytime, lat, lon, 
+	RO2_indx, sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
@@ -82,12 +81,12 @@ def rec_prep(nrec_step,
 	# RO2_indx - index of peroxy radicals
 	# sumt - cumulative time through simulation (s)
 	# Pnow - chamber pressure (Pa)
-	# light_stat - light status
-	# light_time - times corresponding to light status
+	# self.light_stat - light status
+	# self.light_time - times corresponding to light status
 	# light_time_cnt - count on light status array
-	# daytime - start time of simulation (s)
-	# lat - latitude
-	# lon - longitude
+	# self.daytime - start time of simulation (s)
+	# self.lat - latitude
+	# self.lon - longitude
 	# self.af_path - path to actinic flux file
 	# self.dayOfYear - day of year
 	# self.photo_path - path to photochemistry file
@@ -189,9 +188,9 @@ def rec_prep(nrec_step,
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
 		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 		Cinfl_nowp] = cham_up.cham_up(sumt, 
-		temp, tempt, Pnow, light_stat, light_time, light_time_cnt, 0, 
+		temp, tempt, Pnow, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-		update_stp, update_count, lat, lon, 
+		update_stp, update_count, 
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
@@ -271,8 +270,7 @@ def rec_prep(nrec_step,
 	
 	# update reaction rate coefficients
 	rrc = rrc_calc.rrc_calc(RO2_indx, 
-			y[H2Oi], temp_now, lightm, y, daytime+sumt, 
-			lat, lon, Pnow, 
+			y[H2Oi], temp_now, lightm, y, Pnow, 
 			Jlen, y[NOi], y[HO2i], y[NO3i], 
 			0., self)
 

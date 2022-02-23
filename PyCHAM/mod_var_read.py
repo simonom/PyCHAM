@@ -42,7 +42,6 @@ def mod_var_read(self):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			light_stat, light_time, daytime, lat, lon, 
 			con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -113,7 +112,7 @@ def mod_var_read(self):
 				Press = float(value.strip())
 
 			if key == 'daytime_start' and (value.strip()): # time of day at experiment start (s)
-				daytime = float(value.strip())
+				self.daytime = float(value.strip())
 
 			if key == 'wall_on' and (value.strip()): # marker for whether or not to consider wall
 				wall_on = int(value.strip())
@@ -303,17 +302,17 @@ def mod_var_read(self):
 
 			if key == 'light_status' and value.strip(): # status of lights (on or off)
 				light_stat = [int(i) for i in (value.split(','))]
-				light_stat = np.array((light_stat))
+				self.light_stat = np.array((light_stat))
 				
 			if key == 'light_time' and value.strip(): # times (s) corresponding to light status
 				light_time = [float(i) for i in (value.split(','))]
-				light_time = np.array((light_time))
+				self.light_time = np.array((light_time))
 				
 			if key == 'lat': # latitude (degrees)
-				if (value.strip()): lat = float(value.strip())
+				if (value.strip()): self.lat = float(value.strip())
 
 			if key == 'lon': # longitude (degrees)
-				if (value.strip()): lon = float(value.strip())
+				if (value.strip()): self.lon = float(value.strip())
 
 			if key == 'act_flux_file' and (value.strip()): # for indoor actinic flux
 				self.af_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
@@ -500,8 +499,7 @@ def mod_var_read(self):
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-				seedx, light_stat, light_time, daytime, lat, lon, 
-				con_infl_nam, con_infl_t, 
+				seedx, con_infl_nam, con_infl_t, 
 				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 

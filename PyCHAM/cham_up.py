@@ -33,9 +33,9 @@ import scipy.constants as si
 from water_calc import water_calc
 
 # define function
-def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time, 
+def cham_up(sumt, temp, tempt, Pnow, 
 	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	new_part_sum1, update_stp, update_count, lat, lon,
+	new_part_sum1, update_stp, update_count,
 	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
@@ -49,8 +49,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# temp - temperature in chamber (K)
 	# tempt - times that temperatures reached (s)
 	# Pnow - pressure in chamber (Pa)
-	# light_stat - status of lights
-	# light_time - times that light attain status (s)
+	# self.light_stat - status of lights
+	# self.light_time - times that light attain status (s)
 	# light_time_cnt - light status counter
 	# self.light_ad - marker for whether to change time interval 
 	#	in response to changing natural light intensity
@@ -66,8 +66,8 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	#	updates (s)
 	# update_count - count since operator-split last 
 	#	updated (s)
-	# lat - latitude (degrees)
-	# lon - longitude (degrees)
+	# self.lat - latitude (degrees)
+	# self.lon - longitude (degrees)
 	# self.dayOfYear - number of days since 31st December
 	# self.photo_path - photochemistry parameter file
 	# self.af_path - actinic flux file
@@ -149,15 +149,15 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 	# condition/nucleation
 	bc_red = 0
 	
-	if ((len(light_time)) > 0):
+	if ((len(self.light_time)) > 0):
 	
 		# whether lights on (1) or off (0) during this step
-		lightm = light_stat[int(sum(light_time<=sumt)-1)]
+		lightm = self.light_stat[int(sum(self.light_time<=sumt)-1)]
 		
 		# check whether changes occur at start of this time step
-		if (sumt == light_time[light_time_cnt] and light_time_cnt>-1):
+		if (sumt == self.light_time[light_time_cnt] and light_time_cnt>-1):
 			
-			if (light_time_cnt<(len(light_stat)-1)):
+			if (light_time_cnt<(len(self.light_stat)-1)):
 				light_time_cnt += 1 # keep count of light setting index
 			else:
 				light_time_cnt = -1 # reached end
@@ -166,15 +166,15 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 				
 		
 		# check whether light on/off changes during proposed integration time step
-		if (sumt+tnew > light_time[light_time_cnt] and light_time_cnt != -1):
+		if (sumt+tnew > self.light_time[light_time_cnt] and light_time_cnt != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
-			tnew = light_time[light_time_cnt]-sumt
+			tnew = self.light_time[light_time_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 			
 		# if reached final status of lights, then keep this status
 		if light_time_cnt == -1:
-			lightm = light_stat[light_time_cnt]
+			lightm = self.light_stat[light_time_cnt]
  
 	# if lights are on during this step and lighting is natural, then check whether
 	# proposed time step needs reducing to limit change to light intensity, if this
@@ -190,17 +190,18 @@ def cham_up(sumt, temp, tempt, Pnow, light_stat, light_time,
 		# other photochemical equations)
 		import zenith
 		# photochemical rate now
-		(secxn, cosxn) = zenith.zenith(sumt, lat, lon, self.dayOfYear)
+		time = self.daytime+sumt
+		(secxn, cosxn) = zenith.zenith(time, self)
 		Jn =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# photochemical rate after proposed time step
-		(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, self.dayOfYear)
+		(secxt, cosxt) = zenith.zenith(time+tnew, self)
 		Jt =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
 		# iteratively reduce proposed time interval until photochemical
 		# rate changes by acceptable amount
 		while (abs(Jt-Jn) > 5.e-3):
 			tnew = tnew*0.9
 			# photochemical rate after proposed time step
-			(secxt, cosxt) = zenith.zenith(sumt+tnew, lat, lon, self.dayOfYear)
+			(secxt, cosxt) = zenith.zenith(time+tnew, self)
 			Jt = 1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
 			bc_red = 1
 			

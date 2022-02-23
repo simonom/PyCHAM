@@ -21,12 +21,12 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2022-02-22 11:43:03.231453
+# created at 2022-02-23 14:22:30.295659
 
 import numpy
 import photolysisRates
 
-def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):
+def evaluate_rates(RO2, H2O, TEMP, lightm, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):
 
 	# inputs: ------------------------------------------------------------------
 	# RO2 - names of components included in peroxy radical list
@@ -192,22 +192,25 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, M, N2, O2, Jlen, NO, 
 		KNO3=KRO2NO3*NO3 
 		KTR=KNO+KHO2+KRO2+KNO3 
 		K16ISOM=(KTR*5.18e-04*numpy.exp(1308/TEMP))+(2.76e07*numpy.exp(-6759/TEMP)) 
+		#%8.0e7:=O 
+		#%1.0e-15:NO2+NO2=NO+NO 
+		#%1.0e-7:OH+OH= 
+		#%3.0e-12:NO2+HO2=NO+HO2 
 		#%5.0e-16:NO2+NO2=HONO+HNO3 
 		#%0.0e-16:HONO+HONO=NO+NO2 
 		#%2.0e-14:HONO+HNO3=NO+NO 
 		#%1.0e-3:HNO3=HONO+O 
-		#%0.0e0:HO2= 
 
 	except:
 		erf = 1 # flag error
 		err_mess = 'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file' # error message
 
 	# estimate and append photolysis rates
-	J = photolysisRates.PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self)
+	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)
 
 	if (lightm == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((946))
+	rate_values = numpy.zeros((947))
 	
 	# reac_coef has been formatted so that python can recognize it
 	# gas-phase reactions
@@ -1153,10 +1156,11 @@ def evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, M, N2, O2, Jlen, NO, 
 	rate_values[939] = J[34]
 	rate_values[940] = J[35]
 	rate_values[941] = 0.0
-	rate_values[942] = 1.0e-6
-	rate_values[943] = 2.0e-6
-	rate_values[944] = 4.0e-4
-	rate_values[945] = 4.0e-4
+	rate_values[942] = 1.0e-4
+	rate_values[943] = 3.0e7
+	rate_values[944] = 1.5e-3
+	rate_values[945] = 1.2e2
+	rate_values[946] = 6.0e-2
 	
 	# aqueous-phase reactions
 	

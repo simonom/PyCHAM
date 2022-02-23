@@ -57,8 +57,7 @@ def ode_updater(update_stp,
 	tot_time, save_stp, y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
 	jac_den_indx, jac_indx, RO2_indx, RO_indx, H2Oi, temp, tempt, 
-	Pnow, light_stat, light_time, daytime, lat, lon, 
-	Jlen, con_infl_C, nrec_steps, 
+	Pnow, Jlen, con_infl_C, nrec_steps, 
 	dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
@@ -103,11 +102,11 @@ def ode_updater(update_stp,
 	# temp - temperature in chamber (K)
 	# tempt - times that temperatures reached (s)
 	# Pnow - pressure inside chamber (Pa)
-	# light_stat - lights status
-	# light_time - time light status attained (s)
-	# daytime - time of day experiment starts (s)
-	# lat - latitude of experiment (degrees)
-	# lon - longitude of experiment (degrees)
+	# self.light_stat - lights status
+	# self.light_time - time light status attained (s)
+	# self.daytime - time of day experiment starts (s)
+	# self.lat - latitude of experiment (degrees)
+	# self.lon - longitude of experiment (degrees)
 	# self.af_path - path to actinic flux values
 	# self.dayOfYear - number of days since 31st December experiment held on
 	# self.photo_path - path to file with absorption cross-sections
@@ -353,8 +352,7 @@ def ode_updater(update_stp,
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
-	RO2_indx, sumt, Pnow, light_stat, light_time, 
-	light_time_cnt, daytime, lat, lon, 
+	RO2_indx, sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
@@ -412,9 +410,9 @@ def ode_updater(update_stp,
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow0, light_stat, light_time, light_time_cnt0, 
+			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-			update_stp, update_count, lat, lon, 
+			update_stp, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
@@ -468,9 +466,8 @@ def ode_updater(update_stp,
 		
 			# reaction rate coefficient
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
-				y[H2Oi], temp_now, lightm, y, daytime+sumt, 
-				lat, lon, Pnow, 
-				Jlen, y[NOi], y[HO2i], y[NO3i], 
+				y[H2Oi], temp_now, lightm, y, 
+				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
 				sumt, self)
 			
 			if (erf == 1): # if error message from reaction rate calculation
@@ -742,9 +739,9 @@ def ode_updater(update_stp,
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
-			Pnow0, light_stat, light_time, light_time_cnt0, 
+			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-			update_stp, update_count, lat, lon, 
+			update_stp, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 

@@ -35,9 +35,7 @@ except:
 import importlib
 
 
-def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon, 
-		PInit, Jlen, NO, HO2, NO3, sumt, 
-		self):
+def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 
 	import rate_coeffs # in case failure to import previous version using import command above
 
@@ -48,9 +46,8 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon,
 	# TEMP - temperature (K)
 	# lightm - whether lights off (0) or on (1)
 	# y - component concentrations (# molecules/cm3 (air))
-	# time - time of day (for natural light photolysis)
-	# lat - latitude
-	# lon - longitude
+	# self.lat - latitude
+	# self.lon - longitude
 	# self.af_path - path to file stating actinic flux
 	# self.DayOfYear - day number of the year (1-365)
 	# PInit - chamber pressure (Pa)
@@ -63,6 +60,8 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon,
 	# NO3 - concentration of NO3 (# molecules/cm3)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ---------------------------------------------
+	
+	time = self.daytime+sumt # time of day (for natural light photolysis) (s)
 	
 	# start by assuming no error message
 	erf = 0
@@ -86,7 +85,7 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, time, lat, lon,
 		
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
-	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, lat, lon, 
+	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, 
 					M_val, N2_val, O2_val, Jlen, NO, HO2, NO3, sumt, self)
 	#except:
 	#	import os

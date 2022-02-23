@@ -1,4 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\mcm_APINENE_CH4_wall_scheme\16_11_015UVC_auxO3nNO2_NO2conv_O3loss
+/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/mcm_APINENE_CH4_wall_scheme/16_11_015UVC_WallChemScheme2_HONOnOin
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

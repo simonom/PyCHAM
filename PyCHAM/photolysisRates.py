@@ -31,12 +31,12 @@ import shutil
 from lamp_photo import lamp_photo
 import zenith
 
-def PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self):
+def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 
 	# inputs:-----------------------------------------------------------------------------
-	# time - time of day (for natural light photolysis)
-	# lat - latitude
-	# lon - longitude
+	# self.daytime - time of day experiment starts (for natural light photolysis)
+	# self.lat - latitude
+	# self.lon - longitude
 	# TEMP - temperature inside chamber (K)
 	# self.af_path - name of path to file containing known actinic flux (only used if 
 	#				lights on inside chamber)
@@ -53,6 +53,8 @@ def PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self):
     
 	cwd = os.getcwd() # address of current working directory
 	
+	time = self.daytime+sumt # time through day reached (s)
+	
 	# if using MCM chemical scheme and natural light
 	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no'):
 	
@@ -60,7 +62,7 @@ def PhotolysisCalculation(time, lat, lon, TEMP, Jlen, sumt, self):
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
 		# Ground Level" by S. Madronich) of the textbook
 		# Environmental UV Photobiology (1993)
-		(secx, cosx) = zenith.zenith(time, lat, lon, DayOfYear)
+		(secx, cosx) = zenith.zenith(time)
 		
 		# The Hayman (1997) parameterisation for MCM reactions as described in
 		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
