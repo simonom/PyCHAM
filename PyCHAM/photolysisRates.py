@@ -62,7 +62,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
 		# Ground Level" by S. Madronich) of the textbook
 		# Environmental UV Photobiology (1993)
-		(secx, cosx) = zenith.zenith(time)
+		(secx, cosx) = zenith.zenith(time, self)
 		
 		# The Hayman (1997) parameterisation for MCM reactions as described in
 		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
