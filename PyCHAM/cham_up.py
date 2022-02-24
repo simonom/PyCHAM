@@ -184,24 +184,31 @@ def cham_up(sumt, temp, tempt, Pnow,
 
 	if (lightm == 1 and self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no' and self.light_ad == 1):	
 		# check time step required to limit change to rate of 
-		# MCM photochemical equation number 6 (python index 5), 
+		# MCM photochemical equation number 6, 
 		# which the unit test for
 		# the zenith module shows to be most photosensitive (compared to
 		# other photochemical equations)
 		import zenith
 		# photochemical rate now
-		time = self.daytime+sumt
-		(secxn, cosxn) = zenith.zenith(time, self)
+		self.sumt = sumt
+		(secxn, cosxn) = zenith.zenith(self)
 		Jn =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
+		
 		# photochemical rate after proposed time step
-		(secxt, cosxt) = zenith.zenith(time+tnew, self)
+		self.sumt += tnew # temporary changed (reversed below)
+		(secxt, cosxt) = zenith.zenith(self)
+		self.sumt -= tnew # reverse to temporary change above
+		
 		Jt =1.747e-1*cosxn**(0.155)*np.exp(-1.*0.125*secxn)
+		
 		# iteratively reduce proposed time interval until photochemical
 		# rate changes by acceptable amount
 		while (abs(Jt-Jn) > 5.e-3):
 			tnew = tnew*0.9
+			self.sumt += tnew # temporary changed (reversed below)
 			# photochemical rate after proposed time step
-			(secxt, cosxt) = zenith.zenith(time+tnew, self)
+			(secxt, cosxt) = zenith.zenith(self)
+			self.sumt -= tnew # reverse to temporary change above
 			Jt = 1.747e-1*cosxt**(0.155)*np.exp(-1.*0.125*secxt)
 			bc_red = 1
 			

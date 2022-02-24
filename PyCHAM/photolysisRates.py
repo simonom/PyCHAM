@@ -34,7 +34,7 @@ import zenith
 def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 
 	# inputs:-----------------------------------------------------------------------------
-	# self.daytime - time of day experiment starts (for natural light photolysis)
+	# self.daytime - time of day experiment starts (for natural light photolysis) (s)
 	# self.lat - latitude
 	# self.lon - longitude
 	# TEMP - temperature inside chamber (K)
@@ -49,11 +49,11 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ------------------------------------------------------------------------------------
 	
+	self.sumt = sumt
+	
 	J = np.zeros((Jlen)) # prepare output
     
 	cwd = os.getcwd() # address of current working directory
-	
-	time = self.daytime+sumt # time through day reached (s)
 	
 	# if using MCM chemical scheme and natural light
 	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no'):
@@ -62,7 +62,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
 		# Ground Level" by S. Madronich) of the textbook
 		# Environmental UV Photobiology (1993)
-		(secx, cosx) = zenith.zenith(time, self)
+		(secx, cosx) = zenith.zenith(self)
 		
 		# The Hayman (1997) parameterisation for MCM reactions as described in
 		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
@@ -140,7 +140,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	if (self.af_path != 'no'):
 		# call on module to process photolysis files and estimate J values
-		J = lamp_photo(J, TEMP, sumt, self)
+		J = lamp_photo(J, TEMP, self)
 	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0

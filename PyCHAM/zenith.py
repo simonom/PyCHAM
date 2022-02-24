@@ -29,20 +29,20 @@
 import numpy as np
 
 
-def zenith(time, self):
+def zenith(self):
     
 	# inputs ------------------------------------------------------
-	# time (s) through day
-	# self.lat is latitude and lon is longitude in degrees
-	# self.dayOfYear is the day number of the year (between 1-365)
+	# self - reference to program
 	# -------------------------------------------------------------
+
+	time = self.sumt+self.daytime # time (s) through day
 
 	pi = 4.*np.arctan(1.) # 1pi=180deg=3.14. For future calculation
 	radian = 1.8e2/pi # 1 unit rad; use this to convert [\deg] to [\rad]
 	dec = 0.41 # solar declination angle (rad), consistent with AtChem2 default
 
 	# latitude conversion from degrees to radian
-	lat = self.lat/radian # in [\rad]
+	lat_rad = self.lat/radian # in [\rad]
 	
 	# the day angle (radians), from calcTheta inside solarFunctions.f90 file of AtChem2,
 	# assuming not a leap year (correct for 2010)
@@ -60,13 +60,13 @@ def zenith(time, self):
 	# get the fraction hour by dividing by seconds per hour, then remove any hours
 	# from previous days by using the remainder function and 24 hours
 	currentFracHour = np.remainder(time/3600., 24.)
-	
+
 	# local hour angle (lha): representing the time of the day - taken from 
 	# solarFunctions.f90 of AtChem2
 	lha = pi*((currentFracHour/12.)-(1.+self.lon/180.))+eqtime
 
-	sinld = np.sin(self.lat)*np.sin(dec)
-	cosld = np.cos(self.lat)*np.cos(dec)
+	sinld = np.sin(lat_rad)*np.sin(dec)
+	cosld = np.cos(lat_rad)*np.cos(dec)
    
 	cosx = (np.cos(lha)*cosld)+sinld
 	secx = 1.E+0/(cosx+1.E-30)
