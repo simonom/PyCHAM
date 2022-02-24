@@ -41,7 +41,7 @@ def middle(self): # define function
 	# ---------------------------------------------------------------
 	
 	# get required inputs
-	[sav_nam, sch_name, chem_sch_mrk, xml_name, update_stp, tot_time, 
+	[sav_nam, chem_sch_mrk, update_stp, tot_time, 
 		comp0, y0, temp, tempt, RH, RHt, Pnow, wall_on,
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
@@ -51,7 +51,7 @@ def middle(self): # define function
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
-		e_field, dil_fac, partit_cutoff, ser_H2O, inname, wat_hist, drh_str, 
+		e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		testf, chamSA, chamV] = ui.share()
 
@@ -71,8 +71,7 @@ def middle(self): # define function
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
-	con_C_indx] = eqn_pars.extr_mech(sch_name, 
-	chem_sch_mrk, xml_name, con_infl_nam, int_tol, wall_on, 
+	con_C_indx] = eqn_pars.extr_mech(chem_sch_mrk, con_infl_nam, int_tol, wall_on, 
 	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac, sav_nam,
 	pcont, self)
 	
@@ -156,8 +155,8 @@ def middle(self): # define function
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
-		sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
-		rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
+		sav_nam, comp_namelist, dydt_trak, space_mode, 
+		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 		HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
 		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 

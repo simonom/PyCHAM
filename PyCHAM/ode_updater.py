@@ -75,8 +75,8 @@ def ode_updater(update_stp,
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
-	sch_name, sav_nam, comp_namelist, dydt_trak, space_mode, 
-	rbou00, ub_rad_amp, indx_plot, comp0, inname, rel_SMILES,
+	sav_nam, comp_namelist, dydt_trak, space_mode, 
+	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 	HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
 	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
@@ -249,7 +249,7 @@ def ode_updater(update_stp,
 	# C_p2w - concentration of components on the wall due to particle
 	# deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
-	# sch_name - path to chemical scheme
+	# self.sch_name - path to chemical scheme
 	# sav_nam - name of folder to save in
 	# comp_namelist - chemical scheme name of components
 	# dydt_trak - name of components to track change tendencies
@@ -258,7 +258,7 @@ def ode_updater(update_stp,
 	# ub_rad_amp - amplificatin factor for upper bin size bound
 	# indx_plot - indices of components to plot the gas-phase temporal profile of
 	# comp0 - names of components to plot the gas-phase temporal profile of
-	# inname - path to model variables file
+	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings of components in chemical scheme
 	# Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
 	# Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
@@ -773,10 +773,10 @@ def ode_updater(update_stp,
 	time_taken = time.time()-st_time
 
 	# save results
-	save.saving(sch_name, yrec, Nres_dry, Nres_wet, trec, sav_nam, 
+	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		dydt_vst, num_comp, Cfactor_vst, 0, 
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi, seedi, 
-		siz_str, cham_env, RO2_indx[:, 1], RO_indx, tot_in_res_ft)
+		comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi, seedi, 
+		siz_str, cham_env, RO2_indx[:, 1], RO_indx, tot_in_res_ft, self)
 	return()

@@ -37,15 +37,15 @@ import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
-def extr_mech(sch_name, chem_sch_mrk, xml_name, 
+def extr_mech(chem_sch_mrk, 
 		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
 		drh_str, erh_str, dil_fac, sav_nam, pcont, self):
 
 	# inputs: ----------------------------------------------------
-	# sch_name - file name of chemical scheme
+	# self.sch_name - file name of chemical scheme
 	# chem_sch_mrk - markers to identify different sections of 
 	# 	the chemical scheme
-	# xml_name - name of xml file
+	# self.xml_name - name of xml file
 	# self.photo_path - path to file containing absorption 
 	# 	cross-sections and quantum yields
 	# con_infl_nam - chemical scheme names of components with 
@@ -70,7 +70,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name,
 	erf = 0
 	err_mess = ''
 
-	f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
+	f_open_eqn = open(self.sch_name, mode='r') # open the chemical scheme file
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
 	f_open_eqn.close() # close file
@@ -80,7 +80,7 @@ def extr_mech(sch_name, chem_sch_mrk, xml_name,
 		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
 	
 	# interrogate xml to list all component names and SMILES
-	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
+	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
 
 	# get equation information for chemical reactions
 	[rindx_g, rstoi_g, pindx_g, pstoi_g, reac_coef_g, 

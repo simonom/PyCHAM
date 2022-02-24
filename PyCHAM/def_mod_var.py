@@ -35,9 +35,9 @@ def def_mod_var(caller, self): # define function
 
 	# default input files ------------------------------
 	# default chemical scheme
-	sch_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
-	xml_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
-	inname = 'Default' # model variables file name
+	self.sch_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
+	self.xml_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
+	self.inname = 'Default' # model variables file name
 	
 	# general ---------------------------------------------------------------------------------
 	# name of folder to save results to
@@ -188,7 +188,7 @@ def def_mod_var(caller, self): # define function
 	
 
 	# prepare for pickling
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
@@ -211,7 +211,7 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	return(sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, save_step, const_comp, Compt, 

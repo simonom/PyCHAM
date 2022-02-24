@@ -43,7 +43,7 @@ def ui_check(self):
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -59,7 +59,7 @@ def ui_check(self):
 
 	# loaded variables: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
-	# sch_name - name of chemical scheme file
+	# self.sch_name - name of chemical scheme file
 	# wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
 	# num_sb - number of particle size bins
@@ -113,7 +113,7 @@ def ui_check(self):
 	# saving path (copied from saving module) ------------
 	dir_path = os.getcwd() # current working directory
 	output_root = 'PyCHAM/output'
-	filename = os.path.basename(sch_name)
+	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
@@ -366,10 +366,10 @@ def ui_check(self):
 			em_flag = em_flag
 	
 	# chemical scheme check-------------------------------------
-	if (em_flag < 2 and sch_name != 'Not found'): # if a chemical scheme has been identified
+	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
 		[comp_namelist, _, err_mess_new, 
-		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(sch_name, xml_name, chem_sch_mark)
+		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self, chem_sch_mark)
 		
 		
 		if (err_mess_new == '' and em_flag < 2):
@@ -389,7 +389,7 @@ def ui_check(self):
 			err_mess = err_mess_new
 			em_flag = 2
 	
-	if (em_flag < 2 and sch_name == 'Not found'): # if a chemical scheme has not been identified
+	if (em_flag < 2 and self.sch_name == 'Not found'): # if a chemical scheme has not been identified
 	
 		err_mess_n = str('Note - a new chemical scheme has not been identified automatically.  For PyCHAM to identify automatically the chemical scheme file must be inside the selected folder and its file name must contain the string \'chem\'.  Alternatively use the relevant button to select the chemical scheme individually.\n')
 		if (em_flag == 0):
@@ -451,7 +451,7 @@ def ui_check(self):
 	
 
 	# store in pickle file
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, const_comp, 

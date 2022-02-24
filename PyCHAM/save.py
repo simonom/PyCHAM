@@ -28,15 +28,14 @@ import numpy as np
 import csv
 from shutil import copyfile
 
-def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
+def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, yrec_p2w, sch_name, inname, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	seedi, siz_str, cham_env, opri, oari, tot_in_res_ft):
+	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
+	seedi, siz_str, cham_env, opri, oari, tot_in_res_ft, self):
 
 	# inputs: ----------------------------------------------------------------------------
 	
-	# filename - name of model variables file
 	# y_mat - species (columns) concentrations with time (rows) (# molecules/cm3 (air))
 	# Nresult_dry  - number concentration of dry particles per size bin (# particles/cm3 (air))
 	# Nresult_wet  - number concentration of dry particles per size bin (# particles/cm3 (air))
@@ -71,8 +70,8 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# yrec_p2w - concentration of components on the wall due to 
 	#	particle-wall loss, stacked by component first then by
 	#	size bin (molecules/cc)
-	# sch_name - path to chemical scheme file
-	# inname - path to model variables file
+	# self.sch_name - path to chemical scheme file
+	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings for components in chemical scheme
 	# Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
 	# OC - oxygen to carbon ratio of components
@@ -84,6 +83,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# opri - organic peroxy radical indices
 	# oari - organic alkoxy radical indices
 	# tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
+	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
 	
@@ -96,7 +96,7 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 
 	dir_path = os.getcwd() # current working directory
 	output_root = 'PyCHAM/output'
-	filename = os.path.basename(filename)
+	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, savefolder)
@@ -106,11 +106,11 @@ def saving(filename, y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vs
 	# create folder to store copies of inputs
 	os.makedirs(str(output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
-	output_by_sim_sch_ext = str(output_by_sim+'/inputs/'+sch_name.split('/')[-1])
-	copyfile(sch_name, output_by_sim_sch_ext)
-	output_by_sim_mv_ext = str(output_by_sim+'/inputs/'+inname.split('/')[-1])
-	if (inname != 'Default'): # if not in default model variables mode 
-		copyfile(inname, output_by_sim_mv_ext)
+	output_by_sim_sch_ext = str(output_by_sim+'/inputs/'+self.sch_name.split('/')[-1])
+	copyfile(self.sch_name, output_by_sim_sch_ext)
+	output_by_sim_mv_ext = str(output_by_sim+'/inputs/'+self.inname.split('/')[-1])
+	if (self.inname != 'Default'): # if not in default model variables mode 
+		copyfile(self.inname, output_by_sim_mv_ext)
 	
 	# saving dictionary
 	# dictionary containing variables for model and components

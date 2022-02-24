@@ -28,18 +28,18 @@ import sch_interr
 import xml_interr
 import re
 
-def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
+def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 
 	# inputs: ------------------------------------------
-	# sch_name - path to chemical scheme
-	# xml_name - path to xml name
+	# self.sch_name - path to chemical scheme
+	# self.xml_name - path to xml name
 	# chem_scheme_markers - markers for chemical scheme
 	# ----------------------------------------------------
 	
 	# initiate with empty error message
 	err_mess = ''
 
-	f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
+	f_open_eqn = open(self.sch_name, mode='r') # open the chemical scheme file
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
 	f_open_eqn.close() # close file
@@ -49,7 +49,7 @@ def chem_scheme_SMILES_extr(sch_name, xml_name, chem_scheme_markers):
 		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_scheme_markers)
 	
 	# interrogate xml to list all component names and SMILES
-	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(xml_name)
+	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
 	
 	# in case error given by xml_interr
 	if err_mess_new[0:5] == 'Error':

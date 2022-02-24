@@ -36,7 +36,7 @@ def share():
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -55,7 +55,7 @@ def share():
 		# (below eq. 2 in Charan et al. 2018, doi.org/10.1080/02786826.2018.1474167)
 		chamR = (chamSA/(4.*np.pi))**0.5
 
-	return(sav_nam, sch_name, chem_sch_mark, xml_name, update_stp, 
+	return(sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 		std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -65,5 +65,5 @@ def share():
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
-		inname, wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		testf, chamSA, chamV)

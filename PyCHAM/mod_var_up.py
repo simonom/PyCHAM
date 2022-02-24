@@ -34,7 +34,7 @@ def mod_var_up(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,

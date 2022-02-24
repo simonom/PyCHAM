@@ -36,7 +36,7 @@ def plotter_taf(self): # define function for photolysis stuff
 	# prepare by opening existing inputs, ready for modification
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -53,7 +53,7 @@ def plotter_taf(self): # define function for photolysis stuff
 	testf = 4 # modify test flag value
 
 	# pickle with new testf
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
@@ -98,7 +98,7 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 	# prepare by opening existing inputs, ready for modification
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -115,7 +115,7 @@ def plotter_gpdc(self): # define function for gas-phase diffusion coefficients
 	testf = 2 # modify test flag value
 
 	# pickle with new testf
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 
@@ -162,7 +162,7 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 	# prepare by opening existing inputs, ready for modification
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		[sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -179,7 +179,7 @@ def plotter_gpmts(self): # define function for gas-phase mean thermal speeds
 	testf = 3 # modify test flag value
 
 	# pickle with new testf
-	list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 		uppsize, space_mode, std, mean_rad, save_step, const_comp, 

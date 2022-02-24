@@ -37,7 +37,7 @@ def mod_var_read(self):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+			[sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, const_comp, Compt, injectt, Ct, seed_name,
@@ -51,8 +51,8 @@ def mod_var_read(self):
 			testf, chamV] = pickle.load(pk)
 		pk.close()
 		
-		if (inname != 'Default' and inname != 'Not found'): # if not using defaults
-			inputs = open(inname, mode= 'r' ) # open model variables file
+		if (self.inname != 'Default' and self.inname != 'Not found'): # if not using defaults
+			inputs = open(self.inname, mode= 'r' ) # open model variables file
 			in_list = inputs.readlines() # read file and store everything into a list
 			inputs.close() # close file
 		else: # if using defaults
@@ -494,7 +494,7 @@ def mod_var_read(self):
 				self.bd_st = 1		
 
 		# prepare for pickling
-		list_vars = [sav_nam, sch_name, chem_sch_mark, xml_name, inname, update_stp, 
+		list_vars = [sav_nam, chem_sch_mark, update_stp, 
 				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
