@@ -12,9 +12,10 @@ PyCHAM is an open-source computer code (written in Python) for simulating aeroso
 5. [Inputs](#Inputs)
 6. [Photochemistry](#Photochemistry)
 7. [Numerical Considerations](#Numerical-Considerations)
-8. [Basic Plotting Tab](#Basic-Plotting-Tab)
-9. [Frequently Asked Questions](#Frequently-Asked-Questions)
-10. [Acknowledgements](#Acknowledgements)
+8. [Quick Plotting Tab](#Quick-Plotting-Tab)
+9. [Flow Mode](#Flow-Mode)
+10. [Frequently Asked Questions](#Frequently-Asked-Questions)
+11. [Acknowledgements](#Acknowledgements)
 
 ## Documentation
 
@@ -174,6 +175,7 @@ An example is provided in the inputs folder (of the Github repository), called
 'example_model_var.txt' , this can include the following variables separated by a 
 return (so one line per variable), 
 note that if a variable is irrelevant for your simulation, it can be omitted and will be replaced by the default.
+In addition, you can find more information around photochemistry and flow mode instruments in the corresponding section of this README file.
 
 | Input Name | Description|
 | ---------- | ---------- |
@@ -271,7 +273,7 @@ Photolysis rate is the product of actinic flux, component absorption cross-secti
 
 For photolysis reactions in chemical schemes other than Master Chemical Mechanism, the user can supply their own file for component absorption cross-section and quantum yield (the values are to be contained in the same file).  The file name should be stated in the photo_par_file model variable and the file should be stored in PyCHAM/photofiles.  A short example is given in the photofiles folder, called example_inputs.txt.  File must be of .txt format with the formatting: <br> J_n_axs <br> wv_m, axs_m <br> J_n_qy <br> wv_M, qy_m <br> J_end <br> where n is the photochemical reaction number, axs represents the absorption cross-section (cm2/molecule), wv is wavelength (nm), _m is the wavelength number, and qy represents quantum yield (fraction).  J_end marks the end of the photolysis file.
 
-If a lamp power is given in terms of watts (J ((kg m^2/s^2))/s), and a spectrum per unit wavelength is provided then it is possible to convert to actinic flux in units of Photons/cm2/nm/s.  To do this use the photon energy formula: E (J (kg m^2/s^2)) = h (J (kg m^2/s^2) s)*c (nm/s)/lamda (nm), where h is Planck's constant (6.626e-34 Js), c is the speed of light (3e17 nm/s) and lambda is the wavelength (nm), to get the energy of one photon.  Then, divide the provided Watts (J/nm/s) value by the result to get the frequency of photons (photons/nm/s).  If the 
+If a lamp power is given in terms of watts (J (kg m^2/s^2)/s), and a spectrum per unit wavelength is provided then it is possible to convert to actinic flux in units of photons/s.  To do this use the photon energy formula: E (J (kg m^2/s^2)) = h (J (kg m^2/s^2) s)*c (m/s)/lamda (m), where h is Planck's constant (6.626e-34 Js), c is the speed of light (3e8 m/s) and lambda is the wavelength (m), to get the energy of one photon.  Then, divide the provided Watts (J/s) per unit wavelength value by the result to get the actinic flux (photons/s) (note that by definition the actinic flux corresponds to a unit wavelength and a unit area).
 
 ## Numerical Considerations
 In this section aspects of PyCHAM affecting numerical stability and computation time speed-up are discussed.
@@ -288,9 +290,13 @@ If the user-supplied model variables includes a seed component that is volatile 
 
 Computation time speed-up and ODE solver stability may be gained by increasing the value of the user-supplied model variable z_prt_coeff.  This variable determines for which size bins gas-particle partitioning of components (including water) is allowed.  If the gas-particle partitioning coefficient of a particle size bin is sufficiently low that it comprises less than this fraction of the total gas-particle partitioning coefficient, then for this size bin partitioning is treated as zero.  If a size bin represents a relatively very small fraction of total partitioning the partitioning problem can become too stiff and prevent the ODE solver from concluding.
 
-## Basic Plotting Tab
+## Quick Plotting Tab
 
 Particle mass concentration (whether total of all components or excluding certain components) is calculated based on the concentration of components and their molecular weight.  At a given time, for a given component in a given particle size bin (note that the concentration of a component represents the sum over all particles present in a size bin) the formula is: ((# molecules/cm3)/(Avogadro's Number (# molecules/mol)))*(g/mol)*1.e12 = ug/m3.  This equation can be extended over certain size bins and certain groupings of components to attain the desired particle-phase mass concentration.
+
+## Flow Mode
+
+When preparing model variable inputs for an instrument in flow mode (e.g. a flow tube or a chamber in flow reactor mode), the dilution factor and continuous influx of component model variables can be used.  To simulate removal of a constant fraction of the chamber's volume per second, set the dil_fac model variable accordingly.  For example, if the residence time in the instrument is 10 seconds, then 0.1 of the volume is removed per second, so use dil_fac = 0.1.  If components of interest (including potentially water) are injected to the instrument to replace the components lost through chamber air being extracted, then use the model variables: const_infl, const_infl_t and Cinfl to describe their continuous influx.
 
 ## Frequently Asked Questions
 

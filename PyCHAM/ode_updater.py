@@ -424,7 +424,7 @@ def ode_updater(update_stp,
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
-			if ((sumt+tnew) > save_stp*(save_cnt_chck)):
+			if ((sumt+tnew) > save_stp*save_cnt_chck):
 				tnew = (save_stp*(save_cnt_chck))-sumt
 				# temporarily set the update step for operator-split processes
 				# to align with recording time step, this ensures that
@@ -626,7 +626,14 @@ def ode_updater(update_stp,
 					gpp_stab = -1 # maintain unstable flag
 					# tell user what's happening
 					yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
-
+					y_gp = np.zeros((len(y)))
+					y_gp[:] = y[:]
+					y_gp = y_gp.reshape(num_comp, num_sb-wall_on+1, order='F')
+					y_gpi = np.where(y_gp<0.)
+					for gpi in y_gpi[0]: # loop through negative components
+						print('negative component name:', comp_namelist[gpi])
+					print('negative component size bin:', np.unique(y_gpi[1][:]))
+					
 					if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 						# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 						ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
@@ -661,8 +668,9 @@ def ode_updater(update_stp,
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		self.sumt += tnew
-		if (sumt % save_stp == 0.): # get remainder
-			save_cnt_chck += 1 # if need to move up count on interval check to
+		
+		if (sumt%save_stp < 1.e-12 or (sumt%save_stp-save_stp) < 1.e-12): # get remainder
+			save_cnt_chck += 1 # if need to move up count on recording
 		
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been

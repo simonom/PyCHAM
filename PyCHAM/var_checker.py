@@ -59,7 +59,7 @@ def var_checker(testf, temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, s
 		tempt = np.array(tempt)
 		temp = np.array(temp)
 		
-		while (sumt < tot_time):
+		while (sumt < tot_time-tot_time*1.e-10):
 
 			# identify relevant light status
 			lindx = np.sum(self.light_time >= sumt)
@@ -97,7 +97,7 @@ def var_checker(testf, temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, s
 		plt.ion() # allow plotting
 		
 		# times to plot against (hours through experiment)
-		thr = (np.arange(0.0, sumt, update_stp))/3600.0
+		thr = (np.arange(0.0, tot_time, update_stp))/3600.0
 		
 		# number of plots
 		nplot = math.ceil((Jlen)/10.)
