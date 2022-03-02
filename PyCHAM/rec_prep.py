@@ -43,7 +43,7 @@ def rec_prep(nrec_step,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
-	DStar_org, seedi, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
+	DStar_org, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, 
@@ -141,7 +141,7 @@ def rec_prep(nrec_step,
 	#		partitioning assumed zero (Pa)
 	# diff_vol - diffusion volume of components according to Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
-	# seedi - index of seed component(s)
+	# self.seedi - index of seed component(s)
 	# C_p2w - concentration of components on the wall due to particle
 	# deposition to wall (molecules/cc)
 	# RH - relative humidities (fraction 0-1)
@@ -194,7 +194,7 @@ def rec_prep(nrec_step,
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, seedi, diff_vol, 
+		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
@@ -233,7 +233,7 @@ def rec_prep(nrec_step,
 		[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
-		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf)
+		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf, self)
 		
 	if (num_sb-wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 

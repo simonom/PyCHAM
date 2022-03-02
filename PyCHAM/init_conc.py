@@ -35,7 +35,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	rindx, pindx, num_eqn, nreac, nprod, 
 	comp_namelist, Compt, seed_name, seed_mw,
 	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	RO2_indx, HOMRO2_indx, rstoi, pstoi):
+	RO2_indx, HOMRO2_indx, rstoi, pstoi, self):
 		
 	# inputs:------------------------------------------------------
 	
@@ -69,6 +69,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
 	# rstoi - stoichiometry of reactants per equation
 	# pstoi - stoichiometry of products per equation
+	# self - reference to program
 	# -----------------------------------------------------------
 
 	# start by assuming no error
@@ -158,7 +159,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# that an index is provided for core material
 
 	# empty array for index of core component
-	seedi = (np.zeros((len(seed_name)))).astype(int)
+	self.seedi = (np.zeros((len(seed_name)))).astype(int)
 	
 	comp_namelist.append('core') # append name of core to component name list
 	corei = [num_comp] # index for core component
@@ -287,7 +288,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	indx = 0 # count on seed component(s)
 	for sname in seed_name:
 		# index of core component
-		seedi[indx] = int(comp_namelist.index(sname))
+		self.seedi[indx] = int(comp_namelist.index(sname))
 		indx += 1 # count on seed component(s)
 	
 	# get index of component with latter injections
@@ -321,5 +322,5 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 			comp_namelist, inj_indx, core_diss,
-			Psat_water, nuci, nrec_steps, seedi, erf, err_mess, NOi, 
-			HO2i, NO3i)
+			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
+			HO2i, NO3i, self)

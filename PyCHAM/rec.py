@@ -30,9 +30,9 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
-	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, seedi, 
+	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, 
 	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
-	tot_in_res_ft):
+	tot_in_res_ft, self):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -71,7 +71,6 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# rbou - size bin radius boundaries (um)
 	# wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
-	# seedi - index of seed component
 	# yrec_p2w - record of concentration of components on 
 	#	the wall due to particle-wall deposition (molecules/cc)
 	# C_p2w - concentration of components on the wall due to 
@@ -84,6 +83,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# tot_in_res - cumulative influx of injected components (ug/m3)
 	# tot_in_res_ft - record of continuous influx of injected 
 	#	components (ug/m3)
+	# self - reference to program
 	# --------------------------------------------------------------------
 
 	trec[save_cnt] = sumt # track recording times (s)

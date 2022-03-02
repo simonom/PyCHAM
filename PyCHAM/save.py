@@ -32,7 +32,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	seedi, siz_str, cham_env, opri, oari, tot_in_res_ft, self):
+	siz_str, cham_env, opri, oari, tot_in_res_ft, self):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -76,7 +76,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	# Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
 	# OC - oxygen to carbon ratio of components
 	# H2Oi - index of water
-	# seedi - index of seed components
+	# self.seedi - index of seed components
 	# siz_str - the size structure
 	# cham_env - chamber environmental conditions (temperature (K), 
 	# pressure (Pa) and relative humidity
@@ -131,7 +131,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	const["pure_component_saturation_vapour_pressures_at_298.15K"] = Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
 	const["index_of_water"] = H2Oi
-	const["index_of_seed_components"] = seedi.tolist()
+	const["index_of_seed_components"] = self.seedi.tolist()
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
 	const["output_by_sim_sch_ext"] = output_by_sim_sch_ext
 	const["output_by_sim_mv_ext"] = output_by_sim_mv_ext

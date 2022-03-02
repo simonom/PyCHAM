@@ -23,11 +23,11 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2022-03-01 16:59:02.386334
+# File Created at 2022-03-02 15:58:44.044026
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, seedi, dydt_erh_flag, H2Oi, wat_hist):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
 	
 	# loop through components to record the tendency of change, note that components can be grouped, e.g. RO2 for non-HOM-RO2 
 	dydtnames = dydt_vst['comp_names'] 
@@ -65,7 +65,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
 				conc_sum = np.zeros((1)) 
 				if (sum(sum(pconc > 0.)) > 0): # if seed particles present 
-					conc_sum[0] = ((Csit.sum()-sum(Csit[seedi]))+sum(Csit[seedi]*core_diss))
+					conc_sum[0] = ((Csit.sum()-sum(Csit[self.seedi]))+sum(Csit[self.seedi]*core_diss))
 				else: 
 					conc_sum[0] = Csit.sum() 
 				# prevent numerical error due to division by zero 

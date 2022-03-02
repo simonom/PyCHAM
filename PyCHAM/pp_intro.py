@@ -32,7 +32,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, Psat, core_diss, kgwt, space_mode, seedx, 
 		spec_namelist, act_coeff, wall_on, partit_cutoff, Press,
-		seedi, pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat):
+		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -70,7 +70,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# partit_cutoff - product of vapour pressure and activity coefficient
 	#		at which gas-particle partitioning assumed zero (Pa)
 	# Press - pressure inside chamber
-	# seedi - index of seed components
+	# self.seedi - index of seed components
 	# pcont - whether particle injections are instantaneous 
 	#	or continuous (flag)
 	# seed_mw - molecular weight of seed components (g/mol)
@@ -79,6 +79,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# distribution of seed particles includes the volume of water
 	# seed_eq_wat - flag for whether (1) or not (0) to allow water
 	# equilibrium with seed particles prior to experiment start
+	# self - reference to program
 	# ------------------------------------------
 	
 	if (testf == 1): # in test mode
@@ -196,7 +197,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				avMW0 = np.ones((num_aasb)) # first guess of average molecular weight
 
 				# average molecular weight of seed in each size bin (g/mol)
-				avMW1 = np.ones((num_aasb))*(np.sum(y_mw[seedi])/len(seedi))
+				avMW1 = np.ones((num_aasb))*(np.sum(y_mw[self.seedi])/len(self.seedi))
 				
 				avMW = avMW1 # for calculating Kelvin factor
 				lcnt = 1 # loop count
@@ -209,7 +210,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					# 1e7 for units g cm2/s2.mol.K, 
 					# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
 					# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-					kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[seedi[:], 0])/len(seedi)*1.e-3)))
+					kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 					# equilibrium mole fraction of water per size bin
 					# from the ode solver equation for vapour-particle partitioning of water
@@ -221,19 +222,19 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					seedxn = seedx*(1.-xwat)
 				
 					# average molar volume of seed components (cc/mol) for all size bins
-					avMV = (sum(seedxn*MV[seedi[:], 0])+xwat*MV[H2Oi, 0])
+					avMV = (sum(seedxn*MV[self.seedi[:], 0])+xwat*MV[H2Oi, 0])
 				
 					# total molecular concentration of seed components including water (molecules/cm3) per size bin,
 					# note that volume multiplied by 1e-12 to convert from um3 to cm3
 					tmc = (((Varr*1.e-12)*N_perbin[:, 0])/avMV)*NA
 
 					# concentration of particle-phase seed components in all size bin
-					for ci in range(len(seedi)): # loop through indices of seed components
+					for ci in range(len(self.seedi)): # loop through indices of seed components
 						
 						# non-water (# molecules/cm3)
-						y[num_comp+seedi[ci]:(num_comp*(num_aasb)+seedi[ci])+1:num_comp] = tmc*(seedxn[ci, :])
+						y[num_comp+self.seedi[ci]:(num_comp*(num_aasb)+self.seedi[ci])+1:num_comp] = tmc*(seedxn[ci, :])
 						
-						if (ci == len(seedi)-1): # reached water component
+						if (ci == len(self.seedi)-1): # reached water component
 							# water (# molecules/cm3)
 							y[num_comp+H2Oi:(num_comp*(num_aasb)+H2Oi)+1:num_comp] = tmc*xwat
 
@@ -261,7 +262,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
 				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*sum(seed_mw)/len(seed_mw)*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[seedi[:], 0])/len(seedi)*1.e-3)))
+				kelv = np.exp((2.e0*sum(seed_mw)/len(seed_mw)*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
@@ -270,7 +271,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 				
 				# average molar volume of dry (no water) seed components (cc/mol) for all size bins
-				avMV = (sum(seedx*MV[seedi[:], 0]))
+				avMV = (sum(seedx*MV[self.seedi[:], 0]))
 				
 				# total molecular concentration of dry (no water) seed components 
 				# including water (molecules/cm3) per size bin, 
@@ -278,11 +279,11 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				tmc = (((Varr*1.e-12)*N_perbin[:, 0])/avMV)*NA
 				
 				# concentration of particle-phase seed components in all size bin
-				for ci in range(len(seedi)): # loop through indices of seed components
+				for ci in range(len(self.seedi)): # loop through indices of seed components
 					# non-water (# molecules/cm3)
-					y[num_comp+seedi[ci]:(num_comp*(num_aasb)+seedi[ci])+1:num_comp] = tmc*(seedx[ci, :])
+					y[num_comp+self.seedi[ci]:(num_comp*(num_aasb)+self.seedi[ci])+1:num_comp] = tmc*(seedx[ci, :])
 						
-					if (ci == len(seedi)-1): # reached final non-water seed component
+					if (ci == len(self.seedi)-1): # reached final non-water seed component
 						# water (# molecules/cm3)
 						y[num_comp+H2Oi:(num_comp*(num_aasb)+H2Oi)+1:num_comp] = (-xwat*tmc)/(xwat-1.)
 					
@@ -293,17 +294,17 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 			# will try to equilibrate with particles through the ODE solver		
 			
 			# mole-fraction weighted molar volume (cm3/mole) (average molar volume of particles)
-			mfwMV = sum(MV[seedi[:], 0]*(seedx/sum(seedx)))
+			mfwMV = sum(MV[self.seedi[:], 0]*(seedx/sum(seedx)))
 			# convert to molecular volume (cm3/molecule)
 			mfwMV = mfwMV/NA
 			# total molecular concentration of seed components per size bin (molecules/cm3)
 			# note that volume multiplied by 1e-12 to convert from um3 to cm3
 			ytot = ((Varr*1.e-12)*N_perbin[:, 0])/mfwMV
 		
-			for ci in range(len(seedi)): # loop through indices of seed components
+			for ci in range(len(self.seedi)): # loop through indices of seed components
 		
 				# concentration of this component in all size bins (molecules/cc (air)):
-				y[num_comp+seedi[ci]:(num_comp*(num_aasb)+seedi[ci])+1:num_comp] = ytot*(seedx[ci]/sum(seedx))
+				y[num_comp+self.seedi[ci]:(num_comp*(num_aasb)+self.seedi[ci])+1:num_comp] = ytot*(seedx[ci]/sum(seedx))
 				
 				
 	# mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3

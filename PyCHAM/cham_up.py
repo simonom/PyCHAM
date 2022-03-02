@@ -39,7 +39,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, seedi, diff_vol, 
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cinfl, wall_on, Cfactor, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, self):
@@ -110,7 +110,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 	# 	influx (ppb/s)
 	# wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cc (air)
-	# seedi - index of seed component(s)
+	# self.seedi - index of seed component(s)
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
@@ -410,10 +410,10 @@ def cham_up(sumt, temp, tempt, Pnow,
 			if (pcontf == 0):
 				[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
 					_, _] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
-					N_perbin, mean_radn, pmode, pconcn, seedi, seedx, lowsize, 
+					N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
-					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi])
+					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 		
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
@@ -424,7 +424,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# prepare for continuous influx of particles flagged
-	Cinfl_seed = np.zeros((len(seedi), 1)) # continuous influx of seed components
+	Cinfl_seed = np.zeros((len(self.seedi), 1)) # continuous influx of seed components
 	
 	# if there is continuous influx of particles
 	if ((pcontf == 1) and (sumt >= pconct[0, seedt_cnt])):
@@ -445,10 +445,10 @@ def cham_up(sumt, temp, tempt, Pnow,
 		
 		[Cinfl_nowp, N_perbin, _, 
 			_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
-			N_perbin, mean_radn, pmode, (pconcn), seedi, seedx, lowsize, 
+			N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
 			uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
 			stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
-			seed_eq_wat, Vwat_inc, pcontf, y[H2Oi])
+			seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 		
 		y[num_comp:num_comp*(num_sb-wall_on+1)] = Cinfl_nowp
 		

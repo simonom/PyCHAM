@@ -34,14 +34,14 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,
 	rowvals, colptrs, num_comp, num_sb,
 	wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,
-	seedi, core_diss, kelv_fac, kimt, num_asb,
+	core_diss, kelv_fac, kimt, num_asb,
 	jac_part_indx,
 	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 	nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq,
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq,
 	reac_col_aq, prod_col_aq, rstoi_flat_aq,
 	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,
-	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi):
+	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self):
 
 	# inputs: -------------------------------------
 	# y - initial concentrations (molecules/cm3)
@@ -85,7 +85,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# act_coeff - activity coefficient of components
 	# kw - mass transfer coefficient to wall (/s)
 	# jac_wall_indx - index of inputs to Jacobian by wall partitioning
-	# seedi - index of seed material
+	# self.seedi - index of seed material
 	# core_diss - dissociation constant of seed material
 	# kelv_fac - kelvin factor for particles
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
@@ -101,6 +101,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# jac_part_H2O_indx - sparse Jacobian indices for the effect of
 	#	particle-phase water on all other components
 	# H2Oi - index for water
+	# self - reference to program
 	# ---------------------------------------------
 
 	def dydt(t, y): # define the ODE(s)
@@ -124,7 +125,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		ymat[:, H2Oi] = y[1::, 0]
 		
 		# total particle-phase concentration per size bin (molecules/cc (air))
-		csum = ((ymat.sum(axis=1)-ymat[:, seedi].sum(axis=1))+((ymat[:, seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
+		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
 		if (any(isb)): # if particle-phase components present
@@ -185,7 +186,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		# update the particle-phase concentrations of water (molecules/cc (air))
 		ymat[:, H2Oi] = y[1::, 0]
 		# total particle-phase concentration per size bin (molecules/cc (air))
-		csum = ymat.sum(axis=1)-ymat[:, seedi].sum(axis=1)+(ymat[:, seedi]*core_diss).sum(axis=1)
+		csum = ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1)+(ymat[:, self.seedi]*core_diss).sum(axis=1)
 		
 		# effect of particle-on-gas and particle-on-particle
 		for isb in range(int(num_asb)): # size bin loop

@@ -31,10 +31,10 @@ import datetime # for dealing with times
 def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi, 
 			pstoi, rrc, nreac, nprod, wall_on, num_comp, 
 			num_asb, Cw, Psat, act_coeff, kw, neg_comp_indx,
-			N_perbin, seedi, core_diss, kelv_fac, kimt, 
+			N_perbin, core_diss, kelv_fac, kimt, 
 			eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 			rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, call, 
-			H2Oi, y):
+			H2Oi, y, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# y0 - concentrations prior to attempted integration (# molecules/cm3)
@@ -59,7 +59,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# kw - mass transfer coefficient to wall (/s)
 	# neg_comp_indx - indices of components with negative concentrations
 	# N_perbin - number concentration of particles per size bin (#/cc)
-	# seedi - index of seed components
+	# self.seedi - index of seed components
 	# core_diss - dissociation of seed components
 	# kelv_fac - kelvin factor for particle
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
@@ -76,6 +76,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# call - flag for whether module called after ode_solv_wat or ode_solv
 	# H2Oi - index for water
 	# y - concentrations (molecules/cm3) after solver
+	# self - reference to program
 	# --------------------------------------------------------------------------
 
 	# create new  file to store fluxes
@@ -201,7 +202,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		# force all components in size bins with no particle to zero
 		ymat[N_perbin[:, 0] == 0, :] = 0.
 		# total particle-phase concentration per size bin (molecules/cc (air))		
-		csum = ((ymat.sum(axis=1)-ymat[:, seedi].sum(axis=1))+((ymat[:, seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
+		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
 		# tile over components
 		csum = np.tile(csum, [1, len(neg_comp_indx)])
 		ymat = ymat[:, neg_comp_indx] # keep just the components with negative values output by ODE solver

@@ -89,12 +89,12 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, seedi, erf, err_mess, NOi, HO2i, NO3i] = init_conc.init_conc(comp_num, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
 	comp0, y0, temp[0], RH, Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, 
 	save_step, rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	RO2_indx, HOMRO2_indx, rstoi_g, pstoi_g)
+	RO2_indx, HOMRO2_indx, rstoi_g, pstoi_g, self)
 
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):
@@ -122,8 +122,8 @@ def middle(self): # define function
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedx,
-		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, seedi, 
-		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat)
+		comp_namelist, act_coeff, wall_on, partit_cutoff, Pnow, 
+		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, cont_inf_reci, cont_inf_i, 
@@ -136,7 +136,7 @@ def middle(self): # define function
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
 		jac_den_indx_g, jac_indx_g, RO2_indx, RO_indx, H2Oi, temp, tempt, 
 		Pnow, Jlen, con_infl_C, nrec_steps, 
-		dydt_vst, siz_str, num_sb, num_comp, seedi, seed_name, seedx, 
+		dydt_vst, siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, y_arr_g, y_rind_g, 

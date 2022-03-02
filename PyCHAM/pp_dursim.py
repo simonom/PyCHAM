@@ -27,9 +27,9 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
-def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppersize, num_comp, 
+def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
 		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, Psat, 
-		act_coeff, seed_eq_wat, Vwat_inc, pcontf, H2Ogc):
+		act_coeff, seed_eq_wat, Vwat_inc, pcontf, H2Ogc, self):
 	
 			
 	# inputs -----------------------------------
@@ -38,7 +38,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 	# mean_rad - mean radius of seed particles at this time (um)
 	# pmode - whether particle number size distribution stated by mode or explicitly
 	# pconc - number concentration of seed particles (# particles/cm3 (air))
-	# seedi - index of seed material
+	# self.seedi - index of seed material
 	# seedx - mole ratio of non-water components comprising seed particles
 	# lowersize - smallest radius bound (um)
 	# uppersize - greatest radius bound (um)
@@ -60,6 +60,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# pcontf - flag for whether injection of particles is continuous or instantaneous
 	# H2Ogc - gas-phase concentration of water (# molecules/cm3)
+	# self - reference to program
 	# ------------------------------------------
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
@@ -131,7 +132,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 			avMW0 = np.ones((num_sb)) # first guess of average molecular weight	
 
 			# average molecular weight of seed in each size bin (g/mol)
-			avMW1 = np.ones((num_sb))*(np.sum(y_mw[seedi])/len(seedi))
+			avMW1 = np.ones((num_sb))*(np.sum(y_mw[self.seedi])/len(self.seedi))
 
 			avMW = avMW1 # for calculating Kelvin factor
 			lcnt = 1 # loop count
@@ -144,7 +145,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
 				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[seedi[:], 0])/len(seedi)*1.e-3)))
+				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water per size bin
 				# from the ode solver equation for vapour-particle partitioning of water
@@ -156,7 +157,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				seedxn = seedx*(1.-xwat)
 				
 				# average molar volume of seed components (cc/mol) for all size bins
-				avMV = (sum(seedxn*MV[seedi[:], 0])+xwat*MV[H2Oi, 0])
+				avMV = (sum(seedxn*MV[self.seedi[:], 0])+xwat*MV[H2Oi, 0])
 				
 				# total molecular concentration of seed components including water 
 				# (# molecules/cm3) per size bin, note that volume multiplied by 
@@ -164,12 +165,12 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				tmc = ((Vperbin*1.e-12)/avMV)*NA
 
 				# concentration of particle-phase seed components in all size bin
-				for ci in range(len(seedi)): # loop through indices of seed components
+				for ci in range(len(self.seedi)): # loop through indices of seed components
 					
 					# non-water (# molecules/cm3)
-					yn[seedi[ci]:(num_comp*(num_sb-1)+seedi[ci])+1:num_comp] = tmc*(seedxn[ci, :])
+					yn[self.seedi[ci]:(num_comp*(num_sb-1)+self.seedi[ci])+1:num_comp] = tmc*(seedxn[ci, :])
 					
-					if (ci == len(seedi)-1): # reached water component
+					if (ci == len(self.seedi)-1): # reached water component
 						# water (# molecules/cm3)
 						yn[H2Oi:(num_comp*(num_sb-1)+H2Oi)+1:num_comp] = tmc*xwat
 
@@ -197,7 +198,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 
 		if (Vwat_inc == 0): # if number size distribution does not include volume of water
 			
-				seed_mw = y_mw[seedi] # molecular weight of seed components (g/mol)
+				seed_mw = y_mw[self.seedi] # molecular weight of seed components (g/mol)
 
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 
@@ -205,7 +206,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				avMW = (sum(seedx*seed_mw))				
 
 				# average molar volume of dry (no water) seed components (cc/mol) for all size bins
-				avMV = (sum(seedx*MV[seedi[:], 0]))
+				avMV = (sum(seedx*MV[self.seedi[:], 0]))
 
 				# calculate Kelvin effect factor for the provided number size distribution
 				# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
@@ -213,7 +214,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
 				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[seedi[:], 0])/len(seedi)*1.e-3)))
+				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
@@ -225,12 +226,12 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 				tmc = ((Vperbin*1.e-12)/avMV)*NA
 				
 				# concentration of particle-phase seed components in all size bin
-				for ci in range(len(seedi)): # loop through indices of seed components
+				for ci in range(len(self.seedi)): # loop through indices of seed components
 
 					# non-water (# molecules/cm3)
-					yn[seedi[ci]:(num_comp*(num_sb-1)+seedi[ci])+1:num_comp] = tmc*(seedx[ci, :])
+					yn[self.seedi[ci]:(num_comp*(num_sb-1)+self.seedi[ci])+1:num_comp] = tmc*(seedx[ci, :])
 						
-					if (ci == len(seedi)-1): # reached final non-water seed component
+					if (ci == len(self.seedi)-1): # reached final non-water seed component
 						# water (# molecules/cm3)
 						yn[H2Oi:(num_comp*(num_sb-1)+H2Oi)+1:num_comp] = (xwat*tmc)/(1.-xwat)
 	
@@ -244,17 +245,17 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 		seedx = seedx/sum(seedx)
 
 		# mole-fraction weighted molar volume (cm3/mole) (average molar volume of particles)
-		mfwMV = sum(MV[seedi[:], 0]*seedx)
+		mfwMV = sum(MV[self.seedi[:], 0]*seedx)
 		# convert to molecular volume (cm3/molecule)
 		mfwMV = mfwMV/NA
 		# total molecular concentration of seed components per size bin (# molecules/cm3)
 		# note that volume multiplied by 1e-12 to convert from um3 to cm3
 		ytot = (Vperbin*1.e-12)/mfwMV
 		
-		for ci in range(len(seedi)): # loop through indices of seed components
+		for ci in range(len(self.seedi)): # loop through indices of seed components
 		
 			# concentration of this component in all size bins (# molecules/cm3 (air)):
-			yn[seedi[ci]:(num_comp*(num_sb-1)+seedi[ci])+1:num_comp] = ytot*seedx[ci]
+			yn[self.seedi[ci]:(num_comp*(num_sb-1)+self.seedi[ci])+1:num_comp] = ytot*seedx[ci]
 	
 
 	# if instantaneous injection of particles
@@ -284,7 +285,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedi, seedx, lowersize, uppe
 			Varr[i] = (4./3.*np.pi)*rad0[i]**3.
 		# multiply y_dens by 1e-3 to get ug/um3 (particle) from kg/m3, 
 		# then multiplying ug/um3 (particle) by um3/cm3 (air) gives ug/cm3 (air)
-		mass_conc += np.sum((y_dens[seedi, 0]*1.e-9)*Vtot[i])
+		mass_conc += np.sum((y_dens[self.seedi, 0]*1.e-9)*Vtot[i])
 	
 	# new radius of single particles (um)
 	radn = ((3./(4.*np.pi))*Varr)**(1./3.)
