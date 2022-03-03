@@ -600,7 +600,7 @@ def ode_updater(update_stp,
 			# if any components set to have constant gas-phase concentration
 			if (any(con_C_indx)): # then keep constant
 				y[con_C_indx] = y0[con_C_indx] # (# molecules/cm3)
-			
+
 			# if negative, suggests ODE solver instability, but could also be numerical limits, 
 			# especially if concentrations are relatively close to zero, so allow some leeway
 			if (any(y < -np.sum(np.abs(y))*1.e-50)):
