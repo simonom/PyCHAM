@@ -53,7 +53,7 @@ def middle(self): # define function
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-		testf, chamSA, chamV] = ui.share()
+		chamSA, chamV] = ui.share()
 
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
@@ -77,10 +77,10 @@ def middle(self): # define function
 	
 	# if needed then run operations to produce variable checker plot 
 	# from the simulate tab
-	if (testf >= 4):
+	if (self.testf == 4):
 		import var_checker
-		[err_mess, erf] = var_checker.var_checker(testf,
-			temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self)
+		[err_mess, erf] = var_checker.var_checker(temp, tempt, tot_time, 
+							Jlen, update_stp, err_mess, erf, self)
 	
 	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
@@ -109,9 +109,9 @@ def middle(self): # define function
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
 		R_gas, NA, diff_vol, Dstar_org, err_mess] = partit_var_prep.prep(y_mw, 
-		temp[0], num_comp, testf, Cw, act_comp, act_user, accom_comp, 
+		temp[0], num_comp, Cw, act_comp, act_user, accom_comp, 
 		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow, 
-		Pybel_objects, comp_smil)
+		Pybel_objects, comp_smil, self)
 
 	if (err_mess != ''): # if error raised or in testing mode then stop
 		yield err_mess

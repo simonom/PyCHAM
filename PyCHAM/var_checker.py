@@ -26,10 +26,10 @@
 
 import numpy as np # for math and array handling
 
-def var_checker(testf, temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self): # define function
+def var_checker(temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
-	# testf - flag for whether in checking mode and what to check
+	# self.testf - flag for whether in checking mode and what to check
 	# self.light_stat - status of light (on=1 or off=0)
 	# self.light_time - times through experiment light status corresponds to
 	# temp - temperatures inside chamber (K)
@@ -47,7 +47,7 @@ def var_checker(testf, temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, s
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ---------------------------------------------------------------------------------
 
-	if (testf == 4): # checking on estimated photolysis rates throughout simulation
+	if (self.testf == 4): # checking on estimated photolysis rates throughout simulation
 		
 		# following the method used in rate_coeffs
 		import photolysisRates

@@ -53,7 +53,7 @@ def def_mod_var(caller, self): # define function
 	if (caller == 1): # called from Travis
 		uman_up = 1
 	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
-	testf = 0 # whether in testing mode or not
+	self.testf = 0 # whether in testing mode or not
 	
 	# chamber environment -----------------------------------------------------------------
 	temp = np.array((298.15)).reshape(1) # temperature of experiment (K)
@@ -200,7 +200,7 @@ def def_mod_var(caller, self): # define function
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
-			z_prt_coeff, testf, chamV]
+			z_prt_coeff, chamV]
 
 	
 	# path to store for variables
@@ -222,4 +222,4 @@ def def_mod_var(caller, self): # define function
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, self)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self)

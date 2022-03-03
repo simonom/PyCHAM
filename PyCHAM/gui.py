@@ -147,7 +147,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, 
+		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
 		# listing input files -----------------------------------------------------------
@@ -893,6 +893,7 @@ class PyCHAM(QWidget):
 		self.b80s.addItem('Particle number size distributions')
 		self.b80s.addItem('Gas-phase diffusion coefficients')
 		self.b80s.addItem('Gas-phase mean thermal speeds')
+		self.b80s.addItem('Molar masses')
 		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
 		
 		# button to run checks on variables selected in drop down button
@@ -1727,7 +1728,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, testf, chamV, self] = def_mod_var.def_mod_var(0, self)
+		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1744,7 +1745,7 @@ class PyCHAM(QWidget):
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-			testf, chamV] = pickle.load(pk)
+			chamV] = pickle.load(pk)
 			pk.close()
 		
 		# button to get path to folder containing relevant files
@@ -1896,7 +1897,7 @@ class PyCHAM(QWidget):
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, testf, chamV, self] = def_mod_var.def_mod_var(0, self)
+			seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -1941,7 +1942,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-				testf, chamV] = pickle.load(pk)
+				chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
 			# let check know this is a second call
@@ -3529,11 +3530,11 @@ class PyCHAM(QWidget):
 		# get values to check from drop down button
 		input_check_text = self.b80s.currentText() # drop down selection
 
-		if input_check_text == 'Photolysis rates':
+		if (input_check_text == 'Photolysis rates'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_taf(self)
 
-		if input_check_text == 'Particle number size distributions':
+		if (input_check_text == 'Particle number size distributions'):
 			import plotter_nsd # for plotting supplied number size distributions
 		
 			# path for pickle file
@@ -3552,7 +3553,7 @@ class PyCHAM(QWidget):
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-				testf, chamV] = pickle.load(pk)
+				chamV] = pickle.load(pk)
 				pk.close()
 		
 			# call on plotting script
@@ -3566,6 +3567,10 @@ class PyCHAM(QWidget):
 		if (input_check_text == 'Gas-phase mean thermal speeds'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_gpmts(self)
+
+		if (input_check_text == 'Molar masses'):
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_mm(self)
 
 	@pyqtSlot() # button to retrieve and report component consumption
 	def on_click224(self):

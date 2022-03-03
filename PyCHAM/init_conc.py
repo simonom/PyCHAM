@@ -319,6 +319,41 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		NO3i = comp_namelist.index(NO3)
 	except:
 		NO3i = 0 # filler
+
+	# if user wants to see molar masses of all components
+	if (self.testf == 3.1):
+
+		import matplotlib.pyplot as plt
+		from matplotlib.colors import BoundaryNorm
+		from matplotlib.ticker import MaxNLocator
+		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+
+		plt.ion() # show results to screen and turn on interactive mode
+		
+		# prepare plot
+		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+		
+		# get indices of molar mass in ascending order
+		asc_ind = np.argsort(y_mw, axis = 0)
+		array_names = (np.array(comp_namelist)).reshape(-1, 1)
+
+		# plot molar masses against component names in ascending order
+		ax0.plot(np.arange(len(y_mw)), y_mw[asc_ind][:, 0, 0], '+')
+
+		ax0.set_ylabel(r'Molar Mass (g mol$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_xlabel(r'Component name', fontsize = 14)
+		# set location of x ticks
+		ax0.set_xticks(np.arange(len(comp_namelist)))
+		ax0.set_xticklabels(array_names[asc_ind], rotation = 45)
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.set_title(str('Molar masses of all components'), fontsize = 14)
+		
+		# ensure that software stops on return to middle module
+		erf = 1
+		err_mess = 'Stop'
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
 			comp_namelist, inj_indx, core_diss,

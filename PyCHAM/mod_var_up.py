@@ -45,7 +45,7 @@ def mod_var_up(self):
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-		testf, chamV] = pickle.load(pk)
+		chamV] = pickle.load(pk)
 	pk.close()
 
 	
