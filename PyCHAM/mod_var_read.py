@@ -40,7 +40,7 @@ def mod_var_read(self):
 			[sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, const_comp, Compt, injectt, Ct, seed_name,
+			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -232,7 +232,10 @@ def mod_var_read(self):
 				save_step = float(value.strip())
 
 			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
-				const_comp = [str(i).strip() for i in (value.split(','))]
+				self.const_comp = [str(i).strip() for i in (value.split(','))]
+
+			if key == 'obs_file' and (value.strip()): # name of file containing observations to constrain by
+				self.obs_file =str(value.strip())
 			
 			# names of components with instantaneous gas-phase injections
 			if key == 'Compt' and (value.strip()):
@@ -497,7 +500,7 @@ def mod_var_read(self):
 		list_vars = [sav_nam, chem_sch_mark, update_stp, 
 				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-				uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+				uppsize, space_mode, std, mean_rad, save_step, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, con_infl_nam, con_infl_t, 
 				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 

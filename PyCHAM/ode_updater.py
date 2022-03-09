@@ -78,7 +78,7 @@ def ode_updater(update_stp,
 	sav_nam, comp_namelist, dydt_trak, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
-	HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
+	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
 	chamV, self):
 	
@@ -275,8 +275,8 @@ def ode_updater(update_stp,
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
 	#	below which partitioning to a particle size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny 
-	# con_C_indx - index of components with constant 
-	# 	gas-phase concentration (# molecules/cm3)
+	# self.con_C_indx - index of components with constant 
+	# 	gas-phase concentration
 	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
@@ -598,8 +598,8 @@ def ode_updater(update_stp,
 				Cinfl_nowp, self)
 			
 			# if any components set to have constant gas-phase concentration
-			if (any(con_C_indx)): # then keep constant
-				y[con_C_indx] = y0[con_C_indx] # (# molecules/cm3)
+			if (any(self.con_C_indx)): # then keep constant
+				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
 
 			# if negative, suggests ODE solver instability, but could also be numerical limits, 
 			# especially if concentrations are relatively close to zero, so allow some leeway
@@ -666,6 +666,11 @@ def ode_updater(update_stp,
 		sumt += tnew # total time through simulation (s)
 		self.sumt += tnew
 		
+		if (any(self.obs_comp_i)): # if any components constrained to observations
+				# get observed concentrations now
+				for ci in range(len(self.obs_comp_i)): # loop through components
+					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
+
 		if (sumt%save_stp < 1.e-12 or (sumt%save_stp-save_stp) < 1.e-12): # get remainder
 			save_cnt_chck += 1 # if need to move up count on recording
 		

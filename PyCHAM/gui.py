@@ -141,7 +141,7 @@ class PyCHAM(QWidget):
 		# default variables for all required input model variables -------------------------
 		[sav_nam, chem_sch_mark, update_stp, tot_time, comp0, 
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
@@ -592,7 +592,7 @@ class PyCHAM(QWidget):
 		l45.setText('Chemical scheme names of components \nwith constant concentration: ')
 		self.varbox.addWidget(l45, gas_row+6, 0)
 		self.l45a = QLabel(self)
-		self.l45a.setText((str(const_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l45a.setText((str(self.const_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l45a, gas_row+6, 1)
 		
 		l46 = QLabel(self)
@@ -1722,7 +1722,7 @@ class PyCHAM(QWidget):
 		# default variables for all required input model variables -------------------------
 		[sav_nam, chem_sch_mark, update_stp, tot_time, comp0, 
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, const_comp, Compt, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
@@ -1737,7 +1737,7 @@ class PyCHAM(QWidget):
 			[sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, const_comp, Compt, injectt, Ct, seed_name,
+			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_nam, con_infl_t, con_infl_C, 
 			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -1889,7 +1889,7 @@ class PyCHAM(QWidget):
 			[sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
-			space_mode, std, mean_rad, save_step, const_comp, Compt, injectt, 
+			space_mode, std, mean_rad, save_step, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 			con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
 			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
@@ -1934,7 +1934,7 @@ class PyCHAM(QWidget):
 				[sav_nam, chem_sch_mark, update_stp, 
 				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-				save_step, const_comp, Compt, injectt, Ct, seed_name,
+				save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_nam, con_infl_t, con_infl_C, 
 				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -3545,7 +3545,7 @@ class PyCHAM(QWidget):
 				[sav_nam, chem_sch_mark, update_stp, 
 				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-				std, mean_rad, save_step, const_comp, Compt, injectt, Ct, seed_name,
+				std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_nam, con_infl_t, con_infl_C, 
 				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 

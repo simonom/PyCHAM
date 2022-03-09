@@ -120,7 +120,7 @@ def def_mod_var(caller, self): # define function
 	# times of component influx (s)
 	con_infl_t = np.empty(0)
 	# chemical scheme name of components with constant concentration	
-	const_comp = []
+	self.const_comp = []
 	# Chemical scheme names of components injected instantaneously after start of experiment
 	Compt = []
 	# times at which instantaneous injection of component(s) occur after 
@@ -191,7 +191,7 @@ def def_mod_var(caller, self): # define function
 	list_vars = [sav_nam, chem_sch_mark, update_stp, 
 			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-			uppsize, space_mode, std, mean_rad, save_step, const_comp, 
+			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 			seedx, con_infl_nam, 
 			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
@@ -214,7 +214,7 @@ def def_mod_var(caller, self): # define function
 	return(sav_nam, chem_sch_mark, update_stp, 
 		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
-		space_mode, std, mean_rad, save_step, const_comp, Compt, 
+		space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
 		con_infl_nam, con_infl_t, con_infl_C, 
 		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 

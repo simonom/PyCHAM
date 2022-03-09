@@ -96,6 +96,9 @@ def plotter_gp_mod_n_obs(self):
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
 		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.mod_path)
 
+	# subtract any time before lights on
+	timehr += float(obs_setup[4])
+
 	# loop through modelled components
 	for mci in range(len(self.gp_names)):
 		if (self.gp_names[mci].strip() == ''): # if empty

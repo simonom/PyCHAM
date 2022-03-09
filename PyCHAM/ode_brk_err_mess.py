@@ -219,7 +219,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		# gas-phase concentration of components at particle surface (molecules/cm3)
 		Csit[isb, :] = Csit[isb, :]*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]
 		# gas-particle partitioning rate (molecules/cm3/s)
-		dd_trouble = -1.*kimt[isb, :]*(y0[neg_comp_indx].reshape(1, -1)-Csit)
+		dd_trouble = -1.*kimt*(y0[neg_comp_indx].reshape(1, -1)-Csit)
 		
 		for i in range(len(neg_comp_indx)): # loop through trouble components
 			f.write(str(str(neg_names[i]) + ': ' + str(dd_trouble[:, i]) + '\n'))		

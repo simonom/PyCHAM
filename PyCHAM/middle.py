@@ -45,7 +45,7 @@ def middle(self): # define function
 		comp0, y0, temp, tempt, RH, RHt, Pnow, wall_on,
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
-		save_step, const_comp, Compt, injectt, Ct, seed_name, seed_mw, 
+		save_step, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
 		con_infl_nam, const_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
@@ -71,8 +71,8 @@ def middle(self): # define function
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
-	con_C_indx] = eqn_pars.extr_mech(chem_sch_mrk, con_infl_nam, int_tol, wall_on, 
-	(num_sb+wall_on), const_comp, drh_str, erh_str, dil_fac, sav_nam,
+	self] = eqn_pars.extr_mech(chem_sch_mrk, con_infl_nam, int_tol, wall_on, 
+	(num_sb+wall_on), drh_str, erh_str, dil_fac, sav_nam,
 	pcont, self)
 	
 	# if needed then run operations to produce variable checker plot 
@@ -158,7 +158,7 @@ def middle(self): # define function
 		sav_nam, comp_namelist, dydt_trak, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
-		HO2i, NO3i, z_prt_coeff, con_C_indx, seed_eq_wat, Vwat_inc, tot_in_res,
+		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
 		chamV, self):
 

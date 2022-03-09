@@ -38,7 +38,7 @@ import aq_mat_prep
 
 # define function to extract the chemical mechanism
 def extr_mech(chem_sch_mrk, 
-		con_infl_nam, int_tol, wall_on, num_sb, const_comp,
+		con_infl_nam, int_tol, wall_on, num_sb,
 		drh_str, erh_str, dil_fac, sav_nam, pcont, self):
 
 	# inputs: ----------------------------------------------------
@@ -53,7 +53,7 @@ def extr_mech(chem_sch_mrk,
 	# int_tol - integration tolerances
 	# wall_on - marker for whether to include wall partitioning
 	# num_sb - number of size bins (including any wall)
-	# const_comp - chemical scheme name of components with 
+	# self.const_comp - chemical scheme name of components with 
 	#	constant concentration
 	# drh_str - string from user inputs describing 
 	#	deliquescence RH (fraction 0-1) as function of temperature (K)
@@ -117,7 +117,7 @@ def extr_mech(chem_sch_mrk,
 	# get index of components with constant influx/concentration -----------
 	# empty array for storing index of components with constant influx
 	con_infl_indx = np.zeros((len(con_infl_nam)))
-	con_C_indx = np.zeros((len(const_comp))).astype('int')
+	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
 	for i in range (len(con_infl_nam)):
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
 		if (con_infl_nam[i] == 'H2O'):
@@ -130,15 +130,49 @@ def extr_mech(chem_sch_mrk,
 			erf = 1 # raise error
 			err_mess = str('Error: constant influx component with name ' +str(con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
-	for i in range (len(const_comp)):
+	for i in range (len(self.const_comp)):
 		try:
 			# index of where constant concentration components occur in list 
 			# of components
-			con_C_indx[i] = comp_namelist.index(const_comp[i])
+			self.con_C_indx[i] = comp_namelist.index(self.const_comp[i])
 		except:
 			erf = 1 # raise error
 			err_mess = str('Error: constant concentration component with name ' + str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
+	if (self.obs_file): # if observation file provided for constraint
+
+		import openpyxl
+		import os
+		self.obs_file = str(os.getcwd() + self.obs_file)
+		wb = openpyxl.load_workbook(filename = self.obs_file)
+		sheet = wb['PyCHAMobs']
+		# time (seconds) is in first column, components in later columns
+		ic = 0 # count on row iteration
+		for i in sheet.iter_rows(values_only=True): # loop through rows
+			if (ic == 0):
+				names_xlsx = i[1::] # get chemical scheme names of components
+				self.obs_comp = [] # prepare for names
+				for oc in names_xlsx:
+					if oc != None:
+						self.obs_comp.append(oc)
+
+				# get number of components to consider
+				nc_obs = len(self.obs_comp)
+				# prepare to store observations, not forgetting a column for time
+				self.obs = np.zeros((1, nc_obs+1))
+				
+			else:
+				if ic > 1: # add row onto data array
+					self.obs = np.concatenate((self.obs, (np.zeros((1, nc_obs+1)))), axis=0)
+				self.obs[ic-1, :] = i[0:nc_obs+1]
+				
+			ic += 1 # count on row iteration
+
+		# get indices of components with concentrations to fit obervations
+		self.obs_comp_i = np.zeros((len(self.obs_comp))).astype('int')
+		for i in range(len(self.obs_comp)):
+			self.obs_comp_i[i] = comp_namelist.index(self.obs_comp[i])
+
 	# ---------------------------------------------------------------------
 
 	# call function to generate ordinary differential equation (ODE)
@@ -178,4 +212,4 @@ def extr_mech(chem_sch_mrk,
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil, erf, err_mess, con_C_indx)
+		rr_arr_aq, rr_arr_p_aq, comp_name, comp_smil, erf, err_mess, self)
