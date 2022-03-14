@@ -103,7 +103,22 @@ def plotter_gp_mod_n_obs(self):
 	for mci in range(len(self.gp_names)):
 		if (self.gp_names[mci].strip() == ''): # if empty
 			continue
-		indx_plt = comp_names.index(self.gp_names[mci].strip())
+		try:
+			indx_plt = comp_names.index(self.gp_names[mci].strip())
+		except:
+			self.l203a.setText(str('Component ' + self.gp_names[mci].strip() + ' not found in chemical scheme used for this simulation'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			plt.ioff() # turn off interactive mode
+			plt.close() # close figure window
+			return()
+			
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
 			ax0.plot(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))
 		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis

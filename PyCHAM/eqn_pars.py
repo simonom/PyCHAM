@@ -139,7 +139,7 @@ def extr_mech(chem_sch_mrk,
 			erf = 1 # raise error
 			err_mess = str('Error: constant concentration component with name ' + str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
-	if (self.obs_file): # if observation file provided for constraint
+	if hasattr(self, 'obs_file'): # if observation file provided for constraint
 
 		import openpyxl
 		import os

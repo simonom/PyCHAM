@@ -625,10 +625,10 @@ def ode_updater(update_stp,
 				gpp_stab = -1 # maintain unstable flag
 				# tell user what's happening
 				yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
-				y_gp = np.zeros((len(y)))
-				y_gp[:] = y[:]
-				y_gp = y_gp.reshape(num_comp, num_sb-wall_on+1, order='F')
-				y_gpi = np.where(y_gp<0.)
+				#y_gp = np.zeros((len(y)))
+				#y_gp[:] = y[:]
+				#y_gp = y_gp.reshape(num_comp, num_sb-wall_on+1, order='F')
+				#y_gpi = np.where(y_gp<0.)
 				
 				# in case more detailed look at negative issue wanted
 				#for gpi in y_gpi[0]: # loop through negative components

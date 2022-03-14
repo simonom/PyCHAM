@@ -19,14 +19,14 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-# File created at 2022-02-16 18:31:55.327812 by ode_brk_err_mess
+# File created at 2022-03-10 15:34:14.816026 by ode_brk_err_mess
 
 Gas-phase reaction fluxes with equation numbers starting at 1 (# molecules/cm3/s):
 Eq. 1 reac: [0.]
 Eq. 1 prod: [0.]
 Eq. 2 reac: [0.]
 Eq. 2 prod: [0.]
-Eq. 3 reac: [0. 0.]
+Eq. 3 reac: [-0. -0.]
 Eq. 3 prod: []
 Eq. 4 reac: [0. 0.]
 Eq. 4 prod: [0.]
@@ -38,12 +38,12 @@ Eq. 7 reac: [0.]
 Eq. 7 prod: [0.]
 Eq. 8 reac: [0.]
 Eq. 8 prod: [0.]
-Eq. 9 reac: [0. 0.]
-Eq. 9 prod: [0.]
-Eq. 10 reac: [0. 0.]
-Eq. 10 prod: [0.]
-Eq. 11 reac: [16007.57549573]
-Eq. 11 prod: [16007.57549573]
+Eq. 9 reac: [-9407120.729926 -9407120.729926]
+Eq. 9 prod: [-9407120.729926]
+Eq. 10 reac: [-4897.78299358 -4897.78299358]
+Eq. 10 prod: [-4897.78299358]
+Eq. 11 reac: [16286.73177016]
+Eq. 11 prod: [16286.73177016]
 Eq. 12 reac: [0. 0.]
 Eq. 12 prod: [0.]
 Eq. 13 reac: [0. 0.]
@@ -52,16 +52,16 @@ Eq. 14 reac: [0. 0.]
 Eq. 14 prod: [0.]
 Eq. 15 reac: [0.]
 Eq. 15 prod: [0.]
-Eq. 16 reac: [0. 0.]
-Eq. 16 prod: [0.]
+Eq. 16 reac: [-0. -0.]
+Eq. 16 prod: [-0.]
 Eq. 17 reac: [0. 0.]
 Eq. 17 prod: [0.]
 Eq. 18 reac: [0. 0.]
 Eq. 18 prod: [0.]
 Eq. 19 reac: [0. 0.]
 Eq. 19 prod: [0.]
-Eq. 20 reac: [0. 0.]
-Eq. 20 prod: [0.]
+Eq. 20 reac: [-0. -0.]
+Eq. 20 prod: [-0.]
 Eq. 21 reac: [0. 0.]
 Eq. 21 prod: []
 Eq. 22 reac: [0.]
@@ -98,20 +98,20 @@ Eq. 37 reac: [0.]
 Eq. 37 prod: [0.]
 Eq. 38 reac: [0.]
 Eq. 38 prod: [0.]
-Eq. 39 reac: [0.]
-Eq. 39 prod: [0.]
-Eq. 40 reac: [0.]
-Eq. 40 prod: [0.]
+Eq. 39 reac: [-4096796.21084871]
+Eq. 39 prod: [-4096796.21084871]
+Eq. 40 reac: [-503938.22738829]
+Eq. 40 prod: [-503938.22738829]
 Eq. 41 reac: [0.]
 Eq. 41 prod: [0.]
-Eq. 42 reac: [91091845.58082232]
-Eq. 42 prod: [91091845.58082232 91091845.58082232]
+Eq. 42 reac: [1.37610174e+08]
+Eq. 42 prod: [1.37610174e+08 1.37610174e+08]
 Eq. 43 reac: [0.]
 Eq. 43 prod: [0.]
 Eq. 44 reac: [0.]
 Eq. 44 prod: [0. 0.]
-Eq. 45 reac: [6389175.47803037]
-Eq. 45 prod: [6389175.47803037 6389175.47803037]
+Eq. 45 reac: [6389170.5508244]
+Eq. 45 prod: [6389170.5508244 6389170.5508244]
 Eq. 46 reac: [0.]
 Eq. 46 prod: [0. 0.]
 Eq. 47 reac: [0.]
@@ -122,10 +122,10 @@ Eq. 49 reac: [0. 0.]
 Eq. 49 prod: [0.]
 Eq. 50 reac: [0. 0.]
 Eq. 50 prod: [0.]
-Eq. 51 reac: [0. 0.]
-Eq. 51 prod: [0.]
-Eq. 52 reac: [0. 0.]
-Eq. 52 prod: [0.]
+Eq. 51 reac: [-103513.69933833 -103513.69933833]
+Eq. 51 prod: [-103513.69933833]
+Eq. 52 reac: [-69009.13289222 -69009.13289222]
+Eq. 52 prod: [-69009.13289222]
 Eq. 53 reac: [0. 0.]
 Eq. 53 prod: [0.]
 Eq. 54 reac: [0. 0.]
@@ -1906,27 +1906,65 @@ Eq. 941 reac: [0.]
 Eq. 941 prod: [0. 0. 0.]
 Eq. 942 reac: [0.]
 Eq. 942 prod: [0.]
-Eq. 943 reac: [50069.51987387]
+Eq. 943 reac: [75638.77193546]
 Eq. 943 prod: []
-Eq. 944 reac: [0.]
+Eq. 944 reac: [-4220.86052537]
 Eq. 944 prod: []
+Eq. 945 reac: [0.]
+Eq. 945 prod: []
 
 Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall
-O3 : -0.0
+O3 : 211043.02626836786
+NO3 : -0.0
 O1D : -0.0
+N2O5 : -0.0
+H2O2 : -0.0
+NAPINAO2 : -0.0
+NAPINBO2 : -0.0
 APINOOA : -0.0
 APINOOB : -0.0
+NAPINAOOH : -0.0
+NAPINAO : -0.0
+NAPINBOOH : -0.0
+NAPINBO : -0.0
 C107O2 : -0.0
 C109O2 : -0.0
 APINBOO : -0.0
 C96O2 : -0.0
+PINAL : -0.0
+C107OOH : -0.0
+C107O : -0.0
+C109OOH : -0.0
+C109O : -0.0
+PINONIC : -0.0
+C96OOH : -0.0
+C96NO3 : -0.0
+C96O : -0.0
 
 Gas-particle partitioning fluxes (molecules/cm3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.
-O3: [-0. -0.]
+O3: [3.22943353e+08 0.00000000e+00]
+NO3: [-0. -0.]
 O1D: [-0. -0.]
+N2O5: [-0. -0.]
+H2O2: [-0. -0.]
+NAPINAO2: [-0. -0.]
+NAPINBO2: [-0. -0.]
 APINOOA: [-0. -0.]
 APINOOB: [-0. -0.]
+NAPINAOOH: [-0. -0.]
+NAPINAO: [-0. -0.]
+NAPINBOOH: [-0. -0.]
+NAPINBO: [-0. -0.]
 C107O2: [-0. -0.]
 C109O2: [-0. -0.]
 APINBOO: [-0. -0.]
 C96O2: [-0. -0.]
+PINAL: [-0. -0.]
+C107OOH: [-0. -0.]
+C107O: [-0. -0.]
+C109OOH: [-0. -0.]
+C109O: [-0. -0.]
+PINONIC: [-0. -0.]
+C96OOH: [-0. -0.]
+C96NO3: [-0. -0.]
+C96O: [-0. -0.]
