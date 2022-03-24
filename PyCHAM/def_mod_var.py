@@ -186,8 +186,11 @@ def def_mod_var(caller, self): # define function
 	# user-defined accommodation coefficients
 	accom_val = []
 
+	# fixing to observations ---------------------------------------------
+	self.obs_file = [] # path to observations file
 	# components to fix to observed
 	self.obs_comp_i = []
+	# --------------------------------------------------------------------------
 
 	# prepare for pickling
 	list_vars = [sav_nam, chem_sch_mark, update_stp, 

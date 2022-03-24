@@ -448,6 +448,17 @@ def ui_check(self):
 				em_flag = 1
 		
 	# ------------------------------------
+	# check on presence of observation file for tracking specific components
+	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
+		try: # try opening as in eqn_pars module
+			import openpyxl # require module
+			self.obs_file = str(os.getcwd() + self.obs_file) # path to file
+			wb = openpyxl.load_workbook(filename = self.obs_file) # open file
+			wb.close() # close excel file
+		except:
+			err_mess = str('Error- observation file ' + self.obs_file + ' could not be found, please check observation file and/or the obs_file model variable in the model variable file.')
+			em_flag = 2
+	# ------------------------------------
 	
 
 	# store in pickle file
