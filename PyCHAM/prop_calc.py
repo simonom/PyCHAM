@@ -178,7 +178,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			OC[0, i] = 0.
 			continue
 
-		# use EVAPORATION method for vapour pressure (log10(atm)) of HOMs
+		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:	
 			Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], TEMP, boiling_points.nannoolal(Pybel_objects[i]))))
 			

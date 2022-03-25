@@ -54,7 +54,7 @@ def middle(self): # define function
 		e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamSA, chamV] = ui.share()
-
+	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
 	[rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, 
@@ -95,7 +95,7 @@ def middle(self): # define function
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
 	RO2_indx, HOMRO2_indx, rstoi_g, pstoi_g, self)
-
+	
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):
 		yield err_mess

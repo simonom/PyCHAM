@@ -76,7 +76,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	erf = 0
 	err_mess = ''
 	
-	if testf==1: # testing mode
+	if (testf == 1): # testing mode
 		# return dummies
 		return(0,0,0,0,0,0,0,0)
 
@@ -109,7 +109,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 			return (0, 0, 0, 0, 0, 0, 0, 0, 
 				0, 0, 0,
-				0, 0, 0, 0, erf, err_mess, 0, 0, 0)
+				0, 0, 0, erf, err_mess, 0, 0, 0, 0)
 			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3 (air)
 		
@@ -157,7 +157,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
-
+	
 	# empty array for index of core component
 	self.seedi = (np.zeros((len(seed_name)))).astype(int)
 	
