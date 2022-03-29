@@ -183,13 +183,13 @@ def retr_out(output_by_sim):
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
 
-	try: # indices of organic peroxy radical components
+	try: # indices of alkyl peroxy radical components
 		group_indx['RO2i'] = const['organic_peroxy_radical_index']
 		
 	except:
 		group_indx['RO2i'] = []
 
-	try: # indices of organic alkoxy radical components
+	try: # indices of alkoxy radical components
 		group_indx['ROi'] = const['organic_alkoxy_radical_index']
 	except:
 		group_indx['ROi'] = []

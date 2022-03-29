@@ -30,7 +30,7 @@ import pybel
 import sys
 
 def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name, 
-		comp_smil, num_sb, wall_on):
+		comp_smil, num_sb, wall_on, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	# num_eqn - number of equations
@@ -41,6 +41,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# comp_smil - SMILES from xml file
 	# num_sb - number of size bins
 	# wall_on - marker for whether to include wall partitioning
+	# self - reference to PyCHAM
 	# ------------------------------------------------------------------------------------
 	
 	# preparatory part ----------------------------------------------------
@@ -90,7 +91,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	# list of Pybel objects of components in chemical scheme
 	Pybel_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme
-	RO_indx = [] # empty list for holding indices of alkoxy components
+	self.RO_indx = [] # empty list for holding indices of alkoxy components
 	# ---------------------------------------------------------------------
 
 	max_no_reac = 0. # log maximum number of reactants in a reaction
@@ -226,9 +227,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'C' in name_SMILE):
-						if (name_SMILE != 'C[O]'): # ensure it's not carbon monoxide
-							# if it is an organic alkoxy radical add its index to list
-							RO_indx.append(comp_num)			
+						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
+						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
+							self.RO_indx.append(comp_num)			
 
 				comp_num += 1 # number of unique species
 				
@@ -296,9 +297,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'C' in name_SMILE):
-						if (name_SMILE != 'C[O]'): # ensure it's not carbon monoxide
-							# if it is an organic alkoxy radical add its index to list
-							RO_indx.append(comp_num)				
+						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
+						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
+							self.RO_indx.append(comp_num)					
 
 				comp_num += 1 # number of unique species
 				
@@ -554,9 +555,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'C' in name_SMILE):
-						if (name_SMILE != 'C[O]'): # ensure it's not carbon monoxide
-							# if it is an organic alkoxy radical add its index to list
-							RO_indx.append(comp_num)	
+						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
+						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
+							self.RO_indx.append(comp_num)	
 
 				comp_num += 1 # number of unique species
 				
@@ -629,9 +630,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'C' in name_SMILE):
-						if (name_SMILE != 'C[O]'): # ensure it's not carbon monoxide
-							# if it is an organic alkoxy radical add its index to list
-							RO_indx.append(comp_num)
+						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
+						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
+							self.RO_indx.append(comp_num)
 
 				comp_num += 1 # number of unique species
 				
@@ -724,4 +725,4 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 			uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 			rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
-			comp_num, RO_indx)
+			comp_num, self)

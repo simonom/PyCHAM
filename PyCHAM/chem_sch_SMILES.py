@@ -27,6 +27,10 @@
 import sch_interr
 import xml_interr
 import re
+import write_rate_file
+import formatting
+import photo_num
+import importlib
 
 def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 
@@ -57,6 +61,9 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 
 	comp_namelist = [] # list for chemical scheme names of components in the chemical scheme
 	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
+
+	# ready for storing reaction rate coefficients
+	reac_coef = []
 
 	for eqn_step in range(eqn_num[0]): # loop through gas-phase reactions
 
@@ -97,6 +104,34 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 		products = [t for t in eqn_split[eqmark_pos+1:] if t != '+']
 		
 		stoich_regex = r"^\d*\.\d*|^\d*" # necessary for checking for stoichiometries
+
+		# rate coefficient part --------------------------------------------
+		# .* means occurs anywhere in line and, first \ means second \ can be interpreted 
+		# and second \ ensures recognition of marker
+		rate_coeff_start_mark = str('\\' +  chem_scheme_markers[9])
+		# . means match with anything except a new line character, when followed by a * 
+		# means match zero or more times (so now we match with all characters in the line
+		# except for new line characters, \\ ensures the marker
+		# is recognised
+		if eqn_sec == 1: # end of reaction rate coefficient part is start of equation part
+			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[10])
+		else: # end of reaction rate coefficient part is end of line
+			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[11])
+		
+		# rate coefficient starts and end punctuation
+		rate_regex = str(rate_coeff_start_mark + rate_coeff_end_mark)
+		# rate coefficient expression in a string
+		rate_ex = re.findall(rate_regex, line)[0][1:-1].strip()
+
+		# convert fortran-type scientific notation to python type
+		rate_ex = formatting.SN_conversion(rate_ex)
+		# convert the rate coefficient expressions into Python readable commands
+		rate_ex = formatting.convert_rate_mcm(rate_ex)
+
+		# store the reaction rate coefficient for this equation 
+		# (/s once any inputs applied)
+		reac_coef.append(rate_ex)
+		# ----------------------------------------------------
 		
 		for reactant in reactants: # left hand side of equations (losses)
 		
@@ -117,7 +152,7 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 					name_SMILE = comp_smil[name_indx] # SMILES of component
 					comp_list.append(name_SMILE) # list SMILE names
 				else:
-					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
+					err_mess = str('Error - chemical scheme name '+ str(name_only) +' not found in xml file')
 					H2Oi = 0 # filler
 					
 					return(comp_namelist, comp_list, err_mess, H2Oi)
@@ -164,5 +199,16 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 	if (err_mess == '' and eqn_num[0] == 0):
 		err_mess = 'Note: no gas-phase reactions seen, this could be due to the chemical scheme marker input (chem_scheme_markers in the model variables input) not corresponding to the chemical scheme file, please see README for more guidance.'
 	
+	# check on whether all rate coefficients can be calculated
+	# call function to generate reaction rate calculation module
+	write_rate_file.write_rate_file(reac_coef, [], rrc, rrc_name, 0)
+
+	# get number of photolysis equations
+	Jlen = photo_num.photo_num(self.photo_path)
+
+	# call on reaction rate calculation (with dummy inputs) to check for issues
+	import rate_coeffs
+	importlib.reload(rate_coeffs) # ensure latest version uploaded
+	[rate_values, erf, err_mess] = rate_coeffs.evaluate_rates(0., 0., 298.15, 1, 0., 1., 1., 1., Jlen, 1., 1., 1., 0., self)
 	
 	return(comp_namelist, comp_list, err_mess, H2Oi)

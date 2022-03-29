@@ -998,6 +998,7 @@ class PyCHAM(QWidget):
 		PLtabs.addTab(self.SECtab(), "Flux")
 		PLtabs.addTab(self.VOLtab(), "Volatility")
 		PLtabs.addTab(self.PARtab(), "Particle") # for particle-phase things
+		PLtabs.addTab(self.RADtab(), "Radicals") # for radical chemicals
 		PLtabs.addTab(self.INSTRtab(), "Convolution")
 		PLtabs.addTab(self.OBStab(), "Observed")
 		self.PLlayout.addWidget(PLtabs, 1, 0, 1, 5)
@@ -1348,9 +1349,37 @@ class PyCHAM(QWidget):
 		self.b225.clicked.connect(self.on_click225)
 		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PARlayout.addWidget(self.b225, 7, 1, 1, 1)
-
+		
 		return(PARTab)
+
+	def RADtab(self): # more detailed plotting tab for radical chemicals
+
+		RADTab = QWidget()
+		self.RADlayout = QGridLayout() 
+		RADTab.setLayout(self.RADlayout)
+		
+		# input bar for number of components contributing
+		# to radical population
+		self.e360 = QLineEdit(self)
+		self.e360.setText('Provide the top number of components contributing to a radical pool')
+		self.e360.setStyleSheet('qproperty-cursorPosition : 0')
+		self.RADlayout.addWidget(self.e360, 0, 0, 1, 2)
+
+		# drop down button for type of radical
+		self.b361a = QComboBox(self)
+		self.b361a.addItem('RO2 (alkyl peroxy radical)')
+		self.b361a.addItem('RO (alkoxy radical)')
+		self.RADlayout.addWidget(self.b361a, 1, 0, 1, 1)
 	
+		# button to plot RO2 contributions
+		self.b362 = QPushButton(str('Contributions (%)'))
+		self.b362.setToolTip('Show the contribution to the selected radical pool by the top number of contributors (number given in box above)')
+		self.b362.clicked.connect(self.on_click362)
+		#self.b362.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.RADlayout.addWidget(self.b362, 1, 1)
+
+		return(RADTab)
+
 	def INSTRtab(self): # instrument comparison plotting tab definition
 	
 		INSTRTab = QWidget()
@@ -3641,6 +3670,38 @@ class PyCHAM(QWidget):
 
 		import consumption # function to estimate consumption
 		consumption.cons(comp_chem_schem_name, dir_path, self, 1)
+		return()
+
+	@pyqtSlot()
+	def on_click362(self): # for viewing contributions to radicals
+	
+		# get number of top contributors
+		# in case no user-defined value provided then default
+		if (self.e360.text() == 'Provide the top number of components contributing to a radical pool'):
+			self.rad_ord_num = 3
+		else:
+			self.rad_ord_num = int(self.e360.text())
+
+		# get the name of the radical pool to plot from the drop down selection
+		input_check_text = self.b361a.currentText()
+		
+		# if RO2
+		if (input_check_text == 'RO2 (alkyl peroxy radical)'):
+			self.rad_mark = 0
+
+		# if RO
+		if (input_check_text == 'RO (alkoxy radical)'):
+			self.rad_mark = 1
+		
+		dir_path = self.l201.text() # name of folder with results
+
+
+		import plotter_gp # required module
+
+		# call on gas-phase plotter for radical pools
+		plotter_gp.plotter_rad_pool(dir_path, self) # plot results
+
+		return()
 
 	@pyqtSlot()
 	def on_click400(self): # when observation file requires selection

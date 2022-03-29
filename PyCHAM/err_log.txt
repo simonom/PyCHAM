@@ -1,31 +1,591 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\mcm_APINENE_CH4_chem_scheme\O3_wall_loss_kw1p5e-3_Cw6e0
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\mcm_chem_scheme\Apinen_CH4
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in double_scalars
+Warning: underflow encountered in double_scalars
+Warning: underflow encountered in double_scalars
+Warning: underflow encountered in double_scalars
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in double_scalars
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in true_divide

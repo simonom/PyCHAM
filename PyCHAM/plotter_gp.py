@@ -119,7 +119,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				# gas-phase concentration (# molecules/cm3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
 			
-			if (len(indx_plot) > 1):
+			if (len(indx_plot) > 1): # e.g. for sum of RO2 or RO
 				conc = np.sum(conc, axis=1) # sum multiple components
 			
 			# plot this component
@@ -263,7 +263,7 @@ def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 	PRESS = 1.e5 # chamber pressure (Pa)
 	ntot = PRESS*(si.N_A/((si.R*1.e6)*TEMP))
 	# one billionth of number of molecules in chamber unit volume
-	Cfac = (ntot*1.e-9) # ppb to molecules/cc conversion factor
+	Cfac = (ntot*1.e-9) # ppb to molecules/cm3 conversion factor
 	
 	if (comp_names_to_plot): # if component names specified
 	
@@ -281,3 +281,71 @@ def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 	ax0.legend(fontsize = 14)
 	if (caller <= 2): # display
 		plt.show()	
+	
+	return()
+
+# plotting the radical pool
+def plotter_rad_pool(dir_path, self):
+
+	# ---------------------
+	# inputs:
+	# dir_path - path to folder containing results
+	# self - reference to PyCHAM
+	# ---------------------
+
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
+		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path)
+	
+	if (self.rad_mark == 0): # if alkyl peroxy radicals
+		# get RO2 indices
+		indx_plot = np.array((group_indx['RO2i']))
+		
+	if (self.rad_mark == 1): # if alkoxy radicals
+		# get RO indices		
+		indx_plot = np.array((group_indx['ROi']))
+	
+	# get names of radicals in this pool
+	rad_names = (np.array((comp_names)))[indx_plot]
+
+	# isolate gas-phase concentrations of radical (ppb)
+	y_rad = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
+
+	# prepare for fractional contribution
+	y_radf = np.zeros((y_rad.shape[0], y_rad.shape[1]))
+
+	# sum of contributions per time step
+	rad_sum = ((np.sum(y_rad, axis= 1)).reshape(-1, 1))
+
+	# fractional contribution per time step
+	y_radf = np.zeros((y_rad.shape[0], y_rad.shape[1]))
+	y_radf[rad_sum[:,0]>0, :] = y_rad[rad_sum[:,0]>0, :]/rad_sum[rad_sum[:,0]>0, :]
+	
+	# sum of fractional contributions over time per component
+	y_radf_tot = np.sum(y_radf, axis = 0)
+
+	# order of radicals with greatest contributor first
+	ord = y_radf_tot.argsort()
+	
+	# use just the indices of the top number given by user
+	ord = ord[-self.rad_ord_num::]
+	
+	# plot fractional contribution ---------------------
+	plt.ion() # show results to screen and turn on interactive mode
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	
+	for i in range(len(ord)): # loop through top contributors
+		ax0.plot(timehr, y_radf[:, ord[i]], label = rad_names[ord[i]])
+
+	# in case you want to check that sum of fractions=1
+	#ax0.plot(timehr, np.sum(y_radf, axis=1), label = 'sum of fractions (check)')
+
+	ax0.set_ylabel(str('Fraction of all ' + self.b361a.currentText()), fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
+
+	return()

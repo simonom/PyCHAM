@@ -32,7 +32,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	siz_str, cham_env, opri, oari, tot_in_res_ft, self):
+	siz_str, cham_env, opri, tot_in_res_ft, self):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -80,8 +80,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	# siz_str - the size structure
 	# cham_env - chamber environmental conditions (temperature (K), 
 	# pressure (Pa) and relative humidity
-	# opri - organic peroxy radical indices
-	# oari - organic alkoxy radical indices
+	# opri - alkyl peroxy radical indices
+	# self.RO_indx - alkoxy radical indices
 	# tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
@@ -120,7 +120,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
 	const["organic_peroxy_radical_index"] = (opri.tolist())
-	const["organic_alkoxy_radical_index"] = oari
+	const["organic_alkoxy_radical_index"] = self.RO_indx
 	const["chem_scheme_names"] = comp_namelist
 	const["SMILES"] = rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())

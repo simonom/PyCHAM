@@ -56,7 +56,7 @@ import ode_brk_err_mess
 def ode_updater(update_stp, 
 	tot_time, save_stp, y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
-	jac_den_indx, jac_indx, RO2_indx, RO_indx, H2Oi, temp, tempt, 
+	jac_den_indx, jac_indx, RO2_indx, H2Oi, temp, tempt, 
 	Pnow, Jlen, con_infl_C, nrec_steps, 
 	dydt_vst, siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
@@ -96,8 +96,8 @@ def ode_updater(update_stp,
 	# njac - number of elements of Jacobian affected per equation
 	# jac_den_indx - index of denominator components for Jacobian
 	# jac_indx - index of Jacobian affected per equation
-	# RO2_indx - index of components in peroxy radical list
-	# RO_indx - index of components in alkoxy radical list
+	# RO2_indx - index of components in alkyl peroxy radical list
+	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
 	# temp - temperature in chamber (K)
 	# tempt - times that temperatures reached (s)
@@ -788,5 +788,5 @@ def ode_updater(update_stp,
 		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
 		comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi, 
-		siz_str, cham_env, RO2_indx[:, 1], RO_indx, tot_in_res_ft, self)
+		siz_str, cham_env, RO2_indx[:, 1], tot_in_res_ft, self)
 	return()
