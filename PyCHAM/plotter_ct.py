@@ -38,7 +38,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
-	# self - reference to GUI
+	# self - reference to PyCHAM
 	# --------------------------------------------------------------------------
 
 	# chamber condition ---------------------------------------------------------

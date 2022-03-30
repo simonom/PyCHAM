@@ -1367,13 +1367,14 @@ class PyCHAM(QWidget):
 
 		# drop down button for type of radical
 		self.b361a = QComboBox(self)
-		self.b361a.addItem('RO2 (alkyl peroxy radical)')
-		self.b361a.addItem('RO (alkoxy radical)')
+		self.b361a.addItem('RO2 (alkyl peroxy radical) Number Contribution (%)')
+		self.b361a.addItem('RO (alkoxy radical) Number Contribution (%)')
+		self.b361a.addItem('RO (alkoxy radical) Flux (molecules/cm3/s)')
 		self.RADlayout.addWidget(self.b361a, 1, 0, 1, 1)
 	
-		# button to plot RO2 contributions
-		self.b362 = QPushButton(str('Contributions (%)'))
-		self.b362.setToolTip('Show the contribution to the selected radical pool by the top number of contributors (number given in box above)')
+		# button to plot radical output
+		self.b362 = QPushButton(str('Plot'))
+		self.b362.setToolTip('Show the selected output by the top number of components (number given in box above)')
 		self.b362.clicked.connect(self.on_click362)
 		#self.b362.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.RADlayout.addWidget(self.b362, 1, 1)
@@ -3673,11 +3674,11 @@ class PyCHAM(QWidget):
 		return()
 
 	@pyqtSlot()
-	def on_click362(self): # for viewing contributions to radicals
+	def on_click362(self): # for viewing properties of radicals
 	
 		# get number of top contributors
 		# in case no user-defined value provided then default
-		if (self.e360.text() == 'Provide the top number of components contributing to a radical pool'):
+		if (self.e360.text() == 'Provide the top number of components to plot'):
 			self.rad_ord_num = 3
 		else:
 			self.rad_ord_num = int(self.e360.text())
@@ -3686,20 +3687,27 @@ class PyCHAM(QWidget):
 		input_check_text = self.b361a.currentText()
 		
 		# if RO2
-		if (input_check_text == 'RO2 (alkyl peroxy radical)'):
+		if ('RO2 (alkyl peroxy radical)' in input_check_text):
 			self.rad_mark = 0
 
 		# if RO
-		if (input_check_text == 'RO (alkoxy radical)'):
+		if ('RO (alkoxy radical) Number' in input_check_text):
 			self.rad_mark = 1
+
+		if ('RO (alkoxy radical) Flux' in input_check_text):
+			self.rad_mark = 2
 		
-		dir_path = self.l201.text() # name of folder with results
+		self.dir_path = self.l201.text() # name of folder with results
 
 
 		import plotter_gp # required module
+		if self.rad_mark == 0 or self.rad_mark == 1:
+			# call on gas-phase plotter for radical pools
+			plotter_gp.plotter_rad_pool(self) # plot results
 
-		# call on gas-phase plotter for radical pools
-		plotter_gp.plotter_rad_pool(dir_path, self) # plot results
+		if (self.rad_mark == 2):
+			# call on gas-phase plotter for radical flux
+			plotter_gp.plotter_rad_flux(self) # plot results
 
 		return()
 
