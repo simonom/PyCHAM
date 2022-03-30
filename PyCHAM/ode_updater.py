@@ -56,9 +56,9 @@ import ode_brk_err_mess
 def ode_updater(update_stp, 
 	tot_time, save_stp, y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
-	jac_den_indx, jac_indx, RO2_indx, H2Oi, temp, tempt, 
+	jac_den_indx, jac_indx, H2Oi, temp, tempt, 
 	Pnow, Jlen, con_infl_C, nrec_steps, 
-	dydt_vst, siz_str, num_sb, num_comp, seed_name, seedx, 
+	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 	x, Varr, act_coeff, Cw, kw, Cfactor, y_arr, 
@@ -75,7 +75,7 @@ def ode_updater(update_stp,
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
-	sav_nam, comp_namelist, dydt_trak, space_mode, 
+	sav_nam, comp_namelist, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
@@ -96,7 +96,7 @@ def ode_updater(update_stp,
 	# njac - number of elements of Jacobian affected per equation
 	# jac_den_indx - index of denominator components for Jacobian
 	# jac_indx - index of Jacobian affected per equation
-	# RO2_indx - index of components in alkyl peroxy radical list
+	# self.RO2_indx - index of components in alkyl peroxy radical list
 	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
 	# temp - temperature in chamber (K)
@@ -115,7 +115,7 @@ def ode_updater(update_stp,
 	# con_infl_C - influx of components with constant concentration
 	# (molecules/cc/s)
 	# nrec_step - number of recording steps
-	# dydt_vst - dictionary for holding change tendencies of specified
+	# self.dydt_vst - dictionary for holding change tendencies of specified
 	#		components
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
@@ -252,7 +252,7 @@ def ode_updater(update_stp,
 	# self.sch_name - path to chemical scheme
 	# sav_nam - name of folder to save in
 	# comp_namelist - chemical scheme name of components
-	# dydt_trak - name of components to track change tendencies
+	# self.dydt_trak - name of components to track change tendencies
 	# space_mode - type of spacing used in particle size distribution
 	# rbou00 - original particle size bin bounds
 	# ub_rad_amp - amplificatin factor for upper bin size bound
@@ -352,7 +352,7 @@ def ode_updater(update_stp,
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
-	RO2_indx, sumt, Pnow, light_time_cnt, 
+	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
@@ -465,10 +465,8 @@ def ode_updater(update_stp,
 				dydt_erh_flag = 0
 		
 			# reaction rate coefficient
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(RO2_indx, 
-				y[H2Oi], temp_now, lightm, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
-				sumt, self)
+			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, lightm, y, 
+				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
 			
 			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)
@@ -481,7 +479,7 @@ def ode_updater(update_stp,
 			
 			# for change tendencies, do want to save from t=0
 			# record any change tendencies of specified components
-			if (len(dydt_vst) > 0 and save_cntf == 0):
+			if (len(self.dydt_vst) > 0 and save_cntf == 0):
 				if (sumt == 0. or (sumt-(save_stp*(save_cnt-1)) > -1.e-10)):
 					if (sumt == 0.):
 						dydt_cnt = save_cnt-2
@@ -490,8 +488,8 @@ def ode_updater(update_stp,
 					
 					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
-					dydt_vst = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-						dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
+					self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
+						nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 						kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 			
 			# record output if on the first attempt at solving this time interval, 
@@ -594,7 +592,7 @@ def ode_updater(update_stp,
 				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-				H2Oi, dil_fac, RO2_indx[:, 1], comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
+				H2Oi, dil_fac, comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
 			
 			# if any components set to have constant gas-phase concentration
@@ -784,9 +782,9 @@ def ode_updater(update_stp,
 
 	# save results
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
-		dydt_vst, num_comp, Cfactor_vst, 0, 
-		num_sb, comp_namelist, dydt_trak, y_mw, MV, time_taken, 
+		num_comp, Cfactor_vst, 0, 
+		num_sb, comp_namelist, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
 		comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi, 
-		siz_str, cham_env, RO2_indx[:, 1], tot_in_res_ft, self)
+		siz_str, cham_env, tot_in_res_ft, self)
 	return()

@@ -47,7 +47,7 @@ def middle(self): # define function
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
-		con_infl_nam, const_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+		con_infl_nam, const_infl_t, con_infl_C, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
@@ -62,8 +62,7 @@ def middle(self): # define function
 	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, jac_extr_indx, comp_num, RO2_indx, 
-	HOMRO2_indx, rel_SMILES, 
+	jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
 	Pybel_objects, eqn_num, comp_namelist, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
@@ -87,14 +86,14 @@ def middle(self): # define function
 		yield err_mess
 	
 	# set initial concentrations (# molecules/cm3)
-	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, dydt_vst, comp_namelist, 
+	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
-	comp0, y0, temp[0], RH, Pnow, Pybel_objects, 0, pconc, dydt_trak, tot_time, 
+	comp0, y0, temp[0], RH, Pnow, Pybel_objects, 0, pconc, tot_time, 
 	save_step, rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	RO2_indx, HOMRO2_indx, rstoi_g, pstoi_g, self)
+	rstoi_g, pstoi_g, self)
 	
 	# if error raised, then tell GUI to display and to stop programme
 	if (erf == 1):
@@ -134,9 +133,9 @@ def middle(self): # define function
 	for prog in ode_updater.ode_updater(update_stp, 
 		tot_time, save_step, y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
-		jac_den_indx_g, jac_indx_g, RO2_indx, H2Oi, temp, tempt, 
+		jac_den_indx_g, jac_indx_g, H2Oi, temp, tempt, 
 		Pnow, Jlen, con_infl_C, nrec_steps, 
-		dydt_vst, siz_str, num_sb, num_comp, seed_name, seedx, 
+		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 		x, Varr, act_coeff, Cw, kw, Cfactor, y_arr_g, y_rind_g, 
@@ -155,7 +154,7 @@ def middle(self): # define function
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
-		sav_nam, comp_namelist, dydt_trak, space_mode, 
+		sav_nam, comp_namelist, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
 		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,

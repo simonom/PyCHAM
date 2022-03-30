@@ -195,10 +195,10 @@ def extr_mech(chem_sch_mrk,
 	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
 	# get index of components in the peroxy radical list
-	RO2_indx = RO2_indices.RO2_indices(comp_namelist, RO2_names)
+	self = RO2_indices.RO2_indices(comp_namelist, RO2_names, self)
 	
 	# get index of HOM-RO2 radicals
-	HOMRO2_indx = RO2_indices.HOMRO2_indices(comp_namelist)
+	self = RO2_indices.HOMRO2_indices(comp_namelist, self)
 	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
@@ -207,8 +207,7 @@ def extr_mech(chem_sch_mrk,
 		njac_g, jac_den_indx_g, jac_indx_g, y_arr_g, y_rind_g,
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, RO2_indx,
-		HOMRO2_indx, comp_list, 
+		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num,comp_list, 
 		Pybel_objects, eqn_num, comp_namelist, Jlen, 
 		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 		nreac_aq, nprod_aq, jac_stoi_aq, 

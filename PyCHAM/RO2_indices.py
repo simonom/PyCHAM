@@ -26,11 +26,12 @@
 
 import numpy as np
 
-def RO2_indices(comp_namelist, RO2_names):
+def RO2_indices(comp_namelist, RO2_names, self):
 
 	# inputs: -----------------------------------------------------------------------------------------
 	# comp_namelist - all chemical scheme names
 	# RO2_names - all RO2 (non-HOM) names
+	# self - reference to PyCHAM
 	# ---------------------------------------------------------------------------------------------------
     
 	# store the names of RO2 species which are present in the equation file
@@ -38,7 +39,7 @@ def RO2_indices(comp_namelist, RO2_names):
 	# (or total species dict)
 	# empty list for RO2_indices
 	RO2_indices0 = []
-	RO2_indices = []
+	self.RO2_indices = []
     
 	for name in RO2_names:
         
@@ -48,16 +49,16 @@ def RO2_indices(comp_namelist, RO2_names):
 			RO2_indices0.append(index0)
 			# get the comp_namelist index for this RO2 species
 			index1 = comp_namelist.index(name)
-			RO2_indices.append(index1)
+			self.RO2_indices.append(index1)
     
 	# ensure elements in RO2_indices are integer (iterable)
 	RO2_indices0 = (np.asarray(RO2_indices0, dtype=int)).reshape(-1, 1)
-	RO2_indices = (np.asarray(RO2_indices, dtype=int)).reshape(-1, 1)
-	RO2_indices = np.hstack((RO2_indices0, RO2_indices))
+	self.RO2_indices = (np.asarray(self.RO2_indices, dtype=int)).reshape(-1, 1)
+	self.RO2_indices = np.hstack((RO2_indices0, self.RO2_indices))
     
-	return (RO2_indices)
+	return(self)
 	
-def HOMRO2_indices(comp_namelist):
+def HOMRO2_indices(comp_namelist, self):
 
 	# inputs: -----------------------------------------------------------------------------------------
 	# comp_namelist - all chemical scheme names
@@ -67,7 +68,7 @@ def HOMRO2_indices(comp_namelist):
 	# get a list of INDICES of RO2 that present in the equation file 
 	# (or total species dict)
 	# empty list for HOMRO2 indices
-	HOMRO2_indices = []
+	self.HOMRO2_indices = []
     
 	cin = 0 # count on components
 	for name in comp_namelist: # loop through names of all components
@@ -75,10 +76,10 @@ def HOMRO2_indices(comp_namelist):
 		if ('API_' in name) or ('api_' in name):
 			if ('RO2 in name'):
 				# store the HOMRO2 index
-				HOMRO2_indices.append(cin)
+				self.HOMRO2_indices.append(cin)
 				
 		cin += 1 # count on components
 	# ensure elements in HOMRO2_indices are integer (iterable)
-	HOMRO2_indices = (np.asarray(HOMRO2_indices, dtype=int)).reshape(-1, 1)
+	self.HOMRO2_indices = (np.asarray(self.HOMRO2_indices, dtype=int)).reshape(-1, 1)
     
-	return (HOMRO2_indices)
+	return(self)

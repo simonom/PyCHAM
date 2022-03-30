@@ -35,13 +35,13 @@ except:
 import importlib
 
 
-def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
+def rrc_calc(H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 
 	import rate_coeffs # in case failure to import previous version using import command above
 
 	# ---------------------------------------------
 	# inputs:
-	# RO2_indices - indices of RO2 components
+	# self.RO2_indices - indices of RO2 components
 	# H2O - concentrations of water (# molecules/cm3)
 	# TEMP - temperature (K)
 	# lightm - whether lights off (0) or on (1)
@@ -68,10 +68,10 @@ def rrc_calc(RO2_indices, H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt,
 	err_mess = ''
 	
 	# calculate total RO2 concentration
-	if (RO2_indices.size == 0):
+	if (self.RO2_indices.size == 0):
 		RO2 = 0
 	else:
-		RO2 = np.sum(y[RO2_indices[:, 1]])
+		RO2 = np.sum(y[self.RO2_indices[:, 1]])
 		
 	# calculate concentrations of third body (M), nitrogen and oxygen
 	# calculate gas-phase concentrations of M, N2 and O2 (# molecules/cm3 (air))

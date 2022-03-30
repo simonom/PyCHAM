@@ -36,7 +36,7 @@ def rec_prep(nrec_step,
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
 	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
-	RO2_indx, sumt, Pnow, light_time_cnt, 
+	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
@@ -78,7 +78,7 @@ def rec_prep(nrec_step,
 	# therm_sp - thermal speed (m/s)
 	# H2Oi - index for water
 	# act_coeff - activity coefficient
-	# RO2_indx - index of peroxy radicals
+	# self.RO2_indx - index of alkyl peroxy radicals
 	# sumt - cumulative time through simulation (s)
 	# Pnow - chamber pressure (Pa)
 	# self.light_stat - light status
@@ -269,8 +269,7 @@ def rec_prep(nrec_step,
 		kimt = kelv_fac = 0.
 	
 	# update reaction rate coefficients
-	rrc = rrc_calc.rrc_calc(RO2_indx, 
-			y[H2Oi], temp_now, lightm, y, Pnow, 
+	rrc = rrc_calc.rrc_calc(y[H2Oi], temp_now, lightm, y, Pnow, 
 			Jlen, y[NOi], y[HO2i], y[NO3i], 
 			0., self)
 

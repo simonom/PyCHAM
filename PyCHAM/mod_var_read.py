@@ -43,7 +43,7 @@ def mod_var_read(self):
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
@@ -368,7 +368,7 @@ def mod_var_read(self):
 					con_infl_C = np.empty(0)
 					
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
-				dydt_trak = [str(i).strip() for i in (value.split(','))]
+				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'dens_Comp' and (value.strip()):
 				dens_comp = [str(i).strip() for i in (value.split(','))]
@@ -503,7 +503,7 @@ def mod_var_read(self):
 				uppsize, space_mode, std, mean_rad, save_step, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, con_infl_nam, con_infl_t, 
-				con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, 
+				con_infl_C, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 

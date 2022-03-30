@@ -166,7 +166,7 @@ def def_mod_var(caller, self): # define function
 
 	# specific component properties ---------------------------------------------------------
 	# chemical scheme name of components to track the change tendencies of	
-	dydt_trak = []
+	self.dydt_trak = []
 	# chemical scheme names of components with densities manually set
 	dens_comp = []
 	# manually assigned densities (g/cc)
@@ -199,7 +199,7 @@ def def_mod_var(caller, self): # define function
 			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 			seedx, con_infl_nam, 
-			con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, 
+			con_infl_t, con_infl_C, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
@@ -222,7 +222,7 @@ def def_mod_var(caller, self): # define function
 		space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
 		con_infl_nam, con_infl_t, con_infl_C, 
-		dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 

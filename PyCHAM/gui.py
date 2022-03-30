@@ -143,7 +143,7 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
+		con_infl_nam, con_infl_t, con_infl_C, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
@@ -814,7 +814,7 @@ class PyCHAM(QWidget):
 		l70.setText('Chemical scheme name of components \nto track process tendencies: ')
 		self.varbox.addWidget(l70, scp_row+1, 0)
 		self.l70a = QLabel(self)
-		self.l70a.setText((str(dydt_trak)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l70a.setText((str(self.dydt_trak)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l70a, scp_row+1, 1)
 		
 		l71 = QLabel(self)
@@ -1361,7 +1361,7 @@ class PyCHAM(QWidget):
 		# input bar for number of components contributing
 		# to radical population
 		self.e360 = QLineEdit(self)
-		self.e360.setText('Provide the top number of components contributing to a radical pool')
+		self.e360.setText('Provide the top number of components to plot')
 		self.e360.setStyleSheet('qproperty-cursorPosition : 0')
 		self.RADlayout.addWidget(self.e360, 0, 0, 1, 2)
 
@@ -1754,7 +1754,7 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		con_infl_nam, con_infl_t, con_infl_C, dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, 
+		con_infl_nam, con_infl_t, con_infl_C, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
@@ -1770,7 +1770,7 @@ class PyCHAM(QWidget):
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_nam, con_infl_t, con_infl_C, 
-			dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
@@ -1921,7 +1921,7 @@ class PyCHAM(QWidget):
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, save_step, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-			con_infl_nam, con_infl_t, con_infl_C, dydt_trak, 
+			con_infl_nam, con_infl_t, con_infl_C, 
 			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -1967,7 +1967,7 @@ class PyCHAM(QWidget):
 				save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_nam, con_infl_t, con_infl_C, 
-				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
@@ -3578,7 +3578,7 @@ class PyCHAM(QWidget):
 				std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_nam, con_infl_t, con_infl_C, 
-				dydt_trak, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 

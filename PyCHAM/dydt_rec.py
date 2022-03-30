@@ -23,24 +23,24 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2022-03-30 10:52:22.794539
+# File Created at 2022-03-30 15:40:46.600735
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
 	
 	# loop through components to record the tendency of change, note that components can be grouped, e.g. RO2 for non-HOM-RO2 
-	dydtnames = dydt_vst['comp_names'] 
+	dydtnames = self.dydt_vst['comp_names'] 
 	for comp_name in dydtnames: # get name of this component
 		
 		key_name = str(str(comp_name) + '_comp_indx') # get index of this component
-		compi = dydt_vst[key_name] 
+		compi = self.dydt_vst[key_name] 
 		# open relevant dictionary value containing reaction numbers and results 
 		key_name = str(str(comp_name) + '_res')
-		dydt_rec = dydt_vst[key_name] 
+		dydt_rec = self.dydt_vst[key_name] 
 		# open relevant dictionary value containing flag for whether component is reactant (1) or product (0) in each reaction 
 		key_name = str(str(comp_name) + '_reac_sign')
-		reac_sign = dydt_vst[key_name] 
+		reac_sign = self.dydt_vst[key_name] 
 		# keep count on relevant reactions 
 		reac_count = 0 
 		# loop through relevant reactions 
@@ -87,4 +87,4 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, dydt_vst, nr
 			# gas-phase change (# molecules/cm3/s) 
 			dydt_rec[step+1, reac_count+1] -= np.sum(dydt_all[compi]) 
 		
-	return(dydt_vst) 
+	return(self) 

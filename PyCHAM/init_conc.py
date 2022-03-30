@@ -31,11 +31,11 @@ import write_dydt_rec
 
 
 def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
-	testf, pconc, dydt_trak, end_sim_time, save_step, 
+	testf, pconc, end_sim_time, save_step, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	comp_namelist, Compt, seed_name, seed_mw,
 	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	RO2_indx, HOMRO2_indx, rstoi, pstoi, self):
+	rstoi, pstoi, self):
 		
 	# inputs:------------------------------------------------------
 	
@@ -49,7 +49,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# concentrations are given in init_conc)
 	# testf - flag for whether in normal mode (0) or testing mode (1/2)
 	# pconc - initial concentration of particles (# particles/cc (air))
-	# dydt_trak - chemical scheme name of components for which user wants the tendency to  
+	# self.dydt_trak - chemical scheme name of components for which user wants the tendency to  
 	#			change tracked
 	# end_sim_time - total simulation time (s)
 	# save_step - recording frequency (s)
@@ -65,8 +65,9 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# comp_xmlname - component names in xml file
 	# comp_smil - all SMILES strings in xml file
 	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
-	# RO2_indx - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
-	# HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
+	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
+	# self.RO2_indx - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
+	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
 	# rstoi - stoichiometry of reactants per equation
 	# pstoi - stoichiometry of products per equation
 	# self - reference to program
@@ -94,7 +95,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 
 	# prepare dictionary for tracking tendency to change of user-specified components
-	dydt_vst = {}
+	self.dydt_vst = {}
 
 	# insert initial concentrations where appropriate
 	for i in range(len(Comp0)):
@@ -172,29 +173,36 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	y = np.append(y, 0.)
 	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
 	
-	# --------------------------------------
-	# get index of user-specified components for tracking their change tendencies (dydt) due to modeled
+	# tracked components (dydt)--------------------------------------
+	# check for tracking of all alkoxy radicals
+	if ('RO_ind' in self.dydt_trak): # append existing list and list of RO radicals
+		self.dydt_trak = self.dydt_trak + ((np.array((comp_namelist)))[self.RO_indx]).tolist()
+	
+	# remove the RO_ind item from the tracked component list
+	self.dydt_trak.remove('RO_ind')
+
+	# get index of user-specified components for tracking their change tendencies (dydt) due to modelled
 	# mechanisms
-	if (len(dydt_trak) > 0):
+	if (len(self.dydt_trak) > 0):
 		
 		dydt_traki = [] # empty list for indices of these components
 		
-		for i in range (len(dydt_trak)):
+		for i in range (len(self.dydt_trak)):
 
 			reac_index = [] # indices of reactions involving this component
 			# value for whether this component is reactant or product in a reaction and stoichiometry
 			reac_sign = []
 			
-			if dydt_trak[i] != 'RO2' and dydt_trak[i] != 'HOMRO2':
+			if (self.dydt_trak[i] != 'RO2' and self.dydt_trak[i] != 'HOMRO2'):
 			
 				# index of components in component list
 				try:
-					y_indx = comp_namelist.index(dydt_trak[i])
+					y_indx = comp_namelist.index(self.dydt_trak[i])
 				# if component not already listed via interpretation of the chemical scheme
 				# then send error message
 				except:
 					erf = 1
-					err_mess = str('Error: component called ' + str(dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 					return (0, 0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, 0, 0, erf, err_mess, 0, 0, 0)
@@ -212,13 +220,13 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 						reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
 						reac_sign.append(1*pstoi[int(ri), reac_place])
 			
-			if dydt_trak[i] == 'RO2': # for non-HOM-RO2 (organic peroxy radicals)
+			if (self.dydt_trak[i] == 'RO2'): # for non-HOM-RO2 (alkyl peroxy radicals)
 			
 				# remember index for plotting gas-phase concentrations later
-				dydt_traki.append(list(RO2_indx[:, 1]))
+				dydt_traki.append(list(self.RO2_indx[:, 1]))
 				
 				# loop through non-HOM-RO2 components to get their reaction indices
-				for y_indx in RO2_indx[:, 1]:
+				for y_indx in self.RO2_indx[:, 1]:
 					
 					# search through reactions to see where this component is reactant or product
 					for ri in range(num_eqn):
@@ -232,15 +240,15 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 							reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
 							reac_sign.append(1*pstoi[int(ri), reac_place])
 					
-					y_indx = RO2_indx[:, 1] # ready for storing below
+					y_indx = self.RO2_indx[:, 1] # ready for storing below
 			
-			if dydt_trak[i] == 'HOMRO2': # for HOM-RO2 (highly oxidised molecule organic peroxy radicals)
+			if (self.dydt_trak[i] == 'HOMRO2'): # for HOM-RO2 (highly oxidised molecule alkyl peroxy radicals)
 			
 				# remember index for plotting gas-phase concentrations later
-				dydt_traki.append(list(np.squeeze(HOMRO2_indx)))
+				dydt_traki.append(list(np.squeeze(self.HOMRO2_indx)))
 				
 				# loop through non-HOM-RO2 components to get their reaction indices
-				for y_indx in HOMRO2_indx[:]:
+				for y_indx in self.HOMRO2_indx[:]:
 					
 					# search through reactions to see where this component is reactant or product
 					for ri in range(num_eqn):
@@ -252,7 +260,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 							reac_index.append(int(ri)) # append reaction index
 							reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
 							reac_sign.append(1*pstoi[int(ri), reac_place])
-				y_indx = HOMRO2_indx[:] # ready for storing below
+				y_indx = self.HOMRO2_indx[:] # ready for storing below
 				
 			# save reaction indices in dictionary value for this component,
 			# when creating empty rec_array, add two columns onto the end for particle- and 
@@ -260,17 +268,17 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			rec_array = np.zeros((nrec_steps, len(reac_index)+2))
 			rec_array[0, 0:-2] = reac_index
 
-			comp_indx_str = str(dydt_trak[i] + '_comp_indx')
-			res_string = str(dydt_trak[i] + '_res')
-			reac_string = str(dydt_trak[i] + '_reac_sign')
+			comp_indx_str = str(self.dydt_trak[i] + '_comp_indx')
+			res_string = str(self.dydt_trak[i] + '_res')
+			reac_string = str(self.dydt_trak[i] + '_reac_sign')
 			
-			dydt_vst[comp_indx_str] = y_indx # dictionary entry to hold index of tracked component
-			dydt_vst[res_string] = rec_array # dictionary entry to hold reaction indices and results
-			dydt_vst[reac_string] = reac_sign # dictionary entry to hold results
+			self.dydt_vst[comp_indx_str] = y_indx # dictionary entry to hold index of tracked component
+			self.dydt_vst[res_string] = rec_array # dictionary entry to hold reaction indices and results
+			self.dydt_vst[reac_string] = reac_sign # dictionary entry to hold results
 
 
 		# dictionary entry to hold component names of components to track
-		dydt_vst['comp_names'] = dydt_trak
+		self.dydt_vst['comp_names'] = self.dydt_trak
 		
 		# call on write_dydt_rec to generate the module that will process
 		# the tendency to change during the simulation
@@ -355,7 +363,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		erf = 1
 		err_mess = 'Stop'
 	
-	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, dydt_vst, 
+	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			comp_namelist, inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
 			HO2i, NO3i, self)

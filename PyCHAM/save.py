@@ -28,11 +28,11 @@ import numpy as np
 import csv
 from shutil import copyfile
 
-def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_comp, 
-	Cfactor_vst, testf, numsb, comp_namelist, dydt_trak, y_mw, MV,
+def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
+	Cfactor_vst, testf, numsb, comp_namelist, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
-	siz_str, cham_env, opri, tot_in_res_ft, self):
+	siz_str, cham_env, tot_in_res_ft, self):
 
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -43,8 +43,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	# (air) into ppb
 	# testf - flag to show whether in normal mode (0) or test mode (1)
 	# numsb - number of size bins
-	# dydt_vst - tendency to change of user-specified components
-	# dydt_trak - user-input names of components to track
+	# self.dydt_vst - tendency to change of user-specified components
+	# self.dydt_trak - user-input names of components to track
 	# comp_namelist - names of components given by the chemical scheme file
 	# upper_bin_rad_amp - factor upper bin radius found increased by in 
 	#						Size_distributions.py for more than 1 size bin, or in 
@@ -80,7 +80,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	# siz_str - the size structure
 	# cham_env - chamber environmental conditions (temperature (K), 
 	# pressure (Pa) and relative humidity
-	# opri - alkyl peroxy radical indices
+	# self.RO2_indices[:, 1] - alkyl peroxy radical indices
 	# self.RO_indx - alkoxy radical indices
 	# tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
 	# self - reference to PyCHAM
@@ -119,7 +119,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	const["number_of_components"] = num_comp
 	const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
-	const["organic_peroxy_radical_index"] = (opri.tolist())
+	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
 	const["organic_alkoxy_radical_index"] = self.RO_indx
 	const["chem_scheme_names"] = comp_namelist
 	const["SMILES"] = rel_SMILES
@@ -184,16 +184,16 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, dydt_vst, num_com
 	
 	# if tracking of tendencies to change requested by user, loop through the components
 	# and save the tendency record for each of these (%/hour)
-	if (len(dydt_vst) > 0):
+	if (len(self.dydt_vst) > 0):
 		compind = 0
-		dydtnames = dydt_vst['comp_names'] # get names of tracked components
+		dydtnames = self.dydt_vst['comp_names'] # get names of tracked components
 		# loop through components to record the tendency of change \n')
 		for comp_name in dydtnames:
 			# open relevant dictionary value, to get the 2D numpy array for saving
-			dydt_rec = np.array(dydt_vst[str(str(comp_name) + '_res')])
+			dydt_rec = np.array(self.dydt_vst[str(str(comp_name) + '_res')])
 			
 			# get user-input name of this component
-			comp_name = str(dydt_trak[compind] +'_rate_of_change')
+			comp_name = str(self.dydt_trak[compind] +'_rate_of_change')
 			# save
 			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), penultimate column is gas-particle partitioning and final column is gas-wall partitioning (molecules/cc.s (air))')
 			compind += 1

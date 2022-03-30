@@ -285,7 +285,7 @@ def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 	return()
 
 # plotting the radical pool
-def plotter_rad_pool(dir_path, self):
+def plotter_rad_pool(self):
 
 	# ---------------------
 	# inputs:
@@ -373,7 +373,7 @@ def plotter_rad_flux(self):
 	# get names of radicals in this pool
 	rad_names = (np.array((comp_names)))[indx_plot]
 
-	# check that 
+	# check that all these components present
 	for comp_name in (rad_names):
 		
 		fname = str(self.dir_path+ '/' + comp_name + '_rate_of_change')
@@ -409,8 +409,15 @@ def plotter_rad_flux(self):
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
+	# empty results for production (top half of rows) and loss (bottom half of rows) term sums across all times
+	cr_dydt = np.zeros((len(timehr)*2, len(rad_names)))
 	
+	compi = 0 # count on components
 	for comp_name in (rad_names): # loop through components to plot
+		
+		# open results for this component
+		fname = str(self.dir_path+ '/' + comp_name + '_rate_of_change')
+		dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header	
 		
 		ci = comp_names.index(comp_name) # get index of this component
 		
@@ -425,28 +432,34 @@ def plotter_rad_flux(self):
 
 		for ti in range(dydt.shape[0]-1): # loop through times
 			indx = dydt[ti+1, 0:-2] > 0 # indices of reactions that produce component
-			crg[ti] = dydt[ti+1, 0:-2][indx].sum()
+			cr_dydt[ti, compi] = dydt[ti+1, 0:-2][indx].sum()
 			indx = dydt[ti+1, 0:-2] < 0 # indices of reactions that lose component
-			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
-			 
-		# convert change tendencies from molecules/cc/s to ug/m3/s
-		#crg = ((crg/si.N_A)*y_mw[ci])*1.e12
-		#crl = ((crl/si.N_A)*y_mw[ci])*1.e12
-			 
+			cr_dydt[ti+len(timehr), compi] = dydt[ti+1, 0:-2][indx].sum()
+		
+		compi += 1 # count on components
+	
+	# sum absolute values of losses and gains across all times
+	sum_cr_dydt = np.sum(np.abs(cr_dydt), axis=0)
+	# get order
+	ord = sum_cr_dydt.argsort()
+	
+	# loop through top contributors
+	for compi in range(self.rad_ord_num):
+		
+	
 		# plot temporal profiles of change tendencies due to chemical 
 		# reaction production and loss
-		ax0.plot(timehr, crg, label = str('chemical reaction gain '+ comp_name))
-		ax0.plot(timehr, crl, label = str('chemical reaction loss '+ comp_name))
-		ax0.yaxis.set_tick_params(direction = 'in')
+		ax0.plot(timehr, cr_dydt[0:len(timehr), ord[-(compi+1)]], label = str('chemical reaction gain '+ rad_names[ord[-(compi+1)]]))
+		ax0.plot(timehr, cr_dydt[len(timehr)::, ord[-(compi+1)]], label = str('chemical reaction loss '+ rad_names[ord[-(compi+1)]]))
 		
-		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
-		ax0.set_xlabel('Time through experiment (hours)')
-		ax0.set_ylabel('Change tendency ($\mathrm{molecules \, cm^{-3}\, s^{-1}}$)')
+	ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
+	ax0.set_xlabel('Time through experiment (hours)')
+	ax0.set_ylabel('Change tendency ($\mathrm{molecules \, cm^{-3}\, s^{-1}}$)')
 		
-		ax0.yaxis.set_tick_params(direction = 'in')
-		ax0.xaxis.set_tick_params(direction = 'in')
+	ax0.yaxis.set_tick_params(direction = 'in')
+	ax0.xaxis.set_tick_params(direction = 'in')
 		
-		ax0.legend()
+	ax0.legend()
 			 
 
 	return()

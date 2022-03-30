@@ -95,7 +95,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
-	f.write('	H2Oi, dil_fac, RO2_indx, comp_namelist, Psat_Pa, Cinfl_nowp_indx,\n')
+	f.write('	H2Oi, dil_fac, comp_namelist, Psat_Pa, Cinfl_nowp_indx,\n')
 	f.write('	Cinfl_nowp, self):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
@@ -159,7 +159,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
 	f.write('	# dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
-	f.write('	# RO2_indx - index of organic peroxy radicals\n')
+	f.write('	# self.RO2_indx - index of organic peroxy radicals\n')
 	f.write('	# comp_namelist - chemical scheme names of components\n')
 	f.write('	# Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
 	f.write('	#	temperature of chamber\n')
@@ -261,8 +261,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		dd[0:num_comp][Psat_Pa[0, :] <= 3.8e-10] -= y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
 		f.write('		dd[(num_comp*num_sb)::][Psat_Pa[0, :] <= 3.8e-10] += y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
 		
-		f.write('		dd[RO2_indx] -= y[RO2_indx]*(lr) # RO2 components following Silvia thesis\n')
-		f.write('		dd[(num_comp*num_sb)+RO2_indx] += y[RO2_indx]*(lr) # RO2 components following Silvia thesis\n')
+		f.write('		dd[self.RO2_indices[:, 1]] -= y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
+		f.write('		dd[(num_comp*num_sb)+self.RO2_indices[:, 1]] += y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
 
 		f.write('		dd[comp_namelist.index(\'HO2\')] -= y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
 		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'HO2\')] += y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
