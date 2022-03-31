@@ -1367,8 +1367,9 @@ class PyCHAM(QWidget):
 
 		# drop down button for type of radical
 		self.b361a = QComboBox(self)
-		self.b361a.addItem('RO2 (alkyl peroxy radical) Number Contribution (%)')
-		self.b361a.addItem('RO (alkoxy radical) Number Contribution (%)')
+		self.b361a.addItem('RO2 (alkyl peroxy radical) Concentration (ppb)')
+		self.b361a.addItem('RO (alkoxy radical) Concentration (ppb)')
+		self.b361a.addItem('RO2 (alkyl peroxy radical) Flux (molecules/cm3/s)')
 		self.b361a.addItem('RO (alkoxy radical) Flux (molecules/cm3/s)')
 		self.RADlayout.addWidget(self.b361a, 1, 0, 1, 1)
 	
@@ -3686,16 +3687,21 @@ class PyCHAM(QWidget):
 		# get the name of the radical pool to plot from the drop down selection
 		input_check_text = self.b361a.currentText()
 		
-		# if RO2
-		if ('RO2 (alkyl peroxy radical)' in input_check_text):
+		# if RO2 absolute concentrations
+		if ('RO2 (alkyl peroxy radical) Concentration' in input_check_text):
 			self.rad_mark = 0
 
-		# if RO
-		if ('RO (alkoxy radical) Number' in input_check_text):
+		# if RO abolsute concentrations
+		if ('RO (alkoxy radical) Concentration' in input_check_text):
 			self.rad_mark = 1
 
-		if ('RO (alkoxy radical) Flux' in input_check_text):
+		# if RO2 flux
+		if ('RO2 (alkyl peroxy radical) Flux (molecules/cm3/s)' in input_check_text):
 			self.rad_mark = 2
+
+		# if RO flux
+		if ('RO (alkoxy radical) Flux' in input_check_text):
+			self.rad_mark = 3
 		
 		self.dir_path = self.l201.text() # name of folder with results
 
@@ -3705,7 +3711,7 @@ class PyCHAM(QWidget):
 			# call on gas-phase plotter for radical pools
 			plotter_gp.plotter_rad_pool(self) # plot results
 
-		if (self.rad_mark == 2):
+		if (self.rad_mark == 2 or self.rad_mark == 3):
 			# call on gas-phase plotter for radical flux
 			plotter_gp.plotter_rad_flux(self) # plot results
 

@@ -66,7 +66,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# comp_smil - all SMILES strings in xml file
 	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
 	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
-	# self.RO2_indx - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
+	# self.RO2_indices - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
 	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
 	# rstoi - stoichiometry of reactants per equation
 	# pstoi - stoichiometry of products per equation
@@ -174,12 +174,20 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
 	
 	# tracked components (dydt)--------------------------------------
+	
+	# check for tracking of all alkyl peroxy radicals
+	if ('RO2_ind' in self.dydt_trak): # append existing list and list of RO2 radicals
+		self.dydt_trak = self.dydt_trak + ((np.array((comp_namelist)))[self.RO2_indices[:, 1]]).tolist()
+	
+		# remove the RO2_ind item from the tracked component list
+		self.dydt_trak.remove('RO2_ind')
+
 	# check for tracking of all alkoxy radicals
 	if ('RO_ind' in self.dydt_trak): # append existing list and list of RO radicals
 		self.dydt_trak = self.dydt_trak + ((np.array((comp_namelist)))[self.RO_indx]).tolist()
 	
-	# remove the RO_ind item from the tracked component list
-	self.dydt_trak.remove('RO_ind')
+		# remove the RO_ind item from the tracked component list
+		self.dydt_trak.remove('RO_ind')
 
 	# get index of user-specified components for tracking their change tendencies (dydt) due to modelled
 	# mechanisms
@@ -223,10 +231,10 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			if (self.dydt_trak[i] == 'RO2'): # for non-HOM-RO2 (alkyl peroxy radicals)
 			
 				# remember index for plotting gas-phase concentrations later
-				dydt_traki.append(list(self.RO2_indx[:, 1]))
+				dydt_traki.append(list(self.RO2_indices[:, 1]))
 				
 				# loop through non-HOM-RO2 components to get their reaction indices
-				for y_indx in self.RO2_indx[:, 1]:
+				for y_indx in self.RO2_indices[:, 1]:
 					
 					# search through reactions to see where this component is reactant or product
 					for ri in range(num_eqn):
@@ -240,7 +248,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 							reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
 							reac_sign.append(1*pstoi[int(ri), reac_place])
 					
-					y_indx = self.RO2_indx[:, 1] # ready for storing below
+					y_indx = self.RO2_indices[:, 1] # ready for storing below
 			
 			if (self.dydt_trak[i] == 'HOMRO2'): # for HOM-RO2 (highly oxidised molecule alkyl peroxy radicals)
 			
