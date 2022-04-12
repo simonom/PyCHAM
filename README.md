@@ -10,13 +10,14 @@ PyCHAM is an open-source computer code (written in Python) for simulating aeroso
 3. [Running](#Running)
 4. [Testing](#Testing)
 5. [Inputs](#Inputs)
-6. [Photochemistry](#Photochemistry)
-7. [Gas-particle Partitioning](#Gas-particle-Partitioning)
-8. [Numerical Considerations](#Numerical-Considerations)
-9. [Quick Plotting Tab](#Quick-Plotting-Tab)
-10. [Flow Mode](#Flow-Mode)
-11. [Frequently Asked Questions](#Frequently-Asked-Questions)
-12. [Acknowledgements](#Acknowledgements)
+6. [Outputs](#Outputs)
+7. [Photochemistry](#Photochemistry)
+8. [Gas-particle Partitioning](#Gas-particle-Partitioning)
+9. [Numerical Considerations](#Numerical-Considerations)
+10. [Quick Plotting Tab](#Quick-Plotting-Tab)
+11. [Flow Mode](#Flow-Mode)
+12. [Frequently Asked Questions](#Frequently-Asked-Questions)
+13. [Acknowledgements](#Acknowledgements)
 
 ## Documentation
 
@@ -261,6 +262,74 @@ In addition, you can find more information around photochemistry and flow mode i
 | drh_ft = | Expression for deliquescence relative humidity (fraction between 0-1) as a function of temperature, where the usual python math symbols should be used for mathematical functions and TEMP should be used to represent temperature which has units K.  E.g. for a deliquescence relative humidity at 298.15 K of 0.5 and an increase/decrease of 0.001 for every unit decrease/increase in temperature: drh_ft = 0.5-(1.e-3*(TEMP-298.15)).  Defaults to a deliquescence relative humidity of 0.0 at all temperatures if left empty (which combined with the default H2O_hist model variable of 1 would result in the assumption of no crystallisation and therefore particle-phase always treated as a solution).  For general information on deliquescence and efflorescence, please see page 410 of [Seinfeld and Pandis 2016](https://www.wiley.com/en-us/Atmospheric+Chemistry+and+Physics%3A+From+Air+Pollution+to+Climate+Change%2C+3rd+Edition-p-9781118947401) and references therein.  Research into the gas-particle partitioning of water for various types of particles is ongoing, and a literature search is recommended for a particular PyCHAM simulation setup.  Please see the [Gas-particle Partitioning](#Gas-particle-Partitioning) section for information on how PyCHAM uses this model variable.|
 | erh_ft = | Expression for efflorescence relative humidity (fraction between 0-1) as a function of temperature, where the usual python math symbols should be used for mathematical functions and TEMP should be used to represent temperature which has units K.  E.g. for an efflorescence relative humidity at 298.15 K of 0.5 and an increase/decrease of 0.001 for every unit decrease/increase in temperature: erh_ft = 0.5-(1.e-3*(TEMP-298.15)).  Defaults to an efflorescence relative humidity of 0.0 at all temperatures if left empty (which combined with the default H2O_hist model variable of 1 would result in the assumption of no crystallisation and therefore particle-phase always treated as a solution).  For general information on deliquescence and efflorescence, please see page 410 of [Seinfeld and Pandis 2016](https://www.wiley.com/en-us/Atmospheric+Chemistry+and+Physics%3A+From+Air+Pollution+to+Climate+Change%2C+3rd+Edition-p-9781118947401) and references therein.  Research into the gas-particle partitioning of water for various types of particles is ongoing, and a literature search is recommended for a particular PyCHAM simulation setup.  Please see the [Gas-particle Partitioning](#Gas-particle-Partitioning) section for information on how PyCHAM uses this model variable.|
 | ser_H2O = | Integer value for whether to separate the integration of the water partitioning between vapour and particle problem from integration of other processes.  Set to 0 to turn off separation and set to 1 to turn on (1 is default).  See [Numerical Considerations](#Numerical-Considerations) for more information. |
+
+## Outputs
+
+Model results are saved to the folder specified by the user in the model variables file, using the model variable res_file_name (described above).  PyCHAM automatically places this folder inside the PyCHAM/output/name of chemical scheme/ folder.  Several files are stored in this output folder.  The concentrations of components is stored in the file with name beginning 'concentrations_all_components_all_times'.  This is a comma separated value (csv) file.  If you would like suggestions for code to open and view results, please see below, along with the plotter_gp.py file and the retr_out.py files.
+
+A minimum working example (for plotting the time profile of the gas-phase concentration of a given component) is (note that you may need to activate the PyCHAM environment in order to have the necessary packages available (numpy and matplotlib)):
+
+# state path to output folder (for Windows Operating System use \\ to separate folders rather than /))
+output_by_sim = 'path to your output folder'
+
+# combine folder path with specific file name for component names
+fname = str(output_by_sim + '/model_and_component_constants')
+
+# open file containing component name
+const_in = open(fname)
+# create empty dictionary to hold component names
+const = {}
+
+# loop through lines of file containing component names
+for line in const_in.readlines():
+		
+	dlist = [] # empty list to hold values
+	for i in line.split(',')[1::]:
+			
+		if (str(line.split(',')[0]) == 'chem_scheme_names') or (str(line.split(',')[0]) == 'SMILES') or (str(line.split(',')[0]) == 'space_mode'):
+			i = i.strip('\n')
+			i = i.strip('[')
+			i = i.strip(']')
+			i = i.strip(' ')
+			i = i.strip('\'')
+			dlist.append(str(i))
+			
+	const[str(line.split(',')[0])] = dlist
+
+# close file with component names
+const_in.close()
+
+# isolate component names from dictionary
+comp_names = const['chem_scheme_names']
+
+# withdraw times (s) -----------------
+fname = str(output_by_sim+'/time')
+# import numpy package
+import numpy as np
+# load times
+t_array = np.loadtxt(fname, delimiter=',', skiprows=1)
+timehr = t_array/3600.0 # convert from s to hr
+# ------------------------------------------
+
+# combine folder path with specific file name for component concentrations
+fname = str(output_by_sim + '/concentrations_all_components_all_times_gas_particle_wall')
+# load file, omitting headers
+y = np.loadtxt(fname, delimiter=',', skiprows=1)
+
+# state name of component you want to plot
+comp_names_to_plot = 'APINENE'
+
+# get index of this component
+indx_plot = [comp_names.index(comp_names_to_plot.strip())]
+
+# import packages for plotting
+import matplotlib.pyplot as plt
+
+# make plot
+plt.plot(timehr, y[:, indx_plot])
+
+# show plot
+plt.show()
 
 ## Photochemistry
 Chemical schemes may include photochemical reactions where the rate of reaction is dependent on light intensity.  Several of the model variables described here in the Model Variables .txt file section are relevant to correct modelling of photochemistry and these will be further detailed here.  
