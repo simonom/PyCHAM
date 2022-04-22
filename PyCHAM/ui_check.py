@@ -364,13 +364,26 @@ def ui_check(self):
 				em_flag = 2
 		except:
 			em_flag = em_flag
+
+	# ----------------------------------------------------------
+	# check on presence of actinic flux file for photolysis - note this has to 
+	# be before chemical scheme check to stop that check crashing when actinic flux file has a problem
+	if hasattr(self, 'af_path') and self.af_path != []  and self.af_path != 'no': # if file provided
+		try: # try opening as in lamp_photo module
+			f = open(self.af_path, 'r') # open file
+			f.close() # close excel file
+		except:
+			err_mess = str('Error- actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_file model variable in the model variable file.')
+			em_flag = 2
+	
+	
+
 	
 	# chemical scheme check-------------------------------------
 	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
 		[comp_namelist, _, err_mess_new, 
 		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self, chem_sch_mark)
-		
 		
 		if (err_mess_new == '' and em_flag < 2):
 			
