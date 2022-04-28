@@ -218,12 +218,20 @@ def retr_out(output_by_sim):
 	t_array = np.loadtxt(fname, delimiter=',', skiprows=1)
 	timehr = t_array/3600.0 # convert from s to hr
 	
+	
 	try: # this output added on 23/02/2021
 		# withdraw chamber environmental conditions (s)
 		fname = str(output_by_sim+'/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
 		cham_env = []
+		
+	# withdraw generation number of components, note this output added on 28/04/2022
+	try:
+		fname = str(output_by_sim+'/component_generation')
+		gen_num = np.loadtxt(fname, delimiter=',', skiprows=1)
+	except:
+		gen_num = []
 	
 	# withdraw concentrations
 	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
@@ -282,6 +290,7 @@ def retr_out(output_by_sim):
 		sp = output_by_sim_sch_ext # chemical scheme path
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
+		gen_numbers = gen_num # for each component, the generation number
 
 	ro_obj = ro_outputs() # create object to hold outputs
 	

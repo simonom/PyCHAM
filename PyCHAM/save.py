@@ -197,6 +197,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), penultimate column is gas-particle partitioning and final column is gas-wall partitioning (molecules/cc.s (air))')
 			compind += 1
 	
+	# saving generation of components
+	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised VOC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	
 	if ((numsb-wall_on) > 0): # if particles present
 	

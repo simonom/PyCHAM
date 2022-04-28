@@ -19,7 +19,7 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''module to read and store (via pickle file) model variables from file'''
+'''module to read and store (via pickle file and self parameter) model variables from file'''
 
 import pickle
 import numpy as np

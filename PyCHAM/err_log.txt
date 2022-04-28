@@ -1,4 +1,4 @@
-/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/mcm_APINENE_CH4_wall_scheme/lowT_wROind
+/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/mcm_APINENE_CH4_wall_scheme/normal
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
