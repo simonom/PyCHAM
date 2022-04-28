@@ -1,32 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\mcm_APINENE_CH4_wall_scheme\17_04_Kw1e-4_Cw1e1_O3loss_NOgain
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
+/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/mcm_APINENE_CH4_wall_scheme/lowT_wROind
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

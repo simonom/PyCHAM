@@ -92,6 +92,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	Pybel_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme
 	self.RO_indx = [] # empty list for holding indices of alkoxy components
+	self.gen_num = [] # for holding generation numbers of components
 	# ---------------------------------------------------------------------
 
 	max_no_reac = 0. # log maximum number of reactants in a reaction
@@ -101,6 +102,13 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 	for eqn_step in range(num_eqn[0]):
 		
 		line = eqn_list[eqn_step] # extract this line
+		
+		# reset list of SMILE strings representing reactants and 
+		# products in this equation
+		SMILES_this_eq = []
+		# reset list of chemical scheme name representing reactants 
+		# and products in this equation
+		name_only_this_eq = []
 		
 		# work out whether equation or reaction rate coefficient part comes first
 		eqn_start = str('.*\\' +  chem_scheme_markers[10])
@@ -216,7 +224,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				# index where xml file name matches reaction component name
 				name_indx = comp_name.index(name_only)
 				name_SMILE = comp_smil[name_indx] # SMILES of component
-			
+				
 				comp_list.append(name_SMILE) # list SMILE names
 				name_indx = comp_num # allocate index to this species
 				# generate pybel object
@@ -237,6 +245,11 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 			else: # if it is a component already encountered it will be in comp_list
 				# existing index
 				name_indx = comp_namelist.index(name_only)
+				name_SMILE = comp_list[name_indx]
+			
+			# store reactant SMILE for this equation
+			SMILES_this_eq.append(name_SMILE)
+			name_only_this_eq.append(name_only)
 			
 			# store reactant index
 			# check if index already present - i.e. component appears more than once
@@ -264,7 +277,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		# record 1D array of stoichiometries per equation
 		rstoi_flat = np.append(rstoi_flat, rstoi[eqn_step, 0:int(reactant_step)])
 		
-		# right hand side of equations (gains)
+		# right hand side of equations (products/gains)
 		for product in products:
 
 			if (re.findall(stoich_regex, product)[0] != ''):
@@ -303,12 +316,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 
 				comp_num += 1 # number of unique species
 				
-			
-
 			else: # if it's a species already encountered
 				# index of component already listed
 				name_indx = comp_namelist.index(name_only)
-				
+				name_SMILE = comp_list[name_indx]
+			
+			# store product SMILE for this equation
+			SMILES_this_eq.append(name_SMILE)
+			name_only_this_eq.append(name_only)
+			
 			# store product index
 			# check if index already present - i.e. component appears more than once
 			if sum(pindx[eqn_step, 0:product_step]==int(name_indx))>0:
@@ -344,6 +360,80 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 				jac_stoi[eqn_step, i*tot_comp:(i+1)*tot_comp] = jac_stoi[eqn_step, 0:tot_comp] 
  		# number of Jacobian elements affected by this equation
 		njac[eqn_step, 0] = tot_comp*nreac[eqn_step]
+		
+		ci = -1 # count on components in this equation
+		# reset the generation number for reactants
+		reac_min_gen = 0
+		ap_rad_f = 0 # flag for whether reactants include radicals
+		nzr = 0 # flag for non-zero generation number reactants
+		# loop through components in this equation
+		for SMILEi in SMILES_this_eq:
+			
+			ci += 1 # count on components in this equation
+			
+			# chemical scheme name of this component
+			name_only = name_only_this_eq[ci]
+			# number of carbons in this component
+			numC = SMILEi.count('c')+SMILEi.count('C')
+			if (numC <= 1): # if it is inorganic or methane-related
+				# if generation number not yet included for this component
+				if (len(self.gen_num)-1 < comp_namelist.index(name_only)):
+					self.gen_num.append(0)
+				# note, don't allow the generation numbers of inorganics 
+				# to affect generation numbers of organics
+			else:
+				# if it is an unoxidised organic, then say it's 0th-generation
+				if (SMILEi.count('o')+SMILEi.count('O') == 0):
+					# if it's not yet accounted for
+					if (len(self.gen_num)-1 < comp_namelist.index(name_only)):
+						self.gen_num.append(0)
+						
+					# minimum generation number of reactant
+					reac_min_gen = min(0, reac_min_gen)
+					continue # continue onto next component in this equation
+				# otherwise, if it's a reactant, then it should already 
+				# have a generation number assigned
+				if (ci < len(reactants)):
+					# index of this reactant
+					reac_index = comp_namelist.index(name_only)
+					# check on whether this component is an alkyl peroxy radical
+					if ('[O]O' in SMILEi or 'O[O]' in SMILEi):
+						ap_rad_f = 1 # flag that an alkyl peroxy radical in reactants
+					# if it has a generation number greater than zero
+					if (self.gen_num[reac_index] > 0):
+						# if it's the first non-zero generation number reactant
+						if (nzr == 0):
+							reac_min_gen = self.gen_num[reac_index]
+							nzr = 1
+						# if it's the second non-zero generation number reactant, find the minimum
+						if (nzr > 0):
+							reac_min_gen = min(self.gen_num[reac_index], reac_min_gen)
+					continue # continue onto next component in this equation
+				
+				# if a product is being considered
+				if (ci >= len(reactants)):
+
+					# check on whether this component is a radical or Criegee Intermediate
+					if ('[o]' in SMILEi or '[O]' in SMILEi or '[O+]' in SMILEi):
+						if (ap_rad_f == 0): # if no alkyl peroxy radicals in reactants
+							prod_gen = reac_min_gen+1 # suggested generation number
+						if (ap_rad_f == 1): # if alkyl peroxy radicals in reactants
+							prod_gen = reac_min_gen # suggested generation number
+					else: # if it's a termination product
+						prod_gen = reac_min_gen # suggested generation number
+					
+					# check if this already has a generation number
+					if (comp_namelist.index(name_only) <= len(self.gen_num)-1):
+
+						gn_pre = self.gen_num[comp_namelist.index(name_only)]
+						# if this number less than that suggested by reactants, then
+						# no change needed
+						if (gn_pre < prod_gen):
+							continue # continue to next component in this equation
+						else: # otherwise 
+							self.gen_num[comp_namelist.index(name_only)] = prod_gen
+					else: # if this component is on first appearance during this loop
+						self.gen_num.append(prod_gen)
 	
 	# remove fillers and flatten index for arranging concentrations 
 	# ready for reaction rate coefficient calculation
