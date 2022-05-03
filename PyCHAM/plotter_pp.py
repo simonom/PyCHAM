@@ -32,7 +32,7 @@ import matplotlib.ticker as ticker # set colormap tick labels to standard notati
 import os
 import retr_out
 import numpy as np
-import scipy.constants as si
+import scipy.constants as si # for scientific constants
 
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
@@ -95,6 +95,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.ioff() # turn off interactive mode
 					plt.close() # close figure window
 					return()
+			
+			import scipy.constants as si # for scientific constants
 			
 			# particle-phase concentrations of all components (# molecules/cm3)
 			if (wall_on == 1): # wall on

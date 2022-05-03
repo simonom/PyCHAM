@@ -48,11 +48,10 @@ def ui_check(self):
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_nam, con_infl_t, con_infl_C, 
-		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()	
@@ -94,8 +93,8 @@ def ui_check(self):
 	# wat_hist - flag for particle-phase history with respect to water 
 	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
 	# con_infl_t - times of continuous influx of components
-	# con_infl_nam - chemical scheme names of components with continuous influx
-	# con_infl_C - influx rate of components with continuous influx (ppb/s)
+	# self.con_infl_nam - chemical scheme names of components with continuous influx
+	# self.con_infl_C - influx rate of components with continuous influx (ppb/s)
 	# Vwat_inc - flag for whether (1) or not (0) the number size 
 	# distribution of seed particles includes the volume of water
 	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
@@ -195,7 +194,7 @@ def ui_check(self):
 			std = np.ones((1, pconct.shape[1]))*1.e20
 
 		# if particle concentration per size bin supplied by modes
-		# check that number of time consisent across relevant variables
+		# check that number of time consistent across relevant variables
 		if (pmode == 0):
 			if (pconct.shape[1] != std.shape[1] or pconct.shape[1] != mean_rad.shape[1] or pconct.shape[1] != pcont.shape[1] or pconct.shape[1] != pconc.shape[1]):
 				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), pcont ('+str(pcont.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
@@ -352,14 +351,14 @@ def ui_check(self):
 	# check on continuous injection of components inputs -----------------------------------------------
 	if (em_flag < 2): # if no other errors
 		try: # note, won't work on the empty con_infl_C default variable
-			if (con_infl_C.shape[0] != len(con_infl_nam)):
+			if (self.con_infl_C.shape[0] != len(self.con_infl_nam)):
 				err_mess = str('Error - input for influx rate (ppb/s) of components with continuous influx does not correspond to the number of component names for continuous influx, note that for the continuous influx rate a semicolon should separate values for different components and commas should separate different times.  Please see README for more guidance.')
 				em_flag = 2
 		except:
 			em_flag = em_flag
 				
 		try: # note, won't work on the empty con_infl_C default variable
-			if (con_infl_C.shape[1] != len(con_infl_t)):
+			if (self.con_infl_C.shape[1] != len(con_infl_t)):
 				err_mess = str('Error - input for influx rate (ppb/s) of components with continuous influx does not correspond to the number of times for continuous influx, note that for the continuous influx rate a comma should separate values for different times and semicolons should separate different components.  Please see README for more guidance.')
 				em_flag = 2
 		except:
@@ -480,12 +479,11 @@ def ui_check(self):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, con_infl_nam, 
-			con_infl_t, con_infl_C, dens_comp, dens, vol_comp, 
+			seedx, con_infl_t, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
-			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
 			z_prt_coeff, chamV]
 

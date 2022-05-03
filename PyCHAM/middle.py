@@ -47,11 +47,11 @@ def middle(self): # define function
 		lowsize, uppsize, space_mode, std, mean_rad,
 		save_step, Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
-		con_infl_nam, const_infl_t, con_infl_C, dens_comp, dens, vol_comp, 
+		const_infl_t, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
-		e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamSA, chamV] = ui.share()
 	
@@ -70,8 +70,8 @@ def middle(self): # define function
 	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
-	self] = eqn_pars.extr_mech(chem_sch_mrk, con_infl_nam, int_tol, wall_on, 
-	(num_sb+wall_on), drh_str, erh_str, dil_fac, sav_nam,
+	self] = eqn_pars.extr_mech(chem_sch_mrk, int_tol, wall_on, 
+	(num_sb+wall_on), drh_str, erh_str, sav_nam,
 	pcont, self)
 	
 	# if needed then run operations to produce variable checker plot 
@@ -125,16 +125,15 @@ def middle(self): # define function
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
 	# estimate total inputs of emitted components (ug/m3)
-	[tot_in_res, Compti, cont_inf_reci, cont_inf_i, 
-		tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, comp_namelist, y_mw, con_infl_nam,
-		const_infl_t, tot_time, con_infl_C, Compt) 
-	
+	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, comp_namelist, y_mw,
+		const_infl_t, tot_time, Compt, self) 
+
 	# solve problem
 	for prog in ode_updater.ode_updater(update_stp, 
 		tot_time, save_step, y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
 		jac_den_indx_g, jac_indx_g, H2Oi, temp, tempt, 
-		Pnow, Jlen, con_infl_C, nrec_steps, 
+		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
@@ -156,10 +155,9 @@ def middle(self): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
 		sav_nam, comp_namelist, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
+		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
-		Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
-		chamV, self):
+		Compti, tot_in_res_indx, chamSA, chamV, self):
 
 		yield prog # update progress bar	
 

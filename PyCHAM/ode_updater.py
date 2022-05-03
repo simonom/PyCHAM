@@ -57,7 +57,7 @@ def ode_updater(update_stp,
 	tot_time, save_stp, y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
 	jac_den_indx, jac_indx, H2Oi, temp, tempt, 
-	Pnow, Jlen, con_infl_C, nrec_steps, 
+	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
@@ -77,9 +77,9 @@ def ode_updater(update_stp,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
 	sav_nam, comp_namelist, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, dil_fac, NOi, 
+	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
-	Compti, cont_inf_reci, cont_inf_i, tot_in_res_indx, chamSA, 
+	Compti, tot_in_res_indx, chamSA, 
 	chamV, self):
 	
 	# inputs: ----------------------------------------------------
@@ -112,8 +112,7 @@ def ode_updater(update_stp,
 	# self.photo_path - path to file with absorption cross-sections
 	# 		and quantum yields
 	# Jlen - number of photochemical reactions
-	# con_infl_C - influx of components with constant concentration
-	# (molecules/cc/s)
+	# self.con_infl_C - influx of components with constant concentration (molecules/cm3/s)
 	# nrec_step - number of recording steps
 	# self.dydt_vst - dictionary for holding change tendencies of specified
 	#		components
@@ -268,7 +267,7 @@ def ode_updater(update_stp,
 	#	(therefore on the efflorescence curve)
 	# Pybel_objects - the pybel objects for components
 	# pcont - flag for whether particle injection continuous or instantaneous
-	# dil_fac - chamber dilution factor (fraction of chamber/s)
+	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
 	# NOi - NO index
 	# HO2i - HO2 index
 	# NO3i - NO3 index
@@ -281,8 +280,8 @@ def ode_updater(update_stp,
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
-	# cont_inf_reci - index of components with continuous influx in record
-	# cont_inf_i - index of components with continuous influx in concentration array
+	# self.cont_inf_reci - index of components with continuous influx in record
+	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
@@ -358,11 +357,11 @@ def ode_updater(update_stp,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
-	infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, DStar_org, 
+	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
-	cont_inf_i, tot_in_res_indx, chamSA, chamV, kwf, self)
+	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
+	tot_in_res_indx, chamSA, chamV, kwf, self)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -416,11 +415,10 @@ def ode_updater(update_stp,
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, diff_vol, 
+			const_infl_t, infx_cnt0, wall_on, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
-			cont_inf_reci, cont_inf_i, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
@@ -530,6 +528,7 @@ def ode_updater(update_stp,
 					reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 					pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
+				
 					
 					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
 						
@@ -592,13 +591,13 @@ def ode_updater(update_stp,
 				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-				H2Oi, dil_fac, comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
+				H2Oi, comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
 			
 			# if any components set to have constant gas-phase concentration
 			if (any(self.con_C_indx)): # then keep constant
 				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
-
+			
 			# if negative, suggests ODE solver instability, but could also be numerical limits, 
 			# especially if concentrations are relatively close to zero, so allow some leeway
 			if (any(y < -np.sum(np.abs(y))*1.e-50)):
@@ -675,8 +674,8 @@ def ode_updater(update_stp,
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been
 		# reduced due to dilution inside the ODE solver
-		if (dil_fac > 0):
-			N_perbin -= N_perbin*(dil_fac*tnew)
+		if (self.dil_fac > 0):
+			N_perbin -= N_perbin*(self.dil_fac*tnew)
 		
 		if ((num_sb-wall_on) > 0): # if particle size bins present
 			# update particle sizes
@@ -753,11 +752,10 @@ def ode_updater(update_stp,
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, con_infl_C, wall_on, Cfactor, diff_vol, 
+			const_infl_t, infx_cnt0, wall_on, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
-			cont_inf_reci, cont_inf_i, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 
@@ -777,7 +775,7 @@ def ode_updater(update_stp,
 		# remember the gas-phase water concentration from previous 
 		# integration step (# molecules/cm3)
 		y_H2O0 = y[H2Oi]
-	
+		
 	time_taken = time.time()-st_time
 
 	# save results

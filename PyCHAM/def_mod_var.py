@@ -61,7 +61,7 @@ def def_mod_var(caller, self): # define function
 	RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
 	RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
-	dil_fac = 0. # dilution factor (volume fraction per second)
+	self.dil_fac = 0. # dilution factor (volume fraction per second)
 	
 	# particle section ----------------------------------------------------------------
 	siz_stru = 0 # size structure (0 for moving-centre, 1 for full-moving)
@@ -114,9 +114,9 @@ def def_mod_var(caller, self): # define function
 	comp0 = np.array(())
 	# initial concentrations (ppb)
 	y0 = np.array(())	
-	con_infl_nam = [] # chemical scheme names of components with continuous influx
+	self.con_infl_nam = [] # chemical scheme names of components with continuous influx
 	# influx rate of components with continuous influx (ppb/s)
-	con_infl_C = np.empty(0)
+	self.con_infl_C = np.empty(0)
 	# times of component influx (s)
 	con_infl_t = np.empty(0)
 	# chemical scheme name of components with constant concentration	
@@ -198,12 +198,11 @@ def def_mod_var(caller, self): # define function
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, con_infl_nam, 
-			con_infl_t, con_infl_C, dens_comp, dens, vol_comp, 
+			seedx, con_infl_t, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
-			Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
 			z_prt_coeff, chamV]
 
@@ -221,10 +220,9 @@ def def_mod_var(caller, self): # define function
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
-		con_infl_nam, con_infl_t, con_infl_C, 
-		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
-		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, dil_fac, 
+		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
 		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self)

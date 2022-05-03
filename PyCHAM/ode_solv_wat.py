@@ -107,7 +107,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	def dydt(t, y): # define the ODE(s)
 		
 		# inputs: ----------------
-		# y - water concentrations (molecules/cc), note when using scipy integrator solve_ivp, 
+		# y - water concentrations (molecules/cm3), note when using scipy integrator solve_ivp, 
 		#	this should have shape (number of elements, 1)
 		# t - time interval to integrate over (s)
 		# ---------------------------------------------
@@ -115,9 +115,19 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 		# ensure y is correct shape
 		if (y.shape[1] > 1):
 			y = y[:, 0].reshape(-1, 1)
+		
 		# empty array to hold rate of change per component
 		dd = np.zeros((y.shape[0], 1))
 		
+		# check for continuous gas-phase inputs for water
+		if (self.H2Oin == 1):
+			dd[0, 0] += self.Cinfl_H2O_now
+		# check for continuous dilution of chamber
+		if (self.dil_fac > 0):
+			if (wall_on == 1):
+				dd[0:-1, 0] -= y[0:-1, 0]*self.dil_fac
+			else:
+				dd[:, 0] -= y[:, 0]*self.dil_fac
 		# gas-particle partitioning-----------------
 		
 		# update the water particle-phase concentrations in the matrix of particle-phase 

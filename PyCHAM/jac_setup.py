@@ -25,7 +25,7 @@
 # required modules
 import numpy as np
 
-def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, num_asb, dil_fac):
+def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, num_asb, self):
 
 	# inputs ---------------------------------------------
 	# jac_den_indx - index of denominators for jacobian
@@ -45,7 +45,8 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# pindx_aq - index of prodcuts per equation
 	# jac_indx_aq - index of jacobian affected per equation
 	# num_asb - number of actual particle size bins (excluding wall)
-	# dil_fac - fraction of chamber air removed/s
+	# self.dil_fac - fraction of chamber air removed/s
+	# self - reference to PyCHAM
 	# ----------------------------------------------------
 
 	# rows in Jacobian affected by this equation		 	
@@ -436,7 +437,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
 	
 	# extraction effect on Jacobian part -----------------------
-	if (dil_fac > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
+	if (self.dil_fac > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
 	
 		extr_cnt = 0 # count on jac_extr_indx inputs
 		

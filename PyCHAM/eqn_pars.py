@@ -37,9 +37,8 @@ import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
-def extr_mech(chem_sch_mrk, 
-		con_infl_nam, int_tol, wall_on, num_sb,
-		drh_str, erh_str, dil_fac, sav_nam, pcont, self):
+def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
+		drh_str, erh_str, sav_nam, pcont, self):
 
 	# inputs: ----------------------------------------------------
 	# self.sch_name - file name of chemical scheme
@@ -48,7 +47,7 @@ def extr_mech(chem_sch_mrk,
 	# self.xml_name - name of xml file
 	# self.photo_path - path to file containing absorption 
 	# 	cross-sections and quantum yields
-	# con_infl_nam - chemical scheme names of components with 
+	# self.con_infl_nam - chemical scheme names of components with 
 	# 		constant influx
 	# int_tol - integration tolerances
 	# wall_on - marker for whether to include wall partitioning
@@ -59,7 +58,7 @@ def extr_mech(chem_sch_mrk,
 	#	deliquescence RH (fraction 0-1) as function of temperature (K)
 	# erh_str - string from user inputs describing 
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
-	# dil_fac - fraction of chamber air extracted/s
+	# self.dil_fac - fraction of chamber air extracted/s
 	# sav_nam - name of folder to save results to
 	# pcont - flag for whether seed particle injection is 
 	#	instantaneous (0) or continuous (1)
@@ -97,7 +96,7 @@ def extr_mech(chem_sch_mrk,
 		comp_num, self] = eqn_interr.eqn_interr(eqn_num, 
 		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on, self)
 		
-	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on), dil_fac)
+	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on), self)
 	
 	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation
 	if (eqn_num[1] > 0): # if aqueous-phase reactions present
@@ -116,19 +115,19 @@ def extr_mech(chem_sch_mrk,
 	
 	# get index of components with constant influx/concentration -----------
 	# empty array for storing index of components with constant influx
-	con_infl_indx = np.zeros((len(con_infl_nam)))
+	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
 	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
-	for i in range (len(con_infl_nam)):
+	for i in range (len(self.con_infl_nam)):
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
-		if (con_infl_nam[i] == 'H2O'):
-			con_infl_indx[i] = comp_num
+		if (self.con_infl_nam[i] == 'H2O'):
+			self.con_infl_indx[i] = int(comp_num)
 			continue
 		try:
 			# index of where components with constant influx occur in list of components
-			con_infl_indx[i] = comp_namelist.index(con_infl_nam[i])
+			self.con_infl_indx[i] = comp_namelist.index(self.con_infl_nam[i])
 		except:
 			erf = 1 # raise error
-			err_mess = str('Error: constant influx component with name ' +str(con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+			err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
 	for i in range (len(self.const_comp)):
 		try:
@@ -171,7 +170,7 @@ def extr_mech(chem_sch_mrk,
 		
 		wb.close() # close excel file
 		
-		# get indices of components with concentrations to fit obervations
+		# get indices of components with concentrations to fit observations
 		self.obs_comp_i = np.zeros((len(self.obs_comp))).astype('int')
 		for i in range(len(self.obs_comp)):
 			self.obs_comp_i[i] = comp_namelist.index(self.obs_comp[i])
@@ -180,8 +179,27 @@ def extr_mech(chem_sch_mrk,
 
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
-	write_ode_solv.ode_gen(con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), 0, eqn_num, dil_fac, sav_nam, pcont)
+	if (comp_num in self.con_infl_indx):
+
+		self.H2Oin = 1 # flag for water influx
+		self.con_infl_H2O = self.con_infl_C[self.con_infl_indx==comp_num, :]
+		
+		# index of water in continuous influx array
+		wat_indx = self.con_infl_indx==comp_num
+		# do not allow continuous influx of water in the standard ode 
+		# solver, instead deal with it inside the water ode-solver
+		
+		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
+		self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
+
+	else:
+		self.H2Oin = 0 # flag for no water influx
+	
+	# ensure integer
+	self.con_infl_indx = self.con_infl_indx.astype('int')
+	
+	write_ode_solv.ode_gen(self.con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
+			(num_sb-wall_on), 0, eqn_num, sav_nam, pcont, self)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)

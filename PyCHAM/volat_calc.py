@@ -143,7 +143,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	
 	ish = Psat==0.0
 	
-	Psat = (np.power(10.0, Psat)*101325.0) # convert to Pa from atm
+	Psat = (np.power(10.0, Psat)*101325.) # convert to Pa from atm
 	# retain low volatility where wanted
 	Psat[ish] = 0.0
 	
@@ -160,8 +160,8 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	Psat_Pa = np.zeros((len(Psat), 1)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[:, 0] = Psat[:, 0]
     
-	# convert saturation vapour pressures from Pa to molecules/cc (air) using ideal
+	# convert saturation vapour pressures from Pa to molecules/cm3 (air) using ideal
 	# gas law, R has units cc.Pa/K.mol
 	Psat = Psat*(NA/((si.R*1.e6)*TEMP))
 	
-	return Psat, y_dens, Psat_Pa
+	return(Psat, y_dens, Psat_Pa)

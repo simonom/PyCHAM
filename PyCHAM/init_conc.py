@@ -93,7 +93,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	ntot = PInit*(NA/((si.R*1.e6)*TEMP))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
-
+	self.Cfactor = Cfactor
 	# prepare dictionary for tracking tendency to change of user-specified components
 	self.dydt_vst = {}
 
@@ -132,6 +132,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# holder for water index (will be used if not identified in chemical scheme)
 	H2Oi = num_comp # index for water
+	self.H2Oi = H2Oi # index for water
 	
 	# check for water presence in chemical scheme via its SMILE string
 	# count on components

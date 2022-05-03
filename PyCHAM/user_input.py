@@ -41,11 +41,10 @@ def share():
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_nam, con_infl_t, con_infl_C, 
-		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()
@@ -60,10 +59,9 @@ def share():
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 		std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_nam, con_infl_t, con_infl_C, 
-		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamR, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+		inflectk, chamR, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamSA, chamV)

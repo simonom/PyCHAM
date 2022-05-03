@@ -42,11 +42,11 @@ def rec_prep(nrec_step,
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, con_infl_C, MV, partit_cutoff, diff_vol, 
+	const_infl_t, infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
-	tot_in_res, Compti, tot_time, cont_inf_reci, cont_inf_i, 
+	tot_in_res, Compti, tot_time, 
 	tot_in_res_indx, chamSA, chamV, kwf, self):
 	
 	# inputs: --------------------------------------------------------
@@ -133,7 +133,7 @@ def rec_prep(nrec_step,
 	# rbou - size bin radius bounds (um)
 	# const_infl_t - times for constant influxes (s)
 	# infx_cnt - count on constant influx occurrences
-	# con_infl_C - influx rates of components with constant influx 
+	# self.con_infl_C - influx rates of components with constant influx 
 	#	(ppb/s)
 	# MV - molar volume (cc/mol)
 	# partit_cutoff - the product of saturation vapour pressure and
@@ -165,8 +165,8 @@ def rec_prep(nrec_step,
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
 	# tot_time - total experiment time (s)
-	# cont_inf_reci - index of components with continuous influx in record
-	# cont_inf_i - index of components with continuous influx in concentration array
+	# self.cont_inf_reci - index of components with continuous influx in record
+	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
@@ -194,11 +194,10 @@ def rec_prep(nrec_step,
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, con_infl_C, wall_on, Cfactor, diff_vol, 
+		const_infl_t, infx_cnt, wall_on, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
-		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, cont_inf_reci, 
-		cont_inf_i, self)
+		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)

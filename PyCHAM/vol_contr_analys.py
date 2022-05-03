@@ -45,19 +45,10 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	# inputs: -------------------------------
 	# caller - the module calling (0 for gui)
 	# dir_path - path to results
-	# self - reference to GUI
+	# self - reference to PyCHAM
 	# now - whether to include (0) or exclude water (1)
 	# -----------------------------------------
 
-	# ----------------------------------------------------------------------------------------
-	if (caller == 0): # if calling function is gui
-		plt.ion() # show figure
-	
-	# prepare plot
-	fig, (ax1) = plt.subplots(1, 1, figsize=(10,7))
-	fig.subplots_adjust(hspace = 0.7)
-
-	# ----------------------------------------------------------------------------------------
 	# prepare the volatility basis set interpretation
 	# of particle-phase concentrations
 
@@ -66,6 +57,27 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, 
 		PsatPa, OC, H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path)
 	
+
+	# tell user that this code won't work if no particle size bins present
+	if (num_sb-wall_on) == 0:
+		self.l203a.setText('Error - volatility basis set may only be estimated for simulations including particles')
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
+		
+	# prepare plot -----------------------------------------------------------------------
+	if (caller == 0): # if calling function is gui
+		plt.ion() # show figure
+	
+	# prepare plot
+	fig, (ax1) = plt.subplots(1, 1, figsize=(10,7))
+	fig.subplots_adjust(hspace = 0.7)
+
+	# ----------------------------------------------------------------------------------------
 
 	# number of particle size bins without wall
 	num_asb = (num_sb-wall_on)

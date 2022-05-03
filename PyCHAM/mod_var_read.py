@@ -42,11 +42,10 @@ def mod_var_read(self):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			con_infl_nam, con_infl_t, con_infl_C, 
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
@@ -145,8 +144,9 @@ def mod_var_read(self):
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
 				mode_cnt = 1 # track number of modes
+			
 				for i in value:
-					if i == ';':
+					if i == ';': # semi-colon represents a time difference
 						time_cnt += 1 # increase time count
 					if (time_cnt == 1 and i == ','):
 						sb_cnt += 1 # increase size bin count
@@ -154,6 +154,10 @@ def mod_var_read(self):
 					if (time_cnt == 1 and i == ':'):
 						mode_cnt += 1 # mode count
 						pmode = 0 # particle concentrations expressed as modes
+				# a possible situation where there is just one size bin and 
+				# therefore only one concentration given for that size bin
+				if (sb_cnt ==1 and mode_cnt ==1):
+					 pmode = 1 # explicitly stated particle concentrations
 
 				# if number concentration per size bin given explicitly
 				if (sb_cnt > 1):
@@ -341,7 +345,7 @@ def mod_var_read(self):
 				self.light_ad = int(value.strip())
 
 			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
-				con_infl_nam = [str(i).strip() for i in (value.split(','))]
+				self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'const_infl_t' and (value.strip()): # times of continuous influxes (s)
 				con_infl_t = [float(i.strip()) for i in (value.split(','))]
@@ -355,18 +359,18 @@ def mod_var_read(self):
 						comp_count += 1 # record number of components
 					if (i==',' and comp_count == 1):
 						time_count += 1 # record number of times
-				con_infl_C = np.zeros((comp_count, time_count))
+				self.con_infl_C = np.zeros((comp_count, time_count))
 				
 				try:	
 					for i in range(comp_count): # loop through components
 						for ii in range(time_count): # loop through times
-							con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
+							self.con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
 							
 				# in case semicolons and commas messed up on input, note this will invoke an 
 				# error message from the user input check module
 				except:
-					con_infl_C = np.empty(0)
-					
+					self.con_infl_C = np.empty(0)
+				
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 
@@ -449,7 +453,7 @@ def mod_var_read(self):
 				e_field = float(value.strip())
 			
 			if key == 'dil_fac' and (value.strip()): # dilution factor rate
-				dil_fac = float(value)
+				self.dil_fac = float(value)
 				
 			if key == 'ser_H2O' and (value.strip()): # whether to serialise water gas-particle partitioning
 				ser_H2O = int(value)
@@ -502,12 +506,11 @@ def mod_var_read(self):
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, save_step, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-				seedx, con_infl_nam, con_infl_t, 
-				con_infl_C, dens_comp, dens, vol_comp, volP, 
+				seedx, con_infl_t, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
-				e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+				e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 				chamV]
 

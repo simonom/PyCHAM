@@ -1,0 +1,39 @@
+# test for indoor simulation
+res_file_name = HCHO
+total_model_time = 1.728e5
+update_step = 6.e2
+recording_time_step = 600.
+light_status = 1
+light_time = 0.0
+trans_fac = 0.5
+lat = 53.8
+lon = 1.8
+DayOfYear = 1
+daytime_start = 0.
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.6
+# initial concentrations (ppb)
+# alpha-pinene from observations presented in Q3 Report from WP4
+# NO and NO2 from Bradford Mayo AURN Site for 28/04/2022: https://uk-air.defra.gov.uk/data/site-data?f_site_id=BDMA&view=last_hour, followed by multiplying No by 1 and NO2 by 0.72 following the infiltration factors recommended by this paper: doi.org/10.1021/acs.est.9b02920 
+# Ozone from Leeds Central observations AURN site:https://uk-air.defra.gov.uk/latest/currentlevels?view=site#L, followed by decrease by 50 % in accordance with paper: https://doi.org/10.1016/S1352-2310(02)00151-6
+# HCHO level of 300 ppb taken from Figure 4 of doi.org/10.1016/j.proeng.2017.10.238
+C0 =   17.,     0.1,     0.0, 1.4e2, 2.0e3, 71.0, 33.0, 0.e2
+Comp0 = O3, APINENE,     OH,  CO,     CH4,  NO, NO2, HCHO
+Cinfl = 4.8e-3, 4.8e-3; 2.8e-5, 2.8e-5; 3.92e-2, 3.92e-2; 5.6e-1, 5.6e-1; 1.8e-2, 1.8e-2; 8.7e-3, 8.7e-3; 0., 9.0e-2; 3.878e3, 3.878e3
+const_infl = O3, APINENE, CO, CH4, NO, NO2, HCHO, H2O
+const_infl_t = 0., 8.64e4
+# dilution rate based on 1 exchange rates per house, as suggested for residences by:
+# https://www.engineeringtoolbox.com/air-change-rate-room-d_867.html
+dil_fac = 2.8e-4
+chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
+number_size_bins = 1
+pconct = 0.; 10.
+pconc = 2.e4; 5.6
+pcont = 0; 1
+seed_name = AMM_SUL
+vol_Comp = AMM_SUL
+volP = 1.e-30
+wall_on = 0
+tracked_comp = O3

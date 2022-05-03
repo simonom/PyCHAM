@@ -54,7 +54,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
-	if (caller == 0 or caller == 1 or caller == 3):
+	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or caller == 5 or caller == 6):
 		plt.ion() # show results to screen and turn on interactive mode
 		
 	# prepare plot
@@ -145,11 +145,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
 					
-		if (caller == 0): # ug/m3 plot
+		if (caller == 0 or caller == 5): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
-		if (caller == 1): # ppb plot
+		if (caller == 1 or caller == 4): # ppb plot
 			ax0.set_ylabel(r'Mixing ratio (ppb)', fontsize = 14)
-		if (caller == 3): # # molecules/cm3 plot
+		if (caller == 3 or caller == 6): # # molecules/cm3 plot
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
 			ax0.set_ylabel(r'Concentration ' + gpunit, fontsize = 14)
 

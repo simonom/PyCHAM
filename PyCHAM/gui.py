@@ -143,10 +143,10 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_nam, con_infl_t, con_infl_C, dens_comp, dens, vol_comp, volP, act_comp, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
-		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
 		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
@@ -330,7 +330,7 @@ class PyCHAM(QWidget):
 		l17_1.setText('Dilution factor (volume fraction \nof chamber per second): ')
 		self.varbox.addWidget(l17_1, env_row+6, 0)
 		self.l17_1a = QLabel(self)
-		self.l17_1a.setText((str(dil_fac)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l17_1a.setText((str(self.dil_fac)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l17_1a, env_row+6, 1)
 		
 		# particle properties ----------------
@@ -571,14 +571,14 @@ class PyCHAM(QWidget):
 		l42.setText('Chemical scheme names of \n components with continuous \n influx: ')
 		self.varbox.addWidget(l42, gas_row+3, 0)
 		self.l42a = QLabel(self)
-		self.l42a.setText((str(con_infl_nam)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l42a.setText((str(self.con_infl_nam)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l42a, gas_row+3, 1)
 		
 		l43 = QLabel(self)
 		l43.setText('Influx rate of components with \ncontinuous influx (ppb/s): ')
 		self.varbox.addWidget(l43, gas_row+4, 0)
 		self.l43a = QLabel(self)
-		self.l43a.setText((str(con_infl_C)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l43a.setText((str(self.con_infl_C)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l43a, gas_row+4, 1)
 		
 		l44 = QLabel(self)
@@ -1755,10 +1755,10 @@ class PyCHAM(QWidget):
 		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		con_infl_nam, con_infl_t, con_infl_C, dens_comp, dens, vol_comp, volP, act_comp, 
+		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
-		p_char, e_field, dil_fac, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
 		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
@@ -1770,11 +1770,10 @@ class PyCHAM(QWidget):
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			con_infl_nam, con_infl_t, con_infl_C, 
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 			pk.close()
@@ -1922,11 +1921,10 @@ class PyCHAM(QWidget):
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, save_step, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-			con_infl_nam, con_infl_t, con_infl_C, 
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
+			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, 
+			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
 			seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 			
@@ -1967,11 +1965,10 @@ class PyCHAM(QWidget):
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 				save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				con_infl_nam, con_infl_t, con_infl_C, 
-				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close() # close pickle file
@@ -3578,11 +3575,10 @@ class PyCHAM(QWidget):
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 				std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				con_infl_nam, con_infl_t, con_infl_C, 
-				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, e_field, dil_fac, partit_cutoff, ser_H2O, 
+				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close()
