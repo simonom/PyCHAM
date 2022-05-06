@@ -29,14 +29,14 @@ import datetime
 
 # function to generate the ordinary differential equation (ODE)
 # solver file
-def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp, 
+def ode_gen(con_infl_indx, int_tol, rowvals, num_comp, 
 		num_asb, testf, eqn_num, sav_nam, pcont, self):
 	
 	# inputs: ------------------------------------------------
 	# con_infl_indx - indices of components with continuous influx
 	# int_tol - integration tolerances
 	# rowvals - indices of rows for Jacobian
-	# wall_on - marker for whether to consider wall 
+	# self.wall_on - marker for whether to consider wall 
 	# 	partitioning
 	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
@@ -87,7 +87,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	y_pind, uni_y_pind, reac_col, prod_col, \n')
 	f.write('	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,\n') 
 	f.write('	rowvals, colptrs, num_comp, num_sb,\n')
-	f.write('	wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,\n') 
+	f.write('	Psat, Cw, act_coeff, kw, jac_wall_indx,\n') 
 	f.write('	core_diss, kelv_fac, kimt, num_asb,\n')
 	f.write('	jac_part_indx, jac_extr_indx,\n')
 	f.write('	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,\n')
@@ -135,7 +135,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	f.write('	# 	Jacobian\n')
 	f.write('	# num_comp - number of components\n')
 	f.write('	# num_sb - number of size bins\n')
-	f.write('	# wall_on - flag saying whether to include wall partitioning\n')
+	f.write('	# self.wall_on - flag saying whether to include wall partitioning\n')
 	f.write('	# Psat - pure component saturation vapour pressures (molecules/cm3)\n')
 	f.write('	# Cw - effective absorbing mass concentration of wall (molecules/cm3) \n')
 	f.write('	# act_coeff - activity coefficient of components\n')
@@ -325,12 +325,12 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 
 	if (self.dil_fac > 0): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
-		f.write('		if (wall_on == 1): # if wall on\n')
+		f.write('		if (self.wall_on == 1): # if wall on\n')
 		f.write('			df_indx = np.ones((len(dd)-num_comp)).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
 		f.write('			dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac\n')
-		f.write('		if (wall_on == 0): # if wall off\n')
+		f.write('		if (self.wall_on == 0): # if wall off\n')
 		f.write('			df_indx = np.ones((len(dd))).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
@@ -369,7 +369,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('			dd[num_comp:num_comp*(num_asb+1), 0] += (dd_all.flatten())\n')
 		f.write('		\n')
 		
-	if (wall_on > 0): # include gas-wall partitioning in ode solver
+	if (self.wall_on > 0): # include gas-wall partitioning in ode solver
 		f.write('		# gas-wall partitioning ----------------\n')
 		f.write('		# concentration on wall (# molecules/cm3 (air))\n')
 		f.write('		Csit = y[num_comp*(num_asb+1):num_comp*(num_asb+2), 0]\n')
@@ -425,7 +425,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 	#		f.write('				dd[num_comp*(ibin+1):num_comp*(ibin+2)] += dydt_all\n')
 	#		f.write('		\n')
 	#	# only write next section if gas-wall partitioning active
-	#	if (wall_on==1):
+	#	if (self.wall_on==1):
 	#		f.write('		if (Cw > 0.): # only consider if wall present\n')
 	#		f.write('			# if wall consideration turned on, estimate gas-wall partitioning\n')
 	#		f.write('			# concentration at wall (molecules/cm3 (air))\n')
@@ -493,15 +493,15 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('			rr = rrc[i]*(y[rindx_aq[aqi::n_aqr, 0:nreac_aq[aqi]], 0].prod(axis=1))\n')
 		f.write('			# spread along affected components\n')
 		f.write('			rr = rr.reshape(-1, 1)\n')
-		f.write('			rr = (np.tile(rr, int(njac_aq[aqi, 0]/(num_sb-wall_on)))).flatten(order=\'C\')\n')
+		f.write('			rr = (np.tile(rr, int(njac_aq[aqi, 0]/(num_sb-self.wall_on)))).flatten(order=\'C\')\n')
 		f.write('			# prepare Jacobian inputs\n')
 		f.write('			jac_coeff = np.zeros((njac_aq[aqi, 0]))\n')
 		f.write('			nzi = (rr != 0)\n')
 		f.write('			jac_coeff[nzi] = (rr[nzi]*((jac_stoi_aq[aqi, 0:njac_aq[aqi, 0]])[nzi])/\n')
 		f.write('				((y[jac_den_indx_aq[aqi, 0:njac_aq[aqi, 0]], 0])[nzi]))\n')
 		f.write('			# stack size bins\n')
-		f.write('			jac_coeff = jac_coeff.reshape(int(num_sb-wall_on), int(njac_aq[aqi, 0]/(num_sb-wall_on)), order=\'C\')\n')
-		f.write('			data[jac_indx_aq[aqi::n_aqr, 0:(int(njac_aq[aqi, 0]/(num_sb-wall_on)))]] += jac_coeff\n')
+		f.write('			jac_coeff = jac_coeff.reshape(int(num_sb-self.wall_on), int(njac_aq[aqi, 0]/(num_sb-self.wall_on)), order=\'C\')\n')
+		f.write('			data[jac_indx_aq[aqi::n_aqr, 0:(int(njac_aq[aqi, 0]/(num_sb-self.wall_on)))]] += jac_coeff\n')
 		f.write('			\n')
 		f.write('			aqi += 1 # keep count on aqueous-phase reactions \n')
 	f.write('		\n')
@@ -571,7 +571,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, wall_on, num_comp,
 		f.write('		#data[jac_part_H2O_indx] += part_eff_cl # columns\n')
 		f.write('		\n')
 		
-	if (wall_on > 0): # include gas-wall partitioning in ode solver Jacobian
+	if (self.wall_on > 0): # include gas-wall partitioning in ode solver Jacobian
 		f.write('		if (Cw > 0.):\n')
 		f.write('			wall_eff = np.zeros((%s))\n' %(num_comp*4))
 		f.write('			wall_eff[0:%s:2] = -kw # effect of gas on gas \n' %(num_comp*2))

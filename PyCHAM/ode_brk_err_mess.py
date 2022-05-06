@@ -29,7 +29,7 @@ import numpy as np # for arithmetic
 import datetime # for dealing with times
 	
 def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi, 
-			pstoi, rrc, nreac, nprod, wall_on, num_comp, 
+			pstoi, rrc, nreac, nprod, num_comp, 
 			num_asb, Cw, Psat, act_coeff, kw, neg_comp_indx,
 			N_perbin, core_diss, kelv_fac, kimt, 
 			eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
@@ -49,7 +49,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# rrc - reaction rate coefficient (/s)
 	# nreac - number of reactants per equation
 	# nprod - number of products per equation
-	# wall_on - whether wall considerations turned on or off
+	# self.wall_on - whether wall considerations turned on or off
 	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
 	# Cw - effective absorbing mass concentration of wall 
@@ -167,7 +167,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*eqn_num[1]+i, 0:nreac_aq[i]]) + '\n'))
 				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*eqn_num[1]+i, 0:nprod_aq[i]]) + '\n'))
 	
-	if (wall_on == 1): # include fluxes of trouble components to wall if wall is considered
+	if (self.wall_on == 1): # include fluxes of trouble components to wall if wall is considered
 		
 		f.write('\n')
 		f.write('Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall\n')

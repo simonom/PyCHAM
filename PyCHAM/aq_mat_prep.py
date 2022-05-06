@@ -29,7 +29,7 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 	jac_den_indx, jac_indx, 				
 	y_arr, y_rind, uni_y_rind, y_pind, 
 	uni_y_pind, reac_col, prod_col, rstoi_flat, pstoi_flat, 
-	rr_arr, rr_arr_p, num_sb, wall_on, num_eqn, comp_num):
+	rr_arr, rr_arr_p, num_sb, num_eqn, comp_num, self):
 
 	# inputs: --------------------------------------------------------------
 	# rindx - index for reactants
@@ -52,12 +52,13 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 	# rr_arr - reaction rate array indices for reactants
 	# rr_arr_p - reaction rate indices for products
 	# num_sb - number of size bins
-	# wall_on - marker for whether wall on or off
+	# self.wall_on - marker for whether wall on or off
 	# num_eqn - number of aqueous reactions
 	# comp_num - number of components
+	# self - reference to PyCHAM
 	# ----------------------------------------------------------------------
 
-	num_asb = (num_sb-wall_on) # number of particle size bins
+	num_asb = (num_sb-self.wall_on) # number of particle size bins
 	# shapes of arrays
 	rindxs = rindx.shape
 	pindxs = pindx.shape
@@ -85,7 +86,7 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 	# it makes no difference as the corresponding stoichiometry is 0
 	rindx[rindx == -2] = 0
 	
-	for sbi in range(num_sb-wall_on): # size bin loop
+	for sbi in range(num_sb-self.wall_on): # size bin loop
 		
 		if (sbi == 0): # first size bin - account for gas-phase indices prior
 			rindx += (sbi+1)*(comp_num+2)
@@ -117,7 +118,7 @@ def aq_mat_prep(rindx, rstoi, pindx, pstoi, reac_coef,
 				jac_den_indx[eqi, int(sbi*njac[eqi]):int((sbi+1)*njac[eqi])] = jac_den_indx[eqi, 0:int(njac[eqi])]+(sbi)*(comp_num+2)
 	
 	# account for size bins
-	njac = njac*(num_sb-wall_on)
+	njac = njac*(num_sb-self.wall_on)
 	
 	# ensure integer type
 	njac = njac.astype(int)

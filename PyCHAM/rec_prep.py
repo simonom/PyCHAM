@@ -34,11 +34,11 @@ def rec_prep(nrec_step,
 	y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
-	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA, 
+	accom_coeff, y_mw, surfT, R_gas, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
-	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
@@ -70,8 +70,8 @@ def rec_prep(nrec_step,
 	# y_mw - molecular weight (g/mol)
 	# surfT - surface tension (g/s2)
 	# R_gas - ideal gas constant (kg.m2.s-2.K-1.mol-1)
-	# temp - temperature (K)
-	# tempt - times temperatures achieved (s)
+	# self.TEMP - temperature (K)
+	# self.tempt - times temperatures achieved (s)
 	# NA - Avogadro constants (molecules/mol)
 	# y_dens - component densities (g/cm3)
 	# x - particle radii (um)
@@ -97,7 +97,7 @@ def rec_prep(nrec_step,
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval to 
 	#		changing natural light intensity
-	# wall_on - marker for whether wall present
+	# self.wall_on - marker for whether wall present
 	# Vbou - volume boundary of particle size bins (um3)
 	# tnew - the proposed integration time interval (s)
 	# nuc_ad - marker for whether to adapt time step based on 
@@ -188,15 +188,15 @@ def rec_prep(nrec_step,
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
 		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 		Cinfl_nowp] = cham_up.cham_up(sumt, 
-		temp, tempt, Pnow, light_time_cnt, 0, 
+		Pnow, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_stp, update_count, 
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, wall_on, Cfactor, diff_vol, 
+		const_infl_t, infx_cnt, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, temp[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
+		y_mw, self.TEMP[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
 	
 	# note that recording occurs after any instaneous changes--------------------
@@ -210,15 +210,15 @@ def rec_prep(nrec_step,
 	Cfactor_vst[0] = Cfactor
 
 	# arrays to record particle radii and number size distributions	
-	if ((num_sb-wall_on) > 0): # if particle size bins present
-		x2 = np.zeros((nrec_step, (num_sb-wall_on)))
-		Nres_dry = np.zeros((nrec_step, (num_sb-wall_on)))
-		Nres_wet = np.zeros((nrec_step, (num_sb-wall_on)))
-		rbou_rec = np.zeros((nrec_step, (num_sb-wall_on+1)))
+	if ((num_sb-self.wall_on) > 0): # if particle size bins present
+		x2 = np.zeros((nrec_step, (num_sb-self.wall_on)))
+		Nres_dry = np.zeros((nrec_step, (num_sb-self.wall_on)))
+		Nres_wet = np.zeros((nrec_step, (num_sb-self.wall_on)))
+		rbou_rec = np.zeros((nrec_step, (num_sb-self.wall_on+1)))
 		# concentration of components on the wall due to 
 		# particle-wall loss, stacked by component first then by
 		# size bin (molecules/cc)
-		yrec_p2w = np.zeros((nrec_step, (num_sb-wall_on)*num_comp))
+		yrec_p2w = np.zeros((nrec_step, (num_sb-self.wall_on)*num_comp))
 	else:
 		x2 = 0.
 		Nres_dry = 0.
@@ -226,15 +226,15 @@ def rec_prep(nrec_step,
 		rbou_rec = 0.
 		yrec_p2w = 0.
 	
-	if ((num_sb-wall_on) > 0 or wall_on == 1): # if particles or wall present
+	if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles or wall present
 		
 		# update partitioning variables
 		[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
-		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
+		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf, self)
 		
-	if (num_sb-wall_on) > 0: # if particles present
+	if (num_sb-self.wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 
 		# including contribution of water
 		x2[0, :] = x
@@ -243,18 +243,18 @@ def rec_prep(nrec_step,
 		rbou_rec[0, :] = rbou
 		
 		# estimate particle number size distributions ----------------------------------
-		Vnew = np.zeros((num_sb-wall_on))
+		Vnew = np.zeros((num_sb-self.wall_on))
 		ish = N_perbin[:, 0] > 1.e-10
 		
 		if ish.sum()>0:
 			# rearrange particle concentrations into size bins in rows, components in columns
-			Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
+			Cn = y[num_comp:num_comp*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp)
 			# new volume of single particle per size bin (um3) excluding volume of water	
 			Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*N_perbin[ish]))*MV[:, 0]*1.e12, 1)-
 					((Cn[ish, H2Oi]/(si.N_A*N_perbin[ish, 0]))*MV[H2Oi, 0]*1.e12))
 			# loop through size bins to find number of particles in each 
 			# (# particle/cc (air))
-			for Ni in range(0, (num_sb-wall_on)):
+			for Ni in range(0, (num_sb-self.wall_on)):
 				ish = (Vnew>=Vbou[Ni])*(Vnew<Vbou[Ni+1])
 				Nres_dry[0, Ni] = N_perbin[ish, 0].sum()
 			Nres_wet[0, :] = N_perbin[:, 0] # record with water

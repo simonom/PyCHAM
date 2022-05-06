@@ -56,7 +56,7 @@ import ode_brk_err_mess
 def ode_updater(update_stp, 
 	tot_time, save_stp, y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
-	jac_den_indx, jac_indx, H2Oi, temp, tempt, 
+	jac_den_indx, jac_indx, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
@@ -64,7 +64,7 @@ def ode_updater(update_stp,
 	x, Varr, act_coeff, Cw, kw, Cfactor, y_arr, 
 	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
-	colptrs, wall_on, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
+	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
@@ -99,8 +99,8 @@ def ode_updater(update_stp,
 	# self.RO2_indx - index of components in alkyl peroxy radical list
 	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
-	# temp - temperature in chamber (K)
-	# tempt - times that temperatures reached (s)
+	# self.TEMP - temperature in chamber (K)
+	# self.tempt - times that temperatures reached (s)
 	# Pnow - pressure inside chamber (Pa)
 	# self.light_stat - lights status
 	# self.light_time - time light status attained (s)
@@ -165,7 +165,7 @@ def ode_updater(update_stp,
 	# rowvals - row indices of Jacobian elements
 	# colptrs - indices of  rowvals corresponding to each column of
 	# 	the Jacobian
-	# wall_on - marker for whether wall partitioning turned on
+	# self.wall_on - marker for whether wall partitioning turned on
 	# jac_wall_indx - index of inputs to Jacobian from wall 
 	# 	partitioning
 	# jac_part_indx - index of inputs to Jacobian from particle
@@ -349,11 +349,11 @@ def ode_updater(update_stp,
 	RHn, Cinfl_now, tot_in_res_ft] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
-	accom_coeff, y_mw, surfT, R_gas, temp, tempt, NA,
+	accom_coeff, y_mw, surfT, R_gas, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
-	wall_on, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
@@ -408,14 +408,14 @@ def ode_updater(update_stp,
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
+			Cinfl_nowp] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, wall_on, Cfactor, diff_vol, 
+			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
@@ -442,12 +442,12 @@ def ode_updater(update_stp,
 				ic_red = 1
 			# ------------------------------------------------------------------		
 			
-			if ((num_sb-wall_on) > 0 or wall_on == 1): # if particles present
+			if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles present
 			
 				# update partitioning variables
 				[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
-				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, wall_on, 1, partit_cutoff, 
+				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf, self)
 			
 				# update particle-phase activity coefficients, note the output,
@@ -455,11 +455,11 @@ def ode_updater(update_stp,
 				# the cham_up module prior to this call
 				[act_coeff, wat_hist, RHn, y, 
 				dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
-				wat_hist0, act_coeff, num_comp, (num_sb-wall_on))
+				wat_hist0, act_coeff, num_comp, (num_sb-self.wall_on))
 				
 			else: # fillers
-				kimt = np.zeros((num_sb-wall_on, num_comp))
-				kelv_fac = np.zeros((num_sb-wall_on, 1))
+				kimt = np.zeros((num_sb-self.wall_on, num_comp))
+				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
 		
 			# reaction rate coefficient
@@ -471,8 +471,8 @@ def ode_updater(update_stp,
 			
 			# update Jacobian inputs based on particle-phase fractions of components
 			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
-			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-wall_on+1))], rowvals, 
-			colptrs, (num_sb-wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
+			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
+			colptrs, (num_sb-self.wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 			
 			
 			# for change tendencies, do want to save from t=0
@@ -502,12 +502,12 @@ def ode_updater(update_stp,
 				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, 
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
 				# prepare for recording next point
 				save_cnt += 1
 
-			if (ser_H2O == 1 and (num_sb-wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
+			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
@@ -519,8 +519,8 @@ def ode_updater(update_stp,
 					Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 					reac_col, prod_col, rstoi_flat, 
 					pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-					num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
-					core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+					num_sb, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 					jac_part_indxn,
 					rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 					nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
@@ -554,8 +554,8 @@ def ode_updater(update_stp,
 							
 							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
-									y_rind, rstoi, pstoi, rrc, nreac, nprod, wall_on, num_comp, 
-									(num_sb-wall_on), Cw, Psat, act_coeff, kw, neg_comp_indx, 
+									y_rind, rstoi, pstoi, rrc, nreac, nprod, num_comp, 
+									(num_sb-self.wall_on), Cw, Psat, act_coeff, kw, neg_comp_indx, 
 									N_perbin, core_diss, kelv_fac, kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 									rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 0, H2Oi, y, self)
 
@@ -582,8 +582,8 @@ def ode_updater(update_stp,
 				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 				reac_col, prod_col, rstoi_flat, 
 				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-				num_sb, wall_on, Psat, Cw, act_coeff, kw, jac_wall_indxn,
-				core_diss, kelv_fac, kimt, (num_sb-wall_on), 
+				num_sb, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 				jac_part_indxn, jac_extr_indx,
 				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
 				nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
@@ -624,7 +624,7 @@ def ode_updater(update_stp,
 				yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
 				#y_gp = np.zeros((len(y)))
 				#y_gp[:] = y[:]
-				#y_gp = y_gp.reshape(num_comp, num_sb-wall_on+1, order='F')
+				#y_gp = y_gp.reshape(num_comp, num_sb-self.wall_on+1, order='F')
 				#y_gpi = np.where(y_gp<0.)
 				
 				# in case more detailed look at negative issue wanted
@@ -638,8 +638,8 @@ def ode_updater(update_stp,
 				if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
-						y_rind, rstoi, pstoi, rrc, nreac, nprod, wall_on, 
-						num_comp, (num_sb-wall_on), Cw, Psat, act_coeff, kw, 
+						y_rind, rstoi, pstoi, rrc, nreac, nprod, 
+						num_comp, (num_sb-self.wall_on), Cw, Psat, act_coeff, kw, 
 						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
 						kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 						rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 1, H2Oi, y, self)
@@ -677,19 +677,19 @@ def ode_updater(update_stp,
 		if (self.dil_fac > 0):
 			N_perbin -= N_perbin*(self.dil_fac*tnew)
 		
-		if ((num_sb-wall_on) > 0): # if particle size bins present
+		if ((num_sb-self.wall_on) > 0): # if particle size bins present
 			# update particle sizes
-			if ((num_sb-wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present
+			if ((num_sb-self.wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present
 				
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
-					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, wall_on)
+					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, self)
 				
 				if (siz_str == 1): # full-moving
-					(Varr, x, y[num_comp:(num_comp*(num_sb-wall_on+1))], 
-					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-wall_on), N_perbin,
- 					num_comp, y[num_comp:(num_comp)*(num_sb-wall_on+1)], MV*1.e12, 
+					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
+					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-self.wall_on), N_perbin,
+ 					num_comp, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
 			
 			update_count += tnew # time since operator-split processes last called (s)
@@ -699,10 +699,10 @@ def ode_updater(update_stp,
 				if (any(N_perbin > 1.e-10)):
 				
 					# particle-phase concentration(s) (# molecules/cm3 (air))
-					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp))
+					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp))
 				
 					# coagulation
-					[N_perbin, y[num_comp:(num_comp)*(num_sb-wall_on+1)], x, Gi, eta_ai, 
+					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
 						Varr, Vbou, rbou] = coag.coag(RH[RHt_cnt], temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.e-6, 
@@ -710,18 +710,18 @@ def ode_updater(update_stp,
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
 						num_comp, 0, (np.squeeze(y_dens*1.e-3)), Vol0, rad0, Pnow, 0,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
-						coag_on, siz_str, wall_on)
+						coag_on, siz_str, self)
 					
-					if ((McMurry_flag > -1) and (wall_on == 1)): #if particle loss to walls turned on
+					if ((McMurry_flag > -1) and (self.wall_on == 1)): #if particle loss to walls turned on
 						# particle loss to walls
 						[N_perbin, 
-						y[num_comp:(num_comp)*(num_sb-wall_on+1)]] = wallloss.wallloss(
+						y[num_comp:(num_comp)*(num_sb-self.wall_on+1)]] = wallloss.wallloss(
 							N_perbin.reshape(-1, 1), 
-							y[num_comp:(num_comp)*(num_sb-wall_on+1)], Gi, eta_ai,
+							y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], Gi, eta_ai,
  							x*2.0e-6, y_mw, 
-							Varr*1.0e-18, (num_sb-wall_on), num_comp, temp_now, update_count, 
+							Varr*1.0e-18, (num_sb-self.wall_on), num_comp, temp_now, update_count, 
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
-							0, p_char, e_field, (num_sb-wall_on), C_p2w)
+							0, p_char, e_field, (num_sb-self.wall_on), C_p2w)
 			
 				if (nucv1 > 0.): # nucleation
 					
@@ -729,7 +729,7 @@ def ode_updater(update_stp,
 						N_perbin, y, y_mw.reshape(-1, 1), 
 						np.squeeze(y_dens*1.0e-3),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
-						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-wall_on))
+						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on))
 				
 				# reset count that tracks when next operator-split should be called (s)
 				update_count = 0.
@@ -737,6 +737,22 @@ def ode_updater(update_stp,
 		# update the percentage time in the GUI progress bar
 		yield (sumt/tot_time*100.)
 		
+		# if ozone isopleth being made, then store ozone result
+		if (self.testf == 5):
+			print(y[self.VOCi], y[self.NOi], y[self.NO2i], y[self.O3i])
+			if step_no == 1: # if first time step
+				self.O3equil = y[self.O3i]
+			else: # later time steps
+				O3equil_new = y[self.O3i]
+				# if O3 concentration still changing significantly (not at equilibrium)
+				if (np.abs(O3equil_new-self.O3equil)/O3equil_new)/tnew > 1.e-3:
+					self.O3equil = O3equil_new
+				else: # if O3 close enough to equilibrium
+					self.O3equil = O3equil_new
+					return() # end this call to simulation
+				print(y[self.VOCi], y[self.NOi], y[self.NO2i])
+				print((np.abs(O3equil_new-self.O3equil)/O3equil_new)/tnew)	
+
 		if (sumt >= (tot_time-tot_time/1.e10)): # record output at experiment end
 			
 			# update chamber variables, note this ensures that any changes made
@@ -745,14 +761,14 @@ def ode_updater(update_stp,
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp] = cham_up.cham_up(sumt, temp, tempt, 
+			Cinfl_nowp] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 			update_stp, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, wall_on, Cfactor, diff_vol, 
+			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
@@ -762,7 +778,7 @@ def ode_updater(update_stp,
 			trec, yrec, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 			Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
-			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, 
+			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)		
 		
 		# if time step was temporarily reduced, then reset
@@ -782,7 +798,7 @@ def ode_updater(update_stp,
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, 
 		num_sb, comp_namelist, y_mw, MV, time_taken, 
-		seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, ub_rad_amp, indx_plot, 
+		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
 		comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi, 
 		siz_str, cham_env, tot_in_res_ft, self)
 	return()

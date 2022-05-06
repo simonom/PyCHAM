@@ -30,7 +30,7 @@ from shutil import copyfile
 
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
 	Cfactor_vst, testf, numsb, comp_namelist, y_mw, MV,
-	time_taken, seed_name, x2, rbou_rec, wall_on, space_mode, rbou00, upper_bin_rad_amp, 
+	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
 	siz_str, cham_env, tot_in_res_ft, self):
 
@@ -59,7 +59,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# seed_name - chemical scheme name of component comprising seed particles
 	# x2 - record of size bin radii (um)
 	# rbou_rec - radius bounds per size bin (columns) per time step (rows) (um)
-	# wall_on - marker for whether wall on or off
+	# self.wall_on - marker for whether wall on or off
 	# space_mode - type of spacing between particle size bins (log or lin)
 	# rbou00 - initial lower size (radius) bound of particles (um)
 	# upper_bin_rad_amp - factor increase in radius of upper bound
@@ -87,7 +87,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# ---------------------------------------------------------------
 	
 	
-	if ((numsb-wall_on) > 0): # correct for changes to size bin radius bounds
+	if ((numsb-self.wall_on) > 0): # correct for changes to size bin radius bounds
 		rbou_rec[:, 0] = rbou00
 		rbou_rec[:, -1] = rbou_rec[:, -1]/upper_bin_rad_amp
 
@@ -126,7 +126,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
-	const["wall_on_flag_0forNO_1forYES"] = wall_on
+	const["wall_on_flag_0forNO_1forYES"] = self.wall_on
 	const["space_mode"] = space_mode
 	const["pure_component_saturation_vapour_pressures_at_298.15K"] = Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
@@ -156,7 +156,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			end = str('_p' + str(i))
 			x2_header = str(x2_header + str(i))
 		if (i == numsb):
-			if (wall_on == 0):
+			if (self.wall_on == 0):
 				end = str('_p'  + str(i))
 				x2_header = str(x2_header+str(np.repeat(i, num_comp)))
 			else:
@@ -200,7 +200,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# saving generation of components
 	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised VOC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	
-	if ((numsb-wall_on) > 0): # if particles present
+	if ((numsb-self.wall_on) > 0): # if particles present
 	
 		# saving the concentration of components on the wall due to particle deposition to wall
 		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (molecules/cc (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
@@ -221,6 +221,21 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), tot_in_res_ft, delimiter=',',
 				header=str('the total concentration (ug/m3) of injected (through initial gas-phase concentration, instantaneous and/or continuous gas-phase influx) components, with component index (relative to all components) in the first row and its cumulative injected concentrations in following rows'))
 
+	# this save added on 05/05/2022
+	# save self, so that same simulation can be recreated again
+	import pickle
+	# transfer variables in self object into variables in a list
+	model_var_dict = {} # empty dictionary to hold wanted variables
+	for attr, value in self.__dict__.items(): # loop through self object attributes
+		# don't need to save QGridLayout objects
+		if attr == 'title' or attr == 'left' or attr == 'top' or attr == 'width' or attr == 'height' or attr == 'initUI' or attr == 'setWindowTitle' or attr == 'setGeometry' or attr == 'setLayout':
+			continue
+		if '_orig' in attr or 'sch_name' in attr or 'xml_name' in attr or 'photo_path' in attr or 'chem_sch_mrk' in attr or 'TEMP' in attr or 'tempt' in attr or 'wall_on' in attr:
+			# transfer to dictionary
+			model_var_dict.update({attr:value})
+	with open(os.path.join(output_by_sim, 'simulation_self.pickle'), "wb") as f:
+		pickle.dump(model_var_dict, f)
+	
 	# if save name is the default, then remove to ensure no duplication in future
 	if (savefolder == 'default_res_name'):
 		import shutil	

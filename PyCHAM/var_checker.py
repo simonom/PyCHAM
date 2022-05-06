@@ -26,14 +26,14 @@
 
 import numpy as np # for math and array handling
 
-def var_checker(temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self): # define function
+def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
 	# self.testf - flag for whether in checking mode and what to check
 	# self.light_stat - status of light (on=1 or off=0)
 	# self.light_time - times through experiment light status corresponds to
-	# temp - temperatures inside chamber (K)
-	# tempt - times through experiment (s) temperatures correspond to
+	# self.TEMP - temperatures inside chamber (K)
+	# self.tempt - times through experiment (s) temperatures correspond to
 	# tot_time - total time to run experiment for (s)
 	# self.af_path - path to file stating actinic flux
 	# self.DayOfYear - day number of the year (1-365)
@@ -56,8 +56,8 @@ def var_checker(temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self): #
 		self.sumt = 0.
 
 		# ensure numpy arrays
-		tempt = np.array(tempt)
-		temp = np.array(temp)
+		self.tempt = np.array(self.tempt)
+		self.TEMP = np.array(self.TEMP)
 		
 		while (sumt < tot_time-tot_time*1.e-10):
 
@@ -71,10 +71,10 @@ def var_checker(temp, tempt, tot_time, Jlen, update_stp, err_mess, erf, self): #
 					Jres = np.concatenate((Jres, (np.zeros(Jlen)).reshape(1, -1)), axis = 0)
 					
 			else: # if lights on
-				TEMP = temp[np.sum(tempt >= sumt)-1] # temperature inside chamber now (K)
+				TEMPn = self.TEMP[np.sum(self.tempt >= sumt)-1] # temperature inside chamber now (K)
 			
 				# estimate and append photolysis rates
-				J = photolysisRates.PhotolysisCalculation(TEMP, 
+				J = photolysisRates.PhotolysisCalculation(TEMPn, 
 					Jlen, sumt, self)
 				
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)

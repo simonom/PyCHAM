@@ -33,21 +33,21 @@ import scipy.constants as si
 from water_calc import water_calc
 
 # define function
-def cham_up(sumt, temp, tempt, Pnow, 
+def cham_up(sumt, Pnow, 
 	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	new_part_sum1, update_stp, update_count,
 	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, wall_on, Cfactor, diff_vol, 
+	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
-	# temp - temperature in chamber (K)
-	# tempt - times that temperatures reached (s)
+	# self.TEMP - temperature in chamber (K)
+	# self.tempt - times that temperatures reached (s)
 	# Pnow - pressure in chamber (Pa)
 	# self.light_stat - status of lights
 	# self.light_time - times that light attain status (s)
@@ -107,7 +107,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 	# const_infl_t - times for constant influxes (s)
 	# infx_cnt - count on constant influx occurrences
 	# self.Cinfl - influx rate for components with constant influx (ppb/s)
-	# wall_on - marker for whether wall is on
+	# self.wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cc (air)
 	# self.seedi - index of seed component(s)
 	# diff_vol - diffusion volumes of components according to 
@@ -212,23 +212,23 @@ def cham_up(sumt, temp, tempt, Pnow,
 			bc_red = 1
 			
 	# check on updates to temperature (K) --------------------------------------	
-	if (len(temp) > 1): # because a temperature must be given for experiment start
+	if (len(self.TEMP) > 1): # because a temperature must be given for experiment start
 	
 		# check whether changes occur at start of this time step
-		if (sumt >= tempt[tempt_cnt] and tempt_cnt != -1):
+		if (sumt >= self.tempt[tempt_cnt] and tempt_cnt != -1):
 
 			# new temperature (K)
 			if (gpp_stab != -1): # if no linear interpolation required
 			
-				temp_nown = temp[tempt_cnt] # new temperature (K)
-				if (tempt_cnt < (len(tempt)-1)):
+				temp_nown = self.TEMP[tempt_cnt] # new temperature (K)
+				if (tempt_cnt < (len(self.tempt)-1)):
 					tempt_cnt += 1 # keep count of temperature setting index
 				else:
 					tempt_cnt = -1 # reached end
 				bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			else:
 				# new temperature (K)
-				temp_nown = np.interp(tnew, [0, t00], [temp_now, temp[tempt_cnt]])
+				temp_nown = np.interp(tnew, [0, t00], [temp_now, self.TEMP[tempt_cnt]])
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 			
 			# update vapour pressure of water (log10(atm)),
@@ -244,8 +244,8 @@ def cham_up(sumt, temp, tempt, Pnow,
 			Psat = Psat.reshape(1, -1) # ensure Psat is correct shape
 
 			# now, in preparation for ode solver, repeat over number of size bins
-			if ((num_sb-wall_on) > 0):
-				Psat = np.repeat(Psat, (num_sb-wall_on), axis=0)
+			if ((num_sb-self.wall_on) > 0):
+				Psat = np.repeat(Psat, (num_sb-self.wall_on), axis=0)
 			
 			# according to the ideal gas law, air pressure (Pa) inside chamber
 			# is proportional to temperature, therefore pressure changes by 
@@ -289,14 +289,14 @@ def cham_up(sumt, temp, tempt, Pnow,
 			temp_now = temp_nown # update current temperature (K)
 		
 		# check whether temperature changes during proposed integration time step
-		if (sumt+tnew > tempt[tempt_cnt] and tempt_cnt != -1 and gpp_stab != -1):
+		if (sumt+tnew > self.tempt[tempt_cnt] and tempt_cnt != -1 and gpp_stab != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
-			tnew = tempt[tempt_cnt]-sumt
+			tnew = self.tempt[tempt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 		
-	if (len(temp) == 1):
-		temp_now = temp[0] # temperature constant if only one value given
+	if (len(self.TEMP) == 1):
+		temp_now = self.TEMP[0] # temperature constant if only one value given
 
 	# check on instantaneous injection of components ---------------------------------------
 	if (len(injectt) > 0 and gasinj_cnt > -1): # if any injections occur
@@ -376,7 +376,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
 	
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-wall_on > 0)): # if influx occurs
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0)): # if influx occurs
 		
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
@@ -397,7 +397,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
 				pconcn = np.zeros((pconc.shape[0])) # empty results array
 				# loop through size bins for interpolation since interpolation is one dimensional
-				for i in range(num_sb-wall_on):
+				for i in range(num_sb-self.wall_on):
 					pconcn[i] = np.interp(tnew, [0, t00], [pconc[i, seedt_cnt-1], pconc[i, seedt_cnt]])
 				# remember the fraction of the number concentration added so far
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
@@ -407,11 +407,11 @@ def cham_up(sumt, temp, tempt, Pnow,
 
 			# account for instantaneous change in seed particles (continuous change dealt with below)
 			if (pcontf == 0):
-				[y[num_comp:num_comp*(num_sb-wall_on+1)], N_perbin, _, 
-					_, _] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
+				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
+					_, _] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 					N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
-					uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-					stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
+					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
+					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], Psat, act_coeff, 
 					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 		
 		# check whether changes occur during proposed integration time step
@@ -443,13 +443,13 @@ def cham_up(sumt, temp, tempt, Pnow,
 			seedt_cnt += 1
 		
 		[Cinfl_nowp, N_perbin, _, 
-			_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-wall_on+1)], 
+			_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 			N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
-			uppsize, num_comp, (num_sb-wall_on), MV, rad0, radn, 
-			stdn, y_dens, H2Oi, rbou, y_mw, surfT, temp[tempt_cnt], Psat, act_coeff, 
+			uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
+			stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], Psat, act_coeff, 
 			seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 		
-		y[num_comp:num_comp*(num_sb-wall_on+1)] = Cinfl_nowp
+		y[num_comp:num_comp*(num_sb-self.wall_on+1)] = Cinfl_nowp
 		
 	else:
 		Cinfl_nowp_indx = [] # filler
@@ -510,7 +510,7 @@ def cham_up(sumt, temp, tempt, Pnow,
 	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
 	# the specified nucleation event has not yet reached its defined finishing particle number
 	# concentration (# particles/cm3 (air))
-	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-wall_on) > 0)):
+	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-self.wall_on) > 0)):
 	
 		# the time step (s) needed to increase number concentration of nucleated particles by 10 %
 		t_need = (0.1*nucv1+new_part_sum1)

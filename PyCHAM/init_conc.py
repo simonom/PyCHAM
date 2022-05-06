@@ -116,6 +116,23 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		
 		# remember index for plotting gas-phase concentrations later
 		y_indx_plot.append(y_indx)
+	
+				
+	# check on whether O3 isopleth due to be made
+	# if isopleth due to be made overide any 
+	# originally provided initial conditions
+	if (self.testf == 5):
+		y[self.VOCi] = self.VOCequil # VOC concentration
+		y[self.NOi] = self.NOxequil/2. # NO concentration
+		y[self.NO2i] = self.NOxequil/2. # NO2 concentration
+
+		# ensure that these components are held at this concentration
+		if self.VOCi not in self.con_C_indx:
+			self.con_C_indx = np.append(self.con_C_indx, self.VOCi)
+		if self.NOi not in self.con_C_indx:
+			self.con_C_indx = np.append(self.con_C_indx, self.NOi)
+		if self.NO2i not in self.con_C_indx:
+			self.con_C_indx = np.append(self.con_C_indx, self.NO2i)
 
 	# number of recording steps
 	nrec_steps = int(math.ceil(end_sim_time/save_step)+1)
@@ -168,7 +185,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# increase number of components to account for 'core' component
 	num_comp += 1
 
-	# append core gas-phase concentration (molecules/cc (air)) and molecular 
+	# append core gas-phase concentration (molecules/cm3 (air)) and molecular 
 	# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
 	# calculations)
 	y = np.append(y, 0.)

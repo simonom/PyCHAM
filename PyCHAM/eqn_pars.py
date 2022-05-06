@@ -37,12 +37,12 @@ import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
-def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
+def extr_mech(int_tol, num_sb,
 		drh_str, erh_str, sav_nam, pcont, self):
 
 	# inputs: ----------------------------------------------------
 	# self.sch_name - file name of chemical scheme
-	# chem_sch_mrk - markers to identify different sections of 
+	# self.chem_sch_mrk - markers to identify different sections of 
 	# 	the chemical scheme
 	# self.xml_name - name of xml file
 	# self.photo_path - path to file containing absorption 
@@ -50,7 +50,7 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 	# self.con_infl_nam - chemical scheme names of components with 
 	# 		constant influx
 	# int_tol - integration tolerances
-	# wall_on - marker for whether to include wall partitioning
+	# self.wall_on - marker for whether to include wall partitioning
 	# num_sb - number of size bins (including any wall)
 	# self.const_comp - chemical scheme name of components with 
 	#	constant concentration
@@ -68,7 +68,7 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 	# starting error flag and message (assumes no errors)
 	erf = 0
 	err_mess = ''
-
+	
 	f_open_eqn = open(self.sch_name, mode='r') # open the chemical scheme file
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
@@ -76,7 +76,7 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 	
 	# interrogate scheme to list equations
 	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)
+		RO2_names] = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
@@ -94,9 +94,11 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
 		rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
 		comp_num, self] = eqn_interr.eqn_interr(eqn_num, 
-		eqn_list, aqeqn_list, chem_sch_mrk, comp_name, comp_smil, num_sb, wall_on, self)
+		eqn_list, aqeqn_list, comp_name, comp_smil, num_sb, self)
 		
-	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, (num_sb-wall_on), self)
+	[rowvals, colptrs, jac_indx_g, jac_indx_aq, jac_part_indx, jac_wall_indx, jac_extr_indx] = jac_setup.jac_setup(jac_den_indx_g, 
+		njac_g, comp_num, num_sb, eqn_num, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, nreac_aq, nprod_aq, rindx_aq, 
+		pindx_aq, jac_indx_aq, (num_sb-self.wall_on), self)
 	
 	# prepare aqueous-phase reaction matrices for applying to reaction rate calculation
 	if (eqn_num[1] > 0): # if aqueous-phase reactions present
@@ -111,7 +113,7 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 			jac_den_indx_aq, jac_indx_aq, 				
 			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 			uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-			rr_arr_aq, rr_arr_p_aq, num_sb, wall_on, eqn_num[1], comp_num) 
+			rr_arr_aq, rr_arr_p_aq, num_sb, eqn_num[1], comp_num, self) 
 	
 	# get index of components with constant influx/concentration -----------
 	# empty array for storing index of components with constant influx
@@ -198,8 +200,8 @@ def extr_mech(chem_sch_mrk, int_tol, wall_on, num_sb,
 	# ensure integer
 	self.con_infl_indx = self.con_infl_indx.astype('int')
 	
-	write_ode_solv.ode_gen(self.con_infl_indx, int_tol, rowvals, wall_on, comp_num+2, 
-			(num_sb-wall_on), 0, eqn_num, sav_nam, pcont, self)
+	write_ode_solv.ode_gen(self.con_infl_indx, int_tol, rowvals, comp_num+2, 
+			(num_sb-self.wall_on), 0, eqn_num, sav_nam, pcont, self)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, 0)

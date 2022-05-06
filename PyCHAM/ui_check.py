@@ -43,8 +43,8 @@ def ui_check(self):
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, chem_sch_mark, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+		[sav_nam, update_stp, 
+		tot_time, comp0, y0, RH, RHt, Press,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
@@ -59,7 +59,7 @@ def ui_check(self):
 	# loaded variables: ------------------------------------------------------------
 	# sav_nam - name of folder to save results to
 	# self.sch_name - name of chemical scheme file
-	# wall_on - marker for whether wall on or off
+	# self.wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
 	# num_sb - number of particle size bins
 	# pmode - whether particle number concentrations expressed by mode or explicitly
@@ -71,7 +71,7 @@ def ui_check(self):
 	# mean_rad - mean radius of particle size distributions (um)
 	# new_partr - radius of newly nucleated particles (cm)
 	# chamSA - chamber surface area (m2)
-	# chem_sch_mark - markers in chemical scheme
+	# self.chem_sch_mark - markers in chemical scheme
 	# self.af_path - actinic flux path
 	# int_tol - integration tolerances
 	# update_stp - time step for updating ODE initial conditions (s)
@@ -125,7 +125,7 @@ def ui_check(self):
 		em_flag = 2
 	
 	# incorrect wall_on marker
-	if (wall_on != 1 and wall_on != 0):
+	if (self.wall_on != 1 and self.wall_on != 0):
 		if (em_flag < 2):
 			err_mess = str('Error - wall_on model variable must be either 0 for no wall or 1 for wall, please see the notes on the wall_on model variable in README')
 			em_flag = 2
@@ -214,18 +214,18 @@ def ui_check(self):
 	# check on temperature inputs ----------------------------------------------
 	
 	if (em_flag<2):
-		if (len(temp) != len(tempt)):
+		if (len(self.TEMP) != len(self.tempt)):
 			err_mess = str('Error - length of temperature inputs does not match length of corresponding times for temperatures, and the two must match, please see the README notes on the temperature and tempt model variables for further guidance')
 			em_flag = 2 # error message flag for a note
-		if (len(temp) > 0 and tempt[0] != 0):
+		if (len(self.TEMP) > 0 and self.tempt[0] != 0):
 			err_mess = str('Error - no temperature given for the start of the experiment (0 seconds), and one must be provided, please see the README notes on the temperature and tempt model variables for further guidance')
 			em_flag = 2 # error message flag for a note
 		
 	if (em_flag<2):
 		# check on rate of temperature change 
-		if (len(temp) == len(tempt) and len(temp)>1):
+		if (len(self.TEMP) == len(self.tempt) and len(self.TEMP)>1):
 			# maximum change
-			max_change = np.max(np.abs(np.diff(temp)))
+			max_change = np.max(np.abs(np.diff(self.TEMP)))
 			if (max_change > 1.):
 				err_mess_n = str('Note - the maximum change of chamber temperature exceeds 1 K.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to temperature given in the temperature model variable are limited to 1 K, with their corresponding times given in the tempt model variable (PyCHAM will automatically limit the update step according to the time differences given by the tempt model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as temperature change, and will attempt to rectify the instability by attempting incrementally smaller temperature changes over incrementally smaller time steps.\n')
 				if (em_flag == 0):
@@ -382,7 +382,7 @@ def ui_check(self):
 	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
 		[comp_namelist, _, err_mess_new, 
-		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self, chem_sch_mark)
+		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
 		
 		if (err_mess_new == '' and em_flag < 2):
 			
@@ -474,8 +474,8 @@ def ui_check(self):
 	
 
 	# store in pickle file
-	list_vars = [sav_nam, chem_sch_mark, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+	list_vars = [sav_nam, update_stp, 
+			tot_time, comp0, y0, RH, RHt, Press, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 

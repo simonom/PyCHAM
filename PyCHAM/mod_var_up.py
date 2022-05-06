@@ -34,8 +34,8 @@ def mod_var_up(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, chem_sch_mark, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+		[sav_nam, update_stp, 
+		tot_time, comp0, y0, RH, RHt, Press,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		save_step, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
@@ -50,7 +50,7 @@ def mod_var_up(self):
 	
 	# contents of model variables update
 	self.l9a.setText(sav_nam);
-	self.l10a.setText((str(chem_sch_mark)).replace('\'', '').replace(' ', '')[1:-1])
+	self.l10a.setText((str(self.chem_sch_mrk)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l11a.setText((str(tot_time)).replace('\'', '').replace(' ', ''))
 	self.l12a.setText((str(update_stp)).replace('\'', '').replace(' ', ''))
 	self.l13a.setText((str(save_step)).replace('\'', '').replace(' ', ''))#
@@ -58,8 +58,8 @@ def mod_var_up(self):
 	self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	
 	
-	self.l14a.setText((str(temp)).replace('\'', '').replace(' ', '')[1:-1])
-	self.l15a.setText((str(tempt)).replace('\'', '').replace(' ', '')[1:-1])
+	self.l14a.setText((str(self.TEMP)).replace('\'', '').replace(' ', '')[1:-1])
+	self.l15a.setText((str(self.tempt)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l16a.setText((str(RH.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l16c.setText((str(RHt.tolist())).replace('\'', '').replace(' ', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l17a.setText((str(Press)).replace('\'', '').replace(' ', ''))
@@ -115,7 +115,7 @@ def mod_var_up(self):
 	self.l58a.setText((str(self.light_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58bb.setText((str(self.tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58cc.setText((str(self.tf_UVCt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l59a.setText((str(wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l59a.setText((str(self.wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l60a.setText((str(Cw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l61a.setText((str(kw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l62a.setText((str(inflectDp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

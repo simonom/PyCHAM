@@ -31,7 +31,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, Psat, core_diss, kgwt, space_mode, seedx, 
-		spec_namelist, act_coeff, wall_on, partit_cutoff, Press,
+		spec_namelist, act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
 	
 	# inputs -----------------------------------
@@ -66,7 +66,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# seedx - mole ratio of non-water components comprising seed particles
 	# spec_namelist - names of components noted in chemical scheme file
 	# act_coeff - activity coefficient of components
-	# wall_on - whether or not to consider wall
+	# self.wall_on - whether or not to consider wall
 	# partit_cutoff - product of vapour pressure and activity coefficient
 	#		at which gas-particle partitioning assumed zero (Pa)
 	# Press - pressure inside chamber
@@ -170,7 +170,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		# particle deposition to wall (molecules/cc)
 		C_p2w = np.zeros((num_asb*num_comp))
 	
-	if (wall_on > 0):
+	if (self.wall_on > 0):
 		num_sb = num_asb+1 # add one to size bin number to account for wall
 	else:
 		num_sb = num_asb
@@ -183,7 +183,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	MV = (y_mw/(y_dens*1.e-3)).reshape(num_comp, 1)
 
 	# number of size bins, excluding wall
-	num_aasb = num_sb-wall_on
+	num_aasb = num_sb-self.wall_on
 	# account for particle-phase concentration of components contained in seed particles
 	if (sum(pconcn) > 0.):
 		

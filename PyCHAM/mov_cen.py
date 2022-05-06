@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 from v_check import Vchange_check as Vchange_check
 
 def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV, 
-				Psat, ic_red, res, solv_time, wall_on):
+				Psat, ic_red, res, solv_time, self):
 
 
 	# input:---------------------------------------------------------
@@ -53,12 +53,13 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# ic_red - flag for time step reduction due to changing initial conditions
 	# res - resulting concentrations from ode solver (molecules/cc (air)) 
 	# solv_time - times at which integration solved (s)
-	# wall_on - flag for whether wall turned on
+	# self.wall_on - flag for whether wall turned on
+	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 
-	sbn -= wall_on # exclude wall from size bin number
+	sbn -= self.wall_on # exclude wall from size bin number
 	
 	# get new volumes of single particles per size bin and
 	# check whether volume change is acceptable
@@ -68,10 +69,10 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	if (redt == 1): # repeat integration with new smaller time step
 		return(n0, Vol0, C0, x, redt, t, ic_red)
 	
-	y = np.zeros((nc*(sbn+1+wall_on))) # empty array for holding new concentrations
+	y = np.zeros((nc*(sbn+1+self.wall_on))) # empty array for holding new concentrations
 	# gas and wall concentrations (molecules/cc (air))
 	y[0:nc] = res[0:nc]
-	if (wall_on == 1):
+	if (self.wall_on == 1):
 		y[-nc::] = res[-nc::]
 		
 	# empty array for holding new particle number concentrations

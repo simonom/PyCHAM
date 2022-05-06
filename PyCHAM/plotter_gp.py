@@ -492,3 +492,112 @@ def plotter_rad_flux(self):
 			 
 
 	return()
+
+# function to plots ozone isopleths -----------------------------------------
+def O3_iso(self):
+
+	import pickle # for dealing with pickle files
+
+	# ---------------------
+	# inputs:
+	# self - reference to PyCHAM
+	# ---------------------
+
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
+		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path)
+
+	# get generation numbers of all components
+	gen_num = ro_obj.gen_numbers
+
+	# get SMILE strings of all zero generation components
+	zg_smile = np.array(rel_SMILES)[gen_num==0]
+	# sum carbon numbers in SMILE strings
+	for zg_i in zg_smile:
+		if (zg_i.count('c')+zg_i.count('C') > 1): # more than 1 carbon
+			if (zg_i.count('o')+zg_i.count('O') == 0): # no oxygen
+				VOC_smile = zg_i # get VOC SMILE string
+				break
+
+	# VOC index
+	self.VOCi = rel_SMILES.index(VOC_smile)
+	# get range (# molecules/cm3) of gas-phase VOC seen in simulation
+	VOC_range = [min(yrec[:, self.VOCi]*Cfac), max(yrec[:, self.VOCi]*Cfac)]
+
+	# NOx index
+	self.NOxi = [comp_names.index('NO'), comp_names.index('NO2'), comp_names.index('NO3')]
+	self.NOi = comp_names.index('NO')
+	self.NO2i = comp_names.index('NO2')
+
+	# O3 index
+	self.O3i = comp_names.index('O3')
+
+	NOxsum = np.zeros((len(timehr)))
+	# sum NOx constituents (# molecules/cm3)
+	for NOxii in self.NOxi:
+		NOxsum += yrec[:, NOxii]*Cfac
+	# range of NOx (# molecules/cm3)
+	NOx_range = [min(NOxsum), max(NOxsum)]
+	
+	NOx_values = np.arange(NOx_range[0], NOx_range[1]*1.01, (NOx_range[1]-NOx_range[0])/3.)
+	VOC_values = np.arange(VOC_range[0], VOC_range[1]*1.01, (VOC_range[1]-VOC_range[0])/3.)
+	
+	# using the initial conditions specified in the 
+	# model variables file, but with NOx and VOC 
+	# fixed at the values set here, identify the
+	# equilibrium O3 concentration
+	
+	# empty results (VOC changes by row, NOx by column)
+	O3_res = np.zeros((len(VOC_values), len(NOx_values)))
+
+	Nc = 0 # NOx count
+	for NOxvi in NOx_values: # loop through NOx values
+		Vc = 0 # VOC count
+		for VOCvi in VOC_values: # loop through VOC values
+			
+			# load original self attributes and values
+			with open(os.path.join(self.dir_path, 'simulation_self.pickle'), "rb") as f:
+				self_dict = pickle.load(f)
+			
+			# transfer original values to self for this run
+			for key in self_dict:# loop through dictionary entries here
+				# set object's attribute value here
+				# if original entry tagged as original, then transform to functional
+				if key[-5::] == '_orig':
+					setattr(self, key[0:-5], self_dict[key])
+				else:
+					setattr(self, key, self_dict[key])
+				
+			# get equilibrium O3 concentration
+			self.testf = 5 # modify test flag value
+		
+			# set NOx and VOC value
+			self.NOxequil = NOxvi
+			self.VOCequil = VOCvi
+
+			# now run program
+			from middle import middle # prepare to communicate with main program
+		
+			note_messf = 0 # cancel note message flag
+		
+			for prog in middle(self): # call on modules to solve problem
+		
+				if (isinstance(prog, str)): # check if it's a message
+					mess = prog
+					if (mess[0:4] == 'Stop'): # if it's an error message
+						return()
+
+			# O result (ppb)
+			O3_res[Vc, Nc] = self.O3equil/Cfac[0]
+			print(Vc, Nc)
+			Vc += 1 # VOC count
+		Nc += 1 # NOx count
+	print(O3_res)
+	# prepare plot
+	plt.ion() # display figure in interactive mode
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	# ozone contour plot (# molecules/cm3)
+	#cs = plt.contourf(O3_res, levels=[0.0, 0.1, 0.2], colors=['yellow', 'green', 'purple'], extend='both', alpha=.90)
+	cs = plt.contourf(O3_res)
+	return()

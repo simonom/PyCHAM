@@ -37,8 +37,8 @@ def mod_var_read(self):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, chem_sch_mark, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+			[sav_nam, update_stp, 
+			tot_time, comp0, y0, RH, RHt, Press,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
@@ -75,7 +75,7 @@ def mod_var_read(self):
 				sav_nam = str(value.strip())
 				
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
-				chem_sch_mark = [str(i).strip() for i in (value.split(','))]
+				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
 				update_stp = float(value.strip())
@@ -96,10 +96,10 @@ def mod_var_read(self):
 					err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
 			
 			if key == 'temperature' and (value.strip()): # chamber temperature (K)
-				temp = [float(i) for i in ((value.strip()).split(','))]
+				self.TEMP = [float(i) for i in ((value.strip()).split(','))]
 
 			if key == 'tempt' and (value.strip()): # times (s) that temperature values correspond to
-				tempt = [float(i) for i in ((value.strip()).split(','))]
+				self.tempt = [float(i) for i in ((value.strip()).split(','))]
 
 			if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
 				RH = np.array(([float(i) for i in ((value.strip()).split(','))]))
@@ -114,7 +114,7 @@ def mod_var_read(self):
 				self.daytime = float(value.strip())
 
 			if key == 'wall_on' and (value.strip()): # marker for whether or not to consider wall
-				wall_on = int(value.strip())
+				self.wall_on = int(value.strip())
 
 			if key == 'eff_abs_wall_massC' and (value.strip()): # effective absorbing mass concentration of wall
 				Cw = float(value.strip())
@@ -501,8 +501,8 @@ def mod_var_read(self):
 				self.bd_st = 1		
 
 		# prepare for pickling
-		list_vars = [sav_nam, chem_sch_mark, update_stp, 
-				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+		list_vars = [sav_nam, update_stp, 
+				tot_time, comp0, y0, RH, RHt, Press, 
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, save_step, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 

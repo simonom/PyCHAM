@@ -33,7 +33,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,
 	rowvals, colptrs, num_comp, num_sb,
-	wall_on, Psat, Cw, act_coeff, kw, jac_wall_indx,
+	Psat, Cw, act_coeff, kw, jac_wall_indx,
 	core_diss, kelv_fac, kimt, num_asb,
 	jac_part_indx,
 	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -79,7 +79,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# 	Jacobian
 	# num_comp - number of components
 	# num_sb - number of size bins
-	# wall_on - flag saying whether to include wall partitioning
+	# self.wall_on - flag saying whether to include wall partitioning
 	# Psat - pure component saturation vapour pressures (molecules/cc)
 	# Cw - effective absorbing mass concentration of wall (molecules/cc) 
 	# act_coeff - activity coefficient of components
@@ -124,7 +124,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 			dd[0, 0] += self.Cinfl_H2O_now
 		# check for continuous dilution of chamber
 		if (self.dil_fac > 0):
-			if (wall_on == 1):
+			if (self.wall_on == 1):
 				dd[0:-1, 0] -= y[0:-1, 0]*self.dil_fac
 			else:
 				dd[:, 0] -= y[:, 0]*self.dil_fac
@@ -241,7 +241,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	
 	# incorporate new water concentrations (molecules/cm3)
 	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
-	y[H2Oi:num_comp*((num_sb-wall_on)+1):num_comp] = y_w
+	y[H2Oi:num_comp*((num_sb-self.wall_on)+1):num_comp] = y_w
 	
 	# return concentration(s) and time(s) following integration
 	return(y, sol.t)

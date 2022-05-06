@@ -29,18 +29,17 @@ import formatting
 import pybel
 import sys
 
-def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name, 
-		comp_smil, num_sb, wall_on, self):
+def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name, 
+		comp_smil, num_sb, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	# num_eqn - number of equations
 	# eqn_list - gas-phase equations in list of strings
 	# aqeqn_list - aqueous-phase equations in list of strings
-	# chem_scheme_markers - markers for separating sections of the chemical scheme
+	# self.chem_sch_mrk - markers for separating sections of the chemical scheme
 	# comp_name - name string of components in xml file (not SMILES)
 	# comp_smil - SMILES from xml file
 	# num_sb - number of size bins
-	# wall_on - marker for whether to include wall partitioning
 	# self - reference to PyCHAM
 	# ------------------------------------------------------------------------------------
 	
@@ -111,8 +110,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		name_only_this_eq = []
 		
 		# work out whether equation or reaction rate coefficient part comes first
-		eqn_start = str('.*\\' +  chem_scheme_markers[10])
-		rrc_start = str('.*\\' +  chem_scheme_markers[9])
+		eqn_start = str('.*\\' +  self.chem_sch_mrk[10])
+		rrc_start = str('.*\\' +  self.chem_sch_mrk[9])
 		# get index of these markers, note span is the property of the match object that
 		# gives the location of the marker
 		eqn_start_indx = (re.match(eqn_start, line)).span()[1]
@@ -129,9 +128,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		# except for new line characters, so final part is stating the character(s) we 
 		# are specifically looking for, \\ ensures the marker is recognised
 		if eqn_sec == 1:
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[11])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[11])
 		else: # end of equation part is start of reaction rate coefficient part
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[9])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[9])
 
 		# extract the equation as a string ([0] extracts the equation section and 
 		# [1:-1] removes the bounding markers)
@@ -168,15 +167,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 
 		# .* means occurs anywhere in line and, first \ means second \ can be interpreted 
 		# and second \ ensures recognition of marker
-		rate_coeff_start_mark = str('\\' +  chem_scheme_markers[9])
+		rate_coeff_start_mark = str('\\' +  self.chem_sch_mrk[9])
 		# . means match with anything except a new line character, when followed by a * 
 		# means match zero or more times (so now we match with all characters in the line
 		# except for new line characters, \\ ensures the marker
 		# is recognised
 		if eqn_sec == 1: # end of reaction rate coefficient part is start of equation part
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[10])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[10])
 		else: # end of reaction rate coefficient part is end of line
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[11])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[11])
 		
 		# rate coefficient starts and end punctuation
 		rate_regex = str(rate_coeff_start_mark + rate_coeff_end_mark)
@@ -519,8 +518,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		line = aqeqn_list[eqn_step] # extract this line
 		
 		# work out whether equation or reaction rate coefficient part comes first
-		eqn_start = str('.*\\' +  chem_scheme_markers[10])
-		rrc_start = str('.*\\' +  chem_scheme_markers[9])
+		eqn_start = str('.*\\' +  self.chem_sch_mrk[10])
+		rrc_start = str('.*\\' +  self.chem_sch_mrk[9])
 		# get index of these markers, note span is the property of the match object that
 		# gives the location of the marker
 		eqn_start_indx = (re.match(eqn_start, line)).span()[1]
@@ -537,9 +536,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 		# except for new line characters, so final part is stating the character(s) we 
 		# are specifically looking for, \\ ensures the marker is recognised
 		if eqn_sec == 1:
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[11])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[11])
 		else: # end of equation part is start of reaction rate coefficient part
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[9])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[9])
 
 		# extract the equation as a string ([0] extracts the equation section and 
 		# [1:-1] removes the bounding markers)
@@ -574,15 +573,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, chem_scheme_markers, comp_name,
 
 		# .* means occurs anywhere in line and, first \ means second \ can be interpreted 
 		# and second \ ensures recognition of marker
-		rate_coeff_start_mark = str('\\' +  chem_scheme_markers[9])
+		rate_coeff_start_mark = str('\\' +  self.chem_sch_mrk[9])
 		# . means match with anything except a new line character, when followed by a * 
 		# means match zero or more times (so now we match with all characters in the line
 		# except for new line characters, \\ ensures the marker
 		# is recognised
 		if eqn_sec == 1: # end of reaction rate coefficient part is start of equation part
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[10])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[10])
 		else: # end of reaction rate coefficient part is end of line
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[11])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[11])
 		
 		# rate coefficient starts and end punctuation
 		rate_regex = str(rate_coeff_start_mark + rate_coeff_end_mark)

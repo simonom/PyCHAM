@@ -43,7 +43,7 @@ def def_mod_var(caller, self): # define function
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
-	chem_sch_mark = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
+	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
 	# time interval between updates to integration inputs (s)
 	update_stp = 1.
 	tot_time = 1. # total time to integrate over (s)
@@ -56,8 +56,8 @@ def def_mod_var(caller, self): # define function
 	self.testf = 0 # whether in testing mode or not
 	
 	# chamber environment -----------------------------------------------------------------
-	temp = np.array((298.15)).reshape(1) # temperature of experiment (K)
-	tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
+	self.TEMP = np.array((298.15)).reshape(1) # temperature of experiment (K)
+	self.tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
 	RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
 	RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
@@ -150,7 +150,7 @@ def def_mod_var(caller, self): # define function
 	self.tf_UVCt = np.zeros((1, 1)) # time (s) for transmission factor for 254 nm wavelength artificial light
 	
 	# deposition of particles and vapours to wall ------------------------------------------
-	wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
+	self.wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	Cw = 0. # effective absorbing mass of wall (g/m3 (air))
 	kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
 
@@ -193,8 +193,7 @@ def def_mod_var(caller, self): # define function
 	# --------------------------------------------------------------------------
 
 	# prepare for pickling
-	list_vars = [sav_nam, chem_sch_mark, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, 
+	list_vars = [sav_nam, update_stp, tot_time, comp0, y0, RH, RHt, Press, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, save_step, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
@@ -215,8 +214,8 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, chem_sch_mark, update_stp, 
-		tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
+	return(sav_nam, update_stp, 
+		tot_time, comp0, y0, RH, RHt, Press, Cw, 
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  

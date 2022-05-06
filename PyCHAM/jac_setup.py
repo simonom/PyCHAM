@@ -25,7 +25,7 @@
 # required modules
 import numpy as np
 
-def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, wall_on, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, num_asb, self):
+def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, rindx_g, pindx_g, jac_indx_g, nreac_aq, nprod_aq, rindx_aq, pindx_aq, jac_indx_aq, num_asb, self):
 
 	# inputs ---------------------------------------------
 	# jac_den_indx - index of denominators for jacobian
@@ -38,7 +38,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# rindx_g - index of reactants per equation
 	# pindx_g - index of products per equation
 	# jac_indx_g - index of Jacobian affected per equation
-	# wall_on - flag for whether wall on or off
+	# self.wall_on - flag for whether wall on or off
 	# nreac_aq - number of reactants per equation
 	# nprod_aq - number of products per equation
 	# rindx_aq - index of reactants per equation
@@ -349,7 +349,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	jac_wall_indx = np.zeros(((comp_num+2)*4))
 	wall_cnt = 0 # count on jac_wall_indx inputs
 
-	if (wall_on > 0):
+	if (self.wall_on > 0):
 		# loop through components in the gas-phase (add two 
 		# to account for water and core component)
 		for compi in range(comp_num+2):
@@ -442,7 +442,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 		extr_cnt = 0 # count on jac_extr_indx inputs
 		
 		# loop through all gas- and particle-phase components
-		for compi in range((comp_num+2)*(num_sb-wall_on)):
+		for compi in range((comp_num+2)*(num_sb-self.wall_on)):
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals

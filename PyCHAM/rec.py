@@ -30,7 +30,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
 	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
-	MV, H2Oi, Vbou, rbou, wall_on, rbou_rec, 
+	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
 	tot_in_res_ft, self):
 	
@@ -69,7 +69,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# H2Oi - index for water
 	# Vbou - volume boundaries per size bin (um3)
 	# rbou - size bin radius boundaries (um)
-	# wall_on - marker for whether wall turned on
+	# self.wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
 	# yrec_p2w - record of concentration of components on 
 	#	the wall due to particle-wall deposition (molecules/cc)
@@ -93,7 +93,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	
 	# single particle radius (um) at size bin centre 
 	# including contribution of water
-	if ((num_sb-wall_on) > 0): # if particle size bins present
+	if ((num_sb-self.wall_on) > 0): # if particle size bins present
 		x2[save_cnt, :] = x
 		# single particle radius boundaries (um) including contribution of water
 		rbou_rec[save_cnt, :] = rbou
@@ -103,18 +103,18 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 		yrec_p2w[save_cnt, :] = C_p2w
 	
 	# estimate particle number size distributions ----------------------------------
-	Vnew = np.zeros((num_sb-wall_on))
+	Vnew = np.zeros((num_sb-self.wall_on))
 	ish = (pconc[:, 0] > 1.e-10)
 	
 	if (ish.sum() > 0):
 		# rearrange particle concentrations into size bins in rows, components in columns
-		Cn = y[num_comp:num_comp*(num_sb-wall_on+1)].reshape(num_sb-wall_on, num_comp)
+		Cn = y[num_comp:num_comp*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp)
 		# new volume of single particle per size bin (um3) excluding volume of water	
 		Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*pconc[ish]))*MV[:, 0]*1.e12, 1)-
 				((Cn[ish, H2Oi]/(si.N_A*pconc[ish, 0]))*MV[H2Oi, 0]*1.e12))
 		# loop through size bins to find number of particles in each 
 		# (# particle/cm3 (air))
-		for Ni in range(0, (num_sb-wall_on)):
+		for Ni in range(0, (num_sb-self.wall_on)):
 			ish = (Vnew>=Vbou[Ni])*(Vnew<Vbou[Ni+1])
 			Nres_dry[save_cnt, Ni] = pconc[ish, 0].sum()
 		Nres_wet[save_cnt, :] = pconc[:, 0] # record with water

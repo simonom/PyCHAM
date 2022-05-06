@@ -139,8 +139,8 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(b0, 0, ffscn, 1, 2)
 		
 		# default variables for all required input model variables -------------------------
-		[sav_nam, chem_sch_mark, update_stp, tot_time, comp0, 
-		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		[sav_nam, update_stp, tot_time, comp0, 
+		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
@@ -238,7 +238,7 @@ class PyCHAM(QWidget):
 		l10.setText('Chemical scheme markers: ')
 		self.varbox.addWidget(l10, gen_row+2, 0)
 		self.l10a = QLabel(self)
-		self.l10a.setText((str(chem_sch_mark)).replace('\'', '').replace(' ', '')[1:-1])
+		self.l10a.setText((str(self.chem_sch_mrk)).replace('\'', '').replace(' ', '')[1:-1])
 		self.varbox.addWidget(self.l10a, gen_row+2, 1)
 		
 		l11 = QLabel(self)
@@ -295,14 +295,14 @@ class PyCHAM(QWidget):
 		l14.setText('Chamber temperature(s) (K): ')
 		self.varbox.addWidget(l14, env_row+1, 0)
 		self.l14a = QLabel(self)
-		self.l14a.setText((str(temp)).replace('\'', '').replace(' ', '')[1:-1])
+		self.l14a.setText((str(self.TEMP)).replace('\'', '').replace(' ', '')[1:-1])
 		self.varbox.addWidget(self.l14a, env_row+1, 1)
 		
 		l15 = QLabel(self)
 		l15.setText('Time(s) for chamber \ntemperature(s) (s): ')
 		self.varbox.addWidget(l15, env_row+2, 0)
 		self.l15a = QLabel(self)
-		self.l15a.setText((str(tempt)).replace('\'', '').replace(' ', '')[1:-1])
+		self.l15a.setText((str(self.tempt)).replace('\'', '').replace(' ', '')[1:-1])
 		self.varbox.addWidget(self.l15a, env_row+2, 1)
 		
 		l16 = QLabel(self)
@@ -722,7 +722,7 @@ class PyCHAM(QWidget):
 		l59.setText('Whether wall off (0) or on (1): ')
 		self.varbox.addWidget(l59, wall_row+1, 0)
 		self.l59a = QLabel(self)
-		self.l59a.setText((str(wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l59a.setText((str(self.wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l59a, wall_row+1, 1)
 		
 		l60 = QLabel(self)
@@ -1060,6 +1060,13 @@ class PyCHAM(QWidget):
 		self.b206b.addItem(str(u'\u03BC' + 'g/m' + u'\u00B3' + ' log.'))
 		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' + u'\u00B3' + ' log.'))
 		self.PRIMlayout.addWidget(self.b206b, 3, 1, 1, 1)
+
+		# button to plot ozone isopleth as relevant to the used chemical scheme and the oberved
+		# range of VOC and NOx
+		self.b206c = QPushButton(str('Ozone isopleth'), self)
+		self.b206c.setToolTip('Plot equilibrium ozone concentrations over the range of simulatec concentrations of NOx and VOC')
+		self.b206c.clicked.connect(self.on_click206c)
+		self.PRIMlayout.addWidget(self.b206c, 3, 2, 1, 1)
 
 		# particle-phase concentrations temporal profiles -------------
 
@@ -1751,8 +1758,8 @@ class PyCHAM(QWidget):
 		
 		# prepare by enforcing default variables
 		# default variables for all required input model variables -------------------------
-		[sav_nam, chem_sch_mark, update_stp, tot_time, comp0, 
-		y0, temp, tempt, RH, RHt, Press, wall_on, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		[sav_nam, update_stp, tot_time, comp0, 
+		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
@@ -1765,8 +1772,8 @@ class PyCHAM(QWidget):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, chem_sch_mark, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+			[sav_nam, update_stp, 
+			tot_time, comp0, y0, RH, RHt, Press,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			save_step, Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
@@ -1916,8 +1923,8 @@ class PyCHAM(QWidget):
 		
 			# reset to default variables to allow any new variables to arise
 			# from the current model variables file only
-			[sav_nam, chem_sch_mark, update_stp, 
-			tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on, Cw, 
+			[sav_nam, update_stp, 
+			tot_time, comp0, y0, RH, RHt, Press, Cw, 
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, save_step, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
@@ -1960,8 +1967,8 @@ class PyCHAM(QWidget):
 			# get the save path name variables
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, chem_sch_mark, update_stp, 
-				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+				[sav_nam, update_stp, 
+				tot_time, comp0, y0, RH, RHt, Press,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 				save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
@@ -2320,12 +2327,20 @@ class PyCHAM(QWidget):
 
 		import plotter_gp
 		dir_path = self.l201.text() # name of folder with model results
+
 		if (dir_path[-4::] != '.nc'):
 			plotter_gp.plotter(caller, dir_path, comp_names, self) # plot results
 		if (dir_path[-3::] == '.nc'):
 			plotter_gp.plotter_noncsv(caller, dir_path, comp_names, self) # plot results
 	
+	@pyqtSlot() # button to plot ozone isopleth
+	def on_click206c(self):
+
+		import plotter_gp
+		self.dir_path = self.l201.text() # name of folder with model results
 	
+		plotter_gp.O3_iso(self)
+
 	# button to plot total particle-phase concentration for individual components temporal profile
 	@pyqtSlot()
 	def on_click209(self):	
@@ -3570,8 +3585,8 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, chem_sch_mark, update_stp, 
-				tot_time, comp0, y0, temp, tempt, RH, RHt, Press, wall_on,
+				[sav_nam, update_stp, 
+				tot_time, comp0, y0, RH, RHt, Press,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 				std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,

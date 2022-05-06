@@ -32,12 +32,12 @@ import formatting
 import photo_num
 import importlib
 
-def chem_scheme_SMILES_extr(self, chem_scheme_markers):
+def chem_scheme_SMILES_extr(self):
 
 	# inputs: ------------------------------------------
 	# self.sch_name - path to chemical scheme
 	# self.xml_name - path to xml name
-	# chem_scheme_markers - markers for chemical scheme
+	# self.chem_sch_mrk - markers for chemical scheme
 	# ----------------------------------------------------
 	
 	# initiate with empty error message
@@ -50,7 +50,7 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 
 	# interrogate scheme to list equations
 	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-		RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_scheme_markers)
+		RO2_names] = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
@@ -70,8 +70,8 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 		line = eqn_list[eqn_step] # extract this line
 		
 		# work out whether equation or reaction rate coefficient part comes first
-		eqn_start = str('.*\\' +  chem_scheme_markers[10])
-		rrc_start = str('.*\\' +  chem_scheme_markers[9])
+		eqn_start = str('.*\\' +  self.chem_sch_mrk[10])
+		rrc_start = str('.*\\' +  self.chem_sch_mrk[9])
 		# get index of these markers, note span is the property of the match object that
 		# gives the location of the marker
 		eqn_start_indx = (re.match(eqn_start, line)).span()[1]
@@ -88,9 +88,9 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 		# except for new line characters, so final part is stating the character(s) we 
 		# are specifically looking for, \\ ensures the marker is recognised
 		if eqn_sec == 1:
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[11])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[11])
 		else: # end of equation part is start of reaction rate coefficient part
-			eqn_markers = str('\\' +  chem_scheme_markers[10]+ '.*\\' +  chem_scheme_markers[9])
+			eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[9])
 		
 		# extract the equation as a string ([0] extracts the equation section and 
 		# [1:-1] removes the bounding markers)
@@ -108,15 +108,15 @@ def chem_scheme_SMILES_extr(self, chem_scheme_markers):
 		# rate coefficient part --------------------------------------------
 		# .* means occurs anywhere in line and, first \ means second \ can be interpreted 
 		# and second \ ensures recognition of marker
-		rate_coeff_start_mark = str('\\' +  chem_scheme_markers[9])
+		rate_coeff_start_mark = str('\\' +  self.chem_sch_mrk[9])
 		# . means match with anything except a new line character, when followed by a * 
 		# means match zero or more times (so now we match with all characters in the line
 		# except for new line characters, \\ ensures the marker
 		# is recognised
 		if eqn_sec == 1: # end of reaction rate coefficient part is start of equation part
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[10])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[10])
 		else: # end of reaction rate coefficient part is end of line
-			rate_coeff_end_mark = str('.*\\' +  chem_scheme_markers[11])
+			rate_coeff_end_mark = str('.*\\' +  self.chem_sch_mrk[11])
 		
 		# rate coefficient starts and end punctuation
 		rate_regex = str(rate_coeff_start_mark + rate_coeff_end_mark)

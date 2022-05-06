@@ -186,7 +186,8 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				Psat_Pa_rec[i] = Psat_Pa[0, i]
 			else: 
 				Psat_Pa_rec[i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], 298.15, boiling_points.nannoolal(Pybel_objects[i]))))
-		else:
+		
+		else: # for non-HOM components
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 			# that equation given by eq. 7 of same reference)
 			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
@@ -198,7 +199,10 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				Psat[0, i] = Psatnow
 			
 			if (TEMP == 298.15):
-				Psat_Pa_rec[i] = Psat_Pa[0, i]
+				try: # in case array
+					Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
+				except: # in case float
+					Psat[0, i] = Psatnow # note transfer to Pa is below
 			else: 
 				Psatnow= ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
 						boiling_points.nannoolal(Pybel_objects[i]))))

@@ -29,7 +29,7 @@ import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
 		y_dens, N_perbin, radius, Psat, therm_sp,
-		H2Oi, act_coeff, wall_on, caller, partit_cutoff, Press, DStar_org,
+		H2Oi, act_coeff, caller, partit_cutoff, Press, DStar_org,
 		z_prt_coeff, chamSA, chamV, kwf, self):
 	
 	# inputs:---------------------------------------------------------------------------
@@ -49,7 +49,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# therm_sp - thermal speed of components (m/s) (num_comp, 1)
 	# H2Oi - water index (integer)
 	# act_coeff - activity coefficient of components (dimensionless)
-	# wall_on - marker for whether wall present
+	# self.wall_on - marker for whether wall present
 	# caller - marker for the calling function
 	# partit_cutoff - the product of Psat and act_coeff above which gas-particle 
 	# 		partitioning assumed zero (Pa)
@@ -65,24 +65,24 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# ------------------------------------------------------------------------------------
 	
 	if (num_sb == 0): # fillers
-		kimt = np.zeros((num_sb-wall_on, num_comp))
-		kelv_fac = np.zeros((num_sb-wall_on, 1))
+		kimt = np.zeros((num_sb-self.wall_on, num_comp))
+		kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 
 		return(kimt, kelv)
 
-	if (num_sb > 0) and (wall_on > 0): # if wall present
+	if (num_sb > 0) and (self.wall_on > 0): # if wall present
 		y_part = y[num_comp:-(num_comp)]
-	if (num_sb > 0) and (wall_on == 0): # if wall absent
+	if (num_sb > 0) and (self.wall_on == 0): # if wall absent
 		y_part = y[num_comp::]
 	
-	if (num_sb-wall_on > 0): # if particles present
+	if (num_sb-self.wall_on > 0): # if particles present
 		# density (g/cm3) and average molecular weight (g/mol) of particles (excluding wall)
-		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-wall_on), NA, y_mw, y_dens, 
+		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-self.wall_on), NA, y_mw, y_dens, 
 					N_perbin)
 	
 	
 		# Knudsen number (dimensionless)
-		Kn = np.repeat(mfp, (num_sb-wall_on), 1)/np.repeat(radius, num_comp, 0)
+		Kn = np.repeat(mfp, (num_sb-self.wall_on), 1)/np.repeat(radius, num_comp, 0)
 	
 		# update accommodation coefficients if necessary
 		# note, using __import__ rather than import allows opening in run time, thereby using
@@ -108,7 +108,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# note that avMW has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 		# 1e7 for units g cm2/s2.mol.K, 
 		# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
-		kelv = np.zeros((num_sb-wall_on, 1))
+		kelv = np.zeros((num_sb-self.wall_on, 1))
 		kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*1.e2*tot_rho[ish]))
 	
 		# ------------------------------------------------
@@ -130,14 +130,14 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# when compared against non-water and non-seed components
 		#if (z_prt_coeff > 0.):
 		#	# get gas and particle phase concentrations
-		#	if (num_sb > 0) and (wall_on > 0): # if wall present
+		#	if (num_sb > 0) and (self.wall_on > 0): # if wall present
 		#		y_gp[:] = np.zeros((len(y[0:-(num_comp)])))
 		#		y_gp = y[0:-(num_comp)]
-		#	if (num_sb > 0) and (wall_on == 0): # if wall absent
+		#	if (num_sb > 0) and (self.wall_on == 0): # if wall absent
 		#		y_gp = np.zeros((len(y[:])))
 		#		y_gp[:] = y[:]
 		#	# rearrange so that components in rows and gas/size bins in columns
-		#	y_gp = y_gp.reshape(num_comp, num_sb-wall_on+1, order='F')
+		#	y_gp = y_gp.reshape(num_comp, num_sb-self.wall_on+1, order='F')
 		#	# zero water
 		#	y_gp[H2Oi, :] = 0.
 		#	# zero seed
@@ -163,8 +163,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 			kimt[highVPi] = 0.
 	
 	else: # if no particles
-		kimt = np.zeros((num_sb-wall_on, num_comp))
-		kelv = np.zeros((num_sb-wall_on, 1))
+		kimt = np.zeros((num_sb-self.wall_on, num_comp))
+		kelv = np.zeros((num_sb-self.wall_on, 1))
 
 	if (kwf == -1):
 		# gas-wall partitioning coefficient (/s), from Huang et al. 2018 

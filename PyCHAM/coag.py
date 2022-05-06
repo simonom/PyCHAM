@@ -37,7 +37,7 @@ import fullmov
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 			num_comp, vdWon, rho, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
-			sbVj, coag_on, siz_str, wall_on):
+			sbVj, coag_on, siz_str, self):
 
 	# inputs:---------------------------------------------------------
 	
@@ -70,7 +70,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	# coag_on - whether to allow coagulation to occur (1) or not (0)
 	# siz_str - the size structure to use
-	# wall_on - marker for whether wall being considered
+	# self - reference to PyCHAM
 	# --------------------------------------------------------------
 	
 	num_part = num_part.reshape(1, -1)
