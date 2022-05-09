@@ -372,7 +372,7 @@ def ui_check(self):
 			f = open(self.af_path, 'r') # open file
 			f.close() # close excel file
 		except:
-			err_mess = str('Error- actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_file model variable in the model variable file.')
+			err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_file model variable in the model variable file.')
 			em_flag = 2
 	
 	
