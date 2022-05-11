@@ -109,9 +109,9 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# probability distribution function scaled to actual size bin radii
 			pdf_out = np.interp(x_output, hires, pdf_output)	
 			# contribute the number concentration of all size bins in 
-			# this mode (# particle/cc (air))
+			# this mode (# particle/cm3 (air))
 			Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
-		
+	
 	# if number concentration (# particles/cm3 (air)) explicitly stated in inputs
 	if (pmode == 1):
 		Nperbin = np.array((pconc))

@@ -147,7 +147,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf)
-
+		
 		# if injection of particles at start of experiment is continuous, then even for the 
 		# start of the experiment, this will be dealt with in cham_up
 		if (i.size > 0 and num_asb > 0 and pcont[0, 0] == 1):

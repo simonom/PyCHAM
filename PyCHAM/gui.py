@@ -139,9 +139,9 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(b0, 0, ffscn, 1, 2)
 		
 		# default variables for all required input model variables -------------------------
-		[sav_nam, update_stp, tot_time, comp0, 
+		[sav_nam, comp0, 
 		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
@@ -245,21 +245,21 @@ class PyCHAM(QWidget):
 		l11.setText('Total experiment time (s): ')
 		self.varbox.addWidget(l11, gen_row+3, 0)
 		self.l11a = QLabel(self)
-		self.l11a.setText((str(tot_time)).replace('\'', '').replace(' ', ''))
+		self.l11a.setText((str(self.tot_time)).replace('\'', '').replace(' ', ''))
 		self.varbox.addWidget(self.l11a, gen_row+3, 1)
 		
 		l12 = QLabel(self)
 		l12.setText('Update time interval (s): ')
 		self.varbox.addWidget(l12, gen_row+4, 0)
 		self.l12a = QLabel(self)
-		self.l12a.setText((str(update_stp)).replace('\'', '').replace(' ', ''))
+		self.l12a.setText((str(self.update_stp)).replace('\'', '').replace(' ', ''))
 		self.varbox.addWidget(self.l12a, gen_row+4, 1)
 		
 		l13 = QLabel(self)
 		l13.setText('Recording time interval (s): ')
 		self.varbox.addWidget(l13, gen_row+5, 0)
 		self.l13a = QLabel(self)
-		self.l13a.setText((str(save_step)).replace('\'', '').replace(' ', ''))
+		self.l13a.setText((str(self.save_step)).replace('\'', '').replace(' ', ''))
 		self.varbox.addWidget(self.l13a, gen_row+5, 1)
 		
 		l13_1 = QLabel(self)
@@ -1758,9 +1758,9 @@ class PyCHAM(QWidget):
 		
 		# prepare by enforcing default variables
 		# default variables for all required input model variables -------------------------
-		[sav_nam, update_stp, tot_time, comp0, 
+		[sav_nam, comp0, 
 		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, save_step, Compt, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
@@ -1772,10 +1772,9 @@ class PyCHAM(QWidget):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, update_stp, 
-			tot_time, comp0, y0, RH, RHt, Press,
+			[sav_nam, comp0, y0, RH, RHt, Press,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, Compt, injectt, Ct, seed_name,
+			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -1923,10 +1922,9 @@ class PyCHAM(QWidget):
 		
 			# reset to default variables to allow any new variables to arise
 			# from the current model variables file only
-			[sav_nam, update_stp, 
-			tot_time, comp0, y0, RH, RHt, Press, Cw, 
+			[sav_nam, comp0, y0, RH, RHt, Press, Cw, 
 			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
-			space_mode, std, mean_rad, save_step, Compt, injectt, 
+			space_mode, std, mean_rad, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
@@ -1967,10 +1965,9 @@ class PyCHAM(QWidget):
 			# get the save path name variables
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, update_stp, 
-				tot_time, comp0, y0, RH, RHt, Press,
+				[sav_nam, comp0, y0, RH, RHt, Press,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-				save_step, Compt, injectt, Ct, seed_name,
+				Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -3585,10 +3582,9 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, update_stp, 
-				tot_time, comp0, y0, RH, RHt, Press,
+				[sav_nam, comp0, y0, RH, RHt, Press,
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-				std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
+				std, mean_rad, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 

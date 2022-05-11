@@ -36,10 +36,9 @@ def share(self):
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, update_stp, 
-		tot_time, comp0, y0, RH, RHt, Press,
+		[sav_nam, comp0, y0, RH, RHt, Press,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-		save_step, Compt, injectt, Ct, seed_name,
+		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -58,8 +57,6 @@ def share(self):
 		# ensure that every variable passed to middle is also available in self.
 		# this allows saving of all initial states of variables
 		self.sav_nam_orig = sav_nam
-		self.update_stp_orig = update_stp
-		self.tot_time_orig = tot_time
 		self.comp0_orig = comp0
 		self.y0_orig = y0
 		self.RH_orig = RH
@@ -77,7 +74,6 @@ def share(self):
 		self.space_mode_orig = space_mode
 		self.std_orig = std
 		self.mean_rad_orig = mean_rad
-		self.save_step_orig = save_step
 		self.Compt_orig = Compt
 		self.injectt_orig = injectt
 		self.Ct_orig = Ct
@@ -140,10 +136,9 @@ def share(self):
 		self.dil_fac_orig = self.dil_fac
 		self.tf_UVC_orig = self.tf_UVC
 
-	return(sav_nam, update_stp, 
-		tot_time, comp0, y0, RH, RHt, Press,
+	return(sav_nam, comp0, y0, RH, RHt, Press,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-		std, mean_rad, save_step, Compt, injectt, Ct, seed_name,
+		std, mean_rad, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 

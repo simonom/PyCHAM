@@ -381,6 +381,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 				# if generation number not yet included for this component
 				if (len(self.gen_num)-1 < comp_namelist.index(name_only)):
 					self.gen_num.append(0)
+			
 			else:
 				# if it is an unoxidised organic, then say it's 0th-generation
 				if (SMILEi.count('o')+SMILEi.count('O') == 0):
@@ -415,7 +416,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 							reac_min_gen = 1
 							nzr = 1
 						
-					# if this component is already assigned a >0 
+					# if this component is already assigned a > 0 
 					# generation number,
 					# then identify minimum generation number in this equation
 					else:

@@ -26,14 +26,14 @@ import scipy.constants as si
 import matplotlib.pyplot as plt
 from v_check import Vchange_check as Vchange_check
 
-def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV, 
+def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV, 
 				Psat, ic_red, res, solv_time, self):
 
 
 	# input:---------------------------------------------------------
 	
 	# n0 - particle number concentration per size bin before integration
-	# (# particle/cc (air))
+	# (# particle/cm3 (air))
 	# s0 - volume bounds per size bin (um3) (1st dim.)
 	# before a time step over which gas phase reaction and 
 	# gas-particle partitioning have occurred (molecules/cc (air))
@@ -44,7 +44,6 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, tmax, C0, MV,
 	# Vol0 - original volume of size bins (um3) (excluding wall, i.e. volume at mid-point
 	# 		between size bin bounds)
 	# t - total integration time (s)
-	# tmax - maximum integration time (s)
 	# tinc_count - count on number of time steps since time interval last required 
 	# decreasing
 	# C0 - original concentrations (# molecules/cm3 (air))

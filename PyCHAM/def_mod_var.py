@@ -45,9 +45,9 @@ def def_mod_var(caller, self): # define function
 	# markers to isolate sections of chemical scheme based on MCM KPP format
 	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
 	# time interval between updates to integration inputs (s)
-	update_stp = 1.
-	tot_time = 1. # total time to integrate over (s)
-	save_step = 1. # time interval between saving results (s)
+	self.update_stp = 1.
+	self.tot_time = 1. # total time to integrate over (s)
+	self.save_step = 1. # time interval between saving results (s)
 	if (caller == 0): # called from PyCHAM
 		uman_up = 0 # marker for whether to update the UManSysProp folder
 	if (caller == 1): # called from Travis
@@ -193,9 +193,9 @@ def def_mod_var(caller, self): # define function
 	# --------------------------------------------------------------------------
 
 	# prepare for pickling
-	list_vars = [sav_nam, update_stp, tot_time, comp0, y0, RH, RHt, Press, 
+	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-			uppsize, space_mode, std, mean_rad, save_step, 
+			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 			seedx, con_infl_t, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
@@ -214,10 +214,9 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, update_stp, 
-		tot_time, comp0, y0, RH, RHt, Press, Cw, 
+	return(sav_nam, comp0, y0, RH, RHt, Press, Cw, 
 		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
-		space_mode, std, mean_rad, save_step, Compt, 
+		space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 

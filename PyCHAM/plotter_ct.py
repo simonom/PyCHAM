@@ -298,11 +298,11 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			# ----------------------------------------------------
 
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
-				chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 		# interrogate scheme to list equations
 		[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-			RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)	
+			RO2_names] = sch_interr.sch_interr(total_list_eqn, self)	
 	
 		for cnum in range(np.min([top_num[0], len(res_sort)])): # loop through chemical reactions
 			

@@ -31,7 +31,7 @@ import write_dydt_rec
 
 
 def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
-	testf, pconc, end_sim_time, save_step, 
+	testf, pconc, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	comp_namelist, Compt, seed_name, seed_mw,
 	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
@@ -51,8 +51,8 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# pconc - initial concentration of particles (# particles/cc (air))
 	# self.dydt_trak - chemical scheme name of components for which user wants the tendency to  
 	#			change tracked
-	# end_sim_time - total simulation time (s)
-	# save_step - recording frequency (s)
+	# self.tot_time - total simulation time (s)
+	# self.save_step - recording frequency (s)
 	# rindx - indices of reactants per equation
 	# pindx - indices of products per equation
 	# num_eqn - number of equations
@@ -125,17 +125,22 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		y[self.VOCi] = self.VOCequil # VOC concentration
 		y[self.NOi] = self.NOxequil/2. # NO concentration
 		y[self.NO2i] = self.NOxequil/2. # NO2 concentration
+		# if a previous equilibrium ozone concentration has been found, 
+		# then use this as a first guess to help speed-up iteration
+		#if hasattr(self, 'O3equil'):
+		#	y[self.O3i] = self.O3equil
+		
+		#else: # if no existing guess of [O3], then estimate of [NOx] and [VOC]
+		y[self.O3i] = self.VOCequil+self.NOxequil
 
-		# ensure that these components are held at this concentration
-		if self.VOCi not in self.con_C_indx:
-			self.con_C_indx = np.append(self.con_C_indx, self.VOCi)
-		if self.NOi not in self.con_C_indx:
-			self.con_C_indx = np.append(self.con_C_indx, self.NOi)
-		if self.NO2i not in self.con_C_indx:
-			self.con_C_indx = np.append(self.con_C_indx, self.NO2i)
+		self.O3equil = y[self.O3i] # register first guess at O3
+		# note that for NOx, the NO:NO2 ratio is allowed to change during integration steps,
+		# however, the total NO+NO2 concentration is held constant through commands
+		# contained in ode_updater, likewise inside ode solver the VOC concentration is 
+		# not allowed to change
 
 	# number of recording steps
-	nrec_steps = int(math.ceil(end_sim_time/save_step)+1)
+	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
 	for i in range(num_comp): # loop through all components to get molar weights
 		y_mw[i] = Pybel_objects[i].molwt # molecular weight (g/mol)

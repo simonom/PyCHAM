@@ -41,11 +41,10 @@ def middle(self): # define function
 	# ---------------------------------------------------------------
 	
 	# get required inputs
-	[sav_nam, update_stp, tot_time, 
-		comp0, y0, RH, RHt, Pnow,
+	[sav_nam, comp0, y0, RH, RHt, Pnow,
 		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
-		save_step, Compt, injectt, Ct, seed_name, seed_mw, 
+		Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
 		const_infl_t, dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
@@ -78,8 +77,7 @@ def middle(self): # define function
 	# from the simulate tab
 	if (self.testf == 4):
 		import var_checker
-		[err_mess, erf] = var_checker.var_checker(tot_time, Jlen, 
-							update_stp, err_mess, erf, self)
+		[err_mess, erf] = var_checker.var_checker(Jlen, err_mess, erf, self)
 	
 	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
@@ -89,8 +87,8 @@ def middle(self): # define function
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
-	comp0, y0, self.TEMP[0], RH, Pnow, Pybel_objects, 0, pconc, tot_time, 
-	save_step, rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
+	comp0, y0, self.TEMP[0], RH, Pnow, Pybel_objects, 0, pconc, 
+	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
 	rstoi_g, pstoi_g, self)
@@ -126,11 +124,10 @@ def middle(self): # define function
 
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, comp_namelist, y_mw,
-		const_infl_t, tot_time, Compt, self) 
+		const_infl_t, Compt, self) 
 
 	# solve problem
-	for prog in ode_updater.ode_updater(update_stp, 
-		tot_time, save_step, y, rindx_g, 
+	for prog in ode_updater.ode_updater(y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
 		jac_den_indx_g, jac_indx_g, H2Oi, 
 		Pnow, Jlen, nrec_steps, 

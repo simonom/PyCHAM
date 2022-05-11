@@ -42,7 +42,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, y_dens, n0):
 	
 	mass_fracs = np.zeros((num_comp, num_asb)) # empty matrix for mass fractions
 		
-	ish = np.array((n0[:, 0]))>0.0 # size bins with particles
+	ish = np.array((n0[:, 0])) > 0. # size bins with particles
 	
 	# mass fractions of each species including core
 	mass_fracs[:, ish] = y_mass_array[:, ish]/((np.sum(y_mass_array, 0))[ish])

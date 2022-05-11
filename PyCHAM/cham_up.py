@@ -35,14 +35,14 @@ from water_calc import water_calc
 # define function
 def cham_up(sumt, Pnow, 
 	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	new_part_sum1, update_stp, update_count,
+	new_part_sum1, update_count,
 	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, const_infl_t, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, Psat, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self):
+	seed_eq_wat, Vwat_inc, tot_in_res, Compti, self):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -61,8 +61,8 @@ def cham_up(sumt, Pnow,
 	# nucv2 - nucleation parameter two
 	# nucv3 - nucleation parameter three
 	# new_part_sum1 - total number concentration of new 
-	#	particles so far (#/cc (air))
-	# update_stp - time interval between operator-split 
+	#	particles so far (#/cm3 (air))
+	# self.update_stp - time interval between operator-split 
 	#	updates (s)
 	# update_count - count since operator-split last 
 	#	updated (s)
@@ -137,7 +137,6 @@ def cham_up(sumt, Pnow,
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - count on total injected concentration of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
-	# tot_time - total simulation time (s)
 	# self.cont_inf_reci - index for total injection record for continuously injected components
 	# self.con_infl_indx - index for continuously injected components from all components
 	# -----------------------------------------------------------------------
@@ -470,8 +469,9 @@ def cham_up(sumt, Pnow,
 		if (infx_cnt == -1):
 			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
 			Cinfl_now = (self.con_infl_C[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
-			# continuous influx rate of water now
-			self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
+			if (self.H2Oin == 1):
+				# continuous influx rate of water now
+				self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
 		
@@ -481,8 +481,9 @@ def cham_up(sumt, Pnow,
 			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
 			Cinfl_now = (self.con_infl_C[:, infx_cnt]*Cfactor).reshape(-1, 1)
 			
-			# continuous influx rate of water now
-			self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
+			if (self.H2Oin == 1):
+				# continuous influx rate of water now
+				self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
 			
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
@@ -520,13 +521,13 @@ def cham_up(sumt, Pnow,
 	
 		if (tnew > t_need): # if suggested time step exceeds this, then reduce to required time step 
 			tnew = t_need
-			update_stp = t_need
+			self.update_stp = t_need
 			update_count = 0.
 			bc_red = 1
 			
 	# nucleation check end -------------------------------------------------------------------------
 	
-	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_stp, update_count, 
+	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 		RHt_cnt, Psat, N_perbin, x, pconcn_frac, pcontf, tot_in_res, Cinfl_nowp_indx, 
 		Cinfl_nowp)

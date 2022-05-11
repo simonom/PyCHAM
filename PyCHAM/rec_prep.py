@@ -39,14 +39,14 @@ def rec_prep(nrec_step,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
+	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	const_infl_t, infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
-	tot_in_res, Compti, tot_time, 
+	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, kwf, self):
 	
 	# inputs: --------------------------------------------------------
@@ -61,7 +61,7 @@ def rec_prep(nrec_step,
 	# nreac - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
-	# N_perbin - particle concentration per size bin (#/cc (air))
+	# N_perbin - particle concentration per size bin (#/cm3 (air))
 	# core_diss - dissociation constant of seed
 	# Psat - pure component saturation vapour pressure 
 	#	(# molecules/cm3 (air))
@@ -106,8 +106,8 @@ def rec_prep(nrec_step,
 	# nucv2 - nucleation parameter two
 	# nucv3 - nucleation parameter three
 	# np_sum - cumulative number concentration of new 
-	#	particles so far (#/cc (air))
-	# update_stp - time interval between operator-split processes
+	#	particles so far (#/cm3 (air))
+	# self.update_stp - time interval between operator-split processes
 	# update_count - count on time since last operator-split (s)
 	# injectt - time of instantaneous injection of components (s)
 	# gasinj_cnt - count on injection times of components
@@ -164,7 +164,7 @@ def rec_prep(nrec_step,
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
-	# tot_time - total experiment time (s)
+	# self.tot_time - total experiment time (s)
 	# self.cont_inf_reci - index of components with continuous influx in record
 	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
@@ -182,22 +182,22 @@ def rec_prep(nrec_step,
 	# index of components being stored for influx
 	tot_in_res_ft[0, :] = tot_in_res_indx
 	tot_in_res_ft[1, :] = tot_in_res # influx at start
-
-	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+	
+	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
 		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 		Cinfl_nowp] = cham_up.cham_up(sumt, 
 		Pnow, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-		update_stp, update_count, 
+		update_count, 
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
-		seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
+		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)

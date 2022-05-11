@@ -26,7 +26,7 @@
 
 import numpy as np # for math and array handling
 
-def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define function
+def var_checker(Jlen, err_mess, erf, self): # define function
 
 	# inputs: -----------------------------------------------------------------------
 	# self.testf - flag for whether in checking mode and what to check
@@ -34,7 +34,7 @@ def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define funct
 	# self.light_time - times through experiment light status corresponds to
 	# self.TEMP - temperatures inside chamber (K)
 	# self.tempt - times through experiment (s) temperatures correspond to
-	# tot_time - total time to run experiment for (s)
+	# self.tot_time - total time to run experiment for (s)
 	# self.af_path - path to file stating actinic flux
 	# self.DayOfYear - day number of the year (1-365)
 	# self.photo_file - name of file with with estimates for photolysis absorption
@@ -59,7 +59,7 @@ def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define funct
 		self.tempt = np.array(self.tempt)
 		self.TEMP = np.array(self.TEMP)
 		
-		while (sumt < tot_time-tot_time*1.e-10):
+		while (sumt < self.tot_time-self.tot_time*1.e-10):
 
 			# identify relevant light status
 			lindx = np.sum(self.light_time >= sumt)
@@ -82,8 +82,8 @@ def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define funct
 				else:
 					Jres = np.concatenate((Jres, J.reshape(1, -1)), axis = 0)
 					
-			sumt += update_stp # time through experiment (s)
-			self.sumt += update_stp # time through experiment (s)
+			sumt += self.update_stp # time through experiment (s)
+			self.sumt += self.update_stp # time through experiment (s)
 
 		# ignore first column of Jres as this left empty by photolysisRates
 		Jres = Jres[:, 1::]
@@ -97,7 +97,7 @@ def var_checker(tot_time, Jlen, update_stp, err_mess, erf, self): # define funct
 		plt.ion() # allow plotting
 		
 		# times to plot against (hours through experiment)
-		thr = (np.arange(0.0, tot_time, update_stp))/3600.0
+		thr = (np.arange(0., self.tot_time, self.update_stp))/3600.
 		
 		# number of plots
 		nplot = math.ceil((Jlen)/10.)

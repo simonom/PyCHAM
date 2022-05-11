@@ -76,6 +76,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		y_part = y[num_comp::]
 	
 	if (num_sb-self.wall_on > 0): # if particles present
+		
 		# density (g/cm3) and average molecular weight (g/mol) of particles (excluding wall)
 		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-self.wall_on), NA, y_mw, y_dens, 
 					N_perbin)

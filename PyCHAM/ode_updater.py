@@ -53,8 +53,7 @@ import act_coeff_update
 import ode_brk_err_mess
 
 
-def ode_updater(update_stp, 
-	tot_time, save_stp, y, rindx, 
+def ode_updater(y, rindx, 
 	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
 	jac_den_indx, jac_indx, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
@@ -83,10 +82,10 @@ def ode_updater(update_stp,
 	chamV, self):
 	
 	# inputs: ----------------------------------------------------
-	# update_stp - interval at which to update integration 
+	# self.update_stp - interval at which to update integration 
 	#		constants (s)
-	# tot_time - total time to simulate (s)
-	# save_stp - frequency to save results (s)
+	# self.tot_time - total time to simulate (s)
+	# self.save_step - frequency to save results (s)
 	# y - initial component concentrations (molecules/cc/s)
 	# rindx - index of reactants per equation
 	# pindx - index of products per equation
@@ -323,10 +322,10 @@ def ode_updater(update_stp,
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
 	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1])) # remember initial particle number concentrations (# particles/cm3)
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
-	t0 = update_stp # remember initial integration step (s)
+	t0 = self.update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
-	tnew = update_stp # the time to integrate over (s)
+	tnew = self.update_stp # the time to integrate over (s)
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
 	comp_namelist_np = np.array(comp_namelist) # numpy array version of chemical scheme names
@@ -354,13 +353,13 @@ def ode_updater(update_stp,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cw, kw, Cfactor, 
 	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	np_sum, update_stp, update_count, injectt, gasinj_cnt, 
+	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, 
+	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, kwf, self)
 	
 	import ode_solv
@@ -368,7 +367,7 @@ def ode_updater(update_stp,
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
 
-	while (tot_time-sumt) > (tot_time/1.e10):
+	while (self.tot_time-sumt) > (self.tot_time/1.e10):
 		
 		# remembering variables at the start of the integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
@@ -404,42 +403,42 @@ def ode_updater(update_stp,
 				y[:] = y0[:] # (# molecules/cm3)
 			
 			# update chamber variables
-			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
-			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-			update_stp, update_count, 
+			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
-			if ((sumt+tnew) > save_stp*save_cnt_chck):
-				tnew = (save_stp*(save_cnt_chck))-sumt
+			if ((sumt+tnew) > self.save_step*save_cnt_chck):
+				tnew = (self.save_step*(save_cnt_chck))-sumt
 				# temporarily set the update step for operator-split processes
 				# to align with recording time step, this ensures that
 				# recording and operator-split intervals don't fall out of sync
-				update_stp = tnew
+				self.update_stp = tnew
 				update_count = 0.
 				ic_red = 1
 			
 			# ensure update to operator-split processes interval not surpassed
-			if (update_count+tnew > update_stp):
-				tnew = (update_stp-update_count)
+			if (update_count+tnew > self.update_stp):
+				tnew = (self.update_stp-update_count)
 				ic_red = 1
 			
 			# ensure simulation end time not surpassed
-			if (sumt+tnew > tot_time):
-				tnew = (tot_time-sumt)
+			if (sumt+tnew > self.tot_time):
+				tnew = (self.tot_time-sumt)
 				ic_red = 1
+			
 			# ------------------------------------------------------------------		
 			
 			if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles present
@@ -478,24 +477,25 @@ def ode_updater(update_stp,
 			# for change tendencies, do want to save from t=0
 			# record any change tendencies of specified components
 			if (len(self.dydt_vst) > 0 and save_cntf == 0):
-				if (sumt == 0. or (sumt-(save_stp*(save_cnt-1)) > -1.e-10)):
+				if (sumt == 0. or (sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
 					if (sumt == 0.):
 						dydt_cnt = save_cnt-2
-					if (sumt-(save_stp*(save_cnt-1)) > -1.e-10):
+					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
 						dydt_cnt = save_cnt-1
 					
 					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
-					self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-						nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-						kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
+					if (self.testf != 5):
+						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
+							nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
+							kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 			
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
 			# instantaneous changes at this time step without interpolation to
 			# smaller instantaneous changes (when interpolation forced due to 
 			# instability)
-			if (save_cntf == 0 and (sumt-(save_stp*(save_cnt-1)) > -1.e-10)):
+			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
 				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
@@ -594,7 +594,8 @@ def ode_updater(update_stp,
 				H2Oi, comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
 			
-			# if any components set to have constant gas-phase concentration
+			# if any components set to have constant gas-phase 
+			# concentration
 			if (any(self.con_C_indx)): # then keep constant
 				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
 			
@@ -622,19 +623,7 @@ def ode_updater(update_stp,
 				gpp_stab = -1 # maintain unstable flag
 				# tell user what's happening
 				yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
-				#y_gp = np.zeros((len(y)))
-				#y_gp[:] = y[:]
-				#y_gp = y_gp.reshape(num_comp, num_sb-self.wall_on+1, order='F')
-				#y_gpi = np.where(y_gp<0.)
 				
-				# in case more detailed look at negative issue wanted
-				#for gpi in y_gpi[0]: # loop through negative components
-				#	print('negative component name:', comp_namelist[gpi])
-				#	print(y0[gpi::num_comp])
-				#	print(y[gpi::num_comp])
-				#	import ipdb; ipdb.set_trace()
-				#print('negative component size bin:', np.unique(y_gpi[1][:]))
-					
 				if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
@@ -668,7 +657,7 @@ def ode_updater(update_stp,
 				for ci in range(len(self.obs_comp_i)): # loop through components
 					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
 
-		if (sumt%save_stp < 1.e-12 or (sumt%save_stp-save_stp) < 1.e-12): # get remainder
+		if (sumt%self.save_step < 1.e-12 or (sumt%self.save_step-self.save_step) < 1.e-12): # get remainder
 			save_cnt_chck += 1 # if need to move up count on recording
 		
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
@@ -684,7 +673,7 @@ def ode_updater(update_stp,
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
-					update_stp, y0, MV, Psat[0, :], ic_red, y, res_t, self)
+					y0, MV, Psat[0, :], ic_red, y, res_t, self)
 				
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
@@ -695,7 +684,7 @@ def ode_updater(update_stp,
 			update_count += tnew # time since operator-split processes last called (s)
 			
 			# if time met to implement operator-split processes
-			if (update_count >= (update_stp*9.999999e-1)):
+			if (update_count >= (self.update_stp*9.999999e-1)):
 				if (any(N_perbin > 1.e-10)):
 				
 					# particle-phase concentration(s) (# molecules/cm3 (air))
@@ -735,43 +724,78 @@ def ode_updater(update_stp,
 				update_count = 0.
 		
 		# update the percentage time in the GUI progress bar
-		yield (sumt/tot_time*100.)
+		yield (sumt/self.tot_time*100.)
 		
 		# if ozone isopleth being made, then store ozone result
 		if (self.testf == 5):
-			print(y[self.VOCi], y[self.NOi], y[self.NO2i], y[self.O3i])
-			if step_no == 1: # if first time step
-				self.O3equil = y[self.O3i]
-			else: # later time steps
-				O3equil_new = y[self.O3i]
-				# if O3 concentration still changing significantly (not at equilibrium)
-				if (np.abs(O3equil_new-self.O3equil)/O3equil_new)/tnew > 1.e-3:
-					self.O3equil = O3equil_new
-				else: # if O3 close enough to equilibrium
-					self.O3equil = O3equil_new
-					return() # end this call to simulation
-				print(y[self.VOCi], y[self.NOi], y[self.NO2i])
-				print((np.abs(O3equil_new-self.O3equil)/O3equil_new)/tnew)	
+			
+			if (sumt + t0 >= self.tot_time): # ensure simulation doesn't end
+				self.tot_time += t0*2.
 
-		if (sumt >= (tot_time-tot_time/1.e10)): # record output at experiment end
+			# keep [VOC] constant
+			y[self.VOCi] = y0[self.VOCi]
+			# keep [NO]+[NO2] constant
+			y_NO_reset = (y[self.NOi]/(y[self.NOi]+y[self.NO2i]))*(y0[self.NOi]+y0[self.NO2i])
+			y_NO2_reset = (y[self.NO2i]/(y[self.NOi]+y[self.NO2i]))*(y0[self.NOi]+y0[self.NO2i])
+			y[self.NOi] = y_NO_reset
+			y[self.NO2i] = y_NO2_reset
+			
+			
+			# change to ozone concentration between start 
+			# and finish of this integration step
+			O3_changen = (y[self.O3i]-self.O3equil)
+			
+			dfracn = np.abs(O3_changen)/y[self.O3i] # new fractional change
+			
+			# remember this [O3] (before integration 
+			# generates the next new attempt)
+			self.O3equil = y[self.O3i]
+
+			# if O3 concentration still changing significantly (not at equilibrium)
+			if ((np.abs(O3_changen)/y[self.O3i])/tnew > 1.e-4 or step_no < 2 or sumt < 1800. or dfracn > dfrac0):
+				
+				if (step_no > 1):
+
+					# new ozone concentration to begin integration with
+					if (np.abs(O3_changen)/y[self.O3i] <= 3.e-4 and (np.abs(dfracn-dfrac0)/dfrac0) < 0.05): # if iteration going in right direction
+				
+						y[self.O3i] += O3_changen*((np.abs(O3_changen)/y[self.O3i])*1.e4)
+
+					elif (np.abs(O3_changen)/y[self.O3i] < 0.05): # if change by integration is modest
+						y[self.O3i] += O3_changen/2.
+					elif (np.abs(O3_changen)/y[self.O3i] >= 0.05): # if change by integration is large
+						y[self.O3i] = y[self.O3i]
+				else:
+						y[self.O3i] += O3_changen/2.
+
+				# remember this fraction change
+				dfrac0 = dfracn
+				
+				
+			else: # if O3 close enough to equilibrium
+				# remember new ozone concentration for next set of [NOx] and [VOC] values
+				self.O3equil = y[self.O3i]
+				
+				return() # end this call to simulation
+
+		if (sumt >= (self.tot_time-self.tot_time/1.e10) and self.testf != 5): # record output at experiment end
 			
 			# update chamber variables, note this ensures that any changes made
 			# coincidentally with the experiment end are captured
-			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, update_stp, 
+			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
 			Cinfl_nowp] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
-			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-			update_stp, update_count, 
+			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, tot_time, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 
@@ -783,8 +807,8 @@ def ode_updater(update_stp,
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):
-			update_stp = t0
-			tnew = update_stp
+			self.update_stp = t0
+			tnew = self.update_stp
 			ic_red = 0 # reset flag
 			stab_red = 0 # reset flag
 		

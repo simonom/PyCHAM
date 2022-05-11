@@ -230,7 +230,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		# don't need to save QGridLayout objects
 		if attr == 'title' or attr == 'left' or attr == 'top' or attr == 'width' or attr == 'height' or attr == 'initUI' or attr == 'setWindowTitle' or attr == 'setGeometry' or attr == 'setLayout':
 			continue
-		if '_orig' in attr or 'sch_name' in attr or 'xml_name' in attr or 'photo_path' in attr or 'chem_sch_mrk' in attr or 'TEMP' in attr or 'tempt' in attr or 'wall_on' in attr:
+		if '_orig' in attr or 'sch_name' in attr or 'xml_name' in attr or 'photo_path' in attr or 'chem_sch_mrk' in attr or 'TEMP' in attr or 'tempt' in attr or 'wall_on' in attr or 'update_stp' in attr or 'tot_time' in attr or 'save_step' in attr:
 			# transfer to dictionary
 			model_var_dict.update({attr:value})
 	with open(os.path.join(output_by_sim, 'simulation_self.pickle'), "wb") as f:

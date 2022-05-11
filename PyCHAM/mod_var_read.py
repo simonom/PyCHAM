@@ -37,10 +37,9 @@ def mod_var_read(self):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, update_stp, 
-			tot_time, comp0, y0, RH, RHt, Press,
+			[sav_nam, comp0, y0, RH, RHt, Press,
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-			save_step, Compt, injectt, Ct, seed_name,
+			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -78,11 +77,11 @@ def mod_var_read(self):
 				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
-				update_stp = float(value.strip())
+				self.update_stp = float(value.strip())
 
 			if key == 'total_model_time' and (value.strip()):
 				try:
-					tot_time = float(value.strip())
+					self.tot_time = float(value.strip())
 				except:
 					err_mess = 'Could not convert string to float for total_model_time model variable, please check model variables file and see README for guidance'
 
@@ -140,10 +139,10 @@ def mod_var_read(self):
 			if key == 'number_size_bins' and (value.strip()): # number of particle size bins
 				num_sb = int(value.strip())
 
-			if key == 'pconc' and (value.strip()): # seed particle number concentrations (#/cc)
+			if key == 'pconc' and (value.strip()): # seed particle number concentrations (#/cm3)
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
-				mode_cnt = 1 # track number of modes
+				pmode_cnt = 1 # track number of modes
 			
 				for i in value:
 					if i == ';': # semi-colon represents a time difference
@@ -152,11 +151,11 @@ def mod_var_read(self):
 						sb_cnt += 1 # increase size bin count
 						pmode = 1 # explicitly stated particle concentrations
 					if (time_cnt == 1 and i == ':'):
-						mode_cnt += 1 # mode count
+						pmode_cnt += 1 # mode count
 						pmode = 0 # particle concentrations expressed as modes
 				# a possible situation where there is just one size bin and 
 				# therefore only one concentration given for that size bin
-				if (sb_cnt ==1 and mode_cnt ==1):
+				if (sb_cnt == 1 and pmode_cnt == 1):
 					 pmode = 1 # explicitly stated particle concentrations
 
 				# if number concentration per size bin given explicitly
@@ -233,7 +232,7 @@ def mod_var_read(self):
 					mean_rad[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
 				
 			if key == 'recording_time_step' and (value.strip()): # frequency (s) of storing results
-				save_step = float(value.strip())
+				self.save_step = float(value.strip())
 
 			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
 				self.const_comp = [str(i).strip() for i in (value.split(','))]
@@ -500,11 +499,15 @@ def mod_var_read(self):
 			if (self.bd_st >= 4):
 				self.bd_st = 1		
 
+		# a possible situation where there are multiple particle size bins,
+		# but just one mode given for the particle number size distribution
+		if (num_sb > 1 and pmode_cnt == 1):
+			pmode = 0 # modal particle concentrations
+
 		# prepare for pickling
-		list_vars = [sav_nam, update_stp, 
-				tot_time, comp0, y0, RH, RHt, Press, 
+		list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
 				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-				uppsize, space_mode, std, mean_rad, save_step, 
+				uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, con_infl_t, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 

@@ -305,6 +305,11 @@ def plotter_rad_pool(self):
 	if (self.rad_mark == 1): # if alkoxy radicals
 		# get RO indices		
 		indx_plot = np.array((group_indx['ROi']))
+
+	
+	
+ 	# need a section here to conditionally 
+	# ignore methane-related radicals
 	
 	# get names of radicals in this pool
 	rad_names = (np.array((comp_names)))[indx_plot]
@@ -539,6 +544,8 @@ def O3_iso(self):
 		NOxsum += yrec[:, NOxii]*Cfac
 	# range of NOx (# molecules/cm3)
 	NOx_range = [min(NOxsum), max(NOxsum)]
+	NOx_range = [1.0*Cfac[0], 1500.*Cfac[0]]
+	VOC_range = [1.0*Cfac[0], 200.*Cfac[0]]
 	
 	NOx_values = np.arange(NOx_range[0], NOx_range[1]*1.01, (NOx_range[1]-NOx_range[0])/3.)
 	VOC_values = np.arange(VOC_range[0], VOC_range[1]*1.01, (VOC_range[1]-VOC_range[0])/3.)
@@ -576,6 +583,10 @@ def O3_iso(self):
 			self.NOxequil = NOxvi
 			self.VOCequil = VOCvi
 
+			# ensure time step sufficiently long for spin-up
+			self.update_stp = 6.e1
+			self.save_step = 1.8e4
+			self.tot_time = 1.8e4
 			# now run program
 			from middle import middle # prepare to communicate with main program
 		
@@ -587,17 +598,30 @@ def O3_iso(self):
 					mess = prog
 					if (mess[0:4] == 'Stop'): # if it's an error message
 						return()
-
-			# O result (ppb)
+			# O3 result (ppb)
 			O3_res[Vc, Nc] = self.O3equil/Cfac[0]
-			print(Vc, Nc)
+			
 			Vc += 1 # VOC count
 		Nc += 1 # NOx count
-	print(O3_res)
+	
 	# prepare plot
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	# ozone contour plot (# molecules/cm3)
-	#cs = plt.contourf(O3_res, levels=[0.0, 0.1, 0.2], colors=['yellow', 'green', 'purple'], extend='both', alpha=.90)
-	cs = plt.contourf(O3_res)
+	p1 = plt.contourf(NOx_values/Cfac[0], VOC_values/Cfac[0], O3_res)
+	# format axis labels
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+
+	# set axis titles
+	ax0.set_xlabel(r'NOx mixing ratio (ppb)', fontsize=14)
+	ax0.set_ylabel(r'VOC mixing ratio (ppb)', fontsize=14)
+
+	# colour bar
+	cb = plt.colorbar(p1, pad=0.25, ax=ax0)
+	# colour bar label
+	cb.set_label('O3 mixing ratio (ppb)', size=14, rotation=270, labelpad=20)
+	# format color bar label
+	cb.ax.tick_params(labelsize=14)
+
 	return()

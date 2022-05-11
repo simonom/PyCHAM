@@ -27,7 +27,7 @@ import scipy.constants as si # for scientific constants
 import numpy as np # for arithmetic
 
 def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
-		const_infl_t, tot_time, Compt, self): # define function
+		const_infl_t, Compt, self): # define function
 
 	# inputs: ----------------------------------------------
 	# init_conc - initial concentrations (ppb)
@@ -38,7 +38,6 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
 	# y_mw - molar mass of components (g/mol)
 	# self.con_infl_nam - names of components with continuous influx
 	# const_infl_t - times at which injections occur (s)
-	# tot_time - total experiment time (s)
 	# Compt - name of components injected instantaneously 
 	#	after start of experiment
 	# self - reference to PyCHAM

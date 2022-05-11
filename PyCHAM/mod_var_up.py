@@ -34,10 +34,9 @@ def mod_var_up(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, update_stp, 
-		tot_time, comp0, y0, RH, RHt, Press,
+		[sav_nam, comp0, y0, RH, RHt, Press,
 		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-		save_step, Compt, injectt, Ct, seed_name,
+		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
@@ -51,9 +50,9 @@ def mod_var_up(self):
 	# contents of model variables update
 	self.l9a.setText(sav_nam);
 	self.l10a.setText((str(self.chem_sch_mrk)).replace('\'', '').replace(' ', '')[1:-1])
-	self.l11a.setText((str(tot_time)).replace('\'', '').replace(' ', ''))
-	self.l12a.setText((str(update_stp)).replace('\'', '').replace(' ', ''))
-	self.l13a.setText((str(save_step)).replace('\'', '').replace(' ', ''))#
+	self.l11a.setText((str(self.tot_time)).replace('\'', '').replace(' ', ''))
+	self.l12a.setText((str(self.update_stp)).replace('\'', '').replace(' ', ''))
+	self.l13a.setText((str(self.save_step)).replace('\'', '').replace(' ', ''))#
 	self.l13_1a.setText((str(uman_up)).replace('\'', '').replace(' ', ''))
 	self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	

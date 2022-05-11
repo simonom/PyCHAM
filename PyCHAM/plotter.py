@@ -167,7 +167,7 @@ def plotter(caller, dir_path, uc, self):
 			# assume lower radius bound is ten times smaller than upper
 			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
 			
-		# number size distribution contours (/cc (air))
+		# number size distribution contours (# particles/cm3 (air))
 		dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
 		dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]
 		# transpose ready for contour plot
