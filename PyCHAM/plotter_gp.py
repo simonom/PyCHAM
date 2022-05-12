@@ -289,7 +289,6 @@ def plotter_rad_pool(self):
 
 	# ---------------------
 	# inputs:
-	# dir_path - path to folder containing results
 	# self - reference to PyCHAM
 	# ---------------------
 
@@ -309,7 +308,14 @@ def plotter_rad_pool(self):
 	
 	
  	# need a section here to conditionally 
-	# ignore methane-related radicals
+	# ignore radicals with carbon number below the user-supplied
+	comp_cnt = 0
+	for SMILEi in rel_SMILES: # loop through SMILE strings
+		# if this component has less than the threshold carbon number
+		if (SMILEi.count('C')+SMILEi.count('c') < self.Cnum_thresh):
+			if comp_cnt in indx_plot:
+				indx_plot = np.delete(indx_plot, indx_plot == comp_cnt)
+		comp_cnt += 1		
 	
 	# get names of radicals in this pool
 	rad_names = (np.array((comp_names)))[indx_plot]
@@ -343,11 +349,16 @@ def plotter_rad_pool(self):
 
 	par1 = ax0.twinx() # parasite (right) axis	
 
-
+	frac_sum = np.zeros((len(timehr))) # results array for total fractions shown here
+	
 	for i in range(len(ord)): # loop through top contributors, with biggest first
 		ax0.plot(timehr, y_radf[:, ord[-(i+1)]], label = str(rad_names[ord[-(i+1)]] + ' frac.'))
+		frac_sum += y_radf[:, ord[-(i+1)]] # total fractions shown here
 		# plot right axis (absolute concentration)
 		p3, = par1.plot(timehr, y_rad[:, ord[-(i+1)]], '--', label = str(rad_names[ord[-(i+1)]] + ' conc.'))
+
+	# also plot sum of fractions shown in plot
+	ax0.plot(timehr, frac_sum, '-k', label = str(r'$\Sigma$(frac. shown here)'))
 
 	# in case you want to check that sum of fractions=1
 	#ax0.plot(timehr, np.sum(y_radf, axis=1), label = 'sum of fractions (check)')

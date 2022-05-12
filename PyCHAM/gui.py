@@ -1378,14 +1378,20 @@ class PyCHAM(QWidget):
 		self.b361a.addItem('RO (alkoxy radical) Concentration (ppb)')
 		self.b361a.addItem('RO2 (alkyl peroxy radical) Flux (molecules/cm3/s)')
 		self.b361a.addItem('RO (alkoxy radical) Flux (molecules/cm3/s)')
-		self.RADlayout.addWidget(self.b361a, 1, 0, 1, 1)
+		self.RADlayout.addWidget(self.b361a, 1, 0, 1, 2)
+		
+		# input bar for carbon number threshold
+		self.e361 = QLineEdit(self)
+		self.e361.setText('Provide the minimum carbon number of a radical to be considered (defaults to 1)')
+		self.e361.setStyleSheet('qproperty-cursorPosition : 0')
+		self.RADlayout.addWidget(self.e361, 2, 0, 1, 1)
 	
 		# button to plot radical output
 		self.b362 = QPushButton(str('Plot'))
 		self.b362.setToolTip('Show the selected output by the top number of components (number given in box above)')
 		self.b362.clicked.connect(self.on_click362)
 		#self.b362.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.RADlayout.addWidget(self.b362, 1, 1)
+		self.RADlayout.addWidget(self.b362, 2, 1)
 
 		return(RADTab)
 
@@ -3709,6 +3715,13 @@ class PyCHAM(QWidget):
 		# if RO flux
 		if ('RO (alkoxy radical) Flux' in input_check_text):
 			self.rad_mark = 3
+		
+		# get minimum carbon number of component to consider
+		if str((self.e361.text()))[0:3] == 'Pro':
+			# default to 1
+			self.Cnum_thresh = 1
+		else:
+			self.Cnum_thresh = float((self.e361.text()))
 		
 		self.dir_path = self.l201.text() # name of folder with results
 

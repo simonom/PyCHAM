@@ -1,0 +1,23 @@
+# test for outdoor simulation
+res_file_name = lo_iso
+total_model_time = 3.6e4
+update_step = 6.e2
+recording_time_step = 6.e2
+light_status = 1
+light_time = 0.
+tf_UVC = 0.
+act_flux_file = MAC_Actinic_Flux_Spectrum_wUVCx3p5.csv
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.7
+# initial concentrations (ppb)
+# alpha-pinene from values seen here: doi.org/10.1016/S1352-2310(98)00302-1
+# HCHO (high isoprene = 25 ppb, low isoprene = 0.25 ppb), NO, NO2, isoprene (high isoprene = 25 ppb, low isoprene = 0.25 ppb), NO and NO2 levels for dry season in Amazon (doi:10.1029/2000JD000267)
+# O3 (high isoprene = 200 ppb) and OH from trying runs to quantify equilibrium level
+C0 =   6.e1,     0.1,     3.e-4, 2.5e-2, 1.4e2, 2.0e3, 0.25, 0.25, 2.5e-1, 2.5e-1
+Comp0 = O3, APINENE,     OH, HO2,  CO,     CH4,  NO, NO2, HCHO, C5H8
+const_comp = APINENE, C5H8, NO, NO2, HCHO
+number_size_bins = 0
+wall_on = 0
+tracked_comp = RO_ind, RO2_ind
