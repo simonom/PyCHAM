@@ -343,6 +343,12 @@ def mod_var_read(self):
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				self.light_ad = int(value.strip())
 
+			if key == 'secx' and (value.strip()): # to keep solar intesnity constant
+				self.secx = float(value.strip())
+
+			if key == 'cosx' and (value.strip()): # to keep solar intesnity constant
+				self.cosx = float(value.strip())
+
 			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
 				self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
 

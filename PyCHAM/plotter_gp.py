@@ -295,7 +295,7 @@ def plotter_rad_pool(self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path)
 	
 	if (self.rad_mark == 0): # if alkyl peroxy radicals
 		# get RO2 indices
@@ -305,7 +305,8 @@ def plotter_rad_pool(self):
 		# get RO indices		
 		indx_plot = np.array((group_indx['ROi']))
 
-	
+	# get generation numbers of all components
+	gen_num = ro_obj.gen_numbers
 	
  	# need a section here to conditionally 
 	# ignore radicals with carbon number below the user-supplied
@@ -322,6 +323,9 @@ def plotter_rad_pool(self):
 
 	# isolate gas-phase concentrations of radical (ppb)
 	y_rad = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
+	
+	# isolate generations of radicals
+	gen_num = gen_num[indx_plot]
 
 	# prepare for fractional contribution
 	y_radf = np.zeros((y_rad.shape[0], y_rad.shape[1]))
@@ -352,7 +356,7 @@ def plotter_rad_pool(self):
 	frac_sum = np.zeros((len(timehr))) # results array for total fractions shown here
 	
 	for i in range(len(ord)): # loop through top contributors, with biggest first
-		ax0.plot(timehr, y_radf[:, ord[-(i+1)]], label = str(rad_names[ord[-(i+1)]] + ' frac.'))
+		ax0.plot(timehr, y_radf[:, ord[-(i+1)]], label = str(rad_names[ord[-(i+1)]] + ' (gen' + str(int(gen_num[ord[-(i+1)]])) + ')' + ' frac.'))
 		frac_sum += y_radf[:, ord[-(i+1)]] # total fractions shown here
 		# plot right axis (absolute concentration)
 		p3, = par1.plot(timehr, y_rad[:, ord[-(i+1)]], '--', label = str(rad_names[ord[-(i+1)]] + ' conc.'))

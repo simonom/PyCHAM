@@ -408,7 +408,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 					# if this component appears in the chemical scheme first as a
 					# reactant (rather than product), and is a methane-related 
 					# oxidised molecule, then use it's generation number of one
-					if reac_index >= len(self.gen_num) and numC == 1 and numO >= 1:
+					if (reac_index >= len(self.gen_num) and numC == 1 and numO >= 1):
 						# if it's the first non-zero generation number reactant
 						if (nzr > 0):
 							reac_min_gen = min(1, reac_min_gen)

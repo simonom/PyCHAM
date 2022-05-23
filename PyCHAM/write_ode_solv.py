@@ -384,17 +384,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1), 0] += dd_all # wall change\n')
 		
 		f.write('		\n')
-
-		if (len(self.con_C_indx) > 0): # if a component has a constant gas-phase concentration
-		
-			f.write('		# account for components with constant gas-phase concentration\n')	
-			f.write('		dd[[')	
-			for Ci in range(len(self.con_C_indx)):
-				# components prior to the last in the continuous influx group
-				if (Ci < len(self.con_C_indx)-1):
-					f.write('%d, ' %int(self.con_C_indx[Ci]))
-				else: # last component in the continuous influx group
-					f.write('%d], 0] = 0.\n')
 	
 	# non-vectorised code for use with numba compiler
 	#	f.write('	# numba compiler to convert to machine code\n')

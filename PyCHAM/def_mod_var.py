@@ -148,7 +148,13 @@ def def_mod_var(caller, self): # define function
 	self.light_ad = 1
 	self.tf_UVC = np.ones((1, 1)) # transmission factor for 254 nm wavelength artificial light
 	self.tf_UVCt = np.zeros((1, 1)) # time (s) for transmission factor for 254 nm wavelength artificial light
-	
+	# if natural sunlight paraemeters have been set in a previous run then delete
+	if hasattr(self, 'secx'):
+		delattr(self, 'secx')
+	if hasattr(self, 'cosx'):
+		delattr(self, 'cosx')	
+
+
 	# deposition of particles and vapours to wall ------------------------------------------
 	self.wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	Cw = 0. # effective absorbing mass of wall (g/m3 (air))

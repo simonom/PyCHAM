@@ -62,7 +62,14 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
 		# Ground Level" by S. Madronich) of the textbook
 		# Environmental UV Photobiology (1993)
-		(secx, cosx) = zenith.zenith(self)
+
+		# if secx and cosx specified by user in the model variables 
+		# file (to keep solar intensity constant), then use these
+		if hasattr(self, 'secx') and hasattr(self, 'cosx'):
+			secx = self.secx
+			cosx = self.cosx
+		else: # otherwise estimate current secx and cosx
+			(secx, cosx) = zenith.zenith(self)
 		
 		# The Hayman (1997) parameterisation for MCM reactions as described in
 		# Saunders et al. (2003): https://doi.org/10.5194/acp-3-161-2003
