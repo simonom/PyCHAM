@@ -3623,7 +3623,7 @@ class PyCHAM(QWidget):
 
 		# get component name
 		try:
-			comp_chem_schem_name = str((self.e224.text()))
+			self.comp_names_to_plot = [str((self.e224.text()))]
 
 		except: # give error message
 			self.l203a.setText('Error - could not read chemical scheme name of component to estimate consumption of from box above')
@@ -3648,7 +3648,7 @@ class PyCHAM(QWidget):
 			self.tmax = 1.
 
 		import consumption # function to estimate consumption
-		consumption.cons(comp_chem_schem_name, dir_path, self, 0)
+		consumption.cons(dir_path, self, 0)
 
 	@pyqtSlot() # button to retrieve and report yield
 	def on_click225(self):

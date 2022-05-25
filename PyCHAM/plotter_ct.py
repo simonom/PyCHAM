@@ -130,7 +130,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			indx = dydt[ti+1, 0:-2] < 0 # indices of reactions that lose component
 			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
 			 
-		# convert change tendencies from molecules/cc/s to ug/m3/s
+		# convert change tendencies from molecules/cm3/s to ug/m3/s
 		gpp = ((gpp/si.N_A)*y_mw[ci])*1.e12
 		gwp = ((gwp/si.N_A)*y_mw[ci])*1.e12
 		crg = ((crg/si.N_A)*y_mw[ci])*1.e12

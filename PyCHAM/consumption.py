@@ -28,10 +28,9 @@ import scipy.constants as si # scientific constants
 import retr_out # retrieving information
 import numpy as np # for arithmetic
 
-def cons(comp_chem_schem_name, dir_path, self, caller):
+def cons(dir_path, self, caller):
 
 	# inputs: -------------------------------
-	# comp_chem_schem_name - chemical scheme name of component
 	# dir_path - path to results
 	# self - reference to GUI
 	# caller - flag for calling function
@@ -43,62 +42,59 @@ def cons(comp_chem_schem_name, dir_path, self, caller):
 		comp0, _, PsatPa, OC, H2Oi, seedi, _, _, _, tot_in_res, 
 		_) = retr_out.retr_out(dir_path)
 
-	try:
-		# get index of component of interest
-		compi = comp_names.index(comp_chem_schem_name)
-	except:
-		self.l203a.setText(str('Error - could not find component ' + comp_chem_schem_name + ' in the simulated system.  Please check whether the name matches that in the chemical scheme.'))		
-		# set border around error message
-		if (self.bd_pl == 1):
-			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-			self.bd_pl = 2
-		else:
-			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-			self.bd_pl = 1
-		return() # return now
+	# loop through components to plot to check they are available
+	for comp_name in (self.comp_names_to_plot):
+		
+		fname = str(dir_path+ '/' +comp_name +'_rate_of_change')
+		try: # try to open
+			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header	
+		except:
+			mess = str('Please note, a change tendency record for the component ' + str(comp_name) + ' was not found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+			self.l203a.setText(mess)
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			
+			return()
 
-	# get consumption
-	try:
-		indx_int = (np.where(tot_in_res[0, :].astype('int') == compi))[0][0]
+	# if all files are available, then proceed without error message
+	mess = str('')
+	self.l203a.setText(mess)
+			
+	if (self.bd_pl < 3):
+		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
+		self.bd_pl == 3
+
+	# note that penultimate column in dydt is gas-particle 
+	# partitioning and final column is gas-wall partitioning, whilst
+	# the first row contains chemical reaction numbers
+	# extract the change tendency due to gas-particle partitioning
+	gpp = dydt[1::, -2]
+	# extract the change tendency due to gas-wall partitioning
+	gwp = dydt[1::, -1]
+	# sum chemical reaction gains
+	crg = np.zeros((dydt.shape[0]-1, 1))
+	# sum chemical reaction losses
+	crl = np.zeros((dydt.shape[0]-1, 1))
+	for ti in range(dydt.shape[0]-1): # loop through times
+		indx = dydt[ti+1, 0:-2] < 0 # indices of reactions that lose component
+		crl[ti] = dydt[ti+1, 0:-2][indx].sum()
 	
-	except:
-		self.l203a.setText(str('Error - could not find a consumption value for component ' + comp_chem_schem_name + '.  Please check whether the name matches that in the chemical scheme and that it had gas-phase influx through the model variables file.'))		
-		# set border around message
-		if (self.bd_pl == 1):
-			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-			self.bd_pl = 2
-		else:
-			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-			self.bd_pl = 1
-		return() # return now
-
-	# indices for supplied time
+	# convert change tendencies from molecules/cm3/s to ug/m3/s
+	crl = ((crl/si.N_A)*y_mw[comp_names.index(self.comp_names_to_plot[0])])*1.e12
 	indxt = (timehr>=self.tmin)*(timehr<=self.tmax)
-	
-	# cumulative influxed over all times (ug/m3)
-	tot_in = tot_in_res[1::, indx_int]
-	
-	# influxes over interested time period
-	tot_in = tot_in[indxt]
 
-	# gas-phase concentration (ppb) over all times
-	yrecn = yrec[:, compi]
+	# integrate chemical losses over period of interest (ug/m3) for total consumed
+	cons = np.abs((np.sum(crl[indxt[0:-1]])/len(indxt[0:-1]))*((timehr[indxt][-1]-timehr[indxt][0])*3.6e3))
 
-	# gas-phase concentration (ppb) over interested time period (ppb)
-	yrecn = yrecn[indxt]
-
-	# change in gas-phase concentration (ug/m3)
-	yrecn = (((yrecn[-1]-yrecn[0])*Cfac[-1])/si.N_A)*y_mw[compi]*1.e12
-
-	# total influx over this time (ug/m3)
-	tot_in = tot_in[-2]-tot_in[0]
-
-	# total consumed (ug/m3)
-	cons = tot_in-yrecn
-	
 	if (caller == 0): # call from the consumption button
 	
-		self.l203a.setText(str('Consumption of ' + comp_chem_schem_name + ': ' + str(cons) + ' ' + u'\u03BC' + 'g/m' + u'\u00B3'))
+		self.l203a.setText(str('Consumption of ' + self.comp_names_to_plot[0] + ': ' + str(cons) + ' ' + u'\u03BC' + 'g/m' + u'\u00B3'))
 		# set border around message
 		if (self.bd_pl == 1):
 			self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
