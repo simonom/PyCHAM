@@ -121,7 +121,7 @@ def cons(dir_path, self, caller):
 		yld = SOA/cons
 
 	
-		self.l203a.setText(str('Yield of ' + comp_chem_schem_name + ': ' + str(yld)))
+		self.l203a.setText(str('Yield of ' + self.comp_names_to_plot[0] + ': ' + str(yld)))
 		# set border around message
 		if (self.bd_pl == 1):
 			self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)

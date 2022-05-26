@@ -329,7 +329,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('			df_indx = np.ones((len(dd)-num_comp)).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('			dd[0:num_comp, 0][df_indx] -= y[0:num_comp, 0][df_indx]*1.*self.dil_fac\n')
+		f.write('			dd[0:-num_comp, 0][df_indx] -= y[0:-num_comp, 0][df_indx]*1.*self.dil_fac\n')
 		f.write('		if (self.wall_on == 0): # if wall off\n')
 		f.write('			df_indx = np.ones((len(dd))).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')

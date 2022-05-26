@@ -179,13 +179,15 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			continue
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
-		if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:	
-			Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], TEMP, boiling_points.nannoolal(Pybel_objects[i]))))
+		if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:
+			Psat[0, i] = -0.1*rel_SMILES[i].count('O')* + rel_SMILES[i].count('C')*-0.2+0.5
+			#	Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], TEMP, boiling_points.nannoolal(Pybel_objects[i]))))
 			
 			if (TEMP == 298.15):
 				Psat_Pa_rec[i] = Psat_Pa[0, i]
-			else: 
-				Psat_Pa_rec[i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], 298.15, boiling_points.nannoolal(Pybel_objects[i]))))
+			else:
+				Psat_Pa_rec[i] = -0.1*rel_SMILES[i].count('O')* + rel_SMILES[i].count('C')*-0.2+0.5
+				#Psat_Pa_rec[i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], 298.15, boiling_points.nannoolal(Pybel_objects[i]))))
 		
 		else: # for non-HOM components
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 

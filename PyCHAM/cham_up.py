@@ -140,7 +140,7 @@ def cham_up(sumt, Pnow,
 	# self.cont_inf_reci - index for total injection record for continuously injected components
 	# self.con_infl_indx - index for continuously injected components from all components
 	# -----------------------------------------------------------------------
-	
+
 	# check on change of light setting --------------------------------------
 
 	# begin by assuming no change to time interval required due to chamber 
@@ -527,6 +527,10 @@ def cham_up(sumt, Pnow,
 			
 	# nucleation check end -------------------------------------------------------------------------
 	
+	# check on change to vapour pressure of HOM-RP2+MCM-RO2 accretion products ---------------------
+
+	# end of check on change to vapour pressure of HOM-RP2+MCM-RO2 accretion products -------------- 
+
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 		RHt_cnt, Psat, N_perbin, x, pconcn_frac, pcontf, tot_in_res, Cinfl_nowp_indx, 

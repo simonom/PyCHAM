@@ -1344,14 +1344,14 @@ class PyCHAM(QWidget):
 		self.PARlayout.addWidget(self.e224b, 6, 0, 1, 2)
 
 		# button to estimate consumption
-		self.b224 = QPushButton(str('Consumption (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
+		self.b224 = QPushButton(str('Consumption by chemical reaction (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
 		self.b224.setToolTip('For the component specified above show the mass concentration consumed throughout the whole simulation in the message box above')
 		self.b224.clicked.connect(self.on_click224)
 		#self.b224.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PARlayout.addWidget(self.b224, 7, 0, 1, 1)
 
 		# button to estimate SOA yield
-		self.b225 = QPushButton(str('SOA yield (fraction 0-1)'))
+		self.b225 = QPushButton(str('SOA yield by chemical reaction (fraction 0-1)'))
 		self.b225.setToolTip('In the message box above show the SOA yield from the component given in the box above between the times stated in the boxes above.')
 		self.b225.clicked.connect(self.on_click225)
 		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
@@ -3657,7 +3657,7 @@ class PyCHAM(QWidget):
 
 		# get component name
 		try:
-			comp_chem_schem_name = str((self.e224.text()))
+			self.comp_names_to_plot = [str((self.e224.text()))]
 
 		except: # give error message
 			self.l203a.setText('Error - could not read chemical scheme name of component to estimate yield of from box above')
@@ -3684,7 +3684,7 @@ class PyCHAM(QWidget):
 			self.tmax = 1.
 
 		import consumption # function to estimate consumption
-		consumption.cons(comp_chem_schem_name, dir_path, self, 1)
+		consumption.cons(dir_path, self, 1)
 		return()
 
 	@pyqtSlot()
