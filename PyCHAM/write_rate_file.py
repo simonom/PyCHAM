@@ -129,7 +129,6 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
 	f.write('		erf = 1 # flag error\n')
 	f.write('		err_mess = str(\'Error: estimating reaction rate for reaction number \' + str(gprn) + \' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
-	
 	f.write('	\n')
 	f.write('	# aqueous-phase reactions\n')
 	for eqn_key_aq in range (1, len(reac_coef_aq)+1):

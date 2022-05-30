@@ -243,6 +243,8 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
 		res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
 		
+		import scipy.constants as si
+
 		if (uc == 0):
 			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 			# convert change tendencies from # molecules/cm3/s to ppb

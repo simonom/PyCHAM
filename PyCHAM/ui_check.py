@@ -39,7 +39,7 @@ def ui_check(self):
 	# inputs: ----------------------------------------------------------------------
 	# self - reference to GUI
 	# --------------------------------------------------------------------------------
-
+	
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
@@ -471,7 +471,6 @@ def ui_check(self):
 			em_flag = 2
 	# ------------------------------------
 	
-
 	# store in pickle file
 	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
 			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 

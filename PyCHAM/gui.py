@@ -1835,7 +1835,7 @@ class PyCHAM(QWidget):
 		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
 		ui_check.ui_check(self)
 		# finished check on model variables --------------------------------------------------------------		
-
+		
 		return()
 		
 	@pyqtSlot()

@@ -41,6 +41,7 @@ def cons(dir_path, self, caller):
 		y_mw, Nwet, comp_names, y_MV, _, wall_on, space_mode, indx_plot, 
 		comp0, _, PsatPa, OC, H2Oi, seedi, _, _, _, tot_in_res, 
 		_) = retr_out.retr_out(dir_path)
+	
 
 	# loop through components to plot to check they are available
 	for comp_name in (self.comp_names_to_plot):
@@ -91,6 +92,9 @@ def cons(dir_path, self, caller):
 
 	# integrate chemical losses over period of interest (ug/m3) for total consumed
 	cons = np.abs((np.sum(crl[indxt[0:-1]])/len(indxt[0:-1]))*((timehr[indxt][-1]-timehr[indxt][0])*3.6e3))
+
+	cons = yrec[:, comp_names.index(self.comp_names_to_plot[0])]
+	cons = (((cons[0]-cons[-1])*Cfac[0])/si.N_A)*y_mw[comp_names.index(self.comp_names_to_plot[0])]*1.e12
 
 	if (caller == 0): # call from the consumption button
 	

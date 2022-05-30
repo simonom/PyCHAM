@@ -365,6 +365,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 		reac_min_gen = 0
 		ap_rad_f = 0 # flag for whether reactants include radicals
 		nzr = 0 # flag for non-zero generation number reactants
+		# prepare to store components that appear first as a reactant rather than product
+		early_comp = []
+
 		# loop through components in this equation
 		for SMILEi in SMILES_this_eq:
 			
@@ -399,8 +402,19 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 				# already appeared as a product which are assigned generation 
 				# numbers below
 				if (ci < len(reactants)):
+
+					
+					
 					# index of this reactant
 					reac_index = comp_namelist.index(name_only)
+
+					# if first appearance of this componenet is as a reactant, 
+					# then store and wait for when it appears as a product
+					if (reac_index >= len(self.gen_num)):
+						self.gen_num.append(0)
+						early_comp.append(name_only)
+						continue
+
 					# check on whether this component is an alkyl peroxy radical
 					if ('[O]O' in SMILEi or 'O[O]' in SMILEi):
 						ap_rad_f = 1 # flag that an alkyl peroxy radical in reactants
@@ -415,7 +429,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 						if (nzr == 0):
 							reac_min_gen = 1
 							nzr = 1
-						
+					
 					# if this component is already assigned a > 0 
 					# generation number,
 					# then identify minimum generation number in this equation
@@ -442,11 +456,11 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 					
 					# check if this already has a generation number
 					if (comp_namelist.index(name_only) <= len(self.gen_num)-1):
-
+						
 						gn_pre = self.gen_num[comp_namelist.index(name_only)]
 						# if this number less than that suggested by reactants, then
 						# no change needed
-						if (gn_pre < prod_gen):
+						if (gn_pre < prod_gen and name_only not in early_comp):
 							continue # continue to next component in this equation
 						else: # otherwise 
 							self.gen_num[comp_namelist.index(name_only)] = prod_gen
