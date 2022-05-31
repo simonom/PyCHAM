@@ -50,7 +50,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	#						Size_distributions.py for more than 1 size bin, or in 
 	# 						pp_intro.py for 1 size bin
 	# Cfactor_vst - one billionth the molecular concentration in a unit volume of chamber
-	#				(molecules/cc) per recording time step
+	#				(# molecules/cm3) per recording time step
 	# time_taken - computer time for entire simulation (s)
 	# seed_name - name of seed component
 	# y_mw - molecular weights (g/mol)
@@ -75,6 +75,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# rel_SMILES - SMILES strings for components in chemical scheme
 	# Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
 	# OC - oxygen to carbon ratio of components
+	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
 	# self.seedi - index of seed components
 	# siz_str - the size structure
@@ -130,6 +131,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["space_mode"] = space_mode
 	const["pure_component_saturation_vapour_pressures_at_298.15K"] = Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
+	const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = self.seedi.tolist()
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str

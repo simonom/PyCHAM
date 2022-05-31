@@ -1721,9 +1721,21 @@ class PyCHAM(QWidget):
 		# plot observations and model results
 		# select observations file --------------------------------------------------------------
 		b401 = QPushButton('Observed && Modelled', self)
-		b401.setToolTip('Plot Observations and Model Results as Described in Quick tab')
+		b401.setToolTip('Plot Observations and Model Results')
 		b401.clicked.connect(self.on_click401)
-		self.OBSlayout.addWidget(b401, 1, 0, 1, 1)
+		self.OBSlayout.addWidget(b401, 1, 1, 1, 1)
+
+		# drop down button for what to plot
+		self.b402 = QComboBox(self)
+		self.b402.addItem('Gas-phase Concentrations (ppb)')
+		self.b402.addItem('Van Krevelen')
+		self.OBSlayout.addWidget(self.b402, 1, 0, 1, 1)
+
+		# in case plotting option wanted in future
+		# input for observed and modelled plotting options
+		#self.e403 = QTextEdit(self)
+		#self.e403.setText('Provide Plotting Options as Described in the Selected Drop-down Button Option Above')
+		#self.OBSlayout.addWidget(self.e403, 2, 0, 1, 1)
 		
 		return(OBSTab)
 
@@ -3763,10 +3775,24 @@ class PyCHAM(QWidget):
 		self.xls_path = self.l401.text()
 		# get path to model results
 		self.mod_path = dir_path = self.l201.text()
-		# get names of gas-phase components to plot
-		self.gp_names = [str(i) for i in self.e205.text(). split(',')]
-		# gas-phase concentration units
-		self.gp_units = self.b206b.currentText()
+	
+		# get what to plot from drop-down button
+		om_choice = self.b402.currentText()
+		
+		# flag for what is being plotted
+		self.oandm = 0
+
+		# if gas-phase concentrations
+		if ('Gas-phase Concentrations' in om_choice):
+			self.oandm = 1
+			# get names of gas-phase components to plot
+			self.gp_names = [str(i) for i in self.e205.text(). split(',')]
+			# gas-phase concentration units
+			self.gp_units = self.b206b.currentText()
+
+		# if Van Krevelen
+		if ('Van Krevelen' in om_choice):
+			self.oandm = 2
 		
 		# check on inputs and provide message for user if anything missing
 		if (self.xls_path == ''):
@@ -3789,17 +3815,22 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
-		
-		if (self.gp_names == ['']):
-			self.l203a.setText('Note, no components specified to be plotted for model results')
-			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
-				self.bd_pl = 2
-			else:
-				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
-				self.bd_pl = 1
+		if (self.oandm == 1): # if on gas-phase temporal profiles
+			if (self.gp_names == ['']):
+				self.l203a.setText('Note, no components specified to be plotted for model results')
+				if (self.bd_pl == 1):
+					self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+					self.bd_pl = 2
+				else:
+					self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+					self.bd_pl = 1
 		import plotter_xls
-		plotter_xls.plotter_gp_mod_n_obs(self)		
+
+		if (self.oandm == 1): # if the gas-phase temporal profiles to be plotted
+			plotter_xls.plotter_gp_mod_n_obs(self)
+		if (self.oandm == 2): # if the Van Krevelen to be plotted
+			plotter_xls.plotter_VK_mod_n_obs(self)
+	
 		return()
 
 # class for scrollable label 

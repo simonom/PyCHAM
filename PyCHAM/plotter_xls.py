@@ -19,7 +19,7 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''plots results for the gas-phase temporal profiles of specified components, both from model and observations'''
+'''plots results from model and observations'''
 # simulation and observation results are represented graphically
 
 import matplotlib.pyplot as plt
@@ -27,6 +27,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+import matplotlib.cm as cm
 import os
 import retr_out
 import numpy as np
@@ -34,7 +35,7 @@ import scipy.constants as si
 import pybel
 import openpyxl # for opening excel file
 
-def plotter_gp_mod_n_obs(self):
+def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	
 	# open xls file
 	wb = openpyxl.load_workbook(filename = self.xls_path)
@@ -135,5 +136,69 @@ def plotter_gp_mod_n_obs(self):
 	ax0.legend(fontsize = 14)
 
 	# -----------------------------------------------------------
+
+	return()
+
+def plotter_VK_mod_n_obs(self): # for Van Krevelen diagrams
+	
+	# model results
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path)
+	
+	self.HC = np.array((ro_obj.HyC)) # hydrogen:carbon ratios of each component
+
+	# index of the required experiment period
+	tindx = (timehr*3600. >= 0)*(timehr*3600. <= timehr[-1]*3600.)
+	# isolate gas-phase concentrations during this period (ppb)
+	yrel = yrec[tindx, 0:num_comp]
+	# isolate hydrocarbon molecules
+	yrel = yrel[:, self.HC>0.]
+	# fractional gas-phase concentration
+	yrel_frac = yrel/(yrel.sum(axis=1).reshape(-1, 1))
+	OC_rel = (np.array((OC)))[self.HC>0.].reshape(1, -1) # and ensure correct alignment with yrel
+	HC_rel = self.HC[self.HC>0.].reshape(1, -1) # and ensure correct alignment with yrel
+	# weight concentrations by O:C ratio
+	OCweight = yrel_frac*OC_rel
+	# weight concentrations by H:C ratio
+	HCweight = yrel_frac*HC_rel
+	
+	# get the average gas-phase O:C and H:C ratios during the stated period
+	OCav = OCweight.sum(axis=1)
+	HCav = HCweight.sum(axis=1)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+
+	# colormap from library (https://matplotlib.org/stable/api/cm_api.html#matplotlib.cm.get_cmap)
+	colors = cm.get_cmap('ocean')
+
+	# set contour levels
+	levels = (MaxNLocator(nbins = 256).tick_values(np.min(timehr[tindx]*3600), np.max(timehr[tindx]*3600)))
+	
+	# associate colours and contour levels
+	norm1 = BoundaryNorm(levels, ncolors=256, clip=True)
+	
+	for i in range(len(OCav)):
+		ax0.plot(OCav[i], HCav[i], 'o', mec = 'k', mfc = colors(i/(len(OCav)-1)))
+
+	# x-axis title
+	ax0.set_xlabel('O:C ratio number-averaged over hydrocarbons', fontsize = 14)
+	# y-axis title
+	ax0.set_ylabel('H:C ratio number-averaged over hydrocarbons', fontsize = 14)
+	# set label font size
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+
+	# include colorbar to demonstrate time through experiment (s)
+	cb = fig.colorbar(cm.ScalarMappable(norm=norm1, cmap=colors), ax=ax0)
+
+	cb.ax.tick_params(labelsize=14)   
+	# colour bar label
+	cb.set_label('Time since experiment start (s)', size=14, rotation=270, labelpad=20)
+
 
 	return()

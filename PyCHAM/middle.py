@@ -98,10 +98,10 @@ def middle(self): # define function
 		yield err_mess
 
 	# get component properties
-	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC, self] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		self.TEMP[0], H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
-		seed_name, y_mw)
+		seed_name, y_mw, self)
 	
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
