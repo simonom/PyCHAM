@@ -177,6 +177,8 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 		# append molar weight of water (g/mol)
 		y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
 		comp_namelist.append('H2O') # append water's name to component name list
+		# add to SMILES list
+		rel_SMILES.append('HOH')
 
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
@@ -189,6 +191,9 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	corei = [num_comp] # index for core component
 	# increase number of components to account for 'core' component
 	num_comp += 1
+
+	# add to SMILES list
+	rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
 	# append core gas-phase concentration (molecules/cm3 (air)) and molecular 
 	# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
@@ -397,4 +402,4 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			comp_namelist, inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
-			HO2i, NO3i, self)
+			HO2i, NO3i, self, rel_SMILES)

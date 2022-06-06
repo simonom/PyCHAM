@@ -1728,14 +1728,19 @@ class PyCHAM(QWidget):
 		# drop down button for what to plot
 		self.b402 = QComboBox(self)
 		self.b402.addItem('Gas-phase Concentrations (ppb)')
-		self.b402.addItem('Van Krevelen')
+		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)')
+		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)')
+		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over _ Extension Hydrocarbons)')
+		self.b402.addItem('Van Krevelen (All Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
+		self.b402.addItem('Van Krevelen (Non-methane Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
+		self.b402.addItem('Van Krevelen (_ Extension Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
+		self.b402.addItem('Mass Defect')
 		self.OBSlayout.addWidget(self.b402, 1, 0, 1, 1)
 
-		# in case plotting option wanted in future
 		# input for observed and modelled plotting options
-		#self.e403 = QTextEdit(self)
-		#self.e403.setText('Provide Plotting Options as Described in the Selected Drop-down Button Option Above')
-		#self.OBSlayout.addWidget(self.e403, 2, 0, 1, 1)
+		self.e403 = QTextEdit(self)
+		self.e403.setText('Provide Plotting Options as Described in the Selected Drop-down Button Option Above')
+		self.OBSlayout.addWidget(self.e403, 2, 0, 1, 1)
 		
 		return(OBSTab)
 
@@ -3791,9 +3796,23 @@ class PyCHAM(QWidget):
 			self.gp_units = self.b206b.currentText()
 
 		# if Van Krevelen
-		if ('Van Krevelen' in om_choice):
+		if ('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)' in om_choice):
 			self.oandm = 2
-		
+		if ('Van Krevelen (All Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+			self.oandm = 3
+		if ('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)' in om_choice):
+			self.oandm = 4
+		if ('Van Krevelen (Non-methane Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+			self.oandm = 5
+		if ('Van Krevelen (Time Profile, Averaged Over _ Extension Hydrocarbons)' in om_choice):
+			self.oandm = 6
+		if ('Van Krevelen (_ Extension Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+			self.oandm = 7
+
+		# if mass defect
+		if ('Mass Defect' in om_choice):
+			self.oandm = 8
+
 		# check on inputs and provide message for user if anything missing
 		if (self.xls_path == ''):
 			self.l203a.setText('Error - no path to observations selected')
@@ -3828,8 +3847,11 @@ class PyCHAM(QWidget):
 
 		if (self.oandm == 1): # if the gas-phase temporal profiles to be plotted
 			plotter_xls.plotter_gp_mod_n_obs(self)
-		if (self.oandm == 2): # if the Van Krevelen to be plotted
+		if (self.oandm >= 2 and self.oandm <= 7): # if the Van Krevelen to be plotted
 			plotter_xls.plotter_VK_mod_n_obs(self)
+		if (self.oandm == 8): # if mass defect plot
+			plotter_xls.plotter_mass_defect(self)
+
 	
 		return()
 

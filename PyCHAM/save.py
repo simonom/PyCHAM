@@ -54,6 +54,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# time_taken - computer time for entire simulation (s)
 	# seed_name - name of seed component
 	# y_mw - molecular weights (g/mol)
+	# self.nom_mass - nominal molar mass (g/mol)
 	# MV - molar volumes of all components (cm3/mol)
 	# time_taken - simulation computer time (s)
 	# seed_name - chemical scheme name of component comprising seed particles
@@ -119,6 +120,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["number_of_size_bins"] = numsb
 	const["number_of_components"] = num_comp
 	const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
+	const["nominal_molar_mass_g/mol"] = self.nom_mass.tolist()
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
 	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
 	const["organic_alkoxy_radical_index"] = self.RO_indx

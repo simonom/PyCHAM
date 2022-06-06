@@ -86,7 +86,7 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, rel_SMILES] = init_conc.init_conc(comp_num, 
 	comp0, y0, self.TEMP[0], RH, Pnow, Pybel_objects, 0, pconc, 
 	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
