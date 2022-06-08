@@ -1734,7 +1734,8 @@ class PyCHAM(QWidget):
 		self.b402.addItem('Van Krevelen (All Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
 		self.b402.addItem('Van Krevelen (Non-methane Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
 		self.b402.addItem('Van Krevelen (_ Extension Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
-		self.b402.addItem('Mass Defect')
+		self.b402.addItem('Mass Defect of All Components in Chemical Scheme')
+		self.b402.addItem('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below')
 		self.OBSlayout.addWidget(self.b402, 1, 0, 1, 1)
 
 		# input for observed and modelled plotting options
@@ -3810,8 +3811,10 @@ class PyCHAM(QWidget):
 			self.oandm = 7
 
 		# if mass defect
-		if ('Mass Defect' in om_choice):
+		if ('Mass Defect of All Components in Chemical Scheme' in om_choice):
 			self.oandm = 8
+		if ('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below'):
+			self.oandm = 9
 
 		# check on inputs and provide message for user if anything missing
 		if (self.xls_path == ''):
@@ -3824,6 +3827,7 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
+
 		if (self.mod_path == ''):
 			self.l203a.setText('Error - no path to model results selected')
 			# set border around error message
@@ -3834,6 +3838,7 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
+
 		if (self.oandm == 1): # if on gas-phase temporal profiles
 			if (self.gp_names == ['']):
 				self.l203a.setText('Note, no components specified to be plotted for model results')
@@ -3849,7 +3854,7 @@ class PyCHAM(QWidget):
 			plotter_xls.plotter_gp_mod_n_obs(self)
 		if (self.oandm >= 2 and self.oandm <= 7): # if the Van Krevelen to be plotted
 			plotter_xls.plotter_VK_mod_n_obs(self)
-		if (self.oandm == 8): # if mass defect plot
+		if (self.oandm >=8): # if mass defect plot
 			plotter_xls.plotter_mass_defect(self)
 
 	

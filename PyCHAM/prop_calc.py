@@ -158,7 +158,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			# assign an assumed O:C ratio of 0.
 			OC[0, i] = 0.
 			self.HC[0, i] = 0.
-			self.nom_mass[0, i] = 0.
+			self.nom_mass[0, i] = 132.
 			# continuing
 			# here means its vapour pressure is 0 Pa, which is fine; if a 
 			# different vapour pressure is specified it is accounted for below
@@ -230,21 +230,22 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				except: # in case float
 					Psat_Pa_rec[i] = Psatnow
 
+		# if component is chlorine, then H:C is 0 and can continue
+		if (rel_SMILES[i] == 'ClCl'):
+			self.HC[0, i] = 0.
+			self.nom_mass[0, i] = 70.
+			continue
+
 		# if hydrogen is present in this molecule
 		if ('H' in Pybel_objects[i].formula):
 
-			# if component is chlorine, then H:C is 0 and can continue
-			if (rel_SMILES[i] == 'CL'):
-				print('chlorine')
-				self.HC[0, i] = 0.
-				self.nom_mass[0, i] = 35.
-				continue
+			
 
 			Hindx_start = Pybel_objects[i].formula.index('H')+1
 			Hindx_end = Hindx_start
 			for Hnum_test in Pybel_objects[i].formula[Hindx_start::]:
 				try:
-					float(Hnum_test)
+					float(Hnum_test) # only continue if this character is a number
 					Hindx_end += 1
 					if (Hindx_end == len(Pybel_objects[i].formula)):
 						Hcount = float(Pybel_objects[i].formula[Hindx_start:Hindx_end])
@@ -252,7 +253,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 					if (Hindx_end != Hindx_start):
 						Hcount = float(Pybel_objects[i].formula[Hindx_start:Hindx_end])
 					else:
-						Hcount = 0.
+						Hcount = 1. # if no number then Hydrogen must be alone
 					break
 
 		else: # if no hydrocarbons
@@ -261,6 +262,10 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 
 		self.nom_mass[0, i] = Hcount*1.+rel_SMILES[i].count('O')*16.+rel_SMILES[i].count('C')*12.+rel_SMILES[i].count('N')*14.+rel_SMILES[i].count('S')*32.
 		
+		#if (rel_SMILES[i] == '[N+](=O)(O)[O-]'):
+		#	print(Hcount, self.nom_mass[0, i])
+		#	import ipdb; ipdb.set_trace()
+
 		# O:C ratio determined from SMILES string
 		if (rel_SMILES[i].count('C') > 0):
 			OC[0, i] = (rel_SMILES[i].count('O'))/(rel_SMILES[i].count('C'))

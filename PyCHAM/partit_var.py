@@ -156,7 +156,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# zero partitioning to particles for any components with low condensability
 		if (partit_cutoff): # if a value provided (default is empty list)
 
-			# convert partit_cutoff from Pa to molecules/cc (air), note README states
+			# convert partit_cutoff from Pa to molecules/cm3 (air), note README states
 			# that just one value accepted for partit_cutoff input
 			partit_cutoff_Pa = partit_cutoff[0]*(NA/((R_gas*1.e6)*TEMP))
 			highVPi = (Psat*act_coeff) > partit_cutoff_Pa

@@ -334,7 +334,6 @@ def plotter_VK_mod_n_obs(self): # for Van Krevelen diagrams
 
 		# include colorbar to demonstrate time through experiment (s)
 		cb = fig.colorbar(cm.ScalarMappable(norm=norm1, cmap=colors), ax=ax0)
-
 		cb.ax.tick_params(labelsize=14)   
 		# colour bar label
 		cb.set_label('Normalised number concentration at this time', size=14, rotation=270, labelpad=20)
@@ -363,8 +362,53 @@ def plotter_mass_defect(self): # for mass defect plots
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 
-	# plot mass defect against nominal mass
-	ax0.plot(nom_mass, mass_def, '+')
+	if (self.oandm == 8): # all components in chemical scheme without scaling
+
+		# plot mass defect against nominal mass
+		ax0.plot(nom_mass, mass_def, '+')
+
+	# all components in chemical scheme scaled to concentration at provided time
+	if (self.oandm == 9):
+
+		self.HC = np.array((ro_obj.HyC)) # hydrogen:carbon ratios of each component
+
+		# get the time through experiment (s) in question
+		try:
+			treq = float((self.e403.toPlainText()))
+		except:
+			treq = timehr[-1]*3600.
+
+		# index of the required experiment period
+		tindx = np.min(np.abs(timehr*3600-treq)) == (np.abs(timehr*3600-treq))
+
+		# index of hydrocarbons
+		HCindx = self.HC > 0.
+
+		# isolate gas-phase concentrations of hydrocarbons at this time (ppb)
+		yrel = (yrec[tindx, 0:num_comp])[0, HCindx]
+
+		# normalise to sum of concentrations
+		yrel = yrel/sum(yrel)
+
+		# colormap from library (https://matplotlib.org/stable/api/cm_api.html#matplotlib.cm.get_cmap)
+		colors = cm.get_cmap('ocean')
+
+		# set contour levels
+		levels = (MaxNLocator(nbins = 256).tick_values(np.min(yrel), np.max(yrel)))
+	
+		# associate colours and contour levels
+		norm1 = BoundaryNorm(levels, ncolors=256, clip=True)
+	
+		for i in range(len(yrel)):
+			ax0.plot(nom_mass[HCindx][i], mass_def[HCindx][i], 'o', mec = 'k', mfc = colors(yrel[i]))
+
+		# include colorbar to demonstrate time through experiment (s)
+		cb = fig.colorbar(cm.ScalarMappable(norm=norm1, cmap=colors), ax=ax0)
+		cb.ax.tick_params(labelsize=14)   
+		# colour bar label
+		cb.set_label('Normalised number concentration at this time', size=14, rotation=270, labelpad=20)
+
+		ax0.set_title(str('Mass Defect at ' + str(treq) + ' s since experiment start for all hydrocarbons'), fontsize = 14)
 			
 	# x-axis title
 	ax0.set_xlabel('Nominal Molar Mass (g/mol)', fontsize = 14)

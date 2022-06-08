@@ -574,7 +574,7 @@ def ode_updater(y, rindx,
 				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
 				kimt[:, H2Oi] = 0.
-			
+			print(Cw)
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
@@ -601,7 +601,7 @@ def ode_updater(y, rindx,
 			
 			# if negative, suggests ODE solver instability, but could also be numerical limits, 
 			# especially if concentrations are relatively close to zero, so allow some leeway
-			if (any(y < -np.sum(np.abs(y))*1.e-50)):
+			if (any(y/np.sum(np.abs(y))<-1.e-30)):
 			
 				# identify components with negative concentrations
 				neg_comp_indx = y < 0.
