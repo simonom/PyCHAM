@@ -574,7 +574,7 @@ def ode_updater(y, rindx,
 				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
 				kimt[:, H2Oi] = 0.
-			print(Cw)
+			
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,

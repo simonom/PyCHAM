@@ -20,11 +20,11 @@
 #                                                                                        											 #
 ##########################################################################################
 '''estimating the natural light intensity for photochemistry'''
-# equivalent to the method for AtChem2
-# solar zenith angle following the equations of 
+# equivalent to the method for AtChem2 for equations related to 
+# solar zenith angle; note follows the equations of 
 # Chapter 1 ("The Atmosphere and UV-B Radiation at 
 # Ground Level" by S. Madronich) of the textbook
-# Environmental UV Photobiology (1993)
+# Environmental UV Photobiology (1993), Young, Antony R., editor.
 
 import numpy as np
 
@@ -39,7 +39,6 @@ def zenith(self):
 
 	pi = 4.*np.arctan(1.) # 1pi=180deg=3.14. For future calculation
 	radian = 1.8e2/pi # 1 unit rad; use this to convert [\deg] to [\rad]
-	dec = 0.41 # solar declination angle (rad), consistent with AtChem2 default
 
 	# latitude conversion from degrees to radian
 	lat_rad = self.lat/radian # in [\rad]
@@ -47,6 +46,20 @@ def zenith(self):
 	# the day angle (radians), from calcTheta inside solarFunctions.f90 file of AtChem2,
 	# assuming not a leap year (correct for 2010)
 	theta = 2.*pi*self.dayOfYear/365.
+	
+	# inputs for solar declination angle (see reference above)
+	b0 =  0.006918
+	b1 = -0.399912
+	b2 =  0.070257
+	b3 = -0.006758
+	b4 =  0.000907
+	b5 = -0.002697
+	b6 =  0.001480
+
+	dec = b0 + b1*np.cos(theta) + b2*np.sin(theta) + b3*np.cos(2.*theta) + b4*np.sin(2.*theta) + b5*np.cos(3.*theta) + b6*np.sin(3.*theta)
+	
+	# initially used (prior to 08/07/2022) value for solar declination angle
+	#dec = 0.41 # solar declination angle (rad), consistent with AtChem2 default
 	
 	# equation of time accounts for the discrepancy between the apparent and the mean
 	# solar time at a given location

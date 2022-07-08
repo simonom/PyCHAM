@@ -379,9 +379,9 @@ def ui_check(self):
 	
 	# chemical scheme check-------------------------------------
 	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
+	
 		# get chemical scheme names and SMILE strings of components present in chemical scheme file
-		[comp_namelist, _, err_mess_new, 
-		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
+		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
 		
 		if (err_mess_new == '' and em_flag < 2):
 			

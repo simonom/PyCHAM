@@ -62,12 +62,13 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
 		# Ground Level" by S. Madronich) of the textbook
 		# Environmental UV Photobiology (1993)
-
+		
 		# if secx and cosx specified by user in the model variables 
 		# file (to keep solar intensity constant), then use these
 		if hasattr(self, 'secx') and hasattr(self, 'cosx'):
 			secx = self.secx
 			cosx = self.cosx
+		
 		else: # otherwise estimate current secx and cosx
 			(secx, cosx) = zenith.zenith(self)
 		

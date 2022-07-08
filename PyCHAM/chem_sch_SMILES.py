@@ -192,7 +192,7 @@ def chem_scheme_SMILES_extr(self):
 		if (single_chem == 'O' and comp_namelist[indx] != 'O'):
 			H2Oi = indx
 				
-	if H2Oi == len(comp_list): # if not in chemical scheme, water would be the next component appended to component list
+	if (H2Oi == len(comp_list)): # if not in chemical scheme, water would be the next component appended to component list
 		comp_namelist.append('H2O')
 	
 	# if no error message but no equations identified then tell user
@@ -205,14 +205,15 @@ def chem_scheme_SMILES_extr(self):
 
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
-
+	
 	# call on reaction rate calculation (with dummy inputs) to check for issues
 	try:
 		import rate_coeffs
 		importlib.reload(rate_coeffs) # ensure latest version uploaded
+		
 		[rate_values, erf, err_mess] = rate_coeffs.evaluate_rates(0., 0., 298.15, 1, 0., 1., 1., 1., Jlen, 1., 1., 1., 0., self)
+		
 	except: # in case import fails
 		err_mess = 'Error: chemical reactions not interpreted correctly, this could be because of inconsistency between the chemical scheme marker input (chem_scheme_markers in the model variables input) and the format of the chemical scheme file, please see README for more guidance.'
-		
 		
 	return(comp_namelist, comp_list, err_mess, H2Oi)
