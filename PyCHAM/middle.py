@@ -87,7 +87,7 @@ def middle(self): # define function
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, comp_namelist, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, rel_SMILES] = init_conc.init_conc(comp_num, 
-	comp0, y0, self.TEMP[0], RH, Pnow, Pybel_objects, 0, pconc, 
+	comp0, y0, RH, Pnow, Pybel_objects, 0, pconc, 
 	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	comp_namelist, Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
@@ -97,12 +97,14 @@ def middle(self): # define function
 	if (erf == 1):
 		yield err_mess
 
+	tempt_cnt = 0 # count on chamber temperatures
+
 	# get component properties
 	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC, self] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
-		self.TEMP[0], H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
+		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
-		seed_name, y_mw, self)
-	
+		seed_name, y_mw, tempt_cnt, self)
+
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
 		R_gas, NA, diff_vol, Dstar_org, err_mess] = partit_var_prep.prep(y_mw, 
@@ -154,7 +156,7 @@ def middle(self): # define function
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, self):
+		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self):
 
 		yield prog # update progress bar	
 

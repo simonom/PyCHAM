@@ -35,17 +35,17 @@ import errno
 import stat
 from water_calc import water_calc
 
-def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
+def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
 			volP, testf, corei, pconc, umansysprop_update, core_dens, spec_namelist,
 			ode_gen_flag, nuci, nuc_comp, num_asb, dens_comp, dens, seed_name,
-			y_mw, self):
+			y_mw, tempt_cnt, self):
 
 	# inputs: ------------------------------------------------------------
 	# rel_SMILES - array of SMILE strings for components 
 	# (omitting water and core, if present)
 	# Pybel_objects - list of Pybel objects representing the components in rel_SMILES
 	# (omitting water and core, if present)
-	# TEMP - temperature (K) in chamber at time function called
+	# self.TEMP - temperature (K) in chamber at all times
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
 	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
@@ -64,6 +64,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 	# seed_name - chemical scheme name(s) of component(s) comprising seed particles
 	# y_mw - molar mass of components (g/mol)
 	# self - reference to PyCHAM
+	# tempt_cnt - count on temperatures
 	# ------------------------------------------------------------
 	
 	
@@ -168,7 +169,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		# and water not included in Pybel_objects
 		if (i == H2Oi):
 			Psat[0, i] = Psat_water
-			if (TEMP == 298.15):
+			if (self.TEMP[tempt_cnt] == 298.15):
 				Psat_Pa_rec[i] = Psat[0, i]
 			else:
 				[_, Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
@@ -179,8 +180,8 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		
 		if (spec_namelist[i] == 'O3'):
 			# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
-			Psat[0, i] =  np.log10((8.25313-(814.941587/TEMP)-0.001966943*TEMP)*1.31579e-3)
-			if (TEMP == 298.15):
+			Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
+			if (self.TEMP[tempt_cnt] == 298.15):
 				Psat_Pa_rec[i] = Psat[0, i]
 			else:
 				Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
@@ -193,9 +194,9 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		#if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:
 			#Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-2.5
 			
-			#	Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], TEMP, boiling_points.nannoolal(Pybel_objects[i]))))
+			#	Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], self.TEMP[tempt_cnt], boiling_points.nannoolal(Pybel_objects[i]))))
 			
-			#if (TEMP == 298.15):
+			#if (self.TEMP[tempt_cnt] == 298.15):
 				#Psat_Pa_rec[i] = Psat_Pa[0, i]
 			#else:
 				#Psat_Pa_rec[i] = -0.1*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.2+0.5
@@ -204,7 +205,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		else: # for non-HOM components
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 			# that equation given by eq. 7 of same reference)
-			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
+			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], self.TEMP[tempt_cnt], 
 						boiling_points.nannoolal(Pybel_objects[i]))))
 
 			# in case you want to ensure small molecules don't contribute to particle mass
@@ -216,7 +217,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 			except: # in case float
 				Psat[0, i] = Psatnow
 			
-			if (TEMP == 298.15):
+			if (self.TEMP[tempt_cnt] == 298.15):
 				try: # in case array
 					Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
 				except: # in case float
@@ -301,7 +302,7 @@ def prop_calc(rel_SMILES, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
     
 	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
 	# gas law, R has units cc.Pa/K.mol
-	Psat = Psat*(NA/((si.R*1.e6)*TEMP))
+	Psat = Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
 	# now, in preparation for ode solver, repeat over number of size bins
 	if (num_asb > 0):
 		Psat = np.repeat(Psat, num_asb, axis=0)

@@ -30,7 +30,7 @@ from water_calc import water_calc
 import write_dydt_rec
 
 
-def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
+def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	testf, pconc, 
 	rindx, pindx, num_eqn, nreac, nprod, 
 	comp_namelist, Compt, seed_name, seed_mw,
@@ -42,7 +42,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# num_comp - number of unique components
 	# Comp0 - chemical scheme names of components present at start of experiment
 	# init_conc - initial concentrations of components (ppb)	
-	# TEMP - temperature in chamber at start of experiment (K)
+	# self.TEMP[0] - temperature in chamber at start of experiment (K)
 	# RH - relative humidity in chamber (dimensionless fraction 0-1)
 	# PInit - initial pressure (Pa)
 	# init_SMIL - SMILES of components present at start of experiment (whose 
@@ -72,7 +72,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# pstoi - stoichiometry of products per equation
 	# self - reference to program
 	# -----------------------------------------------------------
-
+	
 	# start by assuming no error
 	erf = 0
 	err_mess = ''
@@ -90,7 +90,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	
 	# convert concentrations
 	# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
-	ntot = PInit*(NA/((si.R*1.e6)*TEMP))
+	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 	self.Cfactor = Cfactor
@@ -110,7 +110,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 			return (0, 0, 0, 0, 0, 0, 0, 0, 
 				0, 0, 0,
-				0, 0, 0, erf, err_mess, 0, 0, 0, 0)
+				0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 			
 		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3 (air)
 		
@@ -148,9 +148,9 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 	# ------------------------------------------------------------------------------------
 	# account for water's properties
 	
-	# get initial gas-phase concentration (molecules/cc (air)) and vapour pressure
+	# get initial gas-phase concentration (# molecules/cm3 (air)) and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(TEMP, RH[0], si.N_A)
+	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], RH[0], si.N_A)
 	
 	# holder for water index (will be used if not identified in chemical scheme)
 	H2Oi = num_comp # index for water
@@ -241,7 +241,7 @@ def init_conc(num_comp, Comp0, init_conc, TEMP, RH, PInit, Pybel_objects,
 					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 					return (0, 0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
-					0, 0, 0, 0, erf, err_mess, 0, 0, 0)
+					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 				# remember index for plotting gas-phase concentrations later
 				dydt_traki.append([int(y_indx)])
 			

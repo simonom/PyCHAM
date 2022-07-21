@@ -79,7 +79,7 @@ def ode_updater(y, rindx,
 	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
-	chamV, self):
+	chamV, tempt_cnt, self):
 	
 	# inputs: ----------------------------------------------------
 	# self.update_stp - interval at which to update integration 
@@ -285,6 +285,7 @@ def ode_updater(y, rindx,
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light
+	# tempt_cnt # count on chamber temperatures
 	# ------------------------------------------------------------
 
 	# start timer
@@ -308,7 +309,6 @@ def ode_updater(y, rindx,
 		pcontf = 1
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	infx_cnt0 = 0 # remember count at start of integration step
-	tempt_cnt = 0 # count on chamber temperatures
 	tempt_cnt0 = 0 # remember count at start of integration step
 	RHt_cnt = 0 # count on chamber relative humidities
 	RHt_cnt0 = 0 # remember count at start of integration step
