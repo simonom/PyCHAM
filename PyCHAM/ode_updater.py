@@ -111,7 +111,7 @@ def ode_updater(y, rindx,
 	# self.photo_path - path to file with absorption cross-sections
 	# 		and quantum yields
 	# Jlen - number of photochemical reactions
-	# self.con_infl_C - influx of components with constant concentration (molecules/cm3/s)
+	# self.con_infl_C - influx of components with continuous influx (# molecules/cm3/s)
 	# nrec_step - number of recording steps
 	# self.dydt_vst - dictionary for holding change tendencies of specified
 	#		components
@@ -817,7 +817,16 @@ def ode_updater(y, rindx,
 		y_H2O0 = y[H2Oi]
 		
 	time_taken = time.time()-st_time
+	
+	# re-merge continuous influx of water with that of other components, 
+	# this will allow further commands from the GUI
+	if (self.H2Oin == 1):
 
+		# index
+		self.con_infl_indx = np.concatenate((self.con_infl_indx, np.array((H2Oi)).reshape(1)))
+		# influx rate
+		self.con_infl_C = np.concatenate((self.con_infl_C, self.con_infl_H2O), axis=0)
+		
 	# save results
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, 
