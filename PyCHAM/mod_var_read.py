@@ -58,6 +58,8 @@ def mod_var_read(self):
 		
 		err_mess = '' # initial (blank) error message
 		self.bd_st = 3 # change border/error message status to ready for change
+		# default value for number of modes represented by particle number concentration
+		pmode_cnt = 1
 
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 			
@@ -139,7 +141,7 @@ def mod_var_read(self):
 			if key == 'number_size_bins' and (value.strip()): # number of particle size bins
 				num_sb = int(value.strip())
 
-			if key == 'pconc' and (value.strip()): # seed particle number concentrations (#/cm3)
+			if key == 'pconc' and (value.strip()): # seed particle number concentrations (# particles/cm3)
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
 				pmode_cnt = 1 # track number of modes
