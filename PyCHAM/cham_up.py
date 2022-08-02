@@ -234,7 +234,7 @@ def cham_up(sumt, Pnow,
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
 			[_, Psat_water, _] = water_calc(temp_nown, RH[RHt_cnt], si.N_A)
-			# update vapour pressures of all components (molecules/cc and Pa), 
+			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
 			[Psat, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_nown, H2Oi,   
 							num_comp, Psat_water, [], [], 0, corei, seed_name, 
@@ -527,9 +527,32 @@ def cham_up(sumt, Pnow,
 			
 	# nucleation check end -------------------------------------------------------------------------
 	
-	# check on change to vapour pressure of HOM-RP2+MCM-RO2 accretion products ---------------------
+	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products ---------------------
+	
+	# convert y into components in rows and phases in columns
+	if ('RO2_POOL' in self.comp_namelist):
+	
+		y_mat = y.reshape(num_comp, num_sb+1, order='F')
+		if self.wall_on > 0:
+			y_mat = y_mat[:, 0:-self.wall_on]
+	
+		# get the average oxygen and carbon number of the gas- and particle-phase RO2
+		Cnumav = sum(sum((self.Cnum[self.RO2_indices[:, 1], :])*(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
 
-	# end of check on change to vapour pressure of HOM-RP2+MCM-RO2 accretion products -------------- 
+		Onumav = sum(sum((self.Onum[self.RO2_indices[:, 1], :])*(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
+	
+		# estimate vapour pressure (Pa) effect of the RO2 pool based on carbon and oxygen number
+		RO2pool_effect_Pa = 10**(-0.12*Onumav + Cnumav*-0.22)*101325.
+		
+		# take effect on the HOM-RO2-MCM-RO2 accretion product, note that inside Psat_Pa_rec
+		# is the estimated vapour pressure of the HOM-RO2 (Pa)
+		self.Psat_Pa[0, self.RO2_POOL_APi] = self.Psat_Pa_rec[self.RO2_POOL_APi] + RO2pool_effect_Pa
+		# convert to # molecules/cm3 (air) using ideal
+		# gas law, R has units cm3.Pa/K.mol
+		Psat[:, self.RO2_POOL_APi] = self.Psat_Pa[0, self.RO2_POOL_APi]*(si.N_A/((si.R*1.e6)*self.TEMP[tempt_cnt]))
+		
+		
+	# end of check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products -------------- 
 
 	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 

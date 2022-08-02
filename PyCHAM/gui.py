@@ -1237,21 +1237,28 @@ class PyCHAM(QWidget):
 		l219 = QLabel(self)
 		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
 		l219.setWordWrap(True)
-		self.VOLlayout.addWidget(l219, 4, 0, 2, 1)
+		self.VOLlayout.addWidget(l219, 1, 0, 2, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
-		self.b220 = QPushButton('Plot Volatility Basis Set With Water', self)
+		self.b220 = QPushButton('Volatility Basis Set With Water', self)
 		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b220.clicked.connect(self.on_click220)
 		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b220, 6, 0)
+		self.VOLlayout.addWidget(self.b220, 3, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
-		self.b221 = QPushButton('Plot Volatility Basis Set Without Water', self)
+		self.b221 = QPushButton('Volatility Basis Set Without Water', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b221, 7, 0)
+		self.VOLlayout.addWidget(self.b221, 4, 0)
+		
+		# drop down button for which phase to consider for the volatility basis set
+		self.b221a = QComboBox(self)
+		self.b221a.addItem('Particle Phase')
+		self.b221a.addItem('Gas Phase')
+		self.b221a.addItem('Particle and Gas Phase Combined')
+		self.VOLlayout.addWidget(self.b221a, 3, 1, 2, 1)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -1259,14 +1266,14 @@ class PyCHAM(QWidget):
 		self.e222 = QLineEdit(self)
 		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.VOLlayout.addWidget(self.e222, 8, 0)
+		self.VOLlayout.addWidget(self.e222, 5, 0)
 		
 		# button to plot 2D VBS
-		self.b223 = QPushButton('Plot 2D Volatility Basis Set', self)
+		self.b223 = QPushButton('2D Volatility Basis Set', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b223, 9, 0)
+		self.VOLlayout.addWidget(self.b223, 6, 0)
 
 		return(VOLTab)
 
@@ -2627,6 +2634,9 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 			
+		# get the phase to consider
+		self.phase4vol = self.b221a.currentText()
+		
 		import vol_contr_analys
 		dir_path = self.l201.text() # name of folder with results
 		vol_contr_analys.plotter_wiw(0, dir_path, self, 1) # plot results

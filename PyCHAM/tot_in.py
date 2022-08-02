@@ -26,7 +26,7 @@
 import scipy.constants as si # for scientific constants
 import numpy as np # for arithmetic
 
-def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
+def tot_in(init_conc, Cfac, comp0, y_mw,
 		const_infl_t, Compt, self): # define function
 
 	# inputs: ----------------------------------------------
@@ -34,7 +34,7 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
 	# Cfac - factor to convert ppb to # molecules/cm3
 	# comp0 - chemical scheme names of components present 
 	#	at simulation start
-	# comp_namelist - list of all chemical scheme names
+	# self.comp_namelist - list of all chemical scheme names
 	# y_mw - molar mass of components (g/mol)
 	# self.con_infl_nam - names of components with continuous influx
 	# const_infl_t - times at which injections occur (s)
@@ -53,7 +53,7 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
 	for cnam in comp0: # loop through components present initially
 
 		
-		ci = comp_namelist.index(cnam) # index within all components
+		ci = self.comp_namelist.index(cnam) # index within all components
 		tot_in_res_indx.append(ci) # remember component index
 
 		# initial input ug/m3, note *1e12 converts g/cm3 to ug/m3
@@ -67,12 +67,12 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
 	# index for this record of components injected instantaneously after experiment start
 	# loop through chemical scheme names of components injected instantaneously
 	for cnam in Compt:
-		if comp_namelist.index(cnam) in tot_in_res_indx:
-			Compti.append(tot_in_res_indx.index(comp_namelist.index(cnam)))
+		if self.comp_namelist.index(cnam) in tot_in_res_indx:
+			Compti.append(tot_in_res_indx.index(self.comp_namelist.index(cnam)))
 			continue
 		else:
 			Compti.append(len(tot_in_res_indx))
-			tot_in_res_indx.append(comp_namelist.index(cnam))
+			tot_in_res_indx.append(self.comp_namelist.index(cnam))
 			tot_in_res_con.append(0.)
 
 	# continuous injection ---------------------------------------------
@@ -80,12 +80,12 @@ def tot_in(init_conc, Cfac, comp0, comp_namelist, y_mw,
 	# loop through components with continuous influx
 	for cnam in self.con_infl_nam: 
 		if (cnam != 'H2O'): # omit H2O as this dealt with separately
-			if comp_namelist.index(cnam) in tot_in_res_indx:
-				self.cont_inf_reci.append(tot_in_res_indx.index(comp_namelist.index(cnam)))
+			if self.comp_namelist.index(cnam) in tot_in_res_indx:
+				self.cont_inf_reci.append(tot_in_res_indx.index(self.comp_namelist.index(cnam)))
 				continue
 			else:
 				self.cont_inf_reci.append(len(tot_in_res_indx))
-				tot_in_res_indx.append(comp_namelist.index(cnam))
+				tot_in_res_indx.append(self.comp_namelist.index(cnam))
 				tot_in_res_con.append(0.)
 	
 	# array to hold all information (component indices in first 

@@ -19,17 +19,18 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''generates an array of component indices for the components that constitue a particular component type'''
+'''generates an array of component indices for the components that constitute a particular component type'''
 # for peroxy radicals makes a two column array, with the first column giving the index of components
-# included in the peroxy radical list based on component name and the
-# second column containing the index based on component SMILE
+# included in the peroxy radical list and the
+# second column containing the index based on where the RO2 occurs in comp_namelist (i.e., relative
+# to all other components from the chemical scheme)
 
 import numpy as np
 
-def RO2_indices(comp_namelist, RO2_names, self):
+def RO2_indices(RO2_names, self):
 
 	# inputs: -----------------------------------------------------------------------------------------
-	# comp_namelist - all chemical scheme names
+	# self.comp_namelist - all chemical scheme names
 	# RO2_names - all RO2 (non-HOM) names
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------------------------------------------
@@ -43,12 +44,12 @@ def RO2_indices(comp_namelist, RO2_names, self):
     
 	for name in RO2_names:
         
-		if (name in comp_namelist):
+		if (name in self.comp_namelist):
 			# get the RO2 index
 			index0 = RO2_names.index(name)
 			RO2_indices0.append(index0)
-			# get the comp_namelist index for this RO2 species
-			index1 = comp_namelist.index(name)
+			# get the self.comp_namelist index for this RO2 species
+			index1 = self.comp_namelist.index(name)
 			self.RO2_indices.append(index1)
     
 	# ensure elements in RO2_indices are integer (iterable)
@@ -58,10 +59,10 @@ def RO2_indices(comp_namelist, RO2_names, self):
     
 	return(self)
 	
-def HOMRO2_indices(comp_namelist, self):
+def HOMRO2_indices(self):
 
 	# inputs: -----------------------------------------------------------------------------------------
-	# comp_namelist - all chemical scheme names
+	# self.comp_namelist - all chemical scheme names
 	# ---------------------------------------------------------------------------------------------------
     
 	# store the names of HOMRO2 species which are present in the equation file
@@ -71,7 +72,7 @@ def HOMRO2_indices(comp_namelist, self):
 	self.HOMRO2_indices = []
     
 	cin = 0 # count on components
-	for name in comp_namelist: # loop through names of all components
+	for name in self.comp_namelist: # loop through names of all components
         
 		if ('API_' in name) or ('api_' in name):
 			if ('RO2 in name'):

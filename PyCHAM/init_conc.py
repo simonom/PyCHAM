@@ -33,7 +33,7 @@ import write_dydt_rec
 def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	testf, pconc, 
 	rindx, pindx, num_eqn, nreac, nprod, 
-	comp_namelist, Compt, seed_name, seed_mw,
+	Compt, seed_name, seed_mw,
 	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
 	rstoi, pstoi, self):
 		
@@ -56,7 +56,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# rindx - indices of reactants per equation
 	# pindx - indices of products per equation
 	# num_eqn - number of equations
-	# comp_namelist - list of names of components as presented in the chemical scheme file
+	# self.comp_namelist - list of names of components as presented in the chemical scheme file
 	# Compt - name of components injected instantaneously after start of experiment
 	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
@@ -101,7 +101,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	for i in range(len(Comp0)):
     		# index of where initial components occur in list of components
 		try: # in case components already listed via interpretation of the chemical scheme
-			y_indx = comp_namelist.index(Comp0[i])
+			y_indx = self.comp_namelist.index(Comp0[i])
 			
 		# if component not already listed via interpretation of the chemical scheme
 		# then send error message
@@ -163,7 +163,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		indx += 1
 		# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
 		# (O is the MCM chemical scheme name for single oxygen))
-		if (single_chem == 'O' and comp_namelist[indx] != 'O'):
+		if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
 			H2Oi = indx
 			y[H2Oi] = C_H2O # include initial concentration of water (molecules/cm3)
 			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
@@ -176,7 +176,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		y = np.append(y, C_H2O)
 		# append molar weight of water (g/mol)
 		y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-		comp_namelist.append('H2O') # append water's name to component name list
+		self.comp_namelist.append('H2O') # append water's name to component name list
 		# add to SMILES list
 		rel_SMILES.append('HOH')
 
@@ -187,7 +187,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# empty array for index of core component
 	self.seedi = (np.zeros((len(seed_name)))).astype(int)
 	
-	comp_namelist.append('core') # append name of core to component name list
+	self.comp_namelist.append('core') # append name of core to component name list
 	corei = [num_comp] # index for core component
 	# increase number of components to account for 'core' component
 	num_comp += 1
@@ -205,14 +205,14 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	
 	# check for tracking of all alkyl peroxy radicals
 	if ('RO2_ind' in self.dydt_trak): # append existing list and list of RO2 radicals
-		self.dydt_trak = self.dydt_trak + ((np.array((comp_namelist)))[self.RO2_indices[:, 1]]).tolist()
+		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO2_indices[:, 1]]).tolist()
 	
 		# remove the RO2_ind item from the tracked component list
 		self.dydt_trak.remove('RO2_ind')
 
 	# check for tracking of all alkoxy radicals
 	if ('RO_ind' in self.dydt_trak): # append existing list and list of RO radicals
-		self.dydt_trak = self.dydt_trak + ((np.array((comp_namelist)))[self.RO_indx]).tolist()
+		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO_indx]).tolist()
 	
 		# remove the RO_ind item from the tracked component list
 		self.dydt_trak.remove('RO_ind')
@@ -233,7 +233,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 			
 				# index of components in component list
 				try:
-					y_indx = comp_namelist.index(self.dydt_trak[i])
+					y_indx = self.comp_namelist.index(self.dydt_trak[i])
 				# if component not already listed via interpretation of the chemical scheme
 				# then send error message
 				except:
@@ -332,7 +332,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	indx = 0 # count on seed component(s)
 	for sname in seed_name:
 		# index of core component
-		self.seedi[indx] = int(comp_namelist.index(sname))
+		self.seedi[indx] = int(self.comp_namelist.index(sname))
 		indx += 1 # count on seed component(s)
 	
 	# get index of component with latter injections
@@ -341,7 +341,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		for i in range(len(Compt)):
 			# index of where instantaneously injected components 
 			# occur in SMILES string
-			inj_indx[i] = comp_namelist.index(Compt[i])
+			inj_indx[i] = self.comp_namelist.index(Compt[i])
 	else:
 		inj_indx = np.zeros((1)) # dummy
 
@@ -352,15 +352,15 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# get indices of NO, HO2 and NO3 (for reaction rate calculations)
 	
 	try:
-		NOi = comp_namelist.index(NO)
+		NOi = self.comp_namelist.index(NO)
 	except:
 		NOi = 0 # filler
 	try:
-		HO2i = comp_namelist.index(HO2)
+		HO2i = self.comp_namelist.index(HO2)
 	except:
 		HO2i = 0 # filler
 	try:
-		NO3i = comp_namelist.index(NO3)
+		NO3i = self.comp_namelist.index(NO3)
 	except:
 		NO3i = 0 # filler
 
@@ -381,7 +381,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		
 		# get indices of molar mass in ascending order
 		asc_ind = np.argsort(y_mw, axis = 0)
-		array_names = (np.array(comp_namelist)).reshape(-1, 1)
+		array_names = (np.array(self.comp_namelist)).reshape(-1, 1)
 
 		# plot molar masses against component names in ascending order
 		ax0.plot(np.arange(len(y_mw)), y_mw[asc_ind][:, 0, 0], '+')
@@ -389,7 +389,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		ax0.set_ylabel(r'Molar Mass (g mol$\rm{^{-1}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
-		ax0.set_xticks(np.arange(len(comp_namelist)))
+		ax0.set_xticks(np.arange(len(self.comp_namelist)))
 		ax0.set_xticklabels(array_names[asc_ind], rotation = 45)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
@@ -400,6 +400,6 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		err_mess = 'Stop'
 	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
-			comp_namelist, inj_indx, core_diss,
+			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
 			HO2i, NO3i, self, rel_SMILES)

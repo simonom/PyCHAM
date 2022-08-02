@@ -74,9 +74,9 @@ def ode_updater(y, rindx,
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
-	sav_nam, comp_namelist, space_mode, 
+	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-	Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
+	OC, wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
 	chamV, tempt_cnt, self):
@@ -249,7 +249,7 @@ def ode_updater(y, rindx,
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
 	# sav_nam - name of folder to save in
-	# comp_namelist - chemical scheme name of components
+	# self.comp_namelist - chemical scheme name of components
 	# self.dydt_trak - name of components to track change tendencies
 	# space_mode - type of spacing used in particle size distribution
 	# rbou00 - original particle size bin bounds
@@ -258,8 +258,8 @@ def ode_updater(y, rindx,
 	# comp0 - names of components to plot the gas-phase temporal profile of
 	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings of components in chemical scheme
-	# Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
-	# Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
+	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
+	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
 	# OC - oxygen to carbon ratio of components
 	# wat_hist - flag for history of particle-phase with respect to water partitioning,
 	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
@@ -328,7 +328,7 @@ def ode_updater(y, rindx,
 	tnew = self.update_stp # the time to integrate over (s)
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
-	comp_namelist_np = np.array(comp_namelist) # numpy array version of chemical scheme names
+	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
 	save_cnt_chck = 1 # counting recording steps for time interval check
 	
 	# find out what to do with the gas-wall partitioning coefficient
@@ -457,6 +457,7 @@ def ode_updater(y, rindx,
 				wat_hist0, act_coeff, num_comp, (num_sb-self.wall_on))
 				
 			else: # fillers
+			
 				kimt = np.zeros((num_sb-self.wall_on, num_comp))
 				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
@@ -539,7 +540,7 @@ def ode_updater(y, rindx,
 						# get component indices with negative concentration
 						neg_comp_indx = np.unique((np.where(neg_comp_indx == 1))[1])
 						# get chemical scheme names of components with negative concentration
-						neg_names = comp_namelist_np[neg_comp_indx]
+						neg_names = self.comp_namelist_np[neg_comp_indx]
 
 						y_H2O = y[H2Oi::num_comp] # isolate just water concentrations (molecules/cm3)
 						# sum the negative concentrations and convert to absolute value (molecules/cm3)
@@ -591,7 +592,7 @@ def ode_updater(y, rindx,
 				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-				H2Oi, comp_namelist, Psat_Pa, Cinfl_nowp_indx, 
+				H2Oi, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
 			
 			# if any components set to have constant gas-phase 
@@ -610,7 +611,7 @@ def ode_updater(y, rindx,
 				# get component indices with negative concentration
 				neg_comp_indx = np.unique((np.where(neg_comp_indx == 1))[1])
 				# get chemical scheme names of components with negative concentration
-				neg_names = comp_namelist_np[neg_comp_indx]				
+				neg_names = self.comp_namelist_np[neg_comp_indx]				
 
 				# loop through components with negative concentrations
 				for ci in neg_comp_indx:
@@ -826,12 +827,12 @@ def ode_updater(y, rindx,
 		self.con_infl_indx = np.concatenate((self.con_infl_indx, np.array((H2Oi)).reshape(1)))
 		# influx rate
 		self.con_infl_C = np.concatenate((self.con_infl_C, self.con_infl_H2O), axis=0)
-		
+	
 	# save results
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, 
-		num_sb, comp_namelist, y_mw, MV, time_taken, 
+		num_sb, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi, 
+		comp0, yrec_p2w, rel_SMILES, OC, H2Oi, 
 		siz_str, cham_env, tot_in_res_ft, self)
 	return()

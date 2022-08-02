@@ -92,7 +92,7 @@ def extr_mech(int_tol, num_sb,
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 		y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 		uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-		rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
+		rr_arr_aq, rr_arr_p_aq, comp_list, Pybel_objects, 
 		comp_num, self] = eqn_interr.eqn_interr(eqn_num, 
 		eqn_list, aqeqn_list, comp_name, comp_smil, num_sb, self)
 		
@@ -126,7 +126,7 @@ def extr_mech(int_tol, num_sb,
 			continue
 		try:
 			# index of where components with constant influx occur in list of components
-			self.con_infl_indx[i] = comp_namelist.index(self.con_infl_nam[i])
+			self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
 		except:
 			erf = 1 # raise error
 			err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
@@ -135,7 +135,7 @@ def extr_mech(int_tol, num_sb,
 		try:
 			# index of where constant concentration components occur in list 
 			# of components
-			self.con_C_indx[i] = comp_namelist.index(self.const_comp[i])
+			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
 		except:
 			erf = 1 # raise error
 			err_mess = str('Error: constant concentration component with name ' + str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
@@ -175,7 +175,7 @@ def extr_mech(int_tol, num_sb,
 		# get indices of components with concentrations to fit observations
 		self.obs_comp_i = np.zeros((len(self.obs_comp))).astype('int')
 		for i in range(len(self.obs_comp)):
-			self.obs_comp_i[i] = comp_namelist.index(self.obs_comp[i])
+			self.obs_comp_i[i] = self.comp_namelist.index(self.obs_comp[i])
 
 	# ---------------------------------------------------------------------
 
@@ -215,10 +215,10 @@ def extr_mech(int_tol, num_sb,
 	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
 	# get index of components in the peroxy radical list
-	self = RO2_indices.RO2_indices(comp_namelist, RO2_names, self)
+	self = RO2_indices.RO2_indices(RO2_names, self)
 	
 	# get index of HOM-RO2 radicals
-	self = RO2_indices.HOMRO2_indices(comp_namelist, self)
+	self = RO2_indices.HOMRO2_indices(self)
 	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
@@ -228,7 +228,7 @@ def extr_mech(int_tol, num_sb,
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, 
 		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num,comp_list, 
-		Pybel_objects, eqn_num, comp_namelist, Jlen, 
+		Pybel_objects, eqn_num, Jlen, 
 		rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 		nreac_aq, nprod_aq, jac_stoi_aq, 
 		jac_den_indx_aq, njac_aq, jac_indx_aq, 				

@@ -29,9 +29,9 @@ import csv
 from shutil import copyfile
 
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
-	Cfactor_vst, testf, numsb, comp_namelist, y_mw, MV,
+	Cfactor_vst, testf, numsb, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, yrec_p2w, rel_SMILES, Psat_Pa_rec, OC, H2Oi,
+	indx_plot, comp0, yrec_p2w, rel_SMILES, OC, H2Oi,
 	siz_str, cham_env, tot_in_res_ft, self):
 
 	# inputs: ----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# numsb - number of size bins
 	# self.dydt_vst - tendency to change of user-specified components
 	# self.dydt_trak - user-input names of components to track
-	# comp_namelist - names of components given by the chemical scheme file
+	# self.comp_namelist - names of components given by the chemical scheme file
 	# upper_bin_rad_amp - factor upper bin radius found increased by in 
 	#						Size_distributions.py for more than 1 size bin, or in 
 	# 						pp_intro.py for 1 size bin
@@ -74,7 +74,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.sch_name - path to chemical scheme file
 	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings for components in chemical scheme
-	# Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
+	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
 	# OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
@@ -124,14 +124,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
 	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
 	const["organic_alkoxy_radical_index"] = self.RO_indx
-	const["chem_scheme_names"] = comp_namelist
+	const["chem_scheme_names"] = self.comp_namelist
 	const["SMILES"] = rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
 	const["wall_on_flag_0forNO_1forYES"] = self.wall_on
 	const["space_mode"] = space_mode
-	const["pure_component_saturation_vapour_pressures_at_298.15K"] = Psat_Pa_rec.tolist()
+	const["pure_component_saturation_vapour_pressures_at_298.15K"] = self.Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
 	const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi
@@ -170,7 +170,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 				start = ''
 			else:
 				start = ', '
-			y_header = str(y_header + str(start + comp_namelist[ii]) + end)
+			y_header = str(y_header + str(start + self.comp_namelist[ii]) + end)
 			
 	# saving both gas, particle and wall concentrations of components
 	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cm3 (air)) and _w is the wall phase (molecules/cm3 (air))\n' + y_header)) 		

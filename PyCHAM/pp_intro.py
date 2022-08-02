@@ -31,7 +31,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, Psat, core_diss, kgwt, space_mode, seedx, 
-		spec_namelist, act_coeff, partit_cutoff, Press,
+		act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
 	
 	# inputs -----------------------------------
@@ -64,7 +64,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
 	# seedx - mole ratio of non-water components comprising seed particles
-	# spec_namelist - names of components noted in chemical scheme file
+	# self.comp_namelist - names of components noted in chemical scheme file
 	# act_coeff - activity coefficient of components
 	# self.wall_on - whether or not to consider wall
 	# partit_cutoff - product of vapour pressure and activity coefficient
@@ -119,7 +119,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	
 	# index of nucleating component
 	if len(nuc_comp)>0:
-		nuc_compi = spec_namelist.index(nuc_comp[0])
+		nuc_compi = self.comp_namelist.index(nuc_comp[0])
 		nuc_comp = np.empty(1, dtype=int)
 		nuc_comp[0] = nuc_compi
 
@@ -175,7 +175,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	else:
 		num_sb = num_asb
 
-	# append particle and wall concentrations of components to y (molecules/cc (air))
+	# append particle and wall concentrations of components to y (# molecules/cm3 (air))
 	y = np.append(y, np.zeros((num_sb*num_comp)))
 	
 	# molar volume of components (multiply y_dens by 1e-3 to convert from kg/m3 to g/cm3 and give

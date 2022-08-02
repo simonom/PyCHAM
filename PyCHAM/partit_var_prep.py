@@ -29,7 +29,7 @@ import scipy.constants as si
 import diff_vol_est
 
 def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp, 
-	accom_coeff_user, comp_namelist, num_sb, num_asb, Pnow, 
+	accom_coeff_user, num_sb, num_asb, Pnow, 
 	Pybel_object, name_SMILE, self):
 	
 	# ------------------------------------------------------------------
@@ -46,7 +46,7 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 	#			act_comp
 	# accom_comp - names of components with accommodation coefficient set by the user
 	# accom_coeff_user - accommodation coefficient set by the user
-	# comp_namelist - names of components as stated in the chemical scheme
+	# self.comp_namelist - names of components as stated in the chemical scheme
 	# num_sb - number of size bins (excluding wall)
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
@@ -109,12 +109,12 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 		# plot gas-phase diffusion coefficients (cm2/s)
-		ax0.plot(np.arange(len(comp_namelist)), Dstar_org, '+')
+		ax0.plot(np.arange(len(self.comp_namelist)), Dstar_org, '+')
 		ax0.set_ylabel(r'Gas-phase diffusion coeffiecient (cm$\rm{^{2}}\,$s$\rm{^{-1}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
-		ax0.set_xticks(np.arange(len(comp_namelist)))
-		ax0.set_xticklabels(comp_namelist, rotation = 90)
+		ax0.set_xticks(np.arange(len(self.comp_namelist)))
+		ax0.set_xticklabels(self.comp_namelist, rotation = 90)
 		ax0.set_title(str('Gas-phase diffusion coeffiecients at ' + str(TEMP) + ' K and ' + str(Pnow) + ' Pa'), fontsize = 14)
 		err_mess = 'Stop'
 
@@ -128,12 +128,12 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 		# plot gas-phase diffusion coefficients (cm2/s)
-		ax0.plot(np.arange(len(comp_namelist)), therm_sp, '+')
+		ax0.plot(np.arange(len(self.comp_namelist)), therm_sp, '+')
 		ax0.set_ylabel(r'Gas-phase mean thermal speed (m$\,$s$\rm{^{-1}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
-		ax0.set_xticks(np.arange(len(comp_namelist)))
-		ax0.set_xticklabels(comp_namelist, rotation = 90)
+		ax0.set_xticks(np.arange(len(self.comp_namelist)))
+		ax0.set_xticklabels(self.comp_namelist, rotation = 90)
 		ax0.set_title(str('Gas-phase mean thermal speeds at ' + str(TEMP) + ' K'), fontsize = 14)
 		err_mess = 'Stop'
 	
@@ -146,7 +146,7 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 	ac_indx = []
 	for i in range(len(acc_comp)): # user-defined accommodation coefficients
 		# get index of component stated
-		ac_indx.append(comp_namelist.index(acc_comp[i].strip()))
+		ac_indx.append(self.comp_namelist.index(acc_comp[i].strip()))
 
 	# check for any accommodation coefficients set by user
 	if len(ac_indx)>0:
@@ -216,7 +216,7 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 	act_coeff = np.ones((1, num_speci))
 	for i in range(len(act_comp)): # user-defined activity coefficients
 		# get index of component stated
-		ac_indx = comp_namelist.index(act_comp[i].strip())
+		ac_indx = self.comp_namelist.index(act_comp[i].strip())
 		act_coeff[0, ac_indx] = act_user[i].strip()
 	
 	# in preparation for use in ode solver, repeat activity coefficients over

@@ -36,7 +36,7 @@ import stat
 from water_calc import water_calc
 
 def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
-			volP, testf, corei, pconc, umansysprop_update, core_dens, spec_namelist,
+			volP, testf, corei, pconc, umansysprop_update, core_dens,
 			ode_gen_flag, nuci, nuc_comp, num_asb, dens_comp, dens, seed_name,
 			y_mw, tempt_cnt, self):
 
@@ -53,7 +53,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# pconc - initial number concentration of particles (# particles/cm3 (air))
 	# umansysprop_update - marker for cloning UManSysProp so that latest version used
 	# core_dens - density of core material (g/cm3 (liquid/solid density))
-	# spec_namelist - list of component names in chemical equation file
+	# self.comp_namelist - list of component names from the chemical equation file
 	# ode_gen_flag - whether or not called from middle or ode_gen
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
@@ -138,7 +138,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	if (len(dens_comp) > 0  and ode_gen_flag == 0):
 		for i in range (len(dens_comp)):
 			# index of component in list of components
-			dens_indx = spec_namelist.index(dens_comp[i])
+			dens_indx = self.comp_namelist.index(dens_comp[i])
 			y_dens[dens_indx] = dens[i]
 
 	# for records (e.g. plotting volatility basis set), 
@@ -146,13 +146,23 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# pressures (Pa) at standard temperature (298.15 K), though note that
 	# any manually assigned vapour pressures overwrite these later in
 	# this module
-	Psat_Pa_rec = np.zeros((num_comp))
+	self.Psat_Pa_rec = np.zeros((num_comp))
+	
+	# prepare carbon and oxygen atom count
+	self.Cnum = np.zeros((num_comp, 1))
+	self.Onum = np.zeros((num_comp, 1))
+	
+	# prepare for gathering the indices of any HOM-RO2-MCM-RO2 accretion products
+	self.RO2_POOL_APi = []
 	
 	# estimate vapour pressures (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
 	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
 	for i in range (num_comp):
+	
+		if ('RO2_POOL_AP' in self.comp_namelist[i]):
+			self.RO2_POOL_APi.append(i)
 		
 		if (i == corei[0]): # if this component is 'core'
 			# core component not included in Pybel_objects
@@ -170,38 +180,32 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		if (i == H2Oi):
 			Psat[0, i] = Psat_water
 			if (self.TEMP[tempt_cnt] == 298.15):
-				Psat_Pa_rec[i] = Psat[0, i]
+				self.Psat_Pa_rec[i] = Psat[0, i]
 			else:
-				[_, Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
+				[_, self.Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
 			OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
 			continue
 		
-		if (spec_namelist[i] == 'O3'):
+		if (self.comp_namelist[i] == 'O3'):
 			# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
 			Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
 			if (self.TEMP[tempt_cnt] == 298.15):
-				Psat_Pa_rec[i] = Psat[0, i]
+				self.Psat_Pa_rec[i] = Psat[0, i]
 			else:
-				Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
+				self.Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
 			OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 0.*1.+3.*16.
 			continue
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
-		#if 'api_' in spec_namelist[i] or 'API_' in spec_namelist[i]:
-			#Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-2.5
+		if ('_ao' in self.comp_namelist[i]):
+			Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-2.5
 			
-			#	Psat[0, i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], self.TEMP[tempt_cnt], boiling_points.nannoolal(Pybel_objects[i]))))
+			self.Psat_Pa_rec[i] = Psat[0, i]
 			
-			#if (self.TEMP[tempt_cnt] == 298.15):
-				#Psat_Pa_rec[i] = Psat_Pa[0, i]
-			#else:
-				#Psat_Pa_rec[i] = -0.1*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.2+0.5
-				#Psat_Pa_rec[i] = ((vapour_pressures.myrdal_and_yalkowsky(Pybel_objects[i], 298.15, boiling_points.nannoolal(Pybel_objects[i]))))
-		
 		else: # for non-HOM components
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 			# that equation given by eq. 7 of same reference)
@@ -219,7 +223,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			
 			if (self.TEMP[tempt_cnt] == 298.15):
 				try: # in case array
-					Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
+					self.Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
 				except: # in case float
 					Psat[0, i] = Psatnow # note transfer to Pa is below
 			else: 
@@ -227,9 +231,9 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 						boiling_points.nannoolal(Pybel_objects[i]))))
 			
 				try: # in case array
-					Psat_Pa_rec[i]  = Psatnow[0]
+					self.Psat_Pa_rec[i]  = Psatnow[0]
 				except: # in case float
-					Psat_Pa_rec[i] = Psatnow
+					self.Psat_Pa_rec[i] = Psatnow
 
 		# if component is chlorine, then H:C is 0 and can continue
 		if (rel_SMILES[i] == 'ClCl'):
@@ -267,17 +271,21 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		#	print(Hcount, self.nom_mass[0, i])
 		#	import ipdb; ipdb.set_trace()
 
+		# carbon and oxygen numbers in this component
+		self.Cnum[i, 0] = rel_SMILES[i].count('C')
+		self.Onum[i, 0] = rel_SMILES[i].count('O')
+
 		# O:C ratio determined from SMILES string
 		if (rel_SMILES[i].count('C') > 0):
-			OC[0, i] = (rel_SMILES[i].count('O'))/(rel_SMILES[i].count('C'))
-			self.HC[0, i] = Hcount/(rel_SMILES[i].count('C'))
+			OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
+			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
 		else: # if no carbons in this component
 			OC[0, i] = 0.
 	
 	ish = (Psat == 0.)
 	
 	Psat = (10.**Psat)*101325. # convert to Pa from atm
-	Psat_Pa_rec = (10.**Psat_Pa_rec)*101325 # convert to Pa from atm
+	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325 # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
 	Psat[ish] = 0.
 	
@@ -288,23 +296,24 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	if (len(vol_Comp) > 0 and ode_gen_flag == 0):
 		for i in range (len(vol_Comp)):
 			# index of component in list of components
-			vol_indx = spec_namelist.index(vol_Comp[i])
+			vol_indx = self.comp_namelist.index(vol_Comp[i])
 			Psat[0, vol_indx] = volP[i]
-			Psat_Pa_rec[vol_indx] = volP[i]
+			self.Psat_Pa_rec[vol_indx] = volP[i]
 			vi_rec.append(vol_indx)
 
 	# ensure if nucleating component is core that it is involatile
 	if (nuc_comp == 'core'):
 		Psat[0, nuci] = 0.
 	
-	Psat_Pa = np.zeros((1, num_comp)) # for storing vapour pressures in Pa (Pa)
-	Psat_Pa[0, :] = Psat[0, :]
+	self.Psat_Pa = np.zeros((1, num_comp)) # for storing vapour pressures in Pa (Pa)
+	self.Psat_Pa[0, :] = Psat[0, :]
     
 	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
-	# gas law, R has units cc.Pa/K.mol
+	# gas law, R has units cm3.Pa/K.mol
 	Psat = Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
 	# now, in preparation for ode solver, repeat over number of size bins
 	if (num_asb > 0):
 		Psat = np.repeat(Psat, num_asb, axis=0)
+		
 	
-	return(Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC, self)
+	return(Psat, y_dens, OC, self)

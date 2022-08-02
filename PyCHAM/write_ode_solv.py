@@ -96,7 +96,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
-	f.write('	H2Oi, comp_namelist, Psat_Pa, Cinfl_nowp_indx,\n')
+	f.write('	H2Oi, Cinfl_nowp_indx,\n')
 	f.write('	Cinfl_nowp, self):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
@@ -161,8 +161,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	# H2Oi - index for water\n')
 	f.write('	# self.dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
 	f.write('	# self.RO2_indx - index of organic peroxy radicals\n')
-	f.write('	# comp_namelist - chemical scheme names of components\n')
-	f.write('	# Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
+	f.write('	# self.comp_namelist - chemical scheme names of components\n')
+	f.write('	# self.Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
 	f.write('	#	temperature of chamber\n')
 	f.write('	# Cinfl_nowp_indx - index of particle-phase components with continuous influx \n')
 	f.write('	# Cinfl_nowp - concentration (# molecules/cm3/s) of particle-phase components with\n')
@@ -247,32 +247,32 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		lr = 1./1200. # first order loss rate to wall (/s)\n')
 		f.write('		lrnr = 1200. # first order loss rate to wall of non-radical ELVOC and LVOC (/s)\n')
 		
-		#f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
-		#f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e2)*(Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
+		#f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
+		#f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
 		
-		#f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
-		#f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-2)*(Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
+		#f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
+		#f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
 		
-		f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')
-		f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-6)*(Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')		
+		f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')
+		f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')		
 
-		f.write('		dd[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))] -= y[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
-		f.write('		dd[(num_comp*num_sb)::][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))] += y[0:num_comp][((Psat_Pa[0, :]> 3.8e-10)*(Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
+		f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
+		f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
 		
-		f.write('		dd[0:num_comp][Psat_Pa[0, :] <= 3.8e-10] -= y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
-		f.write('		dd[(num_comp*num_sb)::][Psat_Pa[0, :] <= 3.8e-10] += y[0:num_comp][Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
+		f.write('		dd[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10] -= y[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
+		f.write('		dd[(num_comp*num_sb)::][self.Psat_Pa[0, :] <= 3.8e-10] += y[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
 		
 		f.write('		dd[self.RO2_indices[:, 1]] -= y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
 		f.write('		dd[(num_comp*num_sb)+self.RO2_indices[:, 1]] += y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
 
-		f.write('		dd[comp_namelist.index(\'HO2\')] -= y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
-		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'HO2\')] += y[comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
+		f.write('		dd[self.comp_namelist.index(\'HO2\')] -= y[self.comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
+		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'HO2\')] += y[self.comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
 		
-		f.write('		dd[comp_namelist.index(\'SA\')] -= y[comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
-		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'SA\')] += y[comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
+		f.write('		dd[self.comp_namelist.index(\'SA\')] -= y[self.comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
+		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'SA\')] += y[self.comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
 		
-		f.write('		dd[comp_namelist.index(\'OH\')] -= y[comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
-		f.write('		dd[(num_comp*num_sb)+comp_namelist.index(\'OH\')] += y[comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
+		f.write('		dd[self.comp_namelist.index(\'OH\')] -= y[self.comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
+		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'OH\')] += y[self.comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
 		
 		#f.write('		except:\n')
 		#f.write('			dd[:] = dd[:]\n')

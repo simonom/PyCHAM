@@ -62,7 +62,7 @@ def middle(self): # define function
 	reac_col_g, prod_col_g, rstoi_flat_g, 
 	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
 	jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
-	Pybel_objects, eqn_num, comp_namelist, Jlen, 
+	Pybel_objects, eqn_num, Jlen, 
 	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
 	nreac_aq, nprod_aq, jac_stoi_aq, 
 	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
@@ -84,12 +84,12 @@ def middle(self): # define function
 		yield err_mess
 	
 	# set initial concentrations (# molecules/cm3)
-	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, comp_namelist, 
+	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, rel_SMILES] = init_conc.init_conc(comp_num, 
 	comp0, y0, RH, Pnow, Pybel_objects, 0, pconc, 
 	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
-	comp_namelist, Compt, seed_name,
+	Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
 	rstoi_g, pstoi_g, self)
 	
@@ -100,16 +100,16 @@ def middle(self): # define function
 	tempt_cnt = 0 # count on chamber temperatures
 
 	# get component properties
-	[Psat, y_dens, Psat_Pa, Psat_Pa_rec, OC, self] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+	[Psat, y_dens, OC, self] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
-		uman_up, seed_dens, comp_namelist, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
+		uman_up, seed_dens, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name, y_mw, tempt_cnt, self)
 
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
 		R_gas, NA, diff_vol, Dstar_org, err_mess] = partit_var_prep.prep(y_mw, 
 		self.TEMP[0], num_comp, Cw, act_comp, act_user, accom_comp, 
-		accom_coeff_user, comp_namelist, num_sb, num_sb, Pnow, 
+		accom_coeff_user, num_sb, num_sb, Pnow, 
 		Pybel_objects, comp_smil, self)
 
 	if (err_mess != ''): # if error raised or in testing mode then stop
@@ -121,11 +121,11 @@ def middle(self): # define function
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedx,
-		comp_namelist, act_coeff, partit_cutoff, Pnow, 
+		act_coeff, partit_cutoff, Pnow, 
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
 	# estimate total inputs of emitted components (ug/m3)
-	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, comp_namelist, y_mw,
+	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw,
 		const_infl_t, Compt, self) 
 
 	# solve problem
@@ -152,9 +152,9 @@ def middle(self): # define function
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
-		sav_nam, comp_namelist, space_mode, 
+		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-		Psat_Pa_rec, Psat_Pa, OC, wat_hist, Pybel_objects, pcont, NOi, 
+		OC, wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self):
 

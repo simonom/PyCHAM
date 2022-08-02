@@ -85,7 +85,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 	# indices of Jacobian to affect per equation (rows)
 	jac_indx = np.zeros((num_eqn[0], 1))
 	# a new list for the name strings of components presented in the scheme (not SMILES)
-	comp_namelist = []
+	self.comp_namelist = []
 	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
 	# list of Pybel objects of components in chemical scheme
 	Pybel_objects = []
@@ -216,8 +216,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 			rstoi[eqn_step, reactant_step] = stoich_num
 			jac_stoi[eqn_step, reactant_step] = -1*stoich_num
 
-			if name_only not in comp_namelist: # if new component encountered
-				comp_namelist.append(name_only) # add to chemical scheme name list
+			if name_only not in self.comp_namelist: # if new component encountered
+				self.comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
@@ -243,7 +243,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 
 			else: # if it is a component already encountered it will be in comp_list
 				# existing index
-				name_indx = comp_namelist.index(name_only)
+				name_indx = self.comp_namelist.index(name_only)
 				name_SMILE = comp_list[name_indx]
 			
 			# store reactant SMILE for this equation
@@ -291,8 +291,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 			pstoi[eqn_step, product_step] = stoich_num
 			jac_stoi[eqn_step, reactant_step+product_step] = 1*stoich_num
 			
-			if name_only not in comp_namelist: # if new component encountered
-				comp_namelist.append(name_only)
+			if name_only not in self.comp_namelist: # if new component encountered
+				self.comp_namelist.append(name_only)
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
@@ -317,7 +317,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 				
 			else: # if it's a species already encountered
 				# index of component already listed
-				name_indx = comp_namelist.index(name_only)
+				name_indx = self.comp_namelist.index(name_only)
 				name_SMILE = comp_list[name_indx]
 			
 			# store product SMILE for this equation
@@ -382,14 +382,14 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 
 			if (numC == 0): # if it has no carbon (inorganic)
 				# if generation number not yet included for this component
-				if (len(self.gen_num)-1 < comp_namelist.index(name_only)):
+				if (len(self.gen_num)-1 < self.comp_namelist.index(name_only)):
 					self.gen_num.append(0)
 			
 			else:
 				# if it is an unoxidised organic, then say it's 0th-generation
 				if (SMILEi.count('o')+SMILEi.count('O') == 0):
 					# if it's not yet accounted for
-					if (len(self.gen_num)-1 < comp_namelist.index(name_only)):
+					if (len(self.gen_num)-1 < self.comp_namelist.index(name_only)):
 						self.gen_num.append(0)
 						
 					# minimum generation number of reactant
@@ -406,7 +406,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 					
 					
 					# index of this reactant
-					reac_index = comp_namelist.index(name_only)
+					reac_index = self.comp_namelist.index(name_only)
 
 					# if first appearance of this componenet is as a reactant, 
 					# then store and wait for when it appears as a product
@@ -455,15 +455,15 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 						prod_gen = reac_min_gen # suggested generation number
 					
 					# check if this already has a generation number
-					if (comp_namelist.index(name_only) <= len(self.gen_num)-1):
+					if (self.comp_namelist.index(name_only) <= len(self.gen_num)-1):
 						
-						gn_pre = self.gen_num[comp_namelist.index(name_only)]
+						gn_pre = self.gen_num[self.comp_namelist.index(name_only)]
 						# if this number less than that suggested by reactants, then
 						# no change needed
 						if (gn_pre < prod_gen and name_only not in early_comp):
 							continue # continue to next component in this equation
 						else: # otherwise 
-							self.gen_num[comp_namelist.index(name_only)] = prod_gen
+							self.gen_num[self.comp_namelist.index(name_only)] = prod_gen
 					else: # if this component is on first appearance during this loop
 						self.gen_num.append(prod_gen)
 	
@@ -655,8 +655,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 			rstoi[eqn_step, reactant_step] = stoich_num
 			jac_stoi[eqn_step, reactant_step] = -1*stoich_num
 
-			if name_only not in comp_namelist: # if new component encountered
-				comp_namelist.append(name_only) # add to chemical scheme name list
+			if name_only not in self.comp_namelist: # if new component encountered
+				self.comp_namelist.append(name_only) # add to chemical scheme name list
 			
 				# convert MCM chemical names to SMILES
 				if name_only in comp_name:
@@ -686,7 +686,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 
 			else: # if it's a species already encountered it will be in comp_list
 				# existing index
-				name_indx = comp_namelist.index(name_only)
+				name_indx = self.comp_namelist.index(name_only)
 			
 			# store reactant index
 			# check if index already present - i.e. component appears more than once
@@ -729,8 +729,8 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 			# store stoichiometry
 			pstoi[eqn_step, product_step] = stoich_num
 			jac_stoi[eqn_step, reactant_step+product_step] = 1*stoich_num
-			if name_only not in comp_namelist: # if new component encountered
-				comp_namelist.append(name_only)
+			if name_only not in self.comp_namelist: # if new component encountered
+				self.comp_namelist.append(name_only)
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
@@ -762,7 +762,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 
 			else: # if it's a species already encountered
 				# index of component already listed
-				name_indx = comp_namelist.index(name_only)
+				name_indx = self.comp_namelist.index(name_only)
 				
 			# store product index
 			# check if index already present - i.e. component appears more than once
@@ -846,5 +846,5 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 			jac_den_indx_aq, njac_aq, jac_indx_aq, 				
 			y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
 			uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-			rr_arr_aq, rr_arr_p_aq, comp_namelist, comp_list, Pybel_objects, 
+			rr_arr_aq, rr_arr_p_aq, comp_list, Pybel_objects, 
 			comp_num, self)

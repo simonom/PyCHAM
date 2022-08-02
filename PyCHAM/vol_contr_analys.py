@@ -47,6 +47,7 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	# dir_path - path to results
 	# self - reference to PyCHAM
 	# now - whether to include (0) or exclude water (1)
+	# self.phase4vol - the phase to consider for plotting results
 	# -----------------------------------------
 
 	# prepare the volatility basis set interpretation
@@ -59,15 +60,17 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	
 
 	# tell user that this code won't work if no particle size bins present
-	if (num_sb-wall_on) == 0:
-		self.l203a.setText('Error - volatility basis set may only be estimated for simulations including particles')
-		if (self.bd_pl == 1):
-			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-			self.bd_pl = 2
-		else:
-			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-			self.bd_pl = 1
-		return()
+	if (self.phase4vol == 'Particle Phase' or self.phase4vol == 'Particle and Gas Phase Combined'):
+		
+		if ((num_sb-wall_on) == 0 or sum(sum(Ndry))== 0.):
+			self.l203a.setText('Error - volatility basis set for particle phase may only be estimated for simulations where gas-particle partitioning has occurred')
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 	# prepare plot -----------------------------------------------------------------------
 	if (caller == 0): # if calling function is gui
@@ -90,14 +93,22 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	y_mw_rep = np.tile(y_mw, (1, num_asb))
 	y_mw_rep = np.tile(y_mw_rep, (len(t_array), 1))
 	
-	# particulate concentrations of individual components (*1.e-12 to convert from g/cc (air) to ug/m3 (air))
-	# including any water and core
-	pc = (y[:, num_comp:num_comp*(num_asb+1)]/si.N_A)*y_mw_rep*1.e12
+	if (self.phase4vol == 'Particle Phase'):
+	
+		# particulate concentrations of individual components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
+		# including any water and core
+		pc = (y[:, num_comp:num_comp*(num_asb+1)]/si.N_A)*y_mw_rep*1.e12
+	
+	if (self.phase4vol == 'Gas Phase'):
+		# gaseous concentrations of individual components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
+		# including any water and core
+		pc = (y[:, 0:num_comp]/si.N_A)*y_mw*1.e12
+		num_asb = 1
 	
 	if (now == 1): # if water to be excluded, zero its contribution
 		pc[:, H2Oi::num_comp] = 0.
 
-	# total particulate concentrations (ug/m3)
+	# total particulate concentrations at each time (ug/m3)
 	tpc = pc.sum(axis=1)
 	
 	# standard temperature for pure component saturation vapour pressures (K)
