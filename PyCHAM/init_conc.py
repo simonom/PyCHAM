@@ -378,7 +378,6 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
-		
 		# get indices of molar mass in ascending order
 		asc_ind = np.argsort(y_mw, axis = 0)
 		array_names = (np.array(self.comp_namelist)).reshape(-1, 1)

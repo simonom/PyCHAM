@@ -894,6 +894,7 @@ class PyCHAM(QWidget):
 		self.b80s.addItem('Gas-phase diffusion coefficients')
 		self.b80s.addItem('Gas-phase mean thermal speeds')
 		self.b80s.addItem('Molar masses')
+		self.b80s.addItem('Vapour pressures')
 		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
 		
 		# button to run checks on variables selected in drop down button
@@ -1231,49 +1232,62 @@ class PyCHAM(QWidget):
 		self.VOLlayout = QGridLayout() 
 		VOLTab.setLayout(self.VOLlayout)
 
+		# drop down button for which phase to consider for volatility plotting
+		self.b221a = QComboBox(self)
+		self.b221a.addItem('Particle Phase')
+		self.b221a.addItem('Gas Phase')
+		self.b221a.addItem('Particle and Gas Phase Combined')
+		self.b221a.addItem('Gas Phase Only C>1, O>0')
+		self.VOLlayout.addWidget(self.b221a, 0, 1, 2, 1)
+
 		# volatility basis set ------------------
-		
-		# label for names of components to plot tracked change tendencies
-		l219 = QLabel(self)
-		l219.setText('Buttons below plot mass fractions of components grouped by vapour pressure at 298.15 K')
-		l219.setWordWrap(True)
-		self.VOLlayout.addWidget(l219, 1, 0, 2, 1)
 		
 		# button to plot temporal profile of volatility basis set mass fractions with water
 		self.b220 = QPushButton('Volatility Basis Set With Water', self)
 		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b220.clicked.connect(self.on_click220)
 		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b220, 3, 0)
+		self.VOLlayout.addWidget(self.b220, 0, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
 		self.b221 = QPushButton('Volatility Basis Set Without Water', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b221, 4, 0)
-		
-		# drop down button for which phase to consider for the volatility basis set
-		self.b221a = QComboBox(self)
-		self.b221a.addItem('Particle Phase')
-		self.b221a.addItem('Gas Phase')
-		self.b221a.addItem('Particle and Gas Phase Combined')
-		self.VOLlayout.addWidget(self.b221a, 3, 1, 2, 1)
+		self.VOLlayout.addWidget(self.b221, 1, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
 		# input bar for time through experiment to plot the 2D VBS for
 		self.e222 = QLineEdit(self)
-		self.e222.setText('Provide the time (seconds) through experiment at which to plot the two-dimensional volatility basis set - the closest recorded time to this will be used')
+		self.e222.setText('Provide the time (seconds) through experiment at which to plot the options below - the closest recorded time to this will be used')
 		self.e222.setStyleSheet('qproperty-cursorPosition : 0')
-		self.VOLlayout.addWidget(self.e222, 5, 0)
+		self.VOLlayout.addWidget(self.e222, 2, 0)
 		
 		# button to plot 2D VBS
 		self.b223 = QPushButton('2D Volatility Basis Set', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b223, 6, 0)
+		self.VOLlayout.addWidget(self.b223, 3, 0)
+		
+		# button to plot gas-phase concentration ordered by vapour pressure at the time through experiment defined by user
+		self.b223a = QPushButton('Gas-phase Concentrations Ordered by Volatility', self)
+		self.b223a.setToolTip('Plot gas-phase concentrations (ppb) of all components (ordered by volatility) at the time through experiment specified above')
+		self.b223a.clicked.connect(self.on_click223a)
+		self.VOLlayout.addWidget(self.b223a, 4, 0)
+		
+		# button to plot pie chart of mass fraction by top n components at n time after experiment start, with vapour pressure given
+		self.b2231 = QPushButton('Pie Chart of Top Contributors', self)
+		self.b2231.setToolTip('Plot a pie chart of the top (number specified to the right) mass contributors to the phase specified above at the time through experiment specified above')
+		self.b2231.clicked.connect(self.on_click2231)
+		self.VOLlayout.addWidget(self.b2231, 5, 0)
+		
+		# input bar for number of components to include in pie chart
+		self.e2231 = QLineEdit(self)
+		self.e2231.setText('Provide the number of components to consider in the pie chart')
+		self.e2231.setStyleSheet('qproperty-cursorPosition : 0')
+		self.VOLlayout.addWidget(self.e2231, 5, 1)
 
 		return(VOLTab)
 
@@ -2662,9 +2676,69 @@ class PyCHAM(QWidget):
 
 			return()
 			
+	# button to plot concentrations ordered by volatility
+	@pyqtSlot()
+	def on_click223a(self):
+		
+		self.l203a.setStyleSheet(0., '0px dashed magenta', 0., 0.)
+		self.l203a.setText('')
+		
+		try: # get time through experiment (s) at which to plot
+			t_thro = float(self.e222.text())
+		except: # give error message
+			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+			
 		import vol_contr_analys
 		dir_path = self.l201.text() # name of folder with results
-		vol_contr_analys.plotter_2DVBS(0, dir_path, self, t_thro) # plot results
+		vol_contr_analys.plotter_gpc(0, dir_path, self, t_thro) # plot results
+		return()
+		
+	def on_click2231(self): # plot pie chart of top contributors to phase
+		
+		self.l203a.setStyleSheet(0., '0px dashed magenta', 0., 0.)
+		self.l203a.setText('')
+		
+		# get the phase to consider
+		self.phase4vol = self.b221a.currentText()
+		
+		try: # get time through experiment (s) at which to plot
+			self.t_thro = float(self.e222.text())
+		except: # give error message
+			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+		try: # get number of components to plot
+			self.num_pie_comp = int(self.e2231.text())
+		except: # give error message
+			self.l203a.setText('Error - number of components for pie chart must be a single integer')
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+
+			return()
+			
+		import vol_contr_analys
+		self.dir_path = self.l201.text() # name of folder with results
+		vol_contr_analys.plotter_pie_top_n(self) # plot results
 		return()
 	
 	@pyqtSlot() # button to plot total particle number concentration replication of particle counter
@@ -3643,6 +3717,10 @@ class PyCHAM(QWidget):
 		if (input_check_text == 'Molar masses'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_mm(self)
+			
+		if (input_check_text == 'Vapour pressures'):
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_vp(self)
 
 	@pyqtSlot() # button to retrieve and report component consumption
 	def on_click224(self):

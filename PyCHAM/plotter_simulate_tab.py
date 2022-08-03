@@ -123,3 +123,23 @@ def plotter_mm(self): # define function for molar masses
 			mess = prog
 			if (mess[0:4] == 'Stop'): # if it's an error message
 				return()
+				
+def plotter_vp(self): # define function for vapour pressures
+
+	# inputs: --------------------------
+	# self - reference to PyCHAM program
+	# ----------------------------------
+	
+	self.testf = 3.2 # modify test flag value
+		
+	# now run program up to the vapour pressure plot
+	from middle import middle # prepare to communicate with main program
+		
+	note_messf = 0 # cancel note message flag
+		
+	for prog in middle(self): # call on modules to solve problem
+		
+		if (isinstance(prog, str)): # check if it's a message
+			mess = prog
+			if (mess[0:4] == 'Stop'): # if it's an error message
+				return()

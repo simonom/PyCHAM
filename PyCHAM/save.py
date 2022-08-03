@@ -74,7 +74,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.sch_name - path to chemical scheme file
 	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings for components in chemical scheme
-	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K
+	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K (Pa)
 	# OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
@@ -131,7 +131,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["seed_name"] = seed_name
 	const["wall_on_flag_0forNO_1forYES"] = self.wall_on
 	const["space_mode"] = space_mode
-	const["pure_component_saturation_vapour_pressures_at_298.15K"] = self.Psat_Pa_rec.tolist()
+	const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"] = self.Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
 	const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi

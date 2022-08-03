@@ -99,15 +99,34 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 		# including any water and core
 		pc = (y[:, num_comp:num_comp*(num_asb+1)]/si.N_A)*y_mw_rep*1.e12
 	
+		if (now == 1): # if water to be excluded, zero its contribution
+			pc[:, H2Oi::num_comp] = 0.
+	
 	if (self.phase4vol == 'Gas Phase'):
 		# gaseous concentrations of individual components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
 		# including any water and core
-		pc = (y[:, 0:num_comp]/si.N_A)*y_mw*1.e12
+		pc = (y[:, 0:num_comp]*Cfac/si.N_A)*y_mw*1.e12
+		num_asb = 1
+		
+		if (now == 1): # if water to be excluded, zero its contribution
+			pc[:, H2Oi::num_comp] = 0.
+		
+	if (self.phase4vol == 'Gas Phase Only C>1, O>0'):
+		# gaseous concentrations of individual hydrocarbon components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
+		# including any water and core
+		pc = (y[:, 0:num_comp]*Cfac/si.N_A)*y_mw*1.e12
+		
+		# prepare for results
+		hc_indx = []
+		
+		for smile_now in rel_SMILES:
+			hc_indx.append(smile_now.count('C')>1*smile_now.count('O')>0)
+		
+		pc = pc[:, hc_indx]
+		PsatPa = PsatPa[0, hc_indx]
+		
 		num_asb = 1
 	
-	if (now == 1): # if water to be excluded, zero its contribution
-		pc[:, H2Oi::num_comp] = 0.
-
 	# total particulate concentrations at each time (ug/m3)
 	tpc = pc.sum(axis=1)
 	
@@ -117,7 +136,8 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
 	# saturation concentrations in ug/m3
 	# using eq. 1 of O'Meara et al. 2014
-	Psat_Cst = (1.e6*y_mw)*(PsatPa/101325.)/(8.2057e-5*TEMP)
+	
+	Psat_Cst = (1.e6*y_mw[0, hc_indx])*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
 	# tile over size bins
 	Psat_Cst  = np.tile(Psat_Cst, num_asb)
@@ -350,3 +370,137 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 		plt.show() # show figure
 
 	return() # end function
+	
+# define function for plotting gas-phase concentrations at the 
+# user-defined time through experiment ordered by volatility
+def plotter_gpc(caller, dir_path, self, t_thro):
+
+	# inputs: -------------------------------
+	# caller - the module calling (0 for gui)
+	# dir_path - path to results
+	# self - reference to GUI
+	# t_thro - time (s) through experiment at which to pot the 2D-VBS
+	# -----------------------------------------
+
+	# ----------------------------------------------------------------------------------------
+	if (caller == 0): # if calling function is gui
+		plt.ion() # show figure
+	
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(10,7))
+	fig.subplots_adjust(hspace = 0.7)
+	
+	# prepare plot data --------------------------------------
+	# required outputs from full-moving
+	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
+		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
+		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path)
+	
+	# subtract recorded times from requested time and absolute
+	t_diff = np.abs(t_thro-(t_array*3600.))
+	
+	# find closest recorded time to requested time to plot
+	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
+	
+	# isolate gas-phase concentrations (ppb) at this time
+	y_gp_ppb = np.squeeze(y[t_indx, 0:num_comp])
+
+	# order components by their pure component saturation vapour pressures at 298.15 K
+	# get indices of vapour pressure in descending order
+	des_ind = np.flip(np.argsort(PsatPa, axis = 0))
+	
+	array_names = np.squeeze(np.array(comp_names))[des_ind]
+	VPs = np.array((PsatPa))[des_ind]
+	
+	# component names and their vapour pressures listed in descending order of volatility 
+	# together and with 1 decimal point precision
+	xticks_str = [] # start with empty list
+	
+	for ci in range(len(array_names)):
+		xticks_str.append(str(array_names[ci] + ' (' + "{:.2e}".format(VPs[ci]) + ')'))
+	
+	
+	# plot gas-phase concentrations against component names in descending order of volatility
+	ax0.semilogy(np.arange(len(y_gp_ppb)), y_gp_ppb[des_ind], '+')
+
+	ax0.set_ylabel(str('Gas-phase Concentration at ' + str(t_thro) + ' s Through Experiment (ppb)'), fontsize = 14)
+	ax0.set_xlabel(r'Component Name (Pure Component Saturation Vapour Pressure at 298.15 K (Pa))', fontsize = 14)
+	# set location of x ticks
+	ax0.set_xticks(np.arange(len(y_gp_ppb)))
+	print(np.array((PsatPa))[des_ind].shape, len(str(np.array((PsatPa))[des_ind])))
+	ax0.set_xticklabels(xticks_str, rotation = 45)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+
+	return()
+	
+def plotter_pie_top_n(self): # define function to plot the top n mass contributors to a phase at a given time
+
+	# inputs: -------------------------------
+	# self - reference to GUI
+	# -----------------------------------------
+
+	# ----------------------------------------------------------------------------------------
+	plt.ion() # show figure
+	
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(10,7))
+	fig.subplots_adjust(hspace = 0.7)
+	
+	# prepare plot data --------------------------------------
+	# required outputs from full-moving
+	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
+		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
+		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(self.dir_path)
+	
+	# subtract recorded times from requested time and absolute
+	t_diff = np.abs(self.t_thro-(t_array*3600.))
+	
+	# find closest recorded time to requested time to plot
+	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
+	
+	# isolate concentrations for phase to consider
+	if (self.phase4vol == 'Gas Phase Only C>1, O>0'):
+		import scipy.constants as si
+		yn = y[t_indx, 0:num_comp] # gas-phase concentrations (ppb)
+		# convert ppb to ug/m3
+		yn = ((yn*Cfac[t_indx])/(si.N_A))*y_mw*1.e12
+	
+		# now extract only components with more than one carbon and containing oxygen
+		# prepare for results
+		hc_indx = []
+		
+		for smile_now in rel_SMILES:
+			hc_indx.append(smile_now.count('C')>1*smile_now.count('O')>0)
+			
+		yn = yn[hc_indx]
+		
+	# get mass fractions
+	yn = yn/sum(yn)
+	
+	# ascending order by mass fractions
+	asc_ind = np.argsort(yn, axis = 0)
+	
+	# get top number of fractions
+	yn = yn[asc_ind][-self.num_pie_comp::]
+	
+	# get top component names
+	top_name = np.array((comp_names))[hc_indx][asc_ind][-self.num_pie_comp::]
+	
+	# get top component vapour pressures
+	top_vp = np.array((PsatPa))[hc_indx][asc_ind][-self.num_pie_comp::]
+
+	# prepare for pie section labels
+	label = []
+		
+	# combine names and vapour pressures
+	for i in range(len(top_name)):
+		label.append(str(top_name[i] + ' (' + "{:.2e}".format(top_vp[i]) + ' Pa)'))
+	
+	# plot pie chart with labels and title
+	ax0.pie(yn, labels = label)
+	
+	# include title
+	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + str(self.t_thro) + ' s through experiment for top ' + str(self.num_pie_comp) + ' components' ), fontsize=14)
+	
+	return()

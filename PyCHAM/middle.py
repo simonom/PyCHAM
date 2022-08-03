@@ -100,10 +100,14 @@ def middle(self): # define function
 	tempt_cnt = 0 # count on chamber temperatures
 
 	# get component properties
-	[Psat, y_dens, OC, self] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+	[Psat, y_dens, OC, self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name, y_mw, tempt_cnt, self)
+
+	# if error raised, then tell GUI to display and stop program
+	if (erf == 1):
+		yield err_mess
 
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 

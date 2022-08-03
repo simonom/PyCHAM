@@ -53,7 +53,7 @@ def retr_out(output_by_sim):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
-			if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K'):
+			if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
 				i = i.strip('\n')
 				i = i.strip('[[')
 				i = i.strip(']]')
@@ -154,8 +154,8 @@ def retr_out(output_by_sim):
 	comp_names = const['chem_scheme_names']
 	wall_on = const['wall_on_flag_0forNO_1forYES'][0]
 	space_mode = const['space_mode'][0]
-	# pure component saturation vapour pressures at 298.15 K (log10(atm))
-	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K']
+	# pure component saturation vapour pressures at 298.15 K (Pa)
+	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K_Pa']
 	# oxygen:carbon ratios of components
 	OC = const['oxygen_to_carbon_ratios_of_components']
 	# hydrogen:carbon ratios of components; this output added on 31/05/2022

@@ -70,6 +70,10 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	
 	if (testf == 1):
 		return(0, 0, 0) # return dummies
+	
+	# default values for error message and error flag
+	err_mess = ''
+	erf = 0
 		
 	cwd = os.getcwd() # address of current working directory
 	
@@ -314,6 +318,37 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# now, in preparation for ode solver, repeat over number of size bins
 	if (num_asb > 0):
 		Psat = np.repeat(Psat, num_asb, axis=0)
-		
 	
-	return(Psat, y_dens, OC, self)
+	# if vapour pressure plot requested then make this now --------------------------------------------------------------------
+	if (self.testf == 3.2): 
+		
+		import matplotlib.pyplot as plt
+		
+		plt.ion() # show results to screen and turn on interactive mode
+		
+		# prepare plot
+		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+		
+		# get indices of vapour pressure in descending order
+		des_ind = np.flip(np.argsort(self.Psat_Pa_rec, axis = 0))
+		
+		array_names = np.squeeze(np.array(self.comp_namelist))
+
+		# plot vapour pressures against component names in descending order of volatility
+		ax0.semilogy(np.arange(len(self.Psat_Pa_rec)), self.Psat_Pa_rec[des_ind], '+')
+		
+		ax0.set_ylabel(r'Pure Component Saturation Vapour Pressure at 298.15 K (Pa)', fontsize = 14)
+		ax0.set_xlabel(r'Component name', fontsize = 14)
+		# set location of x ticks
+		ax0.set_xticks(np.arange(len(self.comp_namelist)))
+		ax0.set_xticklabels(array_names[des_ind], rotation = 45)
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+		ax0.set_title(str('Pure Component Saturation Vapour Pressures at 298.15 K of All Components'), fontsize = 14)
+		
+		# tell middle that plot made and need to stop running code now
+		err_mess = 'Stop'
+		erf = 1
+	# end of plotting section ----------------------------------------------------------------------------------------------------------
+	
+	return(Psat, y_dens, OC, self, err_mess, erf)
