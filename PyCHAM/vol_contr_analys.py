@@ -114,7 +114,7 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	if (self.phase4vol == 'Gas Phase Only C>1, O>0'):
 		# gaseous concentrations of individual hydrocarbon components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
 		# including any water and core
-		pc = (y[:, 0:num_comp]*Cfac/si.N_A)*y_mw*1.e12
+		pc = (y[:, 0:num_comp]*np.array((Cfac)).reshape(-1, 1)/si.N_A)*np.array((y_mw)).reshape(1, -1)*1.e12
 		
 		# prepare for results
 		hc_indx = []
@@ -125,7 +125,11 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 		pc = pc[:, hc_indx]
 		PsatPa = PsatPa[0, hc_indx]
 		
+		y_mw = y_mw[0, hc_indx]
+
 		num_asb = 1
+
+	
 	
 	# total particulate concentrations at each time (ug/m3)
 	tpc = pc.sum(axis=1)
@@ -135,9 +139,8 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
 	# saturation concentrations in ug/m3
-	# using eq. 1 of O'Meara et al. 2014
-	
-	Psat_Cst = (1.e6*y_mw[0, hc_indx])*(PsatPa/101325.)/(8.2057e-5*TEMP)
+	# using eq. 1 of O'Meara et al. (2014)
+	Psat_Cst = (1.e6*y_mw[0, :])*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
 	# tile over size bins
 	Psat_Cst  = np.tile(Psat_Cst, num_asb)
@@ -259,7 +262,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	# using eq. 1 of O'Meara et al. 2014
 	Psat_Cst = (1.e6*y_mw)*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
-	# get particle concentrations at this time (molecules/cc)
+	# get particle concentrations at this time (# molecules/cm3)
 	pc = y[t_indx, num_comp:num_comp*(num_sb-wall_on)] 
 
 	# zero water and seed components
@@ -270,7 +273,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	# tile molecular weights over size bins
 	y_mw = np.tile(y_mw, (num_sb-wall_on-1))
 	
-	# convert concentrations from molecules/cc to ug/m3
+	# convert concentrations from # molecules/cm3 to ug/m3
 	pc = ((pc/si.N_A)*y_mw)*1.e12
 	
 	# sum particle concentrations (ug/m3) at this time, without water and seed
@@ -427,7 +430,6 @@ def plotter_gpc(caller, dir_path, self, t_thro):
 	ax0.set_xlabel(r'Component Name (Pure Component Saturation Vapour Pressure at 298.15 K (Pa))', fontsize = 14)
 	# set location of x ticks
 	ax0.set_xticks(np.arange(len(y_gp_ppb)))
-	print(np.array((PsatPa))[des_ind].shape, len(str(np.array((PsatPa))[des_ind])))
 	ax0.set_xticklabels(xticks_str, rotation = 45)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
@@ -483,24 +485,38 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	
 	# get top number of fractions
 	yn = yn[asc_ind][-self.num_pie_comp::]
+
+	# include fraction composed of other components
+	yn = np.concatenate((yn, np.array((1.-sum(yn)).reshape(1))))
 	
 	# get top component names
 	top_name = np.array((comp_names))[hc_indx][asc_ind][-self.num_pie_comp::]
 	
-	# get top component vapour pressures
+	# get top component vapour pressures (Pa)
 	top_vp = np.array((PsatPa))[hc_indx][asc_ind][-self.num_pie_comp::]
+
+	# get top component molar masses (g/mol)
+	top_mw = np.array((y_mw))[hc_indx][asc_ind][-self.num_pie_comp::]
 
 	# prepare for pie section labels
 	label = []
-		
+	
+	# convert standard (at 298.15 K) vapour pressures in Pa to 
+	# saturation concentrations in ug/m3 (at 298.15 K)
+	# using eq. 1 of O'Meara et al. (2014)
+	Psat_Cst = (1.e6*top_mw)*(top_vp/101325.)/(8.2057e-5*298.15)
+
 	# combine names and vapour pressures
 	for i in range(len(top_name)):
-		label.append(str(top_name[i] + ' (' + "{:.2e}".format(top_vp[i]) + ' Pa)'))
+		label.append((str(top_name[i] + ' (' + "{:.2e}".format(Psat_Cst[i]) + r' $\rm{\mu g\, m^{-3})}$')))
 	
+	# final label is for all other components
+	label.append('remainder')
+
 	# plot pie chart with labels and title
-	ax0.pie(yn, labels = label)
+	ax0.pie(yn, labels = label, normalize=True)
 	
 	# include title
-	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + str(self.t_thro) + ' s through experiment for top ' + str(self.num_pie_comp) + ' components' ), fontsize=14)
+	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + str(self.t_thro) + ' s through experiment for top ' + str(self.num_pie_comp) + ' components (C*)' ), fontsize=14)
 	
 	return()

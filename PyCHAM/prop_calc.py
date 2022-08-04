@@ -67,7 +67,6 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# tempt_cnt - count on temperatures
 	# ------------------------------------------------------------
 	
-	
 	if (testf == 1):
 		return(0, 0, 0) # return dummies
 	
@@ -206,7 +205,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		if ('_ao' in self.comp_namelist[i]):
-			Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-2.5
+			Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-4.5
 			
 			self.Psat_Pa_rec[i] = Psat[0, i]
 			
