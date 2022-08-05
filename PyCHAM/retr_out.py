@@ -73,7 +73,7 @@ def retr_out(output_by_sim):
 					dlist.append(int(i))
 				except:
 					continue
-			if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index'):
+			if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index' or str(line.split(',')[0]) == 'organic_HOM_peroxy_radical_index'):
 				i = i.strip('\n')
 				i = i.strip(' ')
 				i = i.strip('[[')
@@ -199,6 +199,11 @@ def retr_out(output_by_sim):
 	except:
 		group_indx['ROi'] = []
 	
+	try: # indices of alkyl peroxy radical components from autoxidation
+		group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
+	except:
+		group_indx['HOMRO2'] = []
+	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
@@ -300,7 +305,7 @@ def retr_out(output_by_sim):
 		HyC = HC # hydrogen:carbon ratios for each component
 		nominal_mass = nom_mass 
 	ro_obj = ro_outputs() # create object to hold outputs
-	
+	print(group_indx['HOMRO2'])
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
 		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx, 

@@ -461,7 +461,23 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	# find closest recorded time to requested time to plot
 	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
 	
+	comp_names = np.array((comp_names)) # ensure array
+	PsatPa = np.array((PsatPa)) # ensure array
+
+	y_mw = np.array((y_mw)) # ensure array
+
+	# particle-phase
 	# isolate concentrations for phase to consider
+	if (self.phase4vol == 'Particle Phase'):
+		import scipy.constants as si
+		yn = y[t_indx, num_comp:(num_sb-wall_on+1)*num_comp] # particle-phase concentrations (# molecules/cm3)
+		# convert # molecules/cm3 to ug/m3
+		yn = ((yn)/(si.N_A))*y_mw*1.e12
+
+		# sum over size bins
+		yn = np.squeeze(yn.reshape((num_sb-wall_on), num_comp).sum(axis=0))
+
+	# gas-phase, for non-methane oxidised components
 	if (self.phase4vol == 'Gas Phase Only C>1, O>0'):
 		import scipy.constants as si
 		yn = y[t_indx, 0:num_comp] # gas-phase concentrations (ppb)
@@ -476,7 +492,13 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 			hc_indx.append(smile_now.count('C')>1*smile_now.count('O')>0)
 			
 		yn = yn[hc_indx]
+
+		comp_names = comp_names[hc_indx]
 		
+		PsatPa = PsatPa[hc_indx]
+
+		y_mw = y_mw[hc_indx]
+
 	# get mass fractions
 	yn = yn/sum(yn)
 	
@@ -490,13 +512,13 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	yn = np.concatenate((yn, np.array((1.-sum(yn)).reshape(1))))
 	
 	# get top component names
-	top_name = np.array((comp_names))[hc_indx][asc_ind][-self.num_pie_comp::]
+	top_name = comp_names[asc_ind][-self.num_pie_comp::]
 	
 	# get top component vapour pressures (Pa)
-	top_vp = np.array((PsatPa))[hc_indx][asc_ind][-self.num_pie_comp::]
+	top_vp = PsatPa[asc_ind][-self.num_pie_comp::]
 
 	# get top component molar masses (g/mol)
-	top_mw = np.array((y_mw))[hc_indx][asc_ind][-self.num_pie_comp::]
+	top_mw = y_mw[asc_ind][-self.num_pie_comp::]
 
 	# prepare for pie section labels
 	label = []

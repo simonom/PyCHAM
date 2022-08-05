@@ -124,6 +124,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
 	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
 	const["organic_alkoxy_radical_index"] = self.RO_indx
+	const["organic_HOM_peroxy_radical_index"] = self.aoRO2_indx
 	const["chem_scheme_names"] = self.comp_namelist
 	const["SMILES"] = rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())

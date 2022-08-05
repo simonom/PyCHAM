@@ -140,7 +140,7 @@ def ui_check(self):
 	# let user know that results will be automatically deleted when 
 	# default name used for folder to save to
 	if (sav_nam == 'default_res_name' and em_flag < 2):
-		err_mess_n = str('Note - default name for save folder used, therefore results folder will be automatically deleted at the end of the simulation to avoid future duplication\n')
+		err_mess_n = str('Results will not be saved since the default name for folder to save to is chosen as the \'res_file_name\' variable in the model variables input\n')
 		if (em_flag == 0):
 			err_mess = err_mess_n
 		else:

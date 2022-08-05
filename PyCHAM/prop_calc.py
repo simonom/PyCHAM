@@ -156,7 +156,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.Onum = np.zeros((num_comp, 1))
 	
 	# prepare for gathering the indices of any HOM-RO2-MCM-RO2 accretion products
-	self.RO2_POOL_APi = []
+	self.aoRO2_indx = []
 	
 	# estimate vapour pressures (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
@@ -164,9 +164,11 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
 	for i in range (num_comp):
 	
-		if ('RO2_POOL_AP' in self.comp_namelist[i]):
-			self.RO2_POOL_APi.append(i)
-		
+		if ('_ao' in self.comp_namelist[i]): # if part of the extension
+			# if it's the peroxy radical formed from autoxidation
+			if (self.comp_namelist[i][-4::] == '_ao1'):
+				self.aoRO2_indx.append(i)
+				
 		if (i == corei[0]): # if this component is 'core'
 			# core component not included in Pybel_objects
 			# assign an assumed O:C ratio of 0.

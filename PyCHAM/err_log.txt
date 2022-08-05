@@ -1,9 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_APINENE_C5H8_CH4_scheme\JPAC_noC5H8_1sb
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: invalid value encountered in subtract
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_APINENE_C5H8_CH4_scheme\JPAC_base_1sb
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
@@ -32,23 +27,13 @@ Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: underflow encountered in exp
-Warning: underflow encountered in multiply
-Warning: underflow encountered in exp
-Warning: underflow encountered in multiply
-Warning: underflow encountered in exp
-Warning: underflow encountered in multiply
-Warning: underflow encountered in exp
-Warning: underflow encountered in multiply
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
-Warning: underflow encountered in exp
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter

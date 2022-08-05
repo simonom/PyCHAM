@@ -73,15 +73,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
 			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
-				indx_plot = []
-				cindn = 0 # number of components
-				for cind in comp_names:
-					if 'API_' in cind or 'api_' in cind:
-						if 'RO2' in cind:
-							indx_plot.append(cindn)
-					cindn += 1
-				indx_plot = np.array(indx_plot)
-
+				indx_plot = (np.array((group_indx['HOMRO2'])))
 			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
