@@ -305,7 +305,7 @@ def retr_out(output_by_sim):
 		HyC = HC # hydrogen:carbon ratios for each component
 		nominal_mass = nom_mass 
 	ro_obj = ro_outputs() # create object to hold outputs
-	print(group_indx['HOMRO2'])
+
 	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
 		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
 		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx, 

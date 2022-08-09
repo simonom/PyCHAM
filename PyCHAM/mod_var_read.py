@@ -67,8 +67,11 @@ def mod_var_read(self):
 			# if commented out continue to next line
 			if (in_list[i][0] == '#'):
 				continue
-			
-			key, value = in_list[i].split('=') # split values from keys
+			try:
+				key, value = in_list[i].split('=') # split values from keys
+			except:
+				err_mess = 'Did not see an \'=\' symbol in a line in the model variables file, please check model variables file and ensure that any lines supposed to be comments begin with #, and see README for guidance'
+				continue
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
 			# ----------------------------------------------------

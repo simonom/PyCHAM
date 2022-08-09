@@ -471,6 +471,32 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	if (self.phase4vol == 'Particle Phase'):
 		import scipy.constants as si
 		yn = y[t_indx, num_comp:(num_sb-wall_on+1)*num_comp] # particle-phase concentrations (# molecules/cm3)
+		
+		# ensure correct size
+		y_mw = np.tile(y_mw, num_sb-wall_on)
+		
+		# convert # molecules/cm3 to ug/m3
+		yn = ((yn)/(si.N_A))*y_mw*1.e12
+
+		# sum over size bins
+		yn = np.squeeze(yn.reshape((num_sb-wall_on), num_comp).sum(axis=0))
+		
+	# particle-phase excluding seed and water
+	# isolate concentrations for phase to consider
+	if (self.phase4vol == 'Particle Phase Excluding Seed and Water'):
+		import scipy.constants as si
+		yn = y[t_indx, num_comp:(num_sb-wall_on+1)*num_comp] # particle-phase concentrations (# molecules/cm3)
+	
+		# zero seed
+		for seedin in seedi:
+			yn[seedin::num_comp] = 0.
+	
+		# zero water
+		yn[H2Oi::num_comp] = 0.
+		
+		# ensure correct size
+		y_mw = np.tile(y_mw, num_sb-wall_on)
+		
 		# convert # molecules/cm3 to ug/m3
 		yn = ((yn)/(si.N_A))*y_mw*1.e12
 

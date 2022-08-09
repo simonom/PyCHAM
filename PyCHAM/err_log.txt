@@ -1,4 +1,34 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_APINENE_C5H8_CH4_scheme\JPAC_base_1sb
+/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/MCM_APINENE_C5H8_CH4_scheme/25_11_CH4adj
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

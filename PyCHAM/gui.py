@@ -1237,6 +1237,7 @@ class PyCHAM(QWidget):
 		self.b221a.addItem('Particle Phase')
 		self.b221a.addItem('Gas Phase')
 		self.b221a.addItem('Particle and Gas Phase Combined')
+		self.b221a.addItem('Particle Phase Excluding Seed and Water')
 		self.b221a.addItem('Gas Phase Only C>1, O>0')
 		self.VOLlayout.addWidget(self.b221a, 0, 1, 2, 1)
 
@@ -3901,7 +3902,7 @@ class PyCHAM(QWidget):
 		# if mass defect
 		if ('Mass Defect of All Components in Chemical Scheme' in om_choice):
 			self.oandm = 8
-		if ('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below'):
+		if ('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below' in om_choice):
 			self.oandm = 9
 
 		# check on inputs and provide message for user if anything missing
@@ -3937,7 +3938,7 @@ class PyCHAM(QWidget):
 					self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 					self.bd_pl = 1
 		import plotter_xls
-
+		
 		if (self.oandm == 1): # if the gas-phase temporal profiles to be plotted
 			plotter_xls.plotter_gp_mod_n_obs(self)
 		if (self.oandm >= 2 and self.oandm <= 7): # if the Van Krevelen to be plotted
