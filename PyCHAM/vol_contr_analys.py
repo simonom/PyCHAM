@@ -562,8 +562,9 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	label.append('remainder')
 
 	# plot pie chart with labels and title
-	ax0.pie(yn, labels = label, normalize=True)
-	
+	wedges, labels = ax0.pie(yn, labels = label, normalize=True)
+	plt.setp(labels, fontsize=25)	
+
 	# include title
 	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + str(self.t_thro) + ' s through experiment for top ' + str(self.num_pie_comp) + ' components (C*)' ), fontsize=14)
 	
