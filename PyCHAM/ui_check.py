@@ -44,7 +44,7 @@ def ui_check(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, RH, RHt, Press,
-		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -122,12 +122,6 @@ def ui_check(self):
 		if (em_flag < 2):
 			err_mess = str('Error - the molecular weight of seed particle component (seed_mw in model variables input file) could not be interpreted, please check it adheres to the guidelines in README')
 		em_flag = 2
-	
-	# incorrect wall_on marker
-	if (self.wall_on != 1 and self.wall_on != 0):
-		if (em_flag < 2):
-			err_mess = str('Error - wall_on model variable must be either 0 for no wall or 1 for wall, please see the notes on the wall_on model variable in README')
-			em_flag = 2
 	
 	if (os.path.isdir(output_by_sim) == True and em_flag < 2): # in case proposed results folder already proposed
 		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
@@ -473,7 +467,7 @@ def ui_check(self):
 	
 	# store in pickle file
 	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 			seedx, con_infl_t, dens_comp, dens, vol_comp, 

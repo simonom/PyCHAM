@@ -29,7 +29,7 @@ import importlib
 def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
 	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-	kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
+	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
 	tot_in_res_ft, self):
@@ -57,12 +57,10 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	#	(molecules/cm3 (air))
 	# kelv_fac - Kelvin factor
 	# kimt - partitioning coefficient (/s)
-	# kw - gas-wall mass transfer coefficient (/s)
-	# Cw - effective absorbing mass of wall (molecules/cc (air))
 	# act_coeff - activity coefficients
 	# Cfactor - conversion factor from molecules/cc to ppb
-	# Nres_dry - number size distributions excluding water (#/cc (air))
-	# Nres_wet - number size distributions including water (#/cc (air))
+	# Nres_dry - number size distributions excluding water (#/cm3 (air))
+	# Nres_wet - number size distributions including water (#/cm3 (air))
 	# x2 - radii of single particle (um)
 	# x - radii of single particles per size bin now (um)
 	# MV - molar volume of components (cm3/mol)

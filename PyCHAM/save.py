@@ -33,10 +33,10 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
 	indx_plot, comp0, yrec_p2w, rel_SMILES, OC, H2Oi,
 	siz_str, cham_env, tot_in_res_ft, self):
-
+	
 	# inputs: ----------------------------------------------------------------------------
 	
-	# y_mat - species (columns) concentrations with time (rows) (# molecules/cm3 (air))
+	# y_mat - component (columns) concentrations with time (rows) (# molecules/cm3 (air))
 	# Nresult_dry  - number concentration of dry particles per size bin (# particles/cm3 (air))
 	# Nresult_wet  - number concentration of dry particles per size bin (# particles/cm3 (air))
 	# Cfactor - conversion factor to change gas-phase concentrations from # molecules/cm3 
@@ -146,7 +146,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			f.write("%s,%s\n"%(key, const[key]))
 	
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
-	# leaving any particle-phase concentrations as molecules/cc (air)
+	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
 	
 	

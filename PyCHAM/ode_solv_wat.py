@@ -33,7 +33,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,
 	rowvals, colptrs, num_comp, num_sb,
-	Psat, Cw, act_coeff, kw, jac_wall_indx,
+	Psat, act_coeff, jac_wall_indx,
 	core_diss, kelv_fac, kimt, num_asb,
 	jac_part_indx,
 	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -80,10 +80,8 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# num_comp - number of components
 	# num_sb - number of size bins
 	# self.wall_on - flag saying whether to include wall partitioning
-	# Psat - pure component saturation vapour pressures (molecules/cc)
-	# Cw - effective absorbing mass concentration of wall (molecules/cc) 
+	# Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
-	# kw - mass transfer coefficient to wall (/s)
 	# jac_wall_indx - index of inputs to Jacobian by wall partitioning
 	# self.seedi - index of seed material
 	# core_diss - dissociation constant of seed material
@@ -97,7 +95,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# jac_part_hmf_indx - index of Jacobian affected by water
 	#	 in the particle phase
 	# rw_indx - indices of rows affected by water in particle phase
-	# N_perbin - number concentration of particles per size bin (#/cc)
+	# N_perbin - number concentration of particles per size bin (#/cm3)
 	# jac_part_H2O_indx - sparse Jacobian indices for the effect of
 	#	particle-phase water on all other components
 	# H2Oi - index for water
@@ -128,13 +126,14 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 				dd[0:-1, 0] -= y[0:-1, 0]*self.dil_fac
 			else:
 				dd[:, 0] -= y[:, 0]*self.dil_fac
+				
 		# gas-particle partitioning-----------------
 		
 		# update the water particle-phase concentrations in the matrix of particle-phase 
 		# concentrations for all components
 		ymat[:, H2Oi] = y[1::, 0]
 		
-		# total particle-phase concentration per size bin (molecules/cc (air))
+		# total particle-phase concentration per size bin (# molecules/cm3 (air))
 		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
@@ -142,10 +141,10 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
-			# gas-phase concentration of water at particle surface (molecules/cc (air), core_diss)
-			Csit = Csit*Psat[isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[isb, H2Oi]
+			# gas-phase concentration of water at particle surface (# molecules/cm3 (air), core_diss)
+			Csit = Csit*Psat[0:-self.wall_on, :][isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[0:-self.wall_on, :][isb, H2Oi]
 			# partitioning rate (molecules/cc/s)
-			dd_all = (kimt[isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
+			dd_all = (kimt[0:num_asb, :][isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
 			dd[0, 0] -= sum(dd_all) # gas-phase change
 			
 			dd[1::, 0][isb] += (dd_all.flatten()) # particle change

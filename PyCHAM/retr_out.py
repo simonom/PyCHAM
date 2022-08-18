@@ -153,6 +153,7 @@ def retr_out(output_by_sim):
 	nom_mass = const['nominal_molar_mass_g/mol']
 	comp_names = const['chem_scheme_names']
 	wall_on = const['wall_on_flag_0forNO_1forYES'][0]
+	
 	space_mode = const['space_mode'][0]
 	# pure component saturation vapour pressures at 298.15 K (Pa)
 	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K_Pa']
@@ -243,7 +244,7 @@ def retr_out(output_by_sim):
 	except:
 		gen_num = []
 	
-	# withdraw concentrations
+	# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
 	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
@@ -257,7 +258,7 @@ def retr_out(output_by_sim):
 		yrec_p2w = []
 	
 	try:
-		# withdraw number-size distributions (# particles/cc (air))
+		# withdraw number-size distributions (# particles/cm3 (air))
 		fname = str(output_by_sim+'/particle_number_concentration_dry')
 		N = np.loadtxt(fname, delimiter=',', skiprows=1)
 		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
@@ -266,7 +267,7 @@ def retr_out(output_by_sim):
 		N = []
 	
 	try:
-		# withdraw number-size distributions (# particles/cc (air))
+		# withdraw number-size distributions (# particles/cm3 (air))
 		fname = str(output_by_sim+'/particle_number_concentration_wet')
 		Nwet = np.loadtxt(fname, delimiter=',', skiprows=1)
 		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions

@@ -242,9 +242,8 @@ def cham_up(sumt, Pnow,
 			
 			Psat = Psat.reshape(1, -1) # ensure Psat is correct shape
 
-			# now, in preparation for ode solver, repeat over number of size bins
-			if ((num_sb-self.wall_on) > 0):
-				Psat = np.repeat(Psat, (num_sb-self.wall_on), axis=0)
+			# now, in preparation for ode solver, tile over size bins and wall bins
+			Psat = np.tile(Psat, (num_sb, 1))
 			
 			# according to the ideal gas law, air pressure (Pa) inside chamber
 			# is proportional to temperature, therefore pressure changes by 

@@ -30,7 +30,7 @@ import scipy.constants as si
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
 		y_dens, N_perbin, radius, Psat, therm_sp,
 		H2Oi, act_coeff, caller, partit_cutoff, Press, DStar_org,
-		z_prt_coeff, chamSA, chamV, kwf, self):
+		z_prt_coeff, chamSA, chamV, self):
 	
 	# inputs:---------------------------------------------------------------------------
 	
@@ -60,18 +60,18 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	#	e.g. because surface area of that size bin is tiny
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
-	# kwf - gas-wall partitioning coefficient flag (-1 means treat with Huang et al. 2018)
+	# self.kwf - gas-wall partitioning coefficient flag (-1 means treat with Huang et al. 2018)
 	# self - reference to program
 	# ------------------------------------------------------------------------------------
 	
 	if (num_sb == 0): # fillers
-		kimt = np.zeros((num_sb-self.wall_on, num_comp))
+		kimt = np.zeros((num_sb, num_comp))
 		kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 
 		return(kimt, kelv)
 
 	if (num_sb > 0) and (self.wall_on > 0): # if wall present
-		y_part = y[num_comp:-(num_comp)]
+		y_part = y[num_comp:-(num_comp*self.wall_on)]
 	if (num_sb > 0) and (self.wall_on == 0): # if wall absent
 		y_part = y[num_comp::]
 	
@@ -101,10 +101,10 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# Pruppacher and Klett 1997
 		Inverse_Kn = Kn**-1.
 		correct_1 = (1.33+0.71*Inverse_Kn)/(1.+Inverse_Kn)
-		correct_2 = (4.*(1.-accom_coeff_now))/(3.*accom_coeff_now)
+		correct_2 = (4.*(1.-accom_coeff_now[:, 0:-self.wall_on]))/(3.*accom_coeff_now[:, 0:-self.wall_on])
 		correct_3 = 1.e0+(correct_1+correct_2)*Kn
 		correction = correct_3**-1.
-	
+		
 		# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
 		# note that avMW has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 		# 1e7 for units g cm2/s2.mol.K, 
@@ -116,11 +116,12 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# gas-phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
 		# eq. 5 Zaveri et al. (2008)
 		kimt = (DStar_org)*correction
+		
 		# final partitioning coefficient (converting radius from m to cm)
 		# eq. 16.2 of Jacobson (2005) and eq. 5 Zaveri et al. (2008)
 		# components in rows and size bins in columns (/s)
 		kimt = (4.*np.pi*(radius*1.e2)*N_perbin.reshape(1, -1))*kimt
-
+		
 		# zero partitioning coefficient for particle size bins with 
 		# such little number concentration or radius that partitioning 
 		# is relatively tiny
@@ -167,7 +168,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		kimt = np.zeros((num_sb-self.wall_on, num_comp))
 		kelv = np.zeros((num_sb-self.wall_on, 1))
 
-	if (kwf == -1):
+	if (self.kwf == -1):
 		# gas-wall partitioning coefficient (/s), from Huang et al. 2018 
 		# (Eq. 2 and accompanying text), https://doi.org/10.1021/acs.est.7b05575
 		# mass transport coefficient across gas-phase boundary layer, note the 
@@ -175,9 +176,10 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# decay from MAC
 		ve = ((2./np.pi)*((1./40.*DStar_org*1.e-4)**0.5))
 		vc = 1.*therm_sp/4.
-		kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
-		kw = np.squeeze(kw) # remove single dimensions
-	else:
-		kw = kwf
+		self.kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
+		self.kw = np.tile(self.kw.reshape(1, num_comp), (self.wall_on, 1)) # spread over wall bins
 
-	return(kimt, kelv, kw)
+	# concatenate kw onto kimt, ready for ode solver
+	kimt = np.concatenate((kimt, self.kw), axis = 0)
+
+	return(kimt, kelv)

@@ -42,7 +42,7 @@ def middle(self): # define function
 	
 	# get required inputs
 	[sav_nam, comp0, y0, RH, RHt, Pnow,
-		Cw, kw, siz_str, num_sb, pmode, pconc, pconct,
+		siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
@@ -108,14 +108,14 @@ def middle(self): # define function
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
 		yield err_mess
-
+	
 	# prepare for the calculation of partitioning variables
-	[mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, 
-		R_gas, NA, diff_vol, Dstar_org, err_mess] = partit_var_prep.prep(y_mw, 
-		self.TEMP[0], num_comp, Cw, act_comp, act_user, accom_comp, 
-		accom_coeff_user, num_sb, num_sb, Pnow, 
+	[mfp, accom_coeff, therm_sp, surfT, act_coeff, 
+		R_gas, NA, diff_vol, Dstar_org, err_mess, self] = partit_var_prep.prep(y_mw, 
+		self.TEMP[0], num_comp, act_comp, act_user, accom_comp, 
+		accom_coeff_user, num_sb+self.wall_on, num_sb, Pnow, 
 		Pybel_objects, comp_smil, self)
-
+	
 	if (err_mess != ''): # if error raised or in testing mode then stop
 		yield err_mess
 	
@@ -124,14 +124,14 @@ def middle(self): # define function
 	rbou00, ub_rad_amp, np_sum, C_p2w] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, y_dens, Psat, core_diss, kw, space_mode, seedx,
+		therm_sp, y_dens, Psat, core_diss, space_mode, seedx,
 		act_coeff, partit_cutoff, Pnow, 
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw,
-		const_infl_t, Compt, self) 
-
+		const_infl_t, Compt, self)
+	
 	# solve problem
 	for prog in ode_updater.ode_updater(y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
@@ -140,7 +140,7 @@ def middle(self): # define function
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, Psat, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-		x, Varr, act_coeff, Cw, kw, Cfactor, y_arr_g, y_rind_g, 
+		x, Varr, act_coeff, Cfactor, y_arr_g, y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
 		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
 		colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 

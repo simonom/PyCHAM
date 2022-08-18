@@ -123,7 +123,7 @@ class PyCHAM(QWidget):
 		self.show()
 		return
 		
-	def NStab(self): # New Simulation tab
+	def NStab(self): # new Simulation tab
 	
 		NSTab = QWidget()
 		self.NSlayout = QGridLayout() 
@@ -140,7 +140,7 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model variables -------------------------
 		[sav_nam, comp0, 
-		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
@@ -729,14 +729,14 @@ class PyCHAM(QWidget):
 		l60.setText('Effective absorbing mass of \nwall (g/m3 (air)): ')
 		self.varbox.addWidget(l60, wall_row+2, 0)
 		self.l60a = QLabel(self)
-		self.l60a.setText((str(Cw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l60a.setText((str(self.Cw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l60a, wall_row+2, 1)
 		
 		l61 = QLabel(self)
 		l61.setText('Gas-wall mass transfer \ncoefficient (/s): ')
 		self.varbox.addWidget(l61, wall_row+3, 0)
 		self.l61a = QLabel(self)
-		self.l61a.setText((str(kw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l61a.setText((str(self.kw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l61a, wall_row+3, 1)
 		
 		l62 = QLabel(self)
@@ -1805,7 +1805,7 @@ class PyCHAM(QWidget):
 		# prepare by enforcing default variables
 		# default variables for all required input model variables -------------------------
 		[sav_nam, comp0, 
-		y0, RH, RHt, Press, Cw, kw, siz_stru, num_sb, pmode, pconc, 
+		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
@@ -1819,7 +1819,7 @@ class PyCHAM(QWidget):
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, RH, RHt, Press,
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -1968,8 +1968,8 @@ class PyCHAM(QWidget):
 		
 			# reset to default variables to allow any new variables to arise
 			# from the current model variables file only
-			[sav_nam, comp0, y0, RH, RHt, Press, Cw, 
-			kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			[sav_nam, comp0, y0, RH, RHt, Press, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
@@ -2012,7 +2012,7 @@ class PyCHAM(QWidget):
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
 				[sav_nam, comp0, y0, RH, RHt, Press,
-				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -3692,7 +3692,7 @@ class PyCHAM(QWidget):
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
 				[sav_nam, comp0, y0, RH, RHt, Press,
-				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
+				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 				std, mean_rad, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
 				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 

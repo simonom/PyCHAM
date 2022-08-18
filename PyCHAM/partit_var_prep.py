@@ -28,18 +28,18 @@ import numpy as np
 import scipy.constants as si
 import diff_vol_est
 
-def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp, 
+def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp, 
 	accom_coeff_user, num_sb, num_asb, Pnow, 
 	Pybel_object, name_SMILE, self):
 	
 	# ------------------------------------------------------------------
 	# inputs:
-	# y_mw - molecular weight of components (g/mol) (num_speci,1)
+	# y_mw - molecular weight of components (g/mol) (num_comp,1)
 	# TEMP - temperature of chamber at start of experiment (K)
-	# num_speci - number of components
+	# num_comp - number of components
 	# self.testf - flag for whether in normal mode (0) or testing mode (1) or 
 	#	plotting of gas-phase diffusion coefficients mode (2)
-	# Cw - effective absorbing mass of wall (g/m3 (air))
+	# self.Cw - effective absorbing mass of wall (g/m3 (air))
 	# act_comp - names of components (corresponding to chemical scheme name) with 
 	# 			activity coefficient stated in act_user
 	# act_user - user-specified activity coefficients of components with names given in
@@ -47,12 +47,13 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 	# accom_comp - names of components with accommodation coefficient set by the user
 	# accom_coeff_user - accommodation coefficient set by the user
 	# self.comp_namelist - names of components as stated in the chemical scheme
-	# num_sb - number of size bins (excluding wall)
+	# num_sb - number of size bins (including wall)
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
 	# Pybel_object - Pybel objects for components
 	# name_SMILE - SMILE strings of components
 	# self - reference to program
+	# self.kw - rate of transfer of components to wall (/s)
 	# -----------------------------------------------------------------
 	
 	# start by assuming no error message
@@ -138,7 +139,7 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 		err_mess = 'Stop'
 	
 	# accommodation coefficient of components in each size bin
-	accom_coeff = np.ones((num_speci, num_sb))*1.e0
+	accom_coeff = np.ones((num_comp, num_sb))*1.e0
 	
 	# list containing accommodation coefficients that are functions
 	accom_coeff_func = []
@@ -213,23 +214,31 @@ def prep(y_mw, TEMP, num_speci, Cw, act_comp, act_user, acc_comp,
 	f.close()
 	
 	# activity coefficient of components - affects the particle- and wall-phase
-	act_coeff = np.ones((1, num_speci))
+	act_coeff = np.ones((1, num_comp))
 	for i in range(len(act_comp)): # user-defined activity coefficients
 		# get index of component stated
 		ac_indx = self.comp_namelist.index(act_comp[i].strip())
 		act_coeff[0, ac_indx] = act_user[i].strip()
 	
-	# in preparation for use in ode solver, repeat activity coefficients over
-	# size bins
-	if num_asb>0:
-		act_coeff = np.repeat(act_coeff, num_asb, axis=0)
-
+	# in preparation for use in ode solver, tile activity coefficients over
+	# particle and wall bins
+	act_coeff = np.tile(act_coeff, (num_sb, 1))
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
 	# # molecules/cm3 (air), assuming a molecular weight of 200 g/mol (*1.e-6 to convert from
 	# /m3 (air) to /cm3 (air))
-	Cw = ((Cw*1.e-6)/200.)*si.N_A
-	
+	self.Cw = ((self.Cw*1.e-6)/200.)*si.N_A
+	# ensure effective absorbing mass of walls represents walls in rows and components in columns
+	self.Cw = np.tile((self.Cw.reshape(-1, 1)), (1, num_comp))
+	# in case user has not given a Cw value for every wall
+	if (self.Cw.shape[0] == 1 and self.wall_on > 1):
+		self.Cw = np.tile((self.Cw), (self.wall_on, 1))
+	# ensure rate of transfer to walls represents walls in rows and components in columns
+	self.kw = np.tile((self.kw.reshape(-1, 1)), (1, num_comp))
+	# in case user has not given a kw value for every wall
+	if (self.kw.shape[0] == 1 and self.wall_on > 1):
+		self.kw = np.tile((self.kw), (self.wall_on, 1))
+
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)
 
-	return(mfp, accom_coeff, therm_sp, surfT, Cw, act_coeff, R_gas, NA, diff_vol, Dstar_org, err_mess)
+	return(mfp, accom_coeff, therm_sp, surfT, act_coeff, R_gas, NA, diff_vol, Dstar_org, err_mess, self)

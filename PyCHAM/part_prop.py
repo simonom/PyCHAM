@@ -29,7 +29,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, y_dens, n0):
 	
 	# y - concentration of components in particle size bins 
 	#	(# molecules/cm3 (air)), excluding gas and wall
-	# num_asb - number of actual size bins (no wall)
+	# num_asb - number of actual particle bins (no wall)
 	# n0 - particle concentration per size bin now (# particles/cm3 (air))
 	# ---------------------------------------------------------------------------
 

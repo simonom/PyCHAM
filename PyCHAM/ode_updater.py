@@ -60,7 +60,7 @@ def ode_updater(y, rindx,
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, Psat, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-	x, Varr, act_coeff, Cw, kw, Cfactor, y_arr, 
+	x, Varr, act_coeff, Cfactor, y_arr, 
 	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
 	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
@@ -135,8 +135,8 @@ def ode_updater(y, rindx,
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
 	# act_coeff - activity coefficient
-	# Cw - effective absorbing mass of wall (# molecules/cm3 (air))
-	# kw - gas-wall mass transfer coefficient (/s)
+	# self.Cw - effective absorbing mass of wall (# molecules/cm3 (air))
+	# self.kw - gas-wall mass transfer coefficient (/s)
 	# Cfactor - conversion factor for concentrations (ppb/# molecules/cm3)
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval for 
@@ -331,13 +331,15 @@ def ode_updater(y, rindx,
 	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
 	save_cnt_chck = 1 # counting recording steps for time interval check
 	
-	# find out what to do with the gas-wall partitioning coefficient
-	if (kw == -1):
-		kwf = -1 # Huang et al. 2018 treatment
+	# find out what to do with the gas-wall partitioning coefficient,
+	# note that self.kw and self.Cw are spread over wall bins in rows and components 
+	# in columns (the latter spread is done in partit_var_prep.py)
+	if (sum(sum(self.kw == -1)) >0 ):
+		self.kwf = -1 # Huang et al. 2018 treatment
 	else:
 		# standard PyCHAM (GMD paper) treatment with same gas-wall 
 		# partitioning coefficient for all components
-		kwf = kw
+		self.kwf = 0
 		
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
@@ -351,7 +353,7 @@ def ode_updater(y, rindx,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
-	Jlen, Cw, kw, Cfactor, 
+	Jlen, Cfactor, 
 	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
@@ -360,7 +362,7 @@ def ode_updater(y, rindx,
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, kwf, self)
+	tot_in_res_indx, chamSA, chamV, self)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -441,13 +443,13 @@ def ode_updater(y, rindx,
 			
 			# ------------------------------------------------------------------		
 			
-			if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles present
+			if ((num_sb-self.wall_on) > 0 or self.wall_on > 1): # if particles and/or wall present
 			
 				# update partitioning variables
-				[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
+				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
 				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
-				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf, self)
+				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 			
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
@@ -489,7 +491,7 @@ def ode_updater(y, rindx,
 					if (self.testf != 5):
 						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
 							nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
-							kimt, kw, Cw, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
+							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 			
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
@@ -502,7 +504,7 @@ def ode_updater(y, rindx,
 				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
 				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-				Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
+				Psat, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
 				# prepare for recording next point
@@ -513,14 +515,13 @@ def ode_updater(y, rindx,
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-					
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 					Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 					reac_col, prod_col, rstoi_flat, 
 					pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-					num_sb, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+					num_sb, Psat, act_coeff, jac_wall_indxn,
 					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 					jac_part_indxn,
 					rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -556,7 +557,7 @@ def ode_updater(y, rindx,
 							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
 									y_rind, rstoi, pstoi, rrc, nreac, nprod, num_comp, 
-									(num_sb-self.wall_on), Cw, Psat, act_coeff, kw, neg_comp_indx, 
+									(num_sb-self.wall_on), Psat, act_coeff, neg_comp_indx, 
 									N_perbin, core_diss, kelv_fac, kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 									rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 0, H2Oi, y, self)
 
@@ -583,7 +584,7 @@ def ode_updater(y, rindx,
 				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 				reac_col, prod_col, rstoi_flat, 
 				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-				num_sb, Psat, Cw, act_coeff, kw, jac_wall_indxn,
+				num_sb, Psat, act_coeff, jac_wall_indxn,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 				jac_part_indxn, jac_extr_indx,
 				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -594,7 +595,7 @@ def ode_updater(y, rindx,
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
-			
+
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -802,7 +803,7 @@ def ode_updater(y, rindx,
 			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 
 			trec, yrec, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-			Psat, kelv_fac, kimt, kw, Cw, act_coeff, Cfactor, Nres_dry, 
+			Psat, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)		
 		

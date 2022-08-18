@@ -35,7 +35,7 @@ def mod_var_up(self):
 		
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, RH, RHt, Press,
-		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -115,8 +115,8 @@ def mod_var_up(self):
 	self.l58bb.setText((str(self.tf_UVC)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l58cc.setText((str(self.tf_UVCt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l59a.setText((str(self.wall_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l60a.setText((str(Cw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l61a.setText((str(kw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l60a.setText((str(self.Cw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l61a.setText((str(self.kw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l62a.setText((str(inflectDp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l63a.setText((str(pwl_xpre)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l64a.setText((str(pwl_xpro)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

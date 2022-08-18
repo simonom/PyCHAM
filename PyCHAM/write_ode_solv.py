@@ -87,7 +87,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	y_pind, uni_y_pind, reac_col, prod_col, \n')
 	f.write('	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,\n') 
 	f.write('	rowvals, colptrs, num_comp, num_sb,\n')
-	f.write('	Psat, Cw, act_coeff, kw, jac_wall_indx,\n') 
+	f.write('	Psat, act_coeff, jac_wall_indx,\n') 
 	f.write('	core_diss, kelv_fac, kimt, num_asb,\n')
 	f.write('	jac_part_indx, jac_extr_indx,\n')
 	f.write('	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,\n')
@@ -136,15 +136,14 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	# num_comp - number of components\n')
 	f.write('	# num_sb - number of size bins\n')
 	f.write('	# self.wall_on - flag saying whether to include wall partitioning\n')
-	f.write('	# Psat - pure component saturation vapour pressures (molecules/cm3)\n')
-	f.write('	# Cw - effective absorbing mass concentration of wall (molecules/cm3) \n')
+	f.write('	# Psat - pure component saturation vapour pressures (# molecules/cm3)\n')
+	f.write('	# self.Cw - effective absorbing mass concentration of wall (# molecules/cm3) \n')
 	f.write('	# act_coeff - activity coefficient of components\n')
-	f.write('	# kw - mass transfer coefficient to wall (/s)\n')
 	f.write('	# jac_wall_indx - index of inputs to Jacobian by wall partitioning\n')
 	f.write('	# self.seedi - index of seed material\n')
 	f.write('	# core_diss - dissociation constant of seed material\n')
 	f.write('	# kelv_fac - kelvin factor for particles\n')
-	f.write('	# kimt - mass transfer coefficient for gas-particle partitioning (s)\n')
+	f.write('	# kimt - mass transfer coefficients for gas-particle partitioning (s) and gas-wall partitioning (/s)\n')
 	f.write('	# num_asb - number of actual size bins (excluding wall)\n')
 	f.write('	# jac_part_indx - index for sparse Jacobian for particle influence \n')
 	f.write('	# jac_extr_indx - index for sparse Jacobian for air extraction influence \n')
@@ -214,7 +213,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('		# ensure y is correct shape\n')
 	f.write('		if (y.shape[1] > 1):\n')
 	f.write('			y = y[:, 0].reshape(-1, 1)\n')
-	f.write('		# empty array to hold rate of change per component\n')
+	f.write('		# empty array to hold rate of change per component (this is the returned value from dydt)\n')
 	f.write('		dd = np.zeros((y.shape[0], 1))\n')
 	f.write('		\n')
 	
@@ -240,42 +239,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		loss = SP.csc_matrix((data, y_pind, prod_col))\n')
 		f.write('		# register gain of products\n')
 		f.write('		dd[uni_y_pind, 0] += np.array((loss.sum(axis = 1))[uni_y_pind])[:, 0]\n')
-		f.write('		\n')
-
-	if ('JPAC' in sav_nam): # wall losses for the Julich Plant and Atmosphere Chamber
-		#f.write('		try:\n')
-		f.write('		lr = 1./1200. # first order loss rate to wall (/s)\n')
-		f.write('		lrnr = 1200. # first order loss rate to wall of non-radical ELVOC and LVOC (/s)\n')
-		
-		#f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
-		#f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e2)*(self.Psat_Pa[0, :]<= 3.8e6))]*(0.)  \n')
-		
-		#f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
-		#f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-2)*(self.Psat_Pa[0, :]<= 3.8e2))]*(1./(lrnr-600))  \n')
-		
-		f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')
-		f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-6)*(self.Psat_Pa[0, :]<= 3.8e-2))]*(1./(lrnr-0)) \n')		
-
-		f.write('		dd[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))] -= y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
-		f.write('		dd[(num_comp*num_sb)::][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))] += y[0:num_comp][((self.Psat_Pa[0, :]> 3.8e-10)*(self.Psat_Pa[0, :]<= 3.8e-6))]*(1./(lrnr+0)) # LVOCs following Sarrafzadeh et al. (2016) \n')
-		
-		f.write('		dd[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10] -= y[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
-		f.write('		dd[(num_comp*num_sb)::][self.Psat_Pa[0, :] <= 3.8e-10] += y[0:num_comp][self.Psat_Pa[0, :] <= 3.8e-10]*(1./lrnr) # ELVOCs following Ehn et al. (2014) \n')
-		
-		f.write('		dd[self.RO2_indices[:, 1]] -= y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
-		f.write('		dd[(num_comp*num_sb)+self.RO2_indices[:, 1]] += y[self.RO2_indices[:, 1]]*(lr) # RO2 components following Silvia thesis\n')
-
-		f.write('		dd[self.comp_namelist.index(\'HO2\')] -= y[self.comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
-		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'HO2\')] += y[self.comp_namelist.index(\'HO2\')]*(lr) # following Silvia thesis \n')
-		
-		f.write('		dd[self.comp_namelist.index(\'SA\')] -= y[self.comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
-		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'SA\')] += y[self.comp_namelist.index(\'SA\')]*(1./120.) # following Silvia email \n')
-		
-		f.write('		dd[self.comp_namelist.index(\'OH\')] -= y[self.comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
-		f.write('		dd[(num_comp*num_sb)+self.comp_namelist.index(\'OH\')] += y[self.comp_namelist.index(\'OH\')]*(4.) # following Silvia email (originally 4 /s)\n')
-		
-		#f.write('		except:\n')
-		#f.write('			dd[:] = dd[:]\n')
 		f.write('		\n')
 
 	if (eqn_num[1] > 0): # if particle-phase reactions present
@@ -339,49 +302,81 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		
 	# note the following needs two indents (as for the reaction section), so that it
 	# sits within the dydt function
-	if (num_asb > 0): # include gas-particle partitioning in ode solver
-		f.write('		# gas-particle partitioning-----------------\n')
-		f.write('		# transform particle phase concentrations into\n')
-		f.write('		# size bins in rows, components in columns\n')
-		f.write('		ymat = (y[num_comp:num_comp*(num_asb+1), 0]).reshape(num_asb, num_comp)\n')
-		f.write('		# force all components in size bins with no particle to zero\n')
-		f.write('		ymat[N_perbin[:, 0] == 0, :] = 0\n')	
-		f.write('		# total particle-phase concentration per size bin (molecules/cm3 (air))\n')
-		f.write('		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)\n')
-		f.write('		# tile over components\n')
-		f.write('		csum = np.tile(csum, [1, num_comp])\n')
-		f.write('		# size bins with contents\n')
-		f.write('		isb = (csum[:, 0] > 0.)\n')
+	if (num_asb > 0 or self.wall_on > 0): # include gas-particle partitioning in ode solver
+		if (num_asb > 0 and self.wall_on > 0): 
+			f.write('		# gas-particle and gas-wall partitioning-----------------\n')
+		if (num_asb > 0 and self.wall_on == 0): 
+			f.write('		# gas-particle partitioning-----------------\n')
+		if (num_asb == 0 and self.wall_on > 0): 
+			f.write('		# gas-wall partitioning-----------------\n')
+			
+		f.write('		# transform component concentrations in particles and walls\n')
+		f.write('		# into size bins in rows, components in columns\n')
+		f.write('		ymat = (y[num_comp::, 0]).reshape(num_sb, num_comp)\n')
 		f.write('		\n')
-		f.write('		if (any(isb)): # if particle-phase components present\n')
-		f.write('			# container for gas-phase concentrations at particle surface\n')
-		f.write('			Csit = np.zeros((num_asb, num_comp))\n')
-		f.write('			# mole fraction of components at particle surface\n')
-		f.write('			Csit[isb, :] = (ymat[isb, :]/csum[isb, :])\n')	
-		f.write('			# gas-phase concentration of components at\n')
-		f.write('			# particle surface (molecules/cm3 (air))\n')
-		f.write('			Csit[isb, :] = Csit[isb, :]*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]\n')	
-		f.write('			# partitioning rate (molecules/cm3/s)\n')
-		f.write('			dd_all = kimt*(y[0:num_comp, 0].reshape(1, -1)-Csit)\n')
-		f.write('			# gas-phase change\n')
-		f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
-		f.write('			# particle change\n')
-		f.write('			dd[num_comp:num_comp*(num_asb+1), 0] += (dd_all.flatten())\n')
+		if (num_asb > 0):
+			f.write('		# for particles, force all components in bins with no particle to zero\n')
+			f.write('		ymat[0:num_asb, :][N_perbin[:, 0] == 0, :] = 0\n')
+			f.write('		\n')
+			f.write('		# for particles, calculate total particle-phase concentration per size bin (# molecules/cm3 (air))\n')
+			f.write('		csum = ((ymat[0:num_asb, :].sum(axis=1)-ymat[0:num_asb, self.seedi].sum(axis=1))+((ymat[0:num_asb, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)\n')
+			f.write('		# tile total particle-phase concentration over components (# molecules/cm3 (air))\n')
+			f.write('		csum = np.tile(csum, [1, num_comp])\n')
+			if (self.wall_on > 0):
+				f.write('		# concatenate wall bin total concentrations to total particle-phase concentration (# molecules/cm3)\n')
+				f.write('		csum = np.concatenate((csum, self.Cw), axis=0)\n')
+				f.write('		\n')
+		if (num_asb == 0 and self.wall_on > 0):
+			f.write('		# rename wall bin total concentrations (# molecules/cm3)\n')
+			f.write('		csum = self.Cw\n')
+			f.write('		\n')
+		if (num_asb > 0):
+			f.write('		# size bins with contents\n')
+			f.write('		isb = (csum[0:num_asb, 0] > 0.)\n')
+			f.write('		\n')
+		if (self.wall_on > 0):
+			f.write('		# wall bins with contents\n')
+			f.write('		wsb = (self.Cw[:, 0] > 0.)\n')
+			f.write('		\n')
+		if (num_asb > 0 and self.wall_on > 0):
+			f.write('		# container for gas-phase concentrations at particle surface and at wall surface\n')
+		if (num_asb > 0 and self.wall_on == 0):
+			f.write('		# container for gas-phase concentrations at particle surface\n')
+		if (num_asb == 0 and self.wall_on > 0):
+			f.write('		# container for gas-phase concentrations at wall surface\n')
+		f.write('		Csit = np.zeros((num_sb, num_comp))\n')
 		f.write('		\n')
-		
-	if (self.wall_on > 0): # include gas-wall partitioning in ode solver
-		f.write('		# gas-wall partitioning ----------------\n')
-		f.write('		# concentration on wall (# molecules/cm3 (air))\n')
-		f.write('		Csit = y[num_comp*(num_asb+1):num_comp*(num_asb+2), 0]\n')
-		f.write('		# saturation vapour pressure on wall (molecules/cm3 (air))\n')
-		f.write('		# note, just using the top rows of Psat and act_coeff\n')
-		f.write('		# as do not need the repetitions over size bins\n')
-		f.write('		if (Cw > 0.):\n')
-		f.write('			Csit = Psat[0, :]*(Csit/Cw)*act_coeff[0, :]\n')
-		f.write('			# rate of transfer (# molecules/cm3/s)\n')
-		f.write('			dd_all = kw*(y[0:num_comp, 0]-Csit)\n')
-		f.write('			dd[0:num_comp, 0] -= dd_all # gas-phase change\n')
-		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1), 0] += dd_all # wall change\n')
+		if (num_asb > 0):
+			f.write('		# mole fractions of components at particle surface\n')
+			f.write('		Csit[0:num_asb, :][isb, :] = (ymat[0:num_asb, :][isb, :]/csum[0:num_asb, :][isb, :])\n')
+		if (self.wall_on > 0):
+			f.write('		# mole fraction of components on walls, note that Cw included in csum above\n')
+			f.write('		Csit[num_asb::, :][wsb, :] = (ymat[num_asb::, :][wsb, :]/csum[num_asb::, :][wsb, :])\n')
+		f.write('		\n')
+		if (num_asb > 0):
+			f.write('		if any(isb):\n')
+			f.write('			# gas-phase concentration of components at\n')
+			f.write('			# particle surface (# molecules/cm3 (air))\n')
+			f.write('			Csit[0:num_asb, :][isb, :] = Csit[0:num_asb, :][isb, :]*Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]\n')	
+			f.write('			# partitioning rate (# molecules/cm3/s)\n')
+			f.write('			dd_all = kimt[0:num_asb, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[0:num_asb, :])\n')
+			f.write('			# gas-phase change\n')
+			f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
+			f.write('			# particle change\n')
+			f.write('			dd[num_comp:num_comp*(num_asb+1), 0] += (dd_all.flatten())\n')
+			f.write('		\n')
+		if (self.wall_on > 0):
+			f.write('		if any(wsb):\n')
+			f.write('			# gas-phase concentration of components at\n')
+			f.write('			# wall surface (# molecules/cm3 (air))\n')
+			f.write('			Csit[num_asb::, :][wsb, :] = Csit[num_asb::, :][wsb, :]*Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]\n')	
+			f.write('			# partitioning rate (# molecules/cm3/s)\n')
+			f.write('			dd_all = kimt[num_asb::, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[num_asb::, :])\n')
+			f.write('			# gas-phase change (summed over all wall bins)\n')
+			f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
+			f.write('			# wall change\n')
+			f.write('			dd[num_comp*(num_asb+1)::, 0] += (dd_all.flatten())\n')
+			f.write('		\n')
 		
 		f.write('		\n')
 	
@@ -425,13 +420,13 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	#		f.write('				dd[num_comp*(ibin+1):num_comp*(ibin+2)] += dydt_all\n')
 	#		f.write('		\n')
 	#	# only write next section if gas-wall partitioning active
-	#	if (self.wall_on==1):
-	#		f.write('		if (Cw > 0.): # only consider if wall present\n')
+	#	if (self.wall_on>0):
+	#		f.write('		if (any(self.Cw[:, 0] > 0.)): # only consider if wall present\n')
 	#		f.write('			# if wall consideration turned on, estimate gas-wall partitioning\n')
 	#		f.write('			# concentration at wall (molecules/cm3 (air))\n')
-	#		f.write('			Csit = y[num_comp*num_sb:num_comp*(num_sb+1), 0]\n')
-	#		f.write('			Csit = (Psat[0, :]*(Csit/Cw)*act_coeff[0, :]) # with Raoult term\n')
-	#		f.write('			dydt_all = (kw)*(y[0:num_comp, 0]-Csit)\n')
+	#		f.write('			Csit = y[num_comp*num_sb:num_comp*(num_sb+1), 0].reshape(self.wall_on, num_comp)\n')
+	#		f.write('			Csit = (Psat[0, :].reshape(1, -1)*(Csit/self.Cw)*act_coeff[0, :].reshape(1, -1)) # with Raoult term\n')
+	#		f.write('			dydt_all = kimt[num_asb::, :]*(y[0:num_comp, 0]-Csit)\n')
 	#		f.write('			dd[0:num_comp] -= dydt_all # gas-phase change\n')
 	#		f.write('			# wall concentration change \n')
 	#		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1)] += dydt_all\n')
@@ -452,7 +447,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	def jac(t, y): # define the Jacobian\n')
 	f.write('		\n')
 	f.write('		# inputs: ----------------\n')
-	f.write('		# y - concentrations (molecules/cm3), note when using scipy integrator solve_ivp, this should have shape (number of elements, 1)\n')
+	f.write('		# y - concentrations (# molecules/cm3), note when using scipy integrator solve_ivp, this should have shape (number of elements, 1)\n')
 	f.write('		# t - time interval to integrate over (s)\n')
 	f.write('		# ---------------------------------------------\n')
 	f.write('		\n')
@@ -473,7 +468,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	
 	if (eqn_num[0] > 0): # if gas-phase reactions present
 		f.write('		for i in range(rindx.shape[0]): # gas-phase reaction loop\n')
-		f.write('			# reaction rate (molecules/cm3/s)\n')
+		f.write('			# reaction rate (# molecules/cm3/s)\n')
 		f.write('			rr = rrc[i]*(y[rindx[i, 0:nreac[i]], 0].prod())\n')
 		f.write('			# prepare Jacobian inputs\n')
 		f.write('			jac_coeff = np.zeros((njac[i, 0]))\n')
@@ -510,7 +505,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		# gas-particle partitioning\n')
 		f.write('		part_eff = np.zeros((%s))\n' %((num_comp)*(num_asb+1)+((num_comp)*(num_asb*2))))
 		f.write('		if (sum(N_perbin[:, 0]) > 0.): # if any particles present \n')
-		f.write('			part_eff[0:%s:%s] = -kimt.sum(axis=0) # effect of gas on gas\n' %(num_comp*(num_asb+1), (num_asb+1)))
+		f.write('			part_eff[0:%s:%s] = -kimt[0:num_asb, :].sum(axis=0) # effect of gas on gas\n' %(num_comp*(num_asb+1), (num_asb+1)))
 		f.write('		\n')
 		f.write('		# empty array for any particle-on-gas and particle-on-particle effects on water in the particle-phase for rows of Jacobian\n')
 		f.write('		part_eff_rw = np.zeros((len(jac_part_hmf_indx)))\n')
@@ -572,20 +567,25 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		\n')
 		
 	if (self.wall_on > 0): # include gas-wall partitioning in ode solver Jacobian
-		f.write('		if (Cw > 0.):\n')
-		f.write('			wall_eff = np.zeros((%s))\n' %(num_comp*4))
-		f.write('			wall_eff[0:%s:2] = -kw # effect of gas on gas \n' %(num_comp*2))
-		f.write('			wall_eff[1:%s:2] = +kw # effect of gas on wall \n' %(num_comp*2))
-		f.write('			# effect of wall on gas\n')
-		f.write('			wall_eff[%s:%s:2] = +kw*(Psat[0,:]*act_coeff[0, :]/Cw) \n' %(num_comp*2, num_comp*4))
-		f.write('			# effect of wall on wall\n')
-		f.write('			wall_eff[%s+1:%s:2] = -kw*(Psat[0,:]*act_coeff[0, :]/Cw) \n' %(num_comp*2, num_comp*4))
-		f.write('			data[jac_wall_indx] += wall_eff\n')
+		f.write('		wsb = 0 # count on wall bins\n')
+		# holder for wall effect - note that 1st term is gas-on-gas, 2nd term is gas-on-wall, 3rd term is wall-on-gas and 4th term is wall-on-wall
+		f.write('		# holder for wall effect\n')
+		f.write('		wall_eff = np.zeros((%s))\n' %((num_comp)+(num_comp*self.wall_on)+(num_comp*self.wall_on)+(num_comp*self.wall_on)))
+		f.write('		# effect of gas on gas \n')
+		f.write('		wall_eff[0:%s:%s] = -np.sum(kimt[num_asb::, :], axis=0) \n' %(num_comp*(self.wall_on+1), self.wall_on+1))
+		f.write('		for wsb in range(int(self.wall_on)): # wall bin loop\n')
+		f.write('			if (self.Cw[wsb, 0] > 0.):\n')
+		f.write('				# effect of gas on wall \n')
+		f.write('				wall_eff[wsb+1:%s:%s] = +kimt[num_asb+wsb, :] \n' %(num_comp*(self.wall_on+1), self.wall_on+1))
+		f.write('				# effect of wall on gas\n')
+		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1):num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = +kimt[num_asb::, :][wsb, :]*(Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
+		f.write('				# effect of wall on wall\n')
+		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1)+1:num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = -kimt[num_asb::, :][wsb, :]*(Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
+		f.write('		data[jac_wall_indx] += wall_eff\n')
 		f.write('		\n')
 	if (self.dil_fac > 0): # include extraction of chamber air in ode solver Jacobian
 		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac\n')
 		f.write('		\n')
-
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')
 	f.write('		\n')

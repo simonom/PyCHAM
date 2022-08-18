@@ -37,7 +37,7 @@ def share(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, RH, RHt, Press,
-		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -47,7 +47,6 @@ def share(self):
 		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()
-		
 		
 		# convert chamber surface area (m2) to spherical equivalent radius (m)
 		# (below eq. 2 in Charan et al. 2018, doi.org/10.1080/02786826.2018.1474167)
@@ -62,8 +61,8 @@ def share(self):
 		self.RH_orig = RH
 		self.RHt_orig = RHt
 		self.Press_orig = Press
-		self.Cw_orig = Cw
-		self.kw_orig = kw
+		self.Cw_orig = self.Cw
+		self.kw_orig = self.kw
 		self.siz_stru_orig = siz_stru
 		self.num_sb_orig = num_sb
 		self.pmode_orig = pmode
@@ -137,7 +136,7 @@ def share(self):
 		self.tf_UVC_orig = self.tf_UVC
 
 	return(sav_nam, comp0, y0, RH, RHt, Press,
-		Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 		std, mean_rad, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 

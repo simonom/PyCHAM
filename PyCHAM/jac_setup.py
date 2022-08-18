@@ -298,8 +298,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 			jac_part_indx[part_cnt:part_cnt+num_asb] = range(en_indx, en_indx+num_asb)
 			jac_indx_g[jac_indx_g>=en_indx] += num_asb # gas-phase reaction
 			jac_indx_aq[jac_indx_aq>=en_indx] += num_asb # aqueous-phase reactions
-			new_el = (np.array(range(comp_num+2+compi, 
-				(comp_num+2)*(num_asb+1)+compi, (comp_num+2)))).reshape(-1)
+			new_el = (np.array(range(comp_num+2+compi, (comp_num+2)*(num_asb+1)+compi, (comp_num+2)))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += num_asb
 			part_cnt += num_asb # keep count on particle index		
@@ -344,9 +343,11 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	# diagonal for gas effect on gas components is due to be 
 	# affected by gas-phase reactions or whether wall 
 	# partitioning is the first effect.  Similarly accommodate 
-	# for wall effect for: gas on wall effect, wall on gas effect
-	# and wall on wall affect
-	jac_wall_indx = np.zeros(((comp_num+2)*4))
+	# for wall effect for: gas-on-wall effect, wall-on-gas effect
+	# and wall-on-wall affect
+	
+	# empty results array, 1st term is gas-on-gas, 2nd is gas-on-wall, 3rd is wall-on-gas, 4th is wall-on-wall
+	jac_wall_indx = np.zeros(((comp_num+2)+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))))
 	wall_cnt = 0 # count on jac_wall_indx inputs
 
 	if (self.wall_on > 0):
@@ -375,11 +376,10 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
 					jac_wall_indx[wall_cnt] = new_indx
-					jac_indx_g[jac_indx_g>=new_indx] += 1
-					jac_indx_aq[jac_indx_aq>=new_indx] += 1
+					jac_indx_g[jac_indx_g >= new_indx] += 1
+					jac_indx_aq[jac_indx_aq >= new_indx] += 1
 					new_el = np.array((compi)).reshape(1)
-					rowvals = np.concatenate([rowvals[0:new_indx], 
-						new_el, rowvals[new_indx::]])
+					rowvals = np.concatenate([rowvals[0:new_indx], new_el, rowvals[new_indx::]])
 					colptrs[compi+1::] += 1
 					# increase en_indx to account for new row when
 					# accommodating gas effect on wall below
@@ -389,8 +389,8 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 
 				# modify indices for sparse Jacobian matrix
 				jac_wall_indx[wall_cnt] = st_indx
-				jac_indx_g[jac_indx_g>=st_indx] += 1
-				jac_indx_aq[jac_indx_aq>=st_indx] += 1
+				jac_indx_g[jac_indx_g >= st_indx] += 1
+				jac_indx_aq[jac_indx_aq >= st_indx] += 1
 				new_el = np.array((compi)).reshape(1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
 				colptrs[compi+1::] += 1
@@ -404,35 +404,41 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 			# already know that the gas-phase photochemistry will not
 			# have affected this part of the Jacobian, so just need to
 			# modify sparse Jacobian inputs accordingly
-			jac_wall_indx[wall_cnt] = en_indx
-			# bump gas effect and particle effect indices up by one to 
+			jac_wall_indx[wall_cnt:wall_cnt+self.wall_on] = range(en_indx, en_indx+self.wall_on)
+			# bump gas, aqueous and particle (if present) effect indices up by number of wall bins to 
 			# account for addition to Jacobian
-			jac_indx_g[jac_indx_g>=en_indx] += 1
-			jac_indx_aq[jac_indx_aq>=en_indx] += 1
+			jac_indx_g[jac_indx_g >= en_indx] += self.wall_on
+			jac_indx_aq[jac_indx_aq >= en_indx] += self.wall_on
+			
 			if (num_asb > 0):
-				jac_part_indx[jac_part_indx>=en_indx] += 1
-			new_el = np.array(((comp_num+2)*(num_asb+1)+compi)).reshape(1)
+				jac_part_indx[jac_part_indx >= en_indx] += self.wall_on
+				
+			new_el = (np.array(range((comp_num+2)*(num_asb+1)+compi, (comp_num+2)*(num_asb+1)+(comp_num+2)*self.wall_on+compi, comp_num+2))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
-			colptrs[compi+1::] += 1
-			wall_cnt += 1 # keep count on wall index
+			colptrs[compi+1::] += self.wall_on
+			wall_cnt += self.wall_on # keep count on wall index
 		
 		# wall effect on gas phase and on wall components for the Jacobian, note this will include the
 		# final row in the final column of the Jacobian
-		for compi in range(comp_num+2):
-			# wall component effect on itself in gas-phase
-			jac_wall_indx[wall_cnt] = len(rowvals)
-			new_el = np.array((compi)).reshape(1)
-			rowvals = np.append(rowvals, new_el)
-			colptrs[(comp_num+2)*(num_asb+1)+compi+1::] += 1
-			wall_cnt += 1
-			# wall component effect on itself on wall
-			jac_wall_indx[wall_cnt] = len(rowvals)
-			new_el = np.array(((comp_num+2)*(num_asb+1)+compi)).reshape(1)
-			rowvals = np.append(rowvals, new_el)
-			colptrs[(comp_num+2)*(num_asb+1)+compi+1::] += 1
-			wall_cnt += 1
+		for wbi in range(self.wall_on): # wall bin loop
+			for compi in range(comp_num+2): # component loop
+				
+				# wall component effect on itself in gas-phase
+				jac_wall_indx[wall_cnt] = len(rowvals)
+				
+				new_el = np.array((compi)).reshape(1)
+				rowvals = np.append(rowvals, new_el)
+				colptrs[(comp_num+2)*(num_asb+1)+wbi*(comp_num+2)+compi+1::] += 1
+				wall_cnt += 1
+				# wall component effect on itself on wall
+				jac_wall_indx[wall_cnt] = len(rowvals)
+				new_el = np.array(((comp_num+2)*(num_asb+1)+wbi*(comp_num+2)+compi)).reshape(1)
+				rowvals = np.append(rowvals, new_el)
+				colptrs[(comp_num+2)*(num_asb+1)+wbi*(comp_num+2)+compi+1::] += 1
+				wall_cnt += 1
 			
 	# end of wall influence on Jacobian part ---------------------------------------------------
+	
 	# index of the Jacobian affected by air extraction
 	jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
 	

@@ -30,7 +30,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-		y_dens, Psat, core_diss, kgwt, space_mode, seedx, 
+		y_dens, Psat, core_diss, space_mode, seedx, 
 		act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
 	
@@ -60,7 +60,6 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# y_dens - liquid density of components (kg/m3) (num_comp, 1)
 	# Psat - saturation vapour pressure of components (# molecules/cm3 (air))
 	# core_diss - core dissociation constant
-	# kgwt - mass transfer coefficient for vapour-wall partitioning (/s)
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
 	# seedx - mole ratio of non-water components comprising seed particles
@@ -171,7 +170,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		C_p2w = np.zeros((num_asb*num_comp))
 	
 	if (self.wall_on > 0):
-		num_sb = num_asb+1 # add one to size bin number to account for wall
+		num_sb = num_asb+self.wall_on  # account for wall
 	else:
 		num_sb = num_asb
 
@@ -214,20 +213,20 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				
 					# equilibrium mole fraction of water per size bin
 					# from the ode solver equation for vapour-particle partitioning of water
-					xwat = y[H2Oi]/(Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
-				
+					xwat = y[H2Oi]/(Psat[0:num_aasb, H2Oi]*kelv*act_coeff[0:num_aasb, H2Oi])
+					
 					# allow for mole fraction of water in mole fraction of non-water seed components
 					# for all size bins
 					seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 					seedxn = seedx*(1.-xwat)
-				
-					# average molar volume of seed components (cc/mol) for all size bins
+					
+					# average molar volume of seed components (cm3/mol) for all size bins
 					avMV = (sum(seedxn*MV[self.seedi[:], 0])+xwat*MV[H2Oi, 0])
-				
-					# total molecular concentration of seed components including water (molecules/cm3) per size bin,
+					
+					# total molecular concentration of seed components including water (# molecules/cm3) per size bin,
 					# note that volume multiplied by 1e-12 to convert from um3 to cm3
 					tmc = (((Varr*1.e-12)*N_perbin[:, 0])/avMV)*NA
-
+					
 					# concentration of particle-phase seed components in all size bin
 					for ci in range(len(self.seedi)): # loop through indices of seed components
 						

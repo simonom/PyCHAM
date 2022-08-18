@@ -316,9 +316,8 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
 	# gas law, R has units cm3.Pa/K.mol
 	Psat = Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
-	# now, in preparation for ode solver, repeat over number of size bins
-	if (num_asb > 0):
-		Psat = np.repeat(Psat, num_asb, axis=0)
+	# now, in preparation for ode solver, tile over size and wall bins
+	Psat = np.tile(Psat, (num_asb+self.wall_on, 1))
 	
 	# if vapour pressure plot requested then make this now --------------------------------------------------------------------
 	if (self.testf == 3.2): 

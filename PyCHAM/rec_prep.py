@@ -37,8 +37,7 @@ def rec_prep(nrec_step,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
-	Jlen, Cw, kw, Cfactor, 
-	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	Jlen, Cfactor, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
@@ -47,7 +46,7 @@ def rec_prep(nrec_step,
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, kwf, self):
+	tot_in_res_indx, chamSA, chamV, self):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -91,8 +90,7 @@ def rec_prep(nrec_step,
 	# self.dayOfYear - day of year
 	# self.photo_path - path to photochemistry file
 	# Jlen - length of photochemistry equations
-	# Cw - effective absorbing mass of wall (molecules/cc (air))
-	# kw - gas-wall partitioning coefficient (/s)
+	# self.kw - gas-wall partitioning coefficient (/s)
 	# Cfactor - conversion factor (ppb/molecules/cc)
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval to 
@@ -170,7 +168,6 @@ def rec_prep(nrec_step,
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
-	# kwf - flag for treatment of gas-wall partitioning coefficient
 	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# ----------------------------------------------------------------
 
@@ -229,10 +226,10 @@ def rec_prep(nrec_step,
 	if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles or wall present
 		
 		# update partitioning variables
-		[kimt, kelv_fac, kw] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
+		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
-		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, kwf, self)
+		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 		
 	if (num_sb-self.wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 

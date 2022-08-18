@@ -38,7 +38,7 @@ def mod_var_read(self):
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, RH, RHt, Press,
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -118,20 +118,34 @@ def mod_var_read(self):
 				self.daytime = float(value.strip())
 
 			if key == 'wall_on' and (value.strip()): # marker for whether or not to consider wall
-				self.wall_on = int(value.strip())
-
+				if (int(value.strip()) == 0): # in case wall to be turned off
+					self.wall_on = int(value.strip())
+				if (int(value.strip()) == 1): # in case wall to be turned on
+					if (self.wall_on < 1): # turn on wall if it has been turned off prior
+						self.wall_on = int(value.strip())
+					# in case the number of wall bins is already registered, then we don't need to 
+					# adjust the self.wall_on value
+					else:
+						continue
+								
+			if key == 'number_wall_bins' and (value.strip()): # number of wall bins
+				
+				# note, that if wall_on already set to zero, then this overrides any number_wall_bins setting
+				if 'self.wall_on' in locals():
+					if (self.wall_on == 0):
+						continue
+					else:
+						self.wall_on = int(value.strip())
+				else:
+					self.wall_on = int(value.strip())
+				
+				
 			if key == 'eff_abs_wall_massC' and (value.strip()): # effective absorbing mass concentration of wall
-				Cw = float(value.strip())
-
+				self.Cw = np.array([float(i) for i in ((value.strip()).split(','))])
+				
 			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
-				kw_in = float(value.strip())
-				try:
-					kw = np.zeros((len(kw_in)))
-					kw[:] = kw_in
-				except:
-					kw = np.zeros((1))
-					kw[0] = kw_in
-
+				self.kw = np.array([float(i) for i in ((value.strip()).split(','))])
+				
 			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
 				chamSA = float(value.strip())
 
@@ -169,7 +183,7 @@ def mod_var_read(self):
 					for i in range(time_cnt):
 						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 				else: # mode quantities provided
-					pconc = np.zeros((mode_cnt, time_cnt))
+					pconc = np.zeros((pmode_cnt, time_cnt))
 					for i in range(time_cnt):
 						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
 				
@@ -517,7 +531,7 @@ def mod_var_read(self):
 
 		# prepare for pickling
 		list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
-				Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 				seedx, con_infl_t, dens_comp, dens, vol_comp, volP, 

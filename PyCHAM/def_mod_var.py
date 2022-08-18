@@ -157,8 +157,8 @@ def def_mod_var(caller, self): # define function
 
 	# deposition of particles and vapours to wall ------------------------------------------
 	self.wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
-	Cw = 0. # effective absorbing mass of wall (g/m3 (air))
-	kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
+	self.Cw = np.zeros((1)) # effective absorbing mass of wall (g/m3 (air))
+	self.kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
 
 	inflectDp = 0. # diameter of deposition function inflection
 	pwl_xpre = 0. # gradient before inflection
@@ -200,7 +200,7 @@ def def_mod_var(caller, self): # define function
 
 	# prepare for pickling
 	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
-			Cw, kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
 			seedx, con_infl_t, dens_comp, dens, vol_comp, 
@@ -220,8 +220,8 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, comp0, y0, RH, RHt, Press, Cw, 
-		kw, siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+	return(sav_nam, comp0, y0, RH, RHt, Press, siz_stru, num_sb, 
+		pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
 		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 

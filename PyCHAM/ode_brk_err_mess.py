@@ -30,7 +30,7 @@ import datetime # for dealing with times
 	
 def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi, 
 			pstoi, rrc, nreac, nprod, num_comp, 
-			num_asb, Cw, Psat, act_coeff, kw, neg_comp_indx,
+			num_asb, Psat, act_coeff, neg_comp_indx,
 			N_perbin, core_diss, kelv_fac, kimt, 
 			eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 			rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, call, 
@@ -52,13 +52,13 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# self.wall_on - whether wall considerations turned on or off
 	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
-	# Cw - effective absorbing mass concentration of wall 
-	#	(molecules/cc (air))
+	# self.Cw - effective absorbing mass concentration of wall 
+	#	(# molecules/cm3 (air))
 	# Psat - pure component saturation vapour pressures (molecules/cc)
 	# act_coeff - activity coefficient of components
-	# kw - mass transfer coefficient to wall (/s)
+	# self.kw - mass transfer coefficient to wall (/s)
 	# neg_comp_indx - indices of components with negative concentrations
-	# N_perbin - number concentration of particles per size bin (#/cc)
+	# N_perbin - number concentration of particles per size bin (#/cm3)
 	# self.seedi - index of seed components
 	# core_diss - dissociation of seed components
 	# kelv_fac - kelvin factor for particle
@@ -172,18 +172,18 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		f.write('\n')
 		f.write('Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall\n')
 		
-		# concentration on wall (molecules/cc (air))
-		Csit = y0[num_comp*(num_asb+1):num_comp*(num_asb+2)]
-		# saturation vapour pressure on wall (molecules/cc (air))
+		# concentration on wall (# molecules/cm3 (air))
+		Csit = y0[num_comp*(num_asb+1)::]
+		# saturation vapour pressure on wall (# molecules/cm3 (air))
 		# note, just using the top rows of Psat and act_coeff
 		# as do not need the repetitions over size bins
-		if (Cw > 0.):
-			Csit = Psat[0, neg_comp_indx]*(Csit[neg_comp_indx]/Cw)*act_coeff[0, neg_comp_indx]
-			# rate of transfer (molecules/cc/s)
-			dd_trouble = -1.*kw*(y0[neg_comp_indx]-Csit)
+		if (any(self.Cw > 0.)):
+			Csit = Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
+			# rate of transfer (# molecules/cm3/s), note sum over wall bins
+			dd_trouble = np.sum((-1.*self.kw[:, neg_comp_indx]*(y0[neg_comp_indx].reshape(1, -1)-Csit)), axis=0)
 			
-		if (Cw == 0.):
-			dd_trouble = np.zeros((len(neg_comp_indx))) # rate of transfer (molecules/cc/s)
+		else: # otherwise there is zero partitioning with walls
+			dd_trouble = np.zeros((len(neg_comp_indx))) # rate of transfer (# molecules/cm3/s)
 
 		for i in range(len(neg_comp_indx)): # loop through trouble components
 			f.write(str(str(neg_names[i]) + ' : ' + str(dd_trouble[i]) + '\n'))	
