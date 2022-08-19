@@ -33,7 +33,7 @@ import importlib
 def rec_prep(nrec_step, 
 	y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
-	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
+	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
@@ -62,7 +62,7 @@ def rec_prep(nrec_step,
 	# num_comp - number of components
 	# N_perbin - particle concentration per size bin (#/cm3 (air))
 	# core_diss - dissociation constant of seed
-	# Psat - pure component saturation vapour pressure 
+	# self.Psat - pure component saturation vapour pressure 
 	#	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
 	# accom_coeff - accommodation coefficient
@@ -183,8 +183,8 @@ def rec_prep(nrec_step,
 	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		Psat, N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-		Cinfl_nowp] = cham_up.cham_up(sumt, 
+		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
+		Cinfl_nowp, self] = cham_up.cham_up(sumt, 
 		Pnow, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_count, 
@@ -193,7 +193,7 @@ def rec_prep(nrec_step,
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		const_infl_t, infx_cnt, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
-		y_mw, self.TEMP[0], Psat, 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
+		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 	
 	# note that recording occurs after any instaneous changes--------------------
@@ -228,7 +228,7 @@ def rec_prep(nrec_step,
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
-		x.reshape(1, -1)*1.0e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
+		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 		
 	if (num_sb-self.wall_on) > 0: # if particles present
@@ -276,10 +276,10 @@ def rec_prep(nrec_step,
 	
 	cham_env[0, 0] = temp_now # temperature (K)
 	cham_env[0, 1] = Pnow # pressure (Pa)
-	cham_env[0, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	cham_env[0, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	
 	# --------------------------------------------------------------------------------
 
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, Psat, cham_env[0, 2], 
+		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, cham_env[0, 2], 
 		Cinfl_now, tot_in_res_ft)

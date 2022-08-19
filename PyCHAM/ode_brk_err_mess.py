@@ -30,7 +30,7 @@ import datetime # for dealing with times
 	
 def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi, 
 			pstoi, rrc, nreac, nprod, num_comp, 
-			num_asb, Psat, act_coeff, neg_comp_indx,
+			num_asb, act_coeff, neg_comp_indx,
 			N_perbin, core_diss, kelv_fac, kimt, 
 			eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 			rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, call, 
@@ -54,7 +54,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# num_asb - number of actual size bins (excluding wall)
 	# self.Cw - effective absorbing mass concentration of wall 
 	#	(# molecules/cm3 (air))
-	# Psat - pure component saturation vapour pressures (molecules/cc)
+	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
 	# self.kw - mass transfer coefficient to wall (/s)
 	# neg_comp_indx - indices of components with negative concentrations
@@ -178,7 +178,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		# note, just using the top rows of Psat and act_coeff
 		# as do not need the repetitions over size bins
 		if (any(self.Cw > 0.)):
-			Csit = Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
+			Csit = self.Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
 			# rate of transfer (# molecules/cm3/s), note sum over wall bins
 			dd_trouble = np.sum((-1.*self.kw[:, neg_comp_indx]*(y0[neg_comp_indx].reshape(1, -1)-Csit)), axis=0)
 			
@@ -213,11 +213,11 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		# mole fractions at particle surface
 		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])
 		# filter just the components with negative concentrations following call to ODE solver
-		Psat = Psat[:, neg_comp_indx]
+		self.Psat = self.Psat[:, neg_comp_indx]
 		act_coeff = act_coeff[:, neg_comp_indx]
 		kimt = kimt[:, neg_comp_indx]
 		# gas-phase concentration of components at particle surface (molecules/cm3)
-		Csit[isb, :] = Csit[isb, :]*Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]
+		Csit[isb, :] = Csit[isb, :]*self.Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]
 		# gas-particle partitioning rate (molecules/cm3/s)
 		dd_trouble = -1.*kimt*(y0[neg_comp_indx].reshape(1, -1)-Csit)
 		

@@ -23,11 +23,14 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2022-08-18 16:19:35.338422
+# File Created at 2022-08-19 16:56:16.614848
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
+def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
+	
+	# number of particle size bins excluding wall
+	num_asb = num_sb-self.wall_on
 	
 	# loop through components to record the tendency of change, note that components can be grouped, e.g. RO2 for non-HOM-RO2 
 	dydtnames = self.dydt_vst['comp_names'] 
@@ -61,7 +64,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_s
 			else: 
 				dydt_rec[step+1, reac_count] = 0
 		else:
-			for ibin in range(num_sb-1): # size bin loop
+			for ibin in range(num_asb-1): # particle bin loop
 				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
 				conc_sum = np.zeros((1)) 
 				if (sum(sum(pconc > 0.)) > 0): # if seed particles present 
@@ -71,18 +74,18 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_s
 				# prevent numerical error due to division by zero 
 				ish = (conc_sum == 0.) 
 				conc_sum[ish] = 1.e-40 
-				# particle surface gas-phase concentration (molecules/cc (air)) 
-				Csit = (Csit[compi]/conc_sum)*Psat[0, compi]*kelv_fac[ibin, 0]*act_coeff[0, compi] 
+				# particle surface gas-phase concentration (# molecules/cm3 (air)) 
+				Csit = (Csit[compi]/conc_sum)*self.Psat[0, compi]*kelv_fac[ibin, 0]*act_coeff[0, compi] 
 				# partitioning rate (# molecules/cc.s) 
 				dydt_all = kimt[ibin, compi]*(y[compi]-Csit) 
 				# gas-phase change (# molecules/cm3/s) 
 				dydt_rec[step+1, reac_count] -= np.sum(dydt_all) 
 				
 		# wall-partitioning 
-		if (any(self.kw > 1.e-10)): 
+		if (self.wall_on > 0): 
 			# concentration at walls (# molecules/cm3 (air)) 
-			Csit = y[num_comp*(num_sb+1)::].reshape(len(self.Cw, num_comp)) 
-			Csit = (Psat[0, :]*(Csit/self.Cw)*act_coeff[0, :])
+			Csit = y[num_comp*(num_asb+1)::].reshape(self.wall_on, num_comp) 
+			Csit = (self.Psat[-self.wall_on::, :]*(Csit/self.Cw)*act_coeff[-self.wall_on::, :])
 			dydt_all = (self.kw)*(y[0:num_comp]-Csit) 
 			# gas-phase change due to gas-wall partitioning(# molecules/cm3/s), 
 			# note sum over all wall bins 

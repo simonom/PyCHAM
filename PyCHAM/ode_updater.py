@@ -58,7 +58,7 @@ def ode_updater(y, rindx,
 	jac_den_indx, jac_indx, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, seed_name, seedx, 
-	core_diss, Psat, mfp, therm_sp,
+	core_diss, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 	x, Varr, act_coeff, Cfactor, y_arr, 
 	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
@@ -122,7 +122,7 @@ def ode_updater(y, rindx,
 	# seed_name - names of components comprising seed particles
 	# seedx - mole ratio of components comprising seed material
 	# core_diss - dissociation constant of seed
-	# Psat - pure component saturation vapour pressure 
+	# self.Psat - pure component saturation vapour pressure 
 	# 	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
 	# accom_coeff - accommodation coefficient
@@ -346,10 +346,10 @@ def ode_updater(y, rindx,
 	# in this call but are recorded below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	yrec_p2w, temp_now, cham_env, Pnow, Psat, 
+	yrec_p2w, temp_now, cham_env, Pnow, 
 	RHn, Cinfl_now, tot_in_res_ft] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
-	num_sb, num_comp, N_perbin, core_diss, Psat, mfp,
+	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
@@ -407,9 +407,9 @@ def ode_updater(y, rindx,
 			# update chamber variables
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp] = cham_up.cham_up(sumt, 
+			Cinfl_nowp, self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -417,7 +417,7 @@ def ode_updater(y, rindx,
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 			
 			# aligning time interval with pre-requisites -------------------------
@@ -448,7 +448,7 @@ def ode_updater(y, rindx,
 				# update partitioning variables
 				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
-				x.reshape(1, -1)*1.e-6, Psat, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
+				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 			
 				# update particle-phase activity coefficients, note the output,
@@ -490,7 +490,7 @@ def ode_updater(y, rindx,
 					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
 					if (self.testf != 5):
 						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-							nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
+							nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
 							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 			
 			# record output if on the first attempt at solving this time interval, 
@@ -504,7 +504,7 @@ def ode_updater(y, rindx,
 				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
 				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-				Psat, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
+				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
 				# prepare for recording next point
@@ -515,13 +515,14 @@ def ode_updater(y, rindx,
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
+					print(self.Psat[:, H2Oi])
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
 					Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 					reac_col, prod_col, rstoi_flat, 
 					pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-					num_sb, Psat, act_coeff, jac_wall_indxn,
+					num_sb, act_coeff, jac_wall_indxn,
 					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 					jac_part_indxn,
 					rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -557,7 +558,7 @@ def ode_updater(y, rindx,
 							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
 									y_rind, rstoi, pstoi, rrc, nreac, nprod, num_comp, 
-									(num_sb-self.wall_on), Psat, act_coeff, neg_comp_indx, 
+									(num_sb-self.wall_on), act_coeff, neg_comp_indx, 
 									N_perbin, core_diss, kelv_fac, kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 									rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 0, H2Oi, y, self)
 
@@ -584,7 +585,7 @@ def ode_updater(y, rindx,
 				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
 				reac_col, prod_col, rstoi_flat, 
 				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
-				num_sb, Psat, act_coeff, jac_wall_indxn,
+				num_sb, act_coeff, jac_wall_indxn,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 				jac_part_indxn, jac_extr_indx,
 				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -630,7 +631,7 @@ def ode_updater(y, rindx,
 					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
 						y_rind, rstoi, pstoi, rrc, nreac, nprod, 
-						num_comp, (num_sb-self.wall_on), Cw, Psat, act_coeff, kw, 
+						num_comp, (num_sb-self.wall_on), Cw, act_coeff, kw, 
 						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
 						kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
 						rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 1, H2Oi, y, self)
@@ -675,7 +676,7 @@ def ode_updater(y, rindx,
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
-					y0, MV, Psat[0, :], ic_red, y, res_t, self)
+					y0, MV, ic_red, y, res_t, self)
 				
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
@@ -786,9 +787,9 @@ def ode_updater(y, rindx,
 			# coincidentally with the experiment end are captured
 			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, Psat, N_perbin, x,
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp] = cham_up.cham_up(sumt, 
+			Cinfl_nowp, self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -796,14 +797,14 @@ def ode_updater(y, rindx,
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
-			y_mw, temp_now0, Psat, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 
 			trec, yrec, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-			Psat, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
+			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)		
 		

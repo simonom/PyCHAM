@@ -36,14 +36,14 @@ import scipy.constants as si
 import errno
 import stat
 
-def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_Comp, 
+def volat_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
 				volP, testf, corei, seed_name, pconc, umansysprop_update, core_dens, spec_namelist,
-				ode_gen_flag, nuci, nuc_comp):
+				ode_gen_flag, nuci, nuc_comp, self):
 
 	# inputs: ------------------------------------------------------------
-	# spec_list - array of SMILE strings for components 
+	# comp_list - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# Pybel_objects - list of Pybel objects representing the species in spec_list
+	# Pybel_objects - list of Pybel objects representing the species in comp_list
 	# (omitting water and core, if present)
 	# TEMP - temperature (K) in chamber at time function called
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
@@ -58,6 +58,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	# ode_gen_flag - whether or not called from front or ode_gen
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
+	# self - reference to PyCHAM
 	# ------------------------------------------------------------
 	
 	
@@ -94,14 +95,14 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 	from umansysprop import vapour_pressures
 	from umansysprop import liquid_densities
 
-	NA = si.Avogadro # Avogadro's number (molecules/mol)
-	y_dens = np.zeros((num_speci, 1)) # components' liquid density (kg/m3)
-	Psat = np.zeros((num_speci, 1)) # species' vapour pressure
+	NA = si.Avogadro # Avogadro's number (# molecules/mol)
+	y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)
+	Psat = np.zeros((num_comp, 1)) # species' vapour pressure
 
 	
 	if ode_gen_flag == 0: # estimate densities
 		
-		for i in range (num_speci):
+		for i in range (num_comp):
 			
 			# density estimation ---------------------------------------------------------
 			if i == H2Oi:
@@ -115,7 +116,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 			if i == nuci and nuc_comp[0] == 'core': 
 				y_dens[i] = 1.*1.e3
 				continue
-			if spec_list[i] == '[HH]': # omit H2 as unliked by liquid density code
+			if comp_list[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
 				y_dens[i] = 1.e3
 			else:
@@ -124,7 +125,7 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 			# ----------------------------------------------------------------------------
 	
 	# estimate vapour pressures (log10(atm))
-	for i in range (num_speci):
+	for i in range (num_comp):
 		
 		if (i == corei[0]): # if this core component
 			continue # core component not included in Pybel_objects
@@ -133,35 +134,39 @@ def volat_calc(spec_list, Pybel_objects, TEMP, H2Oi, num_speci, Psat_water, vol_
 		
 		# water vapour pressure already given by Psat_water (log10(atm))
 		if i == H2Oi:
-			Psat[i] = Psat_water
+			self.Psat[i] = Psat_water
 			continue # water not included in Pybel_objects
 		
 		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
-		Psat[i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
+		self.Psat[i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
 						boiling_points.nannoolal(Pybel_objects[i]))))
 	
-	ish = Psat==0.0
+	ish = (self.Psat == 0.)
 	
-	Psat = (np.power(10.0, Psat)*101325.) # convert to Pa from atm
+	self.Psat = (np.power(10.0, self.Psat)*101325.) # convert to Pa from atm
 	# retain low volatility where wanted
-	Psat[ish] = 0.0
+	self.Psat[ish] = 0.
 	
 	# manually assigned vapour pressures (Pa)
 	if len(vol_Comp)>0 and ode_gen_flag==0:
 		for i in range (len(vol_Comp)):
 			# index of component in list of components
 			vol_indx = spec_namelist.index(vol_Comp[i])
-			Psat[vol_indx, 0] = volP[i]
+			self.Psat[vol_indx, 0] = volP[i]
 	# ensure if nucleating component is core that it is involatile
 	if (nuc_comp[0] == 'core'):
-		Psat[nuci, 0] = 0.
+		self.Psat[nuci, 0] = 0.
 	
-	Psat_Pa = np.zeros((len(Psat), 1)) # for storing vapour pressures in Pa (Pa)
+	Psat_Pa = np.zeros((len(self.Psat), 1)) # for storing vapour pressures in Pa (Pa)
 	Psat_Pa[:, 0] = Psat[:, 0]
     
 	# convert saturation vapour pressures from Pa to molecules/cm3 (air) using ideal
-	# gas law, R has units cc.Pa/K.mol
-	Psat = Psat*(NA/((si.R*1.e6)*TEMP))
+	# gas law, R has units cm3.Pa/K.mol
+	self.Psat = self.Psat*(NA/((si.R*1.e6)*TEMP))
 	
-	return(Psat, y_dens, Psat_Pa)
+	# remember Psat (# molecules/cm3) in case it is altered 
+	# by user-defined inputs in partit_var.py
+	self.Psat_num_rec[:, :] = self.Psat[:, :]
+
+	return(self, y_dens, Psat_Pa)

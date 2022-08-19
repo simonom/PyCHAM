@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 from v_check import Vchange_check as Vchange_check
 
 def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV, 
-				Psat, ic_red, res, solv_time, self):
+			ic_red, res, solv_time, self):
 
 
 	# input:---------------------------------------------------------
@@ -48,7 +48,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	# decreasing
 	# C0 - original concentrations (# molecules/cm3 (air))
 	# MV - molar volume of all components (cm3/mol)
-	# Psat - saturation vapour pressures (# molecules/cm3 (air))
+	# self.Psat - saturation vapour pressures (# molecules/cm3 (air))
 	# ic_red - flag for time step reduction due to changing initial conditions
 	# res - resulting concentrations from ode solver (molecules/cc (air)) 
 	# solv_time - times at which integration solved (s)
@@ -63,7 +63,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	# get new volumes of single particles per size bin and
 	# check whether volume change is acceptable
 	(redt, t, ic_red, Vnew, tsi) = Vchange_check(res, s0, sbn, NA, 
-					n0, nc, solv_time, t, ic_red, Vol0, Psat, MV)
+					n0, nc, solv_time, t, ic_red, Vol0, MV, self)
 	
 	if (redt == 1): # repeat integration with new smaller time step
 		return(n0, Vol0, C0, x, redt, t, ic_red)

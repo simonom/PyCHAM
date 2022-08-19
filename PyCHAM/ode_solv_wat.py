@@ -33,7 +33,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	y_pind, uni_y_pind, reac_col, prod_col, 
 	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,
 	rowvals, colptrs, num_comp, num_sb,
-	Psat, act_coeff, jac_wall_indx,
+	act_coeff, jac_wall_indx,
 	core_diss, kelv_fac, kimt, num_asb,
 	jac_part_indx,
 	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
@@ -80,7 +80,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# num_comp - number of components
 	# num_sb - number of size bins
 	# self.wall_on - flag saying whether to include wall partitioning
-	# Psat - pure component saturation vapour pressures (# molecules/cm3)
+	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
 	# jac_wall_indx - index of inputs to Jacobian by wall partitioning
 	# self.seedi - index of seed material
@@ -142,8 +142,8 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
 			# gas-phase concentration of water at particle surface (# molecules/cm3 (air), core_diss)
-			Csit = Csit*Psat[0:-self.wall_on, :][isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[0:-self.wall_on, :][isb, H2Oi]
-			# partitioning rate (molecules/cc/s)
+			Csit = Csit*self.Psat[0:num_sb-self.wall_on, :][isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[0:num_sb-self.wall_on, :][isb, H2Oi]
+			# partitioning rate (# molecules/cm3/s)
 			dd_all = (kimt[0:num_asb, :][isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
 			dd[0, 0] -= sum(dd_all) # gas-phase change
 			
@@ -203,7 +203,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 				# effect of gas on particle
 				data[1+isb] += kimt[isb, H2Oi]
 				# prepare for diagonal (component effect on itself)
-				diag = kimt[isb, H2Oi]*Psat[0, H2Oi]*act_coeff[0, H2Oi]*kelv_fac[isb, 0]*(-(csum[isb]-y[1+isb, :])/(csum[isb]**2.)) 
+				diag = kimt[isb, H2Oi]*self.Psat[0, H2Oi]*act_coeff[0, H2Oi]*kelv_fac[isb, 0]*(-(csum[isb]-y[1+isb, :])/(csum[isb]**2.)) 
 				# implement to part_eff
 				data[(num_asb+1)+isb*2] -= diag
 				data[(num_asb+1)+isb*2+1] += diag

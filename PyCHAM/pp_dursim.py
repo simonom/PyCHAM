@@ -28,7 +28,7 @@ import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
 def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
-		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, Psat, 
+		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, 
 		act_coeff, seed_eq_wat, Vwat_inc, pcontf, H2Ogc, self):
 	
 			
@@ -54,7 +54,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# y_mw - molecular weight of components (g/mol)
 	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
 	# TEMP - chamber temperature (K)
-	# Psat - saturation vapour pressure of components (# molecules/cm3 (air))	
+	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))	
 	# act_coeff - activity coefficient of components
 	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
 	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
@@ -149,7 +149,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				
 				# equilibrium mole fraction of water per size bin
 				# from the ode solver equation for vapour-particle partitioning of water
-				xwat = H2Ogc/(Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
+				xwat = H2Ogc/(self.Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
 				
 				# allow for mole fraction of water in mole fraction of non-water seed components
 				# for all size bins
@@ -218,7 +218,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
-				xwat = H2Ogc/(Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
+				xwat = H2Ogc/(self.Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
 				
 				# total molecular concentration of dry (no water) seed components 
 				# including water (molecules/cm3) per size bin, 

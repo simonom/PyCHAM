@@ -28,7 +28,7 @@ import importlib
 
 def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	rindx, rstoi, rrc, pindx, pstoi, nprod, 
-	nreac, num_sb, num_comp, pconc, core_diss, Psat, kelv_fac, 
+	nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
 	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
@@ -53,8 +53,8 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# num_comp - number of components
 	# pconc - particle concentrations now (# particles/cm3 (air))
 	# core_diss - dissociation constant of seed
-	# Psat - pure component saturation vapour pressure 
-	#	(molecules/cm3 (air))
+	# self.Psat - pure component saturation vapour pressure 
+	#	(# molecules/cm3 (air))
 	# kelv_fac - Kelvin factor
 	# kimt - partitioning coefficient (/s)
 	# act_coeff - activity coefficients
@@ -123,7 +123,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
 	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
-	cham_env[save_cnt, 2] = y[H2Oi]/Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	# --------------------------------------------------------------------------------
 
 	# cumulative influx of injected components (ug/m3)

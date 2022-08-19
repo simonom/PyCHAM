@@ -100,7 +100,7 @@ def middle(self): # define function
 	tempt_cnt = 0 # count on chamber temperatures
 
 	# get component properties
-	[Psat, y_dens, OC, self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+	[y_dens, OC, self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 		uman_up, seed_dens, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
 		seed_name, y_mw, tempt_cnt, self)
@@ -124,7 +124,7 @@ def middle(self): # define function
 	rbou00, ub_rad_amp, np_sum, C_p2w] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, y_dens, Psat, core_diss, space_mode, seedx,
+		therm_sp, y_dens, core_diss, space_mode, seedx,
 		act_coeff, partit_cutoff, Pnow, 
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
@@ -138,7 +138,7 @@ def middle(self): # define function
 		jac_den_indx_g, jac_indx_g, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, seed_name, seedx, 
-		core_diss, Psat, mfp, therm_sp,  
+		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
 		x, Varr, act_coeff, Cfactor, y_arr_g, y_rind_g, 
 		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 

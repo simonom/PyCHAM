@@ -108,7 +108,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)
 	# vapour pressures of components, ensures any seed component called 
 	# core has zero vapour pressure
-	Psat = np.zeros((1, num_comp))
+	self.Psat = np.zeros((1, num_comp))
 	# oxygen:carbon ratio of components
 	OC = np.zeros((1, num_comp))
 	# hydrogen:carbon ratio of components
@@ -183,9 +183,9 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		# water vapour pressure already given by Psat_water (log10(atm))
 		# and water not included in Pybel_objects
 		if (i == H2Oi):
-			Psat[0, i] = Psat_water
+			self.Psat[0, i] = Psat_water
 			if (self.TEMP[tempt_cnt] == 298.15):
-				self.Psat_Pa_rec[i] = Psat[0, i]
+				self.Psat_Pa_rec[i] = self.Psat[0, i]
 			else:
 				[_, self.Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
 			OC[0, i] = 0.
@@ -195,9 +195,9 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		
 		if (self.comp_namelist[i] == 'O3'):
 			# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
-			Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
+			self.Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
 			if (self.TEMP[tempt_cnt] == 298.15):
-				self.Psat_Pa_rec[i] = Psat[0, i]
+				self.Psat_Pa_rec[i] = self.Psat[0, i]
 			else:
 				self.Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
 			OC[0, i] = 0.
@@ -207,9 +207,9 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		if ('_ao' in self.comp_namelist[i]):
-			Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-4.5
+			self.Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-4.5
 			
-			self.Psat_Pa_rec[i] = Psat[0, i]
+			self.Psat_Pa_rec[i] = self.Psat[0, i]
 			
 		else: # for non-HOM components
 			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
@@ -222,15 +222,15 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			#	 Psatnow += 10 # ensure no condensation of small molecules
 			
 			try: # in case array
-				Psat[0, i] = Psatnow[0]
+				self.Psat[0, i] = Psatnow[0]
 			except: # in case float
-				Psat[0, i] = Psatnow
+				self.Psat[0, i] = Psatnow
 			
 			if (self.TEMP[tempt_cnt] == 298.15):
 				try: # in case array
 					self.Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
 				except: # in case float
-					Psat[0, i] = Psatnow # note transfer to Pa is below
+					self.Psat[0, i] = Psatnow # note transfer to Pa is below
 			else: 
 				Psatnow= ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
 						boiling_points.nannoolal(Pybel_objects[i]))))
@@ -287,37 +287,138 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		else: # if no carbons in this component
 			OC[0, i] = 0.
 	
-	ish = (Psat == 0.)
+	ish = (self.Psat == 0.)
 	
-	Psat = (10.**Psat)*101325. # convert to Pa from atm
+	self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm
 	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325 # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
-	Psat[ish] = 0.
+	self.Psat[ish] = 0.
 	
+	# in preparation for ode solver, tile over size and wall bins
+	self.Psat = np.tile(self.Psat, (num_asb+self.wall_on, 1))
+
 	# list to remember which components have vapour pressures specified
 	vi_rec = []
 	
+	# list to remember which walls affected by wall-specific vapour pressures
+	self.P_wfunc_wi = []
+	# list to remember which components affected by wall-specific vapour pressures
+	self.P_wfunc_ci = []
+	# list to remember the user-defined vapour pressure
+	self.P_wfunc = []
+
 	# manually assigned vapour pressures (Pa)
 	if (len(vol_Comp) > 0 and ode_gen_flag == 0):
 		for i in range (len(vol_Comp)):
-			# index of component in list of components
-			vol_indx = self.comp_namelist.index(vol_Comp[i])
-			Psat[0, vol_indx] = volP[i]
-			self.Psat_Pa_rec[vol_indx] = volP[i]
-			vi_rec.append(vol_indx)
+
+			if '_wall' in vol_Comp[i]: # this is specific to a wall
+				# get wall number
+				# get location of wall number
+				wn = vol_Comp[i].rfind('l')
+				wn = int(float(vol_Comp[i][wn+1::]))
+
+				try: # first see if an individual component has been named
+					vol_indx = [self.comp_namelist.index(vol_Comp[i][0:-6])]
+				except: # could be a group of components
+					group_name = vol_Comp[i][0:-6]
+
+					# check if an inequality present
+					if '<' or '>' or '==' in group_name:
+						# get locations of underscores
+						us_indx = group_name.rfind('_') 
+						# get inequality
+						inequal =  group_name[us_indx+1::]
+
+						# get index of components in this group
+						if '<' in inequal:
+							if '=' in inequal: # less than or equal to
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] <= float(inequal[2::])
+							else: # just less than
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] < float(inequal[1::])
+						if '>' in inequal:
+							if '=' in inequal: # greater than or equal to
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] >= float(inequal[2::])
+							else: # just greater than
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] > float(inequal[1::])
+						if '==' in inequal:
+							# get index of all components in this group
+							vol_indx = self.Psat[0, :] == float(inequal[2::])
+
+					if 'RO2' in group_name: # if RO2, as categorised by the chemical scheme
+						vol_indx = self.RO2_indices[:, 1]
+				
+				# assign user-defined vapour pressure for this wall (Pa)
+				self.Psat[(num_asb-1)+wn, vol_indx] = volP[i]
+
+				# remember which components affected
+				self.P_wfunc_ci.append(vol_indx)
+
+				# remember which walls affected
+				self.P_wfunc_wi.append([wn*i for i in [1]*len(vol_indx)])
+				# remember the user-defined vapour pressure
+				self.P_wfunc.append(volP[i])
+
+			else: # not specific to a wall
+
+				# index of component in list of components
+				try: # first see if an individual component has been named
+					vol_indx = self.comp_namelist.index(vol_Comp[i])
+				except: # could be a group of components
+					group_name = vol_Comp[i][0:-6]
+
+					# check if an inequality present
+					if '<' or '>' or '==' in group_name:
+						# get locations of underscores
+						us_indx = group_name.rfind('_') 
+						# get inequality
+						inequal =  group_name[us_indx+1::]
+
+						# get index of components in this group
+						if '<' in inequal:
+							if '=' in inequal: # less than or equal to
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] <= float(inequal[2::])
+							else: # just less than
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] < float(inequal[1::])
+						if '>' in inequal:
+							if '=' in inequal: # greater than or equal to
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] >= float(inequal[2::])
+							else: # just greater than
+								# get index of all components in this group
+								vol_indx = self.Psat[0, :] > float(inequal[1::])
+						if '==' in inequal:
+							# get index of all components in this group
+							vol_indx = self.Psat[0, :] == float(inequal[2::])
+
+					if 'RO2' in group_name: # if RO2, as categorised by the chemical scheme
+						vol_indx = self.RO2_indices
+
+				# assign user-defined vapour pressure (Pa)
+				self.Psat[0, vol_indx] = volP[i]
+				self.Psat_Pa_rec[vol_indx] = volP[i]
+				vi_rec.append(vol_indx)
 
 	# ensure if nucleating component is core that it is involatile
 	if (nuc_comp == 'core'):
-		Psat[0, nuci] = 0.
+		self.Psat[0, nuci] = 0.
 	
 	self.Psat_Pa = np.zeros((1, num_comp)) # for storing vapour pressures in Pa (Pa)
-	self.Psat_Pa[0, :] = Psat[0, :]
+	self.Psat_Pa[0, :] = self.Psat[0, :]
     
 	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
 	# gas law, R has units cm3.Pa/K.mol
-	Psat = Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
-	# now, in preparation for ode solver, tile over size and wall bins
-	Psat = np.tile(Psat, (num_asb+self.wall_on, 1))
+	self.Psat = self.Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
+
+	# remember Psat (# molecules/cm3) in case it is altered 
+	# by user-defined inputs in partit_var.py
+	self.Psat_num_rec = np.zeros((self.Psat.shape))
+	self.Psat_num_rec[:, :] = self.Psat[:, :]
 	
 	# if vapour pressure plot requested then make this now --------------------------------------------------------------------
 	if (self.testf == 3.2): 
@@ -351,4 +452,4 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		erf = 1
 	# end of plotting section ----------------------------------------------------------------------------------------------------------
 	
-	return(Psat, y_dens, OC, self, err_mess, erf)
+	return(y_dens, OC, self, err_mess, erf)

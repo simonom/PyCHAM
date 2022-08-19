@@ -26,7 +26,7 @@
 import numpy as np
 from compl_evap import compl_evap as compl_evap
 
-def Vchange_check(res, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, Psat, MV):
+def Vchange_check(res, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, MV, self):
 
 	# inputs: ---------------------------------
 	
@@ -42,8 +42,9 @@ def Vchange_check(res, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, Psat,
 	# ts0 - original time step passed to integrator (s)
 	# bc_red - flag for whether boundary conditions have caused a change to time step
 	# Vol0 - default volume per size bin (um3), volume at centre of size bin bounds
-	# Psat - saturation vapour pressure of components (# molecules/cm3 (air))
+	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))
 	# MV - molar volume of components (cm3/mol)
+	# self - reference to PyCHAM
 	# -----------------------------------------
 	
 	# flag for breaking condition of volume change, updated once volumes checked below
@@ -80,7 +81,7 @@ def Vchange_check(res, sbb, sbn, NA, n0, nc, solv_time, ts0, bc_red, Vol0, Psat,
 			if (Vnew[sbi]<0.0): # shrunk to unrealistic negative volume
 				# allow complete evaporation of smallest size bin if only volatiles 
 				# present and time step already relatively small
-				if sbi == 0.0 and sum(Cnow[Psat<1.0e-20]<1.0e-20) and ts0<1.0e-3:
+				if sbi == 0.0 and sum(Cnow[Psat[0, :]<1.0e-20]<1.0e-20) and ts0<1.0e-3:
 					(ytest, n0, Vnew) = compl_evap(ytest, n0, Vnew, Vol0, nc, sbn)
 				else: # change integration time step
 					Vchang_flag = 1

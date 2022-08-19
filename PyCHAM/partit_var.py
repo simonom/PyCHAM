@@ -28,7 +28,7 @@ from part_prop import part_prop
 import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
-		y_dens, N_perbin, radius, Psat, therm_sp,
+		y_dens, N_perbin, radius, therm_sp,
 		H2Oi, act_coeff, caller, partit_cutoff, Press, DStar_org,
 		z_prt_coeff, chamSA, chamV, self):
 	
@@ -45,13 +45,13 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# NA - Avogadro's constant (molecules/mol) 
 	# y_dens - density of components (kg/m3)
 	# N_perbin - number of particles per size bin (excluding wall)
-	# Psat - liquid-phase saturation vapour pressures of components (# molecules/cm3 (air))	
+	# self.Psat - liquid-phase saturation vapour pressures of components (# molecules/cm3 (air))	
 	# therm_sp - thermal speed of components (m/s) (num_comp, 1)
 	# H2Oi - water index (integer)
 	# act_coeff - activity coefficient of components (dimensionless)
 	# self.wall_on - marker for whether wall present
 	# caller - marker for the calling function
-	# partit_cutoff - the product of Psat and act_coeff above which gas-particle 
+	# partit_cutoff - the product of self.Psat and act_coeff above which gas-particle 
 	# 		partitioning assumed zero (Pa)
 	# Press - air pressure (Pa)
 	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
@@ -101,7 +101,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# Pruppacher and Klett 1997
 		Inverse_Kn = Kn**-1.
 		correct_1 = (1.33+0.71*Inverse_Kn)/(1.+Inverse_Kn)
-		correct_2 = (4.*(1.-accom_coeff_now[:, 0:-self.wall_on]))/(3.*accom_coeff_now[:, 0:-self.wall_on])
+		correct_2 = (4.*(1.-accom_coeff_now[:, 0:num_sb-self.wall_on]))/(3.*accom_coeff_now[:, 0:num_sb-self.wall_on])
 		correct_3 = 1.e0+(correct_1+correct_2)*Kn
 		correction = correct_3**-1.
 		
@@ -160,7 +160,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 			# convert partit_cutoff from Pa to molecules/cm3 (air), note README states
 			# that just one value accepted for partit_cutoff input
 			partit_cutoff_Pa = partit_cutoff[0]*(NA/((R_gas*1.e6)*TEMP))
-			highVPi = (Psat*act_coeff) > partit_cutoff_Pa
+			highVPi = (self.Psat*act_coeff) > partit_cutoff_Pa
 			highVPi[:, H2Oi] = 0 # mask water to allow its partitioning
 			kimt[highVPi] = 0.
 	
@@ -178,6 +178,11 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		vc = 1.*therm_sp/4.
 		self.kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
 		self.kw = np.tile(self.kw.reshape(1, num_comp), (self.wall_on, 1)) # spread over wall bins
+
+	# make any necessary adjustments for vapour pressure of components as a function of
+	# wall, as defined by the user
+	if 'self.P_wfunc' in locals():
+		self.Psat[self.P_wfunc_wi, self.P_wfunc_ci] = self.P_wfunc
 
 	# concatenate kw onto kimt, ready for ode solver
 	kimt = np.concatenate((kimt, self.kw), axis = 0)

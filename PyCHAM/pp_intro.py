@@ -30,7 +30,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-		y_dens, Psat, core_diss, space_mode, seedx, 
+		y_dens, core_diss, space_mode, seedx, 
 		act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
 	
@@ -58,7 +58,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	#			particles where just one size bin present (in which case pconc is also
 	#			scalar)
 	# y_dens - liquid density of components (kg/m3) (num_comp, 1)
-	# Psat - saturation vapour pressure of components (# molecules/cm3 (air))
+	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))
 	# core_diss - core dissociation constant
 	# space_mode - string specifying whether to space size bins logarithmically or 
 	# linearly
@@ -213,7 +213,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				
 					# equilibrium mole fraction of water per size bin
 					# from the ode solver equation for vapour-particle partitioning of water
-					xwat = y[H2Oi]/(Psat[0:num_aasb, H2Oi]*kelv*act_coeff[0:num_aasb, H2Oi])
+					xwat = y[H2Oi]/(self.Psat[0:num_aasb, H2Oi]*kelv*act_coeff[0:num_aasb, H2Oi])
 					
 					# allow for mole fraction of water in mole fraction of non-water seed components
 					# for all size bins
@@ -265,7 +265,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
-				xwat = y[H2Oi]/(Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
+				xwat = y[H2Oi]/(self.Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
 				
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 				
