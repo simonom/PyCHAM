@@ -252,7 +252,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		rrc_y = np.ones((rindx_aq.shape[0]*rindx_aq.shape[1]))\n')
 		f.write('		rrc_y[y_arr_aq] = y[y_rind_aq, 0]\n')
 		f.write('		rrc_y = rrc_y.reshape(rindx_aq.shape[0], rindx_aq.shape[1], order = \'C\')\n')
-		f.write('		# reaction rate (molecules/cm3/s) \n')
+		f.write('		# reaction rate (# molecules/cm3/s) \n')
 		f.write('		rr = rr_aq*((rrc_y**rstoi_aq).prod(axis=1))\n')
 		f.write('		# loss of reactants\n')
 		f.write('		data = rr[rr_arr_aq]*rstoi_flat_aq # prepare loss values\n')

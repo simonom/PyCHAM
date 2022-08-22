@@ -511,7 +511,7 @@ def ui_check(self):
 			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
 		
 			# allow adding to batch list
-			self.b82 = QPushButton('Add To Batch', self)
+			self.b82 = QPushButton('Add to Batch', self)
 			self.b82.setToolTip('Add this simulation setup to batch')
 			self.b82.clicked.connect(self.on_click82)
 			self.NSlayout.addWidget(self.b82, 5, self.mvpn+2)

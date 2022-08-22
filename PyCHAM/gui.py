@@ -156,40 +156,40 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(l1, 1, ffscn, 1, 2)
 		
 		l2 = QLabel(self)
-		l2.setText("Chemical \nscheme: ")
+		l2.setText("Chemical \nScheme: ")
 		self.NSlayout.addWidget(l2, 2, ffscn, 1, 1)
 			
 		self.l3 = ScrollLabel(self)
 		self.l3.setText(self.sch_name)
 		self.NSlayout.addWidget(self.l3, 2, ffscn+1,  1, 1)
 		
-		b1 = QPushButton('Select Different Chemical scheme', self)
+		b1 = QPushButton('Select Different Chemical Scheme', self)
 		b1.setToolTip('Select the file containing the required chemical scheme file')
 		b1.clicked.connect(self.on_click2)
 		self.NSlayout.addWidget(b1, 3, ffscn, 1, 2)
 		
 		l4 = QLabel(self)
-		l4.setText("xml: ")
+		l4.setText("XML: ")
 		self.NSlayout.addWidget(l4, 4, ffscn, 1, 1)
 			
 		self.l5 = ScrollLabel(self)
 		self.l5.setText(self.xml_name)
 		self.NSlayout.addWidget(self.l5, 4, ffscn+1, 1, 1)
 			
-		b2 = QPushButton('Select Different xml', self)
+		b2 = QPushButton('Select Different XML', self)
 		b2.setToolTip('Select the file containing the required xml file')
 		b2.clicked.connect(self.on_click3)
 		self.NSlayout.addWidget(b2, 5, ffscn, 1, 2)
 		
 		l6 = QLabel(self)
-		l6.setText("Model \nvariables: ")
+		l6.setText("Model \nVariables: ")
 		self.NSlayout.addWidget(l6, 6, ffscn, 1, 1)
 			
 		self.l7 = ScrollLabel(self)
 		self.l7.setText(self.inname)
 		self.NSlayout.addWidget(self.l7, 6, ffscn+1, 1, 1)
 			
-		b3 = QPushButton('Select Different Model variables', self)
+		b3 = QPushButton('Select Different Model Variables', self)
 		b3.setToolTip('Select the file containing the required model variables file')
 		b3.clicked.connect(self.on_click4)
 		self.NSlayout.addWidget(b3, 7, ffscn, 1, 2)
@@ -889,12 +889,12 @@ class PyCHAM(QWidget):
 		# drop down button to let users view a variety of variables 
 		# determined by model variables
 		self.b80s = QComboBox(self)
-		self.b80s.addItem('Photolysis rates')
-		self.b80s.addItem('Particle number size distributions')
-		self.b80s.addItem('Gas-phase diffusion coefficients')
-		self.b80s.addItem('Gas-phase mean thermal speeds')
-		self.b80s.addItem('Molar masses')
-		self.b80s.addItem('Vapour pressures')
+		self.b80s.addItem('Photolysis Rates')
+		self.b80s.addItem('Particle Number Size Distributions')
+		self.b80s.addItem('Gas-phase Diffusion Coefficients')
+		self.b80s.addItem('Gas-phase Mean Thermal Speeds')
+		self.b80s.addItem('Molar Masses')
+		self.b80s.addItem('Vapour Pressures')
 		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
 		
 		# button to run checks on variables selected in drop down button
@@ -1065,24 +1065,24 @@ class PyCHAM(QWidget):
 		# button to plot ozone isopleth as relevant to the used chemical scheme and the oberved
 		# range of VOC and NOx
 		self.b206c = QPushButton(str('Ozone isopleth'), self)
-		self.b206c.setToolTip('Plot equilibrium ozone concentrations over the range of simulatec concentrations of NOx and VOC')
+		self.b206c.setToolTip('Plot equilibrium ozone concentrations over the range of simulated concentrations of NOx and VOC')
 		self.b206c.clicked.connect(self.on_click206c)
 		self.PRIMlayout.addWidget(self.b206c, 3, 2, 1, 1)
 
 		# particle-phase concentrations temporal profiles -------------
 
 		# button to plot temporal profile of total particle-phase concentration of supplied components
-		self.b209 = QPushButton(str('Total particle-phase concentrations \n('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
+		self.b209 = QPushButton(str('Particle-phase concentration \n(summed over size bins) ('+u'\u03BC'+'g/m'+u'\u00B3'+')'), self)
 		self.b209.setToolTip('Plot particle-phase concentration temporal profile of these components')
 		self.b209.clicked.connect(self.on_click209)
 		self.PRIMlayout.addWidget(self.b209, 4, 0)
 
 		# button to plot temporal profile of total particle-phase concentration excluding seed and water 
-		self.b209a = QPushButton(str('Total particle-phase concentrations \n('+u'\u03BC'+'g/m'+u'\u00B3'+') excluding seed and water'), self)
+		self.b209a = QPushButton(str('Particle-phase concentrations (summed over components and size bins) \n('+u'\u03BC'+'g/m'+u'\u00B3'+') excluding seed and water'), self)
 		self.b209a.setToolTip('Plot total particle-phase concentration of all components except for seed and water')
 		self.b209a.clicked.connect(self.on_click209a)
 		#self.b209a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PRIMlayout.addWidget(self.b209a, 4, 1)
+		self.PRIMlayout.addWidget(self.b209a, 4, 1, 1, 2)
 		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
@@ -3679,11 +3679,11 @@ class PyCHAM(QWidget):
 		# get values to check from drop down button
 		input_check_text = self.b80s.currentText() # drop down selection
 
-		if (input_check_text == 'Photolysis rates'):
+		if (input_check_text == 'Photolysis Rates'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_taf(self)
 
-		if (input_check_text == 'Particle number size distributions'):
+		if (input_check_text == 'Particle Number Size Distributions'):
 			import plotter_nsd # for plotting supplied number size distributions
 		
 			# path for pickle file
@@ -3707,19 +3707,19 @@ class PyCHAM(QWidget):
 			plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
 			space_mode, 0, pconct)
 
-		if (input_check_text == 'Gas-phase diffusion coefficients'):
+		if (input_check_text == 'Gas-phase Diffusion Coefficients'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_gpdc(self)
 
-		if (input_check_text == 'Gas-phase mean thermal speeds'):
+		if (input_check_text == 'Gas-phase Mean Thermal Speeds'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_gpmts(self)
 
-		if (input_check_text == 'Molar masses'):
+		if (input_check_text == 'Molar Masses'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_mm(self)
 			
-		if (input_check_text == 'Vapour pressures'):
+		if (input_check_text == 'Vapour Pressures'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_vp(self)
 

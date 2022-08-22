@@ -515,7 +515,7 @@ def ode_updater(y, rindx,
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-					print(self.Psat[:, H2Oi])
+					
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
 					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
@@ -576,7 +576,7 @@ def ode_updater(y, rindx,
 					
 				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
-				kimt[:, H2Oi] = 0.
+				kimt[0:num_sb-self.wall_on, H2Oi] = 0.
 			
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
@@ -596,7 +596,7 @@ def ode_updater(y, rindx,
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, Cinfl_nowp_indx, 
 				Cinfl_nowp, self)
-
+			
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -669,15 +669,17 @@ def ode_updater(y, rindx,
 		if (self.dil_fac > 0):
 			N_perbin -= N_perbin*(self.dil_fac*tnew)
 		
+		
 		if ((num_sb-self.wall_on) > 0): # if particle size bins present
 			# update particle sizes
-			if ((num_sb-self.wall_on) > 1) and (any(N_perbin > 1.e-10)): # if particles present
+			if ((num_sb-self.wall_on) > 1) and (any(N_perbin > 1.e-10)): # if multiple particle size bins present containing particles
 				
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					y0, MV, ic_red, y, res_t, self)
-				
+					
+						
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-self.wall_on), N_perbin,
@@ -685,6 +687,7 @@ def ode_updater(y, rindx,
 					Vol0, Vbou, rbou)
 			
 			update_count += tnew # time since operator-split processes last called (s)
+			
 			
 			# if time met to implement operator-split processes
 			if (update_count >= (self.update_stp*9.999999e-1)):
@@ -725,6 +728,7 @@ def ode_updater(y, rindx,
 				
 				# reset count that tracks when next operator-split should be called (s)
 				update_count = 0.
+		
 		
 		# update the percentage time in the GUI progress bar
 		yield (sumt/self.tot_time*100.)
@@ -806,7 +810,7 @@ def ode_updater(y, rindx,
 			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
-			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)		
+			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):

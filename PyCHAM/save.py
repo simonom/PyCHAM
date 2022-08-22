@@ -88,7 +88,6 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
-	
 	if ((numsb-self.wall_on) > 0): # correct for changes to size bin radius bounds
 		rbou_rec[:, 0] = rbou00
 		rbou_rec[:, -1] = rbou_rec[:, -1]/upper_bin_rad_amp
@@ -130,7 +129,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
-	const["wall_on_flag_0forNO_1forYES"] = self.wall_on
+	const["wall_on_flag_0forNO_>0forYES"] = self.wall_on
 	const["space_mode"] = space_mode
 	const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"] = self.Psat_Pa_rec.tolist()
 	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()

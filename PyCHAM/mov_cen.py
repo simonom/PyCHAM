@@ -36,8 +36,8 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	# (# particle/cm3 (air))
 	# s0 - volume bounds per size bin (um3) (1st dim.)
 	# before a time step over which gas phase reaction and 
-	# gas-particle partitioning have occurred (molecules/cc (air))
-	# sbn - number of size bins
+	# gas-particle partitioning have occurred (# molecules/cm3 (air))
+	# sbn - number of size bins (including any walls)
 	# nc - number of components
 	# MW - molar weight of components (g/mol)
 	# x - original particle size bin radii (um)
@@ -50,15 +50,15 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	# MV - molar volume of all components (cm3/mol)
 	# self.Psat - saturation vapour pressures (# molecules/cm3 (air))
 	# ic_red - flag for time step reduction due to changing initial conditions
-	# res - resulting concentrations from ode solver (molecules/cc (air)) 
+	# res - resulting concentrations from ode solver (# molecules/cm3 (air)) 
 	# solv_time - times at which integration solved (s)
 	# self.wall_on - flag for whether wall turned on
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
-	NA = si.Avogadro # Avogadro's number (molecules/mol)
+	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 
-	sbn -= self.wall_on # exclude wall from size bin number
+	sbn -= self.wall_on # exclude wall from particle size bin number
 	
 	# get new volumes of single particles per size bin and
 	# check whether volume change is acceptable
@@ -69,10 +69,10 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 		return(n0, Vol0, C0, x, redt, t, ic_red)
 	
 	y = np.zeros((nc*(sbn+1+self.wall_on))) # empty array for holding new concentrations
-	# gas and wall concentrations (molecules/cc (air))
+	# gas concentrations (# molecules/cm3 (air))
 	y[0:nc] = res[0:nc]
-	if (self.wall_on == 1):
-		y[-nc::] = res[-nc::]
+	if (self.wall_on > 0): # wall concentrations (# molecules/cm3 (air))
+		y[-nc*self.wall_on::] = res[-nc*self.wall_on::]
 		
 	# empty array for holding new particle number concentrations
 	N_perbin = np.zeros((sbn, 1))
@@ -85,7 +85,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 		
 		# add number concentration (# particles/cc (air))
 		N_perbin[sbi_new, 0] += n0[sbi]
-		# add components (molecules/cc (air))
+		# add components (# molecules/cm3 (air))
 		y[((sbi_new+1)*nc):((sbi_new+2)*nc)] += res[((sbi+1)*nc):((sbi+2)*nc)]
 	
 	# reshape particle-phase concentrations into components in rows and size bins in
@@ -93,9 +93,9 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	num_molec_new = (y[nc:nc*(sbn+1)].reshape(sbn, nc))
 	# need to find new volumes of single particles (um3)
 	# total volume of components 
-	# ((um3 (all particles)/cc (air))/(particle number/cc (air))) 
+	# ((um3 (all particles)/cm3 (air))/(# particle number/cm3 (air))) 
 	# calculation is:
-	# divide number of molecules/cc (air) by Na to get moles/cm3 (air), then 
+	# divide number of # molecules/cm3 (air) by Na to get moles/cm3 (air), then 
 	# multiply by um3/mol (MV*1.e12) to get ug3 (of each component)/cm3 (air),
 	# then sum volume of components per size bin to get ug3 (all particles)/cm3 (air)
 	ish = N_perbin[:, 0]> 0.

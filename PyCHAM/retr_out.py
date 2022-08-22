@@ -45,7 +45,7 @@ def retr_out(output_by_sim):
 				dlist.append(int(i))
 			if str(line.split(',')[0]) == 'output_by_sim_sch_ext' or str(line.split(',')[0]) == 'output_by_sim_mv_ext':
 				dlist.append(str(i))
-			if str(line.split(',')[0]) == 'number_of_components' or str(line.split(',')[0]) == 'wall_on_flag_0forNO_1forYES':
+			if str(line.split(',')[0]) == 'number_of_components' or str(line.split(',')[0]) == 'wall_on_flag_0forNO_>0forYES':
 				dlist.append(int(i))
 			if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol' or  str(line.split(',')[0]) == 'molar_volumes_cm3/mol' or str(line.split(',')[0]) == 'nominal_molar_mass_g/mol':
 				i = i.strip('\n')
@@ -152,7 +152,7 @@ def retr_out(output_by_sim):
 	# nominam molar masses (g/mol)
 	nom_mass = const['nominal_molar_mass_g/mol']
 	comp_names = const['chem_scheme_names']
-	wall_on = const['wall_on_flag_0forNO_1forYES'][0]
+	wall_on = const['wall_on_flag_0forNO_>0forYES'][0]
 	
 	space_mode = const['space_mode'][0]
 	# pure component saturation vapour pressures at 298.15 K (Pa)

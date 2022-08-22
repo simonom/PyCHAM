@@ -99,8 +99,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			import scipy.constants as si # for scientific constants
 			
 			# particle-phase concentrations of all components (# molecules/cm3)
-			if (wall_on == 1): # wall on
-				ppc = yrec[:, num_comp:-num_comp]
+			if (wall_on > 0): # wall on
+				ppc = yrec[:, num_comp:-num_comp*wall_on]
 			if (wall_on == 0): # wall off
 				ppc = yrec[:, num_comp::]
 			

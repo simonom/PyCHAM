@@ -81,9 +81,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.close() # close figure window
 					return()
 			
-			if (wall_on == 1):
-				# wall-phase concentration (from gas-particle partitioning) (molecules/cc)
-				conc = yrec[:, ((num_asb+1)*num_comp)+indx_plot]
+			if (wall_on > 0):
+				# wall-phase concentration (from gas-wall partitioning) (# molecules/cm3)
+				# (summed over walls)
+				conc = np.sum(yrec[:, ((num_asb+1)*num_comp)+indx_plot::num_comp], axis = 1)
+			
 			else:
 				self.l203a.setText(str('Wall not considered in this simulation'))
 				

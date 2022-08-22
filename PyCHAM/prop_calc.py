@@ -369,7 +369,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 					vol_indx = self.comp_namelist.index(vol_Comp[i])
 				except: # could be a group of components
 					group_name = vol_Comp[i][0:-6]
-
+					
 					# check if an inequality present
 					if '<' or '>' or '==' in group_name:
 						# get locations of underscores
