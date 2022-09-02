@@ -68,7 +68,7 @@ def ode_updater(y, rindx,
 	nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-	uppsize, std, rbou, const_infl_t, MV, rindx_aq, 
+	uppsize, std, rbou, MV, rindx_aq, 
 	pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
 	jac_den_indx_aq, jac_indx_aq, y_arr_aq, y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
@@ -210,7 +210,7 @@ def ode_updater(y, rindx,
 	# std - standard deviation for injected particle number size 
 	#	distributions
 	# rbou - size bin radius bounds (um)
-	# const_infl_t - times for constant influxes (s)
+	# self.cont_infl_t - times for constant influxes (s)
 	# MV - molar volume of all components (cm3/mol)
 	# rindx_aq - index of reactants for aqueous-phase 
 	# pindx_aq - index of products for aqueous-phase
@@ -357,7 +357,7 @@ def ode_updater(y, rindx,
 	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, const_infl_t, 
+	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
@@ -415,7 +415,7 @@ def ode_updater(y, rindx,
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
+			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
@@ -443,8 +443,8 @@ def ode_updater(y, rindx,
 			
 			# ------------------------------------------------------------------		
 			
-			if ((num_sb-self.wall_on) > 0 or self.wall_on > 1): # if particles and/or wall present
-			
+			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0): # if particles and/or wall present
+				
 				# update partitioning variables
 				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
 				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
@@ -460,10 +460,10 @@ def ode_updater(y, rindx,
 				
 			else: # fillers
 			
-				kimt = np.zeros((num_sb-self.wall_on, num_comp))
+				kimt = np.zeros((num_sb+self.wall_on, num_comp))
 				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
-		
+			
 			# reaction rate coefficient
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, lightm, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
@@ -576,7 +576,8 @@ def ode_updater(y, rindx,
 					
 				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
-				kimt[0:num_sb-self.wall_on, H2Oi] = 0.
+				if (num_sb > self.wall_on): # if particles present
+					kimt[0:num_sb-self.wall_on, H2Oi] = 0.
 			
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
@@ -669,7 +670,6 @@ def ode_updater(y, rindx,
 		if (self.dil_fac > 0):
 			N_perbin -= N_perbin*(self.dil_fac*tnew)
 		
-		
 		if ((num_sb-self.wall_on) > 0): # if particle size bins present
 			# update particle sizes
 			if ((num_sb-self.wall_on) > 1) and (any(N_perbin > 1.e-10)): # if multiple particle size bins present containing particles
@@ -679,7 +679,6 @@ def ode_updater(y, rindx,
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					y0, MV, ic_red, y, res_t, self)
 					
-						
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
 					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-self.wall_on), N_perbin,
@@ -728,7 +727,6 @@ def ode_updater(y, rindx,
 				
 				# reset count that tracks when next operator-split should be called (s)
 				update_count = 0.
-		
 		
 		# update the percentage time in the GUI progress bar
 		yield (sumt/self.tot_time*100.)
@@ -799,7 +797,7 @@ def ode_updater(y, rindx,
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
-			const_infl_t, infx_cnt0, Cfactor, diff_vol, 
+			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)

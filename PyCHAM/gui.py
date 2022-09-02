@@ -143,7 +143,7 @@ class PyCHAM(QWidget):
 		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
+		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
@@ -585,7 +585,7 @@ class PyCHAM(QWidget):
 		l44.setText('Times of component influx (s): ')
 		self.varbox.addWidget(l44, gas_row+5, 0)
 		self.l44a = QLabel(self)
-		self.l44a.setText((str(con_infl_t)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l44a.setText((str(self.con_infl_t)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l44a, gas_row+5, 1)
 		
 		l45 = QLabel(self)
@@ -1808,7 +1808,7 @@ class PyCHAM(QWidget):
 		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, 
+		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
@@ -1822,7 +1822,7 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -1972,7 +1972,7 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 
@@ -2015,7 +2015,7 @@ class PyCHAM(QWidget):
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -2497,8 +2497,8 @@ class PyCHAM(QWidget):
 		comp_names = [str(i) for i in self.e205.text(). split(',')]
 		
 		import plotter_wp
-		dir_path = self.l201.text() # name of folder with results
-		plotter_wp.plotter(0, dir_path, comp_names, self) # plot results
+		self.dir_path = self.l201.text() # name of folder with results
+		plotter_wp.plotter(0, comp_names, self) # plot results
 	
 	@pyqtSlot() # button to plot temporal profile of total concentration of 
 	# components on wall due to particle deposition to wall
@@ -3695,7 +3695,7 @@ class PyCHAM(QWidget):
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 				std, mean_rad, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 

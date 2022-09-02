@@ -40,7 +40,7 @@ def share(self):
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -81,7 +81,7 @@ def share(self):
 		self.seed_diss_orig = seed_diss
 		self.seed_dens_orig = seed_dens
 		self.seedx_orig = seedx
-		self.con_infl_t_orig = con_infl_t
+		self.con_infl_t_orig = self.con_infl_t
 		self.dens_comp_orig = dens_comp
 		self.dens_orig = dens
 		self.vol_comp_orig = vol_comp
@@ -139,7 +139,7 @@ def share(self):
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 		std, mean_rad, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, partit_cutoff, ser_H2O, 

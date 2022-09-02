@@ -294,9 +294,12 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# retain low volatility where wanted following unit conversion
 	self.Psat[ish] = 0.
 	
-	# in preparation for ode solver, tile over size and wall bins
-	self.Psat = np.tile(self.Psat, (num_asb+self.wall_on, 1))
-
+	# in preparation for ode solver, tile over size and wall bins if present
+	if (num_asb+self.wall_on > 0):
+		self.Psat = np.tile(self.Psat, (num_asb+self.wall_on, 1))
+	else:
+		self.Psat = np.tile(self.Psat, (1, 1))
+	
 	# list to remember which components have vapour pressures specified
 	vi_rec = []
 	
@@ -400,7 +403,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 						vol_indx = self.RO2_indices
 
 				# assign user-defined vapour pressure (Pa)
-				self.Psat[0, vol_indx] = volP[i]
+				self.Psat[:, vol_indx] = volP[i]
 				self.Psat_Pa_rec[vol_indx] = volP[i]
 				vi_rec.append(vol_indx)
 

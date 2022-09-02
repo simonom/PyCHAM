@@ -172,6 +172,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	
 	# the module if needed for testing
 	if (testf > 0):
+		f.write('	\n')
 		f.write('	# gas-particle partitioning-----------------\n')
 		f.write('	# transform particle phase concentrations into\n')
 		f.write('	# size bins in rows, components in columns\n')
@@ -305,7 +306,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	if (num_asb > 0 or self.wall_on > 0): # include gas-particle partitioning in ode solver
 		if (num_asb > 0 and self.wall_on > 0): 
 			f.write('		# gas-particle and gas-wall partitioning-----------------\n')
-		if (num_asb > 0 and self.wall_on == 0): 
+		if (num_asb > 0 and self.wall_on == 0):
+			f.write('	\n')
 			f.write('		# gas-particle partitioning-----------------\n')
 		if (num_asb == 0 and self.wall_on > 0): 
 			f.write('		# gas-wall partitioning-----------------\n')

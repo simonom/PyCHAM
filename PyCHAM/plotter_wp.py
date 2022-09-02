@@ -32,11 +32,11 @@ import retr_out
 import numpy as np
 import scipy.constants as si
 
-def plotter(caller, dir_path, comp_names_to_plot, self):
+def plotter(caller, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
-	# dir_path - path to folder containing results files to plot
+	# self.dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
@@ -45,7 +45,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, _, _, _) = retr_out.retr_out(self.dir_path, self)
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)

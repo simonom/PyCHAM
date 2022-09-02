@@ -95,7 +95,7 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.mod_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.mod_path, self)
 
 	# subtract any time before lights on
 	timehr += float(obs_setup[4])
@@ -144,7 +144,7 @@ def plotter_VK_mod_n_obs(self): # for Van Krevelen diagrams
 	# retrieve model results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path, self)
 	
 	self.HC = np.array((ro_obj.HyC)) # hydrogen:carbon ratios of each component
 
@@ -346,7 +346,7 @@ def plotter_mass_defect(self): # for mass defect plots
 	# retrieve model results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path, self)
 	
 	# get exact molar masses (g/mol)
 	y_MW = np.array((y_MW))

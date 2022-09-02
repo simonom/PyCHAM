@@ -43,10 +43,13 @@ def plotter(caller, dir_path, uc, self):
 
 	# chamber condition ---------------------------------------------------------
 	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(dir_path)
-	
+	try: # retrieval goes fine
+		(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
+			y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
+			comp0, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
+	except: # retrieval fails
+		return()
+		
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 

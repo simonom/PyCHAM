@@ -79,11 +79,11 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	
 	# if volume condition met, then redistribute particles and components based on
 	# the new volume
-	for sbi in range(sbn): # size bin loop
+	for sbi in range(sbn): # particle size bin loop
 		
 		sbi_new = sum(Vnew[sbi]>s0[1::]) # index of size bin these particles fit now
 		
-		# add number concentration (# particles/cc (air))
+		# add number concentration (# particles/cm3 (air))
 		N_perbin[sbi_new, 0] += n0[sbi]
 		# add components (# molecules/cm3 (air))
 		y[((sbi_new+1)*nc):((sbi_new+2)*nc)] += res[((sbi+1)*nc):((sbi+2)*nc)]
@@ -91,6 +91,7 @@ def mov_cen_main(n0, s0, sbn, nc, MW, x, Vol0, t, C0, MV,
 	# reshape particle-phase concentrations into components in rows and size bins in
 	# columns
 	num_molec_new = (y[nc:nc*(sbn+1)].reshape(sbn, nc))
+	
 	# need to find new volumes of single particles (um3)
 	# total volume of components 
 	# ((um3 (all particles)/cm3 (air))/(# particle number/cm3 (air))) 

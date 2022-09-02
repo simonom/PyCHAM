@@ -25,7 +25,7 @@
 import numpy as np
 import os
 
-def retr_out(output_by_sim):
+def retr_out(output_by_sim, self):
 	
 	# inputs: -------------------------------
 	# output_by_sim - name of folder requested by the calling code to be looked at
@@ -33,8 +33,20 @@ def retr_out(output_by_sim):
 	
 	# name of file where experiment constants saved
 	fname = str(output_by_sim + '/model_and_component_constants')
-	const_in = open(fname)
-
+	try: # try opening file
+		const_in = open(fname)
+	except:
+		err_mess = str('Error - no such file ' + fname + ', please check it still exists')
+		self.l203a.setText(err_mess)
+		# set border around error message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
+		
 	const = {} # create empty dictionary to hold constants
 	for line in const_in.readlines():
 		

@@ -47,10 +47,10 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# sbVi - single particle volume for i sizes (relating to sbr) (m3)
 	# M - molecular weight of components (g/mol)	
 	# rint - size(s) of interest (m)
-	# num_molec - molecular concentration (molecules/cc (air)),
+	# num_molec - molecular concentration (# molecules/cm3 (air)),
 	# arranged by component in rows and size bins in columns, for particles in sbr
 	# num_part - concentration of particles per size bin 
-	# (particle/cc (air)) (columns) (excluding walls), for particles in sbr
+	# (# particles/cm3 (air)) (columns) (excluding walls), for particles in sbr
 	# tint - time interval coagulation occurs over (s)
 	# sbbound - size bin volume boundaries (m3)
 	# rbou - size bin radius boundaries (um)
@@ -66,7 +66,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# num_molec_rint - molecular concentration (molecules/cc (air)),
 	# arranged by component in rows and size bins in columns, for particles in rint
 	# num_part_rint - concentration of particles per size bin 
-	# (particle/cc (air)) (columns) (excluding walls), for particles in rint
+	# (# particles/cm3 (air)) (columns) (excluding walls), for particles in rint
 	# sbVj -  - single particle volume for j sizes (relating to rint) (m3)
 	# coag_on - whether to allow coagulation to occur (1) or not (0)
 	# siz_str - the size structure to use
@@ -74,7 +74,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# --------------------------------------------------------------
 	
 	num_part = num_part.reshape(1, -1)
-	# volume concentration of particles (m3/cc (air))
+	# volume concentration of particles (m3/cm3 (air))
 	vol_part = (sbVi*num_part).reshape(1, -1)
 
 	# ensure sbn is integer
@@ -593,7 +593,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		num_part[0, sbi] = num/den
 		
 		# --------------------------------------------------------------------------------
-		# change to molecular concentration part (molecules/cc (air))
+		# change to molecular concentration part (# molecules/cm3 (air))
 
 		#if (siz_str == 1): # full-moving structure
 
@@ -643,7 +643,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 		ish = (num_partj[0, :] > 0.) # index of bins containing particles
 		molec_contr = ((num_contr[ish]/num_partj[0, ish]).reshape(1, -1)*molec_j[:, ish]).sum(axis=1)	
 
-		# molecular concentration loss part (molecules/cc (air)) ------------------------------
+		# molecular concentration loss part (# molecules/cm3 (air)) ------------------------------
 		#if (siz_str == 1): # full-moving structure
 		#	volind = np.zeros((coagV.shape[1]))
 		#	if (sbi < sbn-1): # can't lose molecules from largest size bin due to coagulation

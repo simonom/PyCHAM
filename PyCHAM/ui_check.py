@@ -47,7 +47,7 @@ def ui_check(self):
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -91,7 +91,7 @@ def ui_check(self):
 	# 	above which gas-particle partitioning assumed zero
 	# wat_hist - flag for particle-phase history with respect to water 
 	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
-	# con_infl_t - times of continuous influx of components
+	# self.con_infl_t - times of continuous influx of components
 	# self.con_infl_nam - chemical scheme names of components with continuous influx
 	# self.con_infl_C - influx rate of components with continuous influx (ppb/s)
 	# Vwat_inc - flag for whether (1) or not (0) the number size 
@@ -351,7 +351,7 @@ def ui_check(self):
 			em_flag = em_flag
 				
 		try: # note, won't work on the empty con_infl_C default variable
-			if (self.con_infl_C.shape[1] != len(con_infl_t)):
+			if (self.con_infl_C.shape[1] != len(self.con_infl_t)):
 				err_mess = str('Error - input for influx rate (ppb/s) of components with continuous influx does not correspond to the number of times for continuous influx, note that for the continuous influx rate a comma should separate values for different times and semicolons should separate different components.  Please see README for more guidance.')
 				em_flag = 2
 		except:
@@ -470,7 +470,7 @@ def ui_check(self):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, con_infl_t, dens_comp, dens, vol_comp, 
+			seedx, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 

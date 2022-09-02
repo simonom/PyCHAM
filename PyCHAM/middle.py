@@ -46,7 +46,7 @@ def middle(self): # define function
 		lowsize, uppsize, space_mode, std, mean_rad,
 		Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
-		const_infl_t, dens_comp, dens, vol_comp, 
+		dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
@@ -129,8 +129,7 @@ def middle(self): # define function
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
 
 	# estimate total inputs of emitted components (ug/m3)
-	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw,
-		const_infl_t, Compt, self)
+	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
 	
 	# solve problem
 	for prog in ode_updater.ode_updater(y, rindx_g, 
@@ -148,8 +147,7 @@ def middle(self): # define function
 		nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, const_infl_t, MV,
-		rindx_aq, 
+		uppsize, std, rbou, MV, rindx_aq, 
 		pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
 		jac_den_indx_aq, jac_indx_aq, y_arr_aq,
 		y_rind_aq, 

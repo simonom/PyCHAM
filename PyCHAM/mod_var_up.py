@@ -38,7 +38,7 @@ def mod_var_up(self):
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -97,7 +97,7 @@ def mod_var_up(self):
 	self.l41a.setText((str(y0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l42a.setText((str(self.con_infl_nam)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l43a.setText((str(self.con_infl_C)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l44a.setText((str(con_infl_t.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l44a.setText((str(self.con_infl_t.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l45a.setText((str(self.const_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l46a.setText((str(Compt)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l47a.setText((str(injectt.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

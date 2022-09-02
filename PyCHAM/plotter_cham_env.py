@@ -41,7 +41,7 @@ def plotter(caller, dir_path, self):
 	# retrieve results
 	(_, _, _, _, _, _, _, timehr, _, 
 		_, _, _, _, _, _, _, 
-		_, _, _, _, _, _, _, _, cham_env, _, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, _, _, _, _, _, cham_env, _, _, _) = retr_out.retr_out(dir_path, self)
 
 	# check whether chamber environment variables were saved and therefore
 	# retrieved

@@ -56,7 +56,7 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	# required outputs from full-moving
 	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
 		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, 
-		PsatPa, OC, H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		PsatPa, OC, H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
 	
 
 	# tell user that this code won't work if no particle size bins present
@@ -242,7 +242,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	# required outputs from full-moving
 	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
 		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
 	
 	# subtract recorded times from requested time and absolute
 	t_diff = np.abs(t_thro-(t_array*3600.))
@@ -397,7 +397,7 @@ def plotter_gpc(caller, dir_path, self, t_thro):
 	# required outputs from full-moving
 	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
 		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path)
+		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
 	
 	# subtract recorded times from requested time and absolute
 	t_diff = np.abs(t_thro-(t_array*3600.))
@@ -453,7 +453,7 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	# required outputs from full-moving
 	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
 		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(self.dir_path)
+		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(self.dir_path, self)
 	
 	# subtract recorded times from requested time and absolute
 	t_diff = np.abs(self.t_thro-(t_array*3600.))

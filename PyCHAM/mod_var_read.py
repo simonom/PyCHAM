@@ -31,7 +31,7 @@ def mod_var_read(self):
 	# self - reference to PyCHAM
 	# --------------------------------------------------
 	
-	def read():
+	def read(self):
 	
 		# prepare by opening existing model variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -41,7 +41,7 @@ def mod_var_read(self):
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
@@ -257,7 +257,7 @@ def mod_var_read(self):
 				self.const_comp = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'obs_file' and (value.strip()): # name of file containing observations to constrain by
-				self.obs_file =str(value.strip())
+				self.obs_file = str(value.strip())
 			
 			# names of components with instantaneous gas-phase injections
 			if key == 'Compt' and (value.strip()):
@@ -362,18 +362,25 @@ def mod_var_read(self):
 			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
 				self.light_ad = int(value.strip())
 
-			if key == 'secx' and (value.strip()): # to keep solar intesnity constant
+			if key == 'secx' and (value.strip()): # to keep solar intensity constant
 				self.secx = float(value.strip())
 
-			if key == 'cosx' and (value.strip()): # to keep solar intesnity constant
+			if key == 'cosx' and (value.strip()): # to keep solar intensity constant
 				self.cosx = float(value.strip())
 
 			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
-				self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
+				# check if this is a path to a file containing continuous influxes, if not treat as a list of component names
+				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+					self.const_infl_path = str(value.strip())
+					self = const_infl_open(self)
+					
+					
+				else: # treat as list of components 
+					self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'const_infl_t' and (value.strip()): # times of continuous influxes (s)
-				con_infl_t = [float(i.strip()) for i in (value.split(','))]
-				con_infl_t = np.array((con_infl_t))
+				self.con_infl_t = [float(i.strip()) for i in (value.split(','))]
+				self.con_infl_t = np.array((self.con_infl_t))
 
 			if key == 'Cinfl' and (value.strip()): # influx rate of components with continuous influx (ppb/s)
 				comp_count = 1 # count number of components
@@ -534,7 +541,7 @@ def mod_var_read(self):
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-				seedx, con_infl_t, dens_comp, dens, vol_comp, volP, 
+				seedx, dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
@@ -548,4 +555,43 @@ def mod_var_read(self):
 			pk.close() # close
 		
 			
-	read() # call on function to read the model variables
+	read(self) # call on function to read the model variables
+	
+def const_infl_open(self): # define function to read in values relevant to constant influxes
+
+	import openpyxl
+	import os
+
+	wb = openpyxl.load_workbook(filename = self.const_infl_path)
+	sheet = wb['const_infl']
+	# component names are in first column, times are in headers of first row		
+	ic = 0 # count on row iteration
+	
+	# prepare to store component names
+	self.con_infl_nam = []
+	
+	for i in sheet.iter_rows(values_only=True): # loop through rows
+			if (ic == 0): # get times of influx (s through experiment)
+				self.con_infl_t = np.array((i[1::]))
+				# prepare to store emission rates
+				self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
+				
+			# get names of components (matching chemical scheme names) 
+			# and their emission rates (ppb/s)
+			else:
+				# append component name
+				self.con_infl_nam.append(i[0])
+				
+				# emission rates
+				if (ic>self.con_infl_C.shape[0]): # if we need to concatenate
+					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1::])).reshape(1, -1)), axis=0)
+				else:
+					self.con_infl_C[ic-1] = i[1::]
+			
+				
+			ic += 1 # count on row iteration
+		
+	wb.close() # close excel file
+
+
+	return(self)

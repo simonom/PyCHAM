@@ -118,7 +118,7 @@ def def_mod_var(caller, self): # define function
 	# influx rate of components with continuous influx (ppb/s)
 	self.con_infl_C = np.empty(0)
 	# times of component influx (s)
-	con_infl_t = np.empty(0)
+	self.con_infl_t = np.empty(0)
 	# chemical scheme name of components with constant concentration	
 	self.const_comp = []
 	# Chemical scheme names of components injected instantaneously after start of experiment
@@ -203,7 +203,7 @@ def def_mod_var(caller, self): # define function
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, con_infl_t, dens_comp, dens, vol_comp, 
+			seedx, dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
@@ -224,7 +224,7 @@ def def_mod_var(caller, self): # define function
 		pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
-		con_infl_t, dens_comp, dens, vol_comp, volP, act_comp, act_user, 
+		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 

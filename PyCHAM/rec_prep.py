@@ -41,7 +41,7 @@ def rec_prep(nrec_step,
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
-	const_infl_t, infx_cnt, MV, partit_cutoff, diff_vol, 
+	infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
@@ -129,7 +129,7 @@ def rec_prep(nrec_step,
 	# std - standard deviation for injected particle number size 
 	#	distributions
 	# rbou - size bin radius bounds (um)
-	# const_infl_t - times for constant influxes (s)
+	# self.cont_infl_t - times for constant influxes (s)
 	# infx_cnt - count on constant influx occurrences
 	# self.con_infl_C - influx rates of components with constant influx 
 	#	(ppb/s)
@@ -191,7 +191,7 @@ def rec_prep(nrec_step,
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
-		const_infl_t, infx_cnt, Cfactor, diff_vol, 
+		infx_cnt, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)

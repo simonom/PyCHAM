@@ -46,7 +46,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path, self)
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
@@ -173,7 +173,7 @@ def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path, self)
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
@@ -287,7 +287,7 @@ def plotter_rad_pool(self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path, self)
 	
 	if (self.rad_mark == 0): # if alkyl peroxy radicals
 		# get RO2 indices
@@ -384,7 +384,7 @@ def plotter_rad_flux(self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.dir_path, self)
 	
 	# no record of change tendency for final experiment time point
 	timehr = timehr[0:-1]
@@ -518,7 +518,7 @@ def O3_iso(self):
 	# retrieve results
 	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
 		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path)
+		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path, self)
 
 	# get generation numbers of all components
 	gen_num = ro_obj.gen_numbers

@@ -183,8 +183,9 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# wall, as defined by the user
 	if 'self.P_wfunc' in locals():
 		self.Psat[self.P_wfunc_wi, self.P_wfunc_ci] = self.P_wfunc
-
+	
 	# concatenate kw onto kimt, ready for ode solver
-	kimt = np.concatenate((kimt, self.kw), axis = 0)
+	if (self.wall_on > 0):
+		kimt = np.concatenate((kimt, self.kw), axis = 0)
 
 	return(kimt, kelv)
