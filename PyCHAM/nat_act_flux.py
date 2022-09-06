@@ -197,7 +197,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 	f = open('PyCHAM/scatt_Pfunc.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -545,7 +545,7 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 			gi  += 1 # keep count on asymmetry factors
 	
 	if (callf == -10): # Figure 4 of Shettle and Weinman (1970)
-		# total global downward firected irradiance (Eq. 26 Shettle and Weinman (1970))
+		# total global downward directed irradiance (Eq. 26 Shettle and Weinman (1970))
 		Gdown = Fdown+mu0*np.pi*F0*np.exp(-sum(tau)/mu0)
 		
 		

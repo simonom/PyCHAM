@@ -143,6 +143,7 @@ def def_mod_var(caller, self): # define function
 	self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
 	self.dayOfYear = 1 # number of days since 31st December that experiment conducted
 	self.tf = 1. # transmission factor for natural sunlight (0-1 fraction)
+	self.tf_range = 0 # flag for no wavelength-dependency of transmission factor
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
 	self.light_ad = 1

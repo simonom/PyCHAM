@@ -41,7 +41,7 @@ def zenith(self):
 	radian = 1.8e2/pi # 1 unit rad; use this to convert [\deg] to [\rad]
 
 	# latitude conversion from degrees to radian
-	lat_rad = self.lat/radian # in [\rad]
+	self.lat_rad = self.lat/radian # in [\rad]
 	
 	# the day angle (radians), from calcTheta inside solarFunctions.f90 file of AtChem2,
 	# assuming not a leap year (correct for 2010)
@@ -56,10 +56,7 @@ def zenith(self):
 	b5 = -0.002697
 	b6 =  0.001480
 
-	dec = b0 + b1*np.cos(theta) + b2*np.sin(theta) + b3*np.cos(2.*theta) + b4*np.sin(2.*theta) + b5*np.cos(3.*theta) + b6*np.sin(3.*theta)
-	
-	# initially used (prior to 08/07/2022) value for solar declination angle
-	#dec = 0.41 # solar declination angle (rad), consistent with AtChem2 default
+	self.dec = b0 + b1*np.cos(theta) + b2*np.sin(theta) + b3*np.cos(2.*theta) + b4*np.sin(2.*theta) + b5*np.cos(3.*theta) + b6*np.sin(3.*theta)
 	
 	# equation of time accounts for the discrepancy between the apparent and the mean
 	# solar time at a given location
@@ -76,12 +73,12 @@ def zenith(self):
 
 	# local hour angle (lha): representing the time of the day - taken from 
 	# solarFunctions.f90 of AtChem2
-	lha = pi*((currentFracHour/12.)-(1.+self.lon/180.))+eqtime
+	self.lha = pi*((currentFracHour/12.)-(1.+self.lon/180.))+eqtime
 
-	sinld = np.sin(lat_rad)*np.sin(dec)
-	cosld = np.cos(lat_rad)*np.cos(dec)
+	sinld = np.sin(self.lat_rad)*np.sin(self.dec)
+	cosld = np.cos(self.lat_rad)*np.cos(self.dec)
    
-	cosx = (np.cos(lha)*cosld)+sinld
+	cosx = (np.cos(self.lha)*cosld)+sinld
 	secx = 1.E+0/(cosx+1.E-30)
 
 	# as in solarFunctions.f90 of AtChem2, set negative cosx to 0

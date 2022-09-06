@@ -471,6 +471,7 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 	# ready for reaction rate coefficient calculation
 	y_arr_g = y_arr[y_arr != -9999]
 	y_rind_g = y_rind.astype(int) # ensure integer type
+	
 	uni_y_rind_g = (np.unique(y_rind)).astype(int) # unique index of reactants
 	y_pind_g = y_pind.astype(int) # ensure integer type
 	uni_y_pind_g = (np.unique(y_pind)).astype(int) # unique index of products

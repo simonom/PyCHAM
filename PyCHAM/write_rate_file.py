@@ -25,7 +25,7 @@
 import datetime
 
 def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define function
-
+	
 	# inputs: ----------------------------------------------------------------------------
 	# reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
 	# reac_coef_aq - aqueous-phase reaction rate coefficient expression from the equation file

@@ -360,7 +360,7 @@ def ui_check(self):
 	# ----------------------------------------------------------
 	# check on presence of actinic flux file for photolysis - note this has to 
 	# be before chemical scheme check to stop that check crashing when actinic flux file has a problem
-	if hasattr(self, 'af_path') and self.af_path != []  and self.af_path != 'no': # if file provided
+	if hasattr(self, 'af_path') and self.af_path != [] and self.af_path != 'no' and self.af_path != 'nat_act_flux': # if file provided
 		try: # try opening as in lamp_photo module
 			f = open(self.af_path, 'r') # open file
 			f.close() # close excel file
@@ -559,5 +559,5 @@ def ui_check(self):
 		
 	import mod_var_up # update displayed model variables in case checking has modified any
 	mod_var_up.mod_var_up(self)
-
+	
 	return()

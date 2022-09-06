@@ -339,8 +339,8 @@ def mod_var_read(self):
 			if key == 'lon': # longitude (degrees)
 				if (value.strip()): self.lon = float(value.strip())
 
-			if key == 'act_flux_file' and (value.strip()): # for indoor actinic flux
-				self.af_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
+			if key == 'act_flux_path' and (value.strip()): # for specified actinic flux
+				self.af_path = str(value.strip())
 
 			if key == 'DayOfYear' and (value.strip()):
 				self.dayOfYear = int(value.strip())		
@@ -351,7 +351,12 @@ def mod_var_read(self):
 				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
-				self.tf = float(value.strip())
+				if ',' in value.strip(): # if wavelength-dependent transmission factors supplied
+					self.tf = [str(i.strip()) for i in (value.split(','))]
+					self.tf_range = 1 # flag for wavelength-dependency
+				else: # if a single transmission factor supplied
+					self.tf = float(value.strip())
+					self.tf_range = 0 # flag for no wavelength-dependency
 				
 			if key == 'tf_UVC' and (value.strip()): # transmission factors for 254 nm light
 				self.tf_UVC = [float(i.strip()) for i in (value.split(','))]

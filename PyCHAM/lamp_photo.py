@@ -59,19 +59,51 @@ def lamp_photo(J, TEMP, self):
 		act_chm = np.interp(wl_chm_ref, wl_chm, act_chm)
 		# unit-resolution wavelength wavelength (nm)
 		wl_chm = wl_chm_ref
-	
+		
+		# apply any wavelength-dependent transmission factor
+		if (self.tf_range == 1): # if wavelength-dependent transmission factor supplied
+			for wl_cond in self.tf:
+				# index where underscore separates wavelength from transmission factor
+				us_indx = wl_cond.index('_')
+				# dissociate the wavelength from the transmission factor
+				wln = float(wl_cond[0:us_indx])
+				tfn = float(wl_cond[us_indx+1::])
+				
+				if 'wlo' in locals(): # if there's an old range
+					gt_indx = wl_chm>wln # the greater than index
+					lt_indx = wl_chm<=wlo # the lesser than index
+					act_chm[gt_indx*lt_indx] = act_chm[gt_indx*lt_indx]*tfn
+				else: # if first range
+					act_chm[wl_chm>wln] = act_chm[wl_chm>wln]*tfn
+					
+				# remember old range
+				wlo = wln
+		
 	if (self.af_path == 'nat_act_flux'): # if using modelled solar actinic flux
 		
 		import nat_act_flux
+		import zenith
+		
+		# get required solar properties from zenith
+		(secx, cosx) = zenith.zenith(self)
+		
 		naff = 4 # flag for calling module
+		
+		# cosine of the solar zenith angle (radians), note that solar declination angle 
+		# (self.dec), latitude (in radians) (self.lat_rad) and local hour angle (lha) are 
+		# from zenith.py
+		self.mu0 = np.sin(self.dec)*np.sin(self.lat_rad)+np.cos(self.dec)*np.cos(self.lat_rad)*np.cos(self.lha)
+		
 		# get wavelengths (nm) and their associated actinic fluxes (photon/cm2/nm/s)
 		
-		# cosine of the solar zenith angle which should be in radians
-		mu0 = np.cos(theta)
 		# loop through top-of-the-atmosphere downward actinic flux 
 		# (photon/cm2/nm/s) per wavelength (nm)
+		
 		for F0 in F_dep_wl:
+			print('woop4')
 			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
+		
+		import ipdb; ipdb.set_trace()
 	
 	# get UV-C transmission factor now
 	tf_UVCn = self.tf_UVC[(np.sum(self.tf_UVCt<=self.sumt)-1)]
@@ -238,7 +270,7 @@ def lamp_photo(J, TEMP, self):
 		qyO3P = np.interp(wl_chm, wlO3Pqy, qyO3P)
 		
 		
-		# photolysis rate for J<1> and J<2>(/s)
+		# photolysis rate for J<1> and J<2> (/s)
 		J[1] = sum(xsO3*qyO3*act_chm)
 		J[2] = sum(xsO3*qyO3P*act_chm)
 		
