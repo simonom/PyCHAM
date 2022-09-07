@@ -169,16 +169,19 @@ def mod_var_read(self):
 					if (time_cnt == 1 and i == ','):
 						sb_cnt += 1 # increase size bin count
 						pmode = 1 # explicitly stated particle concentrations
+						pmode_cnt = 0 # no modes
 					if (time_cnt == 1 and i == ':'):
 						pmode_cnt += 1 # mode count
 						pmode = 0 # particle concentrations expressed as modes
+				
 				# a possible situation where there is just one size bin and 
 				# therefore only one concentration given for that size bin
 				if (sb_cnt == 1 and pmode_cnt == 1):
-					 pmode = 1 # explicitly stated particle concentrations
-
+					pmode = 1 # explicitly stated particle concentrations
+					pmode_cnt = 0 # no modes
+					
 				# if number concentration per size bin given explicitly
-				if (sb_cnt > 1):
+				if (pmode == 1):
 					pconc = np.zeros((sb_cnt, time_cnt))
 					for i in range(time_cnt):
 						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
@@ -197,7 +200,7 @@ def mod_var_read(self):
 				# times in columns
 				pconct = np.zeros((1, time_cnt))
 				pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
-			
+				
 			# whether seed particle injection continuous or instantaneous
 			if key == 'pcont' and (value.strip()):
 				time_cnt = 1 # track number of times
@@ -540,7 +543,7 @@ def mod_var_read(self):
 		# but just one mode given for the particle number size distribution
 		if (num_sb > 1 and pmode_cnt == 1):
 			pmode = 0 # modal particle concentrations
-
+		
 		# prepare for pickling
 		list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 

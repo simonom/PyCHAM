@@ -79,8 +79,7 @@ def cham_up(sumt, Pnow,
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
 	# pmode - whether particle number size distributions stated explicitly or by mode
-	# pconc - concentration of injected 
-	#	particles (#/cc (air))
+	# pconc - concentration of injected particles (# particles/cm3 (air))
 	# pconct - times of particle injection (s)
 	# seedt_cnt - count on injections of particles
 	# num_comp - number of components
@@ -140,7 +139,7 @@ def cham_up(sumt, Pnow,
 	# self.cont_inf_reci - index for total injection record for continuously injected components
 	# self.con_infl_indx - index for continuously injected components from all components
 	# -----------------------------------------------------------------------
-
+	
 	# check on change of light setting --------------------------------------
 
 	# begin by assuming no change to time interval required due to chamber 
@@ -295,7 +294,7 @@ def cham_up(sumt, Pnow,
 		
 	if (len(self.TEMP) == 1):
 		temp_now = self.TEMP[0] # temperature constant if only one value given
-
+	
 	# check on instantaneous injection of components ---------------------------------------
 	if (len(injectt) > 0 and gasinj_cnt > -1): # if any injections occur
 	
@@ -374,7 +373,14 @@ def cham_up(sumt, Pnow,
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
 	
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0)): # if influx occurs
+	# fillers, in case continuous influx not occurring	
+	Cinfl_nowp_indx = [] # filler
+	Cinfl_nowp = [] # filler
+	
+	# if influx occurs and we are not on the cham_up call from the rec module (which has tnew=0)
+	# note, if this particle influx section called during the call to rec, then continuous influx is 
+	# cancelled when called later
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and tnew>0.):
 		
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
@@ -383,13 +389,6 @@ def cham_up(sumt, Pnow,
 				pconcn = pconc[:, seedt_cnt]
 				mean_radn = mean_rad[:, seedt_cnt]
 				stdn = std[:, seedt_cnt]
-				
-				if (seedt_cnt < (pconct.shape[1]-1)):
-					seedt_cnt += 1
-				else:
-					seedt_cnt = -1 # reached end
-					
-				bc_red = 0 # reset flag for time step reduction due to boundary conditions
 			
 			# if linear interpolation required and instantaneous injection of seed
 			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
@@ -400,8 +399,6 @@ def cham_up(sumt, Pnow,
 				# remember the fraction of the number concentration added so far
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-				mean_radn = mean_rad[:, seedt_cnt] # mean radius now
-				stdn = std[:, seedt_cnt] # standard deviation now
 
 			# account for instantaneous change in seed particles (continuous change dealt with below)
 			if (pcontf == 0):
@@ -412,6 +409,29 @@ def cham_up(sumt, Pnow,
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 		
+			# account for continuous change in seed particles
+			if (pcontf == 1):
+			
+				# seed particle number concentration integrated over proposed 
+				# time step (# particles/cm3)
+				pconcn = pconc[:, seedt_cnt]*tnew
+				
+				[Cinfl_nowp, N_perbin, _, 
+				_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
+				N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
+				uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
+				stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
+				seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+				
+				y[num_comp:num_comp*(num_sb-self.wall_on+1)] = Cinfl_nowp
+			
+			if (seedt_cnt < (pconct.shape[1]-1)):
+				seedt_cnt += 1
+			else:
+				seedt_cnt = -1 # reached end
+					
+			bc_red = 0 # reset flag for time step reduction due to boundary conditions
+		
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
 		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
@@ -419,39 +439,7 @@ def cham_up(sumt, Pnow,
 			# with change
 			tnew = pconct[0, seedt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
-	
-	# prepare for continuous influx of particles flagged
-	Cinfl_seed = np.zeros((len(self.seedi), 1)) # continuous influx of seed components
-	
-	# if there is continuous influx of particles
-	if ((pcontf == 1) and (sumt >= pconct[0, seedt_cnt])):
-		
-		if (seedt_cnt != -1 and seedt_cnt != 0): # temporary change to count
-			seedt_cnt -= 1
-		
-		# seed particle number concentration integrated over proposed 
-		# time step (# particles/cm3)
-		pconcn = pconc[:, seedt_cnt]*tnew
-		# seed particle number size distribution mean radius per mode
-		mean_radn = mean_rad[:, seedt_cnt]
-		# seed particle number size distribution standard deviation per mode
-		stdn = std[:, seedt_cnt]
-		
-		if (seedt_cnt != -1 and seedt_cnt != 0): # reverse count change
-			seedt_cnt += 1
-		
-		[Cinfl_nowp, N_perbin, _, 
-			_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
-			N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
-			uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
-			stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-			seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
-		
-		y[num_comp:num_comp*(num_sb-self.wall_on+1)] = Cinfl_nowp
-		
-	else:
-		Cinfl_nowp_indx = [] # filler
-		Cinfl_nowp = [] # filler
+
 	# ----------------------------------------------------------------------------------------------------------
 
 	# check on continuous influx of gas-phase components ----------------------------------------------
