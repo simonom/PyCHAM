@@ -595,7 +595,7 @@ def const_infl_open(self): # define function to read in values relevant to const
 					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1::])).reshape(1, -1)), axis=0)
 				else:
 					self.con_infl_C[ic-1] = i[1::]
-			
+				
 				
 			ic += 1 # count on row iteration
 		

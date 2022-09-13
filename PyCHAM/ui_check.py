@@ -284,8 +284,6 @@ def ui_check(self):
 			em_flag = 2
 	# ----------------------------------------------------------------------------
 
-	
-	
 	if (len(self.light_stat) != len(self.light_time) and em_flag < 2):
 		err_mess = str('Error - length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
 		em_flag = 2
@@ -483,6 +481,7 @@ def ui_check(self):
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close
 	
+
 	# update model variables message in GUI
 	if (em_flag < 2): # if no error message
 	
@@ -556,8 +555,7 @@ def ui_check(self):
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
 		
-		
 	import mod_var_up # update displayed model variables in case checking has modified any
 	mod_var_up.mod_var_up(self)
-	
+
 	return()

@@ -148,8 +148,8 @@ def cham_up(sumt, Pnow,
 	
 	if ((len(self.light_time)) > 0):
 	
-		# whether lights on (1) or off (0) during this step
-		lightm = self.light_stat[int(sum(self.light_time<=sumt)-1)]
+		# whether lights on (>1) or off (0) during this step
+		self.light_stat_now = self.light_stat[int(sum(self.light_time<=sumt)-1)]
 		
 		# check whether changes occur at start of this time step
 		if (sumt == self.light_time[light_time_cnt] and light_time_cnt>-1):
@@ -170,8 +170,8 @@ def cham_up(sumt, Pnow,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 			
 		# if reached final status of lights, then keep this status
-		if light_time_cnt == -1:
-			lightm = self.light_stat[light_time_cnt]
+		if (light_time_cnt == -1):
+			self.light_stat_now = self.light_stat[light_time_cnt]
  
 	# if lights are on during this step and lighting is natural, then check whether
 	# proposed time step needs reducing to limit change to light intensity, if this
@@ -179,7 +179,7 @@ def cham_up(sumt, Pnow,
 	# if using natural light
 	cwd = os.getcwd() # address of current working directory
 
-	if (lightm == 1 and self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no' and self.light_ad == 1):	
+	if (self.light_stat_now >= 1 and self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no' and self.light_ad == 1):	
 		# check time step required to limit change to rate of 
 		# MCM photochemical equation number 6, 
 		# which the unit test for
@@ -369,13 +369,9 @@ def cham_up(sumt, Pnow,
 	# get whether next/current injection of seed is instantaneous or continuous
 	pcontf = pcont[0, seedt_cnt]
 	
-	# check on instantaneous injection of particles --------------------------------------
+	# check on injection of particles --------------------------------------
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
-	
-	# fillers, in case continuous influx not occurring	
-	Cinfl_nowp_indx = [] # filler
-	Cinfl_nowp = [] # filler
 	
 	# if influx occurs and we are not on the cham_up call from the rec module (which has tnew=0)
 	# note, if this particle influx section called during the call to rec, then continuous influx is 
@@ -385,7 +381,7 @@ def cham_up(sumt, Pnow,
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
 		
-			if (gpp_stab != -1): # if no linear interpolation required
+			if (gpp_stab != -1 or pcontf == 1): # if no linear interpolation required, or injection continuous
 				pconcn = pconc[:, seedt_cnt]
 				mean_radn = mean_rad[:, seedt_cnt]
 				stdn = std[:, seedt_cnt]
@@ -400,45 +396,63 @@ def cham_up(sumt, Pnow,
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 
+
 			# account for instantaneous change in seed particles (continuous change dealt with below)
 			if (pcontf == 0):
 				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
-					_, _] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
+					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 					N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+
+				if (seedt_cnt < (pconct.shape[1]-1)):
+					seedt_cnt += 1
+				else:
+					seedt_cnt = -1 # reached end
+
+				# check whether changes occur during proposed integration time step
+				# and that time step has not been forced to reduce due to unstable ode solvers
+				if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
+					# if yes, then reset integration time step so that next step coincides 
+					# with change
+					tnew = pconct[0, seedt_cnt]-sumt
+					bc_red = 1 # flag for time step reduction due to boundary conditions
 		
 			# account for continuous change in seed particles
 			if (pcontf == 1):
-			
+				
 				# seed particle number concentration integrated over proposed 
 				# time step (# particles/cm3)
 				pconcn = pconc[:, seedt_cnt]*tnew
 				
-				[Cinfl_nowp, N_perbin, _, 
-				_, Cinfl_nowp_indx] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
+				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
+				_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 				N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
 				uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 				stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 				seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
-				
-				y[num_comp:num_comp*(num_sb-self.wall_on+1)] = Cinfl_nowp
 			
-			if (seedt_cnt < (pconct.shape[1]-1)):
-				seedt_cnt += 1
-			else:
-				seedt_cnt = -1 # reached end
-					
-			bc_red = 0 # reset flag for time step reduction due to boundary conditions
+				# check whether we've reached the end of this continuous influx period
+
+				# if continuous influx is the final state, then continue until simulation ends
+				if (seedt_cnt != pconct.shape[1]-1 and seedt_cnt != -1):
+					if ((sumt+tnew) >= pconct[0, seedt_cnt+1]): # if next state reached
+						if (seedt_cnt < (pconct.shape[1]-1)): # if next state isn't the final state
+							seedt_cnt += 1
+						else: # if next state is final state
+							seedt_cnt = -1 # reached final state
+				
+						
+						# check whether changes occur during proposed integration time step
+						# and that time step has not been forced to reduce due to unstable ode solvers
+						if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
+							# if yes, then reset integration time step so that next step coincides 
+							# with change
+							tnew = pconct[0, seedt_cnt]-sumt
+							bc_red = 1 # flag for time step reduction due to boundary conditions
+						
 		
-		# check whether changes occur during proposed integration time step
-		# and that time step has not been forced to reduce due to unstable ode solvers
-		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
-			# if yes, then reset integration time step so that next step coincides 
-			# with change
-			tnew = pconct[0, seedt_cnt]-sumt
-			bc_red = 1 # flag for time step reduction due to boundary conditions
 
 	# ----------------------------------------------------------------------------------------------------------
 
@@ -474,6 +488,8 @@ def cham_up(sumt, Pnow,
 			
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
+			
+
 
 			# update index counter for constant influxes - used in integrator below
 			if (infx_cnt < (self.con_infl_C.shape[1]-1)):
@@ -487,9 +503,11 @@ def cham_up(sumt, Pnow,
 		if (sumt+tnew > self.con_infl_t[infx_cnt] and (infx_cnt != -1)):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
-			tnew = self.cont_infl_t[infx_cnt]-sumt
+			tnew = self.con_infl_t[infx_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
-			
+
+		if tnew<0:
+			import ipdb; ipdb.set_trace()
 	else: # if no continuous influxes, provide filler
 		Cinfl_now = np.zeros((1, 1))
 	
@@ -541,7 +559,6 @@ def cham_up(sumt, Pnow,
 		
 	# end of check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products -------------- 
 
-	return(temp_now, Pnow, lightm, light_time_cnt, tnew, bc_red, update_count, 
+	return(temp_now, Pnow, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
-		RHt_cnt, N_perbin, x, pconcn_frac, pcontf, tot_in_res, Cinfl_nowp_indx, 
-		Cinfl_nowp, self)
+		RHt_cnt, N_perbin, x, pconcn_frac, pcontf, tot_in_res, self)

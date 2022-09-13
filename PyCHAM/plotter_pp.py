@@ -520,3 +520,81 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		plt.show()	
 
 	return()
+
+def part_mass_vs_time_sizeseg(self):
+
+	import scipy.constants as si
+
+	# chamber condition ---------------------------------------------------------
+	# retrieve results
+	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
+		y_MW, Nwet, comp_names, y_MV, _, wall_on, space_mode, 
+		_, _, _, PsatPa, OC, H2Oi, seedi, _, _, group_indx, _, 
+		ro_obj) = retr_out.retr_out(self.dir_path, self)
+	
+	# number of actual particle size bins
+	num_asb = (num_sb-wall_on)
+
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+
+	# particle size bins (upper bounds) radius (nm)
+	psb_rub = [1.e2, 5.e2, 1.e3, 2.5e3, 1.e4, 2.e4]
+
+	# convert recorded radius to nm from um
+	rbou_rec = rbou_rec*1.e3
+
+	# index array preparation
+	psb_ind = np.zeros((len(timehr), len(psb_rub)))
+	
+
+	# get the index of particle size bins
+	for psb_rubi in psb_rub:
+		psb_ind += rbou_rec[:, 1::]<psb_rubi
+
+	# then use this index to find the mass concentrations 
+	# inside each size bound
+
+	# concentrations of components in particles (# molecules/cm3)
+	yp = yrec[:, num_comp:num_comp*(num_asb+1)]
+	#zero water
+	yp[:, H2Oi::num_comp] = 0
+
+	# mass concentrations of each component in each size bin (ug/m3)
+	mc = (yp/si.N_A)*np.tile(np.array((y_MW)).reshape(1, -1),  (1, num_asb))*1e12
+
+	# mass concentrations summed across size bins (ug/m3)
+	mc_psb = np.zeros((len(timehr), num_asb))
+	for i in range(num_asb): # loop through size bins
+		mc_psb[:, i] = np.sum(mc[:, i*num_comp:(i+1)*num_comp], axis=1)
+
+	# results array preparation
+	psb_res = np.zeros((len(timehr), len(psb_rub)))
+
+	# temporary holder array
+	mc_psb_temp = np.zeros((len(timehr), len(psb_rub)))
+
+	for psb_rubi in range(len(psb_rub)):
+		
+		
+		# temporary holder array
+		mc_psb_temp[:, :] = mc_psb[:, :]
+
+		# zero the unwanted size bins
+		mc_psb_temp[psb_ind<(len(psb_rub)-psb_rubi)] = 0.
+
+		# get the concentrations of components in this bin (ug/m3)
+		psb_res[:, psb_rubi] = np.sum(mc_psb_temp, axis=1)
+	
+		ax0.plot(timehr, psb_res[:, psb_rubi], label = str(str(psb_rub[psb_rubi]/1.e3) + ' um'))
+		
+
+	# include legend
+	ax0.legend(fontsize=14)
+
+	
+
+	return()

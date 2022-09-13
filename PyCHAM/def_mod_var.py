@@ -134,6 +134,7 @@ def def_mod_var(caller, self): # define function
 
 	# lights -------------------------------------------------------------------------------
 	self.light_stat = np.zeros((1), dtype='int') # light status
+	self.light_stat_now = 0 # ready for light checking when chem_sch_SMILES called
 	self.light_time = np.zeros((1, 1)) # time that light status attained (s)
 	self.daytime = 0. # time of day experiment starts (s)
 	self.lat = 0. # latitude of experiment (degrees)

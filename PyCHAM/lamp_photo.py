@@ -37,8 +37,8 @@ def lamp_photo(J, TEMP, self):
 		# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
 		# from chamber
 		f = open(self.af_path, 'r')
-		wl_chm = np.empty(0) # chamber wavelengths (nm)
-		act_chm = np.empty(0) # chamber actinic flux
+		wl_chm = np.empty(0) # wavelengths (nm)
+		act_chm = np.empty(0) # actinic flux
 	
 		for line in f: # loop through line
 		
@@ -79,6 +79,21 @@ def lamp_photo(J, TEMP, self):
 				# remember old range
 				wlo = wln
 		
+		# if using a sinusoidal diurnal variation in actinic flux
+		if (self.light_stat_now == 2):
+			# fraction through day
+			ftd = self.sumt/(24.*3600.)
+			# distance through 2*pi radians
+			dist = ftd*2.*np.pi
+			# shift, so that peak is at midday
+			dist -= np.pi/2.
+			# find the sinusoidal function
+			act_fact = np.sin(dist)
+			# adjust so that peak has value 1, minimum has value 0
+			act_fact = (act_fact+1.)/2.
+			# apply factor to actinic flux	
+			act_chm = act_chm*act_fact
+
 	if (self.af_path == 'nat_act_flux'): # if using modelled solar actinic flux
 		
 		import nat_act_flux
@@ -103,7 +118,6 @@ def lamp_photo(J, TEMP, self):
 			print('woop4')
 			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
 		
-		import ipdb; ipdb.set_trace()
 	
 	# get UV-C transmission factor now
 	tf_UVCn = self.tf_UVC[(np.sum(self.tf_UVCt<=self.sumt)-1)]

@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="PyCHAM",
-    version="3.10.5",
+    version="3.10.6",
     author="Simon O'Meara",
     author_email="simon.omeara@manchester.ac.uk",
     description="PyCHAM: CHemistry with Aerosol Microphysics in Python",

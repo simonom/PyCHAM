@@ -79,9 +79,9 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	
 	if (testf == 1): # testing mode
 		# return dummies
-		return(0,0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
-	NA = si.Avogadro # Avogadro's number (molecules/mol)
+	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	# empty array for storing species' concentrations, must be an array
 	y = np.zeros((num_comp))
 	y_mw = np.zeros((num_comp, 1)) # species' molecular weight (g/mol)
@@ -108,7 +108,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		except:
 			erf = 1
 			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
-			return (0, 0, 0, 0, 0, 0, 0, 0, 
+			return (0, 0, 0, 0, 0, 0, 0, 
 				0, 0, 0,
 				0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 			
@@ -239,7 +239,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 				except:
 					erf = 1
 					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
-					return (0, 0, 0, 0, 0, 0, 0, 0, 
+					return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 				# remember index for plotting gas-phase concentrations later

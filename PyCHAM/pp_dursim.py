@@ -149,7 +149,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				
 				# equilibrium mole fraction of water per size bin
 				# from the ode solver equation for vapour-particle partitioning of water
-				xwat = H2Ogc/(self.Psat[:, H2Oi]*kelv*act_coeff[:, H2Oi])
+				xwat = H2Ogc/(self.Psat[0:(num_sb-self.wall_on+1), H2Oi]*kelv*act_coeff[0:(num_sb-self.wall_on+1), H2Oi])
 				
 				# allow for mole fraction of water in mole fraction of non-water seed components
 				# for all size bins
@@ -263,13 +263,9 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# new seed particles into existing concentration (# molecules/cm3)
 	if (pcontf == 0):
 		y += yn
-		Cinfl_nowp_indx = [] # filler
+		
 	if (pcontf == 1): # if continuous injection of particles
 		y += yn # adding to y array here rather than in ode_solv
-		# use following line if not doing continuous influx inside ode_solv
-		Cinfl_nowp_indx = [] # filler
-		# use following line if doing continuous influx inside ode_solv
-		#Cinfl_nowp_indx = np.where(yn>0.)[0][:]+num_comp
 
 	# loop through size bins to estimate new total volume concentrations (um3/cc (air))
 	Vtot = np.zeros((num_sb))
@@ -290,4 +286,4 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# new radius of single particles (um)
 	radn = ((3./(4.*np.pi))*Varr)**(1./3.)
 	
-	return(y, N_perbin, radn, Varr, Cinfl_nowp_indx)
+	return(y, N_perbin, radn, Varr)

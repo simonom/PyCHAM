@@ -73,15 +73,15 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest using one tab
-	f.write('def evaluate_rates(RO2, H2O, TEMP, lightm, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):\n')
+	f.write('def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):\n')
 	f.write('\n')
 	f.write('	# inputs: ------------------------------------------------------------------\n')
-	f.write('	# RO2 - total concentration of alkyl peroxy radicals (molecules/cm3) \n')	
-	f.write('	# M - third body concentration (molecules/cm3 (air))\n')
-	f.write('	# N2 - nitrogen concentration (molecules/cm3 (air))\n')
-	f.write('	# O2 - oxygen concentration (molecules/cm3 (air))\n')
+	f.write('	# RO2 - total concentration of alkyl peroxy radicals (# molecules/cm3) \n')	
+	f.write('	# M - third body concentration (# molecules/cm3 (air))\n')
+	f.write('	# N2 - nitrogen concentration (# molecules/cm3 (air))\n')
+	f.write('	# O2 - oxygen concentration (# molecules/cm3 (air))\n')
 	f.write('	# H2O, TEMP: given by the user\n')
-	f.write('	# lightm: given by the user and is 0 for lights off and 1 for on\n')
+	f.write('	# self.light_stat_now: given by the user and is 0 for lights off and >1 for on\n')
 	f.write('	# reaction rate coefficients and their names parsed in eqn_parser.py \n')
 	f.write('	# Jlen - number of photolysis reactions\n')
 	f.write('	# self.tf - sunlight transmission factor\n')
@@ -91,9 +91,11 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1) \n')
 	f.write('	# ------------------------------------------------------------------------\n')
 	f.write('\n')
+	
 	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors')
 	f.write('\n')
 	f.write('	# calculate any generic reaction rate coefficients given by chemical scheme\n')
+	f.write('\n')
 	if rrc:
 		f.write('	try:\n')
 		# code to calculate any generic rate coefficients given by chemical scheme file
@@ -103,16 +105,12 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 		f.write('	except:\n')
 		f.write('		erf = 1 # flag error\n')
 		f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
-	f.write('\n')
+	
 	f.write('	# estimate and append photolysis rates\n')
 	f.write('	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)\n')
 	f.write('\n')
-	f.write('	if (lightm == 0):\n')
+	f.write('	if (self.light_stat_now == 0):\n')
 	f.write('		J = [0]*len(J)\n')
-	# in case investigating reaction rate coefficients
-	#f.write('	print(KMT09, K90, F9, NC9, KR9, K9I, FC9)\n')
-	# in case of indexing error when prescribing photolysis rates
-	#f.write('	J[1::] = J[0:-1]; J[0] = 0.\n')
 
 	# calculate the rate coefficient for each equation
 	f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))

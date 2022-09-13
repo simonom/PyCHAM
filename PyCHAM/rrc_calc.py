@@ -35,7 +35,7 @@ except:
 import importlib
 
 
-def rrc_calc(H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
+def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 
 	import rate_coeffs # in case failure to import previous version using import command above
 
@@ -44,7 +44,7 @@ def rrc_calc(H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	# self.RO2_indices - indices of RO2 components
 	# H2O - concentrations of water (# molecules/cm3)
 	# TEMP - temperature (K)
-	# lightm - whether lights off (0) or on (1)
+	# self.light_status_now - whether lights off (0) or on (1)
 	# y - component concentrations (# molecules/cm3 (air))
 	# self.lat - latitude
 	# self.lon - longitude
@@ -85,7 +85,7 @@ def rrc_calc(H2O, TEMP, lightm, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 		
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
-	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, lightm, time, 
+	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, time, 
 					M_val, N2_val, O2_val, Jlen, NO, HO2, NO3, sumt, self)
 	#except:
 	#	import os

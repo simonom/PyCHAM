@@ -96,8 +96,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	reac_col_aq, prod_col_aq, rstoi_flat_aq,\n')
 	f.write('	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,\n')
 	f.write('	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
-	f.write('	H2Oi, Cinfl_nowp_indx,\n')
-	f.write('	Cinfl_nowp, self):\n')
+	f.write('	H2Oi, self):\n')
 	f.write('\n')
 	f.write('	# inputs: -------------------------------------\n')
 	f.write('	# y - initial concentrations (# molecules/cm3)\n')
@@ -163,9 +162,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 	f.write('	# self.comp_namelist - chemical scheme names of components\n')
 	f.write('	# self.Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
 	f.write('	#	temperature of chamber\n')
-	f.write('	# Cinfl_nowp_indx - index of particle-phase components with continuous influx \n')
-	f.write('	# Cinfl_nowp - concentration (# molecules/cm3/s) of particle-phase components with\n')
-	f.write('	#	continuous influx\n')
 	f.write('	# self - reference to program \n')
 	f.write('	# ---------------------------------------------\n')
 	f.write('\n')
@@ -279,13 +275,6 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 				f.write('%d, ' %int(con_infl_indx[Ci]))
 			else: # last component in the continuous influx group
 				f.write('%d], 0] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
-
-	#if ((pcont == 1).any()): # if there is continuous influx of seed particles
-		
-	#	f.write('		# account for components with continuous particle-phase influx\n')
-	#	f.write('		if (len(Cinfl_nowp_indx) > 0): # if index available\n')	
-	#	f.write('			dd[Cinfl_nowp_indx, 0] += Cinfl_nowp[:]\n')	
-	#	f.write('		\n')
 
 	if (self.dil_fac > 0): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')

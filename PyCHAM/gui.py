@@ -929,6 +929,7 @@ class PyCHAM(QWidget):
 		# check on inputs - note this loads the last saved pickle file and saves 
 		# any change to this pickle file
 		ui_check.ui_check(self)
+		
 		# finished check on model variables -------------------------------------------------------------------------
 		
 		# relative stretching (width-wise) of each column in Simuate tab
@@ -1337,7 +1338,15 @@ class PyCHAM(QWidget):
 		self.b302.setToolTip('See the particle-phase mass contribution by different generations of oxidised organic molecules')
 		self.b302.clicked.connect(self.on_click302)
 		self.b302.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b302, 0, 2, 1, 1)
+		self.PARlayout.addWidget(self.b302, 0, 2, 2, 1)
+
+		# button to plot particle-phase mass contribution by different 
+		# sizes of particle
+		self.b303 = QPushButton(str('Particle mass (ug/m3) by upper \nsize limit (nm) without water'))
+		self.b303.setToolTip('See the time series of particle mass grouped by upper size limits (mass excludes water)')
+		self.b303.clicked.connect(self.on_click303)
+		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b303, 2, 2, 2, 1)
 
 		# horizontal separator line -------------------------------
 		self.separatorLine5 = QFrame()
@@ -2485,6 +2494,19 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		plotter_pp.plotter(caller, dir_path, comp_names, self) # plot results
 	
+	# graph the particle-phase mass (excluding water) contribution from 
+	# different upper limits of particle radius against time
+	@pyqtSlot()
+	def on_click303(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		import plotter_pp
+		self.dir_path = self.l201.text() # name of folder with results
+		plotter_pp.part_mass_vs_time_sizeseg(self) # plot results
+
 	@pyqtSlot() # button to plot temporal profile of total concentration of 
 	# components that have gas-wall partitioned to wall
 	def on_click212(self):	

@@ -180,11 +180,11 @@ def rec_prep(nrec_step,
 	tot_in_res_ft[0, :] = tot_in_res_indx
 	tot_in_res_ft[1, :] = tot_in_res # influx at start
 	
-	[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
+	[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-		Cinfl_nowp, self] = cham_up.cham_up(sumt, 
+		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, 
+		self] = cham_up.cham_up(sumt, 
 		Pnow, light_time_cnt, 0, 
 		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
 		update_count, 
@@ -214,7 +214,7 @@ def rec_prep(nrec_step,
 		rbou_rec = np.zeros((nrec_step, (num_sb-self.wall_on+1)))
 		# concentration of components on the wall due to 
 		# particle-wall loss, stacked by component first then by
-		# size bin (molecules/cc)
+		# size bin (# molecules/cM3)
 		yrec_p2w = np.zeros((nrec_step, (num_sb-self.wall_on)*num_comp))
 	else:
 		x2 = 0.
@@ -250,7 +250,7 @@ def rec_prep(nrec_step,
 			Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*N_perbin[ish]))*MV[:, 0]*1.e12, 1)-
 					((Cn[ish, H2Oi]/(si.N_A*N_perbin[ish, 0]))*MV[H2Oi, 0]*1.e12))
 			# loop through size bins to find number of particles in each 
-			# (# particle/cc (air))
+			# (# particle/cm3 (air))
 			for Ni in range(0, (num_sb-self.wall_on)):
 				ish = (Vnew>=Vbou[Ni])*(Vnew<Vbou[Ni+1])
 				Nres_dry[0, Ni] = N_perbin[ish, 0].sum()
@@ -265,9 +265,8 @@ def rec_prep(nrec_step,
 		kimt = kelv_fac = 0.
 	
 	# update reaction rate coefficients
-	rrc = rrc_calc.rrc_calc(y[H2Oi], temp_now, lightm, y, Pnow, 
-			Jlen, y[NOi], y[HO2i], y[NO3i], 
-			0., self)
+	rrc = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, Pnow, 
+			Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 

@@ -120,6 +120,7 @@ def extr_mech(int_tol, num_sb,
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
 	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
 	for i in range (len(self.con_infl_nam)):
+		
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
 		if (self.con_infl_nam[i] == 'H2O'):
 			self.con_infl_indx[i] = int(comp_num)

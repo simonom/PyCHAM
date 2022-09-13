@@ -86,7 +86,7 @@ def ode_updater(y, rindx,
 	#		constants (s)
 	# self.tot_time - total time to simulate (s)
 	# self.save_step - frequency to save results (s)
-	# y - initial component concentrations (molecules/cc/s)
+	# y - initial component concentrations (# molecules/cm3/s)
 	# rindx - index of reactants per equation
 	# pindx - index of products per equation
 	# nreac - number of reactants per equation
@@ -405,11 +405,11 @@ def ode_updater(y, rindx,
 				y[:] = y0[:] # (# molecules/cm3)
 			
 			# update chamber variables
-			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
+			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
-			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp, self] = cham_up.cham_up(sumt, 
+			pconcn_frac,  pcontf, tot_in_res, 
+			self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
@@ -465,7 +465,7 @@ def ode_updater(y, rindx,
 				dydt_erh_flag = 0
 			
 			# reaction rate coefficient
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, lightm, y, 
+			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
 			
 			if (erf == 1): # if error message from reaction rate calculation
@@ -509,7 +509,7 @@ def ode_updater(y, rindx,
 				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
 				# prepare for recording next point
 				save_cnt += 1
-
+			
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 
@@ -595,8 +595,7 @@ def ode_updater(y, rindx,
 				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
 				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
 				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-				H2Oi, Cinfl_nowp_indx, 
-				Cinfl_nowp, self)
+				H2Oi, self)
 			
 			# if any components set to have constant gas-phase 
 			# concentration
@@ -787,11 +786,11 @@ def ode_updater(y, rindx,
 			
 			# update chamber variables, note this ensures that any changes made
 			# coincidentally with the experiment end are captured
-			[temp_now, Pnow, lightm, light_time_cnt, tnew, ic_red, 
+			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
-			pconcn_frac,  pcontf, tot_in_res, Cinfl_nowp_indx, 
-			Cinfl_nowp, self] = cham_up.cham_up(sumt, 
+			pconcn_frac,  pcontf, tot_in_res, 
+			self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
