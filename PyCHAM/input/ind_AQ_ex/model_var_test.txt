@@ -4,11 +4,11 @@ update_step = 1.2e3
 recording_time_step = 7.2e3
 light_status = 2
 light_time = 0.
-# window transmission factor from (Kruza et al. 2021)
+# window transmission factor from (Kruza et al. 2021 (https://doi.org/10.1016/j.atmosenv.2021.118625))
 # doi.org/10.1016/j.atmosenv.2021.118625
-trans_fac = 400_0.492, 0_14.0
+trans_fac = 400_0.492, 0_0.14
 tf_UVC = 0.0
-act_flux_path = \Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM\photofiles\MAC_Actinic_Flux_Spectrum_wUVCx3p5.csv
+act_flux_path = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/photofiles/MAC_Actinic_Flux_Spectrum_wUVCx3p5.csv
 temperature = 293.15
 tempt = 0.
 p_init = 101325.
@@ -31,16 +31,16 @@ volP = 0.0, 1.e-4
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
 # and that cleaning emissions (8pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
-const_infl = \Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM\input\INGENIOUS_test\const_infl.xlsx
+const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
 # note for particles, indoor emissions are from Figure 1 (c): https://dx.doi.org/10.1021/acs.est.0c00740
 # and these are added to a background (assuming windows open particle concentration 
 # from Figure 1 (d) of https://dx.doi.org/10.1021/acs.est.0c00740)
 number_size_bins = 6
 lower_part_size = 4.e-3
-upper_part_size = 1.e1
+upper_part_size = 1.99e1
 space_mode = log
 coag_on = 1
-pconct = 0.; 6.48e4; 6.54e4
-pconc = 6.e0, 5.e-2, 1.e-2, 3.e-4, 3.e-5, 1.e-7; 2.e3, 6.e1, 8.e-1, 1.e-1, 6.e-3, 4.e-5; 6.e0, 5.e-2, 1.e-2, 3.e-4, 3.e-5, 1.e-7
-pcont = 1 ; 1 ; 1
+pconct = 0.0; 0.1; 6.48e4; 6.54e4
+pconc = 6.e4, 5.e2, 1.e2, 8.e0, 1.5e-1, 1.e-3; 6.e0, 5.e-2, 1.e-2, 8.e-4, 1.5e-5, 1.e-7; 2.e3, 6.e1, 8.e-1, 1.e-1, 6.e-3, 4.e-5; 6.e0, 5.e-2, 1.e-2, 8.e-4, 1.5e-5, 1.e-7
+pcont = 0; 1 ; 1 ; 1
 dil_fac =  2.e-4

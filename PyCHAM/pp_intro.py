@@ -139,7 +139,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		rbou = np.zeros((1, 1))
 		upper_bin_rad_amp = 1.e6
 		# empty array for concentration of components on wall due to 
-		# particle deposition to wall (molecules/cc)
+		# particle deposition to wall (# molecules/cm3)
 		C_p2w  = 0.
 
 	else: # get the particle number size distribution from inputs

@@ -488,8 +488,6 @@ def cham_up(sumt, Pnow,
 			
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
-			
-
 
 			# update index counter for constant influxes - used in integrator below
 			if (infx_cnt < (self.con_infl_C.shape[1]-1)):

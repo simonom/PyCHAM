@@ -161,7 +161,7 @@ def retr_out(output_by_sim, self):
 	Cfactor = const['factor_for_multiplying_ppb_to_get_molec/cm3_with_time']
 	rel_SMILES = const['SMILES']
 	y_MW = const['molecular_weights_g/mol_corresponding_to_component_names']
-	# nominam molar masses (g/mol)
+	# nominal molar masses (g/mol)
 	nom_mass = const['nominal_molar_mass_g/mol']
 	comp_names = const['chem_scheme_names']
 	wall_on = const['wall_on_flag_0forNO_>0forYES'][0]

@@ -16,8 +16,9 @@ PyCHAM is an open-source computer code (written in Python) for simulating aeroso
 9. [Numerical Considerations](#Numerical-Considerations)
 10. [Quick Plotting Tab](#Quick-Plotting-Tab)
 11. [Flow Mode](#Flow-Mode)
-12. [Frequently Asked Questions](#Frequently-Asked-Questions)
-13. [Acknowledgements](#Acknowledgements)
+13. [Indoor Air Quality Mode](#Indoor-Air-Quality-Mode)
+14. [Frequently Asked Questions](#Frequently-Asked-Questions)
+15. [Acknowledgements](#Acknowledgements)
 
 ## Documentation
 
@@ -226,7 +227,7 @@ In addition, you can find more information around photochemistry and flow mode i
 | injectt = | Time(s) at which instantaneous injections occur (seconds), which correspond to the concentrations in Ct.  Separate multiple values (representing injection at multiple times) with commas.  If multiple components are  injected after the start time, then this input should still consist of just one series of times as these will apply to all components.  E.g., if k ppb of component A injected after m seconds and j ppb of component B injected after n (n>m) seconds, then this input should be m, n and Compt should be A, B and the Ct should be k,0;0,j Note this is for components with concentrations allowed to change, see const_comp for those with invariable concentrations. |
 | const_comp = | Name of component with continuous gas-phase concentration inside chamber.  Note, this is case sensitive, with the case matching that in the chemical file.  Defaults to nothing if left empty.  To specifically account for constant influx, see const_infl variable below.|
 | obs_file = | Name of xlsx file containing concentrations (molecules/cm3) of components and times (s) through experiment.  Component chemical scheme names must be in the first row, time must vary with later rows and the first column must contain times (s), whilst later columns contain the concentrations (molecules/cm3) of the components given in the first row.  If this variable is provided PyCHAM will automatically fix the component concentrations to those provided in this file.  The name of the file must also include the path from the PyCHAM home directory (and the file must be contained within the PyCHAM home directory or its sub-folders).  The sheet name to extract information from must be called PyCHAMobs.|
-| const_infl = | Name of component(s) with continuous gas-phase influx to chamber. Note, this is case sensitive, with the case matching that in the chemical file. Defaults to nothing if left empty. For constant gas-phase concentration see const_comp variable above. Should be one dimensional array covering all components. For example, if component A has constant influx of K ppb/s from 0 s to 10 s and component B has constant influx of J ppb/s from 5 s to 20 s, the input is: const_infl = A, B Cinfl = K, K, 0, 0; 0, J, J, 0 const_infl_t = 0, 5, 10, 20 therefore, the semicolon in Cinfl is used to distinguish the influxes of different components |
+| const_infl = | Name of component(s) with continuous gas-phase influx to chamber. Note, this is case sensitive, with the case matching that in the chemical file. Defaults to nothing if left empty. For constant gas-phase concentration see const_comp variable above. Should be one dimensional array covering all components. For example, if component A has constant influx of K ppb/s from 0 s to 10 s and component B has constant influx of J ppb/s from 5 s to 20 s, the input is: const_infl = A, B Cinfl = K, K, 0, 0; 0, J, J, 0 const_infl_t = 0, 5, 10, 20 therefore, the semicolon in Cinfl is used to distinguish the influxes of different components.  If information on influxing component names, times and concentrations is more neatly held in an excel spreadsheet, then state the path to that spreadsheet as the value for const_infl.  An example of stating the path inside a model variables file can be seen in PyCHAM/input/ind_AQ_ex/model_var_test.txt.  An example of such a spreadsheet is available in PyCHAM/input/ind_AQ_ex/const_infl.xlsx. |
 | const_infl_t = | Times during which constant influx of each component given in the const_infl variable occurs, with the rate of their influx given in the Cinfl variable.  Should be one dimensional array covering all components.  For example, if component A has constant influx of K ppb/s from 0 s to 10 s and component B has constant influx of J ppb/s from 5 s to 20 s, the input is: const_infl = A, B Cinfl = K, K, 0, 0; 0, J, J, 0 const_infl_t = 0, 5, 10, 20 therefore, the semicolon in Cinfl is used to distinguish the influxes of different components |
 | Cinfl = | Rate of gas-phase influx of components with constant influx (stated in the const_infl variable above).  In units of ppb/s.  Defaults to zero if left empty.  If multiple components affected, their influx rate should be separated by a semicolon, with a rate given for all times presented in const_infl_t (even if this is constant from the previous time step for a given component).  For example, if component A has constant influx of K ppb/s from 0 s to 10 s and component B has constant influx of J ppb/s from 5 s to 20 s, the input is: const_infl = A, B Cinfl = K, K, 0, 0; 0, J, J, 0 const_infl_t = 0, 5, 10, 20 therefore, the semicolon in Cinfl is used to distinguish the influxes of different components.  Cannot be an expression, e.g. 1.e-1, must be number, e.g. 0.1 instead of 1.e-1.  |
 | dens_Comp = | Chemical scheme names of components with a specified density, if more than one name then separate with comma. The number of names must match the number of densities provided in the dens input.  Default is to estimate density based on the SMILE string of each component and the Girolami method contained in UManSysProp. |
@@ -271,6 +272,7 @@ Model results are saved to the folder specified by the user in the model variabl
 
 A minimum working example (for plotting the time profile of the gas-phase concentration of a given component) is (note that you may need to activate the PyCHAM environment in order to have the necessary packages available (numpy and matplotlib)):
 
+```
 # state path to output folder (for Windows Operating System use \\ to separate folders rather than /))
 output_by_sim = 'path to your output folder'
 
@@ -333,6 +335,8 @@ plt.plot(timehr, y[:, indx_plot])
 # show plot
 plt.show()
 
+```
+
 ## Photochemistry
 Chemical schemes may include photochemical reactions where the rate of reaction is dependent on light intensity.  Several of the model variables described here in the Model Variables .txt file section are relevant to correct modelling of photochemistry and these will be further detailed here.  
 
@@ -381,6 +385,12 @@ Particle mass concentration (whether total of all components or excluding certai
 ## Flow Mode
 
 When preparing model variable inputs for an instrument in flow mode (e.g. a flow tube or a chamber in flow reactor mode), the dilution factor and continuous influx of component model variables can be used.  To simulate removal of a constant fraction of the chamber's volume per second, set the dil_fac model variable accordingly.  For example, if the residence time in the instrument is 10 seconds, then 0.1 of the volume is removed per second, so use dil_fac = 0.1.  If components of interest (including potentially water) are injected to the instrument to replace the components lost through chamber air being extracted, then use the model variables: const_infl, const_infl_t and Cinfl to describe their continuous influx.
+
+## Indoor Air Quality Mode
+
+For simulating atmospheres inside a building, an example set of input files is provided at PyCHAM/input/ind_AQ_ex.  When simulating buildings for first time, it is recommended to first read the notes above regarding Flow Mode.  This is because ventilation of the building will extract a certain fraction of air per second, which will be replaced by outdoor air.
+
+Other features that are relevant to indoor air simulation include: the wavelength-dependent attenuation of solar radiation (see the model variable trans_fac above); the difference rates of deposition of gases and vapours to surfaces (possibly due to differing reaction rates on surfaces) (see the vol_Comp model variable above); the emission of gases/vapours into the building either from outdoors, or from indoor surfaces can be dealt with through the const_infl model variable (described above), which has the option of specifying a path to a spreadsheet containing emissions into the gas phase (e.g. if the number of components or/and the number of time points is sufficiently great that it is more neatly contained in a spreadsheet)
 
 ## Frequently Asked Questions
 

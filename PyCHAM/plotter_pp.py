@@ -541,14 +541,15 @@ def part_mass_vs_time_sizeseg(self):
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 
-	# particle size bins (upper bounds) radius (nm)
+	# particle size bins (upper bounds) radius (nm), 
+	# ready for indexing the concentrations that will be summed
 	psb_rub = [1.e2, 5.e2, 1.e3, 2.5e3, 1.e4, 2.e4]
 
 	# convert recorded radius to nm from um
 	rbou_rec = rbou_rec*1.e3
-
+	
 	# index array preparation
-	psb_ind = np.zeros((len(timehr), len(psb_rub)))
+	psb_ind = np.zeros((len(timehr), num_asb))
 	
 
 	# get the index of particle size bins
@@ -566,7 +567,7 @@ def part_mass_vs_time_sizeseg(self):
 	# mass concentrations of each component in each size bin (ug/m3)
 	mc = (yp/si.N_A)*np.tile(np.array((y_MW)).reshape(1, -1),  (1, num_asb))*1e12
 
-	# mass concentrations summed across size bins (ug/m3)
+	# mass concentrations summed across components in each size bin (ug/m3)
 	mc_psb = np.zeros((len(timehr), num_asb))
 	for i in range(num_asb): # loop through size bins
 		mc_psb[:, i] = np.sum(mc[:, i*num_comp:(i+1)*num_comp], axis=1)
@@ -575,7 +576,7 @@ def part_mass_vs_time_sizeseg(self):
 	psb_res = np.zeros((len(timehr), len(psb_rub)))
 
 	# temporary holder array
-	mc_psb_temp = np.zeros((len(timehr), len(psb_rub)))
+	mc_psb_temp = np.zeros((len(timehr), num_asb))
 
 	for psb_rubi in range(len(psb_rub)):
 		
@@ -589,9 +590,14 @@ def part_mass_vs_time_sizeseg(self):
 		# get the concentrations of components in this bin (ug/m3)
 		psb_res[:, psb_rubi] = np.sum(mc_psb_temp, axis=1)
 	
-		ax0.plot(timehr, psb_res[:, psb_rubi], label = str(str(psb_rub[psb_rubi]/1.e3) + ' um'))
+		ax0.plot(timehr, psb_res[:, psb_rubi], label = str(str(r'$r$<') + str(psb_rub[psb_rubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
 		
 
+	ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	
 	# include legend
 	ax0.legend(fontsize=14)
 

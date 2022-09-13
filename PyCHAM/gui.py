@@ -1342,7 +1342,7 @@ class PyCHAM(QWidget):
 
 		# button to plot particle-phase mass contribution by different 
 		# sizes of particle
-		self.b303 = QPushButton(str('Particle mass (ug/m3) by upper \nsize limit (nm) without water'))
+		self.b303 = QPushButton(str('Particle mass by upper \nsize limit without water'))
 		self.b303.setToolTip('See the time series of particle mass grouped by upper size limits (mass excludes water)')
 		self.b303.clicked.connect(self.on_click303)
 		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
