@@ -41,11 +41,22 @@ def plotter(caller, comp_names_to_plot, self):
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, _, _, _) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = self.ro_obj.rad
+	space_mode = self.ro_obj.spacing
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -102,7 +113,7 @@ def plotter(caller, comp_names_to_plot, self):
 				return()
 				
 			# concentration in units of ug/m3
-			conc = ((conc/si.N_A)*y_MW[indx_plot])*1.e12
+			conc = ((conc/si.N_A)*y_MW[0, indx_plot])*1.e12
 			# plot this component
 			ax0.plot(timehr, conc, '+', linewidth = 4., label = str(str(comp_names[indx_plot ]+' (wall (from gas-wall partitioning))')))
 

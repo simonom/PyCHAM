@@ -422,6 +422,7 @@ def ode_updater(y, rindx,
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
+			
 			if ((sumt+tnew) > self.save_step*save_cnt_chck):
 				tnew = (self.save_step*(save_cnt_chck))-sumt
 				# temporarily set the update step for operator-split processes
@@ -430,7 +431,7 @@ def ode_updater(y, rindx,
 				self.update_stp = tnew
 				update_count = 0.
 				ic_red = 1
-			
+				
 			# ensure update to operator-split processes interval not surpassed
 			if (update_count+tnew > self.update_stp):
 				tnew = (self.update_stp-update_count)
@@ -649,25 +650,28 @@ def ode_updater(y, rindx,
 				# reset fraction of newly injected seed particles
 				pconcn_frac = 0.
 				gpp_stab = 1 # change to stable flag
-			
+		
+		
 		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		self.sumt += tnew
+		
 		
 		if (any(self.obs_comp_i)): # if any components constrained to observations
 				# get observed concentrations now
 				for ci in range(len(self.obs_comp_i)): # loop through components
 					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
 
-		if (sumt%self.save_step < 1.e-12 or (sumt%self.save_step-self.save_step) < 1.e-12): # get remainder
-			save_cnt_chck += 1 # if need to move up count on recording
 		
+		if (sumt%self.save_step < 1.e-12): # get remainder
+			save_cnt_chck += 1 # if need to move up count on recording
+			
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been
 		# reduced due to dilution inside the ODE solver
-		if (self.dil_fac > 0):
-			N_perbin -= N_perbin*(self.dil_fac*tnew)
+		if (self.dil_fac_now > 0):
+			N_perbin -= N_perbin*(self.dil_fac_now*tnew)
 		
 		if ((num_sb-self.wall_on) > 0): # if particle size bins present
 			# update particle sizes
@@ -783,7 +787,7 @@ def ode_updater(y, rindx,
 				return() # end this call to simulation
 
 		if (sumt >= (self.tot_time-self.tot_time/1.e10) and self.testf != 5): # record output at experiment end
-			
+
 			# update chamber variables, note this ensures that any changes made
 			# coincidentally with the experiment end are captured
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 

@@ -138,8 +138,12 @@ def extr_mech(int_tol, num_sb,
 			# of components
 			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
 		except:
-			erf = 1 # raise error
-			err_mess = str('Error: constant concentration component with name ' + str(const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+			# if water then we know it will be the next component to be appended to the component list
+			if (self.const_comp[i] == 'H2O'):
+				self.con_C_indx[i] = len(self.comp_namelist)
+			else: # if not water
+				erf = 1 # raise error
+				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
 	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
 

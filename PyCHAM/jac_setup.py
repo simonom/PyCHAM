@@ -443,7 +443,7 @@ def jac_setup(jac_den_indx, njac, comp_num, num_sb, num_eqn, nreac_g, nprod_g, r
 	jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
 	
 	# extraction effect on Jacobian part -----------------------
-	if (self.dil_fac > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
+	if (len(self.dil_fac) > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
 	
 		extr_cnt = 0 # count on jac_extr_indx inputs
 		

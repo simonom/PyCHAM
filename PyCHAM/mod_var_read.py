@@ -159,6 +159,7 @@ def mod_var_read(self):
 				num_sb = int(value.strip())
 
 			if key == 'pconc' and (value.strip()): # seed particle number concentrations (# particles/cm3)
+			
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
 				pmode_cnt = 1 # track number of modes
@@ -173,12 +174,14 @@ def mod_var_read(self):
 					if (time_cnt == 1 and i == ':'):
 						pmode_cnt += 1 # mode count
 						pmode = 0 # particle concentrations expressed as modes
-				
+
 				# a possible situation where there is just one size bin and 
 				# therefore only one concentration given for that size bin
 				if (sb_cnt == 1 and pmode_cnt == 1):
 					pmode = 1 # explicitly stated particle concentrations
-					pmode_cnt = 0 # no modes
+						
+				# see below model input loop for final determination of pmode (
+				# specifically what happens if more than one size bin, but just one mode given)
 					
 				# if number concentration per size bin given explicitly
 				if (pmode == 1):
@@ -190,7 +193,6 @@ def mod_var_read(self):
 					for i in range(time_cnt):
 						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
 				
-			
 			if key == 'pconct' and (value.strip()): # seed particle input times (s)
 				time_cnt = 1 # track number of times
 				for i in value:
@@ -214,7 +216,12 @@ def mod_var_read(self):
 			
 
 			if key == 'lower_part_size' and (value.strip()): # lowest size bin bound
-				lowsize = float(value.strip())
+				lowsize = str(value.strip())
+				if ',' in lowsize: # if a list, representing manually set radius (um) bounds
+					self.manual_rbounds = [float(i) for i in ((value.strip()).split(','))]
+					lowsize = self.manual_rbounds[0]
+				else:
+					lowsize = float(value.strip())
 			
 			if key == 'upper_part_size' and (value.strip()): # radius of uppermost size bin boundary
 				uppsize = float(value.strip())
@@ -492,7 +499,10 @@ def mod_var_read(self):
 				e_field = float(value.strip())
 			
 			if key == 'dil_fac' and (value.strip()): # dilution factor rate
-				self.dil_fac = float(value)
+				self.dil_fac = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+				
+			if key == 'dil_fact' and (value.strip()): # dilution factor rate times through experiment (s)
+				self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
 				
 			if key == 'ser_H2O' and (value.strip()): # whether to serialise water gas-particle partitioning
 				ser_H2O = int(value)
@@ -512,6 +522,7 @@ def mod_var_read(self):
 					erh_str = str(value)
 				except:
 					erh_str = -1 # will cause error message
+		
 		
 		
 		# UManSysProp check ----------------------------------

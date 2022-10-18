@@ -950,29 +950,16 @@ class PyCHAM(QWidget):
 		
 		# results folder and dialogue row --------------
 		
-		# label for name of results folder to plot:
-		l200 = QLabel(self)
-		l200.setText('Path to results folder to be used for plotting: ')
-		l200.setWordWrap(True)
-		#l200.setAlignment(Qt.AlignRight)
-		self.PLlayout.addWidget(l200, 0, 0)
-		
 		self.l201 = ScrollLabel(self)
 		cwd = os.getcwd() # current working directory
-		path = str(cwd + '/PyCHAM/output/ex_chem_scheme/Example_Run_Output')
+		path = str('Select results folder using Select New Folder')
 		self.l201.setText(path)
-		self.PLlayout.addWidget(self.l201, 0, 1, 1, 1)
+		self.PLlayout.addWidget(self.l201, 0, 0, 1, 1)
 		
-		b202 = QPushButton('Select new folder', self)
+		b202 = QPushButton('Select New Folder', self)
 		b202.setToolTip('Select the folder containing the result files to plot')
 		b202.clicked.connect(self.on_click202)
-		self.PLlayout.addWidget(b202, 0, 2)
-		
-		# label for name of dialogue box:
-		l202a = QLabel(self)
-		l202a.setText('Messages from scripts: ')
-		l202a.setWordWrap(True)
-		self.PLlayout.addWidget(l202a, 0, 3)
+		self.PLlayout.addWidget(b202, 0, 1)
 		
 		# status for border around plotting messages
 		self.bd_pl = 3
@@ -980,7 +967,12 @@ class PyCHAM(QWidget):
 		# plotting dialogue box:
 		self.l203a = ScrollLabel(self)
 		self.l203a.setText('No message currently')
-		self.PLlayout.addWidget(self.l203a, 0, 4, 1, 1)
+		self.PLlayout.addWidget(self.l203a, 0, 2, 1, 2)
+		
+		b202a = QPushButton('Load Outputs', self)
+		b202a.setToolTip('Load the results stored in this folder')
+		b202a.clicked.connect(self.on_click202a)
+		self.PLlayout.addWidget(b202a, 0, 4)
 		
 		# vertical separator line -------------------------------
 		#cil = 1# column index for line
@@ -1000,6 +992,7 @@ class PyCHAM(QWidget):
 		PLtabs.addTab(self.SECtab(), "Flux")
 		PLtabs.addTab(self.VOLtab(), "Volatility")
 		PLtabs.addTab(self.PARtab(), "Particle") # for particle-phase things
+		PLtabs.addTab(self.PYIELDtab(), "Yield") # for particle-phase things
 		PLtabs.addTab(self.RADtab(), "Radicals") # for radical chemicals
 		PLtabs.addTab(self.INSTRtab(), "Convolution")
 		PLtabs.addTab(self.OBStab(), "Observed")
@@ -1299,38 +1292,75 @@ class PyCHAM(QWidget):
 		self.PARlayout = QGridLayout() 
 		PARTab.setLayout(self.PARlayout)
 		
+		# input bar for diameter (um) limits for particle-phase concentration properties
+		self.e303p = QLineEdit(self)
+		self.e303p.setText('Diameter (um) limits for options below, separate multiple values with a comma, e.g. 1.0, 2.5 for PM1 and PM2.5')
+		self.e303p.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e303p, 0, 0, 1, 3)
+		
+		# button to plot cumulative particle-phase mass concentration by different 
+		# sizes of particle
+		self.b303 = QPushButton(str('Cumulative particle mass \nconcentration without water'))
+		self.b303.setToolTip('See the time series of particle mass grouped by upper diameter limits (mass and particle size excludes water)')
+		self.b303.clicked.connect(self.on_click303)
+		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b303, 1, 0, 1, 1)
+		
+		# button to plot cumulative particle-phase number concentration by different 
+		# sizes of particle
+		self.b303q = QPushButton(str('Cumulative particle number \nconcentration without water'))
+		self.b303q.setToolTip('See the time series of particle number grouped by upper diameter limits (particle size excludes water)')
+		self.b303q.clicked.connect(self.on_click303q)
+		self.b303q.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b303q, 1, 1, 1, 1)
+		
+		# button to plot cumulative particle-phase surface area concentration by different 
+		# sizes of particle
+		self.b303r = QPushButton(str('Cumulative particle surface area \nconcentration without water'))
+		self.b303r.setToolTip('See the time series of particle surface area grouped by upper diameter limits (particle size excludes water)')
+		self.b303r.clicked.connect(self.on_click303r)
+		self.b303r.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.PARlayout.addWidget(self.b303r, 1, 2, 1, 1)
+		
+		# horizontal separator line -------------------------------
+		self.separatorLine3 = QFrame()
+		self.separatorLine3.setFrameShape(QFrame.HLine)
+		self.separatorLine3.setFrameShadow(QFrame.Raised)
+		self.SEClayout.addWidget(self.separatorLine3, 2, 0, 1, 3)
+		self.separatorLine3.show()
+		
 		# input bar for number of components contributing
 		# to particle-phase concentration
 		self.e300 = QLineEdit(self)
 		self.e300.setText('Provide the top number of components contributing to particle-phase')
 		self.e300.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e300, 0, 0, 1, 1)
+		self.PARlayout.addWidget(self.e300, 2, 1, 1, 1)
 	
 		# button to plot particle-phase contributions
 		self.b300 = QPushButton(str('Particle-phase contributions (%)'))
 		self.b300.setToolTip('Show the contribution to particle-phase by the top contributors (number given in box above)')
 		self.b300.clicked.connect(self.on_click300)
 		#self.b300.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b300, 1, 0)
+		self.PARlayout.addWidget(self.b300, 3, 0)
 
 		# drop down button for type of contributors
 		self.b300a = QComboBox(self)
 		self.b300a.addItem('All components')
 		self.b300a.addItem('Excluding Seed and Water')
-		self.PARlayout.addWidget(self.b300a, 1, 1, 1, 1)
+		self.PARlayout.addWidget(self.b300a, 3, 1, 1, 1)
 
 		# button to plot particle-phase surface concentration
 		self.b301 = QPushButton(str('Particle surface area'))
 		self.b301.setToolTip('Graph the temporal profile of particle surface area')
 		self.b301.clicked.connect(self.on_click301)
 		#self.b301.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b301, 2, 0)
+		self.PARlayout.addWidget(self.b301, 4, 0)
 
 		# drop down button for type of surface area
 		self.b301a = QComboBox(self)
 		self.b301a.addItem('All components')
 		self.b301a.addItem('Seed Only')
-		self.PARlayout.addWidget(self.b301a, 2, 1, 1, 1)
+		self.PARlayout.addWidget(self.b301a, 5, 1, 1, 1)
 
 		# button to plot particle-phase mass contribution by different 
 		# generations of oxidised organic molecules
@@ -1338,57 +1368,50 @@ class PyCHAM(QWidget):
 		self.b302.setToolTip('See the particle-phase mass contribution by different generations of oxidised organic molecules')
 		self.b302.clicked.connect(self.on_click302)
 		self.b302.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b302, 0, 2, 2, 1)
-
-		# button to plot particle-phase mass contribution by different 
-		# sizes of particle
-		self.b303 = QPushButton(str('Particle mass by upper \nsize limit without water'))
-		self.b303.setToolTip('See the time series of particle mass grouped by upper size limits (mass excludes water)')
-		self.b303.clicked.connect(self.on_click303)
-		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b303, 2, 2, 2, 1)
-
-		# horizontal separator line -------------------------------
-		self.separatorLine5 = QFrame()
-		self.separatorLine5.setFrameShape(QFrame.HLine)
-		self.separatorLine5.setFrameShadow(QFrame.Raised)
-		self.PARlayout.addWidget(self.separatorLine5, 3, 0, 1, 2)
-		self.separatorLine5.show()
+		self.PARlayout.addWidget(self.b302, 2, 2, 2, 1)
 	
+		return(PARTab)
+
+	def PYIELDtab(self): # information on consumption and SOA yield
+		
+		PYIELDTab = QWidget()
+		self.PYIELDlayout = QGridLayout() 
+		PYIELDTab.setLayout(self.PYIELDlayout)
+		
 		# section for consumption and yield calculations ------------------------------
 		# input bar for component to estimate consumption for
 		self.e224 = QLineEdit(self)
 		self.e224.setText('Provide the chemical scheme name of the component to view consumption/yield for (result displayed in message box above)')
 		self.e224.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e224, 4, 0, 1, 2)
+		self.PYIELDlayout.addWidget(self.e224, 0, 0, 1, 2)
 
 		# input bar for starting time to estimate consumption for
 		self.e224a = QLineEdit(self)
 		self.e224a.setText('Provide the starting time to calculate consumption for (hours)')
 		self.e224a.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e224a, 5, 0, 1, 2)
+		self.PYIELDlayout.addWidget(self.e224a, 1, 0, 1, 2)
 
 		# input bar for finshing time to estimate consumption for
 		self.e224b = QLineEdit(self)
 		self.e224b.setText('Provide the finishing time to calculate consumption for (hours)')
 		self.e224b.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e224b, 6, 0, 1, 2)
+		self.PYIELDlayout.addWidget(self.e224b, 2, 0, 1, 2)
 
 		# button to estimate consumption
 		self.b224 = QPushButton(str('Consumption by chemical reaction (' + u'\u03BC' + 'g/m' + u'\u00B3' +')'))
 		self.b224.setToolTip('For the component specified above show the mass concentration consumed throughout the whole simulation in the message box above')
 		self.b224.clicked.connect(self.on_click224)
 		#self.b224.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b224, 7, 0, 1, 1)
+		self.PYIELDlayout.addWidget(self.b224, 3, 0, 1, 1)
 
 		# button to estimate SOA yield
 		self.b225 = QPushButton(str('SOA yield by chemical reaction (fraction 0-1)'))
 		self.b225.setToolTip('In the message box above show the SOA yield from the component given in the box above between the times stated in the boxes above.')
 		self.b225.clicked.connect(self.on_click225)
 		#self.b225.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b225, 7, 1, 1, 1)
+		self.PYIELDlayout.addWidget(self.b225, 4, 1, 1, 1)
 		
-		return(PARTab)
+		return(PYIELDTab)
 
 	def RADtab(self): # more detailed plotting tab for radical chemicals
 
@@ -2156,6 +2179,12 @@ class PyCHAM(QWidget):
 		
 		# set the path to folder to plot results to the latest simulation results
 		self.l201.setText(output_by_sim)
+		
+		# tell user that output ready to plot
+		self.l203a.setText('Output ready to plot')
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.bd_pl = 3
+		
 		# if this point reached then no error message generated
 		mess = ''
 		return(mess)
@@ -2283,13 +2312,42 @@ class PyCHAM(QWidget):
 		options = QFileDialog.Options()
 		fol_nme = QFileDialog.getExistingDirectory(self, "Select Folder Containing Required Input Files", "./PyCHAM/output/")
 		
+		# remember path of directory
+		self.dir_path = fol_nme
+		
 		self.l201.clear() # clear old label
 		self.l201.setText(fol_nme)
+
+		# get size of directory
+		import os
+		
+		# assign size (bytes)
+		dir_size = 0
+
+		# get size
+		for path, dirs, files in os.walk(self.dir_path):
+			for f in files:
+				fp = os.path.join(path, f)
+				dir_size += os.path.getsize(fp) # (bytes)
+
+		est_time = (((dir_size/1.e6)**2)/2.)
+
+		# let user know data is being prepared
+		self.l203a.setText(str('Estimated loading time: ' + str(est_time) + ' s, click Load Outputs' ))
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.bd_pl = 3
+		
+		QApplication.processEvents() # allow message panel to update
+		
+		return()
+		
+	@pyqtSlot()
+	def on_click202a(self): # function of opening results
 		
 		# check whether required files present here
 		try:
 			# name of file where experiment constants saved
-			fname = str(fol_nme + '/model_and_component_constants')
+			fname = str(self.dir_path + '/model_and_component_constants')
 			const_in = open(fname)
 			const_in.close()
 			
@@ -2305,10 +2363,19 @@ class PyCHAM(QWidget):
 			self.b221.setEnabled(True)
 			self.b223.setEnabled(True)
 			
-			# clear error message
-			self.l203a.setText('')
-			self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
-			self.bd_pl = 3
+			# retrieve all outputs and include in self
+			from retr_out import retr_out
+			
+			for prog in retr_out(self): # call on modules to solve problem
+			
+				if (isinstance(prog, str)): # check if it's a message
+					mess = prog
+					
+					self.l203a.setText(mess)
+					self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+					self.bd_pl = 3
+				
+				QApplication.processEvents() # allow message panel to update
 			
 		except:
 			self.l203a.setText('The required output files cannot be found at this path, please ensure the folder immediately above the output is selected')
@@ -2350,6 +2417,20 @@ class PyCHAM(QWidget):
 		if (gp_units[2] == 'm'):
 			uc = 2
 
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
 		plotter.plotter(0, dir_path, uc, self) # plot results
 	
 	@pyqtSlot() # button to plot gas-phase concentration temporal profile
@@ -2357,6 +2438,20 @@ class PyCHAM(QWidget):
 		
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 		# get names of components to plot
 		comp_names = [str(i) for i in self.e205.text(). split(',')]
@@ -2388,6 +2483,20 @@ class PyCHAM(QWidget):
 	@pyqtSlot() # button to plot ozone isopleth
 	def on_click206c(self):
 
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
 		import plotter_gp
 		self.dir_path = self.l201.text() # name of folder with model results
 	
@@ -2396,6 +2505,20 @@ class PyCHAM(QWidget):
 	# button to plot total particle-phase concentration for individual components temporal profile
 	@pyqtSlot()
 	def on_click209(self):	
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 		# clear dialogue
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
@@ -2412,6 +2535,20 @@ class PyCHAM(QWidget):
 	# excluding seed and water
 	@pyqtSlot()
 	def on_click209a(self):	
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 		# clear dialogue
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
@@ -2432,6 +2569,20 @@ class PyCHAM(QWidget):
 		# clear dialogue
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 		# get names of components (filler)
 		comp_names = []
@@ -2461,6 +2612,20 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
 		sa_type = self.b301a.currentText() # surface area to consider
 		
 		# convert units into number option
@@ -2485,6 +2650,20 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
 		caller = 8
 		
 		# names of components (filler)
@@ -2503,9 +2682,77 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
 		import plotter_pp
 		self.dir_path = self.l201.text() # name of folder with results
 		plotter_pp.part_mass_vs_time_sizeseg(self) # plot results
+	
+	# graph the particle-phase number (excluding water) contribution from 
+	# different upper limits of particle radius against time
+	@pyqtSlot()
+	def on_click303q(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		import plotter_pp
+		self.dir_path = self.l201.text() # name of folder with results
+		plotter_pp.part_num_vs_time_sizeseg(self) # plot results
+	
+	# graph the particle-phase surface area (excluding water) contribution from 
+	# different upper limits of particle radius against time
+	@pyqtSlot()
+	def on_click303r(self):
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		import plotter_pp
+		self.dir_path = self.l201.text() # name of folder with results
+		plotter_pp.part_area_vs_time_sizeseg(self) # plot results
 
 	@pyqtSlot() # button to plot temporal profile of total concentration of 
 	# components that have gas-wall partitioned to wall
@@ -2514,6 +2761,20 @@ class PyCHAM(QWidget):
 		# clear dialogue
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 		
 		# get names of components to plot
 		comp_names = [str(i) for i in self.e205.text(). split(',')]

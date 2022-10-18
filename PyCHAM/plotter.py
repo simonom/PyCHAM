@@ -40,16 +40,27 @@ def plotter(caller, dir_path, uc, self):
 	# uc - number representing the units to be used for gas-phase concentrations
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
 
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	try: # retrieval goes fine
-		(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-			y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-			comp0, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
-	except: # retrieval fails
-		return()
-		
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
@@ -69,19 +80,26 @@ def plotter(caller, dir_path, uc, self):
 		self.l203a.setText(mess)
 
 	if (num_asb > 0): 
-		if not (indx_plot):
+		
+		if not (indx_plot): # no gaseous components
+			mess = str('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot is not shown')
+			self.l203a.setText(mess)
+
+			
+		if not (indx_plot): # no gaseous components, only particle-phase
 			mess = str('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot will not be shown')
 			self.l203a.setText(mess)
 			# if there are no gaseous components then prepare figure
 			fig, (ax1) = plt.subplots(1, 1, figsize=(14, 7))
-		else:
+			
+				
+		if (indx_plot):
 			# if there are both gaseous components and particle size bins then prepare figure
 			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
-		# parasite axis setup --------------------------------------------------------------
+		# parasite axis setup on particle-phase plot-----------------------------
 		par1 = ax1.twinx() # first parasite axis
 		par2 = ax1.twinx() # second parasite axis
-		
 		# Offset the right spine of par2.  The ticks and label have already been
 		# placed on the right by twinx above.
 		par2.spines["right"].set_position(("axes", 1.2))
@@ -104,7 +122,7 @@ def plotter(caller, dir_path, uc, self):
 			gpunit = '(ppb)'
 		if (uc == 1 or uc == 2): # ug/m3 or # molecules/cm3
 
-			y_MW = np.array(y_mw) # convert to numpy array from list
+			y_MW = (np.array(y_MW)).reshape(1, -1) # convert to numpy array from list
 			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 			
 			gp_conc = yrec[:, 0:num_comp] 
@@ -145,7 +163,7 @@ def plotter(caller, dir_path, uc, self):
 		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 	# particle properties sub-plot --------------------------------------------------
-	if (num_asb > 0): # if particles present		
+	if (num_asb > 0): # if size bins present		
 
 		if (timehr.ndim == 0): # occurs if only one time step saved
 			Ndry = np.array(Ndry.reshape(1, num_asb))
@@ -159,6 +177,7 @@ def plotter(caller, dir_path, uc, self):
 	
 		# don't use the first boundary as it could be zero, which will error when log10 taken
 		log10D = np.log10(rbou_rec[:, 1::]*2.)
+
 		if (num_asb > 1) :
 			# note, can't append zero to start of log10D to cover first size bin as the log10 of the
 			# non-zero boundaries give negative results due to the value being below 1, so instead
@@ -166,6 +185,7 @@ def plotter(caller, dir_path, uc, self):
 			log10D = np.append((log10D[:, 0]-(log10D[:, 1]-log10D[:, 0])).reshape(-1, 1), log10D, axis=1)
 			# radius distance covered by each size bin (log10(um))
 			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], log10D.shape[1]-1)
+			
 		if (num_asb == 1): # single particle size bin
 			# assume lower radius bound is ten times smaller than upper
 			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
@@ -186,22 +206,71 @@ def plotter(caller, dir_path, uc, self):
 		# create the colormap
 		cm = LinearSegmentedColormap.from_list(cmap_name, colors, N=n_bin)
 	
-		# set contour levels
-		levels = (MaxNLocator(nbins = 100).tick_values(np.min(z[~np.isnan(z)]), 
-				np.max(z[~np.isnan(z)])))
-	
-		# associate colours and contour levels
-		norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
 		
-		# contour plot with times (hours) along x axis and 
-		# particle diameters (nm) along y axis
-		for ti in range(len(timehr)-1): # loop through times
-			p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), z[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
+		# -----------------------------
+		# smallest value to consider for levels
+		z_min = np.max(z[~np.isnan(z)])*1.e-3
 	
-		# if logarithmic spacing of size bins specified, plot vertical axis 
+		if np.max(z[~np.isnan(z)]) == 0: # if no particle present above 0 /cm3
+			levels = np.zeros((1))
+			
+		else:	
+			# make a first contour plot (which will be covered by plot p1 below) to get 
+			# the contour labels of actual concentration (not log10(concentration))
+			# set contour levels
+			levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+		
+			# associate colours and contour levels
+			norm1 = BoundaryNorm(10.**levels, ncolors=cm.N, clip=True)
+		
+			# contour plot with times (hours) along x axis and 
+			# particle diameters (nm) along y axis
+			for ti in range(len(timehr)-1): # loop through times
+				p0 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+		
+		# ----------------------------
+		
+		if np.max(z[~np.isnan(z)]) == 0: # if no particle present above 0 /cm3
+			
+			levels = np.arange(-0.1, 0.1, (0.1--0.1)/1.e2)
+			# associate colours and contour levels
+			norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
+			
+			# contour plot with times (hours) along x axis and 
+			# particle diameters (nm) along y axis
+			for ti in range(len(timehr)-1): # loop through times
+				p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+
+			cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
+			
+		else:
+			# set contour levels
+			levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+			
+			# associate colours and contour levels
+			norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
+		
+			# get indices of zeros in z
+			zero_indx = z == 0.
+			# get minimum value above 0 in z
+			z_gt_zero = np.min(z[z!=0])
+			# temporarily assign a > 0 number to zeros
+			z[zero_indx] = z_gt_zero*1.e-1
+			z_log10 = np.log10(z)
+			z[zero_indx] = 0. # return to zero
+		
+			# contour plot with times (hours) along x axis and 
+			# particle diameters (nm) along y axis
+			for ti in range(len(timehr)-1): # loop through times
+				p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z_log10[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+	
+			cb = plt.colorbar(p0, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
+	
+		# if logarithmic or manual spacing of size bins specified, plot vertical axis 
 		# logarithmically
-		if space_mode == 'log':
+		if space_mode == 'log' or space_mode == 'man':
 			ax1.set_yscale("log")
+			
 		# set tick format for vertical axis
 		ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
 		ax1.set_ylabel('Diameter (nm)', size = 14)
@@ -213,7 +282,6 @@ def plotter(caller, dir_path, uc, self):
 			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
-		cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
 		cb.ax.tick_params(labelsize=14)   
 		# colour bar label
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
@@ -243,7 +311,7 @@ def plotter(caller, dir_path, uc, self):
 		yrp = yrec[:, num_comp:num_comp*(num_asb+1)]
 		# loop through size bins to convert to ug/m3
 		for sbi in range(num_asb):
-			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp] /si.N_A)*y_mw)*1.e12
+			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp] /si.N_A)*y_MW)*1.e12
 		
 		MCvst[0, :] = yrp.sum(axis=1)
 		

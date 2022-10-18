@@ -30,7 +30,6 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
-import retr_out
 import numpy as np
 import scipy.constants as si # for scientific constants
 
@@ -47,16 +46,22 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
-
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, Nwet, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, seedi, _, _, group_indx, _, 
-		ro_obj) = retr_out.retr_out(dir_path, self)
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
 	
 	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
+	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
 
 	if (caller == 0 or caller >= 3):
 		plt.ion() # show results to screen and turn on interactive mode
@@ -70,17 +75,17 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		for i in range(len(comp_names_to_plot)):
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
-				indx_plot = [H2Oi]
+				indx_plot = [self.ro_obj.H2O_ind]
 				indx_plot = np.array((indx_plot))
 			if (comp_names_to_plot[i].strip() == 'RO2'):
-				indx_plot = (np.array((group_indx['RO2i'])))
+				indx_plot = (np.array((self.ro_obj.indx_for_groups['RO2i'])))
 			if (comp_names_to_plot[i].strip() == 'RO'):
-				indx_plot = (np.array((group_indx['ROi'])))
+				indx_plot = (np.array((self.ro_obj.indx_for_groups['ROi'])))
 				
 			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
-					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+					indx_plot = [self.ro_obj.names_of_comp.index(comp_names_to_plot[i].strip())]
 					indx_plot = np.array((indx_plot))
 				except:
 					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -99,21 +104,21 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			import scipy.constants as si # for scientific constants
 			
 			# particle-phase concentrations of all components (# molecules/cm3)
-			if (wall_on > 0): # wall on
-				ppc = yrec[:, num_comp:-num_comp*wall_on]
-			if (wall_on == 0): # wall off
-				ppc = yrec[:, num_comp::]
+			if (self.ro_obj.wf > 0): # wall on
+				ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+			if (self.ro_obj.wf == 0): # wall off
+				ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
 			
 			# particle-phase concentration of this component over all size bins (# molecules/cm3)
-			conc = np.zeros((ppc.shape[0], num_sb-wall_on))
+			conc = np.zeros((ppc.shape[0], self.ro_obj.nsb-self.ro_obj.wf))
 			for indxn in indx_plot: # loop through the indices
-				concf = ppc[:, indxn::num_comp]
+				concf = ppc[:, indxn::self.ro_obj.nc]
 				# particle-phase concentration (ug/m3)
-				conc[:, :] += ((concf/si.N_A)*y_MW[indxn])*1.e12
+				conc[:, :] += ((concf/si.N_A)*self.ro_obj.comp_MW[indxn])*1.e12
 			
 			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'): # if not a sum
 				# plot this component
-				ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(comp_names[indx_plot[0]])+' (particle-phase)'))
+				ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
 			
 			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
 				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (particle-phase)'))
@@ -134,17 +139,17 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	if (caller == 3):
 		import scipy.constants as si
 		# particle-phase concentrations of all components (# molecules/cm3)
-		if (wall_on == 1): # wall on
-			ppc = yrec[:, num_comp:-num_comp]
-		if (wall_on == 0): # wall off
+		if (self.ro_obj.wf > 0): # wall on
+			ppc = yrec[:, num_comp:-num_comp*self.ro_obj.wf]
+		if (self.ro_obj.wf == 0): # wall off
 			ppc = yrec[:, num_comp::]
 
 		# zero water and seed
-		ppc[:, H2Oi::num_comp] = 0.
-		for i in seedi: # loop through seed components
+		ppc[:, self.ro_obj.H2O_ind::num_comp] = 0.
+		for i in self.ro_obj.seed_ind: # loop through seed components
 			ppc[:, i::num_comp] = 0.
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_sb-wall_on))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, self.ro_obj.nsb-self.ro_obj.wf))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 		# convert from # molecules/cm3 to ug/m3
 		ppc = (ppc/si.N_A)*y_mwt*1.e12
@@ -152,7 +157,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc = np.sum(ppc, axis=1)
 		
 		# plot
-		ax0.plot(timehr, ppc, '+', linewidth = 4., label = 'total particle-phase excluding seed and water')
+		ax0.plot(self.ro_obj.thr, ppc, '+', linewidth = 4., label = 'total particle-phase excluding seed and water')
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -163,13 +168,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	if (caller == 4):
 		import scipy.constants as si
 		# particle-phase concentrations of all components (# molecules/cm3)
-		if (wall_on == 1): # wall on
-			ppc = yrec[:, num_comp:-num_comp]
-		if (wall_on == 0): # wall off
-			ppc = yrec[:, num_comp::]
+		if (self.ro_obj.wf > 0): # wall on
+			ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+		if (self.ro_obj.wf == 0): # wall off
+			ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, (num_sb-wall_on)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -180,7 +185,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		# sum particle-phase concentrations over size bins (ug/m3), 
 		# but keeping components separate
-		ppc_t = np.sum(ppc_t.reshape(num_sb-wall_on, num_comp), axis=0)
+		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, self.ro_obj.nc), axis=0)
 		
 		# convert to mass contributions
 		ppc_t = ((ppc_t/np.sum(ppc_t))*100.).reshape(-1, 1)
@@ -200,13 +205,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get index
 			indx = np.where(ppc_t == ppc_ts[i])[0][0]
 			# get name
-			namei = comp_names[indx]
+			namei = self.ro_obj.names_of_comp[indx]
 			# sum for this component over size bins (ug/m3)
-			ppci = np.sum(ppc[:, indx::num_comp], axis=1)
+			ppci = np.sum(ppc[:, indx::self.ro_obj.nc], axis=1)
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(timehr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
 	
 		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -220,18 +225,18 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		import scipy.constants as si		
 
 		# particle-phase concentrations of all components (# molecules/cm3)
-		if (wall_on == 1): # wall on
-			ppc = yrec[:, num_comp:-num_comp]
-		if (wall_on == 0): # wall off
-			ppc = yrec[:, num_comp::]
+		if (self.ro_obj.wf > 0): # wall on
+			ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+		if (self.ro_obj.wf == 0): # wall off
+			ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
 
 		for i in seedi: # loop through seed components
-			ppc[:, i::num_comp] = 0. # zero seed
+			ppc[:, i::self.ro_obj.nc] = 0. # zero seed
 
-		ppc[:, H2Oi::num_comp] = 0. # zero water
+		ppc[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0. # zero water
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, (num_sb-wall_on)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -242,7 +247,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		# sum particle-phase concentrations over size bins (ug/m3), 
 		# but keeping components separate
-		ppc_t = np.sum(ppc_t.reshape(num_sb-wall_on, num_comp), axis=0)
+		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, num_comp), axis=0)
 		
 		# convert to mass contributions
 		ppc_t = ((ppc_t/np.sum(ppc_t))*100.).reshape(-1, 1)
@@ -262,13 +267,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get index
 			indx = np.where(ppc_t == ppc_ts[i])[0][0]
 			# get name
-			namei = comp_names[indx]
+			namei = self.ro_obj.names_of_comp[indx]
 			# sum for this component over size bins (ug/m3)
-			ppci = np.sum(ppc[:, indx::num_comp], axis=1)
+			ppci = np.sum(ppc[:, indx::self.ro_obj.nc], axis=1)
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(timehr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
 	
 		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -281,14 +286,14 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# get surface area of single particles per size bin 
 		# at all times (m2), note radius converted from um 
 		# to m
-		asp = 4.*np.pi*(x*1.e-6)**2.
+		asp = 4.*np.pi*(self.ro_obj.cen_size*1.e-6)**2.
 		# integrate over all particles in a size bin, 
 		# note conversion from /cm3 to /m3 (m2/m3)
-		asp = asp*(Nwet*1.e6)	
+		asp = asp*(self.ro_obj.Nrec_wet*1.e6)	
 		# sum over size bins (m2/m3)
 		asp = np.sum(asp, axis=1)
 		# plot
-		ax0.plot(timehr, asp, '-+', linewidth = 4.)
+		ax0.plot(self.ro_obj.thr, asp, '-+', linewidth = 4.)
 		ax0.set_ylabel(r'Total particle-phase surface area concentration ($\rm{m^{2}\,m^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -300,8 +305,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		import scipy.constants as si
 
 		# particle-phase concentrations of all components (# molecules/cm3)
-		if (wall_on == 1): # wall on
-			ppc = yrec[:, num_comp:-num_comp]
+		if (wall_on > 0): # wall on
+			ppc = yrec[:, num_comp:-num_comp*wall_on]
 		if (wall_on == 0): # wall off
 			ppc = yrec[:, num_comp::]
 		
@@ -342,11 +347,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 		gen_num = [] # empty results list
 		ci = 0 # component count
-		sch_name = ro_obj.sp
-		inname = ro_obj.vp
+		sch_name = self.ro_obj.sp
+		inname = self.ro_obj.vp
 
-		sch_name = str(dir_path + '/inputs/api_iso_ch4_mechHOM_scheme.txt')
-		inname = str(dir_path + '/inputs/api_iso_ch4_mechHOM_model_var.txt')
+		sch_name = str(self.dir_path + '/inputs/chem_scheme.txt')
+		inname = str(self.dir_path + '/inputs/model_var.txt')
 
 		f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
 		# read the file and store everything into a list
@@ -379,7 +384,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 			comp_fin = 0 # flag for when component generation number found
 			gen_num.append(0) # assume zero generation by default
-			#print(ci, compi, rel_SMILES[ci], len(comp_names), len(rel_SMILES))
+			
 			# if an organic molecule
 			if ('C' in rel_SMILES[ci] or 'c' in rel_SMILES[ci]):
 				
@@ -482,8 +487,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# generation per time step
 		res = np.zeros((len(timehr), int(np.max(gen_num))))
 		# particle-phase concentrations of all components (# molecules/cm3)
-		if (wall_on == 1): # wall on
-			ppc = yrec[:, num_comp:-num_comp]
+		if (wall_on > 0): # wall on
+			ppc = yrec[:, num_comp:-num_comp*wall_on]
 		if (wall_on == 0): # wall off
 			ppc = yrec[:, num_comp::]
 
@@ -524,73 +529,81 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 def part_mass_vs_time_sizeseg(self):
 
 	import scipy.constants as si
-
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, Nwet, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, seedi, _, _, group_indx, _, 
-		ro_obj) = retr_out.retr_out(self.dir_path, self)
 	
 	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
-
+	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
 
 	plt.ion() # show results to screen and turn on interactive mode
 		
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+	
+	try: # in case user-supplied values given:
+		psb_dub = [float(i) for i in self.e303p.text().split(',')]
+	except:
+		# default
+		# particle size bins (upper bounds) diameter (um), 
+		# ready for indexing the concentrations that will be summed
+		psb_dub = [1.e-1, 5.e-1, 1.e0, 2.5e0, 1.e1, 2.e1]
+	
+	# convert diameters to nm from um
+	for i in range(len(psb_dub)):
+		psb_dub[i] = psb_dub[i]*1.e3
 
-	# particle size bins (upper bounds) radius (nm), 
-	# ready for indexing the concentrations that will be summed
-	psb_rub = [1.e2, 5.e2, 1.e3, 2.5e3, 1.e4, 2.e4]
-
-	# convert recorded radius to nm from um
-	rbou_rec = rbou_rec*1.e3
+	# convert recorded radius to nm from um and from radius to diameter
+	dbou_rec = self.ro_obj.rad*1.e3*2.
 	
 	# index array preparation
-	psb_ind = np.zeros((len(timehr), num_asb))
-	
+	psb_ind = np.zeros((len(self.ro_obj.thr), num_asb))
 
 	# get the index of particle size bins
-	for psb_rubi in psb_rub:
-		psb_ind += rbou_rec[:, 1::]<psb_rubi
+	for psb_dubi in psb_dub:
+		psb_ind += dbou_rec[:, 1::]<psb_dubi
 
 	# then use this index to find the mass concentrations 
 	# inside each size bound
 
 	# concentrations of components in particles (# molecules/cm3)
-	yp = yrec[:, num_comp:num_comp*(num_asb+1)]
-	#zero water
-	yp[:, H2Oi::num_comp] = 0
+	yp = self.ro_obj.yrec[:, self.ro_obj.nc:self.ro_obj.nc*(num_asb+1)]
+	# zero water
+	yp[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0
 
 	# mass concentrations of each component in each size bin (ug/m3)
-	mc = (yp/si.N_A)*np.tile(np.array((y_MW)).reshape(1, -1),  (1, num_asb))*1e12
+	mc = (yp/si.N_A)*np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1),  (1, num_asb))*1e12
 
 	# mass concentrations summed across components in each size bin (ug/m3)
-	mc_psb = np.zeros((len(timehr), num_asb))
+	mc_psb = np.zeros((len(self.ro_obj.thr), num_asb))
+	
 	for i in range(num_asb): # loop through size bins
-		mc_psb[:, i] = np.sum(mc[:, i*num_comp:(i+1)*num_comp], axis=1)
+		mc_psb[:, i] = np.sum(mc[:, i*self.ro_obj.nc:(i+1)*self.ro_obj.nc], axis=1)
+
+	# average mass per particle in this size bin (ug/m3/particle), note that components have been
+	# allocated to size bins based on their wet (with water) sizes, and we want to display
+	# the mass based on dry sizes
+	mc_psb[self.ro_obj.Nrec_dry>0.] = mc_psb[self.ro_obj.Nrec_dry>0.]/self.ro_obj.Nrec_dry[self.ro_obj.Nrec_dry>0.]
+	
+	# now get mass integrated over all particles based on the dry (no water) number concentration
+	# this will ensure the mass is allocated to the correct size bin
+	mc_psb = mc_psb*self.ro_obj.Nrec_wet
 
 	# results array preparation
-	psb_res = np.zeros((len(timehr), len(psb_rub)))
+	psb_res = np.zeros((len(self.ro_obj.thr), len(psb_dub)))
 
 	# temporary holder array
-	mc_psb_temp = np.zeros((len(timehr), num_asb))
+	mc_psb_temp = np.zeros((len(self.ro_obj.thr), num_asb))
 
-	for psb_rubi in range(len(psb_rub)):
-		
+	for psb_dubi in range(len(psb_dub)): # loop through size categories
 		
 		# temporary holder array
 		mc_psb_temp[:, :] = mc_psb[:, :]
 
 		# zero the unwanted size bins
-		mc_psb_temp[psb_ind<(len(psb_rub)-psb_rubi)] = 0.
+		mc_psb_temp[psb_ind<(len(psb_dub)-psb_dubi)] = 0.
 
-		# get the concentrations of components in this bin (ug/m3)
-		psb_res[:, psb_rubi] = np.sum(mc_psb_temp, axis=1)
+		# get the concentrations of components in this size category (ug/m3)
+		psb_res[:, psb_dubi] = np.sum(mc_psb_temp, axis=1)
 	
-		ax0.plot(timehr, psb_res[:, psb_rubi], label = str(str(r'$r$<') + str(psb_rub[psb_rubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
+		ax0.plot(self.ro_obj.thr, psb_res[:, psb_dubi], label = str(str(r'$D_{p}$<') + str(psb_dub[psb_dubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
 		
 
 	ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
@@ -601,6 +614,173 @@ def part_mass_vs_time_sizeseg(self):
 	# include legend
 	ax0.legend(fontsize=14)
 
+	return()
+
+def part_num_vs_time_sizeseg(self):
+
+	import scipy.constants as si
 	
+	# number of actual particle size bins
+	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+	
+	try: # in case user-supplied values given:
+		psb_dub = [float(i) for i in self.e303p.text().split(',')]
+	except:
+		# default
+		# particle size bins (upper bounds) diameter (um), 
+		# ready for indexing the concentrations that will be summed
+		psb_dub = [1.e-1, 5.e-1, 1.e0, 2.5e0, 1.e1, 2.e1]
+	
+	# convert diameters to nm from um
+	for i in range(len(psb_dub)):
+		psb_dub[i] = psb_dub[i]*1.e3
+
+	# convert recorded radius to nm from um and from radius to diameter
+	dbou_rec = self.ro_obj.rad*1.e3*2.
+	
+	# index array preparation
+	psb_ind = np.zeros((len(self.ro_obj.thr), num_asb))
+
+	# get the index of particle size bins
+	for psb_dubi in psb_dub:
+		psb_ind += dbou_rec[:, 1::]<psb_dubi
+
+	# then use this index to find the mass concentrations 
+	# inside each size bound
+
+	# results array preparation
+	psb_res = np.zeros((len(self.ro_obj.thr), len(psb_dub)))
+
+	# temporary holder array
+	nc_psb_temp = np.zeros((len(self.ro_obj.thr), num_asb))
+
+	for psb_dubi in range(len(psb_dub)): # loop through size categories
+		
+		# temporary holder array
+		nc_psb_temp[:, :] = self.ro_obj.Nrec_dry[:, :]
+
+		# zero the unwanted size bins
+		nc_psb_temp[psb_ind<(len(psb_dub)-psb_dubi)] = 0.
+
+		# get the concentrations of components in this size category (# particles/cm3)
+		psb_res[:, psb_dubi] = np.sum(nc_psb_temp, axis=1)
+	
+		ax0.plot(self.ro_obj.thr, psb_res[:, psb_dubi], label = str(str(r'$D_{p}$<') + str(psb_dub[psb_dubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
+		
+
+	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+	ax0.set_ylabel(r'Concentration (# particles$\,$cm$\rm{^{-3}}$)', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	
+	# include legend
+	ax0.legend(fontsize=14)
+
+	return()
+
+def part_area_vs_time_sizeseg(self):
+
+	import scipy.constants as si
+	
+	# number of actual particle size bins
+	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+	
+	try: # in case user-supplied values given:
+		psb_dub = [float(i) for i in self.e303p.text().split(',')]
+	except:
+		# default
+		# particle size bins (upper bounds) diameter (um), 
+		# ready for indexing the concentrations that will be summed
+		psb_dub = [1.e-1, 5.e-1, 1.e0, 2.5e0, 1.e1, 2.e1]
+	
+	# convert diameters to nm from um
+	for i in range(len(psb_dub)):
+		psb_dub[i] = psb_dub[i]*1.e3
+
+	# get particle-phase concentrations (# molecules/cm3)
+	yp = self.ro_obj.yrec[:, self.ro_obj.nc:(self.ro_obj.nc*(num_asb+1))]
+	
+	# zero water
+	yp[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0.
+	
+	# convert # molecules/cm3 to moles/cm3
+	yp = yp/si.N_A
+	
+	# get volume of every component (cm3/cm3)
+	yp = yp*np.tile(np.array(self.ro_obj.comp_MV).reshape(1, -1), (1, num_asb))
+
+	# repeat number concentration of particles over components (# particles/cm3)
+	Nrec_wet_rep = np.repeat(self.ro_obj.Nrec_wet, self.ro_obj.nc, axis=1)
+
+	# get volume of every component per particlecm3/cm3)
+	yp[Nrec_wet_rep>0] = yp[Nrec_wet_rep>0]/Nrec_wet_rep[Nrec_wet_rep>0]
+	yp[Nrec_wet_rep == 0] = 0.
+	
+	vp = np.zeros((self.ro_obj.yrec.shape[0], num_asb))
+	
+	# sum over components
+	for i in range(num_asb):
+		vp[:, i] = np.sum(yp[:, self.ro_obj.nc*i:self.ro_obj.nc*(i+1)], axis=1)
+	
+	# get radius of every size bin particle at every time step (cm/cm3)
+	radius_dry = (((3.*vp)/(4.*np.pi))**(1./3.))
+
+	# get surface area summed across all particles (cm2/cm3), assuming spherical shape
+	sa = 4.*np.pi*radius_dry**2*self.ro_obj.Nrec_wet
+	
+	# convert surface area from cm2/cm3 to m2/m3
+	sa = sa*1.e2
+
+	# convert dry radius to nm from cm and from radius to diameter
+	dbou_rec = radius_dry*1.e7*2.
+	
+	# index array preparation
+	psb_ind = np.zeros((len(self.ro_obj.thr), num_asb))
+
+	# get the index of particle size bins relative to user-defined size bins
+	for psb_dubi in psb_dub:
+		psb_ind += dbou_rec[:, :]<psb_dubi
+		
+	# then use this index to find the surface area concentrations 
+	# inside each size bound
+
+	# results array preparation
+	psb_res = np.zeros((len(self.ro_obj.thr), len(psb_dub)))
+
+	# temporary holder array
+	sac_psb_temp = np.zeros((len(self.ro_obj.thr), num_asb))
+
+	for psb_dubi in range(len(psb_dub)): # loop through size categories
+		
+		# temporary holder array
+		sac_psb_temp[:, :] = sa
+
+		# zero the unwanted size bins
+		sac_psb_temp[psb_ind<(len(psb_dub)-psb_dubi)] = 0.
+
+		# get the concentrations in this size category (m2/m3)
+		psb_res[:, psb_dubi] = np.sum(sac_psb_temp, axis=1)
+	
+		ax0.plot(self.ro_obj.thr, psb_res[:, psb_dubi], label = str(str(r'$D_{p}$<') + str(psb_dub[psb_dubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
+		
+	ax0.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
+	ax0.set_ylabel(r'Concentration (m$\rm{^{2}}\,$ m $\rm{^{-3}}$)', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	
+	# include legend
+	ax0.legend(fontsize=14)
 
 	return()

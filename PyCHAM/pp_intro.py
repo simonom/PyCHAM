@@ -19,7 +19,7 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''module to set up particle phase part of box model'''
+'''module to set up particle phase'''
 # using the user-defined or default values, the initial number size distribution is determined here
 
 import numpy as np
@@ -122,7 +122,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		nuc_comp = np.empty(1, dtype=int)
 		nuc_comp[0] = nuc_compi
 
-	NA = si.Avogadro # Avogadro's number (molecules/mol)
+	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	
 	# if in test mode, let user know what's happening
 	if (testf == 2):
@@ -145,13 +145,13 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	else: # get the particle number size distribution from inputs
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
-		num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf)
+		num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf, self)
 		
 		# if injection of particles at start of experiment is continuous, then even for the 
 		# start of the experiment, this will be dealt with in cham_up
 		if (i.size > 0 and num_asb > 0 and pcont[0, 0] == 1):
 			N_perbin[:, :] = 0
-
+		
 	# set first volume and radius bound to zero, thereby allowing shrinkage to zero in the 
 	# smallest bin
 	# remember initial first radius bound for saving
@@ -166,7 +166,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		Vol0 = np.zeros((len(Varr)))
 		Vol0[:] = Varr[:]
 		# empty array for concentration of components on wall due to 
-		# particle deposition to wall (molecules/cc)
+		# particle deposition to wall (# molecules/cm3)
 		C_p2w = np.zeros((num_asb*num_comp))
 	
 	if (self.wall_on > 0):

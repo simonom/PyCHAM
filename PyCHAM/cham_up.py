@@ -140,6 +140,12 @@ def cham_up(sumt, Pnow,
 	# self.con_infl_indx - index for continuously injected components from all components
 	# -----------------------------------------------------------------------
 	
+	# check on dilution factor setting --------------------------
+	self.dil_fac_cnt =  sum(self.dil_fact <= (sumt+tnew))-1
+
+	# update dilution factor
+	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
+		
 	# check on change of light setting --------------------------------------
 
 	# begin by assuming no change to time interval required due to chamber 

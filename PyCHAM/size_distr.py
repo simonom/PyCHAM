@@ -27,13 +27,13 @@ from scipy import stats # import the scipy.stats module
 import numpy as np
 import matplotlib.pyplot as plt
 
-def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, space_mode):
+def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, space_mode, self):
 
 	# inputs: -------------------------
 	
 	# num_bins - number of size bins (not including wall)
 	# pmode - whether particle number concentrations given in modes or explicitly
-	# pconc - starting number concentration of particles (# particle/cc (air)), if this
+	# pconc - starting number concentration of particles (# particle/cm3 (air)), if this
 	# is scalar, the number concentration will be split between size bins, and if it has
 	# the same length as number of size bins, each element will be allocated to its
 	# corresponding size bin
@@ -45,6 +45,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 	# lowersize - lower radius of particles (um)
 	# uppersize - upper radius of particles (um)
 	# space_mode - string saying whether to space size bins logarithmically or linearly
+	# self - reference to PyCHAM
 	# ---------------------------------
     
 	# volume in largest and smallest size bin (um3)
@@ -61,7 +62,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 # 		x_output = ((3.0/(4.0*np.pi))*Varr[0:-1])**(1.0/3.0)
 	# ---------------------------------------
 	# logarithmic method
-	if space_mode == 'log':
+	if (space_mode == 'log'):
 		rad_bounds = 10.0**(np.linspace(np.log10(lowersize), 
 						np.log10(uppersize), num=(num_bins+1)))
 		rwid = (rad_bounds[1::]-rad_bounds[0:-1]) # width of size bins (um)
@@ -69,10 +70,19 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 		
 	# ---------------------------------------
 	# linear method
-	if space_mode == 'lin' or space_mode == 'none':
+	if (space_mode == 'lin' or space_mode == 'none'):
 		rad_bounds = np.linspace(lowersize, uppersize, (num_bins+1))
 		# width of size bins (um)
 		rwid = np.array((rad_bounds[1]-rad_bounds[0])).reshape(1)
+		x_output = rad_bounds[0:-1]+rwid/2.0 # particle radius (um)
+
+	# ---------------------------------------
+	# manual method
+	if (space_mode == 'man'):
+		# if manual, then user must have supplied the size bin ranges in the lowersize variable
+		rad_bounds = np.array((self.manual_rbounds))
+		# width of size bins (um)
+		rwid = (rad_bounds[1::]-rad_bounds[0:-1]) # width of size bins (um)
 		x_output = rad_bounds[0:-1]+rwid/2.0 # particle radius (um)
 
 	# ---------------------------------------

@@ -41,12 +41,22 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
-
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path, self)
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	Cfac = self.ro_obj.cfac
+	group_indx = self.ro_obj.gi 
+	comp0 = self.ro_obj.init_comp
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list

@@ -244,4 +244,49 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	if (savefolder == 'default_res_name'):
 		import shutil	
 		shutil.rmtree(output_by_sim)
+		
+	# store group indices as in retr_out
+	# empty dictionary to contain indices of certain groups of components
+	group_indx = {}
+	group_indx['RO2i'] = const['organic_peroxy_radical_index']
+	group_indx['ROi'] = const['organic_alkoxy_radical_index']
+	group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
+	
+	# to ensure quick use of output, store results in an object in an identical way to retr_out
+	# create a class to hold outputs
+	class ro_outputs:
+		sp = output_by_sim_sch_ext # chemical scheme path
+		vp = output_by_sim_mv_ext # model variables path
+		gi = group_indx # indices of groups of components
+		gen_numbers = self.gen_num # for each component, the generation number
+		HyC = self.HC.tolist() # hydrogen:carbon ratios for each component, this output added on 31/05/2022
+		nominal_mass = self.nom_mass.tolist()
+		nsb = numsb
+		nc = num_comp
+		cfac = Cfactor_vst
+		yrec = y_mat
+		Nrec_dry = Nresult_dry
+		rad = rbou_rec
+		cen_size = x2
+		thr = t_out/3600.
+		rSMILES = rel_SMILES
+		comp_MW = y_mw
+		Nrec_wet = Nresult_wet
+		names_of_comp = self.comp_namelist
+		comp_MV = MV
+		proc_time = time_taken
+		wf = self.wall_on
+		spacing = space_mode
+		plot_indx = indx_plot
+		init_comp = comp0
+		part_to_wall = yrec_p2w
+		vpPa = self.Psat_Pa_rec
+		O_to_C = OC.tolist()
+		H2O_ind = H2Oi
+		seed_ind = self.seedi.tolist()
+		siz_struc = siz_str
+		env_cond = cham_env
+		total_influx = tot_in_res_ft
+	self.ro_obj = ro_outputs() # create object to hold outputs
+		
 	return()

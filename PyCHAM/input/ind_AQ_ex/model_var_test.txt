@@ -1,4 +1,4 @@
-res_file_name = INGENIOUS_test
+res_file_name = INGENIOUS_test_quick
 total_model_time = 8.64e4
 update_step = 1.2e3
 recording_time_step = 7.2e3
@@ -31,16 +31,23 @@ volP = 0.0, 1.e-4
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
 # and that cleaning emissions (8pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
-const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
+#const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
 # note for particles, indoor emissions are from Figure 1 (c): https://dx.doi.org/10.1021/acs.est.0c00740
-# and these are added to a background (assuming windows open particle concentration 
-# from Figure 1 (d) of https://dx.doi.org/10.1021/acs.est.0c00740)
-number_size_bins = 6
-lower_part_size = 4.e-3
-upper_part_size = 1.99e1
-space_mode = log
+# and these are added to a background (assuming windows open 7am-7pm particle concentration 
+# from Leeds Headingley Kerbside: https://uk-air.defra.gov.uk/data/show-datavis?q=4245365&type=auto)
+number_size_bins = 7
+lower_part_size = 7.49e-4, 4.9e-3, 4.9e-2, 2.4e-1, 4.9e-1, 1.24, 4.9, 9.99
+space_mode = man
 coag_on = 1
-pconct = 0.0; 0.1; 6.48e4; 6.54e4
-pconc = 6.e4, 5.e2, 1.e2, 8.e0, 1.5e-1, 1.e-3; 6.e0, 5.e-2, 1.e-2, 8.e-4, 1.5e-5, 1.e-7; 2.e3, 6.e1, 8.e-1, 1.e-1, 6.e-3, 4.e-5; 6.e0, 5.e-2, 1.e-2, 8.e-4, 1.5e-5, 1.e-7
-pcont = 0; 1 ; 1 ; 1
-dil_fac =  2.e-4
+pconct = 0.0; 0.1; 25200.0; 6.48e4; 6.54e4
+pconc = 1.e4, 4.e3, 1.5e2, 8.0e0, 8.e-1, 0.0e-1, 0.e-3; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7; 2.e0, 1.e-1, 5.e-2, 6.e-3, 8.e-4, 3.0e-5, 3.e-7; 2.e3, 2.0e-1, 2.e-2, 6.e-2, 1.0e-2, 2.5e-4, 8.e-6; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7
+pcont = 0; 1; 1 ; 1 ; 1
+# surface deposition of particles as a function of particle size taken from a mid-point estimate of Figure 6 of Tracy et al. (2002): https://doi.org/10.1016/S1352-2310(02)00157-7
+McMurry_flag = 0
+inflectDp = 2.e-7
+Grad_pre_inflect = 1.
+Grad_post_inflect = 1.
+Rate_at_inflect = 2.8e-5
+# see INGENIOUS_WP4_flowchart.pptx for dil_fac references
+dil_fac =  1.2e-4, 3.7e-4, 1.2e-4 
+dil_fact =  0.0, 25200.0, 6.48e4

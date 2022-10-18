@@ -61,7 +61,8 @@ def def_mod_var(caller, self): # define function
 	RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
 	RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
-	self.dil_fac = 0. # dilution factor (volume fraction per second)
+	self.dil_fac = np.zeros(1) # dilution factor (volume fraction per second)
+	self.dil_fact = np.zeros(1) # dilution factor times through experiment (s)
 	
 	# particle section ----------------------------------------------------------------
 	siz_stru = 0 # size structure (0 for moving-centre, 1 for full-moving)

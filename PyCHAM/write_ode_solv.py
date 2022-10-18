@@ -276,18 +276,18 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 			else: # last component in the continuous influx group
 				f.write('%d], 0] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
 
-	if (self.dil_fac > 0): # if chamber air being extracted
+	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
 		f.write('		if (self.wall_on == 1): # if wall on\n')
 		f.write('			df_indx = np.ones((len(dd)-num_comp)).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('			dd[0:-num_comp, 0][df_indx] -= y[0:-num_comp, 0][df_indx]*1.*self.dil_fac\n')
+		f.write('			dd[0:-num_comp, 0][df_indx] -= y[0:-num_comp, 0][df_indx]*1.*self.dil_fac_now\n')
 		f.write('		if (self.wall_on == 0): # if wall off\n')
 		f.write('			df_indx = np.ones((len(dd))).astype(\'int\') # index for estimating dilution factors\n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('			dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac\n')
+		f.write('			dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac_now\n')
 		f.write('		\n')
 		
 	# note the following needs two indents (as for the reaction section), so that it
@@ -574,8 +574,8 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1)+1:num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = -kimt[num_asb::, :][wsb, :]*(self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
 		f.write('		data[jac_wall_indx] += wall_eff\n')
 		f.write('		\n')
-	if (self.dil_fac > 0): # include extraction of chamber air in ode solver Jacobian
-		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac\n')
+	if (any(self.dil_fac > 0)): # include extraction of chamber air in ode solver Jacobian
+		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac_now\n')
 		f.write('		\n')
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')

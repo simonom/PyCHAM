@@ -26,7 +26,7 @@
 import numpy as np
 import size_distr # for allocating particle number size distributions
 
-def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf):
+def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf, self):
 
 	# inputs: ----------------------------
 	# lowersize - the smallest bound on the particle size range (um)
@@ -39,6 +39,7 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 	# space_mode - how to space out particles (logarithmically or 
 	#		linearly)
 	# testf - flag for whether in testing mode
+	# self - reference to PyCHAM
 	# ------------------------------------
 
 	# if lower bound of particle sizes set to 0, this will cause an error 
@@ -77,7 +78,7 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 		loc = 0. # no shift
 		
 		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_asb, 
-			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode)
+			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode, self)
 		
 		if (testf == 2):
 			print('finished with size_distr.lognormal')

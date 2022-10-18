@@ -1,0 +1,5 @@
+* Reaction definitions. ;
+{} O3 = O1D : J<1> ; 
+{} O3 = O : J<2> ; 
+{} APINENE + O3 = APINOOA : 6.3D-16*EXP(-580/TEMP)*0.57 ; 
+*;

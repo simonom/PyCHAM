@@ -35,7 +35,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# inputs:----------------------------------------------------------
 	
 	# Pn - particle number concentration per size bin before time step
-	# (# particle/cc (air))
+	# (# particle/cm3 (air))
 	# Cn - particle phase concentration per component per size bin
 	# after a time step over which gas phase reaction and 
 	# gas-particle partitioning have occurred (molecules/cc (air))
@@ -60,7 +60,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# num_asb - number of actual particle size bins
 	# C_p2w - concentration of components on the wall due to 
 	#	particle-wall loss, stacked by component first then by
-	#	size bin (molecules/cc)
+	#	size bin (# molecules/cm3)
 	# ----------------------------------------------------------------
 	if (Rader == 0): # manual input of wall loss rate
 		
@@ -163,11 +163,11 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 		# just above eq. 1 of McMurry (1985) DOI: 10.1080/02786828508959054)
 		Beta = (Beta1*Beta2).reshape(-1, 1)
 	
-	if (Beta<0).sum()>0:
-		Beta[Beta<0] = 0.0
+	if ((Beta < 0).sum() > 0):
+		Beta[Beta<0] = 0.
 		print('Warning Beta in walloss.py estimated below 0, which is not possible, so value forced to 0.0')
 	
-	if testf == 1: # if in test mode
+	if (testf == 1): # if in test mode
 		return(Beta)
 	
 	# integrate this fraction over the time step interval to give total 
@@ -177,13 +177,15 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# find where loss of particles exceeds available number of particles and change
 	# Beta to the realistic maximum
 	ish = Pn<(Beta*Pn)
-	Beta[ish] = 1.0
+	Beta[ish] = 1.
 		
 	# new particle number concentration
 	Pn -= (Beta*Pn)
 	# change in particle-phase concentrations of components
 	delC = (Beta*Cn.reshape(sbn, nc)).flatten(order = 'C')
-	Cn -= delC # new particle-phase concentrations of components (molecules/cc)
+	Cn -= delC # new particle-phase concentrations of components (# molecules/cm3)
+	# wall concentrations of components deposited through particle 
+	# loss to wall (# molecules/cm3)
 	C_p2w += delC
 	
 	# remove particles and their components if particle number negative

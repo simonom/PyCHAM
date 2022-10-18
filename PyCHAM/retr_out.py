@@ -25,14 +25,15 @@
 import numpy as np
 import os
 
-def retr_out(output_by_sim, self):
+def retr_out(self):
 	
 	# inputs: -------------------------------
-	# output_by_sim - name of folder requested by the calling code to be looked at
+	# self.dir_path - path of directory requested by the calling code to be looked at
 	# ---------------------------------------
-	
+
 	# name of file where experiment constants saved
-	fname = str(output_by_sim + '/model_and_component_constants')
+	fname = str(self.dir_path + '/model_and_component_constants')
+
 	try: # try opening file
 		const_in = open(fname)
 	except:
@@ -185,9 +186,9 @@ def retr_out(output_by_sim, self):
 		MV = const["molar_volumes_cm3/mol"]
 
 	try:
-		speed = (const["simulation_computer_time(s)"])[0]
+		comp_time = (const["simulation_computer_time(s)"])[0]
 	except:
-		speed = 0.
+		comp_time = 0.
 
 	try:
 		output_by_sim_sch_ext = (const["output_by_sim_sch_ext"])[0][0:-1]
@@ -218,7 +219,7 @@ def retr_out(output_by_sim, self):
 		group_indx['HOMRO2'] = []
 	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
-	fname = str(output_by_sim+'/components_with_initial_gas_phase_concentrations_specified')
+	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
 	if (os.stat(fname).st_size > 123):
 		indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
@@ -237,73 +238,73 @@ def retr_out(output_by_sim, self):
 		indx_plot = []
 
 	# withdraw times (s)
-	fname = str(output_by_sim+'/time')
+	fname = str(self.dir_path + '/time')
 	t_array = np.loadtxt(fname, delimiter=',', skiprows=1)
 	timehr = t_array/3600.0 # convert from s to hr
 	
 	
 	try: # this output added on 23/02/2021
 		# withdraw chamber environmental conditions (s)
-		fname = str(output_by_sim+'/chamber_environmental_conditions')
+		fname = str(self.dir_path + '/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
 		cham_env = []
 		
 	# withdraw generation number of components, note this output added on 28/04/2022
 	try:
-		fname = str(output_by_sim+'/component_generation')
+		fname = str(self.dir_path + '/component_generation')
 		gen_num = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
 		gen_num = []
 	
 	# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
-	fname = str(output_by_sim+'/concentrations_all_components_all_times_gas_particle_wall')
+	fname = str(self.dir_path + '/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
 	# following will only load for certain simulation setups (mostly whether particles included)
 	
 	try:
 		# withdraw the wall concentration of components due to particle deposition to wall
-		fname = str(output_by_sim+'/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
+		fname = str(self.dir_path + '/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
 		yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
 	except:
 		yrec_p2w = []
 	
 	try:
 		# withdraw number-size distributions (# particles/cm3 (air))
-		fname = str(output_by_sim+'/particle_number_concentration_dry')
+		fname = str(self.dir_path + '/particle_number_concentration_dry')
 		N = np.loadtxt(fname, delimiter=',', skiprows=1)
 		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
 			N = N.reshape(-1, 1)
 	except:
-		N = []
+		N = np.zeros((0, 0))
 	
 	try:
 		# withdraw number-size distributions (# particles/cm3 (air))
-		fname = str(output_by_sim+'/particle_number_concentration_wet')
+		fname = str(self.dir_path + '/particle_number_concentration_wet')
 		Nwet = np.loadtxt(fname, delimiter=',', skiprows=1)
 		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
 			Nwet = Nwet.reshape(-1, 1)
 	except:
-		Nwet = []
+		Nwet = np.zeros((0, 0))
 	
 	try:
 		# particle sizes (um)
-		fname = str(output_by_sim+'/size_bin_radius')
+		fname = str(self.dir_path + '/size_bin_radius')
 		x = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
 		x = []
 
 	try:
 		# particle size bin bounds (radii) (um3)
-		fname = str(output_by_sim+'/size_bin_bounds')
+		fname = str(self.dir_path + '/size_bin_bounds')
 		rbou_rec = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
-		rbou_rec = []
+		rbou_rec =  np.zeros((0, 0))
 
 	try: # in case this output is saved for a given simulation
 		# withdraw consumptions (ug/m3)
-		fname = str(output_by_sim+'/total_concentration_of_injected_components')
+		fname = str(self.dir_path + '/total_concentration_of_injected_components')
 		tot_in_res = np.loadtxt(fname, delimiter=',', skiprows=1) # ug/m3
 	except: # in case not saved, e.g. for older outputs
 		tot_in_res = []
@@ -314,15 +315,39 @@ def retr_out(output_by_sim, self):
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
 		gen_numbers = gen_num # for each component, the generation number
-		# this output added on 31/05/2022
-		HyC = HC # hydrogen:carbon ratios for each component
+		HyC = HC # hydrogen:carbon ratios for each component, this output added on 31/05/2022
 		nominal_mass = nom_mass 
-	ro_obj = ro_outputs() # create object to hold outputs
+		nsb = num_sb
+		nc = num_comp
+		cfac = Cfactor
+		yrec = y
+		Nrec_dry = N
+		rad = rbou_rec
+		cen_size = x
+		thr = timehr
+		rSMILES = rel_SMILES
+		comp_MW = y_MW
+		Nrec_wet = Nwet
+		names_of_comp = comp_names
+		comp_MV = MV
+		proc_time = comp_time
+		wf = wall_on
+		spacing = space_mode
+		plot_indx = indx_plot
+		init_comp = comp0
+		part_to_wall = yrec_p2w
+		vpPa = PsatPa
+		O_to_C = OC
+		H2O_ind = H2Oi
+		seed_ind = seedi
+		siz_struc = siz_str
+		env_cond = cham_env
+		total_influx = tot_in_res
+	self.ro_obj = ro_outputs() # create object to hold outputs
 
-	return(num_sb, num_comp, Cfactor, y, N, rbou_rec, x, timehr, rel_SMILES, y_MW, 
-		Nwet, comp_names, MV, speed, wall_on, space_mode, indx_plot, comp0, 
-		yrec_p2w, PsatPa, OC, H2Oi, seedi, siz_str, cham_env, group_indx, 
-		tot_in_res, ro_obj)
+	yield('Output ready to plot')
+
+	return(self)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
 	
