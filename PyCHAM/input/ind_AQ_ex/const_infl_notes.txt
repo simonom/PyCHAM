@@ -23,7 +23,6 @@ NO (nitric oxide) has indoor source from NO2 deposition to surface (page 1483 of
 
 NO2 (nitrogen dioxide) does have outdoor source, and AURN for Leeds Centre in June 2022 shown here: https://uk-air.defra.gov.uk/data/show-datavis?q=4250939&type=auto (results shown in brackets in next sentences).  When windows closed, use the daily minimum (10 ppb)*dil_fac*infiltration factor(0.72) = 8.64e-4 ppb/s.  When windows open: daily maximum (80 ppb)*dil_fac*infiltration factor(1.0) = 2.96e-2 ppb/s.  There is also an indoor source of 7-5 ppb=2ppb when windows closed in Table 6 of https://pubs.rsc.org/en/content/articlelanding/2019/em/c9em00228f, which gives an emission rate of 2ppb*dil_fac when windows closed = 2*1.2e-4 = 2.4e-4 ppb/s.  When summed with outdoor source we get: 2.4e-4+8.64e-4=1.104e-3 ppb/s when windows closed and 2.4e-4+2.96e-2=2.984e-2 ppb/s when windows open.
 
-
 NO3 (nitrate radical) only produced indoors when ozone is high according to abtract of https://pubs.acs.org/doi/10.1021/acs.estlett.8b00415, but this level of ozone (40 ppb), not seen yet in simulations, so no indoor surface source considered.  At night, NO3 reaches 10s of ppt according to https://acp.copernicus.org/articles/10/4187/2010/acp-10-4187-2010.pdf, so allow ingress of this at night time: (0.01 ppb)*dil_fac*infiltration factor(1.0) = 1.e-2*1.2e-4*1.0=1.2e-6ppb/s at night and 0 ppb/s in the day.
 
 HNO3 (nitric acid) will enter buildings when windows open, and the suggested outdoor concentration is 2 ppb (abstract of doi.org/10.1021/es026133x) and Figure 4 of https://www.tandfonline.com/doi/pdf/10.1080/1073161X.1993.10467221?needAccess=true, therefore HNO3 allowed to enter building at a rate of 2ppb*dil_fac when windows open.  Both references above indicate that indoor concentrations of HNO3 are negligible unless a source such as an unvented convective space heater (which are now rare and possibly illegal to sell) is operating.  When windows and doors are closed, penetration factor of HNO3 is suggested to be sufficiently low to make HNO3 penetration from outdoors effectively negligible (doi.org/10.1021/es026133x).  Note that HNO3 concentrations are not measured at Leeds Headingley Kerbside.
@@ -36,9 +35,34 @@ H2O is set to maintain a relative humidity of 50 % when windows closed and 50 % 
 
 SO2 is higher outdoors than indoors in table 1 of Sarwar et al. 2002 (doi.org/10.1016/S1352-2310(02)00278-9).  The indoor to outdoor ratio when windows closed is 1:4.6, therefore the penetration factor is 1/4.6 = 0.217, so emission rate when windows closed is: 4.6*1.2e-4*0.217 = 1.2e-4 and when windows open: 4.6*3.7e-4*1.=1.7e-3
 
+
+*****influxes based on indoor+outdoor measurements by Sarwar et al. 2002 and Zhu et al. 2013*****
+
 Benzene is 2x higher indoors than outdoors in table 1 of Sarwar et al. 2002 (doi.org/10.1016/S1352-2310(02)00278-9).  Therefore a substantial outdoor source is possible.  No penetration factor could be found for benzene.  Therefore, I assume a penetration factor of 1.  When windows closed 2.5ppb*1.2e-4/s=3.e-4 ppb/s enters from outside.  When windows open 2.5ppb*3.7e-4/s=9.25e-4 ppb/s enters from outside.  In addition, 2.5 ppb comes from the inside (5ppb total indoor concentration when windows closed-2.5ppb of this from outdoor concentration=2.5ppb originating from the indoors).  So there is a constant indoor emission of  2.5ppb*1.2e-4/s=3.e-4ppb/s.  When windows closed, in total there is 6e=4 ppb/s (indoor+outdoor source), when windows open, in total there is 1.225e-3 ppb/s (indoor+outdoor source).
 
 m-xylene, o-xylene, p-xylene, 1,2,4-trimethylbenzene, 1,3,5-trimethylbenzene follow the same method as benzene above
 
 Components, C2H6 to TBUTOL (except for benzene, m-xylene, o-xylene, p-xylene, 1,2,4-trimethylbenzene which had at least 1/2 of the indoor concentration value for the outdoor concentration value), listed in the lit_source sheet of the const_infl.xlsx workbook are all assumed to originate from the indoors, so their emission rate is constant, even when ventilation changes, which will mean concentrations tend to go down when ventilation increases, since the loss rate will be the same.  Their emission rate is then calculated to give the literature value for indoor concentration at equilibrium when windows are closed (literature indoor concentration (ppb)*dil_fac(/s) (when windows closed)).
 
+For ethanol, an additional source is added during showering, following Yeoman et al. (2021)(doi.org/10.1111/ina.12811), which is detailed below in the Yeoman section
+
+
+*****influx due to ozone reaction on surfaces*****
+
+Note that the influx of hexanal due to O3 reaction on wall, which is quantified in Kruza et al. (2017), doi.org/10.1111/ina.12381, is assumed to be included in the measurements reported by Sarwar et al. 2002 and Zhu et al. 2013, since they would not have been able to prevent O3 deposition and consequent production of these VOCs during their indoor measurements.
+
+The influx of heptanal (which is not reported by Sarwar or Zhu) is based on the simulated rate of ozone deposition to the wall multiplied by the yield given in Table 1 of Kruza et al. (2017) (doi.org/10.1111/ina.12381).  Using the quick_chem_scheme and both the 'windows closed' and 'windows open' influx of O3, we see 8.4 ug/m3 ('windows closed') and  ('windows open') of ozone deposited to the wall in 2 hours.  Using multiple for converting ppb to # molecules/cm3 (25034759936.935734 ppb/(#molecules/cm3)), this works out, for 'windows closed' to a rate of 5.8e-4 ppb/s of O3 loss to wall ((8.4/7.2e3)*1.e-12/(48.)*6.022e23/25034759936.935734), and for 'windows open' to a rate of 1.1e-3 ((15.19/7.2e3)*1.e-12/(48.)*6.022e23/25034759936.935734).  The yield for heptanal from ozone deposition to surfaces is 0.01 in Table 1 of Kruza et al. (2017), so the rate of emission due to ozone deposition to wall is 5.8e-4 ppb/s*0.01=5.8e-6 ppb/s for 'windows closed' and 1.1e-3 ppb/s*0.01=1.1e-5 ppb/s for 'windows open'.
+
+The influx of 4-oxopentanal (which is not reported by Sarwar or Zhu) is based on the simulated rate of ozone deposition to the wall multiplied by the yield given in Table 1 of Kruza et al. (2017) (doi.org/10.1111/ina.12381).  Using the quick_chem_scheme and both the 'windows closed' and 'windows open' influx of O3, we see 8.4 ug/m3 ('windows closed') and 15.19 ug/m3 ('windows open') of ozone deposited to the wall in 2 hours.  Using multiple for converting ppb to # molecules/cm3 (25034759936.935734 ppb/(#molecules/cm3)), this works out, for 'windows closed' to a rate of 5.8e-4 ppb/s of O3 loss to wall ((8.4/7.2e3)*1.e-12/(48.)*6.022e23/25034759936.935734), and for 'windows open' to a rate of 1.1e-3 ((15.19/7.2e3)*1.e-12/(48.)*6.022e23/25034759936.935734).  The yield for 4-oxopentanal from ozone deposition to surfaces is 0.026 in Table 1 of Kruza et al. (2017), so the rate of emission due to ozone deposition to wall is 5.8e-4 ppb/s*0.026=1.508e-5 ppb/s for 'windows closed' and 1.1e-3 ppb/s*0.026=1.1e-5 ppb/s for 'windows open'.
+
+
+*****influx due to showering*****
+Yeoman et al. 2021 (doi.org/10.1111/ina.12811) report showering emissions for limonene, benzyl alcohol and ethanol
+
+In the PyCHAM setup we assume the shower lasts 10 minutes (600s), so here I divide the total emission reported by Yeoman et al. (2021) by 600s to get the emission rate.
+
+Yeoman et al. (2021) abstracts says limonene emission is 1.77mg, to convert this to ppb/s, first assume that this mass is spread over the entire volume of the house (1.77e-3g/500cm*500cm*500cm=1.25e8cm3=1.416e-11g/cm3) (conversion from total emitted (g) to ppb/s is: ((1.77e-3/(500.**3.))/6.e2)/136.238*6.022e23/2.5e10=4.17e-3ppb/s
+
+As calculated for limonene in line above, the emission rate for benzyl alcohol is 3.2e-3 ppb/s (((1.07e-3/(500.**3.))/6.e2)/108.1378*6.022e23/2.5e10)
+
+As calculated for limonene two lines above, the emission rate for ethanol during showering is 2.3e-3 ppb/s (((0.33e-3/(500.**3.))/6.e2)/46.0684*6.022e23/2.5e10), which must be added to the baseline ethanol emission from Sarwar et al. (2002)
