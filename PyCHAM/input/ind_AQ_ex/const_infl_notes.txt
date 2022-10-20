@@ -46,6 +46,33 @@ Components, C2H6 to TBUTOL (except for benzene, m-xylene, o-xylene, p-xylene, 1,
 
 For ethanol, an additional source is added during showering, following Yeoman et al. (2021)(doi.org/10.1111/ina.12811), which is detailed below in the Yeoman section
 
+*****influx based on components measured under background conditions unique to Arata et al. (2021) (doi.org/10.1111/ina.12906) (see further down this document for emissions during activities)*****
+
+Acetic acid measured background mixing ratio was multiplied by the dilution factor (56.ppb*1.2e-4=6.72e-3 ppb/s) when windows were closed (as windows were closed during measurement), and this value kept for when windows open, since indoor emission dominates over influx from outdoors, so window opening should dilute.
+
+Methanol is also supplied in Sarwar.  The emission rate in Arata is 4x more than in Sarwar, but perhaps this is due to differences in how new bits of the house are.  Stick with the rate from Sarwar.
+
+Formic acid method the same as for acetic acid mentioned above.
+
+Ethanol also supplied by Sarwar and emission rates very similar to Arata.
+
+The C9 saturated carbonyl (e.g. nonanal), is not available in MCM, as realised when other publications identified nonanal emission.
+
+D5, a.k.a. decamethylcyclopentasiloxane, is not included in MCM, as realised when other publications identified emission.
+
+2-propanol is around 2.5x less is Sarwar but we stick with the Sarwar value.
+
+Acetaldehyde emission rate is almost exactly the same as reported in Sarwar, so stick with the Sarwar value.
+
+Acetone emission rate in Sarwar is 3x that in Arata.  However, the Sarwar source is from measurements in an office, whereas Arata is a home, so going with the Arata emission rate.
+
+Furfural is not in MCM.
+
+The background monoterpene in Arata et al. is very similar to the alpha-pinene from Sarwar, so the alpha-pinene is kept the same as from Sarwar.
+
+Hexanoic acid is not in MCM
+
+Pentanol is 7x higher emission rate in Arata than in Zhu et al. 2013.  Neither publication discusses its source, so sticking with Zhu as their measurements were from homes that have been lived in.
 
 *****influx due to ozone reaction on surfaces*****
 
@@ -66,3 +93,15 @@ Yeoman et al. (2021) abstracts says limonene emission is 1.77mg, to convert this
 As calculated for limonene in line above, the emission rate for benzyl alcohol is 3.2e-3 ppb/s (((1.07e-3/(500.**3.))/6.e2)/108.1378*6.022e23/2.5e10)
 
 As calculated for limonene two lines above, the emission rate for ethanol during showering is 2.3e-3 ppb/s (((0.33e-3/(500.**3.))/6.e2)/46.0684*6.022e23/2.5e10), which must be added to the baseline ethanol emission from Sarwar et al. (2002)
+
+*****influx due to cleaning with bleach*****
+Table 2 of Arata et al. (2021) (doi.org/10.1111/ina.12906) gives emissions during bleach cleaninig.  Note that the chloroamines and cyanogen chloride are not available in MCM.  
+
+Methanol has a the total emission mass concentration is 1.06 ug.  Which we convert to ppb/s using the volume of the home (235e6 cm3, the #molecules/cm3 to ppb conversion factor (25034759936.935734 ppb/(# molecules/cm3)) and the time the cleaning occurred over (25*60 s): (1.06*1.e-3/235.e6)/32.0419*6.022e23/25034759936.935734/(25*60).=2.3e-3ppb/s during cleaning.  To this, we add the background emission of 1.2e-3 = 3.5e-3
+
+Acetaldehyde released during cleaning converted to ppb/s using same method as methanol above.
+
+Acetone released during cleaning converted to ppb/s using same method as methanol above.
+
+Chloroform released during cleaning converted to ppb/s using same method as methanol above.
+
