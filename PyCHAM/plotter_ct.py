@@ -28,7 +28,6 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
-import retr_out
 import numpy as np
 import scipy.constants as si
 
@@ -42,10 +41,34 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# --------------------------------------------------------------------------
 
 	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
+		
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	x = self.ro_obj.cen_size
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	wall_on = self.ro_obj.wf
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 	
 	# no record of change tendency for final experiment time point
 	timehr = timehr[0:-1]
@@ -168,11 +191,33 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, _, _, ro_obj) = retr_out.retr_out(dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	x = self.ro_obj.cen_size
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	wall_on = self.ro_obj.wf
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 	
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
@@ -277,8 +322,8 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		import re # for parsing chemical scheme
 		import scipy.constants as si
 
-		sch_name = ro_obj.sp
-		inname = ro_obj.vp
+		sch_name = self.ro_obj.sp
+		inname = self.ro_obj.vp
 		
 		f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
 		# read the file and store everything into a list
@@ -343,11 +388,33 @@ def plotter_prod(caller, dir_path, comp_names_to_plot, tp, uc, self):
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, _, _, ro_obj) = retr_out.retr_out(dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	x = self.ro_obj.cen_size
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	wall_on = self.ro_obj.wf
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 
 	# loop through components due to be plotted, to check they are available
 	for comp_name in (comp_names_to_plot):
@@ -469,11 +536,33 @@ def plotter_reac_ratios(self):
 	# self - reference to PyCHAM
 	# --------------------------------------------------------------------------
 
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, _, _, _) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	x = self.ro_obj.cen_size
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	wall_on = self.ro_obj.wf
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 
 
 	# prepare figure

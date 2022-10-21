@@ -73,7 +73,7 @@ def middle(self): # define function
 	(num_sb+self.wall_on), drh_str, erh_str, sav_nam,
 	pcont, self)
 	
-	# if needed then run operations to produce variable checker plot 
+	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (self.testf == 4):
 		import var_checker
@@ -86,14 +86,15 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, rel_SMILES] = init_conc.init_conc(comp_num, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, 
+	rel_SMILES] = init_conc.init_conc(comp_num, 
 	comp0, y0, RH, Pnow, Pybel_objects, 0, pconc, 
 	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
 	Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
 	rstoi_g, pstoi_g, self)
 	
-	# if error raised, then tell GUI to display and to stop programme
+	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
 		yield err_mess
 

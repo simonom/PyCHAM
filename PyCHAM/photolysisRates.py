@@ -32,7 +32,7 @@ from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(TEMP, Jlen, sumt, self):
-
+	
 	# inputs:-----------------------------------------------------------------------------
 	# self.daytime - time of day experiment starts (for natural light photolysis) (s)
 	# self.lat - latitude
@@ -149,7 +149,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	if (self.af_path != 'no'):
 		# call on module to process photolysis files and estimate J values
 		J = lamp_photo(J, TEMP, self)
-		
+	
 	# in case a print out of photolysis rate to command line needed
 	#Jcn = 0
 	#for Jn in J:

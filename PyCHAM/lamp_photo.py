@@ -115,7 +115,6 @@ def lamp_photo(J, TEMP, self):
 		# (photon/cm2/nm/s) per wavelength (nm)
 		
 		for F0 in F_dep_wl:
-			print('woop4')
 			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
 		
 	
@@ -218,7 +217,7 @@ def lamp_photo(J, TEMP, self):
 	# Using MCM recommended component absorption cross-sections 
 	# and quantum yields (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	# in combination with the actinic flux found above
-	if self.photo_path == str(cwd+'/PyCHAM/photofiles/MCMv3.2'):
+	if (self.photo_path == str(cwd+'/PyCHAM/photofiles/MCMv3.2')):
 	
 		# --------------------------------------------------------------
 		# J<1> and J<2> for O3 (ozone) photolysis
@@ -361,7 +360,7 @@ def lamp_photo(J, TEMP, self):
 		
 		# photolysis rate for J<4>
 		J[4] = sum(xsNO2*qyNO2*act_chm)
-		
+
 		# --------------------------------------------------------------
 		# J<5> for NO3 (nitrate radical) photolysis: NO3 = NO ;
 		# cross-section file

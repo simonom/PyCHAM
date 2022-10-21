@@ -361,10 +361,16 @@ def ui_check(self):
 	if hasattr(self, 'af_path') and self.af_path != [] and self.af_path != 'no' and self.af_path != 'nat_act_flux': # if file provided
 		try: # try opening as in lamp_photo module
 			f = open(self.af_path, 'r') # open file
-			f.close() # close excel file
+			f.close() # close file
 		except:
-			err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_file model variable in the model variable file.')
-			em_flag = 2
+			try: # if they just gave the name of the file try prefixing with the path to the photofiles folder
+				f = open(str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path), 'r') # open file
+				# update variable
+				self.af_path = str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path)
+				f.close() # close file
+			except:
+				err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
+				em_flag = 2
 	
 	
 

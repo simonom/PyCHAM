@@ -42,7 +42,8 @@ def plotter_taf(self): # define function for photolysis stuff
 		
 	for prog in middle(self): # call on modules to solve problem
 			
-		
+		# note that for checking on photolysis rates, middle is called here,
+		# then inside middle var_checker is called
 		if (isinstance(prog, str)): # check if it's a message
 			mess = prog
 			if (mess[0:4] == 'Stop'): # if it's an error message

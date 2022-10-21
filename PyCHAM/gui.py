@@ -1326,7 +1326,7 @@ class PyCHAM(QWidget):
 		self.separatorLine3 = QFrame()
 		self.separatorLine3.setFrameShape(QFrame.HLine)
 		self.separatorLine3.setFrameShadow(QFrame.Raised)
-		self.SEClayout.addWidget(self.separatorLine3, 2, 0, 1, 3)
+		self.PARlayout.addWidget(self.separatorLine3, 2, 0, 1, 3)
 		self.separatorLine3.show()
 		
 		# input bar for number of components contributing
