@@ -180,10 +180,25 @@ def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	# --------------------------------------------------------------------------
 
 	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
 	
 	y_MW = np.array(y_MW) # convert to numpy array from list
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
@@ -294,10 +309,29 @@ def plotter_rad_pool(self):
 	# self - reference to PyCHAM
 	# ---------------------
 
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	group_indx = self.ro_obj.gi
+	OC = self.ro_obj.O_to_C
+	PsatPa = self.ro_obj.vpPa
+	gen_num = self.ro_obj.gen_numbers
 	
 	if (self.rad_mark == 0): # if alkyl peroxy radicals
 		# get RO2 indices
@@ -306,9 +340,6 @@ def plotter_rad_pool(self):
 	if (self.rad_mark == 1): # if alkoxy radicals
 		# get RO indices		
 		indx_plot = np.array((group_indx['ROi']))
-
-	# get generation numbers of all components
-	gen_num = ro_obj.gen_numbers
 	
  	# need a section here to conditionally 
 	# ignore radicals with carbon number below the user-supplied
@@ -391,10 +422,25 @@ def plotter_rad_flux(self):
 	# self - reference to PyCHAM
 	# ---------------------
 
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
 	
 	# no record of change tendency for final experiment time point
 	timehr = timehr[0:-1]
@@ -525,10 +571,25 @@ def O3_iso(self):
 	# self - reference to PyCHAM
 	# ---------------------
 
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
 
 	# get generation numbers of all components
 	gen_num = ro_obj.gen_numbers

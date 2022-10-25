@@ -148,7 +148,6 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
 	
-	
 	y_header = str('') # prepare header for concentrations with time file 
 	x2_header = str('') # prepare header for files relating to size bins
 	
@@ -251,6 +250,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	group_indx['RO2i'] = const['organic_peroxy_radical_index']
 	group_indx['ROi'] = const['organic_alkoxy_radical_index']
 	group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
+	
+	# ensure numpy arrays, rather than float
+	Nresult_wet = (np.array((Nresult_wet))).reshape(-1, 1)
+	Nresult_dry = (np.array((Nresult_dry))).reshape(-1, 1)
+	rbou_rec = (np.array((rbou_rec))).reshape(-1, 1)
 	
 	# to ensure quick use of output, store results in an object in an identical way to retr_out
 	# create a class to hold outputs

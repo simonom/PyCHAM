@@ -283,7 +283,7 @@ def retr_out(self):
 		# withdraw number-size distributions (# particles/cm3 (air))
 		fname = str(self.dir_path + '/particle_number_concentration_wet')
 		Nwet = np.loadtxt(fname, delimiter=',', skiprows=1)
-		if ((num_sb-wall_on) == 1): # if just one size bin, ensure two dimensions
+		if ((num_sb-wall_on)<= 1): # if just one size bin, ensure two dimensions
 			Nwet = Nwet.reshape(-1, 1)
 	except:
 		Nwet = np.zeros((0, 0))

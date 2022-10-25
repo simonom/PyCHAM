@@ -2,12 +2,15 @@ For a summer's day, windows assumed to be open at 7:00am (25200 s) and closed at
 
 AURN for Leeds Headingley link: https://uk-air.defra.gov.uk/data/data_selector_service?q=4250939&s=p&o=p&l=1#mid
 
+*****Emissions from activities notes*****
+Here are the references, but see further down document for more information
 # note that inside const_infl, showering emissions (7am each day) are from:
 # doi.org/10.1111/ina.12811
 # and that cooking emission (6pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
 # and that cleaning emissions (8pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
+*****************************************
 
 CO (carbon monoxide) has a mean indoor value of 0.4 ppb in Table 6 of https://pubs.rsc.org/en/content/articlelanding/2019/em/c9em00228f, and a mean outdoor concentration of 0.1 ppb in the same table.  Emission source indoors is combustion.  Assuming equilibrium the indoor contribution to CO is 0.4-0.1=0.3ppb.  Windows were closed for the 0.4 ppb measurement, so the indoor emission rate must be 0.3ppb*closed window dilution factor: 0.3*1.2e-4=3.6e-5
 The influx from outdoors must change when windows open (to balance the loss caused by increased dil_fac):  when windows closed: 0.1ppb*1.2e-4 = 1.2e-5ppb/s, when windows open: 0.1ppb*3.7e-4=3.7e-5ppb/s.  Therefore indoor+outdoor is 3.6e-5+1.2e-5=4.8e-5ppb/s when windows closed and 3.6e-5+3.7e-5=7.3e-5ppb/s when windows open.
@@ -94,14 +97,33 @@ As calculated for limonene in line above, the emission rate for benzyl alcohol i
 
 As calculated for limonene two lines above, the emission rate for ethanol during showering is 2.3e-3 ppb/s (((0.33e-3/(500.**3.))/6.e2)/46.0684*6.022e23/2.5e10), which must be added to the baseline ethanol emission from Sarwar et al. (2002)
 
+*****influx due to cooking*****
+Table 4 of Arata et al. (2021) (doi.org/10.1111/ina.12906) gives emissions during cooking.
+
+Ethanol has a total emission mass concentration of 67.0 ug.  Which we convert to ppb/s using the volume of the home (235e6 cm3, the #molecules/cm3 to ppb conversion factor (25034759936.935734 ppb/(# molecules/cm3)) and the time the cooking occurred over (20*60 s): (67*1.e-3/235.e6)/46.07*6.022e23/25034759936.935734/(20*60) during cooking.  To this, we add the background emission: 1.2e-2+(67.*1.e-3/235.e6)/46.07*6.022e23/25034759936.935734/(20.*60.)
+
+Methanol released during cooking converted to ppb/s using same method as ethanol above: 1.2e-3+(4.3*1.e-3/235.e6)/32.04*6.022e23/25034759936.935734/(20.*60.)
+
+Acetic acid released during cooking converted to ppb/s using same method as ethanol above: 6.72e-3+(3.5*1.e-3/235.e6)/60.052*6.022e23/25034759936.935734/(20.*60.)
+
+Acetaldehyde released during cooking converted to ppb/s using same method as ethanol above: 6.e-4+(1.69*1.e-3/235.e6)/44.05*6.022e23/25034759936.935734/(20.*60.)
+
+Acetone released during cooking converted to ppb/s using same method as ethanol above: 4.3e-4+(1.28*1.e-3/235.e6)/58.08*6.022e23/25034759936.935734/(20.*60.)
+
+Butanal released during cooking converted to ppb/s using same method as ethanol above: 0.+(0.53*1.e-3/235.e6)/72.11*6.022e23/25034759936.935734/(20.*60.)
+
+Isoprene released during cooking converted to ppb/s using same method as ethanol above: 2.4e-4+(0.35*1.e-3/235.e6)/68.12*6.022e23/25034759936.935734/(20.*60.)
+
+Note that citral is not in the MCM
+
 *****influx due to cleaning with bleach*****
 Table 2 of Arata et al. (2021) (doi.org/10.1111/ina.12906) gives emissions during bleach cleaninig.  Note that the chloroamines and cyanogen chloride are not available in MCM.  
 
-Methanol has a the total emission mass concentration is 1.06 ug.  Which we convert to ppb/s using the volume of the home (235e6 cm3, the #molecules/cm3 to ppb conversion factor (25034759936.935734 ppb/(# molecules/cm3)) and the time the cleaning occurred over (25*60 s): (1.06*1.e-3/235.e6)/32.0419*6.022e23/25034759936.935734/(25*60).=2.3e-3ppb/s during cleaning.  To this, we add the background emission of 1.2e-3 = 3.5e-3
+Methanol has a the total emission mass concentration is 1.06 ug.  Which we convert to ppb/s using the volume of the home (235e6 cm3, the #molecules/cm3 to ppb conversion factor (25034759936.935734 ppb/(# molecules/cm3)) and the time the cleaning occurred over (15*60 s): (1.06*1.e-3/235.e6)/32.0419*6.022e23/25034759936.935734/(15*60)=3.8e-3ppb/s during cleaning.  To this, we add the background emission of 5.0e-3 = 3.5e-3
 
-Acetaldehyde released during cleaning converted to ppb/s using same method as methanol above.
+Acetaldehyde released during cleaning converted to ppb/s using same method as methanol above: (1.04*1.e-3/235.e6)/44.05*6.022e23/25034759936.935734/(15*60)+6.e-4
 
-Acetone released during cleaning converted to ppb/s using same method as methanol above.
+Acetone released during cleaning converted to ppb/s using same method as methanol above: (0.78*1.e-3/235.e6)/58.08*6.022e23/25034759936.935734/(15*60)+4.3e-4
 
-Chloroform released during cleaning converted to ppb/s using same method as methanol above.
+Chloroform released during cleaning converted to ppb/s using same method as methanol above: (0.23*1.e-3/235.e6)/119.38*6.022e23/25034759936.935734/(15*60)+9.6e-5
 

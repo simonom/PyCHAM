@@ -149,14 +149,14 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				
 				# equilibrium mole fraction of water per size bin
 				# from the ode solver equation for vapour-particle partitioning of water
-				xwat = H2Ogc/(self.Psat[0:(num_sb-self.wall_on+1), H2Oi]*kelv*act_coeff[0:(num_sb-self.wall_on+1), H2Oi])
+				xwat = H2Ogc/(self.Psat[0:(num_sb), H2Oi]*kelv*act_coeff[0:(num_sb), H2Oi])
 				
 				# allow for mole fraction of water in mole fraction of non-water seed components
 				# for all size bins
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 				seedxn = seedx*(1.-xwat)
 				
-				# average molar volume of seed components (cc/mol) for all size bins
+				# average molar volume of seed components (cm3/mol) for all size bins
 				avMV = (sum(seedxn*MV[self.seedi[:], 0])+xwat*MV[H2Oi, 0])
 				
 				# total molecular concentration of seed components including water 
