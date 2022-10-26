@@ -200,7 +200,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc_sbc = np.sum(ppc, axis=1)
 
 		# loop through to plot
-		for i in range(self.e300r):
+		for i in range(np.min([self.e300r, len(self.ro_obj.names_of_comp)])):
 			
 			# get index
 			indx = np.where(ppc_t == ppc_ts[i])[0][0]
