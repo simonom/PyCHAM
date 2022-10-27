@@ -70,10 +70,10 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# self.wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
 	# yrec_p2w - record of concentration of components on 
-	#	the wall due to particle-wall deposition (molecules/cc)
+	#	the wall due to particle-wall deposition (# molecules/cm3)
 	# C_p2w - concentration of components on the wall due to 
 	#	particle-wall deposition, stacked by component first then by
-	#	size bin (molecules/cc)
+	#	size bin (# molecules/cm3)
 	# cham_env - chamber environmental conditions (temperature (K), 
 	# pressure (Pa) and relative humdity
 	# temp_now - chamber temperature (K)
@@ -98,7 +98,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 		rbou_rec[save_cnt, :] = rbou
 		
 		# record component concentrations on the wall due to particle loss to wall
-		# (molecules/cc (air))
+		# (# molecules/cm3 (air))
 		yrec_p2w[save_cnt, :] = C_p2w
 	
 	# estimate particle number size distributions ----------------------------------

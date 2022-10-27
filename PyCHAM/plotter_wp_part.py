@@ -28,7 +28,6 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
-import retr_out
 import numpy as np
 import scipy.constants as si
 
@@ -40,15 +39,39 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
-
-	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, yrec_p2w, PsatPa, OC, H2Oi, _, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	group_indx = self.ro_obj.gi
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	yrec_p2w = self.ro_obj.part_to_wall
+	PsatPa = self.ro_obj.vpPa
+	O_to_C = self.ro_obj.O_to_C
+	H2Oi = self.ro_obj.H2O_ind
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
+	
 
 	if (caller == 0):
 		plt.ion() # show results to screen and turn on interactive mode
@@ -81,8 +104,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.close() # close figure window
 					return()
 			
-			if (wall_on == 1):
-				# total concentration on wall (from particle deposition to wall) (molecules/cc)
+			if (wall_on > 0):
+				# total concentration on wall (from particle deposition to wall) (molecules/cm3)
 				conc = (yrec_p2w[:, indx_plot::num_comp]).sum(axis = 1)
 				
 			else:
@@ -102,7 +125,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 				
 			# concentration in ug/m3
-			conc = ((conc/si.N_A)*y_MW[indx_plot])*1.e12
+			conc = ((conc/si.N_A)*y_MW[0, indx_plot])*1.e12
 			# plot this component
 			ax0.plot(timehr, conc, '+', linewidth = 4., label = str(str(comp_names[indx_plot ]+' (wall (from particle deposition to wall))')))
 

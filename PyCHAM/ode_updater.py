@@ -709,7 +709,7 @@ def ode_updater(y, rindx,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
 					
-					if ((McMurry_flag > -1) and (self.wall_on == 1)): #if particle loss to walls turned on
+					if ((McMurry_flag > -1) and (self.wall_on > 0)): #if particle loss to walls turned on
 						# particle loss to walls
 						[N_perbin, 
 						y[num_comp:(num_comp)*(num_sb-self.wall_on+1)]] = wallloss.wallloss(

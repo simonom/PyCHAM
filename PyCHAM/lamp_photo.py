@@ -120,8 +120,14 @@ def lamp_photo(J, TEMP, self):
 	
 	# get UV-C transmission factor now
 	tf_UVCn = self.tf_UVC[(np.sum(self.tf_UVCt<=self.sumt)-1)]
-	if (254 in wl_chm and tf_UVCn != 1.):
-		act_chm[wl_chm == 254.] = act_chm[wl_chm == 254.]*tf_UVCn
+
+	if (tf_UVCn != 1.):
+		# get indices of UVC region (100-280nm)
+		UVCindx = np.zeros((wl_chm.shape[0]))
+		UVCindx[wl_chm>100.] += 1
+		UVCindx[wl_chm<280.] += 1
+		UVCindx = UVCindx == 2
+		act_chm[UVCindx] = act_chm[UVCindx]*tf_UVCn
 
 	# --------------------------------------------------------------
 	# in the below sections photolysis rates are calculated using either the
@@ -286,7 +292,8 @@ def lamp_photo(J, TEMP, self):
 		# photolysis rate for J<1> and J<2> (/s)
 		J[1] = sum(xsO3*qyO3*act_chm)
 		J[2] = sum(xsO3*qyO3P*act_chm)
-		
+		indx = wl_chm<264.
+
 		# --------------------------------------------------------------
 		# J<3> for H2O2 (hydrogen peroxide) photolysis: H2O2 = OH + OH
 		# cross-section file

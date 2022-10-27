@@ -54,7 +54,7 @@ coag_on = 1
 pconct = 0.0; 0.1; 25200.0; 6.48e4; 6.54e4
 pconc = 1.e4, 4.e3, 1.5e2, 8.0e0, 8.e-1, 0.0e-1, 0.e-3; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7; 2.e0, 1.e-1, 5.e-2, 6.e-3, 8.e-4, 3.0e-5, 3.e-7; 2.e3, 2.0e-1, 2.e-2, 6.e-2, 1.0e-2, 2.5e-4, 8.e-6; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7
 pcont = 0; 1; 1 ; 1 ; 1
-seed_name = core
+#seed_name = core
 # surface deposition of particles as a function of particle size taken from a mid-point estimate of Figure 6 of Tracy et al. (2002): https://doi.org/10.1016/S1352-2310(02)00157-7
 McMurry_flag = 0
 inflectDp = 2.e-7

@@ -1334,27 +1334,27 @@ class PyCHAM(QWidget):
 		self.e300 = QLineEdit(self)
 		self.e300.setText('Provide the top number of components contributing to particle-phase')
 		self.e300.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e300, 2, 1, 1, 1)
+		self.PARlayout.addWidget(self.e300, 3, 1, 1, 1)
 	
 		# button to plot particle-phase contributions
 		self.b300 = QPushButton(str('Particle-phase contributions (%)'))
 		self.b300.setToolTip('Show the contribution to particle-phase by the top contributors (number given in box above)')
 		self.b300.clicked.connect(self.on_click300)
 		#self.b300.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b300, 3, 0)
+		self.PARlayout.addWidget(self.b300, 4, 0)
 
 		# drop down button for type of contributors
 		self.b300a = QComboBox(self)
 		self.b300a.addItem('All components')
 		self.b300a.addItem('Excluding Seed and Water')
-		self.PARlayout.addWidget(self.b300a, 3, 1, 1, 1)
+		self.PARlayout.addWidget(self.b300a, 4, 1, 1, 1)
 
 		# button to plot particle-phase surface concentration
 		self.b301 = QPushButton(str('Particle surface area'))
 		self.b301.setToolTip('Graph the temporal profile of particle surface area')
 		self.b301.clicked.connect(self.on_click301)
 		#self.b301.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b301, 4, 0)
+		self.PARlayout.addWidget(self.b301, 5, 0)
 
 		# drop down button for type of surface area
 		self.b301a = QComboBox(self)
