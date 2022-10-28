@@ -95,7 +95,32 @@ def chem_scheme_SMILES_extr(self):
 		# extract the equation as a string ([0] extracts the equation section and 
 		# [1:-1] removes the bounding markers)
 		eqn = re.findall(eqn_markers, line)[0][1:-1].strip()
+
+		# ensure there are spaces either side of the = sign
+		if eqn[eqn.index('=')-1] != ' ':
+			eqn = str(eqn[0:eqn.index('=')] + ' ' + eqn[eqn.index('=')::])
+		if (len(eqn)-1>eqn.index('=')): # note that some equations do not contain reactants
+			if eqn[eqn.index('=')+1] != ' ':
+				eqn = str(eqn[0:eqn.index('=')+1] + ' ' + eqn[eqn.index('=')+1::])
 		
+		# ensure there are spaces either side of + signs
+		# number of +s
+		pcnt = eqn.count('+')
+		pindx = 0 # initiating index
+		
+		for i in range(pcnt): # loop through + signs
+		
+			pindx = eqn[pindx::].index('+') + pindx
+		
+			if (eqn[pindx-1] != ' '):
+				eqn = str(eqn[0:pindx] + ' ' + eqn[pindx::])
+				pindx+=1 # move index up
+			if (eqn[pindx+1] != ' '):
+				eqn = str(eqn[0:pindx+1] + ' ' + eqn[pindx+1::])
+			
+			# set new pindx to search from
+			pindx += 1
+			
 		eqn_split = eqn.split()
 		eqmark_pos = eqn_split.index('=')
 		# reactants with stoichiometry number and omit any photon
@@ -123,6 +148,9 @@ def chem_scheme_SMILES_extr(self):
 		# rate coefficient expression in a string
 		rate_ex = re.findall(rate_regex, line)[0][1:-1].strip()
 
+		# remove all white space in rate coefficient string
+		rate_ex = rate_ex.replace(' ', '')
+
 		# convert fortran-type scientific notation to python type
 		rate_ex = formatting.SN_conversion(rate_ex)
 		# convert the rate coefficient expressions into Python readable commands
@@ -131,6 +159,7 @@ def chem_scheme_SMILES_extr(self):
 		# store the reaction rate coefficient for this equation 
 		# (/s once any inputs applied)
 		reac_coef.append(rate_ex)
+		
 		# ----------------------------------------------------
 		
 		for reactant in reactants: # left hand side of equations (losses)

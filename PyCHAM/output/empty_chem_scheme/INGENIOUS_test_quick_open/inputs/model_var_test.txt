@@ -1,4 +1,4 @@
-res_file_name = INGENIOUS_test_full
+res_file_name = INGENIOUS_test_quick_open
 total_model_time = 1.728e5
 update_step = 6.e2
 recording_time_step = 6.e2
@@ -17,30 +17,30 @@ rh = 0.5
 wall_on = 1
 # note number of wall bins matches number of different mass transfer coefficients 
 # for gas-wall partitioning
-number_wall_bins = 2
+number_wall_bins = 1
 # O3 deposition velocity to soft furnishings is 0.15cm/s according to 
 # doi.org/10.1016/j.atmosenv.2021.118625.  The reference 
 # doi.org/10.1080/09593330.2000.9618931 (page 485) gives deposition velocities and
 # resulting deposition rates, demonstrating a conversion factor of cm/s to /s of
 # /56.  (0.15/56.) for ozone and (6.2e-3/56) for NO2, note the deposition velocity for NO2 
 # (6.2e-3 cm/s is taken from doi.org/10.1080/09593330.2000.9618931 (page 485))
-mass_trans_coeff = 2.7e-3, 1.1e-4
+#mass_trans_coeff = 2.7e-3, 1.1e-4
 # note that effective vapour pressure of O3 and NO2 on wall is set below
-eff_abs_wall_massC = 1.e1, 1.e1
+#eff_abs_wall_massC = 1.e1, 1.e1
 # effective vapour pressure of O3 and NO2 on their respective walls set to zero 
 # because partitioning treated as irreversible
-vol_Comp = NO2_wall1, O3_wall1, all_>0._wall2, NO2_wall2
-volP = 1.e20, 0., 1.e20, 0.
+#vol_Comp = NO2_wall1, O3_wall1, all_>0._wall2, NO2_wall2
+#volP = 1.e20, 0., 1.e20, 0.
 # note that inside const_infl, showering emissions (7am each day) are from:
 # doi.org/10.1111/ina.12811
 # and that cooking emission (6pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
 # and that cleaning emissions (8pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
-const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
-#const_infl = H2O
-#const_infl_t = 0., 25200., 6.48e4, 1.116e5, 1.512e5
-#Cinfl = 1384.8, 4269.8, 1384.8, 4269.8, 1384.8
+#const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
+const_infl = H2O
+const_infl_t = 0., 25200., 6.48e4, 1.116e5, 1.512e5
+Cinfl = 1384.8, 4269.8, 1384.8, 4269.8, 1384.8
 # note for particles, indoor emissions are from Figure 1 (c): https://dx.doi.org/10.1021/acs.est.0c00740
 # and these are added to a background (assuming windows open 7am-7pm particle concentration 
 # from Leeds Headingley Kerbside: https://uk-air.defra.gov.uk/data/show-datavis?q=4245365&type=auto)
@@ -51,6 +51,7 @@ coag_on = 1
 pconct = 0.0; 0.1; 2.52e4; 6.48e4; 6.54e4; 1.116e5; 1.512e5; 1.518e5
 pconc = 1.e4, 4.e3, 1.5e2, 8.0e0, 8.e-1, 0.0e-1, 0.e-3; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7; 2.e0, 1.e-1, 5.e-2, 6.e-3, 8.e-4, 3.0e-5, 3.e-7; 2.e3, 2.0e-1, 2.e-2, 6.e-2, 1.0e-2, 2.5e-4, 8.e-6; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7; 2.e0, 1.e-1, 5.e-2, 6.e-3, 8.e-4, 3.0e-5, 3.e-7; 2.e3, 2.0e-1, 2.e-2, 6.e-2, 1.0e-2, 2.5e-4, 8.e-6; 1.e0, 1.0e-1, 2.e-2, 2.5e-3, 3.0e-4, 0.e-5, 0.e-7
 pcont = 0; 1; 1; 1; 1; 1; 1; 1
+#seed_name = core
 # surface deposition of particles as a function of particle size taken from a mid-point estimate of Figure 6 of Tracy et al. (2002): https://doi.org/10.1016/S1352-2310(02)00157-7
 McMurry_flag = 0
 inflectDp = 2.e-7

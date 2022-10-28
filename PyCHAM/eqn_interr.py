@@ -136,6 +136,31 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 		# [1:-1] removes the bounding markers)
 		eqn = re.findall(eqn_markers, line)[0][1:-1].strip()
 		
+		# ensure there are spaces either side of the = sign
+		if eqn[eqn.index('=')-1] != ' ':
+			eqn = str(eqn[0:eqn.index('=')] + ' ' + eqn[eqn.index('=')::])
+		if (len(eqn)-1>eqn.index('=')): # note that some equations do not contain reactants
+			if eqn[eqn.index('=')+1] != ' ':
+				eqn = str(eqn[0:eqn.index('=')+1] + ' ' + eqn[eqn.index('=')+1::])
+		
+		# ensure there are spaces either side of + signs
+		# number of +s
+		pcnt = eqn.count('+')
+		plusindx = 0 # initiating index
+		
+		for i in range(pcnt): # loop through + signs
+		
+			plusindx = eqn[plusindx::].index('+') + plusindx
+		
+			if (eqn[plusindx-1] != ' '):
+				eqn = str(eqn[0:plusindx] + ' ' + eqn[plusindx::])
+				plusindx+=1 # move index up
+			if (eqn[plusindx+1] != ' '):
+				eqn = str(eqn[0:plusindx+1] + ' ' + eqn[plusindx+1::])
+			
+			# set new plusindx to search from
+			plusindx += 1
+		
 		eqn_split = eqn.split()
 		eqmark_pos = eqn_split.index('=')
 		# reactants with stoichiometry number and omit any photon
@@ -181,6 +206,9 @@ def eqn_interr(num_eqn, eqn_list, aqeqn_list, comp_name,
 		rate_regex = str(rate_coeff_start_mark + rate_coeff_end_mark)
 		# rate coefficient expression in a string
 		rate_ex = re.findall(rate_regex, line)[0][1:-1].strip()
+		
+		# remove all white space in rate coefficient string
+		rate_ex = rate_ex.replace(' ', '')
 
 		# convert fortran-type scientific notation to python type
 		rate_ex = formatting.SN_conversion(rate_ex)

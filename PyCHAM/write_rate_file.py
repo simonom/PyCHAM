@@ -92,46 +92,51 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	f.write('	# ------------------------------------------------------------------------\n')
 	f.write('\n')
 	
-	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors')
-	f.write('\n')
-	f.write('	# calculate any generic reaction rate coefficients given by chemical scheme\n')
-	f.write('\n')
-	if rrc:
-		f.write('	try:\n')
-		# code to calculate any generic rate coefficients given by chemical scheme file
-		for line in rrc:
-			f.write('		%s \n' %line)
+	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors\n')
+	# determine whether to bypass calculations because no chemical reactions were found
+	if (len(reac_coef_g)+len(reac_coef_aq) > 0):
+		
 		f.write('\n')
-		f.write('	except:\n')
-		f.write('		erf = 1 # flag error\n')
-		f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
+		f.write('	# calculate any generic reaction rate coefficients given by chemical scheme\n')
+		f.write('\n')
+		if rrc:
+			f.write('	try:\n')
+			# code to calculate any generic rate coefficients given by chemical scheme file
+			for line in rrc:
+				f.write('		%s \n' %line)
+			f.write('\n')
+			f.write('	except:\n')
+			f.write('		erf = 1 # flag error\n')
+			f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
 	
-	f.write('	# estimate and append photolysis rates\n')
-	f.write('	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)\n')
-	f.write('\n')
-	f.write('	if (self.light_stat_now == 0):\n')
-	f.write('		J = [0]*len(J)\n')
+		f.write('	# estimate and append photolysis rates\n')
+		f.write('	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)\n')
+		f.write('\n')
+		f.write('	if (self.light_stat_now == 0):\n')
+		f.write('		J = [0]*len(J)\n')
 
-	# calculate the rate coefficient for each equation
-	f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))
-	# BE NOTIFIED!!!: before writing the script, 'reac_coef' must be converted to 
-	# python-compatible format
-	f.write('	\n')	
-	f.write('	# reac_coef has been formatted so that python can recognize it\n')
-	f.write('	# gas-phase reactions\n')
-	f.write('	gprn = 0 # keep count on reaction number\n')
-	f.write('	try:\n') # in case there are any issues with calculating a rate coefficient
-	for eqn_key in range (len(reac_coef_g)):
-		f.write('		gprn += 1 # keep count on reaction number\n')
-		f.write('		rate_values[%s] = %s\n' %(eqn_key, reac_coef_g[eqn_key]))
-	f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
-	f.write('		erf = 1 # flag error\n')
-	f.write('		err_mess = str(\'Error: estimating reaction rate for reaction number \' + str(gprn) + \' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
-	f.write('	\n')
-	f.write('	# aqueous-phase reactions\n')
-	for eqn_key_aq in range (1, len(reac_coef_aq)+1):
-		f.write('	rate_values[%s] = %s\n' %(eqn_key+eqn_key_aq, reac_coef_aq[eqn_key_aq-1]))
-	f.write('	\n')
+		# calculate the rate coefficient for each equation
+		f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))
+		
+		f.write('	\n')
+		f.write('	# if reactions have been found in the chemical scheme\n')
+		f.write('	# gas-phase reactions\n')
+		f.write('	gprn = 0 # keep count on reaction number\n')
+		f.write('	try:\n') # in case there are any issues with calculating a rate coefficient
+		for eqn_key in range (len(reac_coef_g)):
+			f.write('		gprn += 1 # keep count on reaction number\n')
+			f.write('		rate_values[%s] = %s\n' %(eqn_key, reac_coef_g[eqn_key]))
+		f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
+		f.write('		erf = 1 # flag error\n')
+		f.write('		err_mess = str(\'Error: estimating reaction rate for reaction number \' + str(gprn) + \' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
+		f.write('	\n')
+		f.write('	# aqueous-phase reactions\n')
+		for eqn_key_aq in range (1, len(reac_coef_aq)+1):
+			f.write('	rate_values[%s] = %s\n' %(eqn_key+eqn_key_aq, reac_coef_aq[eqn_key_aq-1]))
+		f.write('	\n')
+	
+	else: # if no reactions found
+		f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))		
 	f.write('	return(rate_values, erf, err_mess)\n')
 	f.close()
 

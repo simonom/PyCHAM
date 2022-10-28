@@ -55,10 +55,11 @@ def xml_interr(xml_name):
 		comp_name[i] = a[i]['@species_name']
 		if (comp_name[i] == ''): # nothing to register here
 			continue
-
+		
 		if ("smiles" in a[i]):
 			comp_smil[i] = a[i]['smiles']
 		else: # if no SMILE string explicitly given
+		
 			succ = 0 # assume no success
 			if (comp_name[i] == 'O3'):
 				comp_smil[i] = '[O-][O+]=O'
