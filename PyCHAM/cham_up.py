@@ -141,7 +141,7 @@ def cham_up(sumt, Pnow,
 	# -----------------------------------------------------------------------
 	
 	# check on dilution factor setting --------------------------
-	self.dil_fac_cnt =  sum(self.dil_fact <= (sumt+tnew))-1
+	self.dil_fac_cnt =  sum(self.dil_fact <= (sumt))-1
 
 	# update dilution factor
 	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
@@ -386,7 +386,7 @@ def cham_up(sumt, Pnow,
 		
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
-		
+			
 			if (gpp_stab != -1 or pcontf == 1): # if no linear interpolation required, or injection continuous
 				pconcn = pconc[:, seedt_cnt]
 				mean_radn = mean_rad[:, seedt_cnt]
@@ -411,22 +411,15 @@ def cham_up(sumt, Pnow,
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
-
-				if (seedt_cnt < (pconct.shape[1]-1)):
-					seedt_cnt += 1
-				else:
-					seedt_cnt = -1 # reached end
-
-				# check whether changes occur during proposed integration time step
-				# and that time step has not been forced to reduce due to unstable ode solvers
-				if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
-					# if yes, then reset integration time step so that next step coincides 
-					# with change
-					tnew = pconct[0, seedt_cnt]-sumt
-					bc_red = 1 # flag for time step reduction due to boundary conditions
+					
+				# turn off flag for ongoing injection of particles
+				self.pcont_ongoing = 0
 		
-			# account for continuous change in seed particles
+			# account for new continuous change in seed particles
 			if (pcontf == 1):
+				
+				# turn on flag for ongoing injection of particles
+				self.pcont_ongoing = 1
 				
 				# seed particle number concentration integrated over proposed 
 				# time step (# particles/cm3)
@@ -439,27 +432,49 @@ def cham_up(sumt, Pnow,
 				stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 				seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
 			
-				# check whether we've reached the end of this continuous influx period
-
-				# if continuous influx is the final state, then continue until simulation ends
-				if (seedt_cnt != pconct.shape[1]-1 and seedt_cnt != -1):
-					if ((sumt+tnew) >= pconct[0, seedt_cnt+1]): # if next state reached
-						if (seedt_cnt < (pconct.shape[1]-1)): # if next state isn't the final state
-							seedt_cnt += 1
-						else: # if next state is final state
-							seedt_cnt = -1 # reached final state
-				
-						
-						# check whether changes occur during proposed integration time step
-						# and that time step has not been forced to reduce due to unstable ode solvers
-						if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
-							# if yes, then reset integration time step so that next step coincides 
-							# with change
-							tnew = pconct[0, seedt_cnt]-sumt
-							bc_red = 1 # flag for time step reduction due to boundary conditions
-						
+			# move count on particle injections up by one
+			if (seedt_cnt < (pconct.shape[1]-1)):
+				seedt_cnt += 1
+			else:
+				seedt_cnt = -1 # reached end
+	
+		# check whether changes occur during proposed integration time step
+		# and that time step has not been forced to reduce due to unstable ode solvers
+		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
+			# if yes, then reset integration time step so that next step coincides 
+			# with change
+			tnew = pconct[0, seedt_cnt]-sumt
+			bc_red = 1 # flag for time step reduction due to boundary conditions
+			
+	# account for ongoing continuous influx of particles
+	# account for new continuous change in seed particles
+	if (self.pcont_ongoing == 1):
 		
-
+		if (seedt_cnt != -1):
+			pconcn = pconc[:, seedt_cnt-1]
+			mean_radn = mean_rad[:, seedt_cnt-1]
+			stdn = std[:, seedt_cnt-1]		
+		
+			# injected seed particle number concentration integrated over proposed 
+			# time step (# particles/cm3)
+			pconcn = pconc[:, seedt_cnt-1]*tnew
+		
+		if (seedt_cnt == -1):
+			pconcn = pconc[:, -1]
+			mean_radn = mean_rad[:, -1]
+			stdn = std[:, -1]		
+		
+			# injected seed particle number concentration integrated over proposed 
+			# time step (# particles/cm3)
+			pconcn = pconc[:, -1]*tnew
+		
+		[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
+		_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
+		N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
+		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
+		stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
+		seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+		
 	# ----------------------------------------------------------------------------------------------------------
 
 	# check on continuous influx of gas-phase components ----------------------------------------------

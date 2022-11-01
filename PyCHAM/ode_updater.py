@@ -330,6 +330,8 @@ def ode_updater(y, rindx,
 	pconcn_frac = 0.
 	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
 	save_cnt_chck = 1 # counting recording steps for time interval check
+	# turn off flag for ongoing injection of particles
+	self.pcont_ongoing = 0
 	
 	# find out what to do with the gas-wall partitioning coefficient,
 	# note that self.kw and self.Cw are spread over wall bins in rows and components 
@@ -403,6 +405,27 @@ def ode_updater(y, rindx,
 			# if integration interval decreased, reset concentrations to those at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
+			
+			# record output if on the first attempt at solving this time interval, 
+			# note that recording here in this way means we include any
+			# instantaneous changes at this time step without interpolation to
+			# smaller instantaneous changes (when interpolation forced due to 
+			# instability)
+			# note also that recording before calling cham_up means that any instantaneous 
+			# changes occurring during this upcoming time step are not recorded at the very start 
+			# of the time step
+			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
+				
+				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
+				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
+				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
+				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
+				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
+				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
+				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
+				# prepare for recording next point
+				save_cnt += 1
+
 			
 			# update chamber variables
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
@@ -493,24 +516,7 @@ def ode_updater(y, rindx,
 						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
 							nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
 							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
-			
-			# record output if on the first attempt at solving this time interval, 
-			# note that recording here in this way means we include any
-			# instantaneous changes at this time step without interpolation to
-			# smaller instantaneous changes (when interpolation forced due to 
-			# instability)
-			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
-				
-				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
-				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
-				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
-				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
-				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
-				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
-				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
-				# prepare for recording next point
-				save_cnt += 1
-			
+						
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 

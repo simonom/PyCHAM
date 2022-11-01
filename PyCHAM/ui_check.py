@@ -119,12 +119,12 @@ def ui_check(self):
 	
 	# check on gas-wall partitioning inputs ---------------------------------
 	# check that number of effective absorbing masses for walls matches number of walls
-	if len(self.Cw)!=self.wall_on:
+	if len(self.Cw)!=self.wall_on and self.wall_on > 0:
 		err_mess = str('Error - the number of effective absorbing masses for walls (' + str(len(self.Cw)) + ') does not match the number of walls (' + str(self.wall_on) + '), and it must; please check the guidelines in README')
 		em_flag = 2
 	
 	# check that number of gas-to-wall mass transfer coefficients matches number of walls
-	if len(self.kw)!=self.wall_on:
+	if len(self.kw)!=self.wall_on and self.wall_on > 0:
 		err_mess = str('Error - the number of mass transfer coefficients for gas-wall partitioning (' + str(len(self.kw)) + ') does not match the number of walls (' + str(self.wall_on) + '), and it must; please check the guidelines in README')
 		em_flag = 2
 	
