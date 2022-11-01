@@ -1,6 +1,6 @@
 # inputs for autumn 2022 campaign in HIRAC, see notes in shared document:
 # https://docs.google.com/document/d/1yPCQVAdOFtAsjP7foiDpe3KZrRMx1slKQbOLSR7qLC4/edit
-res_file_name = HIRAC_AP_tf1.
+res_file_name = HIRAC_AP_CH4
 total_model_time = 1.e4
 update_step = 60.
 recording_time_step = 60.
@@ -30,7 +30,7 @@ rh = 0.5
 # 50 ppb O3 is about average annual concentration for AURN measurement at Leeds Town Centre
 # APINENE measured at a maximum of 0.7 ppb in tropical forest: doi.org/10.5194/acp-7-4095-2007
 # APINENE measured at 1 ppb in marine pine forest: https://doi.org/10.1016/j.scitotenv.2020.144129
-C0 =   50.,     10.,  0.,   0.,  0.
+C0 =   50.,     10.,  0.,   9.276e4,  0.
 Comp0 = O3, APINENE,  CO,  CH4, NO2
 const_comp = H2O
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
@@ -42,10 +42,6 @@ volP = 1.e30, 0., 0., 1.e30, 0.
 number_wall_bins = 2
 mass_trans_coeff = 4.e-5, 5.e-2 
 eff_abs_wall_massC = 1., 1.
-# set to -1 to invoke Huang et al. 2018 treatment of gas-wall partitioning coefficient
-mass_trans_coeff = 1.e-4
-# based on observed loss of ozone and alpha-pinene in control experiments
-eff_abs_wall_massC = 1.e1
 # dilution factor from auxiliary mechanism section of https://www.eurochamp.org/simulation-chambers/HIRAC 
 dil_fac = 4.e-5
-tracked_comp = OH
+tracked_comp = OH, HO2, PINALO2

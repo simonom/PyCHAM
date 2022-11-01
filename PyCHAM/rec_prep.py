@@ -28,6 +28,8 @@ import rrc_calc
 import cham_up
 import scipy.constants as si
 import importlib
+import dydt_rec
+import act_coeff_update
 
 # define function
 def rec_prep(nrec_step, 
@@ -46,7 +48,7 @@ def rec_prep(nrec_step,
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, self):
+	tot_in_res_indx, chamSA, chamV, wat_hist, self):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -169,6 +171,7 @@ def rec_prep(nrec_step,
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
 	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
+	# wat_hist - flag for water history with respect to particles
 	# ----------------------------------------------------------------
 
 	# note that instaneous changes occur before recording --------------------
@@ -265,8 +268,8 @@ def rec_prep(nrec_step,
 		kimt = kelv_fac = 0.
 	
 	# update reaction rate coefficients
-	rrc = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, Pnow, 
-			Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
+	[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
+				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 
@@ -278,6 +281,25 @@ def rec_prep(nrec_step,
 	cham_env[0, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
 	
 	# --------------------------------------------------------------------------------
+
+	# relative humidity now
+	RH0 = cham_env[0, 2]
+
+	# update particle-phase activity coefficients, note the output,
+	# note that if ODE solver unstable, then y resets to y0 via
+	# the cham_up module prior to this call
+	[act_coeff, wat_hist, RHn, y, 
+	dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
+	wat_hist, act_coeff, num_comp, (num_sb-self.wall_on))
+
+	# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
+	# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
+	if (self.testf != 5):
+		importlib.reload(dydt_rec) # import most recent version
+		dydt_cnt = 0 # index for row to record on
+		self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
+				nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
+				kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
 		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, cham_env[0, 2], 

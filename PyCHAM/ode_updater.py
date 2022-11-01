@@ -364,7 +364,7 @@ def ode_updater(y, rindx,
 	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, self)
+	tot_in_res_indx, chamSA, chamV, wat_hist, self)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -406,6 +406,21 @@ def ode_updater(y, rindx,
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
 			
+			# for change tendencies, t=0 recording done inside rec_prep
+			# record any change tendencies of specified components after t=0
+			if (len(self.dydt_vst) > 0 and save_cntf == 0):
+				if ((sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
+					print(sumt, save_cnt)
+					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
+						dydt_cnt = save_cnt-1
+
+					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
+					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
+					if (self.testf != 5):
+						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
+							nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
+							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
+						
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
 			# instantaneous changes at this time step without interpolation to
@@ -488,7 +503,7 @@ def ode_updater(y, rindx,
 				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
 			
-			# reaction rate coefficient
+			# reaction rate coefficient going into this time step
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
 			
@@ -501,22 +516,6 @@ def ode_updater(y, rindx,
 			colptrs, (num_sb-self.wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 			
 			
-			# for change tendencies, do want to save from t=0
-			# record any change tendencies of specified components
-			if (len(self.dydt_vst) > 0 and save_cntf == 0):
-				if (sumt == 0. or (sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
-					if (sumt == 0.):
-						dydt_cnt = save_cnt-2
-					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
-						dydt_cnt = save_cnt-1
-					
-					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
-					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-							nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
-							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
-						
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 

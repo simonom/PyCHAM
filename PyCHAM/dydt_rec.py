@@ -23,7 +23,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2022-11-01 15:55:31.232476
+# File Created at 2022-11-01 19:39:18.303786
 
 import numpy as np 
 
@@ -49,6 +49,10 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_s
 		# loop through relevant reactions 
 		for i in dydt_rec[0, 0:-2]: # final two rows for particle- and wall-partitioning 
 			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
+			print(rindx[i, 0:nreac[i]])
+			print(y[rindx[i, 0:nreac[i]]])
+			print(rstoi[i, 0:nreac[i]])
+			print(reac_coef[i])
 			# estimate gas-phase change tendency for each reaction involving this component 
 			gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i] 
 			dydt_rec[step+1, reac_count] += reac_sign[reac_count]*((gprate))
