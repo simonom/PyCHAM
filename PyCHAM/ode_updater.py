@@ -410,7 +410,7 @@ def ode_updater(y, rindx,
 			# record any change tendencies of specified components after t=0
 			if (len(self.dydt_vst) > 0 and save_cntf == 0):
 				if ((sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
-					print(sumt, save_cnt)
+					
 					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
 						dydt_cnt = save_cnt-1
 

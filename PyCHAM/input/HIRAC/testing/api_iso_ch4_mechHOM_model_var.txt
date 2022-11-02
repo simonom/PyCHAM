@@ -1,6 +1,6 @@
 # inputs for autumn 2022 campaign in HIRAC, see notes in shared document:
 # https://docs.google.com/document/d/1yPCQVAdOFtAsjP7foiDpe3KZrRMx1slKQbOLSR7qLC4/edit
-res_file_name = HIRAC_AP_CH4
+res_file_name = HIRAC_AP_CO
 total_model_time = 1.e4
 update_step = 60.
 recording_time_step = 60.
@@ -30,7 +30,7 @@ rh = 0.5
 # 50 ppb O3 is about average annual concentration for AURN measurement at Leeds Town Centre
 # APINENE measured at a maximum of 0.7 ppb in tropical forest: doi.org/10.5194/acp-7-4095-2007
 # APINENE measured at 1 ppb in marine pine forest: https://doi.org/10.1016/j.scitotenv.2020.144129
-C0 =   50.,     10.,  0.,   9.276e4,  0.
+C0 =   50.,     10.,  9.360e3,   0.,  0.
 Comp0 = O3, APINENE,  CO,  CH4, NO2
 const_comp = H2O
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;

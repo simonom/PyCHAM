@@ -331,7 +331,8 @@ def plotter_rad_pool(self):
 	group_indx = self.ro_obj.gi
 	OC = self.ro_obj.O_to_C
 	PsatPa = self.ro_obj.vpPa
-	gen_num = self.ro_obj.gen_numbers
+	gen_num = np.zeros((len(self.ro_obj.gen_numbers), 1))
+	gen_num[:, 0] = self.ro_obj.gen_numbers
 	
 	if (self.rad_mark == 0): # if alkyl peroxy radicals
 		# get RO2 indices
@@ -358,7 +359,7 @@ def plotter_rad_pool(self):
 	y_rad = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
 	
 	# isolate generations of radicals
-	gen_num = gen_num[indx_plot]
+	gen_num = gen_num[indx_plot, 0]
 
 	# prepare for fractional contribution
 	y_radf = np.zeros((y_rad.shape[0], y_rad.shape[1]))
