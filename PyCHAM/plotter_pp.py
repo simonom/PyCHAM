@@ -49,16 +49,22 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# get required variables from self
 	wall_on = self.ro_obj.wf
-	yrec = self.ro_obj.yrec
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
 	num_comp = self.ro_obj.nc
 	num_sb = self.ro_obj.nsb
-	Nwet = self.ro_obj.Nrec_wet
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
 	rel_SMILES = self.ro_obj.rSMILES
 	y_MW = self.ro_obj.comp_MW
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
@@ -103,11 +109,14 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			
 			import scipy.constants as si # for scientific constants
 			
+			yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+			yrec[:, :] = self.ro_obj.yrec[:, :]
+			
 			# particle-phase concentrations of all components (# molecules/cm3)
 			if (self.ro_obj.wf > 0): # wall on
-				ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+				ppc = yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
 			if (self.ro_obj.wf == 0): # wall off
-				ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
+				ppc = yrec[:, self.ro_obj.nc::]
 			
 			# particle-phase concentration of this component over all size bins (# molecules/cm3)
 			conc = np.zeros((ppc.shape[0], self.ro_obj.nsb-self.ro_obj.wf))
@@ -169,9 +178,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		import scipy.constants as si
 		# particle-phase concentrations of all components (# molecules/cm3)
 		if (self.ro_obj.wf > 0): # wall on
-			ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+			ppc = yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
 		if (self.ro_obj.wf == 0): # wall off
-			ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
+			ppc = yrec[:, self.ro_obj.nc::]
 
 		# tile molar weights over size bins and times
 		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
@@ -226,9 +235,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 		# particle-phase concentrations of all components (# molecules/cm3)
 		if (self.ro_obj.wf > 0): # wall on
-			ppc = self.ro_obj.yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
+			ppc = yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
 		if (self.ro_obj.wf == 0): # wall off
-			ppc = self.ro_obj.yrec[:, self.ro_obj.nc::]
+			ppc = yrec[:, self.ro_obj.nc::]
 
 		for i in seedi: # loop through seed components
 			ppc[:, i::self.ro_obj.nc] = 0. # zero seed
@@ -564,7 +573,7 @@ def part_mass_vs_time_sizeseg(self):
 	# inside each size bound
 
 	# concentrations of components in particles (# molecules/cm3)
-	yp = self.ro_obj.yrec[:, self.ro_obj.nc:self.ro_obj.nc*(num_asb+1)]
+	yp = yrec[:, self.ro_obj.nc:self.ro_obj.nc*(num_asb+1)]
 	# zero water
 	yp[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0
 
@@ -709,7 +718,7 @@ def part_area_vs_time_sizeseg(self):
 		psb_dub[i] = psb_dub[i]*1.e3
 
 	# get particle-phase concentrations (# molecules/cm3)
-	yp = self.ro_obj.yrec[:, self.ro_obj.nc:(self.ro_obj.nc*(num_asb+1))]
+	yp = yrec[:, self.ro_obj.nc:(self.ro_obj.nc*(num_asb+1))]
 	
 	# zero water
 	yp[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0.
@@ -727,7 +736,7 @@ def part_area_vs_time_sizeseg(self):
 	yp[Nrec_wet_rep>0] = yp[Nrec_wet_rep>0]/Nrec_wet_rep[Nrec_wet_rep>0]
 	yp[Nrec_wet_rep == 0] = 0.
 	
-	vp = np.zeros((self.ro_obj.yrec.shape[0], num_asb))
+	vp = np.zeros((yrec.shape[0], num_asb))
 	
 	# sum over components
 	for i in range(num_asb):
