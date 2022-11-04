@@ -40,9 +40,31 @@ def plotter(caller, dir_path, atom_name, atom_num, self): # define function
 	# self - reference to GUI
 	# --------------------------------------------------------------------------
 	
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, SMILES, 
-		y_mw, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, _, _, _, _, RO2i, _, _) = retr_out.retr_out(dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	Cfac = self.ro_obj.cfac
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	x = self.ro_obj.cen_size
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	SMILES = self.ro_obj.rSMILES
+	y_mw = self.ro_obj.comp_MW
+	y_MV = self.ro_obj.comp_MV
+	space_mode = self.ro_obj.spacing
+	H2Oi = self.ro_obj.H2O_ind
+	PsatPa = self.ro_obj.vpPa
+	seedi = self.ro_obj.seed_ind
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	OC = self.ro_obj.O_to_C
+	RO2i = self.ro_obj.gi.RO2i
 	
 	# empty lists to contain results
 	cnt_list = []
