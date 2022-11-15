@@ -122,10 +122,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 			dd[0, 0] += self.Cinfl_H2O_now
 		# check for continuous dilution of chamber
 		if (self.dil_fac_now > 0):
-			if (self.wall_on == 1):
-				dd[0:-1, 0] -= y[0:-1, 0]*self.dil_fac_now
-			else:
-				dd[:, 0] -= y[:, 0]*self.dil_fac_now
+			dd[0:num_sb+1, 0] -= y[0:num_sb+1, 0]*self.dil_fac_now
 				
 		# gas-particle partitioning-----------------
 		

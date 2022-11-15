@@ -1,0 +1,6 @@
+* Reaction definitions. ;
+*;
+#EQUATIONS
+{36.} O3 = O1D : J(1) ;
+{37.} NO2 = NO2 : J(1) ;
+{38.} APINENE = APINENE : J(1) ;

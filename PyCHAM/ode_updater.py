@@ -73,7 +73,7 @@ def ode_updater(y, rindx,
 	jac_den_indx_aq, jac_indx_aq, y_arr_aq, y_rind_aq, 
 	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
-	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, C_p2w, 
+	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
 	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 	OC, wat_hist, Pybel_objects, pcont, NOi, 
@@ -244,7 +244,7 @@ def ode_updater(y, rindx,
 	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
 	# corei - index of core component
 	# ser_H2O - whether to serialise the gas-particle partitioning of water
-	# C_p2w - concentration of components on the wall due to particle
+	# self.C_p2w - concentration of components on the wall due to particle
 	# deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
@@ -287,7 +287,7 @@ def ode_updater(y, rindx,
 	# self.tf_UVC - transmission factor for 254 nm wavelength light
 	# tempt_cnt # count on chamber temperatures
 	# ------------------------------------------------------------
-
+	
 	# start timer
 	st_time = time.time()
 
@@ -302,6 +302,9 @@ def ode_updater(y, rindx,
 	else:
 		seedt_cnt = 0
 	
+	# current status of lights
+	self.light_stat_now = self.light_stat[light_time_cnt]
+
 	# current status of whether injection of particles instantaneous or continuous,
 	# if not stated assume instantaneous
 	pcontf = 0
@@ -348,8 +351,8 @@ def ode_updater(y, rindx,
 	# in this call but are recorded below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	yrec_p2w, temp_now, cham_env, Pnow, 
-	RHn, Cinfl_now, tot_in_res_ft] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
+	temp_now, cham_env, Pnow, 
+	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
 	rstoi, pindx, pstoi, nprod, nreac, 
 	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
@@ -361,7 +364,7 @@ def ode_updater(y, rindx,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
-	C_p2w, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
+	RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self)
@@ -381,7 +384,7 @@ def ode_updater(y, rindx,
 		wat_hist0 = wat_hist # remember water history flag at start of integration step
 		RH0 = RHn # relative humidity at start of integration step
 		Pnow0 = Pnow # pressure (Pa)
-		
+
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
 		tempt_cnt0 = tempt_cnt
@@ -432,12 +435,12 @@ def ode_updater(y, rindx,
 			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
-				x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, trec, yrec, 
+				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
 				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
-				yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
+				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
 
@@ -714,16 +717,15 @@ def ode_updater(y, rindx,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
 					
-					if ((McMurry_flag > -1) and (self.wall_on > 0)): #if particle loss to walls turned on
-						# particle loss to walls
-						[N_perbin, 
-						y[num_comp:(num_comp)*(num_sb-self.wall_on+1)]] = wallloss.wallloss(
+					# if particle loss to walls turned on, account for this now
+					if ((McMurry_flag > -1) and (self.wall_on > 0)):
+						[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)]] = wallloss.wallloss(
 							N_perbin.reshape(-1, 1), 
 							y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], Gi, eta_ai,
- 							x*2.0e-6, y_mw, 
-							Varr*1.0e-18, (num_sb-self.wall_on), num_comp, temp_now, update_count, 
+ 							x*2.e-6, y_mw, 
+							Varr*1.e-18, (num_sb-self.wall_on), num_comp, temp_now, update_count, 
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
-							0, p_char, e_field, (num_sb-self.wall_on), C_p2w)
+							0, p_char, e_field, (num_sb-self.wall_on), self)
 			
 				if (nucv1 > 0.): # nucleation
 					
@@ -811,12 +813,12 @@ def ode_updater(y, rindx,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
-			x2, rbou_rec, yrec_p2w, cham_env, tot_in_res_ft] = rec.rec(save_cnt-1, 
+			x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, 
 			trec, yrec, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
 			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
 			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
-			yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, tot_in_res_ft, self)
+			cham_env, temp_now, Pnow, tot_in_res, self)
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):
@@ -842,9 +844,8 @@ def ode_updater(y, rindx,
 	
 	# save results
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
-		num_comp, Cfactor_vst, 0, 
-		num_sb, y_mw, MV, time_taken, 
+		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, yrec_p2w, rel_SMILES, OC, H2Oi, 
-		siz_str, cham_env, tot_in_res_ft, self)
-	return()
+		comp0, rel_SMILES, OC, H2Oi, siz_str, cham_env, self)
+	
+	return() # end of function

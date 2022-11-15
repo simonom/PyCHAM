@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 
 def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t, 
 			inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, testf, p_char, 
-			e_field, num_asb, C_p2w):
+			e_field, num_asb, self):
 
 	# inputs:----------------------------------------------------------
 	
@@ -38,7 +38,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# (# particle/cm3 (air))
 	# Cn - particle phase concentration per component per size bin
 	# after a time step over which gas phase reaction and 
-	# gas-particle partitioning have occurred (molecules/cc (air))
+	# gas-particle partitioning have occurred (# molecules/cm3 (air))
 	# Gi - Cunningham slip-correction factor (dimensionless)
 	# eta_ai - dynamic viscosity of air (g/m.s)
 	# Dp - particle diameters (m)
@@ -58,9 +58,10 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# num_asb - number of actual particle size bins
-	# C_p2w - concentration of components on the wall due to 
+	# self.C_p2w - concentration of components on the wall due to 
 	#	particle-wall loss, stacked by component first then by
 	#	size bin (# molecules/cm3)
+	# self - reference to PyCHAM	
 	# ----------------------------------------------------------------
 	if (Rader == 0): # manual input of wall loss rate
 		
@@ -186,10 +187,10 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	Cn -= delC # new particle-phase concentrations of components (# molecules/cm3)
 	# wall concentrations of components deposited through particle 
 	# loss to wall (# molecules/cm3)
-	C_p2w += delC
+	self.C_p2w += delC
 	
 	# remove particles and their components if particle number negative
-	ish = np.array((np.where(Pn<1.0e-8)))
+	ish = np.array((np.where(Pn<1.e-8)))
 	for i in ish[0, :]:
 		Pn[i] = 0.
 		Cn[nc*(i):nc*(i+1)] = 0.

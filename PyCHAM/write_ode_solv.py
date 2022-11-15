@@ -278,16 +278,11 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 
 	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
-		f.write('		if (self.wall_on > 0): # if wall on\n')
-		f.write('			df_indx = np.ones((len(dd)-num_comp)).astype(\'int\') # index for estimating dilution factors\n')
-		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
-		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('			dd[0:-num_comp, 0][df_indx] -= y[0:-num_comp, 0][df_indx]*1.*self.dil_fac_now\n')
-		f.write('		if (self.wall_on == 0): # if wall off\n')
-		f.write('			df_indx = np.ones((len(dd))).astype(\'int\') # index for estimating dilution factors\n')
-		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
-		f.write('			df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('			dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac_now\n')
+		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') # index for estimating dilution factors\n')
+		f.write('		df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
+		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0 # cannot dilute what is on wall \n')
+		f.write('		df_indx = df_indx==1 # transform to Boolean array \n')
+		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac_now\n')
 		f.write('		\n')
 		
 	# note the following needs two indents (as for the reaction section), so that it

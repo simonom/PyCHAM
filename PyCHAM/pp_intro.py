@@ -140,7 +140,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		upper_bin_rad_amp = 1.e6
 		# empty array for concentration of components on wall due to 
 		# particle deposition to wall (# molecules/cm3)
-		C_p2w  = 0.
+		self.C_p2w  = 0.
 
 	else: # get the particle number size distribution from inputs
 		[N_perbin, x, rbou, Vbou, Varr, 
@@ -167,7 +167,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		Vol0[:] = Varr[:]
 		# empty array for concentration of components on wall due to 
 		# particle deposition to wall (# molecules/cm3)
-		C_p2w = np.zeros((num_asb*num_comp))
+		self.C_p2w = np.zeros((num_asb*num_comp))
 	
 	if (self.wall_on > 0):
 		num_sb = num_asb+self.wall_on  # account for wall
@@ -319,4 +319,4 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	np_sum = 0.
 	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
-			upper_bin_rad_amp, np_sum, C_p2w)
+			upper_bin_rad_amp, np_sum)

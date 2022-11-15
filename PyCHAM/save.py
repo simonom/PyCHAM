@@ -31,8 +31,8 @@ from shutil import copyfile
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, yrec_p2w, rel_SMILES, OC, H2Oi,
-	siz_str, cham_env, tot_in_res_ft, self):
+	indx_plot, comp0, rel_SMILES, OC, H2Oi,
+	siz_str, cham_env, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -68,9 +68,9 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# standard results plot
 	# comp0 - names of components to plot gas-phase concentration temporal profiles of in 
 	# standard results plot
-	# yrec_p2w - concentration of components on the wall due to 
+	# self.yrec_p2w - concentration of components on the wall due to 
 	#	particle-wall loss, stacked by component first then by
-	#	size bin (molecules/cm3)
+	#	size bin (# molecules/cm3)
 	# self.sch_name - path to chemical scheme file
 	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings for components in chemical scheme
@@ -84,7 +84,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# pressure (Pa) and relative humidity
 	# self.RO2_indices[:, 1] - alkyl peroxy radical indices
 	# self.RO_indx - alkoxy radical indices
-	# tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
+	# self.tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
@@ -206,7 +206,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	if ((numsb-self.wall_on) > 0): # if particles present
 	
 		# saving the concentration of components on the wall due to particle deposition to wall
-		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (# molecules/cm3 (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
+		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), self.yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (# molecules/cm3 (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
 	
 		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
 				header=('particle number concentration assuming water removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
@@ -221,7 +221,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 				header=str('particle size bin bounds (um), with size bins represented by columns and their number (starting at 1 and in line with the lower bound) given in second line of header, per time step which is is represented by rows and corresponding times given in the time output file \n'+x2_header))		
 	
 	
-	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), tot_in_res_ft, delimiter=',',
+	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), self.tot_in_res_ft, delimiter=',',
 				header=str('the total concentration (ug/m3) of injected (through initial gas-phase concentration, instantaneous and/or continuous gas-phase influx) components, with component index (relative to all components) in the first row and its cumulative injected concentrations in following rows'))
 
 	# this save added on 05/05/2022
@@ -284,14 +284,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		spacing = space_mode
 		plot_indx = indx_plot
 		init_comp = comp0
-		part_to_wall = yrec_p2w
+		part_to_wall = self.yrec_p2w
 		vpPa = self.Psat_Pa_rec
 		O_to_C = OC.tolist()
 		H2O_ind = H2Oi
 		seed_ind = self.seedi.tolist()
 		siz_struc = siz_str
 		env_cond = cham_env
-		total_influx = tot_in_res_ft
+		total_influx = self.tot_in_res_ft
 	self.ro_obj = ro_outputs() # create object to hold outputs
 		
 	return()

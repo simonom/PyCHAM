@@ -31,8 +31,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
 	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
-	yrec_p2w, C_p2w, cham_env, temp_now, Pnow, tot_in_res, 
-	tot_in_res_ft, self):
+	cham_env, temp_now, Pnow, tot_in_res, self):
 	
 	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -69,9 +68,9 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# rbou - size bin radius boundaries (um)
 	# self.wall_on - marker for whether wall turned on
 	# rbou_rec - size bin radius boundary record (um)
-	# yrec_p2w - record of concentration of components on 
+	# self.yrec_p2w - record of concentration of components on 
 	#	the wall due to particle-wall deposition (# molecules/cm3)
-	# C_p2w - concentration of components on the wall due to 
+	# self.C_p2w - concentration of components on the wall due to 
 	#	particle-wall deposition, stacked by component first then by
 	#	size bin (# molecules/cm3)
 	# cham_env - chamber environmental conditions (temperature (K), 
@@ -79,7 +78,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# temp_now - chamber temperature (K)
 	# Pnow - chamber pressure (Pa)
 	# tot_in_res - cumulative influx of injected components (ug/m3)
-	# tot_in_res_ft - record of continuous influx of injected 
+	# self.tot_in_res_ft - record of continuous influx of injected 
 	#	components (ug/m3)
 	# self - reference to program
 	# --------------------------------------------------------------------
@@ -99,7 +98,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 		
 		# record component concentrations on the wall due to particle loss to wall
 		# (# molecules/cm3 (air))
-		yrec_p2w[save_cnt, :] = C_p2w
+		self.yrec_p2w[save_cnt, :] = self.C_p2w
 	
 	# estimate particle number size distributions ----------------------------------
 	Vnew = np.zeros((num_sb-self.wall_on))
@@ -128,9 +127,8 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# --------------------------------------------------------------------------------
 
 	# cumulative influx of injected components (ug/m3)
-	tot_in_res_ft[save_cnt+1, :] += tot_in_res
+	self.tot_in_res_ft[save_cnt+1, :] += tot_in_res
 
 	save_cntf = 1 # flag for increasing number of recordings 
 
-	return(trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, x2, rbou_rec, 
-		yrec_p2w, cham_env, tot_in_res_ft)
+	return(trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, x2, rbou_rec, cham_env)

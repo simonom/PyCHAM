@@ -49,6 +49,8 @@ def plotter(caller, dir_path, uc, self):
 	num_sb = self.ro_obj.nsb
 	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
 	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
 	rel_SMILES = self.ro_obj.rSMILES
@@ -166,12 +168,10 @@ def plotter(caller, dir_path, uc, self):
 	if (num_asb > 0): # if size bins present		
 
 		if (timehr.ndim == 0): # occurs if only one time step saved
-			Ndry = np.array(Ndry.reshape(1, num_asb))
-			x = np.array(x.reshape(1, num_asb))
+			Nwet = np.array(Nwet.reshape(1, num_asb))
 			rbou_rec = np.array(rbou_rec.reshape(1, num_sb))
 		if (num_asb == 1): # just one particle size bin (wall included in num_sb)
-			Ndry = np.array(Ndry.reshape(len(timehr), num_asb))
-			x = np.array(x.reshape(len(timehr), num_asb))
+			Nwet = np.array(Nwet.reshape(len(timehr), num_asb))
 
 		# plotting number size distribution --------------------------------------
 	

@@ -39,7 +39,7 @@ def middle(self): # define function
 	# inputs: -------------------------------------------------------
 	# self - reference to program
 	# ---------------------------------------------------------------
-	
+
 	# get required inputs
 	[sav_nam, comp0, y0, RH, RHt, Pnow,
 		siz_str, num_sb, pmode, pconc, pconct,
@@ -122,7 +122,7 @@ def middle(self): # define function
 	
 	# prepare particle phase and wall
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
-	rbou00, ub_rad_amp, np_sum, C_p2w] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
+	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, core_diss, space_mode, seedx,
@@ -154,7 +154,7 @@ def middle(self): # define function
 		y_rind_aq, 
 		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
 		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
-		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, C_p2w, 
+		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		OC, wat_hist, Pybel_objects, pcont, NOi, 

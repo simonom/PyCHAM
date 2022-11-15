@@ -1200,6 +1200,12 @@ class PyCHAM(QWidget):
 		self.b218b.clicked.connect(self.on_click218b)
 		self.SEClayout.addWidget(self.b218b, 6, 2, 1, 1)
 
+		# button to plot carbon reservoirs with time
+		self.b220c = QPushButton('Carbon reservoirs', self)
+		self.b220c.setToolTip('View carbon flux accumulation with time')
+		self.b220c.clicked.connect(self.on_click220c)
+		self.SEClayout.addWidget(self.b220c, 6, 0, 1, 1)
+
 		# column and row relative lengths---------------------------------
 		
 		# relative stretching (height-wise) of each row in Plot tab
@@ -2139,7 +2145,7 @@ class PyCHAM(QWidget):
 	
 	@pyqtSlot()		
 	def act_81(self, output_by_sim, sim_num): # start the simulation
-	
+		
 		from middle import middle # prepare to communicate with main program
 		
 		note_messf = 0 # cancel note message flag
@@ -2913,6 +2919,15 @@ class PyCHAM(QWidget):
 		# call on plotter for reaction rate ratios
 		import plotter_ct
 		plotter_ct.plotter_reac_ratios(self)
+
+	@pyqtSlot() # button to plot carbon reservoirs
+	def on_click220c(self):
+
+		self.dir_path = self.l201.text() # name of folder with results
+
+		# call on plotter for reaction rate ratios
+		import plotter_ct
+		plotter_ct.plotter_carb_res(self)
 		
 	# button to plot volatility basis set mass fractions with water
 	@pyqtSlot()

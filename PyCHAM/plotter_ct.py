@@ -154,10 +154,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
 			 
 		# convert change tendencies from molecules/cm3/s to ug/m3/s
-		gpp = ((gpp/si.N_A)*y_mw[ci])*1.e12
-		gwp = ((gwp/si.N_A)*y_mw[ci])*1.e12
-		crg = ((crg/si.N_A)*y_mw[ci])*1.e12
-		crl = ((crl/si.N_A)*y_mw[ci])*1.e12
+		gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
+		gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
+		crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
+		crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 			 
 		# plot temporal profiles of change tendencies due to chemical 
 		# reaction production and loss, gas-particle partitioning and gas-wall partitioning
@@ -604,3 +604,381 @@ def plotter_reac_ratios(self):
 	# plot
 	ax0.plot(timehr[den[:,0]>0.], num[den>0.]/den[den>0.])
 	return()
+
+# plot resevoir sizes of carbon
+def plotter_carb_res(self):
+	
+	# inputs: ------------------------------------------------------------------
+	# self - reference to PyCHAM
+	# --------------------------------------------------------------------------
+
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	x = self.ro_obj.cen_size
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	wall_on = self.ro_obj.wf
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
+	mv_path = self.ro_obj.vp
+	yrec_p2w = self.ro_obj.part_to_wall
+
+	# prepare figure
+	plt.ion() # display figure in interactive mode
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+
+	init_flag = 0 # flag for whether initial concentrations are present
+
+
+	# estimate total carbon influxed by user settings ------------
+	inputs = open(mv_path, mode= 'r' ) # open model variables file
+	in_list = inputs.readlines() # read file and store everything into a list
+	inputs.close() # close file
+	
+	# get model variable value for influxed components
+	for i in range(len(in_list)): # loop through supplied model variables to interpret
+
+		try:
+			key, value = in_list[i].split('=') # split values from keys
+		except:
+			continue
+
+		# model variable name - a string with bounding white space removed
+		key = key.strip()
+
+		if key == 'Comp0' and (value.strip()): # names of components present at experiment start
+			comp0 = [str(i).strip() for i in (value.split(','))]			
+
+		if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
+			y0 = [float(i) for i in (value.split(','))]
+			init_flag = 1
+		if key == 'const_infl' and (value.strip()): # names of components with continuous influx
+			# check if this is a path to a file containing continuous influxes, if not treat as a list of component names
+			if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+				self.const_infl_path = str(value.strip())
+				self = const_infl_open(self)
+				
+			else: # treat as list of components 
+				self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
+
+		if key == 'const_infl_t' and (value.strip()): # times of continuous influxes (s)
+			self.con_infl_t = [float(i.strip()) for i in (value.split(','))]
+			self.con_infl_t = np.array((self.con_infl_t))
+
+		if key == 'Cinfl' and (value.strip()): # influx rate of components with continuous influx (ppb/s)
+			comp_count = 1 # count number of components
+			time_count = 1 # track number of times
+			for i in value:
+				if (i==';'):
+					comp_count += 1 # record number of components
+				if (i==',' and comp_count == 1):
+					time_count += 1 # record number of times
+			self.con_infl_C = np.zeros((comp_count, time_count))
+				
+			try:	
+				for i in range(comp_count): # loop through components
+					for ii in range(time_count): # loop through times
+						self.con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
+							
+			# in case semicolons and commas messed up on input, note this will invoke an 
+			# error message from the user input check module
+			except:
+				self.con_infl_C = np.empty(0)
+		
+		if key == 'dil_fac' and (value.strip()): # dilution factor rate
+			self.dil_fac = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+				
+		if key == 'dil_fact' and (value.strip()): # dilution factor rate times through experiment (s)
+			self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+
+	# get carbon reservoir at start of simulation
+	if init_flag == 1:
+		# molar mass of carbon in each component present at start (g/mol)
+		mm_C = np.zeros((len(comp0), 1))
+
+		for i in range(len(comp0)): # loop through starting components
+			compi = comp_names.index(comp0[i])
+			mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
+		# now convert influxes to # molecules/cm3 from ppb
+		y0 = y0*Cfac[0]
+		# now divide by Avogadro's constant to convert # molecules/cm3 to mol/cm3
+		y0 = y0/si.N_A
+		# now multiply by molar mass of carbon and g/cm3 to ug/m3 conversion factor to get ug/m3
+		y0 = y0*mm_C*1.e12
+
+		# sum over components (ug/m3)
+		y0 = (np.sum(y0)).reshape(1, 1)
+	else:
+		y0 = np.zeros((1, 1))
+
+
+	# now convert influx of components (ppb/s) into influx of carbon (ug/m3/s) -------
+	# molar mass of carbon in each influxed component (g/mol)
+	mm_C = np.zeros((len(self.con_infl_nam), 1))
+	for i in range(len(self.con_infl_nam)): # loop through influxed components
+		compi = comp_names.index(self.con_infl_nam[i])
+		mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
+	
+	# now convert influxes to # molecules/cm3/s from ppb/s
+	self.con_infl_C = self.con_infl_C*Cfac[0]
+	# now divide by Avogadro's constant to convert # molecules/cm3/s to mol/cm3/s
+	self.con_infl_C = self.con_infl_C/si.N_A
+	# now multiply by molar mass of carbon to get g/cm3/s
+	self.con_infl_C = self.con_infl_C*mm_C
+	# convert g/cm3/s to ug/m3/s
+	self.con_infl_C = self.con_infl_C*1.e12
+	
+	# sum over components
+	self.con_infl_C = (np.sum(self.con_infl_C, axis = 0)).reshape(1, -1)
+
+	# only keep the influxes within the simulated time
+	self.con_infl_C = self.con_infl_C[0, self.con_infl_t<timehr[-1]*3600.]
+
+	# only keep the times within the simulated time
+	self.con_infl_t = self.con_infl_t[self.con_infl_t<timehr[-1]*3600.]
+	
+	# now, get time intervals (s)
+	# append end simulation time to times
+	self.con_infl_t = np.concatenate((self.con_infl_t, (np.array((timehr[-1]*3600.)).reshape(1))))
+	# time intervals (s)
+	t_int = self.con_infl_t[1::]-self.con_infl_t[0:-1]
+	# integrate over time intervals (ug/m3)
+	self.con_infl_C = self.con_infl_C*(t_int.reshape(1, -1))
+	
+	# consider reservoir present at start of simulation
+	self.con_infl_C = np.concatenate((y0, self.con_infl_C), axis=1)
+
+	# sum with time
+	user_influx_C = np.cumsum(self.con_infl_C, axis=1)
+	
+	# ---------------------------------------
+	# get carbon present in gas-phase at all times in order to calculate 
+	# cumulative gas-phase loss through ventilation
+	# convert gas-phase concentration from ppb to # molecules/cm3
+	yrecg = yrec[:, 0:num_comp]*Cfac[0]
+	# convert to mol/cm3
+	yrecg = yrecg/si.N_A 
+
+	# get carbon number of every component
+	Cnum = np.zeros((len(rel_SMILES)))
+	for compi in range(len(rel_SMILES)):
+		Cnum[compi] = rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c')
+
+	# get molar mass of carbon per component (g of C/mol)
+	Cnum = (Cnum*12.0107).reshape(1, -1)
+
+	# get mass concentration of components (ug/m3 of C)
+	yrecg = (yrecg*Cnum)*1.e12
+	
+	# sum over components (ug/m3 of C)
+	yrecg = np.sum(yrecg, axis=1)
+	
+	# take average over a time interval to best represent what the 
+	# ode solver works on
+	yrecg[1::] = (yrecg[1::]+yrecg[0:-1])/2.
+
+	# prepare for aligning dilution factors with recorded times
+	dil_fac_align = np.zeros((len(yrecg)))
+
+	# loop through record times to assign correct dilution factor, note
+	# that  used < rather than <= because we want dilution factor up to that 
+	# point, not at it.  By the same, principle, the first point 
+	# (at time=0), must have a dilution factor of 0 because no time has 
+	# passed to allow air exchange
+	for ti in range(1, len(timehr)):
+		
+		dil_fac_align[ti] = (self.dil_fac[self.dil_fact<timehr[ti]*3.6e3])[-1]
+
+	# every point represents the resorvoir as it was
+	# up to that point, so we should go all the way up to the final recorded 
+	# time point.  Note that in the first point 0 time had passed, so 0 carbon
+	# can have been lost to air excahnge.  Therefore, include zero time passed in
+	# time interval
+	t_int = np.zeros((len(timehr)))
+	t_int[1::] = np.diff(timehr*3.6e3)
+	dil_fac_align = dil_fac_align*t_int
+
+	# multiply by carbon concentration to get mass concentration removed 
+	# by air exchange (ug/m3)
+	ax_removed = np.cumsum(dil_fac_align*yrecg)
+
+	# calculation of carbon lost through particle loss during air exchange --------
+	if (num_sb-wall_on > 0):
+		# concentration of all components in the particle phase (# molecules/cm3)
+		yrecp = yrec[:, num_comp:num_comp*(num_sb-wall_on+1)]
+		# convert # molecules/cm3 to mol/cm3
+		yrecp = yrecp/si.N_A
+
+		# sum over size bins
+		for i in range(1, num_sb-wall_on):
+			yrecp[:, 0:num_comp] += yrecp[:, num_comp*i:num_comp*(i+1)]
+		
+		# get mass concentration of components (note conversion from g/cm3 to ug/m3 of C)
+		yrecp = (yrecp[:, 0:num_comp]*Cnum)*1.e12
+	
+		# sum over components (ug/m3 of C)
+		yrecp = np.sum(yrecp, axis=1)
+	
+		# take average over a time step to best represent what the 
+		# model works on for carbon lost through particle air exchange
+		yrecp[1::] = (yrecp[1::]+yrecp[0:-1])/2.
+
+		# multiply by dilution factor to get mass concentration removed 
+		# by air exchange (ug/m3)
+		ax_part_removed = np.cumsum(dil_fac_align*yrecp)
+	else:
+		ax_part_removed = np.zeros((len(timehr)))
+
+	# particles on wall ---------------------------------------------
+	if (num_sb-wall_on > 0 and wall_on > 0):
+
+		# convert concentrations of components on wall due to particle deposition to wall
+		# from # molecules/cm3 to mol/cm3
+		yrec_p2w = yrec_p2w/si.N_A
+
+		# sum over particle size bins
+		for i in range(1, num_sb-wall_on):
+			yrec_p2w[:, 0:num_comp] += yrec_p2w[:, num_comp*i:num_comp*(i+1)]
+		
+		# get mass concentration of carbon in components (note the conversion 
+		# from g/cm3 to ug/m3 of C)
+		yrec_p2w = (yrec_p2w[:, 0:num_comp]*Cnum)*1.e12
+	
+		# sum over components (ug/m3 of C)
+		yrec_p2w = np.sum(yrec_p2w, axis=1)
+	else:
+		yrec_p2w = np.zeros((len(timehr)))
+
+	# vapours on wall ---------------------------------------------
+	if (wall_on > 0):
+		# wall concentrations (# molecules/cm3)
+		yrec_w = yrec[:, -num_comp*wall_on::]
+
+		# convert concentrations of components on wall due to particle deposition to wall
+		# from # molecules/cm3 to mol/cm3
+		yrec_w = yrec_w/si.N_A
+
+		# sum over wall bins
+		for i in range(1, wall_on):
+			yrec_w[:, 0:num_comp] += yrec_w[:, num_comp*i:num_comp*(i+1)]
+		
+		# get mass concentration of components (note conversion of g/cm3 
+		# to ug/m3 of C)
+		yrec_w = (yrec_w[:, 0:num_comp]*Cnum)*1.e12
+	
+		# sum over components (ug/m3 of C)
+		yrec_w = np.sum(yrec_w[:, 0:num_comp], axis=1)
+	else: # if no wall
+		yrec_w = np.zeros((len(timehr)))
+
+	# amount in gas phase at any one time ----------------------
+	if (num_comp > 0): # if components are present
+		# gas-phase concentrations (note conversion from ppb to # molecules/cm3)
+		yrec_g = yrec[:, 0:num_comp]*Cfac[0]
+
+		# convert concentrations of components in gas
+		# from # molecules/cm3 to mol/cm3
+		yrec_g = yrec_g/si.N_A
+
+		# get mass concentration of components (ug/m3 of C)
+		yrec_g = (yrec_g[:, 0:num_comp]*Cnum)*1.e12
+	
+		# sum over components (ug/m3 of C)
+		yrec_g = np.sum(yrec_g, axis=1)
+
+	else: # if no components in gas phase
+		yrec_g = np.zeros((len(timehr)))
+
+	# amount in particle phase at any one time ----------------------
+	if (num_sb-wall_on > 0): # if components are present
+		# particle-phase concentrations (# molecules/cm3)
+		yrec_p = yrec[:, num_comp:num_comp*(num_sb-wall_on+1)]
+
+		# convert concentrations of components
+		# from # molecules/cm3 to mol/cm3
+		yrec_p = yrec_p/si.N_A
+
+		# sum over particle size bins
+		for i in range(1, num_sb-wall_on-1):
+			yrec_p[:, 0:num_comp] += yrec_p[:, num_comp*i:num_comp*(i+1)]
+
+		# get mass concentration of components (ug/m3 of C)
+		yrec_p = (yrec_p[:, 0:num_comp]*Cnum)*1.e12
+	
+		# sum over components (ug/m3 of C)
+		yrec_p = np.sum(yrec_p[:, 0:num_comp], axis=1)
+
+	else: # if no components in gas phase
+		yrec_p = np.zeros((len(timehr)))
+
+
+	ax0.plot((self.con_infl_t/3.6e3), user_influx_C[0, :], 'k', label = 'total in')
+	ax0.stackplot(timehr, ax_removed, ax_part_removed, yrec_p2w, yrec_w, yrec_g, yrec_p, labels = ['exchange of gas', 'exchange of particle', 'particle on wall', 'vapour on wall', 'gas phase', 'particle phase'])
+	ax0.set_xlabel('Time through experiment (hours)')
+	ax0.set_ylabel(str('Cumulative Concentration (' + u'\u03BC' + 'g/m' +u'\u00B3' + ')'))
+		
+	ax0.yaxis.set_tick_params(direction = 'in')
+	ax0.xaxis.set_tick_params(direction = 'in')
+		
+	ax0.legend()
+	
+	return()	
+	
+
+def const_infl_open(self): # define function to read in values relevant to constant influxes
+
+	import openpyxl
+	import os
+
+	wb = openpyxl.load_workbook(filename = self.const_infl_path)
+	sheet = wb['const_infl']
+	# component names are in first column, times are in headers of first row		
+	ic = 0 # count on row iteration
+	
+	# prepare to store component names
+	self.con_infl_nam = []
+	
+	for i in sheet.iter_rows(values_only=True): # loop through rows
+			if (ic == 0): # get times of influx (s through experiment)
+				self.con_infl_t = np.array((i[1::]))
+				# prepare to store emission rates
+				self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
+				
+			# get names of components (matching chemical scheme names) 
+			# and their emission rates (ppb/s)
+			else:
+				# append component name
+				self.con_infl_nam.append(i[0])
+				
+				# emission rates
+				if (ic>self.con_infl_C.shape[0]): # if we need to concatenate
+					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1::])).reshape(1, -1)), axis=0)
+				else:
+					self.con_infl_C[ic-1] = i[1::]
+				
+				
+			ic += 1 # count on row iteration
+		
+	wb.close() # close excel file
+
+
+	return(self)

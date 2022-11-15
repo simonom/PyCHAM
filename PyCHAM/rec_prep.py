@@ -44,7 +44,7 @@ def rec_prep(nrec_step,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, 
-	DStar_org, C_p2w, RH, RHt, tempt_cnt, RHt_cnt, 
+	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, 
@@ -142,8 +142,8 @@ def rec_prep(nrec_step,
 	# diff_vol - diffusion volume of components according to Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
 	# self.seedi - index of seed component(s)
-	# C_p2w - concentration of components on the wall due to particle
-	# deposition to wall (molecules/cc)
+	# self.C_p2w - concentration of components on the wall due to particle
+	# deposition to wall (# molecules/cm3)
 	# RH - relative humidities (fraction 0-1)
 	# RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on chamber temperatures
@@ -174,14 +174,20 @@ def rec_prep(nrec_step,
 	# wat_hist - flag for water history with respect to particles
 	# ----------------------------------------------------------------
 
-	# note that instaneous changes occur before recording --------------------
 	# update chamber variables
 	
 	# array to record cumulative influxes of influxing components
-	tot_in_res_ft = np.zeros((nrec_step+1, len(tot_in_res)))
+	self.tot_in_res_ft = np.zeros((nrec_step+1, len(tot_in_res)))
 	# index of components being stored for influx
-	tot_in_res_ft[0, :] = tot_in_res_indx
-	tot_in_res_ft[1, :] = tot_in_res # influx at start
+	self.tot_in_res_ft[0, :] = tot_in_res_indx
+	self.tot_in_res_ft[1, :] = tot_in_res # influx at start
+	
+	# array to record carbon flux between reservoirs (influx to gas-phase 
+	# due to emissions that exclude partitioning), net flux to/from 
+	# particles, net flux to/from wall due to gas-wall partitioning,
+	# loss to wall due to particle deposition on wall, net flux due to air 
+	# exchange
+	self.C_res_flux = np.zeros((nrec_step+1, 5))
 	
 	[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
@@ -218,13 +224,13 @@ def rec_prep(nrec_step,
 		# concentration of components on the wall due to 
 		# particle-wall loss, stacked by component first then by
 		# size bin (# molecules/cM3)
-		yrec_p2w = np.zeros((nrec_step, (num_sb-self.wall_on)*num_comp))
+		self.yrec_p2w = np.zeros((nrec_step, (num_sb-self.wall_on)*num_comp))
 	else:
 		x2 = 0.
 		Nres_dry = 0.
 		Nres_wet = 0.
 		rbou_rec = 0.
-		yrec_p2w = 0.
+		self.yrec_p2w = 0.
 	
 	if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles or wall present
 		
@@ -262,7 +268,7 @@ def rec_prep(nrec_step,
 		# end of number size distribution part ----------------------------------------
 		
 		# concentration of components on the wall due to particle deposition to wall (# molecules/cm3)
-		yrec_p2w[0, :] = C_p2w
+		self.yrec_p2w[0, :] = self.C_p2w
 
 	else: # fillers
 		kimt = kelv_fac = 0.
@@ -294,7 +300,7 @@ def rec_prep(nrec_step,
 
 	# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 	# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
-	if (self.testf != 5):
+	if (self.testf != 5 and len(self.dydt_vst) > 0):
 		importlib.reload(dydt_rec) # import most recent version
 		dydt_cnt = 0 # index for row to record on
 		self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
@@ -302,5 +308,4 @@ def rec_prep(nrec_step,
 				kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
 
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, yrec_p2w, temp_now, cham_env, Pnow, cham_env[0, 2], 
-		Cinfl_now, tot_in_res_ft)
+		infx_cnt, temp_now, cham_env, Pnow, cham_env[0, 2], Cinfl_now)

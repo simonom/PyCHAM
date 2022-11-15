@@ -62,17 +62,20 @@ def var_checker(Jlen, err_mess, erf, self): # define function
 		while (sumt < self.tot_time-self.tot_time*1.e-10):
 
 			# identify relevant light status
-			lindx = np.sum(self.light_time >= sumt)
+			lindx = np.sum(self.light_time >= sumt)-1
+	
+			# current status of lights
+			self.light_stat_now = self.light_stat[lindx]
 		
-			if (self.light_stat[lindx-1] == 0): # if lights off
+			if (self.light_stat_now == 0): # if lights off
 				if (sumt == 0): # initiate results array (time in rows, photolysis channels in columns)
 					Jres = (np.zeros(Jlen)).reshape(1, -1)
 				else:
 					Jres = np.concatenate((Jres, (np.zeros(Jlen)).reshape(1, -1)), axis = 0)
 					
 			else: # if lights on
-				TEMPn = self.TEMP[np.sum(self.tempt >= sumt)-1] # temperature inside chamber now (K)
-			
+				TEMPn = self.TEMP[np.sum(self.tempt >= sumt)-1] # temperature inside chamber now (K)			
+
 				# estimate and append photolysis rates
 				J = photolysisRates.PhotolysisCalculation(TEMPn, 
 					Jlen, sumt, self)
