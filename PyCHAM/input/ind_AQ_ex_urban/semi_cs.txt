@@ -1,5 +1,0 @@
-s* Reaction definitions. ;
-*;
-#EQUATIONS
-{1.} CO = CO : 0.0 ;
-{2.} CH4 = CH4 : 0.0 ;

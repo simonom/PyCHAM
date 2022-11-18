@@ -107,12 +107,22 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# create folder to store copies of inputs
 	os.makedirs(str(output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
-	output_by_sim_sch_ext = str(output_by_sim+'/inputs/'+self.sch_name.split('/')[-1])
+	output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('/')[-1])
+	
 	copyfile(self.sch_name, output_by_sim_sch_ext)
-	output_by_sim_mv_ext = str(output_by_sim+'/inputs/'+self.inname.split('/')[-1])
-	if (self.inname != 'Default'): # if not in default model variables mode 
+	output_by_sim_mv_ext = str(output_by_sim + '/inputs/' + self.inname.split('/')[-1])
+	# if not in default model variables mode or in automatic calling mode
+	if (self.inname != 'Default' and type(self.param_const) != dict):
 		copyfile(self.inname, output_by_sim_mv_ext)
 	
+	# if in automatic calling mode, then save the specified model variables
+	if (type(self.param_const) == dict):
+		output_by_sim_mv_ext = str(output_by_sim + '/inputs/specified_model_variables.txt')
+		with open(output_by_sim_mv_ext, 'w') as f:
+			for key, value in self.param_const.items():
+				f.write('%s = %s\n' % (key, value))
+		f.close()
+
 	# saving dictionary
 	# dictionary containing variables for model and components
 	const = {}

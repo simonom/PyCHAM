@@ -199,7 +199,7 @@ def def_mod_var(caller, self): # define function
 	self.obs_file = [] # path to observations file
 	# components to fix to observed
 	self.obs_comp_i = []
-	# --------------------------------------------------------------------------
+	# --------------------------------------------------------------------
 
 	# prepare for pickling
 	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 

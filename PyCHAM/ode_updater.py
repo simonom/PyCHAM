@@ -741,6 +741,7 @@ def ode_updater(y, rindx,
 		# update the percentage time in the GUI progress bar
 		yield (sumt/self.tot_time*100.)
 		
+		
 		# if ozone isopleth being made, then store ozone result
 		if (self.testf == 5):
 			

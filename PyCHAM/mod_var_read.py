@@ -49,12 +49,18 @@ def mod_var_read(self):
 			chamV] = pickle.load(pk)
 		pk.close()
 		
-		if (self.inname != 'Default' and self.inname != 'Not found'): # if not using defaults
+		if (self.inname != 'Default' and self.inname != 'Not found' and type(self.param_const) != dict): # if not using defaults
 			inputs = open(self.inname, mode= 'r' ) # open model variables file
 			in_list = inputs.readlines() # read file and store everything into a list
 			inputs.close() # close file
 		else: # if using defaults
 			in_list = []
+
+		# if parameters automatically supplied via the automated_setup_and_call module
+		if type(self.param_const) == dict:
+			in_list = [] # prepare list
+			for key, value in self.param_const.items(): # loop through supplied parameters
+				in_list.append(str(str(key) + ' = ' + str(value)))
 		
 		err_mess = '' # initial (blank) error message
 		self.bd_st = 3 # change border/error message status to ready for change

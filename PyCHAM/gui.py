@@ -36,17 +36,33 @@ import vol_contr_analys
 import importlib
 		
 class PyCHAM(QWidget):
-
-	def __init__(self):
+	
+	# set the reference (self) to the current instance of the PyCHAM class,
+	# note that by setting a default value for param_const, a user doesn't need
+	# to provide an input for param_const.  But, having param_const as an
+	# optional argument allows the automated setup and call 
+	# (automated_setup_and_call.py) to call gui
+	def __init__(self, param_const=0):
+		
 		super().__init__()
+
+		self.param_const = param_const
+
 		self.title = 'PyCHAM'
 		self.left = 10
 		self.top = 10
 		self.width = 800
 		self.height = 530
-		
 		self.initUI() # call on initialisation function to fill window
 		
+		# if parameters have been provided automatically (without using GUI)
+		# then automatically setup and run the simulation, e.g. using the
+		# automated_setup_and_call.py
+
+		if (type(param_const) == dict):
+			
+			self.autorun() # call on automatic setup and run
+			
 		return
 		
 	def initUI(self):
@@ -112,7 +128,7 @@ class PyCHAM(QWidget):
 		tabs.addTab(self.PLtab(), "Plot")
 		grid.addWidget(tabs, 1, 0, 1, UoMlogo_hindx)
 		
-		# Quit pane ---------------------------------------------------------------------------------
+		# Quit pane ----------------------------------------------
 		
 		b89 = QPushButton('Quit', self)
 		b89.setToolTip('Finish with PyCHAM and close this window')
@@ -1919,7 +1935,10 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click2(self): # when different chemical scheme file requires selection
 	
-		self.sch_name, _ = QFileDialog.getOpenFileName(self, "Select Chemical Scheme File", "./PyCHAM/input/") # get path of file
+		if type(self.param_const) != dict: # if not called from automatic script (automated_setup_and_call.py)
+			self.sch_name, _ = QFileDialog.getOpenFileName(self, "Select Chemical Scheme File", "./PyCHAM/input/") # get path of file
+		else: # if called from automatic script (automated_setup_and_call.py)
+			self.sch_name = self.param_const['sch_name']
 		self.l3.clear() # clear old label
 		self.l3.setText(str(self.sch_name))
 		self.l3.show()
@@ -1933,7 +1952,11 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click3(self): # when different xml file requires selection
 		
-		self.xml_name, _ = QFileDialog.getOpenFileName(self, "Select xml File", "./PyCHAM/input/") # get path of file
+		if type(self.param_const) != dict: # if not called from automatic script (automated_setup_and_call.py)
+			self.xml_name, _ = QFileDialog.getOpenFileName(self, "Select xml File", "./PyCHAM/input/") # get path of file
+		else: # if called from automatic script (automated_setup_and_call.py)
+			self.xml_name = self.param_const['xml_name']
+
 		self.l5.clear() # clear old label
 		self.l5.setText(str(self.xml_name))
 		self.l5.show()
@@ -1952,9 +1975,12 @@ class PyCHAM(QWidget):
 		if ((self.l81b.text() == 'Simulation complete') or (self.l81b.text() == 'Simulations complete')):
 			self.l81b.setText('')
 
-		# user chooses path of file to model variables file
-		self.inname, _ = QFileDialog.getOpenFileName(self, "Select Model Variables File", "./PyCHAM/input/")
-		
+		if type(self.param_const) != dict: # if not called from automatic script (automated_setup_and_call.py)
+			# user chooses path of file to model variables file
+			self.inname, _ = QFileDialog.getOpenFileName(self, "Select Model Variables File", "./PyCHAM/input/")
+		else: # if run from automatic script (automated_setup_and_call.py)
+			self.inname = 'Automatically Set'
+
 		if (self.inname == ''): # if no file selected, e.g. because selection was cancelled
 			return()
 		
@@ -2197,7 +2223,7 @@ class PyCHAM(QWidget):
 	
 	@pyqtSlot()
 	def on_click81sing(self): # when single simulation button pressed
-	
+		
 		cs_file = self.l3.text()
 		xml_file = self.l5.text()
 		mv_file = self.l7.text()
@@ -4247,6 +4273,51 @@ class PyCHAM(QWidget):
 	
 		return()
 
+	def autorun(self): # function to automatically run PyCHAM
+		# note that default model variables are already set 
+		# before autorun function called
+
+		# choose variable values
+		param_range = self.param_const['param_ranges']
+		
+		# prepare for randomness
+		from numpy.random import default_rng
+		rng = default_rng()
+
+		# loop through simulations
+		for simi in range(self.param_const['sim_num']):
+			
+			# reset component concentrations
+			self.param_const['C0'] = ''
+
+			self.param_const['res_file_name'] = str(self.param_const['res_file_name'][0:15] + str(simi))
+			self.param_const['trans_fac'] = str('200_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
+			self.param_const['temperature'] = (rng.integers(low=param_range['temperature'][0], high=param_range['temperature'][1], size=1))[0]
+			self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
+		
+			comp_cnt = 0
+			for compi in range(len(param_range['C0'])):
+				if (comp_cnt == 0):
+					self.param_const['C0'] = str(self.param_const['C0'] + str((rng.integers(low=param_range['C0'][compi][0], high=param_range['C0'][compi][1], size=1))[0]))
+				else:
+					self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str((rng.integers(low=param_range['C0'][compi][0], high=param_range['C0'][compi][1], size=1))[0]))
+		
+				comp_cnt += 1
+
+			# establish parameters provided by user by calling mod_var_read
+			import mod_var_read
+			mod_var_read.mod_var_read(self)
+			
+			self.on_click2() # assign chemical scheme
+			self.on_click3() # assign xml file
+			self.on_click4() # provide model variables label
+
+			self.on_click81sing() # run simulation
+
+		QWidget.close(self) # quit and close gui window
+
+		return()
+
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 
   
@@ -4288,3 +4359,5 @@ class ScrollLabel(QScrollArea):
 
 	def clear(self): # the clear method
 		self.label.clear() # clearing text
+		
+		
