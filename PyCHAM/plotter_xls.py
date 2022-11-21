@@ -29,7 +29,6 @@ from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import matplotlib.cm as cm
 import os
-import retr_out
 import numpy as np
 import scipy.constants as si
 import pybel
@@ -92,10 +91,23 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	
 	# ----------------------------------------------------------
 	# deal with model results
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, _) = retr_out.retr_out(self.mod_path, self)
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = self.ro_obj.rad
+	space_mode = self.ro_obj.spacing
 
 	# subtract any time before lights on
 	timehr += float(obs_setup[4])
@@ -141,10 +153,22 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 
 def plotter_VK_mod_n_obs(self): # for Van Krevelen diagrams
 	
-	# retrieve model results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, rel_SMILES, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = self.ro_obj.rad
+	space_mode = self.ro_obj.spacing
 	
 	self.HC = np.array((ro_obj.HyC)) # hydrogen:carbon ratios of each component
 
@@ -343,10 +367,22 @@ def plotter_VK_mod_n_obs(self): # for Van Krevelen diagrams
 
 def plotter_mass_defect(self): # for mass defect plots
 
-	# retrieve model results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, group_indx, _, ro_obj) = retr_out.retr_out(self.mod_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = self.ro_obj.rad
+	space_mode = self.ro_obj.spacing
 	
 	# get exact molar masses (g/mol)
 	y_MW = np.array((y_MW))
@@ -419,3 +455,154 @@ def plotter_mass_defect(self): # for mass defect plots
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 
 	return()
+	
+def plotter_exp_prep(self): # for experiment design
+
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = self.ro_obj.yrec
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = self.ro_obj.Nrec_wet
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = self.ro_obj.rad
+	space_mode = self.ro_obj.spacing
+	
+	# simulation title ---------------------------------------------
+	sim_title = self.dir_path
+	# -----------------------------------------------------------------
+	
+	# -----------------------------------------------------------------
+	rationale = [] # remember to leave column for rationale
+	# -----------------------------------------------------------------
+	
+	# -----------------------------------------------------------------
+	# ratio of HO2, NO and RO2 reactivity with PINALO2 
+	# averaged over whole simulation
+	
+	# prepare to hold values
+	ct_PINALO2 = [0]*3
+	
+	# name of file that would contain change tendencies of PINALO2
+	fname = str(self.dir_path+ '/PINALO2_rate_of_change')
+	
+	try: # try to open
+		dydt = np.loadtxt(fname, delimiter = ',', skiprows = 0) # skiprows = 0 includes header
+		# isolate chemical reaction numbers, note last two columns for gas-particle and gas-wall partitioning
+		dydt_header = dydt[0, 0:-2]	
+		dydt = dydt[1::, :] # exclude header now
+		
+	except: # if unable to open file
+		PINALO2_ct = str('No change tendency record for PINALO2 was found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+	
+	# prepare to store results of change tendency due to chemical reactions
+	res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
+	res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
+		
+	import scipy.constants as si
+	
+	# get all reactions out of the used chemical scheme --------------------------------------------------------------------
+	import sch_interr # for interpeting chemical scheme
+	import re # for parsing chemical scheme
+	import scipy.constants as si
+
+	sch_name = self.ro_obj.sp
+	inname = self.ro_obj.vp
+	
+	f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
+	# read the file and store everything into a list
+	total_list_eqn = f_open_eqn.readlines()
+	f_open_eqn.close() # close file
+		
+	inputs = open(inname, mode= 'r' ) # open model variables file
+	in_list = inputs.readlines() # read file and store everything into a list
+	inputs.close() # close file
+	
+	# default chemical scheme markers
+	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
+	
+	for i in range(len(in_list)): # loop through supplied model variables to interpret
+
+		# ----------------------------------------------------
+		# if commented out continue to next line
+		if (in_list[i][0] == '#'):
+			continue
+		key, value = in_list[i].split('=') # split values from keys
+		# model variable name - a string with bounding white space removed
+		key = key.strip()
+		# ----------------------------------------------------
+
+		if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+			self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+
+	# interrogate scheme to list equations
+	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
+		RO2_names] = sch_interr.sch_interr(total_list_eqn, self)	
+	
+	# list interested reactants
+	reac_interest = [' HO2 ', '*RO2', ' NO ']
+	
+	eqn_cnt = 0 # count on equations through chemical scheme
+	PINALO2_eqn_cnt = 0 # count on PINALO2 equations
+	
+	# loop through equations to find where PINALO2 reacts with HO2, RO2 or NO
+	for eqn_numi in dydt_header:
+		
+		# obtain original equation
+		eqni = eqn_list[int(eqn_numi)]
+		
+		for reaci in range(3): # loop through the reactants we're interested in
+		
+			# focus on LHS of reaction first
+			if reac_interest[reaci] in eqni.split('=')[0]:
+				# sum change tendency over time and add to total
+				ct_PINALO2[reaci] += np.sum(dydt[:, PINALO2_eqn_cnt])
+				break # move onto next equation
+			
+			# the reaction rate coefficient for this equation
+			# where reaction rate coefficient starts
+			indx_rrc_start = eqni.index(self.chem_sch_mrk[9])
+			# where equation starts
+			indx_rrc_end = eqni.index(self.chem_sch_mrk[10])
+			
+			# in case equation comes before the reaction rate coefficient,
+			# then change end point of reaction rate coefficient part to end 
+			# of line
+			if (indx_rrc_end < indx_rrc_start):
+				indx_rrc_end = eqni.index(self.chem_sch_mrk[11])
+				
+			# likewise, if reactant is in the reaction rate coefficient
+			if reac_interest[reaci] in eqni[indx_rrc_start:indx_rrc_end]:
+				
+				# sum change tendency over time and add to total
+				ct_PINALO2[reaci] += np.sum(dydt[:, PINALO2_eqn_cnt])
+				break
+		
+		PINALO2_eqn_cnt+= 1 # count on equations
+
+	# -----------------------------------------------------------------
+
+	# open an excel file ready for saving results
+	from openpyxl import Workbook
+	wb = Workbook() # create new workbook
+	ws = wb.active # get active worksheet
+	ws.title = "Exp. Prep." # set worksheet title
+	# add headers
+	ws["A1"] = 'Exp. #'
+	ws["B1"] = 'Rationale'
+	ws["C1"] = 'HO2:NO:RO2 reactivity with PINALO2 over whole simulation'
+	# add data
+	ws["A2"] = 1
+	ws["B2"] = 'HO2 and RO2 at play'
+	ws["C2"] = str(str(ct_PINALO2[0]) + ':' + str(ct_PINALO2[2]) + ':' + str(ct_PINALO2[1]))
+	wb.save(filename = str(self.dir_path+ '/exp_prep.xlsx')) # save workbook
+	
+	
+	return() 

@@ -1012,6 +1012,7 @@ class PyCHAM(QWidget):
 		PLtabs.addTab(self.RADtab(), "Radicals") # for radical chemicals
 		PLtabs.addTab(self.INSTRtab(), "Convolution")
 		PLtabs.addTab(self.OBStab(), "Observed")
+		PLtabs.addTab(self.EXPtab(), "Exp. Prep.")
 		self.PLlayout.addWidget(PLtabs, 1, 0, 1, 5)
 		
 		# relative stretching (width-wise) of each column in Plot tab
@@ -1820,6 +1821,20 @@ class PyCHAM(QWidget):
 		self.OBSlayout.addWidget(self.e403, 2, 0, 1, 1)
 		
 		return(OBSTab)
+
+	def EXPtab(self): # preparing for experiments
+
+		EXPTab = QWidget()
+		self.EXPlayout = QGridLayout() 
+		EXPTab.setLayout(self.EXPlayout)
+
+		# select observations file --------------------------------------------------------------
+		b500 = QPushButton('Output', self)
+		b500.setToolTip('Estimates the outputs typically useful for experiment preparation and save in excel file inside same folder as selected results stored in')
+		b500.clicked.connect(self.on_click500)
+		self.EXPlayout.addWidget(b500, 0, 0, 1, 1)
+		
+		return(EXPTab)
 
 	@pyqtSlot() # eurochamp website under development 10/02/2021
 	def on_clickn1(self): # EUROCHAMP website
@@ -4271,6 +4286,25 @@ class PyCHAM(QWidget):
 			plotter_xls.plotter_mass_defect(self)
 
 	
+		return()
+		
+	@pyqtSlot()
+	def on_click500(self): # when experiment preparation outputs needed
+		
+		import plotter_xls
+		
+		# call function for estimating and saving outputs that are typically 
+		# useful for designing experiments
+		plotter_xls.plotter_exp_prep(self)
+		
+		self.l203a.setText('')
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '0px dashed magenta', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '0px solid magenta', 0., 0.)
+			self.bd_pl = 1
+
 		return()
 
 	def autorun(self): # function to automatically run PyCHAM
