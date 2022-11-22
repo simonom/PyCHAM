@@ -108,6 +108,7 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	comp0 = self.ro_obj.init_comp
 	rbou_rec = self.ro_obj.rad
 	space_mode = self.ro_obj.spacing
+	group_indx = self.ro_obj.gi
 
 	# subtract any time before lights on
 	timehr += float(obs_setup[4])
@@ -474,6 +475,8 @@ def plotter_exp_prep(self): # for experiment design
 	comp0 = self.ro_obj.init_comp
 	rbou_rec = self.ro_obj.rad
 	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	group_indx = self.ro_obj.gi
 	
 	# simulation title ---------------------------------------------
 	sim_title = self.dir_path
@@ -488,7 +491,7 @@ def plotter_exp_prep(self): # for experiment design
 	# averaged over whole simulation
 	
 	# prepare to hold values
-	ct_PINALO2 = [0]*3
+	ct_PINALO2 = np.zeros((3))
 	
 	# name of file that would contain change tendencies of PINALO2
 	fname = str(self.dir_path+ '/PINALO2_rate_of_change')
@@ -508,7 +511,7 @@ def plotter_exp_prep(self): # for experiment design
 		
 	import scipy.constants as si
 	
-	# get all reactions out of the used chemical scheme --------------------------------------------------------------------
+	# get all reactions out of the used chemical scheme --------------------------	
 	import sch_interr # for interpeting chemical scheme
 	import re # for parsing chemical scheme
 	import scipy.constants as si
@@ -587,6 +590,13 @@ def plotter_exp_prep(self): # for experiment design
 		
 		PINALO2_eqn_cnt+= 1 # count on equations
 
+	# normalise change tendencies of PINALO2 to the minimum change tendency
+	ct_PINALO2 = np.abs(ct_PINALO2[:])/min(np.abs(ct_PINALO2[ct_PINALO2!=0.]))
+
+	# round to two significant figures
+	for i in range(len(ct_PINALO2)):
+		ct_PINALO2[i] = float('%s' % float('%.2g' % ct_PINALO2[i]))
+
 	# -----------------------------------------------------------------
 
 	# open an excel file ready for saving results
@@ -597,12 +607,261 @@ def plotter_exp_prep(self): # for experiment design
 	# add headers
 	ws["A1"] = 'Exp. #'
 	ws["B1"] = 'Rationale'
-	ws["C1"] = 'HO2:NO:RO2 reactivity with PINALO2 over whole simulation'
+	ws["N1"] = 'HO2:NO:RO2 reactivity with PINALO2 over whole simulation'
 	# add data
 	ws["A2"] = 1
 	ws["B2"] = 'HO2 and RO2 at play'
-	ws["C2"] = str(str(ct_PINALO2[0]) + ':' + str(ct_PINALO2[2]) + ':' + str(ct_PINALO2[1]))
+	ws["N2"] = str(str(ct_PINALO2[0]) + ':' + str(ct_PINALO2[2]) + ':' + str(ct_PINALO2[1]))
 	wb.save(filename = str(self.dir_path+ '/exp_prep.xlsx')) # save workbook
+
+	# -----------------------------------------------------------------
+	# ratio of O3, OH and NO3 reactivity with APINENE 
+	# averaged over whole simulation
 	
+	# prepare to hold values
+	ct_APINENE = np.zeros((3))
 	
+	# name of file that would contain change tendencies of PINALO2
+	fname = str(self.dir_path+ '/APINENE_rate_of_change')
+	
+	try: # try to open
+		dydt = np.loadtxt(fname, delimiter = ',', skiprows = 0) # skiprows = 0 includes header
+		# isolate chemical reaction numbers, note last two columns for gas-particle and gas-wall partitioning
+		dydt_header = dydt[0, 0:-2]	
+		dydt = dydt[1::, :] # exclude header now
+		
+	except: # if unable to open file
+		APINENE_ct = str('No change tendency record for APINENE was found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+	
+	# prepare to store results of change tendency due to chemical reactions
+	res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
+	res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
+		
+	import scipy.constants as si
+	
+	# get all reactions out of the used chemical scheme --------------------------	
+	import sch_interr # for interpeting chemical scheme
+	import re # for parsing chemical scheme
+	import scipy.constants as si
+
+	sch_name = self.ro_obj.sp
+	inname = self.ro_obj.vp
+	
+	f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
+	# read the file and store everything into a list
+	total_list_eqn = f_open_eqn.readlines()
+	f_open_eqn.close() # close file
+		
+	inputs = open(inname, mode= 'r' ) # open model variables file
+	in_list = inputs.readlines() # read file and store everything into a list
+	inputs.close() # close file
+	
+	# default chemical scheme markers
+	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
+	
+	for i in range(len(in_list)): # loop through supplied model variables to interpret
+
+		# ----------------------------------------------------
+		# if commented out continue to next line
+		if (in_list[i][0] == '#'):
+			continue
+		key, value = in_list[i].split('=') # split values from keys
+		# model variable name - a string with bounding white space removed
+		key = key.strip()
+		# ----------------------------------------------------
+
+		if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+			self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+
+		# for later on in this function, look for, and save physical variables 
+		# (RH, Temperature, Pressure, Light Status)
+		if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
+				self.RH = (np.array(([float(i) for i in ((value.strip()).split(','))])))[0]
+		
+		if key == 'temperature' and (value.strip()): # chamber temperature (K)
+				self.TEMP = [float(i) for i in ((value.strip()).split(','))][0]	
+
+		if key == 'p_init' and (value.strip()): # pressure inside chamber
+				self.Press = float(value.strip())
+
+		if key == 'light_status' and value.strip(): # status of lights (on or off)
+				light_stat = [int(i) for i in (value.split(','))]
+				self.light_stat = np.max(np.array((light_stat)))
+
+	# interrogate scheme to list equations
+	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
+		RO2_names] = sch_interr.sch_interr(total_list_eqn, self)	
+	
+	# list interested reactants
+	reac_interest = [' O3 ', ' OH ', ' NO3 ']
+	
+	eqn_cnt = 0 # count on equations through chemical scheme
+	APINENE_eqn_cnt = 0 # count on APINENE equations
+	
+	# loop through equations to find where APINENE reacts with O3, OH or NO3
+	for eqn_numi in dydt_header:
+		
+		# obtain original equation
+		eqni = eqn_list[int(eqn_numi)]
+		
+		for reaci in range(len(reac_interest)): # loop through the reactants we're interested in
+		
+			# focus on LHS of reaction first
+			if reac_interest[reaci] in eqni.split('=')[0]:
+				# sum change tendency over time and add to total
+				ct_APINENE[reaci] += np.sum(dydt[:, APINENE_eqn_cnt])
+				break # move onto next equation
+			
+			# the reaction rate coefficient for this equation
+			# where reaction rate coefficient starts
+			indx_rrc_start = eqni.index(self.chem_sch_mrk[9])
+			# where equation starts
+			indx_rrc_end = eqni.index(self.chem_sch_mrk[10])
+			
+			# in case equation comes before the reaction rate coefficient,
+			# then change end point of reaction rate coefficient part to end 
+			# of line
+			if (indx_rrc_end < indx_rrc_start):
+				indx_rrc_end = eqni.index(self.chem_sch_mrk[11])
+				
+			# likewise, if reactant is in the reaction rate coefficient
+			if reac_interest[reaci] in eqni[indx_rrc_start:indx_rrc_end]:
+				
+				# sum change tendency over time and add to total
+				ct_APINENE[reaci] += np.sum(dydt[:, APINENE_eqn_cnt])
+				break
+		
+		APINENE_eqn_cnt+= 1 # count on equations
+
+	# normalise change tendencies of APINENE to the minimum change tendency
+	ct_APINENE = np.abs(ct_APINENE[:])/min(np.abs(ct_APINENE[ct_APINENE!=0.]))
+
+	# round to two significant figures
+	for i in range(len(ct_APINENE)):
+		ct_APINENE[i] = float('%s' % float('%.2g' % ct_APINENE[i]))
+
+	# -----------------------------------------------------------------
+
+	# add headers to excel file
+	ws["O1"] = 'O3:OH:NO3 reactivity with APINENE over whole simulation'
+	# add data
+	ws["O2"] = str(str(ct_APINENE[0]) + ':' + str(ct_APINENE[1]) + ':' + str(ct_APINENE[2]))
+
+	# -----------------------------------------------------------------
+	# now onto initial concentrations (ppb) of alpha-pinene, O3, H2O2, NO, CO, CH4
+	
+	# list of components we want initial concentrations of
+	init_comp = ['APINENE', 'O3', 'H2O2', 'NO', 'CO', 'CH4']
+	
+	# spreadsheet columns to use 
+	col = ['C', 'D', 'E', 'F', 'G', 'H']
+
+	for i in range(len(init_comp)): # loop through components
+
+		# add header to excel file
+		cell_id = str(col[i]+'1') # cell ID for header
+		ws[cell_id] = str('[' + init_comp[i] + '] (ppb) at t=0')
+
+		cell_id = str(col[i]+'2') # cell ID for value
+		# get initial gas-phase concentration (ppb)
+		conc_now = yrec[0, comp_names.index(init_comp[i])]
+		# round to two significant figures
+		conc_now = float('%s' % float('%.2g' % conc_now))
+
+		conc_now = "{:e}".format(conc_now) # ensure scientific notation
+		if len(conc_now)>conc_now.index('.')+1:
+			conc_now = str(conc_now[0:conc_now.index('.')+2] + conc_now[conc_now.index('e')::])
+
+		# store result
+		ws[cell_id] = conc_now
+
+	# now onto components whose concentration we want to know --------- 
+	# averaged over the experiment
+	
+	# list of components we want average concentrations of
+	aver_comp = ['HO2', 'OH', 'RO2', 'CH3O2']
+
+	# spreadsheet columns to use 
+	col = ['I', 'J', 'K', 'L']
+	
+	for i in range(len(aver_comp)): # loop through components
+
+
+		# if the short-lived component, then present in units of # molecules/cm3
+		if (aver_comp[i] == 'HO2' or aver_comp[i] == 'OH'):
+			# add header to excel file
+			cell_id = str(col[i]+'1') # cell ID for header
+			ws[cell_id] = str('[' + aver_comp[i] + '] (# molecules/cm3) geometric mean over whole experiment')
+			# get concentration and note conversion from ppb to # molecules/cm3
+			conc_now = np.sum(yrec[:, comp_names.index(aver_comp[i])])/yrec.shape[0]*Cfac[0]
+
+
+		else: # if longer-lived components
+			if (aver_comp[i] == 'RO2'):
+				indx_plot = (np.array((group_indx['RO2i'])))
+				conc_now = yrec[:, indx_plot].sum(axis=1)
+				# remember geometric mean average of RO2 for CH3O2:RO2 ratio 
+				# later
+				conc_RO2 = np.sum(yrec[:, indx_plot].sum(axis=1))/yrec.shape[0]
+			else: # if individual components
+				conc_now = yrec[:, comp_names.index(aver_comp[i])]
+				# remember geometric mean average for CH3O2 for CH3O2:RO2 
+				# ratio later
+				if (aver_comp[i] == 'CH3O2'):
+					conc_CH3O2 = np.sum(yrec[:, comp_names.index(aver_comp[i])])/yrec.shape[0]
+
+			# add header to excel file
+			cell_id = str(col[i]+'1') # cell ID for header
+			ws[cell_id] = str('[' + aver_comp[i] + '] (ppb) geometric mean over whole experiment')
+			# get geometric mean concentration (ppb)
+			conc_now = np.sum(conc_now)/yrec.shape[0]
+
+		cell_id = str(col[i]+'2') # cell ID for value
+		
+		# round to two significant figures
+		conc_now = float('%s' % float('%.2g' % conc_now))
+
+		conc_now = "{:e}".format(conc_now) # ensure scientific notation
+		if len(conc_now)>conc_now.index('.')+1:
+			conc_now = str(conc_now[0:conc_now.index('.')+2] + conc_now[conc_now.index('e')::])
+		
+		# store result
+		ws[cell_id] = conc_now
+
+	# ratio of concentration of CH3O2 to RO2 ------------------
+	RO2_ratio = conc_RO2/conc_CH3O2 
+
+	# round to two significant figures
+	RO2_ratio = float('%s' % float('%.2g' % RO2_ratio))
+
+	RO2_ratio = "{:e}".format(RO2_ratio) # ensure scientific notation
+	if len(RO2_ratio)>RO2_ratio.index('.')+1:
+		RO2_ratio = str(RO2_ratio[0:RO2_ratio.index('.')+2] + RO2_ratio[RO2_ratio.index('e')::])
+	
+	# header for result
+	ws["M1"] = str('[CH3O2]:[RO2] geometric mean over whole simulation')
+
+	# store result
+	ws["M2"] = str('1:' + str(RO2_ratio))
+
+	# include physical variables of experiment ----------------
+	# RH, temperature, pressure, light
+	
+	# header for result
+	ws["P1"] = str('RH (%)')
+	ws["P2"] = str(self.RH*100.)
+	
+	ws["Q1"] = str('Temperature (K)')
+	ws["Q2"] = str(self.TEMP)
+		
+	ws["R1"] = str('Pressure (Pa)')
+	ws["R2"] = str(self.Press)
+		
+	ws["S1"] = str('Light Status')
+	if (self.light_stat == 0):
+		ws["S2"] = 'Off'
+	if (self.light_stat == 1):
+		ws["S2"] = 'On'
+
+	wb.save(filename = str(self.dir_path+ '/exp_prep.xlsx')) # save workbook
 	return() 

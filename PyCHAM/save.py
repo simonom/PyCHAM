@@ -103,7 +103,9 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	output_by_sim = os.path.join(dir_path, output_root, filename, savefolder)
 	# create folder to store results
 	os.makedirs(output_by_sim)
-	
+	# remember this path in self, in case plotting scripts need it
+	self.dir_path = output_by_sim
+
 	# create folder to store copies of inputs
 	os.makedirs(str(output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
