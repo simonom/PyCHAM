@@ -64,7 +64,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# ------------------------------------------
 	
 	# if mean radius not stated explicitly calculate from size ranges (um)
-	if (mean_rad == -1.e6 and num_sb > 0):
+	if (any(mean_rad == -1.e6) and num_sb > 0):
 		if (lowersize > 0.):
 			mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.)
 		else:
@@ -75,7 +75,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	
 	if (num_sb == 1):
 		
-		N_perbin += np.array((pconc)) # (# particles/cc (air))
+		N_perbin += np.array((pconc)) # (# particles/cm3 (air))
 		pconc_new = pconc
 		
 	# number concentration stated per size bin in multi size bin simulation
@@ -95,9 +95,9 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 			else:
 				scale = np.exp(np.log(mean_rad[i]))
 			if np.isscalar(std):
-				std = np.log(std)
+				std_now = np.log(std)
 			else:
-				std = np.log(std[i])
+				std_now = np.log(std[i])
 			loc = 0. # no shift
 		
 			# number fraction-size distribution - enforce high resolution to ensure size
@@ -106,14 +106,15 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				hires = 10**(np.linspace(np.log10(lowersize), np.log10(uppersize), int(num_sb*1.e2)))
 			else: # enforce lowermost size bin radius bound of 1 nm (1e-3 um)
 				hires = 10**(np.linspace(np.log10(1.e-3), np.log10(uppersize), int(num_sb*1.e2)))
-			pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
+			pdf_output = stats.lognorm.pdf(hires, std_now, loc, scale)
 			pdf_out = np.interp(rad0, hires, pdf_output)	
 			# number concentration of seed in all size bins (# particle/cm3 (air))
 			pconc_new = (pdf_out/sum(pdf_out))*pconc[i]
+			
 			# number concentration realism
-			pconc_new[pconc_new<1] = 0.
+			pconc_new[pconc_new < 1] = 0.
 			N_perbin[:, 0] += pconc_new # (# particles/cm3 (air))
-
+					
 	# volume concentration of new seed particles (um3/cm3 (air))
 	Vperbin = ((pconc_new*(4./3.)*np.pi*(rad0)**3.))
 
@@ -121,7 +122,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	yn = np.zeros((num_comp*(num_sb)))
 	
 	# account for particle-phase concentration of components contained in seed particles --------------------
-
+	
 	# check whether water to be equilibrated with seed particles prior to experiment start
 	if (seed_eq_wat == 1 or Vwat_inc == 1): # if yes, water is to be equilibrated
 		
@@ -234,7 +235,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 					if (ci == len(self.seedi)-1): # reached final non-water seed component
 						# water (# molecules/cm3)
 						yn[H2Oi:(num_comp*(num_sb-1)+H2Oi)+1:num_comp] = (xwat*tmc)/(1.-xwat)
-	
+
 	# if water not to be equilibrated with seed particles prior to experiment start
 	if (seed_eq_wat == 0 and Vwat_inc == 0):			
 	
@@ -286,4 +287,5 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# new radius of single particles (um)
 	radn = ((3./(4.*np.pi))*Varr)**(1./3.)
 	
+
 	return(y, N_perbin, radn, Varr)

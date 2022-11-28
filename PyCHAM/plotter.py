@@ -218,8 +218,10 @@ def plotter(caller, dir_path, uc, self):
 			# make a first contour plot (which will be covered by plot p1 below) to get 
 			# the contour labels of actual concentration (not log10(concentration))
 			# set contour levels
-			levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
-		
+			if (z_min > 0.5): # if rounding gives a number greater than 0 
+				levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+			else: # i rounding would give a number below zero, then don't round		
+				levels = np.arange(np.log10((z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
 			# associate colours and contour levels
 			norm1 = BoundaryNorm(10.**levels, ncolors=cm.N, clip=True)
 		
@@ -244,8 +246,11 @@ def plotter(caller, dir_path, uc, self):
 			cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
 			
 		else:
-			# set contour levels
-			levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+			if (z_min > 0.5): # if rounding would give zero
+				# set contour levels
+				levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+			else: # don't round if minimum close to zero
+				levels = np.arange(np.log10((z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
 			
 			# associate colours and contour levels
 			norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)

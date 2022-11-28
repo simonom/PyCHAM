@@ -253,7 +253,10 @@ def retr_out(self):
 	# withdraw generation number of components, note this output added on 28/04/2022
 	try:
 		fname = str(self.dir_path + '/component_generation')
-		gen_num = np.loadtxt(fname, delimiter=',', skiprows=1)
+		if (os.path.getsize(fname) > 483): # only open if not empty
+			gen_num = np.loadtxt(fname, delimiter=',', skiprows=1)
+		else:
+			gen_num = []
 	except:
 		gen_num = []
 	
@@ -305,7 +308,10 @@ def retr_out(self):
 	try: # in case this output is saved for a given simulation
 		# withdraw consumptions (ug/m3)
 		fname = str(self.dir_path + '/total_concentration_of_injected_components')
-		tot_in_res = np.loadtxt(fname, delimiter=',', skiprows=1) # ug/m3
+		if (os.path.getsize(fname) > 483): # only open if not empty
+			tot_in_res = np.loadtxt(fname, delimiter=',', skiprows=1) # ug/m3
+		else:
+			tot_in_res = []
 	except: # in case not saved, e.g. for older outputs
 		tot_in_res = []
 	

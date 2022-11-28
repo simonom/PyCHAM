@@ -1,6 +1,5 @@
 # to test the model's ability to deal with multiple injections of seed particles
 # as expressed with explicit number size distribution
-# including plotting their number size distribution
 res_file_name = mult_seed_part_inj
 total_model_time = 4.e3
 update_step = 4.e1
