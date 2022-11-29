@@ -1,0 +1,16 @@
+res_file_name = fig01_res_0sb_newD
+total_model_time = 25200.
+update_step = 60.
+recording_time_step = 300.
+number_size_bins = 0
+temperature = 298.
+tempt = 0.
+p_init = 1.2e5
+rh = 0.5
+wall_on = 0
+C0 = 10., 0., 0., 22., 0., 5.e5
+Comp0 = LIMONENE, N2O5, NO3, NO2, O3, CO
+injectt = 5400., 14400.
+Compt = LIMONENE, N2O5, NO3, NO2, O3
+Ct = 0.0, 10.0; 0.0, 0.0; 0.0, 0.0; 8.0, 19.0; 38.0, 45.0
+chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;
