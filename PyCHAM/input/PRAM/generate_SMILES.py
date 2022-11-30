@@ -16,8 +16,8 @@ def xml_cont_gen(): # define function
 	total_list_eqn = chem_sch.readlines()
 	chem_sch.close() # close file
 
-	# markers to isolate sections of chemical scheme based on MCM KPP format
-	chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
+	# markers to isolate sections of chemical scheme based on PRAM format
+	chem_sch_mrk = ['%', 'RO2', '+', '', '', ';', '+', ';', '', '%', ':', ';']
 	
 	eqn_list = [] # # empty list for equations
 
@@ -43,73 +43,76 @@ def xml_cont_gen(): # define function
 				re.match(eqn_markers[1], line1) != None):
 		
 				eqn_list.append(line1) # store reaction equations
+	
+	for line in eqn_list: # loop through reactions
+	
+		# start of equation preparation part --------------------------
 
-			# start of equation preparation part --------------------------
+		# work out whether equation or reaction rate coefficient part comes first
+		eqn_start = str('.*\\' +  chem_sch_mrk[10])
+		rrc_start = str('.*\\' +  chem_sch_mrk[9])
+		# get index of these markers, note span is the property of the match object that
+		# gives the location of the marker
+		eqn_start_indx = (re.match(eqn_start, line)).span()[1]
+		rrc_start_indx = (re.match(rrc_start, line)).span()[1]
+		
+		if (eqn_start_indx > rrc_start_indx):
+			eqn_sec = 1 # equation is second part
+		else:
+			eqn_sec = 0 # equation is first part
+		
+		# split the line into 2 parts: equation and rate coefficient
+		# . means match with anything except a new line character., when followed by a * 
+		# means match zero or more times (so now we match with all characters in the line
+		# except for new line characters, so final part is stating the character(s) we 
+		# are specifically looking for, \\ ensures the marker is recognised
+		if eqn_sec == 1:
+			eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[11])
+		else: # end of equation part is start of reaction rate coefficient part
+			eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[9])
 
-			# work out whether equation or reaction rate coefficient part comes first
-			eqn_start = str('.*\\' +  chem_sch_mrk[10])
-			rrc_start = str('.*\\' +  chem_sch_mrk[9])
-			# get index of these markers, note span is the property of the match object that
-			# gives the location of the marker
-			eqn_start_indx = (re.match(eqn_start, line)).span()[1]
-			rrc_start_indx = (re.match(rrc_start, line)).span()[1]
+		# extract the equation as a string ([0] extracts the equation section and 
+		# [1:-1] removes the bounding markers)
+		eqn = re.findall(eqn_markers, line)[0][1:-1].strip()
 		
-			if (eqn_start_indx>rrc_start_indx):
-				eqn_sec = 1 # equation is second part
-			else:
-				eqn_sec = 0 # equation is first part
+		# ensure there are spaces either side of the = sign
+		if eqn[eqn.index('=')-1] != ' ':
+			eqn = str(eqn[0:eqn.index('=')] + ' ' + eqn[eqn.index('=')::])
+		if (len(eqn)-1>eqn.index('=')): # note that some equations do not contain reactants
+			if eqn[eqn.index('=')+1] != ' ':
+				eqn = str(eqn[0:eqn.index('=')+1] + ' ' + eqn[eqn.index('=')+1::])
 		
-			# split the line into 2 parts: equation and rate coefficient
-			# . means match with anything except a new line character., when followed by a * 
-			# means match zero or more times (so now we match with all characters in the line
-			# except for new line characters, so final part is stating the character(s) we 
-			# are specifically looking for, \\ ensures the marker is recognised
-			if eqn_sec == 1:
-				eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[11])
-			else: # end of equation part is start of reaction rate coefficient part
-				eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[9])
-
-			# extract the equation as a string ([0] extracts the equation section and 
-			# [1:-1] removes the bounding markers)
-			eqn = re.findall(eqn_markers, line)[0][1:-1].strip()
+		# ensure there are spaces either side of + signs
+		# number of +s
+		pcnt = eqn.count('+')
+		plusindx = 0 # initiating index
 		
-			# ensure there are spaces either side of the = sign
-			if eqn[eqn.index('=')-1] != ' ':
-				eqn = str(eqn[0:eqn.index('=')] + ' ' + eqn[eqn.index('=')::])
-			if (len(eqn)-1>eqn.index('=')): # note that some equations do not contain reactants
-				if eqn[eqn.index('=')+1] != ' ':
-					eqn = str(eqn[0:eqn.index('=')+1] + ' ' + eqn[eqn.index('=')+1::])
+		for i in range(pcnt): # loop through + signs
 		
-			# ensure there are spaces either side of + signs
-			# number of +s
-			pcnt = eqn.count('+')
-			plusindx = 0 # initiating index
-		
-			for i in range(pcnt): # loop through + signs
-		
-				plusindx = eqn[plusindx::].index('+') + plusindx
+			plusindx = eqn[plusindx::].index('+') + plusindx
 		
 			if (eqn[plusindx-1] != ' '):
 				eqn = str(eqn[0:plusindx] + ' ' + eqn[plusindx::])
-				plusindx+=1 # move index up
+				plusindx += 1 # move index up
 			if (eqn[plusindx+1] != ' '):
 				eqn = str(eqn[0:plusindx+1] + ' ' + eqn[plusindx+1::])
+		
+		
+		# set new plusindx to search from
+		plusindx += 1
+
+		# end of equation preparation part ----------------------------
+	
+		# loop through spaces (and any tabs) in this equation
+		for i in eqn.split():
 			
-			# set new plusindx to search from
-			plusindx += 1
-
-			# end of equation preparation part ----------------------------
-
-
-			# loop through spaces in this equation
-			for i in eqn.split(' '):
-				if i == '+' or i == '=': # continue if just symbols
+			if i == '+' or i == '=': # continue if just symbols
+				continue
+			else: # check for unique components in this reaction
+				if i in comp_list:
 					continue
-				else: # check for unique components in this reaction
-					if i in comp_list:
-						continue
-					else:
-						comp_list.append(i)				
+				else:
+					comp_list.append(i)			
 								
 	# now that we have names of all components in equation file, 
 	# check for their presence in xml file
@@ -171,14 +174,13 @@ def xml_cont_gen(): # define function
 					err_mess_new = str('Error: a smiles string was not found for component ' + str(comp_name[i]) + ' in the xml file, nor could its name be interpreted as a SMILE string')
 					break
 		
-
+	
 	# loop through components in chemical scheme file to 
 	# check on presence in xml
 	for comp in comp_list:
-		
 		if comp in comp_name: # if present then continue
 			continue
-			
+		print(comp)
 		if comp == 'CARENE':
 				SMILES = 'CC1=CCC2CC1C2(C)C' # just bung in the same SMILES as APINENE
 				# write lines for xml file
@@ -192,15 +194,15 @@ def xml_cont_gen(): # define function
 		
 		else: # if absent from xml, then action
 			# number of carbon, hydrogen and oxygen
-			Cn = 0; Hn = 0; On = 0;
+			Cn = 0; Hn = 0; On = 0; Nn = 0
 	
 			# starting flags for counting atoms
-			C_flag = 0; H_flag = 0; O_flag = 0
+			C_flag = 0; H_flag = 0; O_flag = 0; N_flag = 0
 
 			# loop through string elements
 			for stri in comp:
 				
-				if stri == 'C' or stri == 'c':
+				if stri == 'C':
 					if (C_flag == 1): # if finished counting on carbons
 						Cn += float(count_now)
 						C_flag = 0
@@ -210,13 +212,20 @@ def xml_cont_gen(): # define function
 					if (O_flag == 1): # if finished counting on oxygens
 						On += float(count_now)
 						O_flag = 0
+					if (N_flag == 1): # if finished counting on nitrogens
+						if count_now == '':
+							Nn += 1
+						else:
+							Nn += float(count_now)
+						N_flag = 0
 
+					
 					C_flag = 1 # know what we're counting
 					count_now = '' # start count
 
 					continue
 
-				if stri == 'H' or stri == 'h':
+				if (stri == 'H'):
 					if (C_flag == 1): # if finished counting on carbons
 						Cn += float(count_now)
 						C_flag = 0
@@ -226,6 +235,12 @@ def xml_cont_gen(): # define function
 					if (O_flag == 1): # if finished counting on oxygens
 						On += float(count_now)
 						O_flag = 0
+					if (N_flag == 1): # if finished counting on nitrogens
+						if count_now == '':
+							Nn += 1
+						else:
+							Nn += float(count_now)
+						N_flag = 0
 					
 					H_flag = 1 # know what we're counting
 					count_now = '' # start count
@@ -233,7 +248,7 @@ def xml_cont_gen(): # define function
 					continue
 	
 
-				if stri == 'O' or stri == 'o':
+				if (stri == 'O'):
 					if (C_flag == 1): # if finished counting on carbons
 						Cn += float(count_now)
 						C_flag = 0
@@ -243,8 +258,36 @@ def xml_cont_gen(): # define function
 					if (O_flag == 1): # if finished counting on oxygens
 						On += float(count_now)
 						O_flag = 0
+					if (N_flag == 1): # if finished counting on nitrogens
+						if count_now == '':
+							Nn += 1
+						else:
+							Nn += float(count_now)
+						N_flag = 0
 
 					O_flag = 1 # know what we're counting
+					count_now = '' # start count
+
+					continue
+
+				if (stri == 'N'):
+					if (C_flag == 1): # if finished counting on carbons
+						Cn += float(count_now)
+						C_flag = 0
+					if (H_flag == 1): # if finished counting on hydrogens
+						Hn += float(count_now)
+						H_flag = 0
+					if (O_flag == 1): # if finished counting on oxygens
+						On += float(count_now)
+						O_flag = 0
+					if (N_flag == 1): # if finished counting on nitrogens
+						if count_now == '':
+							Nn += 1
+						else:
+							Nn += float(count_now)
+						N_flag = 0
+
+					N_flag = 1 # know what we're counting
 					count_now = '' # start count
 
 					continue
@@ -259,13 +302,19 @@ def xml_cont_gen(): # define function
 
 			try:
 				# get any final numbers accounted for
-				if C_flag == 1 or H_flag == 1 or O_flag == 1:
+				if C_flag == 1 or H_flag == 1 or O_flag == 1 or N_flag == 1:
 					if (C_flag == 1): # if finished counting on carbons
 						Cn += float(count_now)
 						C_flag = 0
 					if (H_flag == 1): # if finished counting on hydrogens
 						Hn += float(count_now)
 						H_flag = 0
+					if (N_flag == 1): # if finished counting on nitrogens
+						if count_now == '':
+							Nn += 1
+						else:
+							Nn += float(count_now)
+						N_flag = 0
 					if (O_flag == 1): # if finished counting on oxygens
 						if count_now == '':
 							On += 1
@@ -283,10 +332,12 @@ def xml_cont_gen(): # define function
 				#	SMILES = str(SMILES + 'H')
 				for i in range(int(On)):
 					SMILES = str(SMILES + 'O')
+				for i in range(int(Nn)):
+					SMILES = str(SMILES + 'N')
 			
 				# write lines for xml file
 				lines = '<species species_name=\"' + comp + '\" species_number=\"n\">\n' + '<smiles>' + SMILES + '</smiles>\n' + '</species>\n'
-	
+				
 				# write this line to bottom of xml file
 				with open(xml_name, "a") as f:
 					f.write(lines)
