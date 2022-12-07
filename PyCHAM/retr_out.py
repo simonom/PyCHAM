@@ -157,7 +157,7 @@ def retr_out(self):
 	# extract required data from dictionary, note this prepared above
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
 	num_comp = int((const['number_of_components'])[0]) # number of components
-	# conversion factor to change gas-phase concentrations from molecules/cm3 
+	# conversion factor to change gas-phase concentrations from # molecules/cm3 
 	# (air) into ppb 
 	Cfactor = const['factor_for_multiplying_ppb_to_get_molec/cm3_with_time']
 	rel_SMILES = const['SMILES']
