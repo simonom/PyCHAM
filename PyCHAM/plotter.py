@@ -342,6 +342,184 @@ def plotter(caller, dir_path, uc, self):
 		plt.show()	
 
 	return()
+	
+
+def aqi_calc(self): # define function
+	
+	# inputs ----------------------------------------------------------
+	# self - reference to PyCHAM class
+	# -------------------------------------------------------------------
+	
+	# import dependencies
+	import math
+	import numpy as np
+	import scipy.constants as si
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	cen_size = self.ro_obj.cen_size
+
+	# time in minutes
+	timemin = timehr*60.
+
+	# limit of index for 24-hour running means
+	indx_lim24 = sum(timehr <= (timehr[-1]-24.))
+
+	# limit of index for 15-minute running means
+	indx_lim15 = sum(timemin <= (timemin[-1]-15.))
+
+	# limit of index for 1-hour running means
+	indx_lim1 = sum(timehr <= (timehr[-1]-1.))
+
+	# limit of index for 8-hour running means
+	indx_lim8 = sum(timehr <= (timehr[-1]-8.))
+	
+	# prepare results matrices
+	sim_PMc = np.zeros((indx_lim24))
+	sim_PMf = np.zeros((indx_lim24))
+	sim_SO2 = np.zeros((indx_lim15))
+	sim_NO2 = np.zeros((indx_lim1))
+	sim_O3 = np.zeros((indx_lim8))
+	
+	# prepare output concentrations (ug/m3)
+	# gas-phase concentrations as ppb
+	# index of O3, NO2, SO2
+	O3_indx = comp_names.indx('O3')
+	NO2_indx = comp_names.indx('NO2')
+	SO2_indx = comp_names.indx('SO2')
+	
+	# concentrations (# molecules/cm3)
+	O3 = yrec[:, O3_indx]/Cfac
+	NO2 = yrec[:, NO2_indx]/Cfac
+	SO2 = yrec[:, SO2_indx]/Cfac
+	
+	# convert concentrations into ug/m3
+	O3 = (O3/si.N_A)*1.e12*y_MW[O3_indx]
+	NO2 = (NO2/si.N_A)*1.e12*y_MW[NO2_indx]
+	SO2 = (SO2/si.N_A)*1.e12*y_MW[SO2_indx]
+	
+	PMf_indx = bp.zeros((len(time_hr), len(rbou_rec)-1))
+	PMc_indx = bp.zeros((len(time_hr), len(rbou_rec)-1))
+	
+	# loop through times to get the indices for PM2.5 and PM10
+	for it in range(len(timehr)):
+		PMf_indx[it, :] = rbou_rec[it, 1::]*2. < 2.5
+		PMc_indx[it, :] = rbou_rec[it, 1::]*2. < 10.
+		
+	# get volumes in all particle size bins at all times (um3)
+	vols = (4./3.*np.pi*cen_size**3.)
+	
+	# get the PM2.5 (ug/cm3) from simulated particle phase,
+	# assuming a particle density of 1.4 g/cm3 (1.4e-6 ug/um3)
+	sim_PMf = (np.sum(((Ndry*vols)[PMf_indx]), axis=0))*1.4e-6
+	
+	# get the PM10. (ug/cm3) from simulated particle phase,
+	# assuming a particle density of 1.4 g/cm3 (1.4e-6 ug/um3)
+	sim_PMc = (np.sum(((Ndry*vols)[PMc_indx]), axis=0))*1.4e-6
+	
+	# finally convert ug/cm3 to ug/m3
+	sim_PMf = sim_PMf*1.e6
+	sim_PMc = sim_PMc*1.e6
+
+	# do running means
+	for i in range(0, len(timehr[0:indx_lim15])):
+
+		if (i<= indx_lim24): # 24-hour running mean
+
+			# get index of range to use
+			tindx = timehr>=timehr[i] + timehr<=timehr[i]+24.
+		
+			# estimate PM10 24-hour running mean (ug/m3)
+			sim_PMc = sim_PMc[tindx]/sum(tindx)
+			# estimate PM2.5 24-hour running mean (ug/m3)
+			sim_PMf = sim_PMf[tindx]/sum(tindx)
+
+		if (i <= indx_lim15): # 15-minute running mean
+
+			# get index of range to use
+			tindx = timemin>=timemin[i] + timemin<=timemin[i]+15.
+		
+			# estimate SO2 15-minute running mean (ug/m3)
+			sim_SO2 = SO2[tindx]/sum(tindx)
+		
+		if (i <= indx_lim1): # 1-hour running mean
+
+			# get index of range to use
+			tindx = timehr>=timehr[i] + timehr<=timehr[i]+1.
+		
+			# estimate NO2 1-hour running mean (ug/m3)
+			sim_NO2 = NO2[tindx]/sum(tindx)
+		
+		if (i <= indx_lim8): # 8-hour running mean
+
+			# get index of range to use
+			tindx = timehr>=time_hr[i] + timehr<=timehr[i]+8.
+		
+			# estimate O3 8-hour running mean (ug/m3)
+			sim_O3 = O3[tindx]/sum(tindx)
+	
+	# PM10.0 24-hour running mean values (ug/m3)
+	PMc_levels = [0., 16., 33., 50., 58., 66., 75., 83., 91., 100.]
+
+	# PM2.5 24-hour running mean values
+	PMf_levels = [0., 11., 23., 35., 41., 47., 53., 58., 64., 70.]
+
+	# SO2 15-minute mean values
+	SO2_levels = [0., 88., 177., 266., 354., 443., 532., 710., 887., 1064.]
+
+	# NO2 hourly mean values
+	NO2_levels = [0., 67., 134., 200., 267., 334., 400., 467., 534., 600.]
+
+	# O3 8-hourly mean values
+	O3_levels = [0., 33., 66., 100., 120., 140., 160., 187., 213., 240.]
+	
+	AQI_res = np.zeros((len(timehr))) # prepare results matrix
+	 
+	# loop through times to get air quality index at each time
+	for it in len(sum(indx_lim24)):
+		# get levels
+		lev = []
+		lev.append(np.sum(PMc_levels<=sim_PMc[it]))
+		lev.append(np.sum(PMf_levels<=sim_PMf[it]))
+		lev.append(np.sum(SO2_levels<=sim_SO2[it]))
+		lev.append(np.sum(NO2_levels<=sim_NO2[it]))
+		lev.append(np.sum(O3_levels<=sim_O3[it]))
+		AQI_res[it] = max(lev)
+
+	# plot air quality index as a function of time
+	if (caller == 0):
+		plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	ax0.plot(timehr[indx_lim24], lev)
+
+	ax0.set_ylabel(r'Air Quality Index', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+
+	return() # end function
 
 # function to makes spines invisible
 def make_patch_spines_invisible(ax):

@@ -1095,6 +1095,12 @@ class PyCHAM(QWidget):
 		#self.b209a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PRIMlayout.addWidget(self.b209a, 4, 1, 1, 2)
 		
+		# button to plot temporal profile of air quality index, using the DEFRA definition (see reference inside plotter.py)
+		self.b209b = QPushButton(str('Air Quality Index'), self)
+		self.b209b.setToolTip('Plot air quality index as a function of time')
+		self.b209b.clicked.connect(self.on_click209b)
+		self.PRIMlayout.addWidget(self.b209b, 5, 1, 1, 1)
+		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of total particle-phase concentrations
@@ -2597,16 +2603,30 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 			return()
 		
+	# button to plot air quality index
+	@pyqtSlot()
+	def on_click209b(self):	
+		
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+		
 		# clear dialogue
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		# get names of components to plot
-		comp_names = []
-		
-		import plotter_pp
-		dir_path = self.l201.text() # name of folder with results
-		plotter_pp.plotter(3, dir_path, comp_names, self) # plot results
+		import plotter
+		plotter.aqi_calc(self) # plot results
 
 	# button to plot temporal profile of particle-phase contribution 
 	# by top contributors to particle-phase concentration
