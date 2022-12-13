@@ -1,4 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\PRAMwithMCM_chem_scheme\PRAM_in_Flow_Reactor
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\ex_chem_scheme\AQI_test
 Warning: invalid value encountered in true_divide
 Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
@@ -8,7 +8,389 @@ Warning: invalid value encountered in true_divide
 Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in subtract
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in exp
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in true_divide
+Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
 Warning: invalid value encountered in true_divide
 Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter

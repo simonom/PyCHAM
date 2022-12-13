@@ -44,10 +44,14 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# get required variables from self
 	wall_on = self.ro_obj.wf
-	yrec = self.ro_obj.yrec
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
 	num_comp = self.ro_obj.nc
 	num_sb = self.ro_obj.nsb
-	Nwet = self.ro_obj.Nrec_wet
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
 	rel_SMILES = self.ro_obj.rSMILES
