@@ -454,6 +454,12 @@ def aqi_calc(self): # define function
 	NO2_mean = np.zeros((indx_lim1))
 	O3_mean = np.zeros((indx_lim8))
 
+	# prepare for holding time relevant to running means
+	time24 = np.zeros((indx_lim24))
+	time15 = np.zeros((indx_lim15))
+	time1 = np.zeros((indx_lim1))
+	time8 = np.zeros((indx_lim8))
+
 	# do running means
 	for i in range(0, len(timehr[0:indx_lim15])):
 
@@ -468,6 +474,9 @@ def aqi_calc(self): # define function
 			# estimate PM2.5 24-hour running mean (ug/m3)
 			sim_PMf_mean[i] = sum(sim_PMf[tindx])/sum(tindx)
 
+			# get the corresponding time points (hour)
+			time24[i] = np.mean(timehr[tindx])
+
 		if (i < indx_lim15): # 15-minute running mean
 
 			# get index of range to use
@@ -476,6 +485,9 @@ def aqi_calc(self): # define function
 			tindx = (tindx==1)
 			# estimate SO2 15-minute running mean (ug/m3)
 			SO2_mean[i] = sum(SO2[tindx])/sum(tindx)
+	
+			# get the corresponding time points (hour)
+			time15[i] = np.mean(timehr[tindx])
 		
 		if (i < indx_lim1): # 1-hour running mean
 
@@ -485,6 +497,9 @@ def aqi_calc(self): # define function
 			tindx = (tindx==1)
 			# estimate NO2 1-hour running mean (ug/m3)
 			NO2_mean[i] = sum(NO2[tindx])/sum(tindx)
+
+			# get the corresponding time points (hour)
+			time1[i] = np.mean(timehr[tindx])
 		
 		if (i < indx_lim8): # 8-hour running mean
 
@@ -494,6 +509,9 @@ def aqi_calc(self): # define function
 			tindx = (tindx==1)
 			# estimate O3 8-hour running mean (ug/m3)
 			O3_mean[i] = sum(O3[tindx])/sum(tindx)
+
+			# get the corresponding time points (hour)
+			time8[i] = np.mean(timehr[tindx])
 	
 	# PM10.0 24-hour running mean values (ug/m3)
 	PMc_levels = [0., 16., 33., 50., 58., 66., 75., 83., 91., 100.]
@@ -514,13 +532,35 @@ def aqi_calc(self): # define function
 	 
 	# loop through times to get air quality index at each time
 	for it in range(indx_lim24):
+
+		# relevant time
+		timen = time24[it]
+
+		# find the index of 8 hour, 15 minunte and 1 hour means that
+		# is closest to this 24 hour time
+		indx8 = (np.abs(time8-timen) == (min(np.abs(time8-timen)))) == 1
+		# in case more than one, choose the first
+		indx8_first = np.where(indx8 == 1)[0][0]
+		indx8[:] = 0; indx8[indx8_first] = True
+
+		indx15 = (np.abs(time15-timen) == (min(np.abs(time15-timen)))) == 1
+		# in case more than one, choose the first
+		indx15_first = np.where(indx15 == 1)[0][0]
+		indx15[:] = 0; indx15[indx15_first] = True
+
+		indx1 = (np.abs(time1-timen) == (min(np.abs(time1-timen)))) == 1
+		# in case more than one, choose the first
+		indx1_first = np.where(indx1 == 1)[0][0]
+		indx1[:] = 0; indx1[indx1_first] = True
+		
+
 		# get levels
 		lev = []
 		lev.append(np.sum(PMc_levels<=sim_PMc_mean[it]))
 		lev.append(np.sum(PMf_levels<=sim_PMf_mean[it]))
-		lev.append(np.sum(SO2_levels<=SO2_mean[it]))
-		lev.append(np.sum(NO2_levels<=NO2_mean[it]))
-		lev.append(np.sum(O3_levels<=O3_mean[it]))
+		lev.append(np.sum(SO2_levels<=SO2_mean[indx15]))
+		lev.append(np.sum(NO2_levels<=NO2_mean[indx1]))
+		lev.append(np.sum(O3_levels<=O3_mean[indx8]))
 		AQI_res[it] = max(lev)
 
 	# plot air quality index as a function of time
@@ -528,7 +568,7 @@ def aqi_calc(self): # define function
 		
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-	ax0.plot(timehr[0: indx_lim24], AQI_res)
+	ax0.plot(time24[0: indx_lim24], AQI_res)
 
 	ax0.set_ylabel(r'Air Quality Index', fontsize = 14)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)

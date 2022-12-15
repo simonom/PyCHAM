@@ -2602,6 +2602,20 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 			return()
+
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		# get names of components to plot
+		comp_names = []
+		
+		import plotter_pp
+		dir_path = self.l201.text() # name of folder with results
+		plotter_pp.plotter(3, dir_path, comp_names, self) # plot results
+
+
+		return()
 		
 	# button to plot air quality index
 	@pyqtSlot()
