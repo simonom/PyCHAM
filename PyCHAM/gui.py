@@ -1749,7 +1749,7 @@ class PyCHAM(QWidget):
 		
 		# type of ionisation source
 		self.e282 = QTextEdit(self)
-		self.e282.setText('Ionisation source (I for iodide, N for nitrate, defaults to I), whether to add molar mass to mass of ionised components (1 for yes), 0 (for no), defaults to 0 for no')
+		self.e282.setText('Ionisation source (I for iodide, N for nitrate, defaults to I), whether to add molar mass to mass of ionised components (1 for yes, 0 for no), defaults to 0 for no')
 		self.CIMSscrolllayout.addWidget(self.e282, 2, 0)
 		
 		# sensitivity dependence on molar mass
@@ -1762,6 +1762,12 @@ class PyCHAM(QWidget):
 		self.b290_aa.setToolTip('Plot the probability distribution function causing mass:charge resolution')
 		self.b290_aa.clicked.connect(self.on_click290_aa)
 		self.CIMSscrolllayout.addWidget(self.b290_aa, 0, 1)
+		
+		# button to plot probability distribution function demonstrating mass:charge resolution
+		self.b290_aaa = QPushButton('Save in CIMS form', self)
+		self.b290_aaa.setToolTip('Save the results in CIMS format at all time steps')
+		self.b290_aaa.clicked.connect(self.on_click290_aaa)
+		self.CIMSscrolllayout.addWidget(self.b290_aaa, 4, 1)
 
 		# button to plot sensitivity dependence on molar mass
 		self.b290_a = QPushButton('Sensitivity', self)
@@ -3956,28 +3962,99 @@ class PyCHAM(QWidget):
 		import plotter_CIMS
 		
 		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MW)
-
-	@pyqtSlot() # button to plot sensitivity to molar mass
-	def on_click290_a(self):
+		
+	@pyqtSlot() # button to plot probability distribution function demonstrating mass:charge resolution
+	def on_click290_aa(self):
 		# reset error message
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
 		dir_path = self.l201.text() # name of folder with results
 		
-		y_MW = np.arange(1000.)
-		
-		# get sensitivity (Hz/ppt) dependence on molar mass
+		# get resolution inputs
 		try:
-			sensit = str((self.e283.toPlainText()))
+			res_in = [] # empty list to contain values
+			for i in ((self.e280.toPlainText().strip(' ').split(','))):
+				res_in.append(float(i))
 		except:
-			sensit = 'np.ones(len(y_MW))' # default
-		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
-			sensit = 'np.ones(len(y_MW))'
+			self.l203a.setText('Note - failed to interpret input values for starting point and width of probability distribution function that represents mass:charge resolution, therefore defaulting to 1.0, 0.3')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			res_in = [1.0, 0.3] # default
+
+		y_MW = np.arange(0., 1000., res_in[1]/3.)
 		
 		import plotter_CIMS
 		
-		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MW)
+		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MW)
+
+	@pyqtSlot() # button to save results in CIMS format at all times through experiment
+	def on_click290_aaa(self):
+		# reset error message
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+		
+		self.dir_path = self.l201.text() # name of folder with results
+		
+		y_MW = np.arange(1000.)
+		
+		# get resolution inputs
+		try:
+			self.resol_in = [] # empty list to contain values
+			for i in ((self.e280.toPlainText().strip(' ').split(','))):
+				self.resol_in.append(float(i))
+		except:
+			self.l203a.setText('Note - failed to interpret input values for starting point and width of probability distribution function that represents mass:charge resolution, therefore defaulting to 1.0, 0.3')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+			self.resol_in = [1.0, 0.3] # default
+		
+		# get ioniser type
+		try:
+			self.iont = ((self.e282.toPlainText()).split(','))
+			if (iont[0][0:3] == 'Ion' or len(iont) != 2):
+				1./'a' # force exception
+			if (int(iont[1]) != 0 and int(iont[1]) != 1):
+				1./'a' # force exception
+			if (iont[0] != 'I' and iont[0] != 'N'):
+				1./'a' # force exception
+
+		except: # give error message
+			self.l203a.setText('Note - ionising agent, whether molar mass of ionising agent to be included in molar mass of components, should be a letter (I for iodide or N for nitrate) followed by a comma, followed by a number (1 to add agent molar mass to component mass or 0 not to).  But this information could not be correctly detected, so defaulting to I, 0')
+			
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
+				self.bd_pl = 1
+
+			self.iont = ['I', 0] # default
+		
+		# get sensitivity (Hz/ppt) dependence on molar mass
+		try:
+			self.sensit = str((self.e283.toPlainText()))
+		except:
+			self.sensit = 'np.ones(len(y_MW))' # default
+		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+			self.sensit = 'np.ones(len(y_MW))'
+		
+		import plotter_CIMS
+		
+		plotter_CIMS.write_CIMS_output(self)
 		
 	@pyqtSlot() # button to plot mass spectrum replication of chemical ionisation mass spectrometer
 	def on_click290(self):

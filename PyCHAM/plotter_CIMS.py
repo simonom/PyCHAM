@@ -41,12 +41,35 @@ def plotter_CIMS(dir_path, res_in, tn, iont, sens_func):
 	# iont - type of ionisation
 	# sens_func - sensitivity to molar mass function
 	# ---------------------------
-
-	# retrieve results, note that num_sb (number of size bins)
-	# includes wall if wall turned on
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_MW, _, comp_names, y_MV, _, wall_on, space_mode, 
-		_, _, _, PsatPa, OC, H2Oi, _, _, _, RO2i, _, _) = retr_out.retr_out(dir_path, self)
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	group_indx = self.ro_obj.gi
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	yrec_p2w = self.ro_obj.part_to_wall
+	PsatPa = self.ro_obj.vpPa
+	O_to_C = self.ro_obj.O_to_C
+	H2Oi = self.ro_obj.H2O_ind
 	
 	# convert to 2D numpy array
 	y_MW = np.array((y_MW)).reshape(-1, 1)
@@ -114,6 +137,76 @@ def plotter_CIMS(dir_path, res_in, tn, iont, sens_func):
 	
 	return()
 
+# function for transforming and saving output in CIMS format
+def write_CIMS_output(self):
+
+	# import dependencies
+	import scipy.stats as st
+	import numpy as np
+
+	# ------------------------------------------------------------
+	# inputs: reference to PyCHAM class
+	# ------------------------------------------------------------
+	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	group_indx = self.ro_obj.gi
+	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
+	yrec_p2w = self.ro_obj.part_to_wall
+	PsatPa = self.ro_obj.vpPa
+	O_to_C = self.ro_obj.O_to_C
+	H2Oi = self.ro_obj.H2O_ind
+	
+	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
+		if self.iont[0] == 'I': # if iodide
+			y_MW += 127.
+		if self.iont[0] == 'N': # if nitrate
+			y_MW += 62.
+		if self.iont[0] == 'B': # if bromide
+			y_MW += 119.
+	
+	# prepare results matrix (for CIMS output)
+	CIMS_res = np.zeros((len(timehr), max(y_MW)/self.resol_in[0]))
+	
+	mm_acc = 0 # keep track on molar masses being considered (g/mol)
+	
+	# loop through times
+	for it in range(len(timehr)):
+		# loop through molar masses
+		for imm in CIMS_res.shape[1]:
+		
+			# get the the probability distribution function range for this molar mass centre (0-1 over entire molar mass range)
+			pdf = st.norm.pdf(y_mw, mm_acc, self.resol_in[1])
+		
+			# record the concentration for this molar mass 
+			CIMS_res[it, imm] += 
+		
+			mm_acc += self.resol_in[0] # keep track on molar masses being considered (g/mol)
+			
+			
+	
+	return()
+
 # function for plotting sensitivity to components
 def write_sens2mm(caller, sens_func, y_MW):
 
@@ -129,7 +222,7 @@ def write_sens2mm(caller, sens_func, y_MW):
 	f = open('PyCHAM/sens2mm.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -203,7 +296,7 @@ def write_mzres(caller, res_in, y_mw):
 	f = open('PyCHAM/mzres.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')

@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving probability density function of mass:charge resolution'''
 # module to estimate the probability density function that is demonstrative of an instrument's mass:charge resolution, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2021-09-20 12:00:11.313553
+# File Created at 2022-12-20 16:09:13.835454
 
 import numpy as np
 import scipy.stats as st
@@ -44,12 +44,12 @@ def mzres(caller, res_in, y_mw):
 	comp_indx = [] # empty list to hold results
 	comp_prob = [] # empty list to hold results
 	maxmm = np.max(y_mw) + res_in[0]
-	mm_acc = 0. + 1.0 # count on accumulated molar mass (g/mol) 
+	mm_acc = 0. + 0.1 # count on accumulated molar mass (g/mol) 
 	# get maximum probability possible
-	pdfm = st.norm.pdf(mm_acc, mm_acc, 0.3)
+	pdfm = st.norm.pdf(mm_acc, mm_acc, 0.01)
 	# loop through until upper end of molar mass reached 
 	while (mm_acc < maxmm):
-		pdf = st.norm.pdf(y_mw, mm_acc, 0.3)
+		pdf = st.norm.pdf(y_mw, mm_acc, 0.01)
 		try: # in case a maximum can be identified
 			pdf = pdf/pdfm # ensure that probability at distribution peak is 1
 			# minimum and maximum molar masses covered significantly by this resolution interval
