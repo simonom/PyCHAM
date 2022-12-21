@@ -3963,36 +3963,28 @@ class PyCHAM(QWidget):
 		
 		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MW)
 		
-	@pyqtSlot() # button to plot probability distribution function demonstrating mass:charge resolution
-	def on_click290_aa(self):
+	@pyqtSlot() # button to plot sensitivity to molar mass
+	def on_click290_a(self):
 		# reset error message
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
 		dir_path = self.l201.text() # name of folder with results
 		
-		# get resolution inputs
+		y_MW = np.arange(1000.)
+		
+		# get sensitivity (Hz/ppt) dependence on molar mass
 		try:
-			res_in = [] # empty list to contain values
-			for i in ((self.e280.toPlainText().strip(' ').split(','))):
-				res_in.append(float(i))
+			sensit = str((self.e283.toPlainText()))
 		except:
-			self.l203a.setText('Note - failed to interpret input values for starting point and width of probability distribution function that represents mass:charge resolution, therefore defaulting to 1.0, 0.3')
-			
-			# set border around error message
-			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
-				self.bd_pl = 2
-			else:
-				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
-				self.bd_pl = 1
-			res_in = [1.0, 0.3] # default
-
-		y_MW = np.arange(0., 1000., res_in[1]/3.)
+			sensit = 'np.ones(len(y_MW))' # default
+		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+			sensit = 'np.ones(len(y_MW))'
 		
 		import plotter_CIMS
 		
-		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MW)
+		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MW)
+
 
 	@pyqtSlot() # button to save results in CIMS format at all times through experiment
 	def on_click290_aaa(self):
@@ -4001,8 +3993,6 @@ class PyCHAM(QWidget):
 		self.l203a.setText('')
 		
 		self.dir_path = self.l201.text() # name of folder with results
-		
-		y_MW = np.arange(1000.)
 		
 		# get resolution inputs
 		try:
@@ -4049,7 +4039,8 @@ class PyCHAM(QWidget):
 			self.sensit = str((self.e283.toPlainText()))
 		except:
 			self.sensit = 'np.ones(len(y_MW))' # default
-		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+		
+		if (self.sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
 			self.sensit = 'np.ones(len(y_MW))'
 		
 		import plotter_CIMS
@@ -4063,7 +4054,7 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		dir_path = self.l201.text() # name of folder with results
+		self.dir_path = self.l201.text() # name of folder with results
 		
 		# get resolution inputs
 		try:
@@ -4121,7 +4112,7 @@ class PyCHAM(QWidget):
 		
 		# import required plotting function
 		import plotter_CIMS
-		plotter_CIMS.plotter_CIMS(dir_path, res_in, tn, iont, sensit)
+		plotter_CIMS.plotter_CIMS(self, res_in, tn, iont, sensit)
 
 	@pyqtSlot() # button to check supplied values
 	def on_clickb80(self):

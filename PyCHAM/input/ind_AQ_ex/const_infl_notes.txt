@@ -1,4 +1,3 @@
-Shared Google Drive: https://drive.google.com/drive/folders/0AEf-N0WYXlG_Uk9PVA 
 For a summer's day, windows assumed to be open at 7:00am (25200 s) and closed at 18:20 (66000 s).  Note that where possible both indoor and outdoor sources are accounted for, with the indoor source assumed constant (unless from an indoor activity) (ppb/s), but the outdoor one varying depending on whether windows open (and possibly if an outdoor diurnal cycle is known).
 
 For NO2 deposition and reaction on surfaces to produce HONO see: doi.org/10.1016/j.jphotochem.2015.06.008

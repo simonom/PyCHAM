@@ -32,10 +32,10 @@ import numpy as np
 import scipy.constants as si
 import importlib
 
-def plotter_CIMS(dir_path, res_in, tn, iont, sens_func):
+def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	
 	# inputs: -----------------
-	# dir_path - path to folder containing results files to plot
+	# self - reference to PyCHAM class
 	# res_in - inputs for resolution of molar mass to charge ratio (g/mol/charge)
 	# tn - time through experiment to plot at (s)
 	# iont - type of ionisation
@@ -143,6 +143,7 @@ def write_CIMS_output(self):
 	# import dependencies
 	import scipy.stats as st
 	import numpy as np
+	import os
 
 	# ------------------------------------------------------------
 	# inputs: reference to PyCHAM class
@@ -176,6 +177,9 @@ def write_CIMS_output(self):
 	PsatPa = self.ro_obj.vpPa
 	O_to_C = self.ro_obj.O_to_C
 	H2Oi = self.ro_obj.H2O_ind
+
+	# ensure numpy array
+	y_MW = np.array((y_MW)).reshape(1, -1)
 	
 	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
 		if self.iont[0] == 'I': # if iodide
@@ -184,27 +188,65 @@ def write_CIMS_output(self):
 			y_MW += 62.
 		if self.iont[0] == 'B': # if bromide
 			y_MW += 119.
-	
+
 	# prepare results matrix (for CIMS output)
-	CIMS_res = np.zeros((len(timehr), max(y_MW)/self.resol_in[0]))
+	CIMS_res = np.zeros((len(timehr), int(max(y_MW[0, :])/self.resol_in[0])))
 	
-	mm_acc = 0 # keep track on molar masses being considered (g/mol)
-	
+	# m:z bin centres for instrument
+	mzbins = np.arange(0, int(max(y_MW[0, :])), self.resol_in[0])
+
+	# prepare results matrix (for CIMS output)
+	CIMS_res = np.zeros((len(timehr)+1, len(mzbins)))
+
+	# record m:z values in first row
+	CIMS_res[0, :] = mzbins[:]
+
+	# empty array to hold the fractional contribution to each m:z of each 
+	# component, omitting water and core
+	fc = np.zeros((num_comp-2, len(mzbins)))
+
+	# loop through components to get m:z indices and fractional
+	# contributions, omitting water and core
+	for imm in range(len(y_MW[0, 0:-2])):
+		
+		# get the probability distribution function range for 
+		# this molar mass centre (0-1 over entire molar mass range)
+		pdf = st.norm.pdf(mzbins, y_MW[0, imm], self.resol_in[1])
+
+		# ensure fractional contributions equal 1
+		fc[imm, :] = pdf/sum(pdf)
+
 	# loop through times
-	for it in range(len(timehr)):
-		# loop through molar masses
-		for imm in CIMS_res.shape[1]:
+	for it in range(1, len(timehr)+1):
 		
-			# get the the probability distribution function range for this molar mass centre (0-1 over entire molar mass range)
-			pdf = st.norm.pdf(y_mw, mm_acc, self.resol_in[1])
+		# multiply concentrations of all gas-phase components (ppb) now by
+		# their fractional contribution to each m:z bin (components vary by
+		# row)
+		fcn = (yrec[it-1, 0:(num_comp-2)].reshape(-1, 1))*fc
 		
-			# record the concentration for this molar mass 
-			CIMS_res[it, imm] += 
-		
-			mm_acc += self.resol_in[0] # keep track on molar masses being considered (g/mol)
-			
-			
-	
+		# sum over components (ppb)
+		fcn = (np.sum(fcn, axis=0)).reshape(1, -1)
+
+		# remember in results (ppb)
+		CIMS_res[it, :] = fcn[0, :] 
+
+	# save CIMS-style output to csv file
+	# saving both gas, particle and wall concentrations of components
+	np.savetxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), CIMS_res, delimiter=',', header=str('time changes with rows which correspond to the time output file, m:z ratios is columns, first row is m:z values')) 		
+	 
+	# uncomment below to run check ----------------------------------------------------
+	# check correct results saved (by comparing with output from the 'CIMS observations' button 
+	#check_plot = np.loadtxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), delimiter=',', skiprows=1, dtype='str')
+	#import matplotlib.pyplot as plt
+	#plt.ion() # disply plot in interactive mode
+	#fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7)) # prepare plot
+	#y_MW = check_plot[0, :].astype('float')
+	# chose the y-axis, note that choice of row index determines time through simulation
+	#peaks = check_plot[-1, :].astype('float')
+	#ax0.plot(y_MW, peaks)
+	# uncomment above to run check ----------------------------------------------------
+
+
 	return()
 
 # function for plotting sensitivity to components
