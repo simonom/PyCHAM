@@ -146,7 +146,7 @@ def write_CIMS_output(self):
 	import os
 
 	# ------------------------------------------------------------
-	# inputs: reference to PyCHAM class
+	# inputs: self - reference to PyCHAM class
 	# ------------------------------------------------------------
 	
 	# get required variables from self
@@ -180,7 +180,198 @@ def write_CIMS_output(self):
 
 	# ensure numpy array
 	y_MW = np.array((y_MW)).reshape(1, -1)
+
+	with open(os.path.join(self.dir_path, 'MCMnames.txt'), "w") as output:
+		for row in comp_names[0:-2]:
+			
+			output.write(str(row) + '\n')
+
+	# preparing code as requested by Lukas in meeting on 19/01/2023
+	# txt file of C H O N (4 integers) (columns) per species (rows)
+	CHON_res = np.zeros((len(comp_names), 4))
+
+	# txt file of concentration (columns) and rate of change of 
+	# concentration (columns) for each component (rows)
+	conc_res = np.zeros((len(comp_names), 2))
+
+	# text file of NO, HO2, RO2 pool concentrations at steady 
+	# state (# molecules/cm3)
+	concs_res = np.zeros((3, 1))
+
+	import pybel # required dependency
+
+	# indices of RO2 components
+	indx_plot = (np.array((group_indx['RO2i'])))
+
+	# loop through components to calculate their C H O N and 
+	# record,  but exclude water and core
+	for icomp in range(len(comp_names)-2):
+		# get the pybel object for this component
+		Pybel_object = pybel.readstring('smi', rel_SMILES[icomp])	
+		
+		# get number of each atom
+		if 'C' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('C')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 0] += numC
+
+		# get number of each atom
+		if 'c' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('c')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 0] += numC
+
+		# get number of each atom
+		if 'H' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('H')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 1] += numC
+
+		# get number of each atom
+		if 'h' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('h')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 1] += numC
+
+		# get number of each atom
+		if 'O' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('O')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 2] += numC
+
+		# get number of each atom
+		if 'o' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('o')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 2] += numC
+
+		# get number of each atom
+		if 'N' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('N')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 3] += numC
+
+		# get number of each atom
+		if 'N' in Pybel_object.formula:
+			try:
+				numiC = Pybel_object.formula.index('n')
+				try:
+					numC = float(Pybel_object.formula[numiC+1])
+					try:
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+					except:
+						numC = float(Pybel_object.formula[numiC+1])
+				except:
+					numC = 1
+			except:
+				numiC = 'str'
+
+			if numiC != 'str':
+				CHON_res[icomp, 3] += numC
+				
 	
+		# concentration of this component at penultimate time step (# molecules/cm3)
+		conc_res[icomp, 0] = yrec[-1, icomp]*Cfac[-1]
+		# rate of change of this component at penultimate time step (# molecules/cm3/s)
+		conc_res[icomp, 1] = (yrec[-1, icomp]-yrec[-2, icomp])*Cfac[-1]
+		
+		if comp_names[icomp] == 'NO':
+			concs_res[0] = yrec[-1, icomp]*Cfac[-1]
+		if comp_names[icomp] == 'HO2':
+			concs_res[1] = yrec[-1, icomp]*Cfac[-1]
+		if icomp in indx_plot: # RO2 pool
+			concs_res[2] += yrec[-1, icomp]*Cfac[-1]
+		
+	
+	# save
+	np.savetxt(os.path.join(self.dir_path, 'CHON.txt'), CHON_res, delimiter=' ') 		
+	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), conc_res, delimiter=' ')
+	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'), conc_res, delimiter=' ') 
+
 	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
 		if self.iont[0] == 'I': # if iodide
 			y_MW += 127.
