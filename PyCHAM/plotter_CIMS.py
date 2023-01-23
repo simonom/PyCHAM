@@ -370,7 +370,7 @@ def write_CIMS_output(self):
 	# save
 	np.savetxt(os.path.join(self.dir_path, 'CHON.txt'), CHON_res, delimiter=' ') 		
 	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), conc_res, delimiter=' ')
-	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'), conc_res, delimiter=' ') 
+	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'), concs_res, delimiter=' ') 
 
 	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
 		if self.iont[0] == 'I': # if iodide
