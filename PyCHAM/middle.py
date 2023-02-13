@@ -10,7 +10,7 @@
 #    Foundation, either version 3 of the License, or (at your option) any later          						 #
 #    version.                                                                            										 #
 #                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT         						 #
 #    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
 #    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
 #    details.                                                                            										 #
@@ -103,9 +103,9 @@ def middle(self): # define function
 	# get component properties
 	[y_dens, OC, self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
 		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
-		uman_up, seed_dens, 0, nuci, nuc_comp, num_sb, dens_comp, dens,
+		uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
 		seed_name, y_mw, tempt_cnt, self)
-
+	
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
 		yield err_mess
@@ -133,6 +133,7 @@ def middle(self): # define function
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
 	
 	# solve problem
+	
 	for prog in ode_updater.ode_updater(y, rindx_g, 
 		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
 		jac_den_indx_g, jac_indx_g, H2Oi, 
@@ -159,7 +160,7 @@ def middle(self): # define function
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		OC, wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self):
+		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):
 
 		yield prog # update progress bar	
 

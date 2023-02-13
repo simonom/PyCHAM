@@ -79,7 +79,7 @@ def ode_updater(y, rindx,
 	OC, wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
-	chamV, tempt_cnt, self):
+	chamV, tempt_cnt, self, vol_Comp, volP):
 	
 	# inputs: ----------------------------------------------------
 	# self.update_stp - interval at which to update integration 
@@ -345,7 +345,7 @@ def ode_updater(y, rindx,
 		# standard PyCHAM (GMD paper) treatment with same gas-wall 
 		# partitioning coefficient for all components
 		self.kwf = 0
-		
+	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are recorded below
@@ -367,7 +367,7 @@ def ode_updater(y, rindx,
 	RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, wat_hist, self)
+	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
 	
 	import ode_solv
 	importlib.reload(ode_solv) # import most recent version
@@ -459,7 +459,7 @@ def ode_updater(y, rindx,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
@@ -811,7 +811,7 @@ def ode_updater(y, rindx,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
+			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, 

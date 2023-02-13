@@ -33,6 +33,7 @@ import numpy as np
 import scipy.constants as si
 import pybel
 
+# plotting gas-phase concentrations
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------

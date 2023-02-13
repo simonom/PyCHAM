@@ -48,7 +48,7 @@ def rec_prep(nrec_step,
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, wat_hist, self):
+	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
 	
 	# inputs: --------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -203,7 +203,7 @@ def rec_prep(nrec_step,
 		infx_cnt, Cfactor, diff_vol, 
 		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
-		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self)
+		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)

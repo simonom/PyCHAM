@@ -42,7 +42,7 @@ def cham_up(sumt, Pnow,
 	y_dens, H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, self):
+	seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -239,23 +239,19 @@ def cham_up(sumt, Pnow,
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
 			[_, Psat_water, _] = water_calc(temp_nown, RH[RHt_cnt], si.N_A)
+
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
-			[self, _, Psat_Pa] = volat_calc.volat_calc(0, Pybel_objects, temp_nown, H2Oi,   
-							num_comp, Psat_water, [], [], 0, corei, seed_name, 
+			[self, _] = volat_calc.volat_calc(0, Pybel_objects, temp_nown, H2Oi,   
+							num_comp, Psat_water, vol_Comp, volP, 0, corei, seed_name, 
 							pconc, 0, 0.0, [], 1, nuci, nuc_comp, self)
-			
-			self.Psat = self.Psat.reshape(1, -1) # ensure Psat is correct shape
-
-			# now, in preparation for ode solver, tile over size bins and wall bins
-			self.Psat = np.tile(self.Psat, (num_sb, 1))
 			
 			# according to the ideal gas law, air pressure (Pa) inside chamber
 			# is proportional to temperature, therefore pressure changes by 
 			# the same factor 
 			Pnow = Pnow*(temp_nown/temp_now)
 			
-			# update ppb to molecules/cc conversion factor concentrations
+			# update ppb to molecules/cm3 conversion factor concentrations
 			# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
 			ntot = Pnow*(si.N_A/((si.R*1.e6)*temp_nown))
 			# one billionth of number of molecules in chamber unit volume
@@ -570,7 +566,7 @@ def cham_up(sumt, Pnow,
 		
 		# take effect on the HOM-RO2-MCM-RO2 accretion product, note that inside Psat_Pa_rec
 		# is the estimated vapour pressure of the HOM-RO2 (Pa)
-		self.Psat_Pa[0, self.RO2_POOL_APi] = self.Psat_Pa_rec[self.RO2_POOL_APi] + RO2pool_effect_Pa
+		self.Psat_Pa[:, self.RO2_POOL_APi] = self.Psat_Pa_rec[self.RO2_POOL_APi] + RO2pool_effect_Pa
 		# convert to # molecules/cm3 (air) using ideal
 		# gas law, R has units cm3.Pa/K.mol
 		self.Psat[:, self.RO2_POOL_APi] = self.Psat_Pa[0, self.RO2_POOL_APi]*(si.N_A/((si.R*1.e6)*self.TEMP[tempt_cnt]))

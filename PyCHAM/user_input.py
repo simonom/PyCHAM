@@ -134,6 +134,7 @@ def share(self):
 		self.inname_orig = self.inname
 		self.dil_fac_orig = self.dil_fac
 		self.tf_UVC_orig = self.tf_UVC
+		self.num_asb = num_sb
 
 	return(sav_nam, comp0, y0, RH, RHt, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 

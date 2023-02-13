@@ -263,12 +263,18 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	group_indx['ROi'] = const['organic_alkoxy_radical_index']
 	group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
 	
-	if ((numsb-self.wall_on) <= 1): # if one or zero size bins
+	if ((numsb-self.wall_on) == 0): # if zero size bins
 		# ensure numpy arrays, rather than float
 		Nresult_wet = (np.array((Nresult_wet))).reshape(-1, 1)
 		Nresult_dry = (np.array((Nresult_dry))).reshape(-1, 1)
 		rbou_rec = (np.array((rbou_rec))).reshape(-1, 1)
-	
+		
+	if ((numsb-self.wall_on) == 1): # if one size bins
+		# ensure numpy arrays, rather than float
+		Nresult_wet = (np.array((Nresult_wet)))
+		Nresult_dry = (np.array((Nresult_dry)))
+		rbou_rec = (np.array((rbou_rec)))	
+
 	# to ensure quick use of output, store results in an object in an identical way to retr_out
 	# create a class to hold outputs
 	class ro_outputs:

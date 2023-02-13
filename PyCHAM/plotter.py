@@ -59,7 +59,7 @@ def plotter(caller, dir_path, uc, self):
 	seedi = self.ro_obj.seed_ind
 	indx_plot = self.ro_obj.plot_indx
 	comp0 = self.ro_obj.init_comp
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
 
@@ -185,11 +185,11 @@ def plotter(caller, dir_path, uc, self):
 			log10D = np.append((log10D[:, 0]-(log10D[:, 1]-log10D[:, 0])).reshape(-1, 1), log10D, axis=1)
 			# radius distance covered by each size bin (log10(um))
 			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], log10D.shape[1]-1)
-			
+		
 		if (num_asb == 1): # single particle size bin
 			# assume lower radius bound is ten times smaller than upper
 			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
-			
+				
 		# number size distribution contours (# particles/cm3 (air))
 		dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
 		dNdlog10D[:, :] = Nwet[:, :]/dlog10D[:, :]

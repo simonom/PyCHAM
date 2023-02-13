@@ -37,7 +37,7 @@ from water_calc import water_calc
 
 def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
 			volP, testf, corei, pconc, umansysprop_update, core_dens,
-			ode_gen_flag, nuci, nuc_comp, num_asb, dens_comp, dens, seed_name,
+			ode_gen_flag, nuci, nuc_comp, dens_comp, dens, seed_name,
 			y_mw, tempt_cnt, self):
 
 	# inputs: ------------------------------------------------------------
@@ -57,7 +57,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# ode_gen_flag - whether or not called from middle or ode_gen
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
-	# num_asb - number of actual size bins (excluding wall)
+	# self.num_asb - number of actual size bins (excluding wall)
 	# dens_comp - chemical scheme names of components with manually assigned 
 	# 	densities
 	# dens - manually assigned densities (g/cm3)
@@ -287,7 +287,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		else: # if no carbons in this component
 			OC[0, i] = 0.
 	
-	ish = (self.Psat == 0.)
+	ish = (self.Psat == 0.) # non-volatiles
 	
 	self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm
 	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325 # convert to Pa from atm
@@ -295,8 +295,8 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.Psat[ish] = 0.
 	
 	# in preparation for ode solver, tile over size and wall bins if present
-	if (num_asb+self.wall_on > 0):
-		self.Psat = np.tile(self.Psat, (num_asb+self.wall_on, 1))
+	if (self.num_asb+self.wall_on > 0):
+		self.Psat = np.tile(self.Psat, (self.num_asb+self.wall_on, 1))
 	else:
 		self.Psat = np.tile(self.Psat, (1, 1))
 	
@@ -309,7 +309,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.P_wfunc_ci = []
 	# list to remember the user-defined vapour pressure
 	self.P_wfunc = []
-
+	
 	# manually assigned vapour pressures (Pa)
 	if (len(vol_Comp) > 0 and ode_gen_flag == 0):
 		for i in range (len(vol_Comp)):
@@ -355,7 +355,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 						vol_indx = self.RO2_indices[:, 1]
 				
 				# assign user-defined vapour pressure for this wall (Pa)
-				self.Psat[(num_asb-1)+wn, vol_indx] = volP[i]
+				self.Psat[(self.num_asb-1)+wn, vol_indx] = volP[i]
 
 				# remember which components affected
 				self.P_wfunc_ci.append(vol_indx)
@@ -364,7 +364,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 				self.P_wfunc_wi.append([wn*i for i in [1]*len(vol_indx)])
 				# remember the user-defined vapour pressure
 				self.P_wfunc.append(volP[i])
-
+				
 			else: # not specific to a wall
 
 				# index of component in list of components
