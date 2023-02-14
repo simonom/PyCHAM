@@ -120,7 +120,7 @@ def middle(self): # define function
 	if (err_mess != ''): # if error raised or in testing mode then stop
 		yield err_mess
 	
-	# prepare particle phase and wall
+	# prepare particle phase
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
 	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 

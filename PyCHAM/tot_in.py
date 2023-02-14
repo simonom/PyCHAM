@@ -50,8 +50,18 @@ def tot_in(init_conc, Cfac, comp0, y_mw, Compt, self): # define function
 
 	for cnam in comp0: # loop through components present initially
 
-		
+		if '_wall' in cnam:
+
+			str_cnt = 0
+			for ii in cnam:
+				
+				if ii == '_':
+					if cnam[str_cnt:str_cnt+5] == '_wall':
+						cnam = cnam[0:str_cnt] # component name
+						break
+				str_cnt += 1
 		ci = self.comp_namelist.index(cnam) # index within all components
+		
 		tot_in_res_indx.append(ci) # remember component index
 
 		# initial input ug/m3, note *1e12 converts g/cm3 to ug/m3

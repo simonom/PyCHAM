@@ -174,9 +174,15 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	else:
 		num_sb = num_asb
 
-	# append particle and wall concentrations of components to y (# molecules/cm3 (air))
-	y = np.append(y, np.zeros((num_sb*num_comp)))
-	
+	# remember wall concentrations (set in init_conc)
+	y_w = y[num_comp::]
+
+	# include particle-phase concentrations of components to y (# molecules/cm3 (air))
+	y = np.append(y[0:num_comp], np.zeros(((num_sb-self.wall_on)*num_comp)))
+
+	# include wall concentrations (# molecules/cm3)
+	y = np.append(y, y_w)	
+
 	# molar volume of components (multiply y_dens by 1e-3 to convert from kg/m3 to g/cm3 and give
 	# MV in units cm3/mol)
 	MV = (y_mw/(y_dens*1.e-3)).reshape(num_comp, 1)

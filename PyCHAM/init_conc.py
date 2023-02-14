@@ -82,14 +82,18 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
-	# empty array for storing species' concentrations, must be an array
+	# empty array for storing component gas-phase concentrations, must be an array
 	y = np.zeros((num_comp))
-	y_mw = np.zeros((num_comp, 1)) # species' molecular weight (g/mol)
+	# empty array for storing component surface-phase concentrations, must be an array,
+	# note that 2 components added on to prepare for water and core and that if water
+	# included in chemical scheme then we adjust for that below
+	y_w = np.zeros(((num_comp+2)*self.wall_on))
+	y_mw = np.zeros((num_comp, 1)) # empty array for component molar mass (g/mol)
 	# empty array for storing index of interesting gas-phase components
 	y_indx_plot = []
 	
 	# convert concentrations
-	# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
+	# total number of molecules in 1 cm3 air using ideal gas law.  R has units cm3.Pa/K.mol
 	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
@@ -99,25 +103,63 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 
 	# insert initial concentrations where appropriate
 	for i in range(len(Comp0)):
-    		# index of where initial components occur in list of components
-		try: # in case components already listed via interpretation of the chemical scheme
-			y_indx = self.comp_namelist.index(Comp0[i])
-			
-		# if component not already listed via interpretation of the chemical scheme
-		# then send error message
-		except:
-			erf = 1
-			err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
-			return (0, 0, 0, 0, 0, 0, 0, 
-				0, 0, 0,
-				0, 0, erf, err_mess, 0, 0, 0, 0, 0)
-			
-		y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3 (air)
-		
-		# remember index for plotting gas-phase concentrations later
-		y_indx_plot.append(y_indx)
+
 	
+
+		if '_wall' in Comp0[i]: # in case component concentration relates to wall
+			wall_flag = 1
+			# get index of string where _wall stated
+			str_cnt = 0 # count way through string
+			for ii in Comp0[i]:
 				
+				if ii == '_':
+					if Comp0[i][str_cnt:str_cnt+5] == '_wall':
+						comp_now = Comp0[i][0:str_cnt] # component name
+						# wall numbers provided by user start from 1
+						wall_number = int(Comp0[i][str_cnt+5])-1
+					break
+				str_cnt += 1 # count way through string	
+			
+		else: # in case component concentration does not relate to wall
+			wall_flag = 0
+
+		if wall_flag == 0:
+    			# index of where initial components occur in list of components
+			try: # in case components already listed via interpretation of the chemical scheme
+				y_indx = self.comp_namelist.index(Comp0[i])
+			
+			# if component not already listed via interpretation of the chemical scheme
+			# then send error message
+			except:
+				erf = 1
+				err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				return (0, 0, 0, 0, 0, 0, 0, 
+					0, 0, 0,
+					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+			
+		
+			y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
+			# remember index for plotting gas-phase concentrations later
+			y_indx_plot.append(y_indx)
+	
+		if wall_flag == 1:
+
+			# index of where initial components occur in list of components
+			try: # in case components already listed via interpretation of the chemical scheme
+				y_indx = self.comp_namelist.index(comp_now)
+			
+			# if component not already listed via interpretation of the chemical scheme
+			# then send error message
+			except:
+				erf = 1
+				err_mess = str('Error: component called ' + str(comp_now) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				return (0, 0, 0, 0, 0, 0, 0, 
+					0, 0, 0,
+					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+
+			# insert surface concentration into surface array 
+			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3		
+
 	# check on whether O3 isopleth due to be made
 	# if isopleth due to be made overide any 
 	# originally provided initial conditions
@@ -167,7 +209,15 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 			H2Oi = indx
 			y[H2Oi] = C_H2O # include initial concentration of water (molecules/cm3)
 			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
-	
+			
+			# remove the addition of water in the surface concentrations
+			# first rearrange matric so that components in rows, surface number in columns
+			y_w = y_w.reshape(self.wall_on, num_comp+2)
+			# remove the excess water column
+			y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
+			# then flatten back to 1D array
+			y_w = y_w.flatten()
+
 	# if not included in chemical scheme file, then add water to end of component list
 	if (H2Oi == num_comp):
 	
@@ -195,12 +245,15 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# add to SMILES list
 	rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
-	# append core gas-phase concentration (molecules/cm3 (air)) and molecular 
-	# weight (g/mol) (needs to have a 1 length in second dimension for the kimt 
+	# append core gas-phase concentration (molecules/cm3 (air)) and molar 
+	# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
 	# calculations)
 	y = np.append(y, 0.)
 	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
 	
+	# finally append surface concentration array to gas-phase array
+	y = np.append(y, y_w)
+
 	# tracked components (dydt)--------------------------------------
 	
 	# check for tracking of all alkyl peroxy radicals
