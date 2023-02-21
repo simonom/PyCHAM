@@ -124,7 +124,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			for key, value in self.param_const.items():
 				f.write('%s = %s\n' % (key, value))
 		f.close()
-
+	
 	# saving dictionary
 	# dictionary containing variables for model and components
 	const = {}
@@ -151,7 +151,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
 	const["output_by_sim_sch_ext"] = output_by_sim_sch_ext
 	const["output_by_sim_mv_ext"] = output_by_sim_mv_ext
-
+	
 	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
@@ -185,7 +185,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			
 	# saving both gas, particle and wall concentrations of components
 	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cm3 (air)) and _w is the wall phase (molecules/cm3 (air))\n' + y_header)) 		
-	 
+	
 	# saving time of outputs
 	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
 	
@@ -212,6 +212,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), penultimate column is gas-particle partitioning and final column is gas-wall partitioning (molecules/cc.s (air))')
 			compind += 1
 	
+	
 	# saving generation of components
 	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised VOC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	
@@ -235,7 +236,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	
 	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), self.tot_in_res_ft, delimiter=',',
 				header=str('the total concentration (ug/m3) of injected (through initial gas-phase concentration, instantaneous and/or continuous gas-phase influx) components, with component index (relative to all components) in the first row and its cumulative injected concentrations in following rows'))
-
+	
 	# this save added on 05/05/2022
 	# save self, so that same simulation can be recreated again
 	import pickle
@@ -274,7 +275,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		Nresult_wet = (np.array((Nresult_wet)))
 		Nresult_dry = (np.array((Nresult_dry)))
 		rbou_rec = (np.array((rbou_rec)))	
-
+	
 	# to ensure quick use of output, store results in an object in an identical way to retr_out
 	# create a class to hold outputs
 	class ro_outputs:
@@ -311,5 +312,5 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		env_cond = cham_env
 		total_influx = self.tot_in_res_ft
 	self.ro_obj = ro_outputs() # create object to hold outputs
-		
+	
 	return()

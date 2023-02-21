@@ -332,7 +332,6 @@ def ode_updater(y, rindx,
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
 	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
-	save_cnt_chck = 1 # counting recording steps for time interval check
 	# turn off flag for ongoing injection of particles
 	self.pcont_ongoing = 0
 	
@@ -444,7 +443,6 @@ def ode_updater(y, rindx,
 				# prepare for recording next point
 				save_cnt += 1
 
-			
 			# update chamber variables
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
@@ -463,16 +461,15 @@ def ode_updater(y, rindx,
 			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
-			
-			if ((sumt+tnew) > self.save_step*save_cnt_chck):
-				tnew = (self.save_step*(save_cnt_chck))-sumt
+			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
+				tnew = (self.save_step*(save_cnt-1))-sumt
 				# temporarily set the update step for operator-split processes
 				# to align with recording time step, this ensures that
 				# recording and operator-split intervals don't fall out of sync
 				self.update_stp = tnew
 				update_count = 0.
 				ic_red = 1
-				
+
 			# ensure update to operator-split processes interval not surpassed
 			if (update_count+tnew > self.update_stp):
 				tnew = (self.update_stp-update_count)
@@ -670,10 +667,6 @@ def ode_updater(y, rindx,
 				# get observed concentrations now
 				for ci in range(len(self.obs_comp_i)): # loop through components
 					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
-
-		
-		if (sumt%self.save_step < 1.e-12): # get remainder
-			save_cnt_chck += 1 # if need to move up count on recording
 			
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been

@@ -104,9 +104,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# insert initial concentrations where appropriate
 	for i in range(len(Comp0)):
 
-	
-
-		if '_wall' in Comp0[i]: # in case component concentration relates to wall
+		if ('_wall' in Comp0[i]): # in case component concentration relates to wall
 			wall_flag = 1
 			# get index of string where _wall stated
 			str_cnt = 0 # count way through string
@@ -123,7 +121,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 		else: # in case component concentration does not relate to wall
 			wall_flag = 0
 
-		if wall_flag == 0:
+		if (wall_flag == 0):
     			# index of where initial components occur in list of components
 			try: # in case components already listed via interpretation of the chemical scheme
 				y_indx = self.comp_namelist.index(Comp0[i])
@@ -142,12 +140,12 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 			# remember index for plotting gas-phase concentrations later
 			y_indx_plot.append(y_indx)
 	
-		if wall_flag == 1:
+		if (wall_flag == 1):
 
 			# index of where initial components occur in list of components
 			try: # in case components already listed via interpretation of the chemical scheme
 				y_indx = self.comp_namelist.index(comp_now)
-			
+				
 			# if component not already listed via interpretation of the chemical scheme
 			# then send error message
 			except:
@@ -158,8 +156,9 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 
 			# insert surface concentration into surface array 
-			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3		
-
+			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
+			y_indx_plot.append(y_indx) # remember for plotting
+			
 	# check on whether O3 isopleth due to be made
 	# if isopleth due to be made overide any 
 	# originally provided initial conditions

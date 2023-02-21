@@ -186,18 +186,31 @@ def ui_check(self):
 			if (sum(sum(mean_rad > uppsize)) > 0):
 				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is greater than the particle size range (determined by the upper_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
 				em_flag = 2 # error message flag for error
-
+				
 		# if particle concentration per size bin supplied explicitly
-		# check that number of time consisent across relevant variables
+		# check that number of time consistent across relevant variables
 		if (pmode == 1):
 			if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != pcont.shape[1] or pconct.shape[1] != pcont.shape[1]):
 				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+') and/or pcont ('+str(pcont.shape[1])+').  Please see README for guidance.')
 				em_flag = 2 # error message flag for error
+			
 			# in this mode ensure fillers for mean_rad and std match the same
-			# length of first dimension as times
-			mean_rad = np.ones((1, pconct.shape[1]))*-1.e6
-			std = np.ones((1, pconct.shape[1]))*1.e20
-
+			# length of first dimension (which represents times)
+			if (mean_rad.shape == (1, 1)):
+				if (mean_rad[0,0] == -1.e-6):
+					mean_rad = np.ones((1, pconct.shape[1]))*-1.e6
+			else: # if insufficient mean_rad values provided then error
+				if mean_rad.shape[1] != pconc.shape[1]:
+					err_mess = str('Error: the mean radius (mean_rad) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+').  Please see README for guidance.')
+					em_flag = 2 # error message flag for error
+			if (std.shape == (1, 1)):
+				if (std[0,0] == 1.2):
+					std = np.ones((1, pconct.shape[1]))*1.2
+			else: # if insufficient std values provided then error
+				if std.shape[1] != pconc.shape[1]:
+					err_mess = str('Error: the standard deviation (std) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
+					em_flag = 2 # error message flag for error
+				
 		# if particle concentration per size bin supplied by modes
 		# check that number of time consistent across relevant variables
 		if (pmode == 0):
