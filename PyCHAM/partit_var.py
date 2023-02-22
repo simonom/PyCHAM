@@ -90,7 +90,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# updated module
 		accom_coeff_calc = __import__('accom_coeff_calc')
 		accom_coeff_now = accom_coeff_calc.accom_coeff_func(accom_coeff, radius)
-
+		
 		# Non-continuum regime correction 
 		# calculate a correction factor according to the continuum versus non-continuum 
 		# regimes
@@ -104,7 +104,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		correct_2 = (4.*(1.-accom_coeff_now[:, 0:num_sb-self.wall_on]))/(3.*accom_coeff_now[:, 0:num_sb-self.wall_on])
 		correct_3 = 1.e0+(correct_1+correct_2)*Kn
 		correction = correct_3**-1.
-		
+
 		# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
 		# note that avMW has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 		# 1e7 for units g cm2/s2.mol.K, 
@@ -187,5 +187,5 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# concatenate kw onto kimt, ready for ode solver
 	if (self.wall_on > 0):
 		kimt = np.concatenate((kimt, self.kw), axis = 0)
-
+	
 	return(kimt, kelv)

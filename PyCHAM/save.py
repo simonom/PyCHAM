@@ -109,7 +109,10 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# create folder to store copies of inputs
 	os.makedirs(str(output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
-	output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('/')[-1])
+	if '/' in self.sch_name: # if using / to separate path parts
+		output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('/')[-1])
+	if '\\' in self.sch_name: # if using \\ to separate path parts
+		output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('\\')[-1])
 	
 	copyfile(self.sch_name, output_by_sim_sch_ext)
 	output_by_sim_mv_ext = str(output_by_sim + '/inputs/' + self.inname.split('/')[-1])

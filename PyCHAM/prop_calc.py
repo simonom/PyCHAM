@@ -164,6 +164,10 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
 	for i in range (num_comp):
 	
+		# note, rec_now_flag is only changed below if alternative vapour pressure estimation 
+		# method uncommented for HOMs
+		rec_now_flag = 0
+
 		if ('_ao' in self.comp_namelist[i]): # if part of the extension
 			# if it's the peroxy radical formed from autoxidation
 			if (self.comp_namelist[i][-4::] == '_ao1'):
@@ -206,40 +210,42 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			continue
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
-		if ('_ao' in self.comp_namelist[i]):
-			self.Psat[0, i] = -0.12*rel_SMILES[i].count('O') + rel_SMILES[i].count('C')*-0.22-4.5
-			
-			self.Psat_Pa_rec[i] = self.Psat[0, i]
-			
-		else: # for non-HOM components
-			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
-			# that equation given by eq. 7 of same reference)
+		
+		if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
+			Psatnow = -2.63+-0.50*rel_SMILES[i].count('O') + (rel_SMILES[i].count('C')-5)*-0.80
+			rec_now_flag = 1 # record this vapour pressure
+				
+		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
+		# that equation given by eq. 7 of same reference)
+		else: 
 			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], self.TEMP[tempt_cnt], 
-						boiling_points.nannoolal(Pybel_objects[i]))))
+					boiling_points.nannoolal(Pybel_objects[i]))))
 
-			# in case you want to ensure small molecules don't contribute to particle mass
-			#if rel_SMILES[i].count('C')<=5:
-			#	 Psatnow += 10 # ensure no condensation of small molecules
+		# in case you want to ensure small molecules don't contribute to particle mass
+		#if rel_SMILES[i].count('C')<=5:
+		#	 Psatnow += 10 # ensure no condensation of small molecules
+
+
+		
+		try: # in case array
+			self.Psat[0, i] = Psatnow[0]
+		except: # in case float
+			self.Psat[0, i] = Psatnow
+	
+		if (self.TEMP[tempt_cnt] == 298.15 or rec_now_flag == 1):
+			try: # in case array
+				self.Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
+			except: # in case float
+				self.Psat_Pa_rec[i] = Psatnow # note transfer to Pa is below
+		else: 
+			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
+					boiling_points.nannoolal(Pybel_objects[i]))))
 			
 			try: # in case array
-				self.Psat[0, i] = Psatnow[0]
+				self.Psat_Pa_rec[i]  = Psatnow[0]
 			except: # in case float
-				self.Psat[0, i] = Psatnow
-			
-			if (self.TEMP[tempt_cnt] == 298.15):
-				try: # in case array
-					self.Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
-				except: # in case float
-					self.Psat[0, i] = Psatnow # note transfer to Pa is below
-			else: 
-				Psatnow= ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
-						boiling_points.nannoolal(Pybel_objects[i]))))
-			
-				try: # in case array
-					self.Psat_Pa_rec[i]  = Psatnow[0]
-				except: # in case float
-					self.Psat_Pa_rec[i] = Psatnow
-
+				self.Psat_Pa_rec[i] = Psatnow
+		
 		# if component is chlorine, then H:C is 0 and can continue
 		if (rel_SMILES[i] == 'ClCl'):
 			self.HC[0, i] = 0.
@@ -290,7 +296,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	ish = (self.Psat == 0.) # non-volatiles
 	
 	self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm
-	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325 # convert to Pa from atm
+	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325. # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
 	self.Psat[ish] = 0.
 	

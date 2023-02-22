@@ -715,7 +715,12 @@ def part_num_vs_time_sizeseg(self):
 def part_area_vs_time_sizeseg(self):
 
 	import scipy.constants as si
+		
+	# get required variables from self
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
 	
+
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
 

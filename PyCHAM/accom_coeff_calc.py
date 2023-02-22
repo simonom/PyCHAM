@@ -36,5 +36,6 @@ def accom_coeff_func(accom_coeff, radius):
 	# ------------------------------------------------------------------ 
 
 	# calculate accommodation coefficients 
+	accom_coeff[0, :] = 1.e0 
 
 	return(accom_coeff)

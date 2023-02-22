@@ -425,12 +425,12 @@ def ui_check(self):
 	
 	if (em_flag < 2 and self.sch_name == 'Not found'): # if a chemical scheme has not been identified
 	
-		err_mess_n = str('Note - a new chemical scheme has not been identified automatically.  For PyCHAM to identify automatically the chemical scheme file must be inside the selected folder and its file name must contain the string \'chem\'.  Alternatively use the relevant button to select the chemical scheme individually.\n')
+		err_mess_n = str('Error - a new chemical scheme has not been identified automatically.  For PyCHAM to identify automatically the chemical scheme file must be inside the selected folder and its file name must contain the string \'chem\'.  Alternatively use the relevant button to select the chemical scheme individually.\n')
 		if (em_flag == 0):
 			err_mess = err_mess_n
 		else:
 			err_mess = str(err_mess+err_mess_n)
-		em_flag = 1
+		em_flag = 2
 	
 	# -------------------------------------
 	# check on water history

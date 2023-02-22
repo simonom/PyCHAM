@@ -53,11 +53,33 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	# prepare the volatility basis set interpretation
 	# of particle-phase concentrations
 
-	# required outputs from full-moving
-	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
-		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, 
-		PsatPa, OC, H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
-	
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	y = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	y[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	N = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	N[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	t_array = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
+	x = self.ro_obj.cen_size
+	y_MV = self.ro_obj.comp_MV
+	space_mode = self.ro_obj.spacing
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 
 	# tell user that this code won't work if no particle size bins present
 	if (self.phase4vol == 'Particle Phase' or self.phase4vol == 'Particle and Gas Phase Combined'):

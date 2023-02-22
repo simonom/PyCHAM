@@ -3017,6 +3017,9 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
+		# get the phase to consider
+		self.phase4vol = self.b221a.currentText()
+
 		import vol_contr_analys	
 		dir_path = self.l201.text() # name of folder with results
 		vol_contr_analys.plotter_wiw(0, dir_path, self, 0) # plot results

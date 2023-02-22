@@ -241,4 +241,5 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)
 
-	return(mfp, accom_coeff, therm_sp, surfT, act_coeff, R_gas, NA, diff_vol, Dstar_org, err_mess, self)
+	return(mfp, accom_coeff, therm_sp, surfT, act_coeff, 
+			R_gas, NA, diff_vol, Dstar_org, err_mess, self)

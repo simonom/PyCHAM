@@ -39,10 +39,10 @@ param_const = {}
 param_const['sim_num'] = 2 # number of simulations
 
 # state path to chemical scheme
-param_const['sch_name'] = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM_working\\PyCHAM\\PyCHAM\\input\\JPAC_test/MCM_APINENE_C5H8_CH4_scheme.kpp'
+param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\apinene_ch4_mcm_PRAM_schem.kpp'
 
 # state path to xml file
-param_const['xml_name'] = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM_working\\PyCHAM\\PyCHAM\\input\\JPAC_test/JPAC_api_iso_HOM.xml'
+param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\apinene_ch4_mcm_xml.xml'
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
@@ -89,7 +89,7 @@ param_const['param_ranges'] = param_range
 def auto_setup_and_call(param_const): # define the function
 
 	# note, to test that steady state being reached, 
-	# I recommend running just two simulations to 
+	# it is recommended to run just two simulations to 
 	# begin and checking on these whether steady state reached
 		
 	# pass chosen parameters to PyCHAM for running the simulation ------
