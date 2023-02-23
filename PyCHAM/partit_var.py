@@ -23,6 +23,7 @@
 # the kimt_calc module is called at the start of the model loop time interval to update
 # the mass transfer coefficient of gases to particles and gases to walls
 
+import importlib
 import numpy as np
 from part_prop import part_prop
 import scipy.constants as si
@@ -85,10 +86,9 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# Knudsen number (dimensionless)
 		Kn = np.repeat(mfp, (num_sb-self.wall_on), 1)/np.repeat(radius, num_comp, 0)
 	
-		# update accommodation coefficients if necessary
-		# note, using __import__ rather than import allows opening in run time, thereby using
-		# updated module
-		accom_coeff_calc = __import__('accom_coeff_calc')
+		# update accommodation coefficients
+		import accom_coeff_calc
+		importlib.reload(accom_coeff_calc) # import most recent version
 		accom_coeff_now = accom_coeff_calc.accom_coeff_func(accom_coeff, radius)
 		
 		# Non-continuum regime correction 

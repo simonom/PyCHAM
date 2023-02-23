@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -30,12 +30,12 @@ def accom_coeff_func(accom_coeff, radius):
 
 	# ------------------------------------------------------------------ 
 	# inputs:
-	# accom_coeff - array containing accommdotion coefficients for all 
+	# accom_coeff - array containing accommodation coefficients for all 
 	# components
 	# radius - radii of size bins (m)
 	# ------------------------------------------------------------------ 
 
 	# calculate accommodation coefficients 
-	accom_coeff[0, :] = 1.e0 
+	accom_coeff[0, :] = 1.e3 
 
 	return(accom_coeff)
