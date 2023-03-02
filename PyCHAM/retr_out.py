@@ -33,7 +33,7 @@ def retr_out(self):
 
 	# name of file where experiment constants saved
 	fname = str(self.dir_path + '/model_and_component_constants')
-
+	
 	try: # try opening file
 		const_in = open(fname)
 	except:
@@ -349,6 +349,7 @@ def retr_out(self):
 		siz_struc = siz_str
 		env_cond = cham_env
 		total_influx = tot_in_res
+
 	self.ro_obj = ro_outputs() # create object to hold outputs
 
 	yield('Output ready to plot')

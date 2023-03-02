@@ -385,8 +385,13 @@ def cham_up(sumt, Pnow,
 			
 			if (gpp_stab != -1 or pcontf == 1): # if no linear interpolation required, or injection continuous
 				pconcn = pconc[:, seedt_cnt]
-				mean_radn = mean_rad[:, seedt_cnt]
-				stdn = std[:, seedt_cnt]
+
+				if (pmode == 0): # if in modal mode
+					mean_radn = mean_rad[:, seedt_cnt]
+					stdn = std[:, seedt_cnt]
+				else: # if number concentrations given per size bin
+					mean_radn = mean_rad
+					stdn = std
 			
 			# if linear interpolation required and instantaneous injection of seed
 			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
@@ -448,8 +453,14 @@ def cham_up(sumt, Pnow,
 		
 		if (seedt_cnt != -1):
 			pconcn = pconc[:, seedt_cnt-1]
-			mean_radn = mean_rad[:, seedt_cnt-1]
-			stdn = std[:, seedt_cnt-1]		
+			
+			if (pmode == 0): # if in modal mode
+				mean_radn = mean_rad[:, seedt_cnt-1]
+				stdn = std[:, seedt_cnt-1]
+			
+			if (pmode == 1): # if number concentration per size bin given explicitly
+				mean_radn = mean_rad
+				stdn = std		
 		
 			# injected seed particle number concentration integrated over proposed 
 			# time step (# particles/cm3)
@@ -463,10 +474,10 @@ def cham_up(sumt, Pnow,
 			# injected seed particle number concentration integrated over proposed 
 			# time step (# particles/cm3)
 			pconcn = pconc[:, -1]*tnew
-		
+			
 		[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 		_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
-		N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
+		N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
 		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 		stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)

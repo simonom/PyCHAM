@@ -1,6 +1,23 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\test_schem\low_vol_test_normwall_ac1e3
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\Lunderberg_scheme\Lundenberg2020
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

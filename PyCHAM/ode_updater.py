@@ -374,7 +374,7 @@ def ode_updater(y, rindx,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		
+			
 		# remembering variables at the start of the integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
@@ -458,7 +458,7 @@ def ode_updater(y, rindx,
 			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
-			
+
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
@@ -698,7 +698,7 @@ def ode_updater(y, rindx,
 				
 					# particle-phase concentration(s) (# molecules/cm3 (air))
 					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp))
-				
+					
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
 						Varr, Vbou, rbou] = coag.coag(RH[RHt_cnt], temp_now, x*1.e-6, 
@@ -720,6 +720,7 @@ def ode_updater(y, rindx,
 							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
 							0, p_char, e_field, (num_sb-self.wall_on), self)
 			
+
 				if (nucv1 > 0.): # nucleation
 					
 					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 

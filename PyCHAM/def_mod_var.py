@@ -163,7 +163,7 @@ def def_mod_var(caller, self): # define function
 	self.Cw = np.zeros((1)) # effective absorbing mass of wall (g/m3 (air))
 	self.kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
 
-	inflectDp = 0. # diameter of deposition function inflection
+	inflectDp = 1.e-6 # diameter of deposition function inflection
 	pwl_xpre = 0. # gradient before inflection
 	pwl_xpro = 0. # gradient after inflection
 	inflectk = 0. # rate at inflection

@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2023-02-23 07:46:40.957933
+# created at 2023-03-02 15:39:39.616040
 
 import numpy
 import photolysisRates
@@ -53,14 +53,50 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 
 	if (self.light_stat_now == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((1))
+	rate_values = numpy.zeros((19))
 	
 	# if reactions have been found in the chemical scheme
 	# gas-phase reactions
 	gprn = 0 # keep count on reaction number
 	try:
 		gprn += 1 # keep count on reaction number
-		rate_values[0] = 0.
+		rate_values[0] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[1] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[2] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[3] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[4] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[5] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[6] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[7] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[8] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[9] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[10] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[11] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[12] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[13] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[14] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[15] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[16] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[17] = 1.e-13
+		gprn += 1 # keep count on reaction number
+		rate_values[18] = 1.e-13
 	except:
 		erf = 1 # flag error
 		err_mess = str('Error: estimating reaction rate for reaction number ' + str(gprn) + ' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file') # error message

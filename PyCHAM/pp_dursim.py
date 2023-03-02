@@ -110,9 +110,10 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 			pdf_out = np.interp(rad0, hires, pdf_output)	
 			# number concentration of seed in all size bins (# particle/cm3 (air))
 			pconc_new = (pdf_out/sum(pdf_out))*pconc[i]
-			
+				
 			# number concentration realism
-			pconc_new[pconc_new < 1] = 0.
+			pconc_new[pconc_new < 1.e-2] = 0.
+			
 			N_perbin[:, 0] += pconc_new # (# particles/cm3 (air))
 					
 	# volume concentration of new seed particles (um3/cm3 (air))
@@ -203,10 +204,10 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 
 				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
 
-				# average molecular weight of dry (no water) seed components (cc/mol) for all size bins
+				# average molecular weight of dry (no water) seed components (cm3/mol) for all size bins
 				avMW = (sum(seedx*seed_mw))				
 
-				# average molar volume of dry (no water) seed components (cc/mol) for all size bins
+				# average molar volume of dry (no water) seed components (cm3/mol) for all size bins
 				avMV = (sum(seedx*MV[self.seedi[:], 0]))
 
 				# calculate Kelvin effect factor for the provided number size distribution
@@ -257,7 +258,6 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 		
 			# concentration of this component in all size bins (# molecules/cm3 (air)):
 			yn[self.seedi[ci]:(num_comp*(num_sb-1)+self.seedi[ci])+1:num_comp] = ytot*seedx[ci]
-	
 
 	# if instantaneous injection of particles
 	# factor concentrations of components comprising 

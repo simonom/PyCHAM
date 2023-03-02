@@ -312,14 +312,15 @@ def plotter(caller, dir_path, uc, self):
 		# array for mass concentration with time
 		MCvst = np.zeros((1, len(timehr)))
 		
-		# first obtain just the particle-phase concentrations (molecules/cm3)
-		yrp = yrec[:, num_comp:num_comp*(num_asb+1)]
+		# first obtain just the particle-phase concentrations (# molecules/cm3)
+		yrp = np.zeros((yrec.shape[0], num_comp*(num_asb)))
+		yrp[:, :] = yrec[:, num_comp:num_comp*(num_asb+1)]
 		# loop through size bins to convert to ug/m3
 		for sbi in range(num_asb):
-			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp] /si.N_A)*y_MW)*1.e12
+			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp]/si.N_A)*y_MW)*1.e12
 		
 		MCvst[0, :] = yrp.sum(axis=1)
-		
+
 		# log10 of maximum in mass concentration
 		if (max(MCvst[0, :]) > 0):
 			MCmax = int(np.log10(max(MCvst[0, :])))

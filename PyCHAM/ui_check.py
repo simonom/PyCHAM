@@ -166,7 +166,7 @@ def ui_check(self):
 		em_flag = 2 # error message flag for error
 	
 	# consistency between length of total particle concentration, 
-	# mean particle radius and standard deviation when in modal mode
+	# mean particle radius and standard deviation
 	if (num_sb > 0 and em_flag < 2):
 		if (pmode == 0): # particle number concentrations expressed as modes
 			if (mean_rad.shape != pconc.shape and em_flag < 2):
@@ -175,7 +175,7 @@ def ui_check(self):
 			if (std.shape != pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
 				em_flag = 2 # error message flag for error
-	
+		
 	# ensure that the mean radius of modes (mean_rad) is consistent with the particle size range
 	if (num_sb > 0 and em_flag < 2):
 		
