@@ -394,8 +394,8 @@ Other features that are relevant to indoor air simulation include: the wavelengt
 
 PyCHAM has been tested against observations from homes. The [Lunderberg et al. (2020)] (https://dx.doi.org/10.1021/acs.est.0c00966) study observes that components with volatilities comparable to C13-C22 alkanes show increased mixing ratios in the gas-phase+particle-phase with increased temperature, with decreased dependency as volatility decreases. They conclude that increased temperature decreases the fraction of these components on surfaces. Furthermore, components with volatilities comparable to C23-C31 alkanes show increased mixing ratios in the gas-phase+particle-phase with increased mass concentrations of particulate matter with diameter below 2.5 um. They conclude that a reservoir for these components on surfaces acts to modulate the particle-phase concentration. The PyCHAM inputs to generate the Lunderberg et al. (2020) results and the code to generate the PyCHAM results below are stored in PyCHAM/input/ind_AQ_ex/Lunderberg2020. The plots below show results from PyCHAM simulations and reproduce the Lunderberg et al. (2020) observations.
 
-![Lunderberg](https://github.com/simonom/PyCHAM/Images_for_readme/Lunderberg2020Fig2.png "Figure 2")
-![Lunderberg2](https://github.com/simonom/PyCHAM/Images_for_readme/Lunderberg2020Fig3.png "Figure 3")
+![Lunderberg Fig. 2](https://github.com/simonom/PyCHAM/blob/master/Images_for_readme/Lunderberg2020Fig2.png "Figure 2")
+![Lunderberg Fig. 3](https://github.com/simonom/PyCHAM/blob/master/Images_for_readme/Lunderberg2020Fig3.png "Figure 3")
 
 ## Frequently Asked Questions
 
