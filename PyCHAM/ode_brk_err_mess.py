@@ -28,28 +28,25 @@
 import numpy as np # for arithmetic
 import datetime # for dealing with times
 	
-def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi, 
-			pstoi, rrc, nreac, nprod, num_comp, 
+def ode_brk_err_mess(y0, neg_names, rrc, num_comp, 
 			num_asb, act_coeff, neg_comp_indx,
 			N_perbin, core_diss, kelv_fac, kimt, 
-			eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
-			rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, call, 
-			H2Oi, y, self):
+			call, H2Oi, y, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# y0 - concentrations prior to attempted integration (# molecules/cm3)
 	# neg_names - chemical scheme names of components with negative concentrations
-	# rindx - index of reactants per equation
-	# y_arr - index for matrix used to arrange concentrations of gas-phase reactants, 
+	# self.rindx_g - index of reactants per equation
+	# self.y_arr_g - index for matrix used to arrange concentrations of gas-phase reactants, 
 	#	enabling calculation of reaction rate coefficients 	
-	# y_rind - index of y relating to reactants for reaction rate 
+	# self.y_rind_g - index of y relating to reactants for reaction rate 
 	# 	coefficient equation
-	# rstoi - stoichiometry of reactants
-	# pstoi - stoichiometry of products
+	# self.rstoi_g - stoichiometry of reactants
+	# self.pstoi_g - stoichiometry of products
 	# rrc - reaction rate coefficient (/s)
-	# nreac - number of reactants per equation
-	# nprod - number of products per equation
-	# self.wall_on - whether wall considerations turned on or off
+	# self.nreac_g - number of reactants per equation
+	# self.nprod_g - number of products per equation
+	# wall_on - whether wall considerations turned on or off
 	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
 	# self.Cw - effective absorbing mass concentration of wall 
@@ -63,16 +60,16 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 	# core_diss - dissociation of seed components
 	# kelv_fac - kelvin factor for particle
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
-	# eqn_num - number of gas- and particle-phase reactions
-	# rindx_aq - index of aqueous-phase reactants
-	# y_rind_aq - index of y relating to particle-phase reactants for reaction rate 
+	# self.eqn_num - number of gas- and particle-phase reactions
+	# self.rindx_aq - index of aqueous-phase reactants
+	# self.y_rind_aq - index of y relating to particle-phase reactants for reaction rate 
 	# 	coefficient equation
-	# y_arr_aq - index for matrix used to arrange concentrations of particle-phase 
+	# self.y_arr_aq - index for matrix used to arrange concentrations of particle-phase 
 	#	reactants, enabling calculation of reaction rate coefficients
-	# rstoi_aq - stoichiometry of particle-phase reactants
-	# pstoi_aq - stoichiometry of particle-phase products
-	# nreac_aq - number of reactants per equation for aqueous-phase reactions
-	# nprod_aq - number of products per equation for aqueous-phase reactions
+	# self.rstoi_aq - stoichiometry of particle-phase reactants
+	# self.pstoi_aq - stoichiometry of particle-phase products
+	# self.nreac_aq - number of reactants per equation for aqueous-phase reactions
+	# self.nprod_aq - number of products per equation for aqueous-phase reactions
 	# call - flag for whether module called after ode_solv_wat or ode_solv
 	# H2Oi - index for water
 	# y - concentrations (molecules/cm3) after solver
@@ -121,7 +118,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 			if (sbi > 0):
 				f.write(str('Size bin ' + str(sbi) + ': ' + str(y[H2Oi+sbi*num_comp]) + '\n'))
 
-	if (eqn_num[0] > 0):# if gas-phase reactions present
+	if (self.eqn_num[0] > 0):# if gas-phase reactions present
 		# gas-phase reactions -------------------------
 		# empty array to hold relevant concentrations for
 		# reaction rate coefficient calculation
@@ -143,7 +140,7 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 			f.write(str('Eq. ' + str(i+1) + ' reac: ' + str(reac_loss_rate[i, 0:nreac[i]]) + '\n'))
 			f.write(str('Eq. ' + str(i+1) + ' prod: ' + str(prod_gain_rate[i, 0:nprod[i]]) + '\n'))
 
-	if (eqn_num[1] > 0):# if particle-phase reactions present
+	if (self.eqn_num[1] > 0):# if particle-phase reactions present
 
 		# particle-phase reactions -------------------------
 		# tile aqueous-phase reaction rate coefficients
@@ -163,9 +160,9 @@ def ode_brk_err_mess(y0, neg_names, rindx, y_arr, y_rind, rstoi,
 		f.write('\n')
 		f.write('Particle-phase reaction fluxes with both size bin numbers and equation numbers starting at 1 (# molecules/cm3/s):\n')
 		for sbi in range(num_asb): # loop through size bins
-			for i in range(eqn_num[1]): # loop through equations
-				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*eqn_num[1]+i, 0:nreac_aq[i]]) + '\n'))
-				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*eqn_num[1]+i, 0:nprod_aq[i]]) + '\n'))
+			for i in range(self.eqn_num[1]): # loop through equations
+				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*self.eqn_num[1]+i, 0:nreac_aq[i]]) + '\n'))
+				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*self.eqn_num[1]+i, 0:nprod_aq[i]]) + '\n'))
 	
 	if (self.wall_on == 1): # include fluxes of trouble components to wall if wall is considered
 		

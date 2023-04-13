@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -24,11 +24,12 @@
 
 import datetime
 
-def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define function
+def write_rate_file(rrc, rrc_name, testf, self): # define function
 	
 	# inputs: ----------------------------------------------------------------------------
-	# reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
-	# reac_coef_aq - aqueous-phase reaction rate coefficient expression from the equation file
+	# self.reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
+	# self.reac_coef_aq - aqueous-phase reaction rate coefficient expression from the equation file
+	# self.reac_coef_su - surface (e.g. wall) reaction rate coefficient expression from the equation file
 	# rrc - expression for generic reaction rate coefficients
 	# rrc_name - name given to generic reaction rate coefficients	
 	# testf - flag for mode: 0 in gas-phase equation mode, 2 for test mode, 3 for
@@ -44,7 +45,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 		f = open('rate_coeffs.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -94,7 +95,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 	
 	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors\n')
 	# determine whether to bypass calculations because no chemical reactions were found
-	if (len(reac_coef_g)+len(reac_coef_aq) > 0):
+	if (len(self.reac_coef_g)+len(self.reac_coef_aq)+len(self.reac_coef_su) > 0):
 		
 		f.write('\n')
 		f.write('	# calculate any generic reaction rate coefficients given by chemical scheme\n')
@@ -107,7 +108,7 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 			f.write('\n')
 			f.write('	except:\n')
 			f.write('		erf = 1 # flag error\n')
-			f.write('		err_mess = \'Error: reaction rates failed to be calculated, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
+			f.write('		err_mess = \'Error: generic reaction rates failed to be calculated inside rate_coeffs.py, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
 	
 		f.write('	# estimate and append photolysis rates\n')
 		f.write('	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)\n')
@@ -116,27 +117,31 @@ def write_rate_file(reac_coef_g, reac_coef_aq, rrc, rrc_name, testf): # define f
 		f.write('		J = [0]*len(J)\n')
 
 		# calculate the rate coefficient for each equation
-		f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))
+		f.write('	rate_values = numpy.zeros((%i))\n' %(len(self.reac_coef_g)+len(self.reac_coef_aq)+len(self.reac_coef_su)))
 		
 		f.write('	\n')
 		f.write('	# if reactions have been found in the chemical scheme\n')
 		f.write('	# gas-phase reactions\n')
 		f.write('	gprn = 0 # keep count on reaction number\n')
 		f.write('	try:\n') # in case there are any issues with calculating a rate coefficient
-		for eqn_key in range (len(reac_coef_g)):
+		for eqn_key in range (len(self.reac_coef_g)):
 			f.write('		gprn += 1 # keep count on reaction number\n')
-			f.write('		rate_values[%s] = %s\n' %(eqn_key, reac_coef_g[eqn_key]))
+			f.write('		rate_values[%s] = %s\n' %(eqn_key, self.reac_coef_g[eqn_key]))
 		f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
 		f.write('		erf = 1 # flag error\n')
 		f.write('		err_mess = str(\'Error: estimating reaction rate for reaction number \' + str(gprn) + \' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
 		f.write('	\n')
 		f.write('	# aqueous-phase reactions\n')
-		for eqn_key_aq in range (1, len(reac_coef_aq)+1):
-			f.write('	rate_values[%s] = %s\n' %(eqn_key+eqn_key_aq, reac_coef_aq[eqn_key_aq-1]))
+		for eqn_key_aq in range (len(self.reac_coef_aq)):
+			f.write('	rate_values[%s] = %s\n' %(len(self.reac_coef_g)+eqn_key_aq, self.reac_coef_aq[eqn_key_aq]))
+		f.write('	\n')
+		f.write('	# surface (e.g. wall) reactions\n')
+		for eqn_key_su in range (len(self.reac_coef_su)):
+			f.write('	rate_values[%s] = %s\n' %(len(self.reac_coef_g)+len(self.reac_coef_aq)+eqn_key_su, self.reac_coef_su[eqn_key_su]))
 		f.write('	\n')
 	
 	else: # if no reactions found
-		f.write('	rate_values = numpy.zeros((%i))\n' %(len(reac_coef_g)+len(reac_coef_aq)))		
+		f.write('	rate_values = numpy.zeros((%i))\n' %(len(self.reac_coef_g)+len(self.reac_coef_aq)+len(self.reac_coef_su)))		
 	f.write('	return(rate_values, erf, err_mess)\n')
 	f.close()
 

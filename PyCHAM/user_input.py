@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -36,7 +36,7 @@ def share(self):
 	# path to store for variables
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, comp0, y0, RH, RHt, Press,
+		[sav_nam, comp0, y0, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
@@ -58,8 +58,8 @@ def share(self):
 		self.sav_nam_orig = sav_nam
 		self.comp0_orig = comp0
 		self.y0_orig = y0
-		self.RH_orig = RH
-		self.RHt_orig = RHt
+		self.RH_orig = self.RH
+		self.RHt_orig = self.RHt
 		self.Press_orig = Press
 		self.Cw_orig = self.Cw
 		self.kw_orig = self.kw
@@ -136,7 +136,7 @@ def share(self):
 		self.tf_UVC_orig = self.tf_UVC
 		self.num_asb = num_sb
 
-	return(sav_nam, comp0, y0, RH, RHt, Press,
+	return(sav_nam, comp0, y0, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 		std, mean_rad, Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,

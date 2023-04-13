@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -43,7 +43,7 @@ def def_mod_var(caller, self): # define function
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
-	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';']
+	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';', '']
 	# time interval between updates to integration inputs (s)
 	self.update_stp = 1.
 	self.tot_time = 1. # total time to integrate over (s)
@@ -58,8 +58,8 @@ def def_mod_var(caller, self): # define function
 	# chamber environment -----------------------------------------------------------------
 	self.TEMP = np.array((298.15)).reshape(1) # temperature of experiment (K)
 	self.tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
-	RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
-	RHt = np.array(([0])) # time through simulation (s) RH reached
+	self.RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
+	self.RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
 	self.dil_fac = np.zeros(1) # dilution factor (volume fraction per second)
 	self.dil_fact = np.zeros(1) # dilution factor times through experiment (s)
@@ -161,7 +161,7 @@ def def_mod_var(caller, self): # define function
 	# deposition of particles and vapours to wall ------------------------------------------
 	self.wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	self.Cw = np.zeros((1)) # effective absorbing mass of wall (g/m3 (air))
-	self.kw = np.zeros((1)) # gas-wall mass transfer coefficient (/s)
+	self.kw = np.zeros((1, 1)) # gas-wall mass transfer coefficient (/s)
 
 	inflectDp = 1.e-6 # diameter of deposition function inflection
 	pwl_xpre = 0. # gradient before inflection
@@ -202,7 +202,7 @@ def def_mod_var(caller, self): # define function
 	# --------------------------------------------------------------------
 
 	# prepare for pickling
-	list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
+	list_vars = [sav_nam, comp0, y0, Press, 
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 			uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
@@ -223,7 +223,7 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, comp0, y0, RH, RHt, Press, siz_stru, num_sb, 
+	return(sav_nam, comp0, y0, Press, siz_stru, num_sb, 
 		pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  

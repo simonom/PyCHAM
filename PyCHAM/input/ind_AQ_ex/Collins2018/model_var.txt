@@ -1,0 +1,34 @@
+# to investigate HONO formation from NO2 surface reaction, based on
+# Collins et al. 2018: https://doi.org/10.1021/acs.est.8b04512
+res_file_name = Collins2018_hiNO2vd
+total_model_time = 1.e4
+update_step = 1.e3
+recording_time_step = 1.e3
+light_status = 0
+light_time = 0.
+tf_UVC = 0.
+wall_on = 1
+# gas-wall partitioning
+mass_trans_coeff = 1.e-4; NO2_wall1_2.7e-3; HONO_wall1_1.7e-3
+eff_abs_wall_massC = 1.e3
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.65
+C0 = 20., 2., 20., 2.
+Comp0 = NO2, HONO, NO2_wall1, HONO_wall1
+Cinfl = 2.8e-3; 2.8e-4
+const_infl = NO2, HONO
+const_infl_t = 0.
+number_size_bins = 0
+# particle loss to wall
+#McMurry_flag = 1
+#coag_on = 1
+#space_mode = log
+#lower_part_size = 1.e-4
+#upper_part_size = 1.e0
+#Vwat_inc = 1
+#pconc = 1.e4
+#pconct = 0.
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , [ , :, }, ;, !
+dil_fac = 1.39e-4

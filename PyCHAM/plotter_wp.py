@@ -93,7 +93,7 @@ def plotter(caller, comp_names_to_plot, self):
 					return()
 			
 			if (wall_on > 0):
-				# wall-phase concentration (from gas-wall partitioning) (# molecules/cm3)
+				# wall-phase concentration (from gas-wall partitioning and production on wall) (# molecules/cm3)
 				# (summed over walls)
 				conc = np.sum(yrec[:, ((num_asb+1)*num_comp)+indx_plot::num_comp], axis = 1)
 			

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -348,8 +348,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 		# interrogate scheme to list equations
-		[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-			RO2_names] = sch_interr.sch_interr(total_list_eqn, self)	
+		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	
 		for cnum in range(np.min([top_num[0], len(res_sort)])): # loop through chemical reactions
 			
@@ -358,7 +357,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			
 			for indx_two in (cindx):
 				
-				reac_txt = str(eqn_list[int(res[0, indx_two])]) # get equation text
+				reac_txt = str(self.eqn_list[int(res[0, indx_two])]) # get equation text
 				# plot, note the +1 in the label to bring label into MCM index
 				ax0.plot(timehr[0:-1], res[1::, indx_two], label = str(' Eq. # ' + str(int(res[0, indx_two])+1) + ':  ' + reac_txt))
 		

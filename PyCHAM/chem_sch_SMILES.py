@@ -49,8 +49,7 @@ def chem_scheme_SMILES_extr(self):
 	f_open_eqn.close() # close file
 
 	# interrogate scheme to list equations
-	[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-		RO2_names] = sch_interr.sch_interr(total_list_eqn, self)
+	[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
@@ -63,11 +62,13 @@ def chem_scheme_SMILES_extr(self):
 	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
 
 	# ready for storing reaction rate coefficients
-	reac_coef = []
+	self.reac_coef_g = []
+	self.reac_coef_aq = []
+	self.reac_coef_su = []
 
-	for eqn_step in range(eqn_num[0]): # loop through gas-phase reactions
+	for eqn_step in range(self.eqn_num[0]): # loop through gas-phase reactions
 
-		line = eqn_list[eqn_step] # extract this line
+		line = self.eqn_list[eqn_step] # extract this line
 		
 		# work out whether equation or reaction rate coefficient part comes first
 		eqn_start = str('.*\\' +  self.chem_sch_mrk[10])
@@ -158,7 +159,7 @@ def chem_scheme_SMILES_extr(self):
 
 		# store the reaction rate coefficient for this equation 
 		# (/s once any inputs applied)
-		reac_coef.append(rate_ex)
+		self.reac_coef_g.append(rate_ex)
 		
 		# ----------------------------------------------------
 		
@@ -225,12 +226,12 @@ def chem_scheme_SMILES_extr(self):
 		comp_namelist.append('H2O')
 	
 	# if no error message but no equations identified then tell user
-	if (err_mess == '' and eqn_num[0] == 0):
+	if (err_mess == '' and self.eqn_num[0] == 0):
 		err_mess = 'Note: no gas-phase reactions seen, this could be due to the chemical scheme marker input (chem_scheme_markers in the model variables input) not corresponding to the chemical scheme file, please see README for more guidance.'
 	
 	# check on whether all rate coefficients can be calculated
 	# call function to generate reaction rate calculation module
-	write_rate_file.write_rate_file(reac_coef, [], rrc, rrc_name, 0)
+	write_rate_file.write_rate_file(rrc, rrc_name, 0, self)
 
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
@@ -242,6 +243,6 @@ def chem_scheme_SMILES_extr(self):
 		[rate_values, erf, err_mess] = rate_coeffs.evaluate_rates(0., 0., 298.15, 0., 1., 1., 1., Jlen, 1., 1., 1., 0., self)
 		
 	except: # in case import fails or rate coefficient calculation fails
-		err_mess = 'Error: chemical reactions not interpreted correctly, this could be because of inconsistency between the chemical scheme marker input (chem_scheme_markers in the model variables input) and the format of the chemical scheme file, please see README for more guidance.'
-		
+		err_mess = err_mess
+
 	return(comp_namelist, comp_list, err_mess, H2Oi)

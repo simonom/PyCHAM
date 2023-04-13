@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -232,11 +232,37 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# in case user has not given a Cw value for every wall
 	if (self.Cw.shape[0] == 1 and self.wall_on > 1):
 		self.Cw = np.tile((self.Cw), (self.wall_on, 1))
-	# ensure rate of transfer to walls represents walls in rows and components in columns
-	self.kw = np.tile((self.kw.reshape(-1, 1)), (1, num_comp))
-	# in case user has not given a kw value for every wall
-	if (self.kw.shape[0] == 1 and self.wall_on > 1):
-		self.kw = np.tile((self.kw), (self.wall_on, 1))
+
+	# start of mass transfer rate coefficient to wall -----------------
+	
+	# empty array ready to hold useful mass transfer rate coefficient to wall matrix
+	kwn = np.zeros((self.wall_on, num_comp))
+	pre_count = 0 # count on prescribed components
+	mask = np.zeros((self.wall_on, num_comp)) # masking matrix
+	mask = mask == 0.
+	
+	if (self.wall_on > 0): # if wall present
+		# loop through user-defined inputs
+		for wi in range(self.kw.shape[0]): # loop through walls
+			for ci in range(self.kw.shape[1]): # loop through components	
+				if self.kw[wi,ci] == -1.e-6: # flag for empty space in array
+					continue
+				strn = str(self.kw[wi, ci]) # get the current string
+				if strn.count('_') == 2: # coefficient specified for a component
+				
+					# coefficient of this component on this wall
+					kwn[wi, self.comp_namelist.index(self.wmtc_deets[pre_count, 0])] = self.wmtc_deets[pre_count, 2]
+					mask[wi, self.comp_namelist.index(self.wmtc_deets[pre_count, 0])] = False
+					pre_count += 1 # count on prescribed components
+				else: # coefficient specified for all components
+					kwn[wi, mask[wi, :]] = self.kw[wi, ci]
+	
+	# finally convert kw to kwn
+	self.kw = np.zeros((((self.wall_on, num_comp))))
+	self.kw[:, :] = kwn[:, :]
+	
+
+	# end of mass transfer rate coefficient to wall -------------------
 
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's constant (molecules/mol)

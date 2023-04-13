@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -41,7 +41,7 @@ def middle(self): # define function
 	# ---------------------------------------------------------------
 
 	# get required inputs
-	[sav_nam, comp0, y0, RH, RHt, Pnow,
+	[sav_nam, comp0, y0, Pnow,
 		siz_str, num_sb, pmode, pconc, pconct,
 		lowsize, uppsize, space_mode, std, mean_rad,
 		Compt, injectt, Ct, seed_name, seed_mw, 
@@ -56,21 +56,10 @@ def middle(self): # define function
 	
 	# parse the chemical scheme equation file to convert equations
 	# into usable code
-	[rindx_g, pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, 
-	jac_stoi_g, njac_g, jac_den_indx_g, 
-	jac_indx_g, y_arr_g, y_rind_g, uni_y_rind_g, y_pind_g, uni_y_pind_g, 
-	reac_col_g, prod_col_g, rstoi_flat_g, 
-	pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, colptrs, jac_wall_indx, 
+	[rowvals, colptrs, jac_wall_indx, 
 	jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
-	Pybel_objects, eqn_num, Jlen, 
-	rindx_aq, rstoi_aq, pindx_aq, pstoi_aq, reac_coef_aq, 
-	nreac_aq, nprod_aq, jac_stoi_aq, 
-	jac_den_indx_aq, njac_aq, jac_indx_aq, 				
-	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, 
-	uni_y_pind_aq, reac_col_aq, prod_col_aq, rstoi_flat_aq, pstoi_flat_aq, 
-	rr_arr_aq, rr_arr_p_aq, comp_xmlname, comp_smil, erf, err_mess, 
-	self] = eqn_pars.extr_mech(int_tol, 
-	(num_sb+self.wall_on), drh_str, erh_str, sav_nam,
+	Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
+	self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
 	pcont, self)
 	
 	# if needed, then run operations to produce variable checker plot 
@@ -88,11 +77,8 @@ def middle(self): # define function
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, 
 	rel_SMILES] = init_conc.init_conc(comp_num, 
-	comp0, y0, RH, Pnow, Pybel_objects, 0, pconc, 
-	rindx_g, pindx_g, eqn_num[0], nreac_g, nprod_g, 
-	Compt, seed_name,
-	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	rstoi_g, pstoi_g, self)
+	comp0, y0, Pnow, Pybel_objects, 0, pconc, self.eqn_num[0], Compt, seed_name,
+	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self)
 	
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
@@ -134,27 +120,18 @@ def middle(self): # define function
 	
 	# solve problem
 	
-	for prog in ode_updater.ode_updater(y, rindx_g, 
-		pindx_g, rstoi_g, pstoi_g, nreac_g, nprod_g, jac_stoi_g, njac_g, 
-		jac_den_indx_g, jac_indx_g, H2Oi, 
+	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-		x, Varr, act_coeff, Cfactor, y_arr_g, y_rind_g, 
-		uni_y_rind_g, y_pind_g, uni_y_pind_g, reac_col_g, prod_col_g, 
-		rstoi_flat_g, pstoi_flat_g, rr_arr_g, rr_arr_p_g, rowvals, 
+		x, Varr, act_coeff, Cfactor, rowvals, 
 		colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-		nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
+		nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, MV, rindx_aq, 
-		pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
-		jac_den_indx_aq, jac_indx_aq, y_arr_aq,
-		y_rind_aq, 
-		uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
-		rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num,
+		uppsize, std, rbou, MV,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,

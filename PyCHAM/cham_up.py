@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -40,7 +40,7 @@ def cham_up(sumt, Pnow,
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
-	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
+	DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP):
 
@@ -112,8 +112,8 @@ def cham_up(sumt, Pnow,
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
-	# RH - relative humidities (fraction 0-1)
-	# RHt - times through experiment at which relative humidities reached (s)
+	# self.RH - relative humidities (fraction 0-1)
+	# self.RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on temperatures
 	# RHt_cnt - relative humidity counts
 	# Pybel_objects - the pybel identifiers for components
@@ -238,7 +238,7 @@ def cham_up(sumt, Pnow,
 			# update vapour pressure of water (log10(atm)),
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
-			[_, Psat_water, _] = water_calc(temp_nown, RH[RHt_cnt], si.N_A)
+			[_, Psat_water, _] = water_calc(temp_nown, self.RH[RHt_cnt], si.N_A)
 
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
@@ -337,22 +337,22 @@ def cham_up(sumt, Pnow,
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# check on instantaneous change in relative humidity ---------------------------------------
-	if (len(RHt) > 0 and RHt_cnt > -1): # if any injections occur
+	if (len(self.RHt) > 0 and RHt_cnt > -1): # if any injections occur
 	
 		# check whether changes occur at start of this time step
-		if (sumt >= RHt[RHt_cnt] and RHt_cnt != -1):
+		if (sumt >= self.RHt[RHt_cnt] and RHt_cnt != -1):
 		
 			if (gpp_stab != -1): # if no linear interpolation required
-				RHn = RH[RHt_cnt]
+				RHn = self.RH[RHt_cnt]
 				
-				if (RHt_cnt < (RHt.shape[0]-1)):
+				if (RHt_cnt < (self.RHt.shape[0]-1)):
 					RHt_cnt += 1 # update count on RH
 				else:
 					RHt_cnt = -1 # reached end
 				bc_red = 0 # reset flag for time step reduction due to boundary conditions
 				
 			else:
-				RHn = np. interp(tnew, [0, t00], [RH[RHt_cnt-1], RH[RHt_cnt]])
+				RHn = np. interp(tnew, [0, t00], [self.RH[RHt_cnt-1], self.RH[RHt_cnt]])
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 		
 			# update vapour pressure of water (log10(atm)), and change 
@@ -362,10 +362,10 @@ def cham_up(sumt, Pnow,
 				
 		# check whether changes occur during next proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
-		if ((sumt+tnew > RHt[RHt_cnt]) and (RHt_cnt != -1) and gpp_stab != -1):
+		if ((sumt+tnew > self.RHt[RHt_cnt]) and (RHt_cnt != -1) and gpp_stab != -1):
 			# if yes, then reset integration time step so that next step coincides 
 			# with change
-			tnew = RHt[RHt_cnt]-sumt
+			tnew = self.RHt[RHt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
 	# get whether next/current injection of seed is instantaneous or continuous

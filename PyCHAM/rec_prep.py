@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -32,9 +32,7 @@ import dydt_rec
 import act_coeff_update
 
 # define function
-def rec_prep(nrec_step, 
-	y, y0, rindx, 
-	rstoi, pindx, pstoi, nprod, nreac, 
+def rec_prep(nrec_step, y, y0, 
 	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	y_dens, x, therm_sp, H2Oi, act_coeff, 
@@ -44,7 +42,7 @@ def rec_prep(nrec_step,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, 
-	DStar_org, RH, RHt, tempt_cnt, RHt_cnt, 
+	DStar_org, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
 	tot_in_res, Compti, 
@@ -54,12 +52,12 @@ def rec_prep(nrec_step,
 	# nrec_step - number of steps to record on
 	# y - initial concentrations (# molecules/cm3 (air))
 	# y0 - component concentrations prior to integration step (# molecules/cm3 (air))
-	# rindx - indices of reactants
-	# rstoi - stoichiometries of reactants
-	# pindx - indices of products
-	# pstoi - stoichiometries of products
-	# nprod - number of products
-	# nreac - number of reactants
+	# self.rindx_g - indices of reactants
+	# self.rstoi_g - stoichiometries of reactants
+	# self.pindx_g - indices of products
+	# self.pstoi_g - stoichiometries of products
+	# self.nprod_g - number of products
+	# self.nreac_g - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
 	# N_perbin - particle concentration per size bin (#/cm3 (air))
@@ -116,7 +114,7 @@ def rec_prep(nrec_step,
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	# instantaneously after experiment start
 	# pmode - whether number size distributions expressed as modes or explicitly
-	# pconc - concentration of injected particles (#/cc (air))
+	# pconc - concentration of injected particles (# particles/cm3 (air))
 	# pconct - times of particle injection (s)
 	# seedt_cnt - count on injection of seed particles
 	# mean_rad - mean radius for particle number size 
@@ -144,8 +142,8 @@ def rec_prep(nrec_step,
 	# self.seedi - index of seed component(s)
 	# self.C_p2w - concentration of components on the wall due to particle
 	# deposition to wall (# molecules/cm3)
-	# RH - relative humidities (fraction 0-1)
-	# RHt - times through experiment at which relative humidities reached (s)
+	# self.RH - relative humidities (fraction 0-1)
+	# self.RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on chamber temperatures
 	# RHt_cnt - chamber relative humidity counts
 	# Pybel_objects - the pybel objects for components
@@ -201,7 +199,7 @@ def rec_prep(nrec_step,
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
 		infx_cnt, Cfactor, diff_vol, 
-		DStar_org, RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
+		DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 	
@@ -303,9 +301,8 @@ def rec_prep(nrec_step,
 	if (self.testf != 5 and len(self.dydt_vst) > 0):
 		importlib.reload(dydt_rec) # import most recent version
 		dydt_cnt = 0 # index for row to record on
-		self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-				nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
-				kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
-
+		self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, num_comp, core_diss, kelv_fac, 
+				kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self)
+						
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
 		infx_cnt, temp_now, cham_env, Pnow, cham_env[0, 2], Cinfl_now)

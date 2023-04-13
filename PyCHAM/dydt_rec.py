@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -23,11 +23,11 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2023-03-02 15:39:39.617054
+# File Created at 2023-04-13 14:20:18.942567
 
 import numpy as np 
 
-def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
+def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self):
 	
 	# number of particle size bins excluding wall
 	num_asb = num_sb-self.wall_on
@@ -50,7 +50,7 @@ def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_s
 		for i in dydt_rec[0, 0:-2]: # final two rows for particle- and wall-partitioning 
 			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
 			# estimate gas-phase change tendency for each reaction involving this component 
-			gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i] 
+			gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]]]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*reac_coef[i] 
 			dydt_rec[step+1, reac_count] += reac_sign[reac_count]*((gprate))
 			reac_count += 1 # keep count on relevant reactions 
 			

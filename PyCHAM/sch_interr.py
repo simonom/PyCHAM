@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -37,8 +37,9 @@ def sch_interr(total_list_eqn, self):
 	# --------------------------------------------------------------------------
 	
 	# preparatory part ---------------------------------------------------------
-	eqn_list = [] # empty list for gas-phase reaction equation
-	aqeqn_list = [] # empty list for particle-phase reaction equation
+	self.eqn_list = [] # empty list for gas-phase reaction equation
+	self.aqeqn_list = [] # empty list for particle-phase reaction equation
+	self.sueqn_list = [] # empty list for surface (e.g. wall) reaction equation
 	RO2_names = [] # empty list for peroxy radicals
 	rrc = [] # empty list for reaction rate coefficients
 	rrc_name = [] # empty list for reaction rate coefficient labels
@@ -88,18 +89,20 @@ def sch_interr(total_list_eqn, self):
 					if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[0]:
 						# don't consider if an aqueous-phase chemical scheme reaction
 						if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[8]:
+							# don't consider if a surface (e.g. wall) chemical scheme reaction
+							if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[12]:
 							
-							# remove end characters
-							line2 = line1.replace(str(self.chem_sch_mrk[7]), '')
-							# remove all white space
-							line2 = line2.replace(' ', '')
-							# convert fortran-type scientific notation to python type
-							line2 = formatting.SN_conversion(line2)
-							# ensure rate coefficient is python readable
-							line2 = formatting.convert_rate_mcm(line2)
-							rrc.append(line2.strip())
-							# get just name of generic reaction rate coefficient
-							rrc_name.append((line2.split('=')[0]).strip())		
+								# remove end characters
+								line2 = line1.replace(str(self.chem_sch_mrk[7]), '')
+								# remove all white space
+								line2 = line2.replace(' ', '')
+								# convert fortran-type scientific notation to python type
+								line2 = formatting.SN_conversion(line2)
+								# ensure rate coefficient is python readable
+								line2 = formatting.convert_rate_mcm(line2)
+								rrc.append(line2.strip())
+								# get just name of generic reaction rate coefficient
+								rrc_name.append((line2.split('=')[0]).strip())		
 			
 		# --------------------------------------------------------------------------------
 		# peroxy radical part
@@ -192,7 +195,7 @@ def sch_interr(total_list_eqn, self):
 			eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
 			if (re.match(eqn_markers[0], line1) != None and 
 				re.match(eqn_markers[1], line1) != None):
-				eqn_list.append(line1) # store reaction equations
+				self.eqn_list.append(line1) # store reaction equations
 
 		# aqueous-phase reaction equation part
 		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
@@ -210,9 +213,27 @@ def sch_interr(total_list_eqn, self):
 				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
 				if (re.match(eqn_markers[0], line1) != None and 
 					re.match(eqn_markers[1], line1) != None):
-					aqeqn_list.append(line1) # store reaction equations
+					self.aqeqn_list.append(line1) # store reaction equations
+
+		# surface (e.g. wall) reaction equation part
+		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
+		# and second \ ensures recognition of marker
+		# first, check if a marker given, if not bypass
+		if self.chem_sch_mrk[12] == '':
+			continue
+		else:
+			
+			marker = str('^\\' +  self.chem_sch_mrk[12])
+		
+			if (re.match(marker, line1) != None):
+				# second check is whether markers for starting reaction rate coefficients
+				# part, and markers for end of equation lines, are present
+				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
+				if (re.match(eqn_markers[0], line1) != None and 
+					re.match(eqn_markers[1], line1) != None):
+					self.sueqn_list.append(line1) # store reaction equations
 
 	# number of equations
-	eqn_num = np.array((len(eqn_list), len(aqeqn_list)))
+	self.eqn_num = np.array((len(self.eqn_list), len(self.aqeqn_list), len(self.sueqn_list)))
 
-	return(eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, RO2_names)
+	return(rrc, rrc_name, RO2_names, self)

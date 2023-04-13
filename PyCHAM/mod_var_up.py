@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -34,7 +34,7 @@ def mod_var_up(self):
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, comp0, y0, RH, RHt, Press,
+		[sav_nam, comp0, y0, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
@@ -59,8 +59,8 @@ def mod_var_up(self):
 	
 	self.l14a.setText((str(self.TEMP)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l15a.setText((str(self.tempt)).replace('\'', '').replace(' ', '')[1:-1])
-	self.l16a.setText((str(RH.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l16c.setText((str(RHt.tolist())).replace('\'', '').replace(' ', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l16a.setText((str(self.RH.tolist())).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l16c.setText((str(self.RHt.tolist())).replace('\'', '').replace(' ', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l17a.setText((str(Press)).replace('\'', '').replace(' ', ''))
 	self.l17_1a.setText((str(self.dil_fac)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l18a.setText((str(siz_stru)).replace('\'', '').replace(' ', ''))

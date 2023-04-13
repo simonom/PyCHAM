@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -37,7 +37,7 @@ def mod_var_read(self):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, comp0, y0, RH, RHt, Press,
+			[sav_nam, comp0, y0, Press,
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
@@ -112,10 +112,10 @@ def mod_var_read(self):
 				self.tempt = [float(i) for i in ((value.strip()).split(','))]
 
 			if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
-				RH = np.array(([float(i) for i in ((value.strip()).split(','))]))
+				self.RH = np.array(([float(i) for i in ((value.strip()).split(','))]))
 				
 			if key == 'rht' and (value.strip()): # times through simulation (s) at which relative humidity reached
-				RHt = np.array(([float(i) for i in ((value.strip()).split(','))]))
+				self.RHt = np.array(([float(i) for i in ((value.strip()).split(','))]))
 
 			if key == 'p_init' and (value.strip()): # pressure inside chamber
 				Press = float(value.strip())
@@ -150,7 +150,61 @@ def mod_var_read(self):
 				self.Cw = np.array([float(i) for i in ((value.strip()).split(','))])
 				
 			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
-				self.kw = np.array([float(i) for i in ((value.strip()).split(','))])
+
+				max_comp = 1
+				max_of_all = [1]
+				reader = '' # prepare to read in string between semi-colons
+				prescribes = [] # list of prescribed mass transfer coefficients
+				num_wall_mtfs = 1 # number of walls mentioned in the mass transfer coefficient
+				# count maximum number of components for a single wall
+				for i in value.strip():
+					if i == ';': # new component
+						max_comp += 1
+						# remember old component and wall and mass transfer coefficient
+						prescribes.append(reader)
+						reader = '' # prepare to read in string between semi-colons
+						
+					if i == ',': # new wall
+						max_of_all.append(max_comp)
+						max_comp = 1
+						num_wall_mtfs += 1
+						prescribes.append(reader)
+						reader = '' # prepare to read in string between semi-colons
+
+					if (i != ';' and i != ',' and i != ' '):
+						reader = str(reader + i)
+
+				max_of_all.append(max_comp) # ensure final wall accounted for
+
+				# remember the components that are prescribed, their wall number and mass transfer coefficient
+				self.wmtc_deets = np.empty([len(prescribes), 3], dtype=str)
+				pre_cnt = 0 # count on number of prescribed mass transfer coefficients
+
+				# prepare holding array for rate coefficient information
+				self.kw = np.ones((num_wall_mtfs, max(max_of_all)))*-1.e-6
+				
+				wall_num = 0 # count on walls
+				ind_wall_cnt = 1 # number of entries for each wall
+				for prei in prescribes:
+	
+					if prei.count('_') == 2: # if this gives the coefficient for a specific component
+						
+						# get component name
+						self.wmtc_deets[pre_cnt, 0] = prei[0:prei.index('_')]
+						# get wall number
+						self.wmtc_deets[pre_cnt, 1] = prei[prei.index('_'):prei[prei.index('_')::].index('_')]
+						# get mass transfer coefficient
+						self.wmtc_deets[pre_cnt, 2] = prei[prei[prei.index('_')::].index('_')::]
+					
+					else: # if just a generic mass transfer coefficient for this wall
+						self.kw[wall_num, ind_wall_cnt-1] = prei
+
+					pre_cnt += 1 # count on number of prescribed mass transfer coefficients
+					ind_wall_cnt += 1 # number of entries for each wall
+					if pre_cnt == sum(max_of_all[0:wall_num+1]): # if moving up a wall
+						wall_num += 1
+						ind_wall_cnt = 1 # number of entries for each wall
+				
 				
 			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
 				chamSA = float(value.strip())
@@ -367,7 +421,8 @@ def mod_var_read(self):
 				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
 			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
-				if ',' in value.strip(): # if wavelength-dependent transmission factors supplied
+				
+				if '_' in value.strip(): # if wavelength-dependent transmission factors supplied
 					self.tf = [str(i.strip()) for i in (value.split(','))]
 					self.tf_range = 1 # flag for wavelength-dependency
 				else: # if a single transmission factor supplied
@@ -562,7 +617,7 @@ def mod_var_read(self):
 			pmode = 0 # modal particle concentrations
 		
 		# prepare for pickling
-		list_vars = [sav_nam, comp0, y0, RH, RHt, Press, 
+		list_vars = [sav_nam, comp0, y0, Press, 
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
 				uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 

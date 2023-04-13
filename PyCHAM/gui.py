@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -156,7 +156,7 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model variables -------------------------
 		[sav_nam, comp0, 
-		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
+		y0, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
 		dens_comp, dens, vol_comp, volP, act_comp, 
@@ -325,14 +325,14 @@ class PyCHAM(QWidget):
 		l16.setText('Relative humidity (0-1): ')
 		self.varbox.addWidget(l16, env_row+3, 0)
 		self.l16a = QLabel(self)
-		self.l16a.setText((str(RH)).replace('\'', '').replace(' ', ','))
+		self.l16a.setText((str(self.RH)).replace('\'', '').replace(' ', ','))
 		self.varbox.addWidget(self.l16a, env_row+3, 1)
 		
 		l16b = QLabel(self)
 		l16b.setText('Relative humidity times (s): ')
 		self.varbox.addWidget(l16b, env_row+4, 0)
 		self.l16c = QLabel(self)
-		self.l16c.setText((str(RHt)).replace('\'', '').replace(' ', ','))
+		self.l16c.setText((str(self.RHt)).replace('\'', '').replace(' ', ','))
 		self.varbox.addWidget(self.l16c, env_row+4, 1)
 		
 		l17 = QLabel(self)
@@ -1104,7 +1104,7 @@ class PyCHAM(QWidget):
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of total particle-phase concentrations
-		self.b212 = QPushButton('Wall concentrations (from gas-wall partitioning) ('+u'\u03BC'+'g/m'+u'\u00B3'+')', self)
+		self.b212 = QPushButton('Wall concentrations (excluding from particle deposition to wall) ('+u'\u03BC'+'g/m'+u'\u00B3'+')', self)
 		self.b212.setToolTip('Plot the temporal profile of wall concentration (from gas-wall partitioning) for the specified components')
 		self.b212.clicked.connect(self.on_click212)
 		self.PRIMlayout.addWidget(self.b212, 5, 0)
@@ -1886,7 +1886,7 @@ class PyCHAM(QWidget):
 		# prepare by enforcing default variables
 		# default variables for all required input model variables -------------------------
 		[sav_nam, comp0, 
-		y0, RH, RHt, Press, siz_stru, num_sb, pmode, pconc, 
+		y0, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
@@ -1899,7 +1899,7 @@ class PyCHAM(QWidget):
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, comp0, y0, RH, RHt, Press,
+			[sav_nam, comp0, y0, Press,
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
@@ -2059,7 +2059,7 @@ class PyCHAM(QWidget):
 		
 			# reset to default variables to allow any new variables to arise
 			# from the current model variables file only
-			[sav_nam, comp0, y0, RH, RHt, Press, 
+			[sav_nam, comp0, y0, Press, 
 			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
 			space_mode, std, mean_rad, Compt, injectt, 
 			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
@@ -2102,7 +2102,7 @@ class PyCHAM(QWidget):
 			# get the save path name variables
 			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, comp0, y0, RH, RHt, Press,
+				[sav_nam, comp0, y0, Press,
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
 				Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
@@ -2116,7 +2116,7 @@ class PyCHAM(QWidget):
 			
 			# let check know this is a second call
 			self.chck_num = 2
-
+			
 			# run another check on inputs - means any changes made by default are set
 			import ui_check; ui_check.ui_check(self)
 
@@ -4135,7 +4135,7 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, comp0, y0, RH, RHt, Press,
+				[sav_nam, comp0, y0, Press,
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
 				std, mean_rad, Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
@@ -4430,19 +4430,48 @@ class PyCHAM(QWidget):
 			self.param_const['C0'] = ''
 
 			self.param_const['res_file_name'] = str(self.param_const['res_file_name'][0:15] + str(simi))
-			self.param_const['trans_fac'] = str('200_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
+			
+			# linear distribution in transmission factor of light (based on common sense, where 
+			# 0=dark and 1=midday sunshine in Meditteranean in summer) 
+			self.param_const['trans_fac'] = str('0_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
+			
+			# linear distribution in temperature (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
 			self.param_const['temperature'] = (rng.integers(low=param_range['temperature'][0], high=param_range['temperature'][1], size=1))[0]
+			# linear distribution in relative humidity (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
 			self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
 		
-			comp_cnt = 0
+			# log-normal distribution of gases like VOCs, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
+			comp_cnt = 0 # count on components
 			for compi in range(len(param_range['C0'])):
-				if (comp_cnt == 0):
-					self.param_const['C0'] = str(self.param_const['C0'] + str((rng.integers(low=param_range['C0'][compi][0], high=param_range['C0'][compi][1], size=1))[0]))
-				else:
-					self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str((rng.integers(low=param_range['C0'][compi][0], high=param_range['C0'][compi][1], size=1))[0]))
-		
-				comp_cnt += 1
 
+				# create log-normal distribution for concentration range of this component
+				minCi = param_range['C0'][compi][0] # minimum concentration (ppb)
+				maxCi = param_range['C0'][compi][1] # maximum concentration (ppb)
+
+				# linear distribution along log10 of range extremes
+				lin_dis = np.linspace(np.log10(minCi), np.log10(maxCi), num=100)
+
+				# randomly select concentration and raise to power 10
+				conc_rand = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
+
+				if (comp_cnt == 0):
+					self.param_const['C0'] = str(self.param_const['C0'] + str(conc_rand))
+				else:
+					self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(conc_rand))
+		
+				comp_cnt += 1 # count on components
+
+			# log-normal distribution of seed particle concentration
+			# create log-normal distribution for concentration range of this component
+			minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
+			maxC = param_range['pconc'][1] # maximum concentration (# particles/cm3)
+
+			# linear distribution along log10 of range extremes
+			lin_dis = np.linspace(np.log10(minC), np.log10(maxC), num=100)
+
+			# randomly select concentration and raise to power 10
+			self.param_const['pconc'] = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
+			
 			# establish parameters provided by user by calling mod_var_read
 			import mod_var_read
 			mod_var_read.mod_var_read(self)

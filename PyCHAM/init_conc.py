@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -30,12 +30,9 @@ from water_calc import water_calc
 import write_dydt_rec
 
 
-def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
-	testf, pconc, 
-	rindx, pindx, num_eqn, nreac, nprod, 
-	Compt, seed_name, seed_mw,
-	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES,
-	rstoi, pstoi, self):
+def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
+	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
+	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self):
 		
 	# inputs:------------------------------------------------------
 	
@@ -43,7 +40,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# Comp0 - chemical scheme names of components present at start of experiment
 	# init_conc - initial concentrations of components (ppb)	
 	# self.TEMP[0] - temperature in chamber at start of experiment (K)
-	# RH - relative humidity in chamber (dimensionless fraction 0-1)
+	# self.RH - relative humidity in chamber (dimensionless fraction 0-1)
 	# PInit - initial pressure (Pa)
 	# init_SMIL - SMILES of components present at start of experiment (whose 
 	# concentrations are given in init_conc)
@@ -53,8 +50,8 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	#			change tracked
 	# self.tot_time - total simulation time (s)
 	# self.save_step - recording frequency (s)
-	# rindx - indices of reactants per equation
-	# pindx - indices of products per equation
+	# self.rindx_g - indices of reactants per equation
+	# self.pindx_g - indices of products per equation
 	# num_eqn - number of equations
 	# self.comp_namelist - list of names of components as presented in the chemical scheme file
 	# Compt - name of components injected instantaneously after start of experiment
@@ -68,8 +65,8 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
 	# self.RO2_indices - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
 	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
-	# rstoi - stoichiometry of reactants per equation
-	# pstoi - stoichiometry of products per equation
+	# self.rstoi_g - stoichiometry of reactants per equation
+	# self.pstoi_g - stoichiometry of products per equation
 	# self - reference to program
 	# -----------------------------------------------------------
 	
@@ -191,7 +188,7 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 	
 	# get initial gas-phase concentration (# molecules/cm3 (air)) and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], RH[0], si.N_A)
+	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], self.RH[0], si.N_A)
 	
 	# holder for water index (will be used if not identified in chemical scheme)
 	H2Oi = num_comp # index for water
@@ -299,14 +296,14 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 			
 				# search through reactions to see where this component is reactant or product
 				for ri in range(num_eqn):
-					if sum(rindx[ri, 0:nreac[ri]] == y_indx) > 0:
+					if sum(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx) > 0:
 						reac_index.append(int(ri)) # append reaction index
-						reac_place = np.where(rindx[ri, 0:nreac[ri]] == y_indx)[0]
-						reac_sign.append(-1*rstoi[int(ri), reac_place])
-					if sum(pindx[ri, 0:nprod[ri]] == y_indx) > 0:
+						reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
+						reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
+					if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
 						reac_index.append(int(ri)) # append reaction index
-						reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
-						reac_sign.append(1*pstoi[int(ri), reac_place])
+						reac_place = np.where(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx)[0]
+						reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
 			
 			if (self.dydt_trak[i] == 'RO2'): # for non-HOM-RO2 (alkyl peroxy radicals)
 			
@@ -318,15 +315,15 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 					
 					# search through reactions to see where this component is reactant or product
 					for ri in range(num_eqn):
-						if sum(rindx[ri, 0:nreac[ri]] == y_indx) > 0:
+						if sum(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx) > 0:
 							reac_index.append(int(ri)) # append reaction index
-							reac_place = np.where(rindx[ri, 0:nreac[ri]] == y_indx)[0]
-							reac_sign.append(-1*rstoi[int(ri), reac_place])
+							reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
+							reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
 							
-						if sum(pindx[ri, 0:nprod[ri]] == y_indx) > 0:
+						if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
 							reac_index.append(int(ri)) # append reaction index
-							reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
-							reac_sign.append(1*pstoi[int(ri), reac_place])
+							reac_place = np.where(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx)[0]
+							reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
 					
 					y_indx = self.RO2_indices[:, 1] # ready for storing below
 			
@@ -340,14 +337,14 @@ def init_conc(num_comp, Comp0, init_conc, RH, PInit, Pybel_objects,
 					
 					# search through reactions to see where this component is reactant or product
 					for ri in range(num_eqn):
-						if sum(rindx[ri, 0:nreac[ri]] == y_indx) > 0:
+						if sum(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx) > 0:
 							reac_index.append(int(ri)) # append reaction index
-							reac_place = np.where(rindx[ri, 0:nreac[ri]] == y_indx)[0]
-							reac_sign.append(-1*rstoi[int(ri), reac_place])
-						if sum(pindx[ri, 0:nprod[ri]] == y_indx) > 0:
+							reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
+							reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
+						if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
 							reac_index.append(int(ri)) # append reaction index
-							reac_place = np.where(pindx[ri, 0:nprod[ri]] == y_indx)[0]
-							reac_sign.append(1*pstoi[int(ri), reac_place])
+							reac_place = np.where(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx)[0]
+							reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
 				y_indx = self.HOMRO2_indx[:] # ready for storing below
 				
 			# save reaction indices in dictionary value for this component,

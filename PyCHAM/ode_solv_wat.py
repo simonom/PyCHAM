@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -27,53 +27,19 @@ import scipy.sparse as SP
 from scipy.integrate import solve_ivp
 
 # define function
-def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi, 
-	nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, 
-	jac_indx, Cinfl_now, y_arr, y_rind, uni_y_rind, 
-	y_pind, uni_y_pind, reac_col, prod_col, 
-	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p,
+def ode_solv(y, integ_step, Cinfl_now,
 	rowvals, colptrs, num_comp, num_sb,
 	act_coeff, jac_wall_indx,
 	core_diss, kelv_fac, kimt, num_asb,
-	jac_part_indx,
-	rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
-	nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq,
-	y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq,
-	reac_col_aq, prod_col_aq, rstoi_flat_aq,
-	pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len,
+	jac_part_indx,jac_mod_len,
 	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self):
 
 	# inputs: -------------------------------------
 	# y - initial concentrations (molecules/cm3)
 	# integ_step - the maximum integration time step (s)
-	# rindx - index of reactants per equation
-	# pindx - index of products per equation
-	# rstoi - stoichiometry of reactants
-	# pstoi - stoichiometry of products
-	# nreac - number of reactants per equation
-	# nprod - number of products per equation
 	# rrc - reaction rate coefficient
-	# jac_stoi - stoichiometries relevant to Jacobian
-	# njac - number of Jacobian elements affected per equation
-	# jac_den_indx - index of component denominators for Jacobian
-	# jac_indx - index of Jacobian to place elements per equation (rows)
 	# Cinfl_now - influx of components with constant influx 
 	#		(molecules/cc/s)
-	# y_arr - index for matrix used to arrange concentrations, 
-	#	enabling calculation of reaction rate coefficients 
-	# y_rind - index of y relating to reactants for reaction rate 
-	# 	coefficient equation
-	# uni_y_rind - unique index of reactants 
-	# y_pind - index of y relating to products
-	# uni_y_pind - unique index of products 
-	# reac_col - column indices for sparse matrix of reaction losses
-	# prod_col - column indices for sparse matrix of production gains
-	# rstoi_flat - 1D array of reactant stoichiometries per equation
-	# pstoi_flat - 1D array of product stoichiometries per equation
-	# rr_arr - index for reaction rates to allow reactant loss
-	# 	calculation
-	# rr_arr_p - index for reaction rates to allow reactant loss
-	# 	calculation
 	# rowvals - row indices of Jacobian elements
 	# colptrs - indices of  rowvals corresponding to each column of the
 	# 	Jacobian
@@ -89,7 +55,7 @@ def ode_solv(y, integ_step, rindx, pindx, rstoi, pstoi,
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
 	# num_asb - number of actual size bins (excluding wall)
 	# jac_part_indx - index for sparse Jacobian for particle influence 
-	# eqn_num - number of gas- and aqueous-phase reactions 
+	# self.eqn_num - number of gas- and aqueous-phase reactions 
 	# jac_mod_len - modification length due to high fraction of component(s)
 	# 	in particle phase
 	# jac_part_hmf_indx - index of Jacobian affected by water

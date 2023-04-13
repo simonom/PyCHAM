@@ -17,7 +17,7 @@ class self:
 	# path where results saved	
 	dir_path = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\output\\Lunderberg_scheme\\Lundenberg2020'
 
-	# path where retr_out module saved
+	# path where retr_out module saved (note that by default this is saved in 'PyCHAM home directory/PyCHAM' folder
 	ret_path = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM'
 	
 	# allow access to retr_out module
@@ -111,16 +111,16 @@ class self:
 
 		ax2 = fig.add_subplot(1, 3, 3)
 		ax2.plot(range(13, 23), m, 'x-')
-		ax2.set_ylabel(r'Fit Slope ' + munit, fontsize = 14)
-		ax2.set_xlabel('Alkane-Equivalent Volatility Bin', fontsize = 14)
-		ax2.yaxis.set_tick_params(labelsize = 14, direction = 'out', which = 'both')
-		ax2.xaxis.set_tick_params(labelsize = 14, direction = 'out', which = 'both')
+		ax2.set_ylabel(r'Fit Slope ' + munit, fontsize = 18)
+		ax2.set_xlabel('Alkane-Equivalent Volatility Bin', fontsize = 18)
+		ax2.yaxis.set_tick_params(labelsize = 18, direction = 'out', which = 'both')
+		ax2.xaxis.set_tick_params(labelsize = 18, direction = 'out', which = 'both')
 		ax2.text(15., 1., str('m = ' + str(round(((m[-1]-m[0])/(23.-13.)), 1))))
 
 		ax5 = fig.add_subplot(5, 3, 7)
 		ax5.plot(tempers, res[4, :], 'x-')
 		ax5.set_title('C17 bin')
-		ax5.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 14)
+		ax5.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 18)
 		ax5.text(288., 3., str('m = ' + str(round(m[4], 1))))
 
 		ax6 = fig.add_subplot(5, 3, 8)
@@ -141,13 +141,13 @@ class self:
 		ax9 = fig.add_subplot(5, 3, 13)
 		ax9.plot(tempers, res[8, :], 'x-')
 		ax9.set_title('C21 bin')
-		ax9.set_xlabel('Temperature (K)', fontsize = 14)
+		ax9.set_xlabel('Temperature (K)', fontsize = 18)
 		ax9.text(288., 0.75, str('m = ' + str(round(m[8], 1))))
 
 		ax10 = fig.add_subplot(5, 3, 14)
 		ax10.plot(tempers, res[9, :], 'x-')
 		ax10.set_title('C22 bin')
-		ax10.set_xlabel('Temperature (K)', fontsize = 14)
+		ax10.set_xlabel('Temperature (K)', fontsize = 18)
 		ax10.text(288., 0.4, str('m = ' + str(round(m[9], 1))))		
 
 		# figure title
@@ -156,6 +156,9 @@ class self:
 		fig.tight_layout() # space out subplots
 		plt.show() # show figure
 		
+		# remember gradients
+		mtempers = np.zeros((len(m)))
+		mtempers[:] = m[:]
 
 		# prepare for holding concentrations (ug/m3)
 		res = np.zeros((10, 3))
@@ -228,7 +231,7 @@ class self:
 		ax4.set_title('C28 bin')
 		ax4.set_ylim((0., 0.15))
 		ax4.text(1., 0.13, str('m = ' + str(round(m[4], 3))))
-		ax4.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 14)		
+		ax4.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 18)		
 
 		ax5 = fig2.add_subplot(2, 4, 6)
 		ax5.plot(PM2p5, res[5, :], 'x-')
@@ -241,7 +244,7 @@ class self:
 		ax6.set_title('C30 bin')
 		ax6.set_ylim((0., 0.15))
 		ax6.text(1., 0.13, str('m = ' + str(round(m[6], 3))))
-		ax6.set_xlabel(r'PM2.5 Concentration ' + cunit, fontsize = 14)
+		ax6.set_xlabel(r'PM2.5 Concentration ' + cunit, fontsize = 18)
 		
 
 		ax7 = fig2.add_subplot(2, 4, 8)
@@ -253,6 +256,37 @@ class self:
 		# figure title
 		fig2.suptitle('Figure 3 of Lunderberg et al. 2020 (doi.org/10.1021/acs.est.0c00966)')
 
+		fig2.tight_layout() # space out subplots
+		plt.show() # show figure
+
+		# summary plot -----------------------------------------------------
+		# finally, create a summary plot (e.g. for posters or abstracts)
+		# setup figure
+		fig3 = plt.figure(figsize=(7, 3))
+
+		ax0 = fig3.add_subplot(1, 2, 1)
+		ax0.plot(tempers, res[0, :], 'x-')
+		ax0.set_title('C13 bin', fontsize = 18)
+		ax0.set_ylim((0., 0.15))
+		ax0.set_yticks([0.00, 0.05, 0.10, 0.15])
+		ax0.set_yticklabels([0.00, 0.05, 0.10, 0.15], fontsize=18)
+		ax0.set_xticks([288., 290., 292.])
+		ax0.set_xticklabels([288., 290., 292.], fontsize=18)
+		ax0.text(288., 0.13, str('m = ' + str(round(mtempers[0], 3))), fontsize = 18)
+		ax0.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 18)
+		ax0.set_xlabel('Temperature (K)', fontsize = 18)
+		
+
+		ax1 = fig3.add_subplot(1, 2, 2)
+		ax1.plot(PM2p5, res[7, :], 'x-')
+		ax1.set_title('C31 bin', fontsize = 18)
+		ax1.set_ylim((0., 0.05))
+		ax1.set_yticks([0.000, 0.025, 0.050])
+		ax1.set_yticklabels([0.000, 0.025, 0.050], fontsize=18)
+		ax1.set_xticks([0.0, 0.5, 1.0, 1.5])
+		ax1.set_xticklabels([0.0, 0.5, 1.0, 1.5], fontsize=18)
+		ax1.text(1., 0.04, str('m = ' + str(round(m[7], 3))), fontsize = 18)
+		ax1.set_xlabel(r'PM2.5 Concentration ' + cunit, fontsize = 18)
 		fig2.tight_layout() # space out subplots
 		plt.show() # show figure
 

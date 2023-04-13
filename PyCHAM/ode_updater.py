@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -53,26 +53,18 @@ import act_coeff_update
 import ode_brk_err_mess
 
 
-def ode_updater(y, rindx, 
-	pindx, rstoi, pstoi, nreac, nprod, jac_stoi, njac, 
-	jac_den_indx, jac_indx, H2Oi, 
+def ode_updater(y, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
-	x, Varr, act_coeff, Cfactor, y_arr, 
-	y_rind, uni_y_rind, y_pind, uni_y_pind, reac_col, prod_col, 
-	rstoi_flat, pstoi_flat, rr_arr, rr_arr_p, rowvals, 
+	x, Varr, act_coeff, Cfactor, rowvals, 
 	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-	nucv3, nuci, nuc_comp, nuc_ad, RH, RHt, coag_on, inflectDp, pwl_xpre, 
+	nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-	uppsize, std, rbou, MV, rindx_aq, 
-	pindx_aq, rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, 
-	jac_den_indx_aq, jac_indx_aq, y_arr_aq, y_rind_aq, 
-	uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, reac_col_aq, prod_col_aq, 
-	rstoi_flat_aq, pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, 
+	uppsize, std, rbou, MV, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
 	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
@@ -87,14 +79,14 @@ def ode_updater(y, rindx,
 	# self.tot_time - total time to simulate (s)
 	# self.save_step - frequency to save results (s)
 	# y - initial component concentrations (# molecules/cm3/s)
-	# rindx - index of reactants per equation
-	# pindx - index of products per equation
-	# nreac - number of reactants per equation
-	# nprod - number of products per equation
-	# jac_stoi - stoichiometries relevant to Jacobian
-	# njac - number of elements of Jacobian affected per equation
-	# jac_den_indx - index of denominator components for Jacobian
-	# jac_indx - index of Jacobian affected per equation
+	# self.rindx_g - index of reactants per equation
+	# self.pindx_g - index of products per equation
+	# self.nreac_g - number of reactants per equation
+	# self.nprod_g - number of products per equation
+	# self.jac_stoi_g - stoichiometries relevant to Jacobian
+	# self.njac_g - number of elements of Jacobian affected per equation
+	# self.jac_den_indx_g - index of denominator components for Jacobian
+	# self.jac_indx_g - index of Jacobian affected per equation
 	# self.RO2_indx - index of components in alkyl peroxy radical list
 	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
@@ -141,25 +133,25 @@ def ode_updater(y, rindx,
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
-	# y_arr - index for arranging concentrations into matrix that 
+	# self.y_arr_g - index for arranging concentrations into matrix that 
 	# 	allows reaction rate coefficient calculation
-	# y_rind - index for the concentration array  that 
+	# self.y_rind_g - index for the concentration array  that 
 	# 	allows reaction rate coefficient calculation
-	# uni_y_rind - unique index of reactants
-	# y_pind - index for the concentration array  that 
+	# self.uni_y_rind_g - unique index of reactants
+	# self.y_pind_g - index for the concentration array  that 
 	# 	allows product gains to be indexed
-	# uni_y_pind - unique index of products
-	# reac_col - column indices for sparse matrix of reaction 
+	# self.uni_y_pind_g - unique index of products
+	# self.reac_co_gl - column indices for sparse matrix of reaction 
 	#		losses
-	# prod_col - column indices for sparse matrix of production
+	# self.prod_col_g - column indices for sparse matrix of production
 	#		gains
-	# rstoi_flat - 1D array of reactant stoichiometries per 
+	# self.rstoi_flat_g - 1D array of reactant stoichiometries per 
 	#	equation
-	# pstoi_flat - 1D array of product stoichiometries per
+	# self.pstoi_flat_g - 1D array of product stoichiometries per
 	#	equation
-	# rr_arr - index for reaction rates to allow reactant loss
+	# self.rr_arr_g - index for reaction rates to allow reactant loss
 	# 	calculation
-	# rr_arr_p - index for reaction rates to allow product gain
+	# self.rr_arr_p_g - index for reaction rates to allow product gain
 	#	calculation
 	# rowvals - row indices of Jacobian elements
 	# colptrs - indices of  rowvals corresponding to each column of
@@ -184,8 +176,8 @@ def ode_updater(y, rindx,
 	# nuc_comp - the nucleating component
 	# nuc_ad - marker for whether to reduce time step to allow 
 	#	for accurate capture of nucleation
-	# RH - relative humidities (fraction 0-1)
-	# RHt - times through experiment at which relative humidities reached (s)
+	# self.RH - relative humidities (fraction 0-1)
+	# self.RHt - times through experiment at which relative humidities reached (s)
 	# coag_on - whether coagulation to be modelled
 	# inflectDp - particle diameter at which wall loss inflection occurs (m)
 	# pwl_xpre - x value preceding inflection point
@@ -212,30 +204,30 @@ def ode_updater(y, rindx,
 	# rbou - size bin radius bounds (um)
 	# self.cont_infl_t - times for constant influxes (s)
 	# MV - molar volume of all components (cm3/mol)
-	# rindx_aq - index of reactants for aqueous-phase 
-	# pindx_aq - index of products for aqueous-phase
-	# rstoi_aq - stoichiometry of reactants for aqueous-phase
-	# pstoi_aq - stoichiometry of products for aqueous-phase
-	# nreac_aq - number of reactants per aqueous-phase reaction
-	# nprod_aq - number of products per aqueous-phase reaction
-	# jac_stoi_aq - stoichiometry for Jacobian for aqueous-phase
-	# njac_aq - number of Jacobian elements per aqueous-phase reaction 
-	# jac_den_indx_aq - index of Jacobian denominators 
-	# jac_indx_aq - index of  Jacobian for aqueous-phase
-	# y_arr_aq - y indices for aqueous-phase
-	# y_rind_aq - reactant indices for aqueous-phase 
-	# uni_y_rind_aq - y indices for reactants for aqueous-phase
-	# y_pind_aq - y indices for products for aqueous-phase
-	# uni_y_pind_aq - y indices for products for aqueous-phase
-	# reac_col_aq - columns of sparse matrix for aqueous-phase
-	# prod_col_aq - columns of sparse matrix for aqueous-phase
-	# rstoi_flat_aq - reactant stoichiometries for Jacobian for 
+	# self.rindx_aq - index of reactants for aqueous-phase 
+	# self.pindx_aq - index of products for aqueous-phase
+	# self.rstoi_aq - stoichiometry of reactants for aqueous-phase
+	# self.pstoi_aq - stoichiometry of products for aqueous-phase
+	# self.nreac_aq - number of reactants per aqueous-phase reaction
+	# self.nprod_aq - number of products per aqueous-phase reaction
+	# self.jac_stoi_aq - stoichiometry for Jacobian for aqueous-phase
+	# self.njac_aq - number of Jacobian elements per aqueous-phase reaction 
+	# self.jac_den_indx_aq - index of Jacobian denominators 
+	# self.jac_indx_aq - index of  Jacobian for aqueous-phase
+	# self.y_arr_aq - y indices for aqueous-phase
+	# self.y_rind_aq - reactant indices for aqueous-phase 
+	# self.uni_y_rind_aq - y indices for reactants for aqueous-phase
+	# self.y_pind_aq - y indices for products for aqueous-phase
+	# self.uni_y_pind_aq - y indices for products for aqueous-phase
+	# self.reac_col_aq - columns of sparse matrix for aqueous-phase
+	# self.prod_col_aq - columns of sparse matrix for aqueous-phase
+	# self.rstoi_flat_aq - reactant stoichiometries for Jacobian for 
 	# 	aqueous-phase
-	# pstoi_flat_aq - product stoichiometries for Jacobian for
+	# self.pstoi_flat_aq - product stoichiometries for Jacobian for
 	#	aqueous-phase
-	# rr_arr_aq - aqueous-phase reaction rate indices
-	# rr_arr_p_aq - aqueous-phase reaction rate indices
-	# eqn_num - number of reactions in gas- and aqueous-phase
+	# self.rr_arr_aq - aqueous-phase reaction rate indices
+	# self.rr_arr_p_aq - aqueous-phase reaction rate indices
+	# self.eqn_num - number of reactions in gas- and aqueous-phase
 	# partit_cutoff - the product of saturation vapour pressure
 	#	and activity coefficient above which gas-particle
 	#	partitioning assumed negligible
@@ -338,12 +330,15 @@ def ode_updater(y, rindx,
 	# find out what to do with the gas-wall partitioning coefficient,
 	# note that self.kw and self.Cw are spread over wall bins in rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
-	if (sum(sum(self.kw == -1)) >0 ):
-		self.kwf = -1 # Huang et al. 2018 treatment
+	if (self.wall_on > 0):
+		if (sum(sum(self.kw == -1)) > 0 ):
+			self.kwf = -1 # Huang et al. 2018 treatment
+		else:
+			# standard PyCHAM (GMD paper) treatment with same gas-wall 
+			# partitioning coefficient for all components
+			self.kwf = 0
 	else:
-		# standard PyCHAM (GMD paper) treatment with same gas-wall 
-		# partitioning coefficient for all components
-		self.kwf = 0
+		self.kwf = 0 # filler when no wall
 	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
@@ -351,8 +346,7 @@ def ode_updater(y, rindx,
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
 	temp_now, cham_env, Pnow, 
-	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, rindx, 
-	rstoi, pindx, pstoi, nprod, nreac, 
+	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, 
 	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
@@ -363,7 +357,7 @@ def ode_updater(y, rindx,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
-	RH, RHt, tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
+	tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
@@ -374,7 +368,7 @@ def ode_updater(y, rindx,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-			
+		
 		# remembering variables at the start of the integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
@@ -419,9 +413,7 @@ def ode_updater(y, rindx,
 					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
 					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
 					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rindx, rstoi, rrc, pindx, pstoi, nprod, dydt_cnt, 
-							nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
-							kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self)
+						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, num_comp, core_diss, 								kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self)
 						
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
@@ -435,8 +427,7 @@ def ode_updater(y, rindx,
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
 				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
-				Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
-				nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
+				Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, core_diss, 
 				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				cham_env, temp_now, Pnow, tot_in_res, self)
@@ -455,7 +446,7 @@ def ode_updater(y, rindx,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 
@@ -523,19 +514,11 @@ def ode_updater(y, rindx,
 				if (wat_hist == 1):
 					
 					# call on ode solver for water
-					[y, res_t] = ode_solv_wat.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
-					nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
-					Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
-					reac_col, prod_col, rstoi_flat, 
-					pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
+					Cinfl_now, rowvalsn, colptrsn, num_comp, 
 					num_sb, act_coeff, jac_wall_indxn,
 					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
-					jac_part_indxn,
-					rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
-					nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
-					y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
-					reac_col_aq, prod_col_aq, rstoi_flat_aq, 
-					pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
+					jac_part_indxn, jac_mod_len, 
 					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
 				
 					
@@ -562,11 +545,9 @@ def ode_updater(y, rindx,
 							yield (str('Note: negative water concentration generated following call to ode_solv_wat module, the program assumes this is because of a change in relative humidity in chamber air, and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current update time interval is ' + str(tnew) + ' seconds'))
 							
 							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
-								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
-									y_rind, rstoi, pstoi, rrc, nreac, nprod, num_comp, 
+								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, num_comp, 
 									(num_sb-self.wall_on), act_coeff, neg_comp_indx, 
-									N_perbin, core_diss, kelv_fac, kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
-									rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 0, H2Oi, y, self)
+									N_perbin, core_diss, kelv_fac, kimt, 0, H2Oi, y, self)
 
 								yield (str('Error: negative concentrations generated following call to ode_solv_wat module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
 							# half the update and integration time step (s) if necessary
@@ -587,22 +568,14 @@ def ode_updater(y, rindx,
 			
 			# model component concentration changes to get new concentrations
 			# (# molecules/cm3 (air))
-			[y, res_t] = ode_solv.ode_solv(y, tnew, rindx, pindx, rstoi, pstoi,
-				nreac, nprod, rrc, jac_stoi, njac, jac_den_indx, jac_indx,
-				Cinfl_now, y_arr, y_rind, uni_y_rind, y_pind, uni_y_pind, 
-				reac_col, prod_col, rstoi_flat, 
-				pstoi_flat, rr_arr, rr_arr_p, rowvalsn, colptrsn, num_comp, 
+			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
+				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff, jac_wall_indxn,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
 				jac_part_indxn, jac_extr_indx,
-				rindx_aq, pindx_aq, rstoi_aq, pstoi_aq,
-				nreac_aq, nprod_aq, jac_stoi_aq, njac_aq, jac_den_indx_aq, jac_indx_aq, 
-				y_arr_aq, y_rind_aq, uni_y_rind_aq, y_pind_aq, uni_y_pind_aq, 
-				reac_col_aq, prod_col_aq, rstoi_flat_aq, 
-				pstoi_flat_aq, rr_arr_aq, rr_arr_p_aq, eqn_num, jac_mod_len, 
-				jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
+				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
-			
+
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -635,12 +608,10 @@ def ode_updater(y, rindx,
 				
 				if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
-					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rindx, y_arr, 
-						y_rind, rstoi, pstoi, rrc, nreac, nprod, 
+					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, 
 						num_comp, (num_sb-self.wall_on), Cw, act_coeff, kw, 
 						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
-						kimt, eqn_num, rindx_aq, y_rind_aq, y_arr_aq, 
-						rstoi_aq, pstoi_aq, nreac_aq, nprod_aq, 1, H2Oi, y, self)
+						kimt, 1, H2Oi, y, self)
 
 					yield (str('Error: negative concentrations generated following call to ode_solv module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
 						
@@ -701,7 +672,7 @@ def ode_updater(y, rindx,
 					
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(RH[RHt_cnt], temp_now, x*1.e-6, 
+						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt], temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
@@ -803,14 +774,13 @@ def ode_updater(y, rindx,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, RH, RHt, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, 
-			trec, yrec, Cfactor_vst, y, sumt, rindx, rstoi, rrc, pindx, pstoi, 
-			nprod, nreac, num_sb, num_comp, N_perbin, core_diss, 
+			trec, yrec, Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, core_diss, 
 			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 			cham_env, temp_now, Pnow, tot_in_res, self)

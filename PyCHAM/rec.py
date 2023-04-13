@@ -27,8 +27,7 @@ import scipy.constants as si
 import importlib
 
 def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
-	rindx, rstoi, rrc, pindx, pstoi, nprod, 
-	nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, 
+	num_sb, num_comp, pconc, core_diss, kelv_fac, 
 	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	cham_env, temp_now, Pnow, tot_in_res, self):
@@ -41,13 +40,6 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# to ppb
 	# y - concentrations (molecules/cc (air))
 	# sumt - cumulative time through simulation (s)
-	# rindx - indices of reactants
-	# rstoi - stoichiometries of reactants
-	# rrc - reaction rate coefficients
-	# pindx - indices of products
-	# pstoi - stoichiometries of products
-	# nprod - number of products
-	# nreac - number of reactants
 	# num_sb - number of size bins
 	# num_comp - number of components
 	# pconc - particle concentrations now (# particles/cm3 (air))

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -32,7 +32,7 @@ def write_dydt_rec(): # define function
 	f = open('PyCHAM/dydt_rec.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -61,7 +61,7 @@ def write_dydt_rec(): # define function
 	f.write('\n')
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest 1 Tab
-	f.write('def dydt_rec(y, rindx, rstoi, reac_coef, pindx, pstoi, nprod, step, nreac, num_sb, num_comp, pconc, core_diss, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):\n')
+	f.write('def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss, kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self):\n')
 	f.write('	\n')
 	f.write('	# number of particle size bins excluding wall\n')
 	f.write('	num_asb = num_sb-self.wall_on\n')
@@ -84,7 +84,7 @@ def write_dydt_rec(): # define function
 	f.write('		for i in dydt_rec[0, 0:-2]: # final two rows for particle- and wall-partitioning \n')
 	f.write('			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) \n')
 	f.write('			# estimate gas-phase change tendency for each reaction involving this component \n')
-	f.write('			gprate = ((y[rindx[i, 0:nreac[i]]]**rstoi[i, 0:nreac[i]]).prod())*reac_coef[i] \n')
+	f.write('			gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]]]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*reac_coef[i] \n')
 	f.write('			dydt_rec[step+1, reac_count] += reac_sign[reac_count]*((gprate))\n')
 	f.write('			reac_count += 1 # keep count on relevant reactions \n')
 	f.write('			\n')

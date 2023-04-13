@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -70,11 +70,11 @@ def lamp_photo(J, TEMP, self):
 				tfn = float(wl_cond[us_indx+1::])
 				
 				if 'wlo' in locals(): # if there's an old range
-					gt_indx = wl_chm>wln # the greater than index
-					lt_indx = wl_chm<=wlo # the lesser than index
+					gt_indx = wl_chm > wln # the greater than index
+					lt_indx = wl_chm <= wlo # the lesser than index
 					act_chm[gt_indx*lt_indx] = act_chm[gt_indx*lt_indx]*tfn
 				else: # if first range
-					act_chm[wl_chm>wln] = act_chm[wl_chm>wln]*tfn
+					act_chm[wl_chm > wln] = act_chm[wl_chm>wln]*tfn
 					
 				# remember old range
 				wlo = wln
