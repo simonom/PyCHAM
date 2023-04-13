@@ -85,6 +85,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.RO2_indices[:, 1] - alkyl peroxy radical indices
 	# self.RO_indx - alkoxy radical indices
 	# self.tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
+	# self.tf - transmission factor of light, possibly segregated by wavelength
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
@@ -192,8 +193,13 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# saving time of outputs
 	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
 	
-	# saving environmental conditions (temperature, pressure, relative humidity)
-	np.savetxt(os.path.join(output_by_sim, 'chamber_environmental_conditions'), cham_env, delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa) and third is relative humidity (fraction (0-1))')
+	# saving environmental conditions (temperature, pressure, relative humidity, transmission factor)
+	# prepare to concatenate transmission factor of light (0-1)
+	self.tf = (np.repeat(np.array((self.tf)).reshape(-1, 1), cham_env.shape[0], axis = 0)).astype('str')
+	cham_env = cham_env.astype('str')
+	cham_env = (np.concatenate((cham_env, self.tf), axis = 1)) # concatenate transmission factor of light (0-1)
+
+	np.savetxt(os.path.join(output_by_sim, 'chamber_environmental_conditions'), cham_env, fmt = '%s', delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa), third is relative humidity (fraction (0-1), fourth is transmission factor of light (0-1))')
 	
 	# saving the index and names of components whose gas-phase temporal profiles can be plotted on the standard results plot
 	fname = os.path.join(output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')

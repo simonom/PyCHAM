@@ -36,7 +36,7 @@ param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 3 # number of simulations
+param_const['sim_num'] = 2 # number of simulations
 
 # state path to chemical scheme
 param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
@@ -46,7 +46,7 @@ param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\in
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
-param_const['total_model_time'] = 1.2e4
+param_const['total_model_time'] = 1.2e3
 param_const['update_step'] = 6.e2
 param_const['recording_time_step'] = 6.e2
 param_const['light_status'] = 1
