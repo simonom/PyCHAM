@@ -36,17 +36,23 @@ param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 2 # number of simulations
+param_const['sim_num'] = 4 # number of simulations
 
 # state path to chemical scheme
-param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+# windows
+#param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+# mac
+param_const['sch_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
 
 # state path to xml file
-param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
+# windows
+#param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
+# mac
+param_const['xml_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
-param_const['total_model_time'] = 1.2e3
+param_const['total_model_time'] = 1.2e4
 param_const['update_step'] = 6.e2
 param_const['recording_time_step'] = 6.e2
 param_const['light_status'] = 1
@@ -62,7 +68,13 @@ param_range['temperature'] = [273.15, 323.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
 param_range['rh'] = [0.05, 0.95]
-param_const['wall_on'] = 0
+# allow wall to be on so that particles can be lost as they would be in the real atmosphere
+param_const['wall_on'] = 1
+param_const['McMurry_flag'] = 1
+param_const['ChamSA'] = 1
+# disallow gas-wall partitioning
+param_const['eff_abs_wall_massC'] = 0
+param_const['mass_trans_coeff'] = 0
 
 # for the SOAPRA project, benzene is used as a proxy for the OH-reactivity-equivalent of: benzene, toluene, ethylbenzene, xylene (BTEX)
 # the minimum concentration for benzene is then 0., and the maximum is based on the maximum observed concentrations of these components:
@@ -99,10 +111,10 @@ param_range['C0'] = [[1.e-4, 1.e1], [1.e-4, benzC], [4.e2, 2.e3], [4.e1, 2.e4], 
 param_const['number_size_bins'] = 7
 param_const['space_mode'] = 'log'
 param_const['coag_on'] = 1
-param_const['pconct'] = 0.
+param_const['pconct'] = 0.1
 # minimum particulate mass concentration from doi.org/10.1021/acsearthspacechem.1c00090, maximum from https://indianexpress.com/article/cities/delhi/delhi-pm2-5-pm10-levels-shoot-through-the-roof-morning-after-diwali-7608039/
-param_range['pconc'] = [1.e3, 1.e6]
-param_const['pcont'] = 0
+param_range['pconc'] = [1.e-3, 1.e1]
+param_const['pcont'] = 1 # ensure continuous influx
 
 # setup dictionary items to hold chosen values
 param_const['trans_fac'] = 0.

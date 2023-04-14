@@ -378,7 +378,7 @@ def cham_up(sumt, Pnow,
 	# if influx occurs and we are not on the cham_up call from the rec module (which has tnew=0)
 	# note, if this particle influx section called during the call to rec, then continuous influx is 
 	# cancelled when called later
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and tnew>0.):
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and tnew > 0.):
 		
 		# check whether changes occur at start of this time step
 		if (sumt >= pconct[0, seedt_cnt]):
@@ -446,7 +446,7 @@ def cham_up(sumt, Pnow,
 			# with change
 			tnew = pconct[0, seedt_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
-			
+	
 	# account for ongoing continuous influx of particles
 	# account for new continuous change in seed particles
 	if (self.pcont_ongoing == 1):

@@ -4481,7 +4481,7 @@ class PyCHAM(QWidget):
 			self.on_click4() # provide model variables label
 
 			self.on_click81sing() # run simulation
-
+			
 		QWidget.close(self) # quit and close gui window
 
 		return()

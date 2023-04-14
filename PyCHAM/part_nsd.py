@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -47,14 +47,14 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 	if (lowersize == 0.):
 		lowersize = 9.e-4
 	
-	# if mean radius not stated explicitly calculate from size ranges (um)
+	# if mean radius not stated explicitly set as arithmetic mean of size range (um)
 	if (num_asb > 0):
 		
 		if (any(mrn == -1.e6 for mrn in mean_radn)):
 			if (lowersize > 0.):
 				mean_radn[mean_radn == -1.e6] = [10**((np.log10(lowersize)+np.log10(uppersize))/2.)]
 			if (lowersize == 0.):
-				mean_radn[mean_radn == -1.e6] = [10**((np.log10(uppersize))/2.)]
+				mean_radn[mean_radn == -1.e6] = [10**(np.log10(uppersize)-1)]
 
 	# if multiple size bins, this call will assume a lognormal distribution if initial 
 	# particle concentration is described by mode, or will assign particles to size bins if

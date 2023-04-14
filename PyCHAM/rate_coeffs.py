@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2023-04-13 17:25:23.090536
+# created at 2023-04-14 16:14:34.740289
 
 import numpy
 import photolysisRates

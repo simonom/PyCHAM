@@ -114,7 +114,7 @@ def middle(self): # define function
 		therm_sp, y_dens, core_diss, space_mode, seedx,
 		act_coeff, partit_cutoff, Pnow, 
 		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
-
+	
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
 	

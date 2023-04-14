@@ -68,7 +68,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 		if (lowersize > 0.):
 			mean_rad = 10**((np.log10(lowersize)+np.log10(uppersize))/2.)
 		else:
-			mean_rad = 10**((np.log10(uppersize))/2.)
+			mean_rad = 10**(np.log10(uppersize)-1)
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
