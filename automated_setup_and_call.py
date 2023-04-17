@@ -36,25 +36,30 @@ param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 4 # number of simulations
+param_const['sim_num'] = 1 # number of simulations
+
+# markers for interpreting chemical scheme - note that all chemical scheme markers should be 
+# included inside quotation marks, e.g. 
+# param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
+param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 
 # state path to chemical scheme
 # windows
-#param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
 # mac
-param_const['sch_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+#param_const['sch_name'] = #'/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
 
 # state path to xml file
 # windows
-#param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
+param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 # mac
-param_const['xml_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
+#param_const['xml_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
-param_const['total_model_time'] = 1.2e4
-param_const['update_step'] = 6.e2
-param_const['recording_time_step'] = 6.e2
+param_const['total_model_time'] = 1.2e5
+param_const['update_step'] = 1.2e3
+param_const['recording_time_step'] = 1.2e3
 param_const['light_status'] = 1
 param_const['light_time'] = 0.
 
@@ -108,7 +113,7 @@ param_const['Comp0'] = 'APINENE, BENZENE, CH4, CO, NO2, SO2'
 # from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2 (i.e. NOx) the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005
 param_range['C0'] = [[1.e-4, 1.e1], [1.e-4, benzC], [4.e2, 2.e3], [4.e1, 2.e4], [1.e-4, 2.e2], [1.e-1, 1.e2]]
 
-param_const['number_size_bins'] = 7
+param_const['number_size_bins'] = 2
 param_const['space_mode'] = 'log'
 param_const['coag_on'] = 1
 param_const['pconct'] = 0.1

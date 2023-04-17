@@ -4479,7 +4479,7 @@ class PyCHAM(QWidget):
 			self.on_click2() # assign chemical scheme
 			self.on_click3() # assign xml file
 			self.on_click4() # provide model variables label
-
+			
 			self.on_click81sing() # run simulation
 			
 		QWidget.close(self) # quit and close gui window

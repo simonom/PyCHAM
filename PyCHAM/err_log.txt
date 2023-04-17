@@ -1,88 +1,205 @@
-/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/ambient_run_num3
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
-Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\ambient_run_num0
 Warning: invalid value encountered in true_divide
 Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in subtract
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: invalid value encountered in true_divide
-Warning: invalid value encountered in true_divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter

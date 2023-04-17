@@ -24,6 +24,7 @@
 
 import numpy as np
 import os
+import ast
 
 def retr_out(self):
 	
@@ -49,9 +50,44 @@ def retr_out(self):
 		return()
 		
 	const = {} # create empty dictionary to hold constants
+	# empty dictionary to contain indices of certain groups of components
+	group_indx = {}
+
 	for line in const_in.readlines():
 		
 		dlist = [] # empty list to hold values
+
+		# get chemical scheme names
+		if (str(line.split(',')[0]) == 'chem_scheme_names'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+			
+			comp_names = ast.literal_eval(line[st_indx:fi_indx])
+			
+		# get indices of organic peroxy radicals
+		if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):		
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt
+			RO2n = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
+			
+
 		for i in line.split(',')[1::]:
 			
 			if str(line.split(',')[0]) == 'number_of_size_bins':
@@ -74,18 +110,7 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
-			if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):
-				i = i.strip('\n')
-				i = i.strip(' ')
-				i = i.strip('[[')
-				i = i.strip(']]')
-				i = i.strip('[')
-				i = i.strip(']')
-				i = i.strip(' ')
-				try:
-					dlist.append(int(i))
-				except:
-					continue
+			
 			if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index' or str(line.split(',')[0]) == 'organic_HOM_peroxy_radical_index'):
 				i = i.strip('\n')
 				i = i.strip(' ')
@@ -122,7 +147,7 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(int(i))
-			if (str(line.split(',')[0]) == 'chem_scheme_names') or (str(line.split(',')[0]) == 'SMILES') or (str(line.split(',')[0]) == 'space_mode'):
+			if (str(line.split(',')[0]) == 'SMILES') or (str(line.split(',')[0]) == 'space_mode'):
 				i = i.strip('\n')
 				i = i.strip('[')
 				i = i.strip(']')
@@ -164,7 +189,6 @@ def retr_out(self):
 	y_MW = const['molecular_weights_g/mol_corresponding_to_component_names']
 	# nominal molar masses (g/mol)
 	nom_mass = const['nominal_molar_mass_g/mol']
-	comp_names = const['chem_scheme_names']
 	wall_on = const['wall_on_flag_0forNO_>0forYES'][0]
 	
 	space_mode = const['space_mode'][0]
@@ -199,12 +223,8 @@ def retr_out(self):
 	except:
 		output_by_sim_mv_ext = 0.
 	
-	# empty dictionary to contain indices of certain groups of components
-	group_indx = {}
-
 	try: # indices of alkyl peroxy radical components
-		group_indx['RO2i'] = const['organic_peroxy_radical_index']
-		
+		group_indx['RO2i'] = RO2n
 	except:
 		group_indx['RO2i'] = []
 

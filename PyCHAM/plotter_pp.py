@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -359,9 +359,6 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		sch_name = self.ro_obj.sp
 		inname = self.ro_obj.vp
 
-		sch_name = str(self.dir_path + '/inputs/chem_scheme.txt')
-		inname = str(self.dir_path + '/inputs/model_var.txt')
-
 		f_open_eqn = open(sch_name, mode='r') # open the chemical scheme file
 		# read the file and store everything into a list
 		total_list_eqn = f_open_eqn.readlines()
@@ -385,8 +382,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 		# interrogate scheme to list equations
-		[eqn_list, aqeqn_list, eqn_num, rrc, rrc_name, 
-			RO2_names] = sch_interr.sch_interr(total_list_eqn, chem_sch_mrk)	
+		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 
 		# loop through components to identify their generation
 		for compi in comp_names[0:-2]: # don't include core and water
@@ -400,9 +396,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				# loop through reactions to identify where this first occurs,
 				# assuming that if first occurrence is as a reactant 
 				# it is zero generation and if as a product is >zero generation
-				for eqn_step in range(len(eqn_list)):
+				for eqn_step in range(len(self.eqn_list)):
 
-					line = eqn_list[eqn_step] # extract this line
+					line = self.eqn_list[eqn_step] # extract this line
 					# work out whether equation or reaction rate coefficient part comes first
 					eqn_start = str('.*\\' +  chem_sch_mrk[10])
 					rrc_start = str('.*\\' +  chem_sch_mrk[9])
@@ -411,7 +407,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					eqn_start_indx = (re.match(eqn_start, line)).span()[1]
 					rrc_start_indx = (re.match(rrc_start, line)).span()[1]
 		
-					if (eqn_start_indx>rrc_start_indx):
+					if (eqn_start_indx > rrc_start_indx):
 						eqn_sec = 1 # equation is second part
 					else:
 						eqn_sec = 0 # equation is first part

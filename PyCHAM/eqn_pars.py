@@ -39,7 +39,7 @@ import aq_mat_prep
 # define function to extract the chemical mechanism
 def extr_mech(int_tol, num_sb,
 		drh_str, erh_str, sav_nam, pcont, self):
-
+	
 	# inputs: ----------------------------------------------------
 	# self.sch_name - file name of chemical scheme
 	# self.chem_sch_mrk - markers to identify different sections of 

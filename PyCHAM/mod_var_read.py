@@ -86,7 +86,7 @@ def mod_var_read(self):
 				
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
 				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
-
+			
 			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
 				self.update_stp = float(value.strip())
 
