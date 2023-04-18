@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -596,21 +596,24 @@ def O3_iso(self):
 	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
+	gen_num = np.zeros((len(self.ro_obj.gen_numbers), 1))
+	gen_num[:, 0] = self.ro_obj.gen_numbers
+	Cfac = self.ro_obj.cfac
+	Cfac = np.squeeze((np.array(Cfac))) # convert to numpy array from list
 
-	# get generation numbers of all components
-	gen_num = ro_obj.gen_numbers
-
-	# get SMILE strings of all zero generation components
-	zg_smile = np.array(rel_SMILES)[gen_num==0]
+	# get SMILE strings of all zero generation components,
+	# ignoring seed and water
+	zg_smile = np.array(rel_SMILES[0:-2])[gen_num[:, 0] == 0]
 	# sum carbon numbers in SMILE strings
 	for zg_i in zg_smile:
-		if (zg_i.count('c')+zg_i.count('C') > 1): # more than 1 carbon
-			if (zg_i.count('o')+zg_i.count('O') == 0): # no oxygen
+		if (zg_i.count('c') + zg_i.count('C') > 1): # more than 1 carbon
+			if (zg_i.count('o') + zg_i.count('O') == 0): # no oxygen
 				VOC_smile = zg_i # get VOC SMILE string
 				break
 
 	# VOC index
 	self.VOCi = rel_SMILES.index(VOC_smile)
+	
 	# get range (# molecules/cm3) of gas-phase VOC seen in simulation
 	VOC_range = [min(yrec[:, self.VOCi]*Cfac), max(yrec[:, self.VOCi]*Cfac)]
 
@@ -659,7 +662,7 @@ def O3_iso(self):
 					setattr(self, key[0:-5], self_dict[key])
 				else:
 					setattr(self, key, self_dict[key])
-				
+			
 			# get equilibrium O3 concentration
 			self.testf = 5 # modify test flag value
 		

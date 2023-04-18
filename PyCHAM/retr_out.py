@@ -52,6 +52,9 @@ def retr_out(self):
 	const = {} # create empty dictionary to hold constants
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
+	group_indx['RO2i'] = [] # filler in case of no RO2i
+	group_indx['ROi'] = [] # filler in case of no ROi
+	group_indx['HOMRO2'] = [] # filler in case of no HOMRO2
 
 	for line in const_in.readlines():
 		
@@ -70,9 +73,123 @@ def retr_out(self):
 			for cnt in range(10):
 				if line[-cnt] == ']':
 					fi_indx = -cnt+1
-			
+					break
+
 			comp_names = ast.literal_eval(line[st_indx:fi_indx])
+
+		if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			y_MW = ast.literal_eval(line[st_indx:fi_indx])
+		
+		if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			MV = ast.literal_eval(line[st_indx:fi_indx])
+
+		if (str(line.split(',')[0]) == 'nominal_molar_mass_g/mol'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			# nominal molar masses (g/mol)
+			nom_mass = ast.literal_eval(line[st_indx:fi_indx])
+
+		if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			PsatPa = ast.literal_eval(line[st_indx:fi_indx])
+		
+		if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
 			
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt:icnt+2] == '[[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt:-cnt+2] == ']]':
+					fi_indx = -cnt+1
+					break
+			
+			OC = ast.literal_eval(line[st_indx:fi_indx])
+			
+		if (str(line.split(',')[0]) == 'hydrogen_to_carbon_ratios_of_components'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt:icnt+2] == '[[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt:-cnt+2] == ']]':
+					fi_indx = -cnt+1
+					break
+
+			HC = ast.literal_eval(line[st_indx:fi_indx])
+		
+		if (str(line.split(',')[0]) == 'SMILES'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt] == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt:] == ']':
+					fi_indx = -cnt+1
+					break
+			rel_SMILES = ast.literal_eval(line[st_indx:fi_indx])
+		
 		# get indices of organic peroxy radicals
 		if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):		
 			# find index of first [ and index of last ]
@@ -85,9 +202,69 @@ def retr_out(self):
 			for cnt in range(10):
 				if line[-cnt] == ']':
 					fi_indx = -cnt
-			RO2n = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
-			
+					break
 
+			if (st_indx == len(line)+fi_indx): # if empty list
+				continue
+			else: # if list has contents
+				group_indx['RO2i'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
+
+		if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt
+					break
+
+			if (st_indx == len(line)+fi_indx): # if empty list
+				continue
+			else: # if list has contents
+				group_indx['ROi'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
+
+		if (str(line.split(',')[0]) == 'organic_HOM_peroxy_radical_index'):
+			
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt
+					break
+
+			if (st_indx == len(line)+fi_indx): # if empty list
+				continue
+			else: # if list has contents
+				group_indx['HOMRO2'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
+
+		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
+
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			# conversion factor to change gas-phase concentrations from # molecules/cm3 
+			# (air) into ppb
+			Cfactor = ast.literal_eval(line[st_indx:fi_indx])
+			
+		
 		for i in line.split(',')[1::]:
 			
 			if str(line.split(',')[0]) == 'number_of_size_bins':
@@ -96,41 +273,6 @@ def retr_out(self):
 				dlist.append(str(i))
 			if str(line.split(',')[0]) == 'number_of_components' or str(line.split(',')[0]) == 'wall_on_flag_0forNO_>0forYES':
 				dlist.append(int(i))
-			if str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names' or  str(line.split(',')[0]) == 'molecular_volumes_cm3/mol' or  str(line.split(',')[0]) == 'molar_volumes_cm3/mol' or str(line.split(',')[0]) == 'nominal_molar_mass_g/mol':
-				i = i.strip('\n')
-				i = i.strip('[')
-				i = i.strip(']')
-				i = i.strip(' ')
-				dlist.append(float(i))
-			if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
-				i = i.strip('\n')
-				i = i.strip('[[')
-				i = i.strip(']]')
-				i = i.strip('[')
-				i = i.strip(']')
-				i = i.strip(' ')
-				dlist.append(float(i))
-			
-			if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index' or str(line.split(',')[0]) == 'organic_HOM_peroxy_radical_index'):
-				i = i.strip('\n')
-				i = i.strip(' ')
-				i = i.strip('[[')
-				i = i.strip(']]')
-				i = i.strip('[')
-				i = i.strip(']')
-				i = i.strip(' ')
-				try:
-					dlist.append(int(i))
-				except:
-					continue
-			if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components' or str(line.split(',')[0]) == 'hydrogen_to_carbon_ratios_of_components'):
-				i = i.strip('\n')
-				i = i.strip('[[')
-				i = i.strip(']]')
-				i = i.strip('[')
-				i = i.strip(']')
-				i = i.strip(' ')
-				dlist.append(float(i))
 			if (str(line.split(',')[0]) == 'index_of_water'):
 				i = i.strip('\n')
 				i = i.strip('[[')
@@ -147,20 +289,13 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(int(i))
-			if (str(line.split(',')[0]) == 'SMILES') or (str(line.split(',')[0]) == 'space_mode'):
+			if (str(line.split(',')[0]) == 'space_mode'):
 				i = i.strip('\n')
 				i = i.strip('[')
 				i = i.strip(']')
 				i = i.strip(' ')
 				i = i.strip('\'')
 				dlist.append(str(i))
-			if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
-				i = i.strip('\n')
-				i = i.strip(' ')				
-				i = i.strip('[[')
-				i = i.strip('[')
-				i = i.strip(']')
-				dlist.append(float(i))
 			if str(line.split(',')[0]) == 'simulation_computer_time(s)':
 				i = i.strip('\n')
 				i = i.strip('[')
@@ -178,37 +313,20 @@ def retr_out(self):
 			
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
-	
+		
 	# extract required data from dictionary, note this prepared above
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
 	num_comp = int((const['number_of_components'])[0]) # number of components
-	# conversion factor to change gas-phase concentrations from # molecules/cm3 
-	# (air) into ppb 
-	Cfactor = const['factor_for_multiplying_ppb_to_get_molec/cm3_with_time']
-	rel_SMILES = const['SMILES']
-	y_MW = const['molecular_weights_g/mol_corresponding_to_component_names']
-	# nominal molar masses (g/mol)
-	nom_mass = const['nominal_molar_mass_g/mol']
+	
 	wall_on = const['wall_on_flag_0forNO_>0forYES'][0]
 	
 	space_mode = const['space_mode'][0]
-	# pure component saturation vapour pressures at 298.15 K (Pa)
-	PsatPa = const['pure_component_saturation_vapour_pressures_at_298.15K_Pa']
-	# oxygen:carbon ratios of components
-	OC = const['oxygen_to_carbon_ratios_of_components']
-	# hydrogen:carbon ratios of components; this output added on 31/05/2022
-	HC = const['hydrogen_to_carbon_ratios_of_components']
 	
 	H2Oi = int((const['index_of_water'])[0]) # index of water
 	
 	seedi = const['index_of_seed_components'] # index of seed components
 	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
 	
-	try:
-		MV = const["molecular_volumes_cm3/mol"]
-	except:
-		MV = const["molar_volumes_cm3/mol"]
-
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]
 	except:
@@ -222,21 +340,6 @@ def retr_out(self):
 		output_by_sim_mv_ext = (const["output_by_sim_mv_ext"])[0][0:-1]
 	except:
 		output_by_sim_mv_ext = 0.
-	
-	try: # indices of alkyl peroxy radical components
-		group_indx['RO2i'] = RO2n
-	except:
-		group_indx['RO2i'] = []
-
-	try: # indices of alkoxy radical components
-		group_indx['ROi'] = const['organic_alkoxy_radical_index']
-	except:
-		group_indx['ROi'] = []
-	
-	try: # indices of alkyl peroxy radical components from autoxidation
-		group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
-	except:
-		group_indx['HOMRO2'] = []
 	
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
@@ -373,7 +476,6 @@ def retr_out(self):
 	self.ro_obj = ro_outputs() # create object to hold outputs
 
 	yield('Output ready to plot')
-
 	return(self)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating

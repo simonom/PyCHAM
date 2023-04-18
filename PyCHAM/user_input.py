@@ -127,6 +127,7 @@ def share(self):
 		self.dayOfYear_orig = self.dayOfYear
 		self.photo_path_orig = self.photo_path
 		self.con_infl_C_orig = self.con_infl_C
+		self.con_infl_nam_orig = self.con_infl_nam
 		self.tf_orig = self.tf
 		self.light_ad_orig = self.light_ad
 		self.sch_name_orig = self.sch_name

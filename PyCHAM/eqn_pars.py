@@ -111,7 +111,7 @@ def extr_mech(int_tol, num_sb,
 		except:
 			erf = 1 # raise error
 			err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
-
+	
 	for i in range (len(self.const_comp)):
 		try:
 			# index of where constant concentration components occur in list 

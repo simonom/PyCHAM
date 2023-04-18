@@ -36,7 +36,7 @@ param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 1 # number of simulations
+param_const['sim_num'] = 3 # number of simulations
 
 # markers for interpreting chemical scheme - note that all chemical scheme markers should be 
 # included inside quotation marks, e.g. 
@@ -57,9 +57,9 @@ param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\in
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
-param_const['total_model_time'] = 1.2e5
-param_const['update_step'] = 1.2e3
-param_const['recording_time_step'] = 1.2e3
+param_const['total_model_time'] = 2.4e5
+param_const['update_step'] = 1.2e4
+param_const['recording_time_step'] = 1.2e4
 param_const['light_status'] = 1
 param_const['light_time'] = 0.
 
@@ -105,20 +105,20 @@ benzC = OHreac/(2.3e-12*np.exp(-190/max(param_range["temperature"]))*0.352)/Cfac
 # the components to keep at constant concentration throughout the simulation
 param_const['const_comp'] = 'APINENE, BENZENE, CH4, CO, NO2, SO2'
 
-# the components present throughout the simulation
+# the components present at the start of the simulation
 param_const['Comp0'] = 'APINENE, BENZENE, CH4, CO, NO2, SO2'
 # range of concentration of components present throughout simulation  - see above in this module for provenance of benzene,
 # a maximum of alpha-pinene of 10 ppb is given by doi.org/10.1016/j.scitotenv.2020.144129, the range in CH4 is from a minimum of 400 ppb,
 # which is from ice-core data (https://data.ess-dive.lbl.gov/view/doi:10.3334/CDIAC/ATG.030) and a maximum of 2000 ppb (2 ppm), which is
-# from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2 (i.e. NOx) the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005
-param_range['C0'] = [[1.e-4, 1.e1], [1.e-4, benzC], [4.e2, 2.e3], [4.e1, 2.e4], [1.e-4, 2.e2], [1.e-1, 1.e2]]
+# from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2, note that inside GUI, [NO] is set the same as [NO2], so the concentration of NOx doubles from the range given here, the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005
+param_range['C0'] = [[1.e-4, 1.e1], [1.e-4, benzC], [4.e2, 2.e3], [4.e1, 2.e4], [5.e-5, 1.e2], [1.e-1, 1.e2]]
 
 param_const['number_size_bins'] = 2
 param_const['space_mode'] = 'log'
 param_const['coag_on'] = 1
 param_const['pconct'] = 0.1
 # minimum particulate mass concentration from doi.org/10.1021/acsearthspacechem.1c00090, maximum from https://indianexpress.com/article/cities/delhi/delhi-pm2-5-pm10-levels-shoot-through-the-roof-morning-after-diwali-7608039/
-param_range['pconc'] = [1.e-3, 1.e1]
+param_range['pconc'] = [1.e-2, 1.e1]
 param_const['pcont'] = 1 # ensure continuous influx
 
 # setup dictionary items to hold chosen values
