@@ -57,9 +57,9 @@ param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\in
 
 # state parameter ranges
 param_const['res_file_name'] = 'ambient_run_num'
-param_const['total_model_time'] = 2.4e5
-param_const['update_step'] = 1.2e4
-param_const['recording_time_step'] = 1.2e4
+param_const['total_model_time'] = 9.6e5
+param_const['update_step'] = 4.8e4
+param_const['recording_time_step'] = 4.8e4
 param_const['light_status'] = 1
 param_const['light_time'] = 0.
 

@@ -4423,6 +4423,11 @@ class PyCHAM(QWidget):
 		from numpy.random import default_rng
 		rng = default_rng()
 
+		# remember original starting components and their concentrations, as these will be reset 
+		# to at the end of each simulation
+		Comp0_orig = self.param_const['Comp0']
+		C0_orig = self.param_const['C0']
+
 		# loop through simulations
 		for simi in range(self.param_const['sim_num']):
 			
@@ -4476,57 +4481,70 @@ class PyCHAM(QWidget):
 			
 			# if NOx concentration supplied but not O3, then estimate O3 concentration based on Fig. 2 of
 			# doi.org/10.1016/j.atmosenv.2012.06.048
-			if ('NO' in self.param_const['Comp0'] and 'O3' not in self.param_const['Comp0']):
+			#if ('NO' in self.param_const['Comp0'] and 'O3' not in self.param_const['Comp0']):
 				
 				# array of O3 concentrations estimates for NOx (varies by rows) and for VOC (varies by columns)
-				O3_est_array = np.array(((0., 0., 0., 0., 0., 0., 0.), (10., 20., 60., 80., 100., 100., 1000), (8., 16., 55., 120., 130., 130., 1000.), (6., 12., 50., 120., 200., 300., 1000.), (5., 11., 45., 110., 170., 300., 1000.), (4., 9., 40., 100., 170., 280., 1000.)))
+				#O3_est_array = np.array(((0., 0., 0., 0., 0., 0., 0.), (10., 20., 60., 80., 100., 100., 1000), (8., 16., 55., 120., 130., 130., 1000.), (6., 12., 50., 120., 200., 300., 1000.), (5., 11., 45., 110., 170., 300., 1000.), (4., 9., 40., 100., 170., 280., 1000.)))
 					
-				O3_est_array = O3_est_array*200.
+				#O3_est_array = O3_est_array*200.
 
-				VOC_array = np.array((0., 100., 250., 500., 750., 1000., 10000))
-				NOx_array = np.array((0., 20., 50., 100., 150., 200.))
-
+				#VOC_array = np.array((0., 100., 250., 500., 750., 1000., 10000))
+				#NOx_array = np.array((0., 20., 50., 100., 150., 200.))
 			
 				# add ozone to list of components present at start of simulation
-				self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'O3')			
+				#self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'O3')			
 				# estimate ozone
-				from scipy import interpolate
+				#from scipy import interpolate
 				# make interpolation function
-				O3int_func = interpolate.interp2d(VOC_array, NOx_array, O3_est_array)
+				#O3int_func = interpolate.interp2d(VOC_array, NOx_array, O3_est_array)
 				
 				# get the NOx concentration (ppb)
-				NOx_conc = 0.
-				try:
-					NOindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO')
-					NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NOindx])
-				except:
-					NOx_conc = NOx_conc	
+				#NOx_conc = 0.
+				#try:
+				#	NOindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO')
+				#	NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NOindx])
+				#except:
+				#	NOx_conc = NOx_conc	
 				
-				try:
-					NO2indx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO2')
-					NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NO2indx])
-				except:
-					NOx_conc = NOx_conc
+				#try:
+				#	NO2indx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO2')
+				#	NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NO2indx])
+				#except:
+				#	NOx_conc = NOx_conc
 				
 				# get the VOC concentration (ppb)
-				VOC_conc = 0.
-				try:
-					APindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('APINENE')
-					VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[APindx])
-				except:
-					VOC_conc = VOC_conc	
+				#VOC_conc = 0.
+				#try:
+				#	APindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('APINENE')
+				#	VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[APindx])
+				#except:
+				#	VOC_conc = VOC_conc	
 				
-				try:
-					BZindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('BENZENE')
-					VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[BZindx])
-				except:
-					VOC_conc = VOC_conc	 
+				#try:
+				#	BZindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('BENZENE')
+				#	VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[BZindx])
+				#except:
+				#	VOC_conc = VOC_conc	 
 
 				# interpolate to get O3 concentration
-				O3int = O3int_func(VOC_conc, NOx_conc)
+				#O3int = O3int_func(VOC_conc, NOx_conc)
 
-				self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(O3int[0]))
+				#self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(O3int[0]))
 			
+			if ('OH' not in self.param_const['Comp0']): # first-guess of steady-state OH concentration
+
+				# add OH to list of components present at start of simulation
+				self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'OH')
+				# add starting OH concentration to list of starting concentrations (ppb)
+				self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(1.e-5*float(self.param_const['trans_fac'])))
+
+			if ('HO2' not in self.param_const['Comp0']): # first-guess of steady-state HO2 concentration
+
+				# add HO2 to list of components present at start of simulation
+				self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'HO2')
+				# add starting OH concentration to list of starting concentrations (ppb)
+				self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(1.e-2*float(self.param_const['trans_fac'])))
+
 			# log-normal distribution of seed particle concentration
 			# create log-normal distribution for concentration range of this component
 			minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
@@ -4550,6 +4568,10 @@ class PyCHAM(QWidget):
 			
 			self.on_click81sing() # run simulation
 			
+			# reset to original start components and their concentrations
+			self.param_const['Comp0'] = Comp0_orig
+			self.param_const['C0'] = C0_orig
+
 		QWidget.close(self) # quit and close gui window
 
 		return()

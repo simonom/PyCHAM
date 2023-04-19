@@ -26,6 +26,8 @@ import numpy as np
 import os
 import ast
 
+# define function, note that retr_out is called by the click202 function in gui.py 
+# and it can return progress updates on loading results
 def retr_out(self):
 	
 	# inputs: -------------------------------
@@ -76,6 +78,7 @@ def retr_out(self):
 					break
 
 			comp_names = ast.literal_eval(line[st_indx:fi_indx])
+			yield (37.)
 
 		if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
 			# find index of first [ and index of last ]
@@ -92,7 +95,7 @@ def retr_out(self):
 					break
 
 			y_MW = ast.literal_eval(line[st_indx:fi_indx])
-		
+			yield (7.)
 		if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -108,7 +111,7 @@ def retr_out(self):
 					break
 
 			MV = ast.literal_eval(line[st_indx:fi_indx])
-
+			yield (17.)
 		if (str(line.split(',')[0]) == 'nominal_molar_mass_g/mol'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -125,7 +128,7 @@ def retr_out(self):
 
 			# nominal molar masses (g/mol)
 			nom_mass = ast.literal_eval(line[st_indx:fi_indx])
-
+			yield (12.)
 		if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -141,7 +144,7 @@ def retr_out(self):
 					break
 
 			PsatPa = ast.literal_eval(line[st_indx:fi_indx])
-		
+			yield (55.)
 		if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
 			
 			# find index of first [ and index of last ]
@@ -158,7 +161,8 @@ def retr_out(self):
 					break
 			
 			OC = ast.literal_eval(line[st_indx:fi_indx])
-			
+			yield (60.)
+
 		if (str(line.split(',')[0]) == 'hydrogen_to_carbon_ratios_of_components'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -174,7 +178,8 @@ def retr_out(self):
 					break
 
 			HC = ast.literal_eval(line[st_indx:fi_indx])
-		
+			yield (65.)		
+
 		if (str(line.split(',')[0]) == 'SMILES'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -189,7 +194,8 @@ def retr_out(self):
 					fi_indx = -cnt+1
 					break
 			rel_SMILES = ast.literal_eval(line[st_indx:fi_indx])
-		
+			yield (42.)
+
 		# get indices of organic peroxy radicals
 		if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):		
 			# find index of first [ and index of last ]
@@ -208,6 +214,7 @@ def retr_out(self):
 				continue
 			else: # if list has contents
 				group_indx['RO2i'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
+			yield (22.)
 
 		if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index'):
 			# find index of first [ and index of last ]
@@ -226,6 +233,7 @@ def retr_out(self):
 				continue
 			else: # if list has contents
 				group_indx['ROi'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
+			yield (27.)
 
 		if (str(line.split(',')[0]) == 'organic_HOM_peroxy_radical_index'):
 			
@@ -245,6 +253,7 @@ def retr_out(self):
 				continue
 			else: # if list has contents
 				group_indx['HOMRO2'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
+			yield (32.)
 
 		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
 
@@ -264,15 +273,25 @@ def retr_out(self):
 			# (air) into ppb
 			Cfactor = ast.literal_eval(line[st_indx:fi_indx])
 			
-		
+			yield (47.)
+
 		for i in line.split(',')[1::]:
 			
 			if str(line.split(',')[0]) == 'number_of_size_bins':
 				dlist.append(int(i))
-			if str(line.split(',')[0]) == 'output_by_sim_sch_ext' or str(line.split(',')[0]) == 'output_by_sim_mv_ext':
+				yield (1.)
+			if str(line.split(',')[0]) == 'output_by_sim_sch_ext':
 				dlist.append(str(i))
-			if str(line.split(',')[0]) == 'number_of_components' or str(line.split(',')[0]) == 'wall_on_flag_0forNO_>0forYES':
+				yield (69.)
+			if str(line.split(',')[0]) == 'output_by_sim_mv_ext':
+				dlist.append(str(i))
+				yield (70.)
+			if str(line.split(',')[0]) == 'number_of_components':
 				dlist.append(int(i))
+				yield (2.)
+			if str(line.split(',')[0]) == 'wall_on_flag_0forNO_>0forYES':
+				dlist.append(int(i))
+				yield (49.)
 			if (str(line.split(',')[0]) == 'index_of_water'):
 				i = i.strip('\n')
 				i = i.strip('[[')
@@ -281,6 +300,7 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(int(i))
+				yield (66.)
 			if (str(line.split(',')[0]) == 'index_of_seed_components'):
 				i = i.strip('\n')
 				i = i.strip('[[')
@@ -289,6 +309,7 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(int(i))
+				yield (67.)
 			if (str(line.split(',')[0]) == 'space_mode'):
 				i = i.strip('\n')
 				i = i.strip('[')
@@ -296,12 +317,14 @@ def retr_out(self):
 				i = i.strip(' ')
 				i = i.strip('\'')
 				dlist.append(str(i))
+				yield (50.)
 			if str(line.split(',')[0]) == 'simulation_computer_time(s)':
 				i = i.strip('\n')
 				i = i.strip('[')
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(float(i))
+				yield (48.)
 			if (str(line.split(',')[0]) == 'size_structure_0_for_moving_centre_1_for_full_moving'):
 				i = i.strip('\n')
 				i = i.strip('[[')
@@ -310,7 +333,8 @@ def retr_out(self):
 				i = i.strip(']')
 				i = i.strip(' ')
 				dlist.append(int(i))
-			
+				yield (68.)
+
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
 		
@@ -341,6 +365,7 @@ def retr_out(self):
 	except:
 		output_by_sim_mv_ext = 0.
 	
+	yield (75.)
 	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
 	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
@@ -383,6 +408,8 @@ def retr_out(self):
 	except:
 		gen_num = []
 	
+	yield (80.)
+
 	# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
 	fname = str(self.dir_path + '/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
@@ -405,6 +432,8 @@ def retr_out(self):
 	except:
 		N = np.zeros((0, 0))
 	
+	yield (85.)
+
 	try:
 		# withdraw number-size distributions (# particles/cm3 (air))
 		fname = str(self.dir_path + '/particle_number_concentration_wet')
@@ -428,6 +457,8 @@ def retr_out(self):
 	except:
 		rbou_rec =  np.zeros((0, 0))
 
+	yield (90.)
+
 	try: # in case this output is saved for a given simulation
 		# withdraw consumptions (ug/m3)
 		fname = str(self.dir_path + '/total_concentration_of_injected_components')
@@ -438,6 +469,8 @@ def retr_out(self):
 	except: # in case not saved, e.g. for older outputs
 		tot_in_res = []
 	
+	yield (95.)
+
 	# create a class to hold outputs
 	class ro_outputs:
 		sp = output_by_sim_sch_ext # chemical scheme path
@@ -475,7 +508,8 @@ def retr_out(self):
 
 	self.ro_obj = ro_outputs() # create object to hold outputs
 
-	yield('Output ready to plot')
+	yield('Results Loaded')
+	
 	return(self)
 
 def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
