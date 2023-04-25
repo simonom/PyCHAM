@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -29,7 +29,7 @@ from scipy import stats # import the scipy.stats module
 
 def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
 		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, 
-		act_coeff, seed_eq_wat, Vwat_inc, pcontf, H2Ogc, self):
+		act_coeff, pcontf, H2Ogc, self):
 	
 			
 	# inputs -----------------------------------
@@ -56,8 +56,8 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# TEMP - chamber temperature (K)
 	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))	
 	# act_coeff - activity coefficient of components
-	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# pcontf - flag for whether injection of particles is continuous or instantaneous
 	# H2Ogc - gas-phase concentration of water (# molecules/cm3)
 	# self - reference to program
@@ -125,11 +125,11 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	# account for particle-phase concentration of components contained in seed particles --------------------
 	
 	# check whether water to be equilibrated with seed particles prior to experiment start
-	if (seed_eq_wat == 1 or Vwat_inc == 1): # if yes, water is to be equilibrated
+	if (self.seed_eq_wat == 1 or self.Vwat_inc == 1): # if yes, water is to be equilibrated
 		
 		# check whether the stated initial number size distribution included the 
 		# volume of water
-		if (Vwat_inc == 1): # if number size distribution does include volume of water
+		if (self.Vwat_inc == 1): # if number size distribution does include volume of water
 
 			avMW0 = np.ones((num_sb)) # first guess of average molecular weight	
 
@@ -198,7 +198,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 				lcnt += 1 # loop count
 		
 
-		if (Vwat_inc == 0): # if number size distribution does not include volume of water
+		if (self.Vwat_inc == 0): # if number size distribution does not include volume of water
 			
 				seed_mw = y_mw[self.seedi] # molecular weight of seed components (g/mol)
 
@@ -238,7 +238,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 						yn[H2Oi:(num_comp*(num_sb-1)+H2Oi)+1:num_comp] = (xwat*tmc)/(1.-xwat)
 
 	# if water not to be equilibrated with seed particles prior to experiment start
-	if (seed_eq_wat == 0 and Vwat_inc == 0):			
+	if (self.seed_eq_wat == 0 and self.Vwat_inc == 0):			
 	
 		# initial seed particles will not contain water and any water vapour in chamber
 		# will try to equilibrate with particles through the ODE solver		

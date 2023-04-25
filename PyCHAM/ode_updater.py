@@ -69,7 +69,7 @@ def ode_updater(y, H2Oi,
 	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 	OC, wat_hist, Pybel_objects, pcont, NOi, 
-	HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
+	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
 	chamV, tempt_cnt, self, vol_Comp, volP):
 	
@@ -267,8 +267,8 @@ def ode_updater(y, H2Oi,
 	#	e.g. because surface area of that size bin is tiny 
 	# self.con_C_indx - index of components with constant 
 	# 	gas-phase concentration
-	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
 	# self.cont_inf_reci - index of components with continuous influx in record
@@ -282,7 +282,7 @@ def ode_updater(y, H2Oi,
 	
 	# start timer
 	st_time = time.time()
-
+	
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
 	self.sumt = 0. # track time through simulation (s)
@@ -359,7 +359,7 @@ def ode_updater(y, H2Oi,
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
 	tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, 
+	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
 	
 	import ode_solv
@@ -368,7 +368,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		
+		print(sumt)
 		# remembering variables at the start of the integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
@@ -448,7 +448,7 @@ def ode_updater(y, H2Oi,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
+			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
@@ -506,7 +506,6 @@ def ode_updater(y, H2Oi,
 			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
 			colptrs, (num_sb-self.wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 			
-			
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
 
 				# if on the deliquescence curve rather than the 
@@ -521,7 +520,6 @@ def ode_updater(y, H2Oi,
 					jac_part_indxn, jac_mod_len, 
 					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
 				
-					
 					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
 						
 						# identify components with negative concentrations
@@ -575,7 +573,7 @@ def ode_updater(y, H2Oi,
 				jac_part_indxn, jac_extr_indx,
 				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
-
+		
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -776,7 +774,7 @@ def ode_updater(y, H2Oi,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
-			act_coeff, seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
+			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, 

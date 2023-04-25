@@ -45,7 +45,7 @@ def mod_var_read(self):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
 		
@@ -173,6 +173,9 @@ def mod_var_read(self):
 
 					if (i != ';' and i != ',' and i != ' '):
 						reader = str(reader + i)
+				
+				# ensure final wall is registered
+				prescribes.append(reader)
 
 				max_of_all.append(max_comp) # ensure final wall accounted for
 
@@ -204,7 +207,6 @@ def mod_var_read(self):
 					if pre_cnt == sum(max_of_all[0:wall_num+1]): # if moving up a wall
 						wall_num += 1
 						ind_wall_cnt = 1 # number of entries for each wall
-				
 				
 			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
 				chamSA = float(value.strip())
@@ -383,12 +385,12 @@ def mod_var_read(self):
 				for i in range(comp_count):
 					seedx[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 			
-			if key == 'Vwat_inc' and value.strip(): # whether number size distribution includes volume of water
-				Vwat_inc = int(value.strip())
+			if (key == 'Vwat_inc' and value.strip()): # whether number size distribution includes volume of water
+				self.Vwat_inc = int(value.strip())
 			
 			# whether to allow water to equilibrate with seed prior to experiment
-			if key == 'seed_eq_wat' and value.strip():
-				seed_eq_wat = int(value.strip())
+			if (key == 'seed_eq_wat' and value.strip()):
+				self.seed_eq_wat = int(value.strip())
 
 			# fraction below which gas-particle partitioning coefficient treated as zero,
 			# e.g. because size bin has relatively very small surface area
@@ -626,8 +628,7 @@ def mod_var_read(self):
 				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
 				e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-				erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
-				chamV]
+				erh_str, pcont, z_prt_coeff, chamV]
 
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
@@ -643,6 +644,7 @@ def const_infl_open(self): # define function to read in values relevant to const
 	import os
 
 	wb = openpyxl.load_workbook(filename = self.const_infl_path)
+	
 	sheet = wb['const_infl']
 	# component names are in first column, times are in headers of first row		
 	ic = 0 # count on row iteration

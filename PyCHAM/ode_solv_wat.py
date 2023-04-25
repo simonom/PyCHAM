@@ -39,7 +39,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# integ_step - the maximum integration time step (s)
 	# rrc - reaction rate coefficient
 	# Cinfl_now - influx of components with constant influx 
-	#		(molecules/cc/s)
+	#		(# molecules/cm3/s)
 	# rowvals - row indices of Jacobian elements
 	# colptrs - indices of  rowvals corresponding to each column of the
 	# 	Jacobian

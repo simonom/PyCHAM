@@ -207,7 +207,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
 			
 			# remove the addition of water in the surface concentrations
-			# first rearrange matric so that components in rows, surface number in columns
+			# first rearrange matrix so that components in rows, surface number in columns
 			y_w = y_w.reshape(self.wall_on, num_comp+2)
 			# remove the excess water column
 			y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
@@ -249,7 +249,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	
 	# finally append surface concentration array to gas-phase array
 	y = np.append(y, y_w)
-
+	
 	# tracked components (dydt)--------------------------------------
 	
 	# check for tracking of all alkyl peroxy radicals

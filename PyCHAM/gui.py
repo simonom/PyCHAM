@@ -163,7 +163,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, 
+		z_prt_coeff, chamV, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
 		# listing input files -----------------------------------------------------------
@@ -425,14 +425,14 @@ class PyCHAM(QWidget):
 		l26b.setText('Whether (1) or not (0) \nvolume of water included \nin seed particle \nnumber size distribution: ')
 		self.varbox.addWidget(l26b, par_row+10, 0)
 		self.l26b = QLabel(self)
-		self.l26b.setText((str(Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l26b.setText((str(self.Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l26b, par_row+10, 1)
 		
 		l26c = QLabel(self)
 		l26c.setText('Whether (1) or not (0) \nwater to be equilibrated \nwith seed particle \nprior to experiment start: ')
 		self.varbox.addWidget(l26c, par_row+11, 0)
 		self.l26c = QLabel(self)
-		self.l26c.setText((str(Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l26c.setText((str(self.seed_eq_wat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l26c, par_row+11, 1)
 		
 		l27 = QLabel(self)
@@ -985,11 +985,6 @@ class PyCHAM(QWidget):
 		self.l203a.setText('No message currently')
 		self.PLlayout.addWidget(self.l203a, 0, 2, 1, 2)
 		
-		b202a = QPushButton('Load Outputs', self)
-		b202a.setToolTip('Load the results stored in this folder')
-		b202a.clicked.connect(self.on_click202a)
-		self.PLlayout.addWidget(b202a, 0, 4)
-		
 		# vertical separator line -------------------------------
 		#cil = 1# column index for line
 		
@@ -1100,6 +1095,12 @@ class PyCHAM(QWidget):
 		self.b209b.setToolTip('Plot air quality index as a function of time')
 		self.b209b.clicked.connect(self.on_click209b)
 		self.PRIMlayout.addWidget(self.b209b, 5, 1, 1, 1)
+
+		# button to plot temporal profile of total VOCs (including methane) in gas-phase
+		self.b209c = QPushButton(str('TVOCS in gas phase'), self)
+		self.b209c.setToolTip('Plot total volatile organic compounds (including methane) as a function of time')
+		self.b209c.clicked.connect(self.on_click209c)
+		self.PRIMlayout.addWidget(self.b209c, 5, 2, 1, 1)
 		
 		# wall (from gas-wall partitioning) concentrations temporal profiles -------------
 		
@@ -1893,7 +1894,7 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
 		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
+		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
@@ -1907,7 +1908,7 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 			pk.close()
 		
@@ -2067,8 +2068,8 @@ class PyCHAM(QWidget):
 			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
 			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 
-			ser_H2O, wat_hist, drh_str, erh_str, pcont, Vwat_inc, 
-			seed_eq_wat, z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
+			ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+			z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -2110,7 +2111,7 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+				wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
@@ -2377,34 +2378,20 @@ class PyCHAM(QWidget):
 		self.l201.clear() # clear old label
 		self.l201.setText(fol_nme)
 
-		# get size of directory
-		import os
-		
-		# assign size (bytes)
-		dir_size = 0
-
-		# get size
-		for path, dirs, files in os.walk(self.dir_path):
-			for f in files:
-				fp = os.path.join(path, f)
-				dir_size += os.path.getsize(fp) # (bytes)
-
-		est_time = (((dir_size/1.e6)**2)/2.)
-
 		# let user know data is being prepared
-		self.l203a.setText(str('Estimated loading time: ' + str(est_time) + ' s, click Load Outputs' ))
+		self.l203a.setText(str('Progress through loading data' ))
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.bd_pl = 3
 		
+		# display progress bar
+		self.progress = QProgressBar(self)
+		self.PLlayout.addWidget(self.progress, 0, 4)
+
 		QApplication.processEvents() # allow message panel to update
-		
-		return()
-		
-	@pyqtSlot()
-	def on_click202a(self): # function of opening results
 		
 		# check whether required files present here
 		try:
+			
 			# name of file where experiment constants saved
 			fname = str(self.dir_path + '/model_and_component_constants')
 			const_in = open(fname)
@@ -2426,17 +2413,24 @@ class PyCHAM(QWidget):
 			from retr_out import retr_out
 			
 			for prog in retr_out(self): # call on modules to solve problem
-			
+				
 				if (isinstance(prog, str)): # check if it's a message
 					mess = prog
 					
 					self.l203a.setText(mess)
 					self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 					self.bd_pl = 3
-				
+
+				self.progress.setValue(prog) # display progress	
 				QApplication.processEvents() # allow message panel to update
-			
+
+			self.l203a.setText('Results loaded') # remove any old progress message from previous run
+			# remove the progress bar after each simulation
+			self.progress.deleteLater()
+			QApplication.processEvents() # allow message panel to update
 		except:
+			# remove the progress bar after each simulation
+			self.progress.deleteLater()
 			self.l203a.setText('The required output files cannot be found at this path, please ensure the folder immediately above the output is selected')
 			# set border around error message
 			if (self.bd_pl == 1):
@@ -2456,6 +2450,7 @@ class PyCHAM(QWidget):
 			self.b220.setEnabled(False)
 			self.b221.setEnabled(False)
 			self.b223.setEnabled(False)
+		QApplication.processEvents() # allow message panel to update
 		return()
 		
 	@pyqtSlot() # button to plot standard results graphically
@@ -2647,6 +2642,17 @@ class PyCHAM(QWidget):
 		
 		import plotter
 		plotter.aqi_calc(self) # plot results
+
+	# button to plot total volatile organic compounds (including methane) against time
+	@pyqtSlot()
+	def on_click209c(self):
+
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		import plotter
+		plotter.tvoc_calc(self) # plot results
 
 	# button to plot temporal profile of particle-phase contribution 
 	# by top contributors to particle-phase concentration
@@ -4143,7 +4149,7 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+				wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close()
 		

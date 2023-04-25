@@ -473,6 +473,7 @@ def retr_out(self):
 
 	# create a class to hold outputs
 	class ro_outputs:
+		
 		sp = output_by_sim_sch_ext # chemical scheme path
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
@@ -505,10 +506,8 @@ def retr_out(self):
 		siz_struc = siz_str
 		env_cond = cham_env
 		total_influx = tot_in_res
-
+		
 	self.ro_obj = ro_outputs() # create object to hold outputs
-
-	yield('Results Loaded')
 	
 	return(self)
 

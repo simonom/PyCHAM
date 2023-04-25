@@ -51,7 +51,7 @@ def middle(self): # define function
 		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
 		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-		erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
 	
 	# parse the chemical scheme equation file to convert equations
@@ -113,7 +113,7 @@ def middle(self): # define function
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, y_dens, core_diss, space_mode, seedx,
 		act_coeff, partit_cutoff, Pnow, 
-		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self)
+		pcont, seed_mw, R_gas, self)
 	
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
@@ -136,7 +136,7 @@ def middle(self): # define function
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
 		OC, wat_hist, Pybel_objects, pcont, NOi, 
-		HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc, tot_in_res,
+		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):
 
 		yield prog # update progress bar	

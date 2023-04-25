@@ -44,7 +44,7 @@ def share(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()
 		
@@ -113,8 +113,8 @@ def share(self):
 		self.drh_str_orig = drh_str
 		self.erh_str_orig = erh_str
 		self.pcont_orig = pcont
-		self.Vwat_inc_orig = Vwat_inc
-		self.seed_eq_wat_orig = seed_eq_wat
+		self.Vwat_inc_orig = self.Vwat_inc
+		self.seed_eq_wat_orig = self.seed_eq_wat
 		self.z_prt_coeff_orig = z_prt_coeff
 		self.chamSA_orig = chamSA
 		self.chamV_orig = chamV
@@ -145,5 +145,5 @@ def share(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV)

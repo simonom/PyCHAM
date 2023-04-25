@@ -105,7 +105,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 						# index of where new index enters rowvals (to ensure
 						# indices per Jacobian column are present in
 						# ascending order)
-						r_in = r_st+int(sum(rowvals[r_st:r_en]<new_el))
+						r_in = r_st+int(sum(rowvals[r_st:r_en] < new_el))
 						rowvals = np.concatenate([rowvals[0:r_in], new_el, rowvals[r_in::]])
 						colptrs[self.rindx_g[eqni, i]+1::] += 1
 						r_en += 1
@@ -314,7 +314,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# account for new rows in latter size bin, add 1 to index because this represents the
 			# number of elements per component
 			colptrs[col_tracker+(comp_num+2)*(num_asb+sbi+1)+1] += np.cumsum(col_num)
-			# ensure latter inidices are consistent 
+			# ensure latter indices are consistent 
 			colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)::] = colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)]
 	
 	if (self.eqn_num[2] == 0):
@@ -445,7 +445,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# empty results array, 1st term is gas-on-gas, 2nd is gas-on-wall, 3rd is wall-on-gas, 4th is wall-on-wall
 	jac_wall_indx = np.zeros(((comp_num+2)+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))))
 	wall_cnt = 0 # count on jac_wall_indx inputs
-
+	
 	if (self.wall_on > 0): # if surface present
 		# loop through components in the gas-phase (add two 
 		# to account for water and core component)
@@ -457,7 +457,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			en_indx = int(colptrs[compi+1])
 			
 			# check if any rows already attributed to this column
-			if ((st_indx<en_indx) == True):
+			if ((st_indx < en_indx) == True):
 				# if rows are already attributed, check 
 				# whether the diagonal is already affected
 				if (sum(rowvals[st_indx:en_indx]==compi))>0:
@@ -516,7 +516,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += self.wall_on
 			wall_cnt += self.wall_on # keep count on wall index
-		
+
 		# wall effect on gas phase and on wall components for the Jacobian, note this will include the
 		# final row in the final column of the Jacobian
 		for wbi in range(self.wall_on): # wall bin loop
@@ -539,12 +539,16 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			
 				# for wall component effect on itself in wall, this is a space in the 
 				# Jacobian that surface reactions might have taken, so check whether 
-				# any surface (e.g. wall reactions) affect this component
+				# any surface (e.g. wall reactions) affect this component - note the +1 added to
+				# colptrs[stc_indx] on the LHS of the equality to account for the +1 addition to colptrs
+				# just above in this loop
 				if ((colptrs[stc_indx]+1) == (colptrs[stc_indx+1])): # surface reaction is not present
 					
 					jac_wall_indx[wall_cnt] = st_indx+1 # include in wall index for Jacobian
-					# include in rowvals
-					rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [compi+(comp_num+2)], rowvals[int(colptrs[stc_indx]+1)::]])
+					# include in rowvals, note that using stc_indx as the value means that 
+					# we use the index for component on wall effect on itself on wall - see 
+					# the stc_indx definition further up in this loop
+					rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [stc_indx], rowvals[int(colptrs[stc_indx]+1)::]])
 					
 					# include in colptrs
 					colptrs[stc_indx+1::] += 1
@@ -557,14 +561,14 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					rows_reac = rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])][1::]	
 					
 					# sum Jacobian indices between the wall on gas effect and this wall on wall effect
-					wall_indx_add = sum(rows_reac<comp_num+2)
+					wall_indx_add = sum(rows_reac < comp_num+2)
 					# get the wall index
 					jac_wall_indx[wall_cnt] = st_indx+1+wall_indx_add # include in wall index for Jacobian
 
-					if (sum(rows_reac == compi+(comp_num+2)) == 0.): # if reaction does not cover wall effect on wall
+					if (sum(rows_reac == stc_indx) == 0.): # if reaction does not cover wall effect on wall
 						
 						# include in rowvals
-						rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [compi+(comp_num+2)], rowvals[int(colptrs[stc_indx]+1)::]])
+						rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [stc_indx], rowvals[int(colptrs[stc_indx]+1)::]])
 						# include in colptrs
 						colptrs[stc_indx+1::] += 1
 						self.jac_indx_su[self.jac_indx_su > jac_wall_indx[wall_cnt]] += 1 # adjust surface (e.g. wall) reactions

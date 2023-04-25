@@ -51,7 +51,7 @@ def ui_check(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()	
 
@@ -94,7 +94,7 @@ def ui_check(self):
 	# self.con_infl_t - times of continuous influx of components
 	# self.con_infl_nam - chemical scheme names of components with continuous influx
 	# self.con_infl_C - influx rate of components with continuous influx (ppb/s)
-	# Vwat_inc - flag for whether (1) or not (0) the number size 
+	# self.Vwat_inc - flag for whether (1) or not (0) the number size 
 	# distribution of seed particles includes the volume of water
 	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
 	# seeds before experiment starts
@@ -504,7 +504,7 @@ def ui_check(self):
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
 
 	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')

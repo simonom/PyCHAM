@@ -44,7 +44,7 @@ def rec_prep(nrec_step, y, y0,
 	infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, 
 	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i, z_prt_coeff, seed_eq_wat, Vwat_inc,
+	NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
 	
@@ -158,8 +158,8 @@ def rec_prep(nrec_step, y, y0,
 	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
 	#	below which partitioning to a particle size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny
-	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
 	# self.tot_time - total experiment time (s)
@@ -201,7 +201,7 @@ def rec_prep(nrec_step, y, y0,
 		infx_cnt, Cfactor, diff_vol, 
 		DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
-		seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP)
+		tot_in_res, Compti, self, vol_Comp, volP)
 	
 	# note that recording occurs after any instaneous changes--------------------
 	# array to record time through simulation (s)

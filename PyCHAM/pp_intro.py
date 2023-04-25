@@ -32,7 +32,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
 		y_dens, core_diss, space_mode, seedx, 
 		act_coeff, partit_cutoff, Press,
-		pcont, seed_mw, R_gas, Vwat_inc, seed_eq_wat, self):
+		pcont, seed_mw, R_gas, self):
 	
 	# inputs -----------------------------------
 	# TEMP - temperature (K) in chamber at start of experiment
@@ -74,7 +74,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	#	or continuous (flag)
 	# seed_mw - molecular weight of seed components (g/mol)
 	# R_gas - the universal gas constant (cc.Pa/K.mol == kg.m2.s-2.K-1.mol-1)
-	# Vwat_inc - flag for whether (1) or not (0) the number size 
+	# self.Vwat_inc - flag for whether (1) or not (0) the number size 
 	# distribution of seed particles includes the volume of water
 	# seed_eq_wat - flag for whether (1) or not (0) to allow water
 	# equilibrium with seed particles prior to experiment start
@@ -194,11 +194,11 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if (sum(pconcn) > 0.):
 		
 		# check whether water to be equilibrated with seed particles prior to experiment start
-		if (seed_eq_wat == 1 or Vwat_inc == 1): # if yes, water is to be equilibrated
+		if (self.seed_eq_wat > 0 or self.Vwat_inc > 0): # if yes, water is to be equilibrated
 		
 			# check whether the stated initial number size distribution included the 
 			# volume of water
-			if (Vwat_inc == 1): # if number size distribution does include volume of water
+			if (self.Vwat_inc > 0): # if number size distribution does include volume of water
 				
 				avMW0 = np.ones((num_aasb)) # first guess of average molecular weight
 
@@ -260,7 +260,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					
 					lcnt += 1 # loop count
 				
-			if (Vwat_inc == 0): # if number size distribution does not include volume of water
+			if (self.Vwat_inc == 0): # if number size distribution does not include volume of water
 			
 				# calculate Kelvin effect factor for the provided number size distribution
 				# kelvin factor for each size bin (excluding wall), eq. 16.33 Jacobson et al. (2005)
@@ -294,7 +294,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 						y[num_comp+H2Oi:(num_comp*(num_aasb)+H2Oi)+1:num_comp] = (-xwat*tmc)/(xwat-1.)
 					
 		# if water not to be equilibrated with seed particles prior to experiment start
-		if (seed_eq_wat == 0 and Vwat_inc == 0):			
+		if (self.seed_eq_wat == 0 and self.Vwat_inc == 0):			
 	
 			# initial seed particles will not contain water and any water vapour in chamber
 			# will try to equilibrate with particles through the ODE solver		
@@ -309,10 +309,12 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		
 			for ci in range(len(self.seedi)): # loop through indices of seed components
 		
-				# concentration of this component in all size bins (molecules/cc (air)):
+				# concentration of this component in all size bins (# molecules/cm3 (air)):
 				y[num_comp+self.seedi[ci]:(num_comp*(num_aasb)+self.seedi[ci])+1:num_comp] = ytot*(seedx[ci]/sum(seedx))
 				
-				
+	if (self.wall_on > 0 and self.Vwat_inc == 2): # if wall present and water to be equilibrated between wall and gas
+		y[-1-(num_comp-H2Oi)] = (y[H2Oi]*self.Cw[0, H2Oi])/(self.Psat[-1, H2Oi]*act_coeff[-1, H2Oi]) 
+	
 	# mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
 	# to g/cm3)
 	if (num_aasb > 0): # with particles

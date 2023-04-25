@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -485,6 +485,11 @@ def aqi_calc(self): # define function
 			# convert to boolean
 			tindx = (tindx==1)
 			# estimate SO2 15-minute running mean (ug/m3)
+			print(type(tindx))
+			print(type(SO2))
+			print(SO2_mean[i])
+			print(sum(SO2[tindx]))
+			print(sum(tindx))
 			SO2_mean[i] = sum(SO2[tindx])/sum(tindx)
 	
 			# get the corresponding time points (hour)
@@ -572,6 +577,57 @@ def aqi_calc(self): # define function
 	ax0.plot(time24[0: indx_lim24], AQI_res)
 
 	ax0.set_ylabel(r'Air Quality Index', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+
+	return() # end function
+
+	# define function to plot total volatile organic 
+	# components in gas-phase against time
+def tvoc_calc(self):
+
+	# inputs: ------------------------------------------------------------------
+	# self - reference to GUI
+	# --------------------------------------------------------------------------
+	
+	# get required variables from self
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	indx_plot = self.ro_obj.plot_indx
+	comp0 = self.ro_obj.init_comp
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	space_mode = self.ro_obj.spacing
+	HC = np.array((self.ro_obj.HyC))
+
+	# get index of components that are hydrocarbons
+	HCindx = np.array(((HC > 0.)))
+	# prepare for indexing y
+	HCindx = np.squeeze(HCindx.reshape(1, -1))
+
+	HCsum = np.zeros((len(timehr), 1))
+
+	for ti in range(len(timehr)):
+		# get relevant concentrations in gas-phase (ppb)
+		HCsum[ti, 0] = np.sum(yrec[ti, 0:num_comp][HCindx])
+
+	# plot against time
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
+	ax0.plot(timehr, HCsum)
+
+	ax0.set_ylabel(r'TVOC (inc. CH4) (ppb)', fontsize = 14)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')

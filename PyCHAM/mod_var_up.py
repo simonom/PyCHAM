@@ -42,7 +42,7 @@ def mod_var_up(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, z_prt_coeff, 
+		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 	pk.close()
 
@@ -72,8 +72,8 @@ def mod_var_up(self):
 	self.l24a.setText((str(seed_dens)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l25a.setText((str(seed_name)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l26a.setText((str(seedx)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l26b.setText((str(Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l26c.setText((str(seed_eq_wat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l26b.setText((str(self.Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l26c.setText((str(self.seed_eq_wat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l27a.setText((str(lowsize)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l28a.setText((str(uppsize)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l29a.setText((str(space_mode)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

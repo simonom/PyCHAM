@@ -42,7 +42,7 @@ def cham_up(sumt, Pnow,
 	y_dens, H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
-	seed_eq_wat, Vwat_inc, tot_in_res, Compti, self, vol_Comp, volP):
+	tot_in_res, Compti, self, vol_Comp, volP):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -132,8 +132,8 @@ def cham_up(sumt, Pnow,
 	# Cinfl_now - influx rate of components with continuous influx (ppb/s)
 	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
 	# act_coeff - activity coefficient of components
-	# seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - count on total injected concentration of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
 	# self.cont_inf_reci - index for total injection record for continuously injected components
@@ -411,7 +411,7 @@ def cham_up(sumt, Pnow,
 					N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-					seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+					pcontf, y[H2Oi], self)
 					
 				# turn off flag for ongoing injection of particles
 				self.pcont_ongoing = 0
@@ -431,7 +431,7 @@ def cham_up(sumt, Pnow,
 				N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
 				uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 				stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-				seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+				pcontf, y[H2Oi], self)
 			
 			# move count on particle injections up by one
 			if (seedt_cnt < (pconct.shape[1]-1)):
@@ -480,7 +480,7 @@ def cham_up(sumt, Pnow,
 		N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
 		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 		stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-		seed_eq_wat, Vwat_inc, pcontf, y[H2Oi], self)
+		pcontf, y[H2Oi], self)
 		
 	# ----------------------------------------------------------------------------------------------------------
 

@@ -78,8 +78,8 @@ def def_mod_var(caller, self): # define function
 	seed_dens = np.ones((1)) # density of seed material (g/cc)
 	seed_name = ['core'] # name of component forming seed material
 	seedx = np.ones((1, 1)) # mole fraction of dry seed components
-	Vwat_inc = 1 # seed particle number size distribution does include water volume
-	seed_eq_wat = 1 # allow water equilibration with seed particle before experiment starts
+	self.Vwat_inc = 1 # seed particle number size distribution does include water volume
+	self.seed_eq_wat = 1 # allow water equilibration with seed particle before experiment starts
 	lowsize = 0. # smallest size bin boundary (radius) (um)
 	uppsize = 5.e-1 # largest size bin boundary (radius) (um)
 	space_mode = 'lin' # treatment for spacing between size bins
@@ -211,7 +211,7 @@ def def_mod_var(caller, self): # define function
 			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
 			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, Vwat_inc, seed_eq_wat, 
+			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
 
 	
@@ -232,4 +232,4 @@ def def_mod_var(caller, self): # define function
 		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 
 		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		Vwat_inc, seed_eq_wat, z_prt_coeff, chamV, self)
+		z_prt_coeff, chamV, self)
