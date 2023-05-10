@@ -27,14 +27,14 @@ from init_water_partit import init_water_partit
 import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
-def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
+def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
 		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, 
 		act_coeff, pcontf, H2Ogc, self):
 	
 			
 	# inputs -----------------------------------
 	# y - concentrations of components in particle phase (# molecules/cm3 (air))
-	# N_perbin - number concentration of particles (# particles/cm3 (air))
+	# N_perbin0 - starting number concentration of particles (# particles/cm3 (air))
 	# mean_rad - mean radius of seed particles at this time (um)
 	# pmode - whether particle number size distribution stated by mode or explicitly
 	# pconc - number concentration of seed particles (# particles/cm3 (air))
@@ -73,14 +73,17 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
+	# prepare for new concentration of particles (# particles/cm3)
+	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
+
 	if (num_sb == 1):
 		
-		N_perbin += np.array((pconc)) # (# particles/cm3 (air))
+		N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc)) # (# particles/cm3 (air))
 		pconc_new = pconc
-		
+
 	# number concentration stated per size bin in multi size bin simulation
 	if (pmode == 1 and num_sb > 1):
-		N_perbin += np.array((pconc)).reshape(-1, 1) # (# particles/cm3 (air))
+		N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc)).reshape(-1, 1) # (# particles/cm3 (air))
 		pconc_new = pconc
 
 	# total number concentration per mode stated in multi size bin simulation
@@ -114,7 +117,7 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 			# number concentration realism
 			pconc_new[pconc_new < 1.e-2] = 0.
 			
-			N_perbin[:, 0] += pconc_new # (# particles/cm3 (air))
+			N_perbin[:, 0] = N_perbin0[:, 0] +  pconc_new # (# particles/cm3 (air))
 					
 	# volume concentration of new seed particles (um3/cm3 (air))
 	Vperbin = ((pconc_new*(4./3.)*np.pi*(rad0)**3.))
@@ -276,8 +279,8 @@ def pp_dursim(y, N_perbin, mean_rad, pmode, pconc, seedx, lowersize, uppersize, 
 	for i in range(num_sb): # size bin loop
 		Vtot[i] = np.sum(y[num_comp*i:num_comp*(i+1)]/NA*(MV[:, 0]*1.e12))
 		# new volume concentration of single particles (um3/cm3 (air))
-		if (N_perbin[i] > 0.):
-			Varr[i] = Vtot[i]/N_perbin[i]
+		if (N_perbin[i, 0] > 0.):
+			Varr[i] = Vtot[i]/N_perbin[i, 0]
 		else:
 			Varr[i] = (4./3.*np.pi)*rad0[i]**3.
 		# multiply y_dens by 1e-3 to get ug/um3 (particle) from kg/m3, 

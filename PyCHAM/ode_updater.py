@@ -368,7 +368,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		print(sumt)
+		
 		# remembering variables at the start of the integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
@@ -433,7 +433,7 @@ def ode_updater(y, H2Oi,
 				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
-
+			
 			# update chamber variables
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
@@ -449,7 +449,7 @@ def ode_updater(y, H2Oi,
 			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
-
+			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > self.save_step*(save_cnt-1)):

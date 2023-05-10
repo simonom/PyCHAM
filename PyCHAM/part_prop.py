@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -48,7 +48,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, y_dens, n0):
 	mass_fracs[:, ish] = y_mass_array[:, ish]/((np.sum(y_mass_array, 0))[ish])
 	# total density of particles per size bin (g/cm3)
 	tot_rho = np.zeros((num_asb))
-	tot_rho[ish] = 1.0E-3/((np.sum(mass_fracs/y_dens, 0))[ish])
+	tot_rho[ish] = 1.0e-3/((np.sum(mass_fracs/y_dens, 0))[ish])
 	# average molecular weight of particles (g/mol)
 	avMW = (mass_fracs*y_mw).sum(0)
 	

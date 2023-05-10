@@ -152,16 +152,18 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			ppc = yrec[:, num_comp:-num_comp*self.ro_obj.wf]
 		if (self.ro_obj.wf == 0): # wall off
 			ppc = yrec[:, num_comp::]
-
+		
 		# zero water and seed
 		ppc[:, self.ro_obj.H2O_ind::num_comp] = 0.
 		for i in self.ro_obj.seed_ind: # loop through seed components
 			ppc[:, i::num_comp] = 0.
+		
 		# tile molar weights over size bins and times
 		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, self.ro_obj.nsb-self.ro_obj.wf))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 		# convert from # molecules/cm3 to ug/m3
 		ppc = (ppc/si.N_A)*y_mwt*1.e12
+		
 		# sum over components and size bins
 		ppc = np.sum(ppc, axis=1)
 		

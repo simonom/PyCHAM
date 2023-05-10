@@ -88,7 +88,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	i = (np.where(pconct[0, :] == 0))[0] # index of initial information
 	
 	if (i.size == 0): # if no initial information provide fillers
-		pconcn = np.zeros((1))
+		# note that this line changed from pconcn = np.zeros((1)) on 27/04/2023 so that 
+		# correct number of size bins given even if particle number is zero at start of simulation
+		pconcn = np.zeros((num_asb))
 		stdn = [1.e20]
 		mean_radn = [-1.e6]
 		
@@ -152,7 +154,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		# start of the experiment, this will be dealt with in cham_up
 		if (i.size > 0 and num_asb > 0 and pcont[0, 0] == 1):
 			N_perbin[:, :] = 0
-		
+
 	# set first volume and radius bound to zero, thereby allowing shrinkage to zero in the 
 	# smallest bin
 	# remember initial first radius bound for saving
@@ -326,6 +328,15 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 
 	# start counter on number concentration of newly nucleated particles (# particles/cm3(air))
 	np_sum = 0.
+
+	try: # in case called from autorun, in which a finisher simulation is setup
+		if (self.param_const['sim_type'] == 'finisher'):
+			# particle and wall concentrations (# molecules/cm3)
+			y[num_comp::] = self.param_const['ynow'][num_comp::]
+			N_perbin[:, 0] = self.param_const['Nnow'][:]
+			
+	except: # not called from finisher simulation
+		N_perbin[:] = N_perbin[:]
 	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
 			upper_bin_rad_amp, np_sum)

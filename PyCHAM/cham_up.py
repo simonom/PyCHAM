@@ -37,7 +37,7 @@ def cham_up(sumt, Pnow,
 	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	new_part_sum1, update_count,
 	injectt, gasinj_cnt, inj_indx, 
-	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
+	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin0, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	y_dens, H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
@@ -85,7 +85,7 @@ def cham_up(sumt, Pnow,
 	# num_comp - number of components
 	# y0 - concentration of components prior to integration (# molecules/cm3 (air))
 	# y - variable concentration of components prior to integration (# molecules/cm3 (air))
-	# N_perbin - concentration of particles (# particles/cm3 (air))
+	# N_perbin0 - concentration of particles (# particles/cm3 (air)) at start of time interval
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
@@ -140,6 +140,10 @@ def cham_up(sumt, Pnow,
 	# self.con_infl_indx - index for continuously injected components from all components
 	# -----------------------------------------------------------------------
 	
+	# ensure N_perbin has a value
+	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
+	N_perbin[:] = N_perbin0[:] # particle number concentration (# particles/cm3)
+
 	# check on dilution factor setting --------------------------
 	self.dil_fac_cnt =  sum(self.dil_fact <= (sumt))-1
 
@@ -408,7 +412,7 @@ def cham_up(sumt, Pnow,
 			if (pcontf == 0):
 				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
-					N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
+					N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 					pcontf, y[H2Oi], self)
@@ -422,23 +426,12 @@ def cham_up(sumt, Pnow,
 				# turn on flag for ongoing injection of particles
 				self.pcont_ongoing = 1
 				
-				# seed particle number concentration integrated over proposed 
-				# time step (# particles/cm3)
-				pconcn = pconc[:, seedt_cnt]*tnew
-				
-				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
-				_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
-				N_perbin, mean_radn, pmode, (pconcn), seedx, lowsize, 
-				uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
-				stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-				pcontf, y[H2Oi], self)
-			
 			# move count on particle injections up by one
 			if (seedt_cnt < (pconct.shape[1]-1)):
 				seedt_cnt += 1
 			else:
 				seedt_cnt = -1 # reached end
-	
+		
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers
 		if (sumt+tnew > pconct[0, seedt_cnt] and seedt_cnt!=-1 and gpp_stab != -1): 
@@ -474,16 +467,16 @@ def cham_up(sumt, Pnow,
 			# injected seed particle number concentration integrated over proposed 
 			# time step (# particles/cm3)
 			pconcn = pconc[:, -1]*tnew
-			
+		
 		[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 		_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
-		N_perbin, mean_radn, pmode, pconcn, seedx, lowsize, 
+		N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
 		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 		stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], self)
 		
 	# ----------------------------------------------------------------------------------------------------------
-
+	
 	# check on continuous influx of gas-phase components ----------------------------------------------
 	if (len(self.con_infl_t) > 0): # if influx occurs
 

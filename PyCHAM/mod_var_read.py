@@ -80,6 +80,7 @@ def mod_var_read(self):
 				continue
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
+			
 			# ----------------------------------------------------
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
@@ -446,8 +447,9 @@ def mod_var_read(self):
 			if key == 'cosx' and (value.strip()): # to keep solar intensity constant
 				self.cosx = float(value.strip())
 
-			if key == 'const_infl' and (value.strip()): # names of components with continuous influx
-				# check if this is a path to a file containing continuous influxes, if not treat as a list of component names
+			if (key == 'const_infl' and (value.strip())): # names of components with continuous influx
+				# check if this is a path to a file containing continuous 
+				# influxes, if not treat as a list of component names
 				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
 					self.const_infl_path = str(value.strip())
 					self = const_infl_open(self)
@@ -461,6 +463,7 @@ def mod_var_read(self):
 				self.con_infl_t = np.array((self.con_infl_t))
 
 			if key == 'Cinfl' and (value.strip()): # influx rate of components with continuous influx (ppb/s)
+				
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
 				for i in value:
@@ -479,7 +482,7 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					self.con_infl_C = np.empty(0)
-				
+
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 

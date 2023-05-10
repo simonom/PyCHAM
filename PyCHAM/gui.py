@@ -1411,7 +1411,7 @@ class PyCHAM(QWidget):
 		# section for consumption and yield calculations ------------------------------
 		# input bar for component to estimate consumption for
 		self.e224 = QLineEdit(self)
-		self.e224.setText('Provide the chemical scheme name of the component to view consumption/yield for (result displayed in message box above)')
+		self.e224.setText('Provide the chemical scheme names of components to view consumption/yield for (result displayed in message box above, separate chemical names by a comma, e.g. APINENE, BENZENE)')
 		self.e224.setStyleSheet('qproperty-cursorPosition : 0')
 		self.PYIELDlayout.addWidget(self.e224, 0, 0, 1, 2)
 
@@ -4176,12 +4176,12 @@ class PyCHAM(QWidget):
 	@pyqtSlot() # button to retrieve and report component consumption
 	def on_click224(self):
 	
-		dir_path = self.l201.text() # name of folder with results
+		self.dir_path = self.l201.text() # name of folder with results
 
 		# get component name
 		try:
-			self.comp_names_to_plot = [str((self.e224.text()))]
-
+			self.comp_names_to_plot = [comp_name for comp_name in (self.e224.text().split(','))]
+			
 		except: # give error message
 			self.l203a.setText('Error - could not read chemical scheme name of component to estimate consumption of from box above')
 			
@@ -4205,16 +4205,16 @@ class PyCHAM(QWidget):
 			self.tmax = 1.
 
 		import consumption # function to estimate consumption
-		consumption.cons(dir_path, self, 0)
+		consumption.cons(self, 0)
 
 	@pyqtSlot() # button to retrieve and report yield
 	def on_click225(self):
 	
-		dir_path = self.l201.text() # name of folder with results
+		self.dir_path = self.l201.text() # name of folder with results
 
 		# get component name
 		try:
-			self.comp_names_to_plot = [str((self.e224.text()))]
+			self.comp_names_to_plot = [comp_name for comp_name in (self.e224.text().split(','))]
 
 		except: # give error message
 			self.l203a.setText('Error - could not read chemical scheme name of component to estimate yield of from box above')
@@ -4241,7 +4241,7 @@ class PyCHAM(QWidget):
 			self.tmax = 1.
 
 		import consumption # function to estimate consumption
-		consumption.cons(dir_path, self, 1)
+		consumption.cons(self, 1)
 		return()
 
 	@pyqtSlot()
@@ -4429,19 +4429,12 @@ class PyCHAM(QWidget):
 		from numpy.random import default_rng
 		rng = default_rng()
 
-		# remember original starting components and their concentrations, as these will be reset 
-		# to at the end of each simulation
-		Comp0_orig = self.param_const['Comp0']
-		C0_orig = self.param_const['C0']
-
 		# loop through simulations
 		for simi in range(self.param_const['sim_num']):
 			
 			# reset component concentrations
-			self.param_const['C0'] = ''
+			self.param_const['Cinfl'] = ''
 
-			self.param_const['res_file_name'] = str(self.param_const['res_file_name'][0:15] + str(simi))
-			
 			# linear distribution in transmission factor of light (based on common sense, where 
 			# 0=dark and 1=midday sunshine in Meditteranean in summer) 
 			self.param_const['trans_fac'] = str('0_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
@@ -4451,13 +4444,13 @@ class PyCHAM(QWidget):
 			# linear distribution in relative humidity (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
 			self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
 		
-			# log-normal distribution of gases like VOCs, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
+			# log-normal distribution for emission rate of gas phase: benzene, alpha-pinene, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
 			comp_cnt = 0 # count on components
-			for compi in range(len(param_range['C0'])):
+			for compi in range(len(param_range['Cinfl'])):
 
 				# create log-normal distribution for concentration range of this component
-				minCi = param_range['C0'][compi][0] # minimum concentration (ppb)
-				maxCi = param_range['C0'][compi][1] # maximum concentration (ppb)
+				minCi = param_range['Cinfl'][compi][0] # minimum concentration (ppb)
+				maxCi = param_range['Cinfl'][compi][1] # maximum concentration (ppb)
 
 				# linear distribution along log10 of range extremes
 				lin_dis = np.linspace(np.log10(minCi), np.log10(maxCi), num=100)
@@ -4466,91 +4459,21 @@ class PyCHAM(QWidget):
 				conc_rand = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
 
 				if (comp_cnt == 0):
-					self.param_const['C0'] = str(self.param_const['C0'] + str(conc_rand))
+					self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + str(conc_rand))
 				else:
-					self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(conc_rand))
+					self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + ', ' + str(conc_rand))
 		
 				comp_cnt += 1 # count on components
 			
-			# ensure NO matches NO2
-			NO2indx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO2')
-			NOx_conc = float((self.param_const['C0'].replace(' ', '').split(','))[NO2indx])
-			self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'NO')
-			self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(NOx_conc))
+			new_Cinfl = ''
+			# now ensure continuous influx of components ends after 1 hour
+			for ci in self.param_const['Cinfl'].split(','):
 
-			# ensure CH3O2 present at start
-			CH4indx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('CH4')
-			CH3O2_conc = float((self.param_const['C0'].replace(' ', '').split(','))[CH4indx])*5.e-6
-			self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'CH3O2')
-			self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(CH3O2_conc))
+				new_Cinfl = str(new_Cinfl + str(ci) + ', 0. ;')
+			# remove final ;			
+			self.param_const['Cinfl'] = new_Cinfl[0:-1]	
 
 			
-			# if NOx concentration supplied but not O3, then estimate O3 concentration based on Fig. 2 of
-			# doi.org/10.1016/j.atmosenv.2012.06.048
-			#if ('NO' in self.param_const['Comp0'] and 'O3' not in self.param_const['Comp0']):
-				
-				# array of O3 concentrations estimates for NOx (varies by rows) and for VOC (varies by columns)
-				#O3_est_array = np.array(((0., 0., 0., 0., 0., 0., 0.), (10., 20., 60., 80., 100., 100., 1000), (8., 16., 55., 120., 130., 130., 1000.), (6., 12., 50., 120., 200., 300., 1000.), (5., 11., 45., 110., 170., 300., 1000.), (4., 9., 40., 100., 170., 280., 1000.)))
-					
-				#O3_est_array = O3_est_array*200.
-
-				#VOC_array = np.array((0., 100., 250., 500., 750., 1000., 10000))
-				#NOx_array = np.array((0., 20., 50., 100., 150., 200.))
-			
-				# add ozone to list of components present at start of simulation
-				#self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'O3')			
-				# estimate ozone
-				#from scipy import interpolate
-				# make interpolation function
-				#O3int_func = interpolate.interp2d(VOC_array, NOx_array, O3_est_array)
-				
-				# get the NOx concentration (ppb)
-				#NOx_conc = 0.
-				#try:
-				#	NOindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO')
-				#	NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NOindx])
-				#except:
-				#	NOx_conc = NOx_conc	
-				
-				#try:
-				#	NO2indx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('NO2')
-				#	NOx_conc += float((self.param_const['C0'].replace(' ', '').split(','))[NO2indx])
-				#except:
-				#	NOx_conc = NOx_conc
-				
-				# get the VOC concentration (ppb)
-				#VOC_conc = 0.
-				#try:
-				#	APindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('APINENE')
-				#	VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[APindx])
-				#except:
-				#	VOC_conc = VOC_conc	
-				
-				#try:
-				#	BZindx = (self.param_const['Comp0'].replace(' ', '').split(',')).index('BENZENE')
-				#	VOC_conc += float((self.param_const['C0'].replace(' ', '').split(','))[BZindx])
-				#except:
-				#	VOC_conc = VOC_conc	 
-
-				# interpolate to get O3 concentration
-				#O3int = O3int_func(VOC_conc, NOx_conc)
-
-				#self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(O3int[0]))
-			
-			if ('OH' not in self.param_const['Comp0']): # first-guess of steady-state OH concentration
-
-				# add OH to list of components present at start of simulation
-				self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'OH')
-				# add starting OH concentration to list of starting concentrations (ppb)
-				self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(1.e-5*float(self.param_const['trans_fac'])))
-
-			if ('HO2' not in self.param_const['Comp0']): # first-guess of steady-state HO2 concentration
-
-				# add HO2 to list of components present at start of simulation
-				self.param_const['Comp0'] = str(self.param_const['Comp0'] + ', ' + 'HO2')
-				# add starting OH concentration to list of starting concentrations (ppb)
-				self.param_const['C0'] = str(self.param_const['C0'] + ', ' + str(1.e-2*float(self.param_const['trans_fac'])))
-
 			# log-normal distribution of seed particle concentration
 			# create log-normal distribution for concentration range of this component
 			minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
@@ -4559,24 +4482,103 @@ class PyCHAM(QWidget):
 			# linear distribution along log10 of range extremes
 			lin_dis = np.linspace(np.log10(minC), np.log10(maxC), num=100)
 
-			# randomly select concentration and raise to power 10
-			self.param_const['pconc'] = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
-			
-			# establish parameters provided by user by calling mod_var_read
-			import mod_var_read
-			mod_var_read.mod_var_read(self)
-			
-			
+			# randomly select total particle concentration influx rate and raise to power 10
+			ptotal = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
 
-			self.on_click2() # assign chemical scheme
-			self.on_click3() # assign xml file
-			self.on_click4() # provide model variables label
+			# randomly select numbers between 0-1 to represent fraction in each size bin
+			p0rnd = (rng.integers(0, 99, size=1))[0]
+			p1rnd = (rng.integers(0, 99, size=1))[0]
+			p2rnd = (rng.integers(0, 99, size=1))[0]
+			ptotrnd = p0rnd+p1rnd+p2rnd
+			self.param_const['pconc'] = str(str((p0rnd/ptotrnd)*ptotal) + ',' + str((p1rnd/ptotrnd)*ptotal) + ',' + str((p2rnd/ptotrnd)*ptotal) + '; 0,0,0')
 			
-			self.on_click81sing() # run simulation
+			if (self.param_const['sim_type'] == 'finisher'):
+				#import ast # for converting imported strings to list
+
+				param_range['starter_paths'] = [] # prepare to list starter folders
+				starter_names = [] # just the folder name
+
+				starter_path = str(os.getcwd() + '/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme')
+
+				# get names of all folders in working folder
+				all_folders = [item for item in os.listdir(starter_path)]
+	
+				for all_foldi in all_folders:
+					if 'ambient_run_num' in all_foldi:
+							param_range['starter_paths'].append(str(starter_path + '/' + all_foldi))			
+							starter_names.append(all_foldi)
+
+				# loop through starter simulations
+				for starteri in range(len(param_range['starter_paths'])):
+
+					self.param_const['res_file_name'] = str(starter_names[starteri] + '_' + str(simi))
+					
+					# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
+					#fname = str(param_range['starter_paths'][starteri] + '/concentrations_all_components_all_times_gas_particle_wall')
+					#ystarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
+
+					#fname = str(param_range['starter_paths'][starteri] + '/model_and_component_constants')
+					#const_in = open(fname)
+					#for line in const_in.readlines():
+
+						#if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
+
+							# find index of first [ and index of last ]
+							#icnt = 0 # count on characters
+							#for i in line:
+							#	if i == '[':
+							#		st_indx = icnt
+							#		break
+							#	icnt += 1 # count on characters
+							#for cnt in range(10):
+							#	if line[-cnt] == ']':
+							#		fi_indx = -cnt+1
+							#		break
+
+							# conversion factor to change gas-phase concentrations from # molecules/cm3 
+							# (air) into ppb
+							#Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
+					
+						#for i in line.split(',')[1::]:
+						#	if str(line.split(',')[0]) == 'number_of_components':
+						#		num_comp = int(i)
+
+					# convert ppb to # molecules/cm3
+					#ystarter[0:num_comp] = ystarter[0:num_comp]*Cfactor
+					
+					# note that param_range['ys'] set in automated_setup_and_call.py
+					# set starting concentration of components now (# molecules/cm3)
+					self.param_const['ynow'] = param_range['ys'][starteri]
+
+					# withdraw number-size distributions (# particles/cm3 (air))
+					#fname = str(param_range['starter_paths'][starteri] +  '/particle_number_concentration_wet')
+					#Nstarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
+
+					# note that param_range['Ns'] set in automated_setup_and_call.py
+					# set starting concentration of particles now (# particles/cm3)
+					self.param_const['Nnow'] = param_range['Ns'][starteri]
+
+					# establish parameters provided by user by calling mod_var_read
+					import mod_var_read
+					mod_var_read.mod_var_read(self)
 			
-			# reset to original start components and their concentrations
-			self.param_const['Comp0'] = Comp0_orig
-			self.param_const['C0'] = C0_orig
+					self.on_click2() # assign chemical scheme
+					self.on_click3() # assign xml file
+					self.on_click4() # provide model variables label
+			
+					self.on_click81sing() # run simulation
+
+			if (self.param_const['sim_type'] == 'starter'):
+
+				# establish parameters provided by user by calling mod_var_read
+				import mod_var_read
+				mod_var_read.mod_var_read(self)
+			
+				self.on_click2() # assign chemical scheme
+				self.on_click3() # assign xml file
+				self.on_click4() # provide model variables label
+			
+				self.on_click81sing() # run simulation
 
 		QWidget.close(self) # quit and close gui window
 

@@ -446,7 +446,15 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 		# ensure that software stops on return to middle module
 		erf = 1
 		err_mess = 'Stop'
-	
+
+	try: # in case called from autorun, in which a finisher simulation is setup
+		if (self.param_const['sim_type'] == 'finisher'):
+			# gas-phase concentrations (# molecules/cm3)
+			y[0:num_comp] = self.param_const['ynow'][0:num_comp]
+			
+	except: # not called from finisher simulation
+		y[:] = y[:]
+
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 

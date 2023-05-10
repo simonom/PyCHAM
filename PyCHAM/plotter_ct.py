@@ -333,20 +333,26 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		inputs = open(inname, mode= 'r' ) # open model variables file
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
+
+		# start by assuming default chemical scheme markers
+		self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';', '']
+
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 
 			# ----------------------------------------------------
 			# if commented out continue to next line
-			if (in_list[i][0] == '#'):
+			if (in_list[i][0] == '#' or in_list[i][0:12] == 'param_ranges'):
 				continue
-			key, value = in_list[i].split('=') # split values from keys
-			# model variable name - a string with bounding white space removed
-			key = key.strip()
-			# ----------------------------------------------------
+			try:
+				key, value = in_list[i].split('=') # split values from keys
+				# model variable name - a string with bounding white space removed
+				key = key.strip()
+				# ----------------------------------------------------
 
-			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
-				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
-
+				if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+					self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+			except:
+				continue
 		# interrogate scheme to list equations
 		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	

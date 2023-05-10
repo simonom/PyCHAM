@@ -415,7 +415,6 @@ def retr_out(self):
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
 	# following will only load for certain simulation setups (mostly whether particles included)
-	
 	try:
 		# withdraw the wall concentration of components due to particle deposition to wall
 		fname = str(self.dir_path + '/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
