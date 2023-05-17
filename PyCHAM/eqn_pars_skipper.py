@@ -19,62 +19,36 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''interrogate the xml file'''
-# opens and extracts the component names and associated SMILE strings
-# from the xml file
+'''code for alterantive to eqn_pars when eqn_pars being skipped'''
 
-import xmltodict # for opening and converting xml files to python dictionaries
-import openbabel.pybel as pybel # for converting SMILE strings to pybel objects
+def eqn_pars_skipper(self): # define function
 
-# define function
-def xml_interr(xml_name):
+	import numpy as np # matrix functions
 
-	# inputs: --------------------------------------------------------
-	# xml_name - name of xml file
-	# ----------------------------------------------------------------
+	# imports: ---------------------------------
+	# self - reference to PyCHAM class
+	# ------------------------------------------
 
-	# start with no error message
-	err_mess_new = ''
+	if ('H2O' in self.con_infl_nam): # check if water in constant influx components 
 
-	with open(xml_name) as fd:
-		try:
-			doc = xmltodict.parse(fd.read())
-		except:
-			err_mess_new = 'Error: xml file could not be interpreted, please check file'
-			return(err_mess_new, [], [])
+		# index of water in continuous influx array
+		wat_indx = (np.array(self.con_infl_nam) == 'H2O').reshape(-1)
 
-	a = doc['mechanism']['species_defs']['species']
-	
-	# prepare arrays to fill	
-	comp_numb = list(('0',) * len(a))
-	comp_name = list(('0',) * len(a))
-	comp_smil = list(('0',) * len(a))
-	
-	for i in range(len(a)):
-		comp_numb[i] = a[i]['@species_number']
-		comp_name[i] = a[i]['@species_name']
-		if (comp_name[i] == ''): # nothing to register here
-			continue
-		
-		if ("smiles" in a[i]):
-			comp_smil[i] = a[i]['smiles']
-		else: # if no SMILE string explicitly given
-		
-			succ = 0 # assume no success
-			if (comp_name[i] == 'O3'):
-				comp_smil[i] = '[O-][O+]=O'
-				succ = 1
-			if (comp_name[i] == 'NO2'):
-				comp_smil[i] = '[N+](=O)[O-]'
-				succ = 1
-			if (comp_name[i] == 'NO3'):
-				comp_smil[i] = '[N+](=O)([O-])[O]'
-				succ = 1
-			if (succ == 0):
-				try: # first try assuming that SMILE string is represented by component name
-					comp_smil[i] = comp_name[i]
-					Pybel_object = pybel.readstring('smi', comp_smil[i])
-				except:
-					err_mess_new = str('Error: a smiles string was not found for component ' + str(comp_name[i]) + ' in the xml file, nor could its name be interpreted as a SMILE string')
-					break
-	return(err_mess_new, comp_smil, comp_name)
+		# do not allow continuous influx of water in the standard ode 
+		# solver, instead deal with it inside the water ode-solver
+		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
+
+		if self.comp_num in self.con_infl_indx:
+			wat_indx = (np.array(self.con_infl_indx == self.comp_num))
+			self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
+
+	# use eqn_pars output from previous simulation
+	rowvals = self.rowvals; colptrs = self.colptrs; jac_wall_indx = self.jac_wall_indx 
+	jac_part_indx = self.jac_part_indx; jac_extr_indx = self.jac_extr_indx
+	comp_num = self.comp_num; rel_SMILES = self.rel_SMILES; Pybel_objects = self.Pybel_objects
+	Jlen = self.Jlen; comp_xmlname = self.comp_xmlname; comp_smil = self.comp_smil; 
+	erf = 0.; err_mess = ''
+
+	return(rowvals, colptrs, jac_wall_indx, 
+		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess)

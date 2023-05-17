@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -30,7 +30,6 @@ import sys
 # (assumes calling from the home folder)
 sys.path.append(str(os.getcwd() + '/PyCHAM'))
 import numpy as np
-import pybel
 import xml_interr
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm

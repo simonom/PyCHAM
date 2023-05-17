@@ -105,12 +105,12 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	from umansysprop import liquid_densities
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
-	y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)
+	self.y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)
 	# vapour pressures of components, ensures any seed component called 
 	# core has zero vapour pressure
 	self.Psat = np.zeros((1, num_comp))
 	# oxygen:carbon ratio of components
-	OC = np.zeros((1, num_comp))
+	self.OC = np.zeros((1, num_comp))
 	# hydrogen:carbon ratio of components
 	self.HC = np.zeros((1, num_comp))
 	# nominal molar mass of components
@@ -123,18 +123,18 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			
 			# density estimation ---------------------------------------------------------
 			if (i == H2Oi): # liquid-phase density of water
-				y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
+				self.y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
 				continue
 			# core component properties
 			if (i == corei[0]): # density of core
-				y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
+				self.y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
 				continue
 			if rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
-				y_dens[i] = 1.e3
+				self.y_dens[i] = 1.e3
 			else:
 				# density (convert from g/cm3 to kg/m3)
-				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
+				self.y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
 			# ----------------------------------------------------------------------------
 		
 	# account for any manually assigned component densities (kg/m3)
@@ -142,7 +142,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		for i in range (len(dens_comp)):
 			# index of component in list of components
 			dens_indx = self.comp_namelist.index(dens_comp[i])
-			y_dens[dens_indx] = dens[i]
+			self.y_dens[dens_indx] = dens[i]
 
 	# for records (e.g. plotting volatility basis set), 
 	# estimate and list the pure component saturation vapour 
@@ -176,7 +176,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		if (i == corei[0]): # if this component is 'core'
 			# core component not included in Pybel_objects
 			# assign an assumed O:C ratio of 0.
-			OC[0, i] = 0.
+			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 132.
 			# continuing
@@ -192,7 +192,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 				self.Psat_Pa_rec[i] = self.Psat[0, i]
 			else:
 				[_, self.Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
-			OC[0, i] = 0.
+			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
 			continue
@@ -204,7 +204,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 				self.Psat_Pa_rec[i] = self.Psat[0, i]
 			else:
 				self.Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
-			OC[0, i] = 0.
+			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 0.*1.+3.*16.
 			continue
@@ -288,10 +288,10 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# O:C ratio determined from SMILES string
 		if (rel_SMILES[i].count('C') > 0):
-			OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
+			self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
 			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
 		else: # if no carbons in this component
-			OC[0, i] = 0.
+			self.OC[0, i] = 0.
 	
 	ish = (self.Psat == 0.) # non-volatiles
 	
@@ -461,4 +461,4 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		erf = 1
 	# end of plotting section ----------------------------------------------------------------------------------------------------------
 	
-	return(y_dens, OC, self, err_mess, erf)
+	return(self, err_mess, erf)

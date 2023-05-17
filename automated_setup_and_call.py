@@ -37,9 +37,11 @@ param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 1 # number of simulations
+param_const['sim_num'] = 3 # number of simulations
 # either 'starter' or 'finisher'
-param_const['sim_type'] = 'finisher' 
+param_const['sim_type'] = 'starter'
+# 1 for whether to not parse input files on repeat runs, 0 to parse on every run
+param_const['skip_parse'] = 1 
 
 # markers for interpreting chemical scheme - note that all chemical scheme markers should be 
 # included inside quotation marks, e.g. 
@@ -98,7 +100,7 @@ param_const['wall_on'] = 1
 param_const['McMurry_flag'] = 1
 param_const['ChamSA'] = 1
 # allow gas-wall partitioning
-param_const['eff_abs_wall_massC'] = 1.e2
+param_const['eff_abs_wall_massC'] = 0.0
 param_const['mass_trans_coeff'] = 1.e-4
 param_const['tracked_comp'] = 'NO2, APINENE, BENZENE, OH'
 
@@ -124,7 +126,7 @@ OHreac = (2.3e-12*np.exp(-190./max(param_range["temperature"]))*0.352*(300.*Cfac
 benzC = OHreac/(2.3e-12*np.exp(-190/max(param_range["temperature"]))*0.352)/Cfac
 
 # the components to keep at constant concentration throughout the simulation
-#param_const['const_comp'] = 'CH4, CO'
+param_const['const_comp'] = 'CH4, CO'
 
 # if starting a simulation, components will undergo an influx 
 # during the first hour to allow spin-up, so can start at zero
@@ -222,11 +224,12 @@ param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [
 if (param_const['sim_type'] == 'starter'):
 	param_const['const_infl_t'] = '0.0, 3.6e3'
 	param_const['pconct'] = '0.1; 3.6e3'
+	param_const['number_size_bins'] = 0
 if (param_const['sim_type'] == 'finisher'):
 	param_const['const_infl_t'] = '0.0, 3.75e3'
 	param_const['pconct'] = '0.1; 3.75e3'
+	param_const['number_size_bins'] = 3
 
-param_const['number_size_bins'] = 3
 param_const['space_mode'] = 'log'
 param_const['coag_on'] = 1
 

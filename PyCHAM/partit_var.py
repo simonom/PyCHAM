@@ -29,7 +29,7 @@ from part_prop import part_prop
 import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, NA, 
-		y_dens, N_perbin, radius, therm_sp,
+		N_perbin, radius, therm_sp,
 		H2Oi, act_coeff, caller, partit_cutoff, Press, DStar_org,
 		z_prt_coeff, chamSA, chamV, self):
 	
@@ -44,7 +44,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# R_gas - the universal gas constant (cm3.Pa/K.mol)
 	# TEMP - current temperature in chamber (K)
 	# NA - Avogadro's constant (molecules/mol) 
-	# y_dens - density of components (kg/m3)
+	# self.y_dens - density of components (kg/m3)
 	# N_perbin - number of particles per size bin (excluding wall)
 	# self.Psat - liquid-phase saturation vapour pressures of components (# molecules/cm3 (air))	
 	# therm_sp - thermal speed of components (m/s) (num_comp, 1)
@@ -79,8 +79,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	if (num_sb-self.wall_on > 0): # if particles present
 		
 		# density (g/cm3) and average molecular weight (g/mol) of particles (excluding wall)
-		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-self.wall_on), NA, y_mw, y_dens, 
-					N_perbin)
+		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, (num_sb-self.wall_on), NA, y_mw, 
+					N_perbin, self)
 	
 	
 		# Knudsen number (dimensionless)

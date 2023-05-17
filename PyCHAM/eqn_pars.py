@@ -99,19 +99,40 @@ def extr_mech(int_tol, num_sb,
 	# empty array for storing index of components with constant influx
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
 	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
+	delete_row_list = [] # prepare for removing rows of unrecognised components
+
 	for i in range (len(self.con_infl_nam)):
 		
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
 		if (self.con_infl_nam[i] == 'H2O'):
 			self.con_infl_indx[i] = int(comp_num)
 			continue
-		try:
-			# index of where components with constant influx occur in list of components
-			self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
-		except:
-			erf = 1 # raise error
-			err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+
+		# if we want to remove constant influxes 
+		# not present in the chemical scheme
+		if (self.remove_influx_not_in_scheme == 1):
+
+			try:
+				# index of where components with constant influx occur in list of components
+				self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
+			except:
+				delete_row_list.append(i)
+		else:
+
+			try:
+				# index of where components with constant influx occur in list of components
+				self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
+			except:
+				erf = 1 # raise error
+				err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
+	if (self.remove_influx_not_in_scheme == 1):
+		for ri in delete_row_list:
+			# remove names of unrecognised components
+			self.con_infl_nam = np.delete(self.con_infl_nam, (ri), axis=0)
+			# remove emissions of unrecognised components
+			self.con_infl_C = np.delete(self.con_infl_C, (ri), axis = 0)
+
 	for i in range (len(self.const_comp)):
 		try:
 			# index of where constant concentration components occur in list 
@@ -208,6 +229,12 @@ def extr_mech(int_tol, num_sb,
 	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
+
+	# in case equation parsing to be skipped in further simulations
+	self.rowvals = rowvals; self.colptrs = colptrs; self.jac_wall_indx = jac_wall_indx 
+	self.jac_part_indx = jac_part_indx; self.jac_extr_indx = jac_extr_indx; self.comp_num = comp_num
+	self.rel_SMILES = comp_list; self.Pybel_objects = Pybel_objects; self.Jlen = Jlen 
+	self.comp_xmlname = comp_name; self.comp_smil = comp_smil
 
 	return(rowvals, colptrs, 
 		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, comp_list, 

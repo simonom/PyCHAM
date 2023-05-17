@@ -35,7 +35,7 @@ import act_coeff_update
 def rec_prep(nrec_step, y, y0, 
 	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
-	y_dens, x, therm_sp, H2Oi, act_coeff, 
+	x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cfactor, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_count, injectt, gasinj_cnt, 
@@ -72,7 +72,7 @@ def rec_prep(nrec_step, y, y0,
 	# self.TEMP - temperature (K)
 	# self.tempt - times temperatures achieved (s)
 	# NA - Avogadro constants (molecules/mol)
-	# y_dens - component densities (g/cm3)
+	# self.y_dens - component densities (kg/m3)
 	# x - particle radii (um)
 	# therm_sp - thermal speed (m/s)
 	# H2Oi - index for water
@@ -197,7 +197,7 @@ def rec_prep(nrec_step, y, y0,
 		update_count, 
 		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
-		lowsize, uppsize, num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, 
+		lowsize, uppsize, num_sb, MV, rad0, radn, std, H2Oi, rbou, 
 		infx_cnt, Cfactor, diff_vol, 
 		DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
@@ -234,7 +234,7 @@ def rec_prep(nrec_step, y, y0,
 		
 		# update partitioning variables
 		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
-		surfT, R_gas, temp_now, NA, y_dens*1.e3, N_perbin, 
+		surfT, R_gas, temp_now, NA, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 		

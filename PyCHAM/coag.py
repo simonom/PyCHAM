@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -36,7 +36,7 @@ from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for r
 import fullmov
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
-			num_comp, vdWon, rho, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
+			num_comp, vdWon, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
 			sbVj, coag_on, siz_str, self):
 
 	# inputs:---------------------------------------------------------
@@ -57,7 +57,7 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# num_comp - number of components
 	# vdWon - flagging whether the van der Waals kernel should be calculated or ignored (0
 	# for ignore, 1 for calculate)
-	# rho - component densities (g/cm3) in a 1D array
+	# self.y_dens - component densities (kg/m3)
 	# V0 - original volume at size bin centre (um3)
 	# rad0 - original radius at size bin centre (um)
 	# PInit - pressure inside chamber (Pa)
@@ -73,6 +73,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	# self - reference to PyCHAM
 	# --------------------------------------------------------------
 	
+	rho = (np.squeeze(self.y_dens*1.e-3)) # component densities (g/cm3 in 1D array)
+
 	num_part = num_part.reshape(1, -1)
 	# volume concentration of particles (m3/cm3 (air))
 	vol_part = (sbVi*num_part).reshape(1, -1)

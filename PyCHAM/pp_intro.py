@@ -30,7 +30,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
-		y_dens, core_diss, space_mode, seedx, 
+		core_diss, space_mode, seedx, 
 		act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, self):
 	
@@ -57,7 +57,7 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	#			distribution (in which case pconc should be scalar), or mean radius of
 	#			particles where just one size bin present (in which case pconc is also
 	#			scalar)
-	# y_dens - liquid density of components (kg/m3) (num_comp, 1)
+	# self.y_dens - liquid density of components (kg/m3) (num_comp, 1)
 	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))
 	# core_diss - core dissociation constant
 	# space_mode - string specifying whether to space size bins logarithmically or 
@@ -186,9 +186,9 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	# include wall concentrations (# molecules/cm3)
 	y = np.append(y, y_w)	
 
-	# molar volume of components (multiply y_dens by 1e-3 to convert from kg/m3 to g/cm3 and give
+	# molar volume of components (multiply self.y_dens by 1e-3 to convert from kg/m3 to g/cm3 and give
 	# MV in units cm3/mol)
-	MV = (y_mw/(y_dens*1.e-3)).reshape(num_comp, 1)
+	MV = (y_mw/(self.y_dens*1.e-3)).reshape(num_comp, 1)
 
 	# number of size bins, excluding wall
 	num_aasb = num_sb-self.wall_on
@@ -217,8 +217,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 					# note that seed_mw has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 					# 1e7 for units g cm2/s2.mol.K, 
 					# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
-					# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-					kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
+					# self.y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
+					kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(self.y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 					# equilibrium mole fraction of water per size bin
 					# from the ode solver equation for vapour-particle partitioning of water
@@ -269,8 +269,8 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 				# note that seed_mw has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
-				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*sum(seed_mw)/len(seed_mw)*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
+				# self.y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
+				kelv = np.exp((2.e0*sum(seed_mw)/len(seed_mw)*surfT)/(R_gas*1.e7*TEMP*x*1.e-4*(sum(self.y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
@@ -317,13 +317,13 @@ def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
 	if (self.wall_on > 0 and self.Vwat_inc == 2): # if wall present and water to be equilibrated between wall and gas
 		y[-1-(num_comp-H2Oi)] = (y[H2Oi]*self.Cw[0, H2Oi])/(self.Psat[-1, H2Oi]*act_coeff[-1, H2Oi]) 
 	
-	# mass concentration of particles (scale y_dens by 1e-3 to convert from kg/m3
+	# mass concentration of particles (scale self.y_dens by 1e-3 to convert from kg/m3
 	# to g/cm3)
 	if (num_aasb > 0): # with particles
 		mass_conc = 0. # start cumulation
 		for i in range(num_aasb): # as size bin now account for wall too
-			mass_conc += sum((y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:, 0]))
-			mass_conc -= (y_dens[int(H2Oi), 0]*1.e-3)*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
+			mass_conc += sum((self.y_dens[:, 0]*1.0e-3)*((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*MV[:, 0]))
+			mass_conc -= (self.y_dens[int(H2Oi), 0]*1.e-3)*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*MV[int(H2Oi), 0])
 		mass_conc = mass_conc*1.e12 # convert from g/cc (air) to ug/m3 (air)
 
 	# start counter on number concentration of newly nucleated particles (# particles/cm3(air))

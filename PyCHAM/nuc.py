@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -24,7 +24,7 @@
 import numpy as np
 import scipy.constants as si
 
-def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV, 
+def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr, MV, 
 		nucv1, nucv2, nucv3, nuc_comp, siz_str, rbou, Vbou, num_sb):
 
 
@@ -33,12 +33,12 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 	
 	# sumt - time through simulation (s)
 	# new_part_sum1 - number concentration of newly nucleated particles already 
-	# added (# particles/cc (air))
-	# n0 - original number concentration of particles (# particles/cc (air))
+	# added (# particles/cm3 (air))
+	# n0 - original number concentration of particles (# particles/cm3 (air))
 	# y - molecular concentration of components in the gas and particle phase
-	# (molecules/cc (air))
+	# (# molecules/cm3 (air))
 	# MW - molecular weight (g/mol)
-	# rho - density (g/cc)
+	# rho - density (kg/m3)
 	# num_comp - number of components
 	# Varr - particles volumes per size bin(s) (um3)	
 	# x - particles radius per size bin(s) (um)
@@ -52,6 +52,8 @@ def nuc(sumt, new_part_sum1, n0, y, MW, rho, num_comp, Varr, x, new_partr, MV,
 	# num_sb - number of size bins, excluding wall
 	# ---------------------------------------------------------------
 	
+	rho = np.squeeze(self.y_dens*1.e-3) # density of components in g/cm3 in 1D array
+
 	# total number of particles that should have been produced through nucleation 
 	# by now given by integration:
 

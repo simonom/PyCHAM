@@ -1,6 +1,5 @@
 name: PyCHAM
 channels:
-  - openbabel
   - numba
   - conda-forge
   - anaconda

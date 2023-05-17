@@ -90,7 +90,7 @@ class PyCHAM(QWidget):
 		grid.addWidget(l0b, 0, EUROlogo_hindx)
 		# link to EUROCHAMP website
 		bn1 = QPushButton('', self)
-		bn1.setStyleSheet('background : transparent')
+		bn1.setStyleSheet('background : transparent; border : 0px; color : white')
 		bn1.setToolTip('Visit the EUROCHAMP website')
 		bn1.clicked.connect(self.on_clickn1)
 		grid.addWidget(bn1, 0, EUROlogo_hindx)
@@ -103,7 +103,7 @@ class PyCHAM(QWidget):
 		grid.addWidget(l0c, 0, NCASlogo_hindx)
 		# link to NCAS website
 		bn1a = QPushButton('', self)
-		bn1a.setStyleSheet('background : transparent')
+		bn1a.setStyleSheet('background : transparent; border : 0px; color : white')
 		bn1a.setToolTip('Visit the NCAS website')
 		bn1a.clicked.connect(self.on_clickn1a)
 		grid.addWidget(bn1a, 0, NCASlogo_hindx)
@@ -116,7 +116,7 @@ class PyCHAM(QWidget):
 		grid.addWidget(l0d, 0, UoMlogo_hindx)
 		# link to EUROCHAMP website
 		bn1b = QPushButton('', self)
-		bn1b.setStyleSheet('background : transparent')
+		bn1b.setStyleSheet('background : transparent; border : 0px; color : white')
 		bn1b.setToolTip('Visit the University of Manchester website')
 		bn1b.clicked.connect(self.on_clickn1b)
 		grid.addWidget(bn1b, 0, UoMlogo_hindx)
@@ -949,11 +949,11 @@ class PyCHAM(QWidget):
 		# finished check on model variables -------------------------------------------------------------------------
 		
 		# relative stretching (width-wise) of each column in Simuate tab
-		self.NSlayout.setColumnStretch(0, 0.7)
+		self.NSlayout.setColumnStretch(0, 1)
 		self.NSlayout.setColumnStretch(1, 1)
 		self.NSlayout.setColumnStretch(2, 1)
 		self.NSlayout.setColumnStretch(3, 1)
-		self.NSlayout.setColumnStretch(4, 0.1)
+		self.NSlayout.setColumnStretch(4, 1)
 		self.NSlayout.setColumnStretch(5, 1)
 
 		return(NSTab)
@@ -1013,7 +1013,7 @@ class PyCHAM(QWidget):
 		# relative stretching (width-wise) of each column in Plot tab
 		self.PLlayout.setColumnStretch(0, 1)
 		self.PLlayout.setColumnStretch(1, 2)
-		self.PLlayout.setColumnStretch(2, 0.8)
+		self.PLlayout.setColumnStretch(2, 1)
 		self.PLlayout.setColumnStretch(3, 1)
 		self.PLlayout.setColumnStretch(4, 2)
 		

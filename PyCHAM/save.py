@@ -31,7 +31,7 @@ from shutil import copyfile
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, rel_SMILES, OC, H2Oi,
+	indx_plot, comp0, rel_SMILES, H2Oi,
 	siz_str, cham_env, self):
 	
 	# inputs: ----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# 						pp_intro.py for 1 size bin
 	# Cfactor_vst - one billionth the molecular concentration in a unit volume of chamber
 	#				(# molecules/cm3) per recording time step
-	# time_taken - computer time for entire simulation (s)
+	# time_taken - computer processing time for entire simulation (s)
 	# seed_name - name of seed component
 	# y_mw - molecular weights (g/mol)
 	# self.nom_mass - nominal molar mass (g/mol)
@@ -75,7 +75,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.inname - path to model variables file
 	# rel_SMILES - SMILES strings for components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K (Pa)
-	# OC - oxygen to carbon ratio of components
+	# self.OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
 	# self.seedi - index of seed components
@@ -148,7 +148,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["wall_on_flag_0forNO_>0forYES"] = self.wall_on
 	const["space_mode"] = space_mode
 	const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"] = self.Psat_Pa_rec.tolist()
-	const["oxygen_to_carbon_ratios_of_components"] = OC.tolist()
+	const["oxygen_to_carbon_ratios_of_components"] = self.OC.tolist()
 	const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = self.seedi.tolist()
@@ -223,7 +223,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	
 	
 	# saving generation of components
-	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised VOC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
+	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised Vself.OC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	
 	if ((numsb-self.wall_on) > 0): # if particles present
 	
@@ -314,7 +314,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		init_comp = comp0
 		part_to_wall = self.yrec_p2w
 		vpPa = self.Psat_Pa_rec
-		O_to_C = OC.tolist()
+		O_to_C = self.OC.tolist()
 		H2O_ind = H2Oi
 		seed_ind = self.seedi.tolist()
 		siz_struc = siz_str

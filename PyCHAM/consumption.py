@@ -59,6 +59,7 @@ def cons(self, caller):
 	space_mode = self.ro_obj.spacing
 	Cfac = self.ro_obj.cfac
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+	inname = self.ro_obj.vp
 	
 	dydt_list = [] # prepare to store change tendencies
 	# loop through components to plot to check they are available
@@ -136,7 +137,7 @@ def cons(self, caller):
 		return() # return now
 
 	if (caller == 1): # call from the yield button
-		# concentrations of components in particle phase at end of user-defined time through simulation (# molecules/cm3)
+		# concentrations of components in particle-phase at end of user-defined time interval (# molecules/cm3)
 		SOA = yrec[timehr==max(timehr[indxt]), num_comp:num_comp*(num_sb-wall_on+1)]
 
 		# remove seed and water in all size bins
@@ -149,7 +150,7 @@ def cons(self, caller):
 		# sum for total (ug/m3)
 		SOAfi = np.sum(SOA)
 
-		# concentrations of components in particle phase at start of simulation (# molecules/cm3)
+		# concentrations of components in particle phase at start of time interval (# molecules/cm3)
 		SOA = yrec[timehr==min(timehr[indxt]), num_comp:num_comp*(num_sb-wall_on+1)]
 		# remove seed and water in all size bins
 		SOA[0, seedi[0]::num_comp] = 0.
@@ -160,8 +161,44 @@ def cons(self, caller):
 
 		# sum for total (ug/m3)
 		SOAst = np.sum(SOA)
-		print(SOAfi-SOAst)
-		yld = (SOAfi-SOAst)/sum(cons)
+
+		inputs = open(inname, mode= 'r' ) # open model variables file
+		in_list = inputs.readlines() # read file and store everything into a list
+		inputs.close() # close file
+
+		for i in range(len(in_list)): # loop through supplied model variables to interpret
+			
+			# ----------------------------------------------------
+			# if commented out continue to next line
+			if (in_list[i][0] == '#'):
+				continue
+			try:
+				key, value = in_list[i].split('=') # split values from keys
+			except:
+				continue
+			if key.strip() == 'dil_fac': # dilution factor rate
+				dil_fac = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+				
+			if key.strip() == 'dil_fact': # dilution factor rate times through experiment (s)
+				dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+
+		# in case there is dilution during this interval
+		try: # will work if dilt given
+			# get final dilution factor in this time inetrval
+			dil_facfi = dil_fac[sum(dil_fact<=max(timehr[indxt]))]
+			# get first dilution factor in this time inetrval
+			dil_facst = dil_fac[sum(dil_fact<=min(timehr[indxt]))]
+			dil_fac = np.mean(dil_fac[dil_facst:dil_facfi+1])
+		except:
+			dil_fac = dil_fac			
+
+
+
+		# integrate loss of SOA due to dilution over time interval
+		tint = (max(timehr[indxt])-min(timehr[indxt]))*3600. # time interval (s)
+		SOA_loss_by_dil = ((SOAfi+SOAst)/2.)*tint*dil_fac # note calculation of mean SOA in this time interval
+
+		yld = (SOA_loss_by_dil+(SOAfi-SOAst))/sum(cons)
 
 	
 		self.l203a.setText(str('Yield of ' + str(self.comp_names_to_plot) + ': ' + str(yld)))

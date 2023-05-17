@@ -39,7 +39,7 @@ def cham_up(sumt, Pnow,
 	injectt, gasinj_cnt, inj_indx, 
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin0, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
-	y_dens, H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
+	H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
 	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
 	tot_in_res, Compti, self, vol_Comp, volP):
@@ -100,14 +100,14 @@ def cham_up(sumt, Pnow,
 	# radn - current radius at size bin centres (um)
 	# std - standard deviation for injected particle number size 
 	#	distributions
-	# y_dens - component densities (g/cm3)
+	# self.y_dens - component densities (kg/m3)
 	# H2Oi - index of water
 	# rbou - size bin radius bounds (um)
 	# self.con_infl_t - times for constant influxes (s)
 	# infx_cnt - count on constant influx occurrences
 	# self.Cinfl - influx rate for components with constant influx (ppb/s)
 	# self.wall_on - marker for whether wall is on
-	# Cfactor - conversion factor from ppb to molecules/cc (air)
+	# Cfactor - conversion factor from ppb to molecules/cm3 (air)
 	# self.seedi - index of seed component(s)
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
@@ -414,7 +414,7 @@ def cham_up(sumt, Pnow,
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 					N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
-					stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
+					stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 					pcontf, y[H2Oi], self)
 					
 				# turn off flag for ongoing injection of particles
@@ -472,7 +472,7 @@ def cham_up(sumt, Pnow,
 		_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 		N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
 		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
-		stdn, y_dens, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
+		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], self)
 		
 	# ----------------------------------------------------------------------------------------------------------
@@ -489,26 +489,53 @@ def cham_up(sumt, Pnow,
 		
 		# if the final input for influxes reached
 		if (infx_cnt == -1):
+
 			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
-			Cinfl_now = (self.con_infl_C[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
+			if ('ppb' in self.abun_unit):
+				Cinfl_now = (self.con_infl_C[:, infx_cnt]*self.Cfactor)
+			if ('molecules/cm3' in self.abun_unit):
+				Cinfl_now = (self.con_infl_C[:, infx_cnt])
+
+			# ensure correct shape
+			Cinfl_now = np.float64(Cinfl_now.reshape(-1, 1))
+
 			if (self.H2Oin == 1):
-				# continuous influx rate of water now
-				self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
+				if ('ppb' in self.abun_unit):
+					# continuous influx rate of water now
+					self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor)
+				if ('molecules/cm3' in self.abun_unit):
+					self.Cinfl_H2O_now = self.con_infl_H2O[:, infx_cnt]
+
+				# ensure correct shape
+				self.Cinfl_H2O_now = np.float64(self.Cinfl_H2O_now.reshape(-1, 1))
+
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
 		
 		# check whether changes occur at start of this time step
 		if (sumt == self.con_infl_t[infx_cnt] and (infx_cnt != -1)):
 			
-			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
-			Cinfl_now = (self.con_infl_C[:, infx_cnt]*Cfactor).reshape(-1, 1)
+			if ('ppb' in self.abun_unit): # note that we assume units of # molecules/cm3/s
+				# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
+				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt]*Cfactor)
+
+			if ('molecules/cm3' in self.abun_unit):
+				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt])
 			
+			Cinfl_now = Cinfl_now.reshape(-1, 1)
+
 			if (self.H2Oin == 1):
-				# continuous influx rate of water now
-				self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor).reshape(-1, 1)
+				if ('ppb' in self.abun_unit):
+					# continuous influx rate of water now
+					self.Cinfl_H2O_now = np.float64(self.con_infl_H2O[:, infx_cnt]*self.Cfactor)
+				if ('molecules/cm3' in self.abun_unit):
+					self.Cinfl_H2O_now = np.float64(self.con_infl_H2O[:, infx_cnt])
+
+				# ensure correct shape
+				self.Cinfl_H2O_now = self.Cinfl_H2O_now.reshape(-1, 1)
 			
 			# record cumulative injection of components (ug/m3)
-			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
+			tot_in_res[self.cont_inf_reci] += ((((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1))
 
 			# update index counter for constant influxes - used in integrator below
 			if (infx_cnt < (self.con_infl_C.shape[1]-1)):
@@ -517,7 +544,7 @@ def cham_up(sumt, Pnow,
 				infx_cnt = -1 # reached end
 
 			bc_red = 0 # reset flag for time step reduction due to boundary conditions
-
+		
 		# check whether changes occur during proposed integration time step
 		if (sumt+tnew > self.con_infl_t[infx_cnt] and (infx_cnt != -1)):
 			# if yes, then reset integration time step so that next step coincides 
@@ -525,7 +552,7 @@ def cham_up(sumt, Pnow,
 			tnew = self.con_infl_t[infx_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 
-		if tnew<0:
+		if (tnew < 0):
 			import ipdb; ipdb.set_trace()
 	else: # if no continuous influxes, provide filler
 		Cinfl_now = np.zeros((1, 1))

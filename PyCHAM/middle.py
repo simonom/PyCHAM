@@ -23,6 +23,7 @@
 # the modules necessary to setup a simulation are called here
 
 import eqn_pars
+import eqn_pars_skipper
 import user_input as ui
 import init_conc
 import prop_calc
@@ -39,7 +40,7 @@ def middle(self): # define function
 	# inputs: -------------------------------------------------------
 	# self - reference to program
 	# ---------------------------------------------------------------
-
+	st_time = time.time()
 	# get required inputs
 	[sav_nam, comp0, y0, Pnow,
 		siz_str, num_sb, pmode, pconc, pconct,
@@ -54,14 +55,20 @@ def middle(self): # define function
 		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
 	
-	# parse the chemical scheme equation file to convert equations
-	# into usable code
-	[rowvals, colptrs, jac_wall_indx, 
-	jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
-	Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
-	self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
-	pcont, self)
-	
+	if (self.pars_skip == 0): # if not skipping parsing of chemical scheme
+		# parse the chemical scheme equation file to convert equations
+		# into usable code
+		[rowvals, colptrs, jac_wall_indx, 
+		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
+		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
+		pcont, self)
+
+	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
+		[rowvals, colptrs, jac_wall_indx, 
+		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, 
+		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (self.testf == 4):
@@ -79,18 +86,18 @@ def middle(self): # define function
 	rel_SMILES] = init_conc.init_conc(comp_num, 
 	comp0, y0, Pnow, Pybel_objects, 0, pconc, self.eqn_num[0], Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self)
-	
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
 		yield err_mess
 
 	tempt_cnt = 0 # count on chamber temperatures
-
-	# get component properties
-	[y_dens, OC, self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
-		H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
-		uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
-		seed_name, y_mw, tempt_cnt, self)
+	
+	if (self.pars_skip == 0): # if not skipping component properties
+		# get component properties
+		[self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+			H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
+			uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
+			seed_name, y_mw, tempt_cnt, self)
 	
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
@@ -111,7 +118,7 @@ def middle(self): # define function
 	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, y_dens, core_diss, space_mode, seedx,
+		therm_sp, core_diss, space_mode, seedx,
 		act_coeff, partit_cutoff, Pnow, 
 		pcont, seed_mw, R_gas, self)
 	
@@ -119,12 +126,11 @@ def middle(self): # define function
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
 	
 	# solve problem
-	
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, mfp, therm_sp,  
-		accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
+		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, 
 		colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
@@ -135,7 +141,7 @@ def middle(self): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-		OC, wat_hist, Pybel_objects, pcont, NOi, 
+		wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):
 

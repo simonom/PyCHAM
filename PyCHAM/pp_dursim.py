@@ -28,7 +28,7 @@ import scipy.constants as si
 from scipy import stats # import the scipy.stats module
 
 def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize, num_comp, 
-		num_sb, MV, rad0, radn, std, y_dens, H2Oi, rbou, y_mw, surfT, TEMP, 
+		num_sb, MV, rad0, radn, std, H2Oi, rbou, y_mw, surfT, TEMP, 
 		act_coeff, pcontf, H2Ogc, self):
 	
 			
@@ -48,7 +48,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize,
 	# rad0 - original radius at size bin centres (um)
 	# radn - current radius at size bin centres (um)
 	# std - standard deviation for lognormal size distribution calculation (dimensionless)
-	# y_dens  - density of components (kg/m3)
+	# self.y_dens  - density of components (kg/m3)
 	# H2Oi - index of water
 	# rbou - radius bounds per size bin (um)
 	# y_mw - molecular weight of components (g/mol)
@@ -149,8 +149,8 @@ def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize,
 				# note that seed_mw has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
-				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
+				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cm3
+				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(self.y_dens[self.seedi[:], 0]*1.e-3)/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water per size bin
 				# from the ode solver equation for vapour-particle partitioning of water
@@ -218,8 +218,8 @@ def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize,
 				# note that seed_mw has units g/mol, surfT (g/s2==mN/m==dyn/cm), R_gas is multiplied by 
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 1e-4 to give cm from um and 
-				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cc
-				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(y_dens[self.seedi[:], 0])/len(self.seedi)*1.e-3)))
+				# y_dens multiplied by  by 1e-3 to convert from kg/m3 to g/cm3
+				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(self.y_dens[self.seedi[:], 0]*1.e-3)/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water from the ode solver 
 				# equation for vapour-particle partitioning
@@ -283,9 +283,9 @@ def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize,
 			Varr[i] = Vtot[i]/N_perbin[i, 0]
 		else:
 			Varr[i] = (4./3.*np.pi)*rad0[i]**3.
-		# multiply y_dens by 1e-3 to get ug/um3 (particle) from kg/m3, 
+		# multiply y_dens by 1e-9 to get ug/um3 (particle) from kg/m3, 
 		# then multiplying ug/um3 (particle) by um3/cm3 (air) gives ug/cm3 (air)
-		mass_conc += np.sum((y_dens[self.seedi, 0]*1.e-9)*Vtot[i])
+		mass_conc += np.sum((self.y_dens[self.seedi, 0]*1.e-9)*Vtot[i])
 	
 	# new radius of single particles (um)
 	radn = ((3./(4.*np.pi))*Varr)**(1./3.)

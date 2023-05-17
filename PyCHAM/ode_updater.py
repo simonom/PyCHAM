@@ -57,7 +57,7 @@ def ode_updater(y, H2Oi,
 	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, mfp, therm_sp,
-	accom_coeff, y_mw, surfT, R_gas, NA, y_dens, 
+	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, Varr, act_coeff, Cfactor, rowvals, 
 	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
@@ -68,7 +68,7 @@ def ode_updater(y, H2Oi,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
 	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
-	OC, wat_hist, Pybel_objects, pcont, NOi, 
+	wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
 	chamV, tempt_cnt, self, vol_Comp, volP):
@@ -122,7 +122,7 @@ def ode_updater(y, H2Oi,
 	# surfT - surface tension (g/s2)
 	# R_gas - ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	# NA - Avogadro's constant (molecules/mol)
-	# y_dens - component densities (kg/m3)
+	# self.y_dens - component densities (kg/m3)
 	# x - particle radii (um)
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
@@ -252,7 +252,7 @@ def ode_updater(y, H2Oi,
 	# rel_SMILES - SMILES strings of components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
 	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
-	# OC - oxygen to carbon ratio of components
+	# self.OC - oxygen to carbon ratio of components
 	# wat_hist - flag for history of particle-phase with respect to water partitioning,
 	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
 	#	(therefore on the efflorescence curve)
@@ -349,7 +349,7 @@ def ode_updater(y, H2Oi,
 	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, 
 	num_sb, num_comp, N_perbin, core_diss, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
-	y_dens*1.e-3, x, therm_sp, H2Oi, act_coeff,
+	x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cfactor, 
 	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
@@ -444,7 +444,7 @@ def ode_updater(y, H2Oi,
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
-			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
@@ -477,7 +477,7 @@ def ode_updater(y, H2Oi,
 				
 				# update partitioning variables
 				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
-				y_mw, surfT, R_gas, temp_now, NA, y_dens, N_perbin, 
+				y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 			
@@ -675,7 +675,7 @@ def ode_updater(y, H2Oi,
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
-						num_comp, 0, (np.squeeze(y_dens*1.e-3)), Vol0, rad0, Pnow, 0,
+						num_comp, 0, Vol0, rad0, Pnow, 0,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
 					
@@ -693,8 +693,7 @@ def ode_updater(y, H2Oi,
 				if (nucv1 > 0.): # nucleation
 					
 					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
-						N_perbin, y, y_mw.reshape(-1, 1), 
-						np.squeeze(y_dens*1.0e-3),  
+						N_perbin, y, y_mw.reshape(-1, 1),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
 						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on))
 				
@@ -770,7 +769,7 @@ def ode_updater(y, H2Oi,
 			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
-			lowsize, uppsize, num_sb, MV, rad0, x0, std, y_dens, H2Oi, rbou, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
@@ -809,6 +808,6 @@ def ode_updater(y, H2Oi,
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, rel_SMILES, OC, H2Oi, siz_str, cham_env, self)
+		comp0, rel_SMILES, H2Oi, siz_str, cham_env, self)
 	
 	return() # end of function

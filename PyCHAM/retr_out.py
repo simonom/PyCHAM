@@ -353,6 +353,7 @@ def retr_out(self):
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]
+		print(comp_time)
 	except:
 		comp_time = 0.
 
