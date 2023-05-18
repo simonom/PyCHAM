@@ -460,7 +460,7 @@ def mod_var_read(self):
 				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
 					self.const_infl_path = str(value.strip())
 					self = const_infl_open(self)
-					
+					err_mess = self.err_mess
 					
 				else: # treat as list of components 
 					self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
@@ -597,6 +597,9 @@ def mod_var_read(self):
 					erh_str = str(value)
 				except:
 					erh_str = -1 # will cause error message
+			# whether to remove influxes of components that aren't seen in chemical scheme
+			if (key == 'remove_influx_not_in_scheme' and (value.strip())):
+				self.remove_influx_not_in_scheme = int(value)
 		
 		
 		
@@ -655,8 +658,12 @@ def const_infl_open(self): # define function to read in values relevant to const
 	import openpyxl
 	import os
 
-	wb = openpyxl.load_workbook(filename = self.const_infl_path)
-	
+	try: # try to open the file at the user-supplied path
+		wb = openpyxl.load_workbook(filename = self.const_infl_path)
+	except: # if file not found tell user
+		self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
+		return(self)
+
 	sheet = wb['const_infl']
 	# component names are in first column, times are in headers of first row		
 	ic = 0 # count on row iteration
@@ -674,7 +681,7 @@ def const_infl_open(self): # define function to read in values relevant to const
 						col_lim_indx = it
 						break
 				
-				self.con_infl_t = self.con_infl_t[0:col_lim_indx-1]
+				self.con_infl_t = self.con_infl_t[0:col_lim_indx]
 
 				# prepare to store emission rates
 				self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
@@ -694,12 +701,11 @@ def const_infl_open(self): # define function to read in values relevant to const
 				if (ic > self.con_infl_C.shape[0]): # if we need to concatenate
 					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx])).reshape(1, -1)), axis=0)
 				else:
-					self.con_infl_C[ic-1] = i[1:col_lim_indx]
+					self.con_infl_C[ic-1, :] = i[1:col_lim_indx+1]
 				
 				
 			ic += 1 # count on row iteration
 
 	wb.close() # close excel file
-
 
 	return(self)

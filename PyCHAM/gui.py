@@ -55,10 +55,11 @@ class PyCHAM(QWidget):
 		self.height = 530
 		self.initUI() # call on initialisation function to fill window
 		
+		self.err_mess = '' # begin with no error message
+
 		# if parameters have been provided automatically (without using GUI)
 		# then automatically setup and run the simulation, e.g. using the
 		# automated_setup_and_call.py
-
 		if (type(param_const) == dict):
 			
 			self.autorun() # call on automatic setup and run

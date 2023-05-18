@@ -29,7 +29,7 @@ def xml_cont_gen(): # define function
 	import re # for parsing
 	import numpy as np # for math and matrix operations
 	import xmltodict # for opening and converting xml files to python dictionaries
-	import pybel # for converting SMILE strings to pybel objects
+	import openbabel.pybel as pybel # for converting SMILE strings to pybel objects
 
 	# -----------------------------------------------------------------------------------
 	# tell code what method to take for estimating SMILES

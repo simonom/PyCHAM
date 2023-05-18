@@ -10,7 +10,7 @@ dir_path = os.getcwd() # current working directory
 # temporarily add the PyCHAM folder to path
 sys.path.append(str(dir_path+'/PyCHAM'))
 
-import pybel
+import openbabel.pybel as pybel
 import diff_vol_est
 
 

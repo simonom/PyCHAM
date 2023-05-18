@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -31,7 +31,7 @@ import matplotlib.cm as cm
 import os
 import numpy as np
 import scipy.constants as si
-import pybel
+import openbabel.pybel as pybel
 import openpyxl # for opening excel file
 
 def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles

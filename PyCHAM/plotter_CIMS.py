@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -198,7 +198,7 @@ def write_CIMS_output(self):
 	# state (# molecules/cm3)
 	concs_res = np.zeros((3, 1))
 
-	import pybel # required dependency
+	import openbabel.pybel as pybel # required dependency
 
 	# indices of RO2 components
 	indx_plot = (np.array((group_indx['RO2i'])))

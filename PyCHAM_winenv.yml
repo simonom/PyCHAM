@@ -1,69 +1,17 @@
 name: PyCHAM
 channels:
-  - openbabel
   - conda-forge
-  - anaconda
   - defaults
 dependencies:
-  - ca-certificates
-  - certifi
   - git
-  - icu
-  - jpeg
-  - libpng
-  - libxml2
-  - openssl
-  - pyqt
-  - sip
-  - sqlite
-  - vc
-  - vs2015_runtime
-  - zlib
-  - backcall
-  - colorama
-  - cycler
-  - decorator
-  - freetype
-  - gitdb2
   - gitpython
   - ipdb
-  - ipython
-  - ipython_genutils
-  - jedi
-  - kiwisolver
-  - libblas
-  - libcblas
-  - liblapack
   - matplotlib
-  - matplotlib-base
-  - mkl-service
   - netcdf4
   - numpy
-  - openpyxl
-  - pandas
-  - parso
-  - pickleshare
-  - prompt_toolkit
-  - pygments
-  - pyparsing
-  - python-dateutil
-  - pytz
-  - requests
-  - six
-  - smmap2
-  - tornado
-  - traitlets
-  - wcwidth
-  - xmltodict
-  - blas
-  - icc_rt
-  - libiconv
-  - mkl
-  - pip
-  - python
-  - qt
-  - scipy
-  - setuptools
-  - wheel
-  - wincertstore
   - openbabel
+  - openpyxl
+  - python
+  - pyqt
+  - scipy
+  - xmltodict

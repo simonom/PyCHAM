@@ -3,10 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - ipdb
   - git
   - gitpython
+  - ipdb
   - matplotlib
+  - netcdf4
   - numpy
   - openbabel
   - openpyxl
