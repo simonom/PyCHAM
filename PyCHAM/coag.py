@@ -80,8 +80,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	vol_part = (sbVi*num_part).reshape(1, -1)
 
 	# ensure sbn is integer
-	sbrn = np.int(np.max(sbr.shape))
-	sbn = np.int(np.max(rint.shape)) # number of size bins
+	sbrn = int(np.max(sbr.shape))
+	sbn = int(np.max(rint.shape)) # number of size bins
 	
 	# call on function to determine the Knudsen number and therefore flow 
 	# regime of each size bin

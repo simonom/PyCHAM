@@ -25,7 +25,7 @@ import numpy as np
 import scipy.constants as si
 
 def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr, MV, 
-		nucv1, nucv2, nucv3, nuc_comp, siz_str, rbou, Vbou, num_sb):
+		nucv1, nucv2, nucv3, nuc_comp, siz_str, rbou, Vbou, num_sb, self):
 
 
 	# ---------------------------------------------------------------
@@ -50,6 +50,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr, MV,
 	# rbou - radius bounds (um)
 	# Vbou - volume bounds (um3)
 	# num_sb - number of size bins, excluding wall
+	# self - PyCHAM class
 	# ---------------------------------------------------------------
 	
 	rho = np.squeeze(self.y_dens*1.e-3) # density of components in g/cm3 in 1D array

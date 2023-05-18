@@ -26,7 +26,7 @@
 import numpy as np
 import re
 import formatting
-import pybel
+import openbabel.pybel as pybel
 import sys
 
 def eqn_interr(comp_name, comp_smil, num_sb, self):

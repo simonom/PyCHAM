@@ -2230,7 +2230,7 @@ class PyCHAM(QWidget):
 						self.l81b.setText('')
 						self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
 			
-				self.progress.setValue(prog) # get progress
+				self.progress.setValue(int(prog)) # get progress
 				
 			QApplication.processEvents() # allow progress bar/message panel to update
 		

@@ -55,6 +55,8 @@ def def_mod_var(caller, self): # define function
 	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
 	self.testf = 0 # whether in testing mode or not
 	self.pars_skip = 0 # whether to skip chemical scheme parsing
+	# whether to remove influxes of components that aren't seen in chemical scheme
+	self.remove_influx_not_in_scheme = 0
 	
 	# chamber environment -----------------------------------------------------------------
 	self.TEMP = np.array((298.15)).reshape(1) # temperature of experiment (K)

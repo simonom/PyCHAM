@@ -1,6 +1,5 @@
 name: PyCHAM
 channels:
-  - openbabel
   - defaults
   - conda-forge
 dependencies:
@@ -40,10 +39,6 @@ dependencies:
   - matplotlib
   - matplotlib-base
   - metis
-  - mkl
-  - mkl-service
-  - mkl_fft
-  - mkl_random
   - ncurses
   - netcdf4
   - numpy

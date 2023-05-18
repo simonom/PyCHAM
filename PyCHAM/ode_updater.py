@@ -695,7 +695,7 @@ def ode_updater(y, H2Oi,
 					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
 						N_perbin, y, y_mw.reshape(-1, 1),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
-						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on))
+						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on), self)
 				
 				# reset count that tracks when next operator-split should be called (s)
 				update_count = 0.
