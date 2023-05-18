@@ -39,7 +39,7 @@ There are two options for installing, via conda and via pip.  The pip method tak
 
 1. Download the PyCHAM repository from github.com/simonom/PyCHAM
 
-2. Download and install the package manager Anaconda (Miniconda is also suitable) using the following address and selecting the appropriate operating system version: https://www.anaconda.com/distribution/#download-section.  For MacOS we recommend the Command Line Installer.
+2. Download and install the package manager Miniconda (Anaconda is also suitable but takes more memory and takes longer to install) using the following address and selecting the appropriate operating system version: https://docs.conda.io/en/latest/miniconda.html.
 
 3. Ensure conda is operating correctly, the method varies between operating systems and is explained [here](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 
