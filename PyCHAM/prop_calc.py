@@ -96,7 +96,16 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 		Repo.clone_from(git_url, (cwd + '/umansysprop'))
-	
+		
+		# now check on whether import pybel written in data/__init__.py
+		f_init = open(str(cwd + '/umansysprop/data/__init__.py'), mode='r')
+		lines = f.readlines()
+		if 'import pybel' in lines[21]:
+			lines[21] = 'import openbabel.pybel as pybel\n'	
+			f_init = open(str(cwd + '/umansysprop/data/__init__.py'), mode='w')
+			f_init.writelines(lines)
+		f_init.close()
+
 	# point to umansysprop folder
 	sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
 	
