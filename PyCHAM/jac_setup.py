@@ -649,6 +649,81 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			extr_cnt += 1 # keep count on wall index
 	
 	# end of extraction effect on Jacobian part -------------
+
+
+	# index of the Jacobian affected by continuous influx
+	self.jac_cont_infl_indx = np.zeros((comp_num+2))
+	
+	# continuous influx effect on Jacobian part -----------------------
+	if (len(self.con_infl_indx) > 0): # if component continuously injected
+	
+		extr_cnt = 0 # count on jac_cont_infl_indx inputs
+		
+		# loop through all gas-phase components
+		for compi in range(comp_num+2):
+		
+			# gas effect on gas part --------------------------------------------
+			# relevant starting and finishing index in rowvals
+			st_indx = int(colptrs[compi])
+			en_indx = int(colptrs[compi+1])
+			
+			# check whether the diagonal of Jacobian for this component is already affected
+			# relevant starting and finishing index in rowvals
+			st_indx = int(colptrs[compi])
+			en_indx = int(colptrs[compi+1])
+			
+			# check if any rows already attributed to this column
+			if ((st_indx < en_indx) == True):
+			
+				# if rows are already attributed, check 
+				# whether the diagonal is already affected
+				if ((sum(rowvals[st_indx:en_indx]==compi)) > 0):
+				
+					# get index
+					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
+					# if diagonal already affected then just copy relevant
+					# data index to the indexing for wall
+					self.jac_cont_infl_indx[extr_cnt] = exist_indx
+					
+				else: # if diagonal not already affected, then add
+				
+					# get index
+					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
+					# modify indices for sparse Jacobian matrix
+					self.jac_cont_infl_indx[extr_cnt] = new_indx
+					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
+					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
+					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
+					if (num_asb > 0):
+						jac_part_indx[jac_part_indx >= new_indx] += 1
+					jac_wall_indx[jac_wall_indx >= new_indx] += 1
+					
+					new_el = np.array((compi)).reshape(1)
+					rowvals = np.concatenate([rowvals[0:new_indx], 
+						new_el, rowvals[new_indx::]])
+					colptrs[compi+1::] += 1
+					
+			else: # no rows yet attributed to this column, so need to include
+
+				# modify indices for sparse Jacobian matrix
+				self.jac_cont_infl_indx[extr_cnt] = st_indx
+				# adjust other indices
+				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
+				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
+				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
+				if (num_asb > 0):
+					jac_part_indx[jac_part_indx >= st_indx] += 1
+				jac_wall_indx[jac_wall_indx >= st_indx] += 1
+				
+				new_el = np.array((compi)).reshape(1)
+				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
+				colptrs[compi+1::] += 1
+				
+			extr_cnt += 1 # keep count on wall index
+
+		self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
+
+	# end of continuous influx effect on Jacobian part -------------
 	
 	if ((num_sb == 0) and len(rowvals) >= 1): # if no particle size bins and no wall
 

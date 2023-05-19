@@ -81,14 +81,11 @@ def extr_mech(int_tol, num_sb,
 	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
 
 	# get equation information for chemical reactions
-	[comp_list, Pybel_objects, comp_num, self] = eqn_interr.eqn_interr(comp_name, comp_smil, num_sb, self)
-		
-	[rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self] = jac_setup.jac_setup(comp_num, 
-		num_sb, (num_sb-self.wall_on), self)
+	[comp_list, Pybel_objects, comp_num, self] = eqn_interr.eqn_interr(comp_name, comp_smil, num_sb, self)                                                        
 	
 	# prepare aqueous-phase and surface (e.g. wall) reaction matrices for applying to reaction rate calculation
 	if (self.eqn_num[1] > 0 or self.eqn_num[2] > 0): # if aqueous-phase or surface (e.g. wall) reactions present
-		[] = aq_mat_prep.aq_mat_prep(num_sb, comp_num, self) 
+		[] = aq_mat_prep.aq_mat_prep(num_sb, comp_num, self)                                                  
 
 	# if particle-phase equations are provided by particles not turned on then raise an error
 	if (self.eqn_num[1] > 0 and num_sb-self.wall_on == 0):
@@ -101,11 +98,14 @@ def extr_mech(int_tol, num_sb,
 	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
 	delete_row_list = [] # prepare for removing rows of unrecognised components
 
+	icon = 0 # count on constant influxes
+
 	for i in range (len(self.con_infl_nam)):
 		
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
-		if (self.con_infl_nam[i] == 'H2O'):
-			self.con_infl_indx[i] = int(comp_num)
+		if (self.con_infl_nam[icon] == 'H2O'):
+			self.con_infl_indx[icon] = int(comp_num)
+			icon += 1 # count on constant influxes
 			continue
 
 		# if we want to remove constant influxes 
@@ -114,9 +114,15 @@ def extr_mech(int_tol, num_sb,
 
 			try:
 				# index of where components with constant influx occur in list of components
-				self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
+				self.con_infl_indx[icon] = self.comp_namelist.index(self.con_infl_nam[icon])
 			except:
-				delete_row_list.append(i)
+				# remove names of unrecognised components
+				self.con_infl_nam = np.delete(self.con_infl_nam, (icon), axis=0)
+				# remove emissions of unrecognised components
+				self.con_infl_C = np.delete(self.con_infl_C, (icon), axis = 0)
+				# remove empty indices of unrecognised components
+				self.con_infl_indx = np.delete(self.con_infl_indx, (icon), axis = 0)
+				icon -= 1 # count on constant influxes
 		else:
 
 			try:
@@ -126,12 +132,7 @@ def extr_mech(int_tol, num_sb,
 				erf = 1 # raise error
 				err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
-	if (self.remove_influx_not_in_scheme == 1):
-		for ri in delete_row_list:
-			# remove names of unrecognised components
-			self.con_infl_nam = np.delete(self.con_infl_nam, (ri), axis=0)
-			# remove emissions of unrecognised components
-			self.con_infl_C = np.delete(self.con_infl_C, (ri), axis = 0)
+		icon += 1 # count on constant influxes
 
 	for i in range (len(self.const_comp)):
 		try:
@@ -145,6 +146,10 @@ def extr_mech(int_tol, num_sb,
 			else: # if not water
 				erf = 1 # raise error
 				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+
+
+	[rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self] = jac_setup.jac_setup(comp_num, 
+		num_sb, (num_sb-self.wall_on), self)
 	
 	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
 
@@ -207,7 +212,7 @@ def extr_mech(int_tol, num_sb,
 	
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
-	write_ode_solv.ode_gen(self.con_infl_indx, int_tol, rowvals, comp_num+2, 
+	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+2, 
 			(num_sb-self.wall_on), 0, sav_nam, pcont, self)
 
 	# call function to generate reaction rate calculation module

@@ -699,7 +699,7 @@ def const_infl_open(self): # define function to read in values relevant to const
 				
 				# emission rates
 				if (ic > self.con_infl_C.shape[0]): # if we need to concatenate
-					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx])).reshape(1, -1)), axis=0)
+					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx+1])).reshape(1, -1)), axis=0)
 				else:
 					self.con_infl_C[ic-1, :] = i[1:col_lim_indx+1]
 				

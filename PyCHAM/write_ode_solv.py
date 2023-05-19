@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -29,11 +29,10 @@ import datetime
 
 # function to generate the ordinary differential equation (ODE)
 # solver file
-def ode_gen(con_infl_indx, int_tol, rowvals, num_comp, 
-		num_asb, testf, sav_nam, pcont, self):
+def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	
 	# inputs: ------------------------------------------------
-	# con_infl_indx - indices of components with continuous influx
+	# self.con_infl_indx - indices of components with continuous influx
 	# int_tol - integration tolerances
 	# rowvals - indices of rows for Jacobian
 	# self.wall_on - marker for whether to consider wall 
@@ -257,16 +256,10 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		dd[self.uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[self.uni_self.y_pind_aq])[:, 0]\n')
 		f.write('		\n')
 	
-	if (len(con_infl_indx) > 0): # if a component has a continuous gas-phase influx
+	if (len(self.con_infl_indx) > 0): # if a component has a continuous gas-phase influx
 		
 		f.write('		# account for components with continuous gas-phase influx\n')	
-		f.write('		dd[[')	
-		for Ci in range(len(con_infl_indx)):
-			# components prior to the last in the continuous influx group
-			if (Ci < len(con_infl_indx)-1):
-				f.write('%d, ' %int(con_infl_indx[Ci]))
-			else: # last component in the continuous influx group
-				f.write('%d], 0] += Cinfl_now[:, 0]\n' %int(con_infl_indx[Ci]))
+		f.write('		dd[[self.con_infl_indx], 0] += Cinfl_now[:, 0]\n')
 
 	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
@@ -481,7 +474,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('			aqi += 1 # keep count on aqueous-phase reactions \n')
 	f.write('		\n')
 	
-	if (num_asb > 0): # include gas-particle partitioning in ode solver Jacobian
+	if (num_asb > 0): # include gas-particle partitioning in Jacobian
 		f.write('		# gas-particle partitioning\n')
 		f.write('		part_eff = np.zeros((%s))\n' %((num_comp)*(num_asb+1)+((num_comp)*(num_asb*2))))
 		f.write('		if (sum(N_perbin[:, 0]) > 0.): # if any particles present \n')
@@ -546,7 +539,7 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('		#data[jac_part_H2O_indx] += part_eff_cl # columns\n')
 		f.write('		\n')
 		
-	if (self.wall_on > 0): # include gas-wall partitioning in ode solver Jacobian
+	if (self.wall_on > 0): # include gas-wall partitioning in Jacobian
 		f.write('		wsb = 0 # count on wall bins\n')
 		# holder for wall effect - note that 1st term is gas-on-gas, 2nd term is gas-on-wall, 3rd term is wall-on-gas and 4th term is wall-on-wall
 		f.write('		# holder for wall effect\n')
@@ -563,12 +556,15 @@ def ode_gen(con_infl_indx, int_tol, rowvals, num_comp,
 		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1)+1:num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = -kimt[num_asb::, :][wsb, :]*(self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
 		f.write('		data[jac_wall_indx] += wall_eff\n')
 		f.write('		\n')
-	if (any(self.dil_fac > 0)): # include extraction of chamber air in ode solver Jacobian
+	if (any(self.dil_fac > 0)): # include extraction of chamber air in ode Jacobian
 		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac_now\n')
 		f.write('		\n')
+		#f.write('		import ipdb; ipdb.set_trace()\n')
+	#if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
+	#	f.write('		data[self.jac_cont_infl_indx] += Cinfl_now[:, 0]/y[0:num_comp, 0]\n')
+
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')
-	f.write('		#print(j); import ipdb; ipdb.set_trace()\n')
 	f.write('		\n')
 	f.write('		return(j)\n')
 	f.write('	\n')

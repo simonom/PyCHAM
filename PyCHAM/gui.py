@@ -2422,7 +2422,7 @@ class PyCHAM(QWidget):
 					self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 					self.bd_pl = 3
 
-				self.progress.setValue(prog) # display progress	
+				self.progress.setValue(int(prog)) # display progress	
 				QApplication.processEvents() # allow message panel to update
 
 			self.l203a.setText('Results loaded') # remove any old progress message from previous run
