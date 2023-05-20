@@ -492,12 +492,12 @@ def cham_up(sumt, Pnow,
 
 			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
 			if ('ppb' in self.abun_unit):
-				Cinfl_now = (self.con_infl_C[:, infx_cnt]*self.Cfactor)
+				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt]*self.Cfactor)
 			if ('molecules/cm3' in self.abun_unit):
-				Cinfl_now = (self.con_infl_C[:, infx_cnt])
+				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt])
 
 			# ensure correct shape
-			Cinfl_now = np.float64(Cinfl_now.reshape(-1, 1))
+			Cinfl_now = np.array((Cinfl_now)).reshape(-1, 1)
 
 			if (self.H2Oin == 1):
 				if ('ppb' in self.abun_unit):
@@ -522,7 +522,8 @@ def cham_up(sumt, Pnow,
 			if ('molecules/cm3' in self.abun_unit):
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt])
 			
-			Cinfl_now = Cinfl_now.reshape(-1, 1)
+			# ensure correct shape
+			Cinfl_now = np.array((Cinfl_now)).reshape(-1, 1)
 
 			if (self.H2Oin == 1):
 				if ('ppb' in self.abun_unit):
@@ -551,9 +552,7 @@ def cham_up(sumt, Pnow,
 			# with change
 			tnew = self.con_infl_t[infx_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
-
-		if (tnew < 0):
-			import ipdb; ipdb.set_trace()
+		
 	else: # if no continuous influxes, provide filler
 		Cinfl_now = np.zeros((1, 1))
 	

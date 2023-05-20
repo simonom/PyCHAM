@@ -652,15 +652,17 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 
 
 	# index of the Jacobian affected by continuous influx
-	self.jac_cont_infl_indx = np.zeros((comp_num+2))
+	self.jac_cont_infl_indx = np.zeros((len(self.con_infl_indx)))
 	
 	# continuous influx effect on Jacobian part -----------------------
 	if (len(self.con_infl_indx) > 0): # if component continuously injected
 	
 		extr_cnt = 0 # count on jac_cont_infl_indx inputs
 		
-		# loop through all gas-phase components
-		for compi in range(comp_num+2):
+		# loop through gas-phase components with continuous influx, note that
+		# self.con_infl_indx and associated arrays are ordered ascending in
+		# eqn_pars.py
+		for compi in self.con_infl_indx:
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
@@ -719,10 +721,10 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
 				colptrs[compi+1::] += 1
 				
-			extr_cnt += 1 # keep count on wall index
+			extr_cnt += 1 # keep count on continous influx for jacobian index
 
 		self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
-
+	
 	# end of continuous influx effect on Jacobian part -------------
 	
 	if ((num_sb == 0) and len(rowvals) >= 1): # if no particle size bins and no wall

@@ -1,3 +1,33 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/INGENIOUS_test_outdoor_wjac
-Warning: invalid value encountered in divide
-Warning: invalid value encountered in divide
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\full_chem_scheme\INGENIOUS_test_full_48hr
+Warning: divide by zero encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter

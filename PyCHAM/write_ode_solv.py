@@ -559,9 +559,9 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	if (any(self.dil_fac > 0)): # include extraction of chamber air in ode Jacobian
 		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac_now\n')
 		f.write('		\n')
-		#f.write('		import ipdb; ipdb.set_trace()\n')
-	#if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
-	#	f.write('		data[self.jac_cont_infl_indx] += Cinfl_now[:, 0]/y[0:num_comp, 0]\n')
+	if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
+		f.write('		Cinfl_gr_zero = Cinfl_now[:, 0] > 0. # influxes over zero\n')
+		f.write('		data[self.jac_cont_infl_indx][Cinfl_gr_zero] += Cinfl_now[Cinfl_gr_zero, 0]/(y[self.con_infl_indx, 0][Cinfl_gr_zero])\n')
 
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')

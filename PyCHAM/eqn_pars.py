@@ -134,6 +134,15 @@ def extr_mech(int_tol, num_sb,
 	
 		icon += 1 # count on constant influxes
 
+	if len(self.con_infl_nam) > 0:
+
+		# get ascending indices of components with continuous influx
+		si = self.con_infl_indx.argsort()
+		# order constant influx indices, influx rates and names ascending by component index
+		self.con_infl_indx = (self.con_infl_indx[si]).astype('int')
+		self.con_infl_C = (self.con_infl_C[si])
+		self.con_infl_nam = (self.con_infl_nam[si])
+
 	for i in range (len(self.const_comp)):
 		try:
 			# index of where constant concentration components occur in list 
@@ -147,9 +156,6 @@ def extr_mech(int_tol, num_sb,
 				erf = 1 # raise error
 				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
-
-	[rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self] = jac_setup.jac_setup(comp_num, 
-		num_sb, (num_sb-self.wall_on), self)
 	
 	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
 
@@ -202,7 +208,6 @@ def extr_mech(int_tol, num_sb,
 		# solver, instead deal with it inside the water ode-solver
 		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
 		self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
-
 	else:
 		self.H2Oin = 0 # flag for no water influx
 
@@ -210,6 +215,9 @@ def extr_mech(int_tol, num_sb,
 	# ensure integer
 	self.con_infl_indx = self.con_infl_indx.astype('int')
 	
+	[rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self] = jac_setup.jac_setup(comp_num, 
+		num_sb, (num_sb-self.wall_on), self)
+
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
 	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+2, 

@@ -463,7 +463,7 @@ def mod_var_read(self):
 					err_mess = self.err_mess
 					
 				else: # treat as list of components 
-					self.con_infl_nam = [str(i).strip() for i in (value.split(','))]
+					self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
 
 				
 
@@ -707,5 +707,8 @@ def const_infl_open(self): # define function to read in values relevant to const
 			ic += 1 # count on row iteration
 
 	wb.close() # close excel file
+
+	# ensure numpy array
+	self.con_infl_nam = np.array((self.con_infl_nam))
 
 	return(self)
