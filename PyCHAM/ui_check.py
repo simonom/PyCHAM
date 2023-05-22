@@ -539,6 +539,7 @@ def ui_check(self):
 			self.l81 = QLabel(self)
 			self.l81.setText('or')
 			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
+			self.l81.setAlignment(Qt.AlignCenter)
 		
 			# allow adding to batch list
 			self.b82 = QPushButton('Add to Batch', self)

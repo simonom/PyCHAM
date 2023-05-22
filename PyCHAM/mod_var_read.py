@@ -155,8 +155,15 @@ def mod_var_read(self):
 				
 			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
 
+				# check if this is a path to a file containing continuous 
+				# influxes, if not treat as a list of component names
+				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+					self.mtc_path = str(value.strip())
+					value = mass_trans_coeff_open(self)
+					err_mess = self.err_mess
+
 				max_comp = 1
-				max_of_all = [1]
+				max_of_all = []
 				reader = '' # prepare to read in string between semi-colons
 				prescribes = [] # list of prescribed mass transfer coefficients
 				num_wall_mtfs = 1 # number of walls mentioned in the mass transfer coefficient
@@ -184,7 +191,9 @@ def mod_var_read(self):
 				max_of_all.append(max_comp) # ensure final wall accounted for
 
 				# remember the components that are prescribed, their wall number and mass transfer coefficient
-				self.wmtc_deets = np.empty([len(prescribes), 3], dtype=str)
+				self.wmtc_names = []
+				self.wmtc_wn = []
+				self.wmtc = []
 				pre_cnt = 0 # count on number of prescribed mass transfer coefficients
 
 				# prepare holding array for rate coefficient information
@@ -197,15 +206,16 @@ def mod_var_read(self):
 					if prei.count('_') == 2: # if this gives the coefficient for a specific component
 						
 						# get component name
-						self.wmtc_deets[pre_cnt, 0] = prei[0:prei.index('_')]
-						# get wall number
-						self.wmtc_deets[pre_cnt, 1] = prei[prei.index('_'):prei[prei.index('_')::].index('_')]
+						self.wmtc_names.append(prei[0:prei.index('_')])
+						# get wall number (note spreadsheet values start at 1 for first wall (not zero))
+						self.wmtc_wn.append(int(prei[prei.index('_')+5:prei.index('_')+5+prei[prei.index('_')+5::].index('_')])-1)
 						# get mass transfer coefficient
-						self.wmtc_deets[pre_cnt, 2] = prei[prei[prei.index('_')::].index('_')::]
-					
+						self.wmtc.append(float(prei[prei.index('_')+1 + prei[prei.index('_')+1::].index('_')+1::]))
+						self.kw[int(self.wmtc_wn[-1]), ind_wall_cnt-1] = -1.e-7
 					else: # if just a generic mass transfer coefficient for this wall
-						self.kw[wall_num, ind_wall_cnt-1] = prei
-
+						self.wmtc_names
+						self.kw[wall_num, ind_wall_cnt-1] = float(prei)
+					
 					pre_cnt += 1 # count on number of prescribed mass transfer coefficients
 					ind_wall_cnt += 1 # number of entries for each wall
 					if pre_cnt == sum(max_of_all[0:wall_num+1]): # if moving up a wall
@@ -712,3 +722,46 @@ def const_infl_open(self): # define function to read in values relevant to const
 	self.con_infl_nam = np.array((self.con_infl_nam))
 
 	return(self)
+
+# function for converting excel spreasheet of surface depositions 
+# into a string that commands above can interpret
+def mass_trans_coeff_open(self):
+
+	import openpyxl
+	import os
+
+	try: # try to open the file at the user-supplied path
+		wb = openpyxl.load_workbook(filename = self.mtc_path)
+	except: # if file not found tell user
+		self.err_mess = str('Error: file path provided by user in model variables file for gas-wall mass transfer coefficient of components was not found, file path attempted was: ' + self.mtc_path)
+		return(self)
+
+	sheet = wb['mtc']
+	# component names are in second column, mass transfer coefficients are in first column		
+	ic = -1 # count on row iteration
+	
+	# prepare to store component names and mass transfer coefficient
+	value = ''
+	
+	
+	for i in sheet.iter_rows(values_only=True): # loop through rows
+		ic += 1 # count on row iteration
+		if (ic == 0): # do not need header
+			continue				
+
+		# get names of components (matching chemical scheme names) 
+		# and their emission rates (abundance unit given above/s)
+		else:
+			if (i[1] is None): # reached end of contiguous components
+				break
+			# if all components then just need mass transfer coefficient value
+			if i[1] == 'all_other_components':
+				value = str(value + str(i[2])  + ';')
+			else: # if component specified then get name, coefficient and wall number (in spreadsheet first wall = 1)
+				value = str(value + i[1] + '_wall' + str(i[3]) + '_' + str(i[2]) + ';')
+	
+	if value[-1] == ';': # remove final ;
+		value = value[0:-1]
+	wb.close() # close excel file
+	
+	return(value)

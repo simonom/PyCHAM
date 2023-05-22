@@ -77,17 +77,30 @@ class PyCHAM(QWidget):
 		self.setLayout(grid)
 		
 		# title --------------------------------------------------------------------------------------------
-		l0 = QLabel(self)
-		l0.setOpenExternalLinks(True)
-		l0.setText("Welcome to PyCHAM - please see <a href=\"http://www.github.com/simonom/PyCHAM\">README</a> for guidance")
-		l0.setFont(QFont('Arial', 20))
-		grid.addWidget(l0, 0, 0, 1, 1)
+		# PyCHAM logo
+		l00 = QLabel(self)
+		pixmap = QPixmap('PyCHAM/PyCHAM_logo_transparent.png')
+		l00.setPixmap(pixmap.scaled(400, 100, transformMode = Qt.SmoothTransformation))
+		PyCHlogo_hindx = 0 # horizontal position on grid
+		grid.addWidget(l00, 0, PyCHlogo_hindx, 1, 1)
+		# link to PyCHAM website
+		bn00 = QPushButton('', self)
+		bn00.setStyleSheet('background : transparent; border : 0px; color : white')
+		bn00.setToolTip('Visit the PyCHAM README (online)')
+		bn00.clicked.connect(self.on_clickn00)
+		grid.addWidget(bn00, 0, PyCHlogo_hindx, 1, 1)
+
+		#l0 = QLabel(self)
+		#l0.setOpenExternalLinks(True)
+		#l0.setText("Welcome to PyCHAM - please see <a href=\"\">README</a> for guidance")
+		#l0.setFont(QFont('Arial', 20))
+		#grid.addWidget(l0, 0, 0, 1, 1)
 		
 		# EUROCHAMP logo
 		l0b= QLabel(self)
 		pixmap = QPixmap('PyCHAM/logos_eurochamp2020-orange-noir.png')
 		l0b.setPixmap(pixmap.scaled(100, 100, transformMode = Qt.SmoothTransformation))
-		EUROlogo_hindx = 1 # horizontal position on grid
+		EUROlogo_hindx = 3 # horizontal position on grid
 		grid.addWidget(l0b, 0, EUROlogo_hindx)
 		# link to EUROCHAMP website
 		bn1 = QPushButton('', self)
@@ -128,7 +141,13 @@ class PyCHAM(QWidget):
 		tabs.addTab(self.NStab(), "Simulate")
 		tabs.addTab(self.PLtab(), "Plot")
 		grid.addWidget(tabs, 1, 0, 1, UoMlogo_hindx)
-		
+
+		# README button ------------------------------------------
+		b89p = QPushButton('README', self)
+		b89p.setToolTip('Go to the online PyCHAM README page (alternatively see README in your local PyCHAM repository)')
+		b89p.clicked.connect(self.on_clickn00)
+		grid.addWidget(b89p, 0, PyCHlogo_hindx+1)
+
 		# Quit pane ----------------------------------------------
 		
 		b89 = QPushButton('Quit', self)
@@ -1849,6 +1868,12 @@ class PyCHAM(QWidget):
 		self.EXPlayout.addWidget(b500, 0, 0, 1, 1)
 		
 		return(EXPTab)
+
+	@pyqtSlot() # PyCHAM website
+	def on_clickn00(self): # EUROCHAMP website
+		import webbrowser
+		webbrowser.open('http://www.github.com/simonom/PyCHAM')
+		return()
 
 	@pyqtSlot() # eurochamp website under development 10/02/2021
 	def on_clickn1(self): # EUROCHAMP website
