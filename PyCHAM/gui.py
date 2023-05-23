@@ -55,6 +55,12 @@ class PyCHAM(QWidget):
 		self.height = 530
 		self.initUI() # call on initialisation function to fill window
 		
+		# changing the background color
+		#self.setStyleSheet("background-color: darkCyan;")
+  
+		# set the title
+		#self.setWindowTitle('PyCHAM')		
+
 		self.err_mess = '' # begin with no error message
 
 		# if parameters have been provided automatically (without using GUI)

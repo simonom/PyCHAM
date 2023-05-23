@@ -154,14 +154,16 @@ def mod_var_read(self):
 				self.Cw = np.array([float(i) for i in ((value.strip()).split(','))])
 				
 			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
-
+				
 				# check if this is a path to a file containing continuous 
 				# influxes, if not treat as a list of component names
 				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
 					self.mtc_path = str(value.strip())
 					value = mass_trans_coeff_open(self)
 					err_mess = self.err_mess
-
+					if err_mess[0:5] == 'Error':
+						break
+				
 				max_comp = 1
 				max_of_all = []
 				reader = '' # prepare to read in string between semi-colons
@@ -682,39 +684,42 @@ def const_infl_open(self): # define function to read in values relevant to const
 	self.con_infl_nam = []
 	
 	for i in sheet.iter_rows(values_only=True): # loop through rows
-			if (ic == 0): # get times of influx (s through experiment)
-				self.con_infl_t = np.array((i[1::]))
+		if (ic == 0): # get times of influx (s through experiment)
+			self.con_infl_t = np.array((i[1::]))
 
-				# get index of end of times in
-				for it in range(len(self.con_infl_t)):
-					if (self.con_infl_t[it] is None):
-						col_lim_indx = it
-						break
-				
-				self.con_infl_t = self.con_infl_t[0:col_lim_indx]
+			# column number limit of times
+			col_lim_indx = len(self.con_infl_t)
 
-				# prepare to store emission rates
-				self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
-				
-				# get abundance unit (ppb or molecules/cm3)
-				self.abun_unit = str(i[0])				
-
-			# get names of components (matching chemical scheme names) 
-			# and their emission rates (abundance unit given above/s)
-			else:
-				if (i[0] is None): # reached end of contiguous components
+			# check whether columns affected by None
+			# get index of end of times in
+			for it in range(len(self.con_infl_t)):
+				if (self.con_infl_t[it] is None):
+					col_lim_indx = it
 					break
-				# append component name
-				self.con_infl_nam.append(i[0])
+			
+			self.con_infl_t = self.con_infl_t[0:col_lim_indx]
+			# prepare to store emission rates
+			self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
 				
-				# emission rates
-				if (ic > self.con_infl_C.shape[0]): # if we need to concatenate
-					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx+1])).reshape(1, -1)), axis=0)
-				else:
-					self.con_infl_C[ic-1, :] = i[1:col_lim_indx+1]
-				
-				
-			ic += 1 # count on row iteration
+			# get abundance unit (ppb or molecules/cm3)
+			self.abun_unit = str(i[0])				
+
+		# get names of components (matching chemical scheme names) 
+		# and their emission rates (abundance unit given above/s)
+		else:
+			if (i[0] is None): # reached end of contiguous components
+				break
+			# append component name
+			self.con_infl_nam.append(i[0])
+			
+			# emission rates
+			if (ic > self.con_infl_C.shape[0]): # if we need to concatenate
+				self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx+1])).reshape(1, -1)), axis=0)
+			else:
+				self.con_infl_C[ic-1, :] = i[1:col_lim_indx+1]
+			
+			
+		ic += 1 # count on row iteration
 
 	wb.close() # close excel file
 
