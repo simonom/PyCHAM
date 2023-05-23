@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="https://github.com/simonom/PyCHAM/PyCHAM/PyCHAM/PyCHAM_logo_transparent.png"/>
+</p>
 # PyCHAM: CHemistry with Aerosol Microphysics in Python Box Model
 
 Welcome to the PyCHAM software for modelling of aerosol chambers.  Funding has been provided by the [EUROCHAMP-2020 research project](http://www.eurochamp.org) and the National Centre for Atmospheric Science ([NCAS](https://www.ncas.ac.uk/en/)).  Please open an issue on the GitHub repository or contact Simon O'Meara (simon.omeara@manchester.ac.uk) with any issues, comments or suggestions.

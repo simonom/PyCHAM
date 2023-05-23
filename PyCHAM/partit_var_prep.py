@@ -251,6 +251,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 				if self.kw[wi,ci] == -1.e-7: # coefficient specified for a component
 				
 					if (self.remove_influx_not_in_scheme == 1):
+						
 						try:
 							# coefficient of this component on this wall
 							kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
@@ -268,14 +269,15 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 							# give error message
 							err_mess = str('Error: component ' + str(self.wmtc_names[pre_count]) + ' has a gas-wall mass transfer coefficient but has not been identified in the chemical scheme')
 							break
-						pre_count += 1 # count on prescribed components
+
+					pre_count += 1 # count on prescribed components
+
 				else: # coefficient specified for all components
 					kwn[wi, mask[wi, :]] = self.kw[wi, ci]
 	
 	# finally convert kw to kwn
 	self.kw = np.zeros((((self.wall_on, num_comp))))
 	self.kw[:, :] = kwn[:, :]
-	
 
 	# end of mass transfer rate coefficient to wall -------------------
 
