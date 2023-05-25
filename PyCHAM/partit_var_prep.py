@@ -249,7 +249,14 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 					continue
 				
 				if self.kw[wi,ci] == -1.e-7: # coefficient specified for a component
-				
+
+					# becuase water may not be in chemical scheme
+					if self.wmtc_names[pre_count] == 'H2O':
+						kwn[wi, self.H2Oi] = self.wmtc[pre_count]
+						mask[wi, self.H2Oi] = False
+						pre_count += 1 # count on prescribed components
+						continue
+
 					if (self.remove_influx_not_in_scheme == 1):
 						
 						try:
