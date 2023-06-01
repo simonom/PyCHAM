@@ -79,6 +79,13 @@ def lamp_photo(J, TEMP, self):
 				# remember old range
 				wlo = wln
 		
+		# apply constant transmission factor
+		if (self.tf[sum(self.tft<=self.sumt)-1] < 1. and self.tf_range == 0):
+			
+			self.tfn = self.tf[sum(self.tft<=self.sumt)-1]
+			
+			act_chm[:] = act_chm[:]*self.tfn
+
 		# if using a sinusoidal diurnal variation in actinic flux
 		if (self.light_stat_now == 2):
 			# fraction through day

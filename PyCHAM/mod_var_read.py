@@ -104,10 +104,20 @@ def mod_var_read(self):
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 
 			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
-				try:
-					y0 = [float(i) for i in (value.split(','))]
-				except:
-					err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
+				
+				if '/' in value or '\\' in value: # treat as path to file
+					self.path_to_C0 = str(value.strip())
+					[y0, comp0] = C0_open(self)
+					err_mess = self.err_mess
+					if err_mess[0:5] == 'Error':
+						break
+				else:
+
+					try:
+						y0 = [float(i) for i in (value.split(','))]
+					except:
+					
+						err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
 			
 			if key == 'temperature' and (value.strip()): # chamber temperature (K)
 				self.TEMP = [float(i) for i in ((value.strip()).split(','))]
@@ -438,15 +448,19 @@ def mod_var_read(self):
 			if key == 'photo_par_file' and (value.strip()):
 				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
-			if key == 'trans_fac' and (value.strip()): # transmission factor for natural light
+			if key == 'trans_fac' and (value.strip()): # transmission factor for light
 				
 				if '_' in value.strip(): # if wavelength-dependent transmission factors supplied
 					self.tf = [str(i.strip()) for i in (value.split(','))]
 					self.tf_range = 1 # flag for wavelength-dependency
 				else: # if a single transmission factor supplied
-					self.tf = float(value.strip())
+					self.tf = (([float(i.strip()) for i in (value.split(';'))]))
 					self.tf_range = 0 # flag for no wavelength-dependency
+			
+			if key == 'trans_fact' and (value.strip()): # time through simulation (s) transmission factor for light applies to
 				
+				self.tft = np.array(([float(i.strip()) for i in (value.split(';'))]))
+
 			if key == 'tf_UVC' and (value.strip()): # transmission factors for 254 nm light
 				self.tf_UVC = [float(i.strip()) for i in (value.split(','))]
 				
@@ -770,3 +784,52 @@ def mass_trans_coeff_open(self):
 	wb.close() # close excel file
 	
 	return(value)
+
+# function for converting csv of initial concentrations
+def C0_open(self):
+
+	import os
+	import ast
+
+	try: # try to open the file at the user-supplied path
+		fname = str(self.path_to_C0 + '/concentrations_all_components_all_times_gas_particle_wall')
+		y0 = np.loadtxt(fname, delimiter=',', skiprows=1)
+		# keep just the final time step concentrations (ppb) - note this will need work for unit 
+		# conversion if more than gas-phase present
+		y0 = y0[-1, :]
+	except: # if file not found tell user
+		self.err_mess = str('Error: file path provided by user in model variables file for initial concentrations of components not found, file path attempted was: ' + str(self.path_to_C0 + '/concentrations_all_components_all_times_gas_particle_wall'))
+		return(self)
+
+	# now get names of components that concentrations correspond to
+	# get chemical scheme names
+
+	# name of file where experiment constants saved
+	fname = str(self.path_to_C0 + '/model_and_component_constants')
+	
+	const_in = open(fname)
+
+	for line in const_in.readlines():
+		if (str(line.split(',')[0]) == 'chem_scheme_names'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			comp0 = ast.literal_eval(line[st_indx:fi_indx])
+	# now just keep the concentrations for components with concentrations above zero
+	comp0 = np.array((comp0))[y0 > 0.]
+	y0 = y0[y0 > 0.]
+	# remove water
+	y0 = y0[comp0 != 'H2O']
+	comp0 = comp0[comp0 != 'H2O']
+	
+	return(y0, comp0)

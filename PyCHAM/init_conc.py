@@ -190,62 +190,78 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	# of water (log10(atm))
 	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], self.RH[0], si.N_A)
 	
-	# holder for water index (will be used if not identified in chemical scheme)
-	H2Oi = num_comp # index for water
-	self.H2Oi = H2Oi # index for water
-	
-	# check for water presence in chemical scheme via its SMILE string
-	# count on components
-	indx = -1
-	for single_chem in rel_SMILES:
-		indx += 1
-		# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
-		# (O is the MCM chemical scheme name for single oxygen))
-		if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
-			H2Oi = indx
-			y[H2Oi] = C_H2O # include initial concentration of water (molecules/cm3)
-			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
-			
-			# remove the addition of water in the surface concentrations
-			# first rearrange matrix so that components in rows, surface number in columns
-			y_w = y_w.reshape(self.wall_on, num_comp+2)
-			# remove the excess water column
-			y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
-			# then flatten back to 1D array
-			y_w = y_w.flatten()
+	if (self.pars_skip == 1): # if skipping parsing and property estimation
+		H2Oi = self.H2Oi # index for water
+		y_mw = self.y_mw
+		num_comp = self.num_comp
+		if y.shape[0] == self.y.shape[0]-2:
+			y = np.append(y, np.zeros((2)))
+			y[self.H2Oi] = self.y[self.H2Oi]
+			y[self.seedi] = self.y[self.seedi]
 
-	# if not included in chemical scheme file, then add water to end of component list
-	if (H2Oi == num_comp):
+	if (self.pars_skip == 0): # if this information already gained in previous run then skip 
+		# holder for water index (will be used if not identified in chemical scheme)
+		H2Oi = num_comp # index for water
+		self.H2Oi = H2Oi # index for water
 	
-		num_comp += 1 # update number of components to account for water
-		# append empty element to y and y_mw to hold water values
-		y = np.append(y, C_H2O)
-		# append molar weight of water (g/mol)
-		y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-		self.comp_namelist.append('H2O') # append water's name to component name list
-		# add to SMILES list
-		rel_SMILES.append('HOH')
+		# check for water presence in chemical scheme via its SMILE string
+		# count on components
+		indx = -1
+		for single_chem in rel_SMILES:
+			indx += 1
+			# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
+			# (O is the MCM chemical scheme name for single oxygen))
+			if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
+				H2Oi = indx
+				y[H2Oi] = C_H2O # include initial concentration of water (# molecules/cm3)
+				y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
+			
+				# remove the addition of water in the surface concentrations
+				# first rearrange matrix so that components in rows, surface number in columns
+				y_w = y_w.reshape(self.wall_on, num_comp+2)
+				# remove the excess water column
+				y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
+				# then flatten back to 1D array
+				y_w = y_w.flatten()
+
+		# if not included in chemical scheme file, then add water to end of component list
+		if (H2Oi == num_comp):
+	
+			num_comp += 1 # update number of components to account for water
+			# append empty element to y and y_mw to hold water values
+			y = np.append(y, C_H2O)
+			# append molar weight of water (g/mol)
+			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
+			self.comp_namelist.append('H2O') # append water's name to component name list
+			# add to SMILES list
+			rel_SMILES.append('HOH')
 
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
-	
-	# empty array for index of core component
-	self.seedi = (np.zeros((len(seed_name)))).astype(int)
-	
-	self.comp_namelist.append('core') # append name of core to component name list
 	corei = [num_comp] # index for core component
-	# increase number of components to account for 'core' component
-	num_comp += 1
 
-	# add to SMILES list
-	rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
+	if (self.pars_skip == 0): # if this information already gained in previous run then skip 
 
-	# append core gas-phase concentration (molecules/cm3 (air)) and molar 
-	# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
-	# calculations)
-	y = np.append(y, 0.)
-	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
+		# empty array for index of core component
+		self.seedi = (np.zeros((len(seed_name)))).astype(int)
+	
+		self.comp_namelist.append('core') # append name of core to component name list
+		
+		# increase number of components to account for 'core' component
+		num_comp += 1
+		self.num_comp = num_comp # prepare for skipping of parsing in following simulations
+		# add to SMILES list
+		rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
+
+		# append core gas-phase concentration (molecules/cm3 (air)) and molar 
+		# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
+		# calculations)
+		y = np.append(y, 0.)
+		y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
+		# prepare for skipping of parsing in future simulations
+		self.y_mw = y_mw
+		self.y = y # prepare for skipping of parsing in following simulations 
 	
 	# finally append surface concentration array to gas-phase array
 	y = np.append(y, y_w)
@@ -454,7 +470,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 			
 	except: # not called from finisher simulation
 		y[:] = y[:]
-
+	
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 

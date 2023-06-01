@@ -69,6 +69,7 @@ def middle(self): # define function
 		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, 
 		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
+
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (self.testf == 4):
@@ -89,7 +90,7 @@ def middle(self): # define function
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
 		yield err_mess
-
+	
 	tempt_cnt = 0 # count on chamber temperatures
 	
 	if (self.pars_skip == 0): # if not skipping component properties

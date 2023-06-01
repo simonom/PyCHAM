@@ -220,10 +220,19 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		
-		if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
-			Psatnow = -2.63+-0.50*rel_SMILES[i].count('O') + (rel_SMILES[i].count('C')-5)*-0.80
-			rec_now_flag = 1 # record this vapour pressure
-				
+		#if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
+		#	Psatnow = -2.63+-0.50*rel_SMILES[i].count('O') + (rel_SMILES[i].count('C')-5)*-0.80
+		#	rec_now_flag = 1 # record this vapour pressure
+		if (rel_SMILES[i].count('O') + rel_SMILES[i].count('o') >= 6): # if six or more oxygens in component
+			# log(C* (ug/m3)) (natural logarithm of effective saturation concentration) of component (Eq. 1 Mohr et al. 2019)
+			nC = rel_SMILES[i].count('C') + rel_SMILES[i].count('c')
+			nO = rel_SMILES[i].count('O') + rel_SMILES[i].count('o')
+			nN = rel_SMILES[i].count('N') + rel_SMILES[i].count('n')
+			Psatnow = (25.-nC)*0.475-(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/(nC+nO-3.*nN))*0.9-nN*2.5
+			# convert to vapour pressure (log10(atm)) (eq. 1 O'Meara et al. 2014)
+			Psatnow = np.exp(Psatnow) # ug/m3
+			Psatnow = np.log10((Psatnow*8.2057e-5*self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))		
+
 		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
 		else: 

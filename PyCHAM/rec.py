@@ -66,7 +66,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	#	particle-wall deposition, stacked by component first then by
 	#	size bin (# molecules/cm3)
 	# cham_env - chamber environmental conditions (temperature (K), 
-	# pressure (Pa) and relative humdity
+	# pressure (Pa), relative humdity, transmission factor
 	# temp_now - chamber temperature (K)
 	# Pnow - chamber pressure (Pa)
 	# tot_in_res - cumulative influx of injected components (ug/m3)
@@ -116,6 +116,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
 	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
 	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	cham_env[save_cnt, 3] = self.tf[sum(self.tft<=sumt)-1]
 	# --------------------------------------------------------------------------------
 
 	# cumulative influx of injected components (ug/m3)

@@ -278,7 +278,7 @@ def rec_prep(nrec_step, y, y0,
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 
 	# and relative humidity (fraction (0-1))
-	cham_env = np.zeros((nrec_step, 3))
+	cham_env = np.zeros((nrec_step, 4))
 	
 	cham_env[0, 0] = temp_now # temperature (K)
 	cham_env[0, 1] = Pnow # pressure (Pa)

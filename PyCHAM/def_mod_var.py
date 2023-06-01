@@ -147,7 +147,8 @@ def def_mod_var(caller, self): # define function
 	# path to file containing absorption cross-sections and quantum yields
 	self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
 	self.dayOfYear = 1 # number of days since 31st December that experiment conducted
-	self.tf = 1. # transmission factor for natural sunlight (0-1 fraction)
+	self.tf = np.ones((1)).astype('float') # transmission factor for natural sunlight (0-1 fraction)
+	self.tft = np.zeros((1)).astype('float') # time (s) through simulation that self.tf applies to
 	self.tf_range = 0 # flag for no wavelength-dependency of transmission factor
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity

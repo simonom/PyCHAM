@@ -178,7 +178,7 @@ def retr_out(self):
 					break
 
 			HC = ast.literal_eval(line[st_indx:fi_indx])
-			yield (65.)		
+			yield (65.)	
 
 		if (str(line.split(',')[0]) == 'SMILES'):
 			# find index of first [ and index of last ]
@@ -392,7 +392,7 @@ def retr_out(self):
 	
 	
 	try: # this output added on 23/02/2021
-		# withdraw chamber environmental conditions (s)
+		# withdraw environmental conditions (s)
 		fname = str(self.dir_path + '/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
