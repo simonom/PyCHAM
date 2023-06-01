@@ -24,7 +24,7 @@
 # of simulations via the graphical user interface is not practical 
 
 
-# import requirements
+# import required modules
 import numpy as np
 import sys
 import os
@@ -32,16 +32,17 @@ from PyQt5.QtWidgets import QApplication, QWidget
 import ast  # converting path text to list
 
 
-# dictionary to hold parameter ranges
+# dictionary to hold parameter possibilities
 param_range = {}
 # dictionary to hold parameters that will be held constant
 param_const = {}
 
-param_const['sim_num'] = 3 # number of simulations
+# number of simulations (in which case provide a number), or whether to work through given values (in which case state 'set')
+param_const['sim_num'] = 'set'
 # either 'starter' or 'finisher'
-param_const['sim_type'] = 'starter'
+param_const['sim_type'] = 'finisher'
 # 1 for whether to not parse input files on repeat runs, 0 to parse on every run
-param_const['skip_parse'] = 1 
+param_const['skip_parse'] = 1
 
 # markers for interpreting chemical scheme - note that all chemical scheme markers should be 
 # included inside quotation marks, e.g. 
@@ -50,15 +51,15 @@ param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 
 # state path to chemical scheme
 # windows
-param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+#param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
 # mac
-#param_const['sch_name'] = #'/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
+param_const['sch_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
 
 # state path to xml file
 # windows
-param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
+#param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 # mac
-#param_const['xml_name'] = '/Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
+param_const['xml_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
 
 # state parameter ranges
 
@@ -78,9 +79,9 @@ if (param_const['sim_type'] == 'starter'): # 24 hours (8.64e4s) spin up
 # the European average wind speed of 3 m/s, the average time in an EMEP grid cell is:
 # (1.125e4m/3m/s) = 3.75e3 s (1.04 hours)
 if (param_const['sim_type'] == 'finisher'):
-	param_const['total_model_time'] = 3.75e3
-	param_const['update_step'] = 1.875e2
-	param_const['recording_time_step'] = 3.75e2
+	param_const['total_model_time'] = 8.64e4
+	param_const['update_step'] = 4.5e2
+	param_const['recording_time_step'] = 4.5e2
 	param_const['light_status'] = 1 # constant daily light intensity
 
 param_const['light_time'] = 0.
@@ -88,21 +89,21 @@ param_const['light_time'] = 0.
 # 12km altitude cloud-free solar actinic flux spectrum from Greece in June: https://doi.org/10.1029/2001JD900142
 param_const['act_flux_path'] = 'Greece_obs_doi_10dot10292001JD900142.csv'
 # affects all wavelengths
-param_range['trans_fac'] = [0., 1.]
+param_range['trans_fac'] = [0.1, 1.]
 
 # minimum temperature and relative humidity ranges given by Porter et al. 2021 (doi.org/10.1021/acsearthspacechem.1c00090)
 param_range['temperature'] = [273.15, 323.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
-param_range['rh'] = [0.05, 0.95]
+param_const['rh'] = [0.50]
 # allow wall to be on so that particles can be lost as they would be in the real atmosphere
-param_const['wall_on'] = 1
-param_const['McMurry_flag'] = 1
-param_const['ChamSA'] = 1
+param_const['wall_on'] = 0
+#param_const['McMurry_flag'] = 1
+#param_const['ChamSA'] = 1
 # allow gas-wall partitioning
-param_const['eff_abs_wall_massC'] = 0.0
-param_const['mass_trans_coeff'] = 1.e-4
-param_const['tracked_comp'] = 'NO2, APINENE, BENZENE, OH'
+#param_const['eff_abs_wall_massC'] = 0.0
+#param_const['mass_trans_coeff'] = 1.e-4
+param_const['tracked_comp'] = 'NO2, APINENE, BENZENE, O3, NO, OH, HO2, CH3O2'
 
 # for the SOAPRA project, benzene is used as a proxy for the OH-reactivity-equivalent of: benzene, toluene, ethylbenzene, xylene (BTEX)
 # the minimum concentration for benzene is then 0., and the maximum is based on the maximum observed concentrations of these components:
@@ -126,7 +127,7 @@ OHreac = (2.3e-12*np.exp(-190./max(param_range["temperature"]))*0.352*(300.*Cfac
 benzC = OHreac/(2.3e-12*np.exp(-190/max(param_range["temperature"]))*0.352)/Cfac
 
 # the components to keep at constant concentration throughout the simulation
-param_const['const_comp'] = 'CH4, CO'
+#param_const['const_comp'] = 'CH4, CO'
 
 # if starting a simulation, components will undergo an influx 
 # during the first hour to allow spin-up, so can start at zero
@@ -144,11 +145,11 @@ if (param_const['sim_type'] == 'finisher'):
 	# this is the PyCHAM home directory)
 	cwd = os.getcwd()
 	# path to automated run results
-	init_conc_path = str(cwd + '/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme')
+	init_conc_path = str('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/')
 	# prepare to hold required concentrations
 	y_arrays = []
 	starter_path_name = []
-	N_perbin_arrays = []
+	#N_perbin_arrays = []
 	
 	# get directories in this top-level directory
 	dirlist = [item for item in os.listdir(init_conc_path)]
