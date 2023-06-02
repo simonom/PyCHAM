@@ -54,7 +54,7 @@ def middle(self): # define function
 		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
-	
+		
 	if (self.pars_skip == 0): # if not skipping parsing of chemical scheme
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
@@ -63,19 +63,19 @@ def middle(self): # define function
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
 		pcont, self)
-
+	
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, jac_wall_indx, 
 		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, 
 		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
-
+	
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (self.testf == 4):
 		import var_checker
 		[err_mess, erf] = var_checker.var_checker(Jlen, err_mess, erf, self)
-	
+	print(erf, err_mess)	
 	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
 		yield err_mess
@@ -87,6 +87,7 @@ def middle(self): # define function
 	rel_SMILES] = init_conc.init_conc(comp_num, 
 	comp0, y0, Pnow, Pybel_objects, 0, pconc, self.eqn_num[0], Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self)
+	
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
 		yield err_mess

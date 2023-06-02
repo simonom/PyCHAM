@@ -60,7 +60,11 @@ def mod_var_read(self):
 		if type(self.param_const) == dict:
 			in_list = [] # prepare list
 			for key, value in self.param_const.items(): # loop through supplied parameters
-				in_list.append(str(str(key) + ' = ' + str(value)))
+				if str(key) == 'Cinfl':
+					value = (str(value)).strip('[').strip(']')
+					in_list.append(str(str(key) + ' = ' + value.replace(' ', '; ')))
+				else:
+					in_list.append(str(str(key) + ' = ' + str(value)))
 		
 		err_mess = '' # initial (blank) error message
 		self.bd_st = 3 # change border/error message status to ready for change
@@ -497,7 +501,7 @@ def mod_var_read(self):
 				self.con_infl_t = [float(i.strip()) for i in (value.split(','))]
 				self.con_infl_t = np.array((self.con_infl_t))
 
-			if key == 'Cinfl' and (value.strip()): # influx rate of components with continuous influx (ppb/s)
+			if (key == 'Cinfl' and (value.strip())): # influx rate of components with continuous influx (ppb/s)
 				
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
@@ -517,7 +521,7 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					self.con_infl_C = np.empty(0)
-
+			
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 

@@ -2310,10 +2310,10 @@ class PyCHAM(QWidget):
 			self.ssb = 0 # remember this button removed
 		
 		self.l81b.setText('') # clear progress message
-		
+			
 		# action to simulate a single simulation
 		err_mess = self.on_click81b()
-		
+		print('81sing', err_mess)	
 		# once all simulations done in single simulation mode, tidy up
 		# clear the list of file combinations for simulations in batch
 		self.output_list = [] # reset list of output paths
@@ -4456,149 +4456,248 @@ class PyCHAM(QWidget):
 
 		# choose variable values
 		param_range = self.param_const['param_ranges']
+	
 		
-		# prepare for randomness
-		from numpy.random import default_rng
-		rng = default_rng()
-
-		# loop through simulations
-		for simi in range(self.param_const['sim_num']):
+		if (self.param_const['sim_num'] == 'set'):
 			
-			# reset component concentrations
-			self.param_const['Cinfl'] = ''
+			# loop through starter simulations
+			for starteri in range(len(param_range['starter_paths'])):
 
-			# linear distribution in transmission factor of light (based on common sense, where 
-			# 0=dark and 1=midday sunshine in Meditteranean in summer) 
-			self.param_const['trans_fac'] = str('0_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
-			
-			# linear distribution in temperature (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
-			self.param_const['temperature'] = (rng.integers(low=param_range['temperature'][0], high=param_range['temperature'][1], size=1))[0]
-			# linear distribution in relative humidity (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
-			self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
+				# get file name of starter	
+				starter_name = param_range['starter_paths'][starteri]
+
+				# set initial concentrations (ppb)
+				# note that param_range['ys'] set in automated_setup_and_call.py
+				# set starting concentration of components now (# molecules/cm3)
+				self.param_const['ynow'] = param_range['ys'][starteri]
+
+				# set temperature (K)
+				self.param_const['temperature'] = param_range['temps'][starteri]
+				# set relative humidity (0-1)
+				self.param_const['rh'] = param_range['rhs'][starteri]
+				# set pressure (Pa)
+				self.param_const['p_init'] = param_range['pressures'][starteri]
+				# set transmission factor for light (0-1)
+				self.param_const['trans_fac'] = param_range['js'][starteri]
+
+				if ('loJ' in starter_name):
+					self.param_const['res_file_name'] = str(starter_name + '_loJ')
+				if ('hiJ' in starter_name):
+					self.param_const['res_file_name'] = str(starter_name + '_hiJ')
 		
-			# log-normal distribution for emission rate of gas phase: benzene, alpha-pinene, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
-			comp_cnt = 0 # count on components
-			for compi in range(len(param_range['Cinfl'])):
+				if ('loT' in starter_name):
+					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loT')
+				if ('hiT' in starter_name):
+					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiT')
+	
 
+				# get names of influxing components in a useful list form (from string)
+				const_influxers = self.param_const['const_infl'].split(',')
+				print(const_influxers)
+				# set influx rate for methane and carbon monoxide (ppb/s)
+				self.param_const['Cinfl'] = np.zeros((len(const_influxers)))
+
+
+				if 'loCH4' in starter_name:
+					# get index for methane
+					CH4indx = const_influxers.index('CH4')
+					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][0]	
+					# get index for carbon monoxide
+					COindx = const_influxers.index('CO')
+					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][0]
+
+
+				if 'hiCH4' in starter_name:
+					# get index for methane
+					CH4indx = const_influxers.index('CH4')
+					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][1]
+					# get index for carbon monoxide
+					COindx = const_influxers.index('CO')
+					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][1]
+		
+				# get alpha-pinene index
+				APindx = const_influxers.index('APINENE')
+
+				# get benzene, NO and NO2 indices
+				BZindx = const_influxers.index('BENZENE')
+				NOindx = const_influxers.index('NO')
+				NO2indx = const_influxers.index('NO2')
+	
+				# now loop through alpha-pinene influxes in combination with 
+				# benzene, nitrogen oxide and nitrogen dioxide influxes
+				for iap in range(len(param_range['Cinfl'][APindx])):
+					self.param_const['Cinfl'][APindx] = param_range['Cinfl'][APindx][iap]
+					if (iap == 0):
+						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loAP')
+					if (iap == 1):
+						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiAP')
+					for ibz in range(len(param_range['Cinfl'][BZindx])):
+						self.param_const['Cinfl'][BZindx] = param_range['Cinfl'][BZindx][ibz]
+						self.param_const['Cinfl'][NOindx] = param_range['Cinfl'][NOindx][ibz]
+						self.param_const['Cinfl'][NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
+						if (ibz == 0):
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
+						if (ibz == 1):
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ')	
+						# check on skip_parse
+						if iap == 0 and ibz == 0:
+							self.param_const['skip_parse'] = '0'
+						else:					
+							self.param_const['skip_parse'] = '1'	
+						# establish parameters provided by user by calling mod_var_read
+						import mod_var_read
+						mod_var_read.mod_var_read(self)
+		
+						self.on_click2() # assign chemical scheme
+						self.on_click3() # assign xml file
+						self.on_click4() # provide model variables label
+						print('calling sim from gui')
+						self.on_click81sing() # run simulation
+
+		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int):
+	
+			# prepare for randomness
+			from numpy.random import default_rng
+			rng = default_rng()
+
+			# loop through simulations
+			for simi in range(self.param_const['sim_num']):
+				
+				# reset component concentrations
+				self.param_const['Cinfl'] = ''
+
+				# linear distribution in transmission factor of light (based on common sense, where 
+				# 0=dark and 1=midday sunshine in Meditteranean in summer) 
+				self.param_const['trans_fac'] = str('0_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
+				
+				# linear distribution in temperature (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
+				self.param_const['temperature'] = (rng.integers(low=param_range['temperature'][0], high=param_range['temperature'][1], size=1))[0]
+				# linear distribution in relative humidity (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
+				self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
+			
+				# log-normal distribution for emission rate of gas phase: benzene, alpha-pinene, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
+				comp_cnt = 0 # count on components
+				for compi in range(len(param_range['Cinfl'])):
+
+					# create log-normal distribution for concentration range of this component
+					minCi = param_range['Cinfl'][compi][0] # minimum concentration (ppb)
+					maxCi = param_range['Cinfl'][compi][1] # maximum concentration (ppb)
+
+					# linear distribution along log10 of range extremes
+					lin_dis = np.linspace(np.log10(minCi), np.log10(maxCi), num=100)
+
+					# randomly select concentration and raise to power 10
+					conc_rand = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
+
+					if (comp_cnt == 0):
+						self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + str(conc_rand))
+					else:
+						self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + ', ' + str(conc_rand))
+			
+					comp_cnt += 1 # count on components
+				
+				new_Cinfl = ''
+				# now ensure continuous influx of components ends after 1 hour
+				for ci in self.param_const['Cinfl'].split(','):
+
+					new_Cinfl = str(new_Cinfl + str(ci) + ', 0. ;')
+				# remove final ;			
+				self.param_const['Cinfl'] = new_Cinfl[0:-1]	
+
+				
+				# log-normal distribution of seed particle concentration
 				# create log-normal distribution for concentration range of this component
-				minCi = param_range['Cinfl'][compi][0] # minimum concentration (ppb)
-				maxCi = param_range['Cinfl'][compi][1] # maximum concentration (ppb)
+				minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
+				maxC = param_range['pconc'][1] # maximum concentration (# particles/cm3)
 
 				# linear distribution along log10 of range extremes
-				lin_dis = np.linspace(np.log10(minCi), np.log10(maxCi), num=100)
+				lin_dis = np.linspace(np.log10(minC), np.log10(maxC), num=100)
 
-				# randomly select concentration and raise to power 10
-				conc_rand = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
+				# randomly select total particle concentration influx rate and raise to power 10
+				ptotal = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
 
-				if (comp_cnt == 0):
-					self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + str(conc_rand))
-				else:
-					self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + ', ' + str(conc_rand))
+				# randomly select numbers between 0-1 to represent fraction in each size bin
+				p0rnd = (rng.integers(0, 99, size=1))[0]
+				p1rnd = (rng.integers(0, 99, size=1))[0]
+				p2rnd = (rng.integers(0, 99, size=1))[0]
+				ptotrnd = p0rnd+p1rnd+p2rnd
+				self.param_const['pconc'] = str(str((p0rnd/ptotrnd)*ptotal) + ',' + str((p1rnd/ptotrnd)*ptotal) + ',' + str((p2rnd/ptotrnd)*ptotal) + '; 0,0,0')
+				
+				if (self.param_const['sim_type'] == 'finisher'):
+					#import ast # for converting imported strings to list
+
+					param_range['starter_paths'] = [] # prepare to list starter folders
+					starter_names = [] # just the folder name
+
+					starter_path = str(os.getcwd() + '/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme')
+
+					# get names of all folders in working folder
+					all_folders = [item for item in os.listdir(starter_path)]
 		
-				comp_cnt += 1 # count on components
-			
-			new_Cinfl = ''
-			# now ensure continuous influx of components ends after 1 hour
-			for ci in self.param_const['Cinfl'].split(','):
+					for all_foldi in all_folders:
+						if 'ambient_run_num' in all_foldi:
+								param_range['starter_paths'].append(str(starter_path + '/' + all_foldi))			
+								starter_names.append(all_foldi)
 
-				new_Cinfl = str(new_Cinfl + str(ci) + ', 0. ;')
-			# remove final ;			
-			self.param_const['Cinfl'] = new_Cinfl[0:-1]	
+					# loop through starter simulations
+					for starteri in range(len(param_range['starter_paths'])):
 
-			
-			# log-normal distribution of seed particle concentration
-			# create log-normal distribution for concentration range of this component
-			minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
-			maxC = param_range['pconc'][1] # maximum concentration (# particles/cm3)
+						self.param_const['res_file_name'] = str(starter_names[starteri] + '_' + str(simi))
+						
+						# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
+						#fname = str(param_range['starter_paths'][starteri] + '/concentrations_all_components_all_times_gas_particle_wall')
+						#ystarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
-			# linear distribution along log10 of range extremes
-			lin_dis = np.linspace(np.log10(minC), np.log10(maxC), num=100)
+						#fname = str(param_range['starter_paths'][starteri] + '/model_and_component_constants')
+						#const_in = open(fname)
+						#for line in const_in.readlines():
 
-			# randomly select total particle concentration influx rate and raise to power 10
-			ptotal = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
+							#if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
 
-			# randomly select numbers between 0-1 to represent fraction in each size bin
-			p0rnd = (rng.integers(0, 99, size=1))[0]
-			p1rnd = (rng.integers(0, 99, size=1))[0]
-			p2rnd = (rng.integers(0, 99, size=1))[0]
-			ptotrnd = p0rnd+p1rnd+p2rnd
-			self.param_const['pconc'] = str(str((p0rnd/ptotrnd)*ptotal) + ',' + str((p1rnd/ptotrnd)*ptotal) + ',' + str((p2rnd/ptotrnd)*ptotal) + '; 0,0,0')
-			
-			if (self.param_const['sim_type'] == 'finisher'):
-				#import ast # for converting imported strings to list
+								# find index of first [ and index of last ]
+								#icnt = 0 # count on characters
+								#for i in line:
+								#	if i == '[':
+								#		st_indx = icnt
+								#		break
+								#	icnt += 1 # count on characters
+								#for cnt in range(10):
+								#	if line[-cnt] == ']':
+								#		fi_indx = -cnt+1
+								#		break
 
-				param_range['starter_paths'] = [] # prepare to list starter folders
-				starter_names = [] # just the folder name
+								# conversion factor to change gas-phase concentrations from # molecules/cm3 
+								# (air) into ppb
+								#Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
+						
+							#for i in line.split(',')[1::]:
+							#	if str(line.split(',')[0]) == 'number_of_components':
+							#		num_comp = int(i)
 
-				starter_path = str(os.getcwd() + '/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme')
+						# convert ppb to # molecules/cm3
+						#ystarter[0:num_comp] = ystarter[0:num_comp]*Cfactor
+						
+						# note that param_range['ys'] set in automated_setup_and_call.py
+						# set starting concentration of components now (# molecules/cm3)
+						self.param_const['ynow'] = param_range['ys'][starteri]
 
-				# get names of all folders in working folder
-				all_folders = [item for item in os.listdir(starter_path)]
-	
-				for all_foldi in all_folders:
-					if 'ambient_run_num' in all_foldi:
-							param_range['starter_paths'].append(str(starter_path + '/' + all_foldi))			
-							starter_names.append(all_foldi)
+						# withdraw number-size distributions (# particles/cm3 (air))
+						#fname = str(param_range['starter_paths'][starteri] +  '/particle_number_concentration_wet')
+						#Nstarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
-				# loop through starter simulations
-				for starteri in range(len(param_range['starter_paths'])):
+						# note that param_range['Ns'] set in automated_setup_and_call.py
+						# set starting concentration of particles now (# particles/cm3)
+						self.param_const['Nnow'] = param_range['Ns'][starteri]
 
-					self.param_const['res_file_name'] = str(starter_names[starteri] + '_' + str(simi))
-					
-					# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
-					#fname = str(param_range['starter_paths'][starteri] + '/concentrations_all_components_all_times_gas_particle_wall')
-					#ystarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
-
-					#fname = str(param_range['starter_paths'][starteri] + '/model_and_component_constants')
-					#const_in = open(fname)
-					#for line in const_in.readlines():
-
-						#if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
-
-							# find index of first [ and index of last ]
-							#icnt = 0 # count on characters
-							#for i in line:
-							#	if i == '[':
-							#		st_indx = icnt
-							#		break
-							#	icnt += 1 # count on characters
-							#for cnt in range(10):
-							#	if line[-cnt] == ']':
-							#		fi_indx = -cnt+1
-							#		break
-
-							# conversion factor to change gas-phase concentrations from # molecules/cm3 
-							# (air) into ppb
-							#Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
-					
-						#for i in line.split(',')[1::]:
-						#	if str(line.split(',')[0]) == 'number_of_components':
-						#		num_comp = int(i)
-
-					# convert ppb to # molecules/cm3
-					#ystarter[0:num_comp] = ystarter[0:num_comp]*Cfactor
-					
-					# note that param_range['ys'] set in automated_setup_and_call.py
-					# set starting concentration of components now (# molecules/cm3)
-					self.param_const['ynow'] = param_range['ys'][starteri]
-
-					# withdraw number-size distributions (# particles/cm3 (air))
-					#fname = str(param_range['starter_paths'][starteri] +  '/particle_number_concentration_wet')
-					#Nstarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
-
-					# note that param_range['Ns'] set in automated_setup_and_call.py
-					# set starting concentration of particles now (# particles/cm3)
-					self.param_const['Nnow'] = param_range['Ns'][starteri]
-
-					# establish parameters provided by user by calling mod_var_read
-					import mod_var_read
-					mod_var_read.mod_var_read(self)
-			
-					self.on_click2() # assign chemical scheme
-					self.on_click3() # assign xml file
-					self.on_click4() # provide model variables label
-			
-					self.on_click81sing() # run simulation
+						# establish parameters provided by user by calling mod_var_read
+						import mod_var_read
+						mod_var_read.mod_var_read(self)
+				
+						self.on_click2() # assign chemical scheme
+						self.on_click3() # assign xml file
+						self.on_click4() # provide model variables label
+				
+						self.on_click81sing() # run simulation
 
 			if (self.param_const['sim_type'] == 'starter'):
 

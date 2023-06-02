@@ -41,11 +41,9 @@ param_const = {}
 param_const['sim_num'] = 'set'
 # either 'starter' or 'finisher'
 param_const['sim_type'] = 'finisher'
-# 1 for whether to not parse input files on repeat runs, 0 to parse on every run
-param_const['skip_parse'] = 1
 
 # markers for interpreting chemical scheme - note that all chemical scheme markers should be 
-# included inside quotation marks, e.g. 
+# included inside quotation marks, e.g.: 
 # param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 
@@ -82,7 +80,7 @@ if (param_const['sim_type'] == 'finisher'):
 	param_const['total_model_time'] = 8.64e4
 	param_const['update_step'] = 4.5e2
 	param_const['recording_time_step'] = 4.5e2
-	param_const['light_status'] = 1 # constant daily light intensity
+	param_const['light_status'] = 1 # constant light intensity
 
 param_const['light_time'] = 0.
 
@@ -146,9 +144,13 @@ if (param_const['sim_type'] == 'finisher'):
 	cwd = os.getcwd()
 	# path to automated run results
 	init_conc_path = str('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/')
-	# prepare to hold required concentrations
+	# prepare to hold required variables
 	y_arrays = []
 	starter_path_name = []
+	temp_arrays = []
+	j_arrays = []
+	rh_arrays = []
+	press_arrays = []
 	#N_perbin_arrays = []
 	
 	# get directories in this top-level directory
@@ -156,70 +158,85 @@ if (param_const['sim_type'] == 'finisher'):
 	
 	for path in dirlist: # loop through objects in this directory
 		
-		if 'ambient_run_num' in path:
-			
-			# path to y result
-			yres_path = str(str(path) + '/concentrations_all_components_all_times_gas_particle_wall')
-			# extract initial concentrations in gas-phase (ppb)
-			# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
-			fname = str(init_conc_path + '/' + path + '/concentrations_all_components_all_times_gas_particle_wall')
-			# note, just keep results from final time
-			y = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
+		if (path[-9::] == '.DS_Store'): # ignore any .DS_Store folders 	
+			continue
+		# extract initial concentrations in gas-phase (ppb)
+		# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
+		fname = str(init_conc_path + path + '/concentrations_all_components_all_times_gas_particle_wall')
+		# note, just keep results from final time
+		y = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
-			# convert gas-phase concentration from ppb to # molecules/cm3
-			fname = str(init_conc_path + '/' + path + '/model_and_component_constants')
-			const_in = open(fname)
-			for line in const_in.readlines():
+		# convert gas-phase concentration from ppb to # molecules/cm3
+		fname = str(init_conc_path + '/' + path + '/model_and_component_constants')
+		const_in = open(fname)
+		for line in const_in.readlines():
+	
+			if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
+
+				# find index of first [ and index of last ]
+				icnt = 0 # count on characters
+				for i in line:
+					if i == '[':
+						st_indx = icnt
+						break
+					icnt += 1 # count on characters
+				for cnt in range(10):
+					if line[-cnt] == ']':
+						fi_indx = -cnt+1
+						break
+
+				# conversion factor to change gas-phase concentrations from # molecules/cm3 
+				# (air) into ppb
+				Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
+
+			# get number of components
+			for i in line.split(',')[1::]:
+				if str(line.split(',')[0]) == 'number_of_components':
+					num_comp = (int(i))
+				else:
+					continue
 		
-				if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
+		# withdraw final time step number-size distributions (# particles/cm3 (air))
+		#fname = str(init_conc_path + '/' + path + '/particle_number_concentration_dry')
+		#N = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
-					# find index of first [ and index of last ]
-					icnt = 0 # count on characters
-					for i in line:
-						if i == '[':
-							st_indx = icnt
-							break
-						icnt += 1 # count on characters
-					for cnt in range(10):
-						if line[-cnt] == ']':
-							fi_indx = -cnt+1
-							break
+		# convert gas-phase concentration from ppb to # molecules/cm3
+		y[0:num_comp] = y[0:num_comp]*Cfactor
 
-					# conversion factor to change gas-phase concentrations from # molecules/cm3 
-					# (air) into ppb
-					Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
+		y_arrays.append(y) # store this concentration			
+		starter_path_name.append(path) # store path to starter file
+		#N_perbin_arrays.append(N)
 
-				# get number of components
-				for i in line.split(',')[1::]:
-					if str(line.split(',')[0]) == 'number_of_components':
-						num_comp = (int(i))
-					else:
-						continue
+		# withdraw environmental conditions (s)
+		fname = str(init_conc_path + '/' + path + '/chamber_environmental_conditions')
+		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
+		temp_arrays.append(cham_env[-1, 0]) # store temperature (K)
+		press_arrays.append(cham_env[-1, 1]) # store pressure (Pa)
+		rh_arrays.append(cham_env[-1, 2]) # store relative humidity (0-1)
+		j_arrays.append(cham_env[-1, 3])
+
+
 			
-			# withdraw final time step number-size distributions (# particles/cm3 (air))
-			fname = str(init_conc_path + '/' + path + '/particle_number_concentration_dry')
-			N = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
-
-			# convert gas-phase concentration from ppb to # molecules/cm3
-			y[0:num_comp] = y[0:num_comp]*Cfactor
-
-			y_arrays.append(y) # store this concentration			
-			starter_path_name.append(path)
-			N_perbin_arrays.append(N)
 
 	# store required outputs
 	param_range['ys'] = y_arrays
 	param_range['starter_paths'] = starter_path_name
-	param_range['Ns'] = N_perbin_arrays
-
-# the components with constant influx
-param_const['const_infl'] = 'APINENE, BENZENE, CH4, CO, NO2, NO, SO2'
+	#param_range['Ns'] = N_perbin_arrays
+	param_range['temps'] = temp_arrays
+	param_range['js'] = j_arrays
+	param_range['rhs'] = rh_arrays
+	param_range['pressures'] = press_arrays
+# the components with constant influx, note, do not leave whitespace
+param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
 # range of concentration of components present throughout simulation  - see above in this module for provenance of benzene,
 # a maximum of alpha-pinene of 10 ppb is given by doi.org/10.1016/j.scitotenv.2020.144129, the range in CH4 is from a minimum of 400 ppb,
 # which is from ice-core data (https://data.ess-dive.lbl.gov/view/doi:10.3334/CDIAC/ATG.030) and a maximum of 2000 ppb (2 ppm), which is
 # from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2, and the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005
 # note that we divide the absolute concentration (ppb) ranges by the time influx occurs over to get the emission rate (ppb/s)
-param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
+#param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
+
+
+param_range['Cinfl'] = [[1.e-6, 5.e-4], [benzC/1.e-7, benzC/1.e-3], [1.e-7, 1.e-6], [1.e-12, 1.e-10], [1.e-8, 1.e-4], [1.e-8, 1.e-4], [0., 0.]]
 
 # time over which influx of components occurs
 if (param_const['sim_type'] == 'starter'):
@@ -227,20 +244,21 @@ if (param_const['sim_type'] == 'starter'):
 	param_const['pconct'] = '0.1; 3.6e3'
 	param_const['number_size_bins'] = 0
 if (param_const['sim_type'] == 'finisher'):
-	param_const['const_infl_t'] = '0.0, 3.75e3'
-	param_const['pconct'] = '0.1; 3.75e3'
-	param_const['number_size_bins'] = 3
+	param_const['const_infl_t'] = '0.0'
+	#param_const['pconct'] = '0.1; 3.75e3'
+	#param_const['number_size_bins'] = 3
 
-param_const['space_mode'] = 'log'
-param_const['coag_on'] = 1
+#param_const['space_mode'] = 'log'
+#param_const['coag_on'] = 1
 
 # minimum particulate mass concentration from doi.org/10.1021/acsearthspacechem.1c00090, maximum from https://indianexpress.com/article/cities/delhi/delhi-pm2-5-pm10-levels-shoot-through-the-roof-morning-after-diwali-7608039/
-param_range['pconc'] = [1.e-1, 1.e2]
-param_const['pcont'] = '1; 0' # ensure continuous influx
+#param_range['pconc'] = [1.e-1, 1.e2]
+#param_const['pcont'] = '1; 0' # ensure continuous influx
 
 # setup dictionary items to hold chosen values
 param_const['trans_fac'] = 0.
 param_const['temperature'] = 0.
+param_const['trans_fac'] = 0.
 param_const['rh'] = 0.
 param_const['pconc'] = 0.
 param_const['Cinfl'] = 0.
