@@ -186,7 +186,7 @@ In addition, you can find more information around photochemistry and flow mode i
 
 | Input Name | Description|
 | ---------- | ---------- |
-| res_file_name = | Name of folder to save results to |
+| res_file_name = | Name of folder to save results to. Note that by default results will be saved to PyCHAM/PyCHAM/output/name of chemical scheme used/res_file_name, however the user can state their own path to results, including the name of the folder they want saving to, e.g.: res_file_name = my documents/my PyCHAM results saves to: my documents/my PyCHAM results.  |
 | total_model_time = | Total experiment time to be simulated (s) |
 | update_step =  | Time (s) interval for updating integration constants (specifically natural light intensity (if applicable) and particle number concentration due to its change during any of: coagulation, particle loss to wall and/or nucleation).  Defaults to 1 s.  Can be set to more than the total_model_time variable above to prevent updates. |
 | recording_time_step =  | Time interval for recording results (s).  Must be at least the value of update_step if particles are present (number_size_bins variable below greater than zero).  Defaults to 60 s.  Note that recorded values represent values at the recording interval.  Therefore, instantaneous injections at the recording interval are registered. |

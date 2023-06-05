@@ -62,7 +62,7 @@ class PyCHAM(QWidget):
 		#self.setWindowTitle('PyCHAM')		
 
 		self.err_mess = '' # begin with no error message
-
+		
 		# if parameters have been provided automatically (without using GUI)
 		# then automatically setup and run the simulation, e.g. using the
 		# automated_setup_and_call.py
@@ -1909,6 +1909,7 @@ class PyCHAM(QWidget):
 			self.fab = 0 # remember that single simulation widgets not showing
 		if (self.atb == 1): # if showing then remove add to batch button
 			self.b82.deleteLater()
+			self.l81.deleteLater() # 'or' label
 			self.atb = 0 # remember that add to batch button not showing
 		# remove any old message from previous run
 		if (len(self.l81b.text()) > 0):
@@ -2030,6 +2031,7 @@ class PyCHAM(QWidget):
 			self.fab = 0 # remember that single simulation widgets not showing
 		if (self.atb == 1): # if showing then remove add to batch button
 			self.b82.deleteLater()
+			self.l81.deleteLater() # 'or' label
 			self.atb = 0 # remember that add to batch button not showing
 		# remove any old 'Simulation complete' message from previous run
 		if ((self.l81b.text() == 'Simulation complete') or (self.l81b.text() == 'Simulations complete')):
@@ -2266,9 +2268,10 @@ class PyCHAM(QWidget):
 				
 			QApplication.processEvents() # allow progress bar/message panel to update
 		
+
 		# remove the progress bar after each simulation
 		self.progress.deleteLater()
-		
+
 		# set the path to folder to plot results to the latest simulation results
 		self.l201.setText(output_by_sim)
 		
@@ -2284,13 +2287,21 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click81sing(self): # when single simulation button pressed
 		
+		# note it can be useful to process events now, in case PyCHAM working in automatic mode
+		QApplication.processEvents() # allow progress bar/message panel to update
+
 		cs_file = self.l3.text()
 		xml_file = self.l5.text()
 		mv_file = self.l7.text()
 		self.btch_no = 1 # ensure just one simulation when single simulation button pressed
 		self.btch_str = (str(str(self.btch_no)+'.\n' + cs_file + '\n' + xml_file + '\n' + mv_file + '\n'))
-		# display progress bar
-		self.progress = QProgressBar(self)
+		
+		# if called from autorun function and if later simulations being conducted (i.e. not the first)  
+		if (type(self.param_const) == dict and 'progress' in self.__dict__):
+			self.progress.setValue(0) # reset to zero
+		else:
+			# display progress bar
+			self.progress = QProgressBar(self)
 		self.NSlayout.addWidget(self.progress, 7, self.mvpn, 1, 3)
 		
 		
@@ -2313,7 +2324,7 @@ class PyCHAM(QWidget):
 			
 		# action to simulate a single simulation
 		err_mess = self.on_click81b()
-		print('81sing', err_mess)	
+			
 		# once all simulations done in single simulation mode, tidy up
 		# clear the list of file combinations for simulations in batch
 		self.output_list = [] # reset list of output paths
@@ -4455,9 +4466,11 @@ class PyCHAM(QWidget):
 		# before autorun function called
 
 		# choose variable values
-		param_range = self.param_const['param_ranges']
-	
-		
+		param_range = self.param_const['param_ranges']		
+
+		# filler for original starter simulation name
+		starter_name0 = 'fill'
+
 		if (self.param_const['sim_num'] == 'set'):
 			
 			# loop through starter simulations
@@ -4480,20 +4493,33 @@ class PyCHAM(QWidget):
 				# set transmission factor for light (0-1)
 				self.param_const['trans_fac'] = param_range['js'][starteri]
 
+				save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\'
+
 				if ('loJ' in starter_name):
-					self.param_const['res_file_name'] = str(starter_name + '_loJ')
+					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_loJ')
 				if ('hiJ' in starter_name):
-					self.param_const['res_file_name'] = str(starter_name + '_hiJ')
+					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_hiJ')
 		
 				if ('loT' in starter_name):
 					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loT')
+					if ('hiT' in starter_name0):
+						# if temperature changes, need to renew property estimation 
+						self.param_const['pars_skip'] = 0
 				if ('hiT' in starter_name):
 					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiT')
-	
+					if ('loT' in starter_name0):
+						# if temperature changes, need to renew property estimation 
+						self.param_const['pars_skip'] = 0
+
+				# remember original starter simulation name
+				starter_name0 = starter_name
+
+				# remember original starting string in results save name
+				res_file_name0 = self.param_const['res_file_name']
 
 				# get names of influxing components in a useful list form (from string)
 				const_influxers = self.param_const['const_infl'].split(',')
-				print(const_influxers)
+
 				# set influx rate for methane and carbon monoxide (ppb/s)
 				self.param_const['Cinfl'] = np.zeros((len(const_influxers)))
 
@@ -4524,7 +4550,7 @@ class PyCHAM(QWidget):
 				NO2indx = const_influxers.index('NO2')
 	
 				# now loop through alpha-pinene influxes in combination with 
-				# benzene, nitrogen oxide and nitrogen dioxide influxes
+				# influxes of benzene, nitrogen oxide and nitrogen dioxide
 				for iap in range(len(param_range['Cinfl'][APindx])):
 					self.param_const['Cinfl'][APindx] = param_range['Cinfl'][APindx][iap]
 					if (iap == 0):
@@ -4539,20 +4565,25 @@ class PyCHAM(QWidget):
 							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
 						if (ibz == 1):
 							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ')	
-						# check on skip_parse
-						if iap == 0 and ibz == 0:
-							self.param_const['skip_parse'] = '0'
-						else:					
-							self.param_const['skip_parse'] = '1'	
+
 						# establish parameters provided by user by calling mod_var_read
 						import mod_var_read
 						mod_var_read.mod_var_read(self)
-		
+						print(self.param_const['Cinfl'][APindx], self.param_const['Cinfl'][BZindx], self.param_const['Cinfl'][NOindx], self.param_const['Cinfl'][NO2indx])
 						self.on_click2() # assign chemical scheme
 						self.on_click3() # assign xml file
 						self.on_click4() # provide model variables label
-						print('calling sim from gui')
+						
 						self.on_click81sing() # run simulation
+
+						# remove benzene tag, ready for new one
+						self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
+						# ensure that after the first call parsing and property estimation is skipped 
+						self.param_const['pars_skip'] = 1
+
+
+					# reset saving name to original
+					self.param_const['res_file_name'] = res_file_name0 
 
 		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int):
 	

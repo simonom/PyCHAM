@@ -27,6 +27,7 @@ import sys
 import numpy as np
 import csv
 from shutil import copyfile
+import pickle
 
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
@@ -100,8 +101,15 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	output_root = 'PyCHAM/output'
 	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
-	# one folder for one simulation
-	output_by_sim = os.path.join(dir_path, output_root, filename, savefolder)
+	# if path and folder name already stated for saving to
+	if (('/' in savefolder) or ('\\' in savefolder)): 
+		# one folder for one simulation
+		output_by_sim = os.path.join(savefolder)
+	else: # if no path given for saving to
+		# one folder for one simulation
+		output_by_sim = os.path.join(dir_path, output_root, filename, savefolder)
+	
+
 	# create folder to store results
 	os.makedirs(output_by_sim)
 	# remember this path in self, in case plotting scripts need it
@@ -134,22 +142,22 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const = {}
 	const["number_of_size_bins"] = numsb
 	const["number_of_components"] = num_comp
-	const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
-	const["nominal_molar_mass_g/mol"] = self.nom_mass.tolist()
-	const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
+	#const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
+	#const["nominal_molar_mass_g/mol"] = self.nom_mass.tolist()
+	#const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
 	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
 	const["organic_alkoxy_radical_index"] = self.RO_indx
 	const["organic_HOM_peroxy_radical_index"] = self.aoRO2_indx
-	const["chem_scheme_names"] = self.comp_namelist
-	const["SMILES"] = rel_SMILES
+	#const["chem_scheme_names"] = self.comp_namelist
+	#const["SMILES"] = rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
 	const["wall_on_flag_0forNO_>0forYES"] = self.wall_on
 	const["space_mode"] = space_mode
-	const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"] = self.Psat_Pa_rec.tolist()
-	const["oxygen_to_carbon_ratios_of_components"] = self.OC.tolist()
-	const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
+	#const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"] = self.Psat_Pa_rec.tolist()
+	#const["oxygen_to_carbon_ratios_of_components"] = self.OC.tolist()
+	#const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = self.seedi.tolist()
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
@@ -159,7 +167,34 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
+
+	# testing area starts --------------------------------------------------------
+	# save
+	save_path = str(output_by_sim + '/nom_mass') # path
+	np.save(save_path, self.nom_mass, allow_pickle=True)
 	
+	save_path = str(output_by_sim + '/y_mw') # path
+	np.save(save_path, np.squeeze(y_mw), allow_pickle=True)
+
+	save_path = str(output_by_sim + '/MV') # path
+	np.save(save_path, np.squeeze(MV), allow_pickle=True)
+
+	save_path = str(output_by_sim + '/comp_namelist') # path
+	np.save(save_path, self.comp_namelist, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/rel_SMILES') # path
+	np.save(save_path, rel_SMILES, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
+	np.save(save_path, self.Psat_Pa_rec, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/oxygen_to_carbon_ratios_of_components') # path
+	np.save(save_path, self.OC, allow_pickle=True)
+	
+	save_path = str(output_by_sim + '/hydrogen_to_carbon_ratios_of_components') # path
+	np.save(save_path, self.HC, allow_pickle=True)
+
+	# testing area finishes ------------------------------------------------------
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))

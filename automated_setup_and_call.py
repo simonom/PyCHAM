@@ -46,18 +46,16 @@ param_const['sim_type'] = 'finisher'
 # included inside quotation marks, e.g.: 
 # param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
+param_const['pars_skip'] = 0 # need to parse equations and estimate properties on first go
 
-# state path to chemical scheme
-# windows
-#param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.kpp'
-# mac
-param_const['sch_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
+# state path to chemical scheme and xml files
+if sys. platform == 'win32':
+	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
+	param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 
-# state path to xml file
-# windows
-#param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
-# mac
-param_const['xml_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
+if sys. platform == 'darwin':
+	param_const['sch_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
+	param_const['xml_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
 
 # state parameter ranges
 
@@ -77,7 +75,7 @@ if (param_const['sim_type'] == 'starter'): # 24 hours (8.64e4s) spin up
 # the European average wind speed of 3 m/s, the average time in an EMEP grid cell is:
 # (1.125e4m/3m/s) = 3.75e3 s (1.04 hours)
 if (param_const['sim_type'] == 'finisher'):
-	param_const['total_model_time'] = 8.64e4
+	param_const['total_model_time'] = 4.32e4
 	param_const['update_step'] = 4.5e2
 	param_const['recording_time_step'] = 4.5e2
 	param_const['light_status'] = 1 # constant light intensity
@@ -90,7 +88,7 @@ param_const['act_flux_path'] = 'Greece_obs_doi_10dot10292001JD900142.csv'
 param_range['trans_fac'] = [0.1, 1.]
 
 # minimum temperature and relative humidity ranges given by Porter et al. 2021 (doi.org/10.1021/acsearthspacechem.1c00090)
-param_range['temperature'] = [273.15, 323.15]
+param_range['temperature'] = [273.15, 318.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
 param_const['rh'] = [0.50]
@@ -143,7 +141,10 @@ if (param_const['sim_type'] == 'finisher'):
 	# this is the PyCHAM home directory)
 	cwd = os.getcwd()
 	# path to automated run results
-	init_conc_path = str('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/')
+	if sys.platform == 'win32': # windows
+		init_conc_path = str('C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\\')
+	if sys.platform == 'darwin': # mac
+		init_conc_path = str('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/')
 	# prepare to hold required variables
 	y_arrays = []
 	starter_path_name = []
@@ -236,7 +237,7 @@ param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
 #param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
 
 
-param_range['Cinfl'] = [[1.e-6, 5.e-4], [benzC/1.e-7, benzC/1.e-3], [1.e-7, 1.e-6], [1.e-12, 1.e-10], [1.e-8, 1.e-4], [1.e-8, 1.e-4], [0., 0.]]
+param_range['Cinfl'] = [[1.e-5, 1.e-2], [benzC*1.e-7, benzC*1.e-4], [1.e-7, 1.e-6], [1.e-12, 1.e-10], [1.e-6, 2.e-3], [1.e-6, 2.e-3], [0., 0.]]
 
 # time over which influx of components occurs
 if (param_const['sim_type'] == 'starter'):
