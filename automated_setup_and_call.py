@@ -49,11 +49,11 @@ param_const['chem_scheme_markers'] = '{, RO2, +, C(ind_, ), , &, , , :, }, ;,'
 param_const['pars_skip'] = 0 # need to parse equations and estimate properties on first go
 
 # state path to chemical scheme and xml files
-if sys. platform == 'win32':
-	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
+if sys.platform == 'win32':
+	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_nint_scheme.dat'
 	param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 
-if sys. platform == 'darwin':
+if sys.platform == 'darwin':
 	param_const['sch_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
 	param_const['xml_name'] = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/auto_call_test/MCM_PRAM_xml.xml'
 
@@ -88,7 +88,7 @@ param_const['act_flux_path'] = 'Greece_obs_doi_10dot10292001JD900142.csv'
 param_range['trans_fac'] = [0.1, 1.]
 
 # minimum temperature and relative humidity ranges given by Porter et al. 2021 (doi.org/10.1021/acsearthspacechem.1c00090)
-param_range['temperature'] = [273.15, 318.15]
+param_range['temperature'] = [273.15, 313.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
 param_const['rh'] = [0.50]

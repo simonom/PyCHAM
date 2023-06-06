@@ -4562,14 +4562,14 @@ class PyCHAM(QWidget):
 						self.param_const['Cinfl'][NOindx] = param_range['Cinfl'][NOindx][ibz]
 						self.param_const['Cinfl'][NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
 						if (ibz == 0):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ_nint')
 						if (ibz == 1):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ')	
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ_nint')	
 
 						# establish parameters provided by user by calling mod_var_read
 						import mod_var_read
 						mod_var_read.mod_var_read(self)
-						print(self.param_const['Cinfl'][APindx], self.param_const['Cinfl'][BZindx], self.param_const['Cinfl'][NOindx], self.param_const['Cinfl'][NO2indx])
+						
 						self.on_click2() # assign chemical scheme
 						self.on_click3() # assign xml file
 						self.on_click4() # provide model variables label
@@ -4577,7 +4577,11 @@ class PyCHAM(QWidget):
 						self.on_click81sing() # run simulation
 
 						# remove benzene tag, ready for new one
-						self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
+						if 'nint' in self.param_const['res_file_name']:
+							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-10]						
+						else:
+							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
+
 						# ensure that after the first call parsing and property estimation is skipped 
 						self.param_const['pars_skip'] = 1
 
