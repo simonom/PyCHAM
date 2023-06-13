@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import part_nsd # determining particle number size distributions
 
 def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc, 
-		space_mode, testf, pconct): # define module
+		space_mode, testf, pconct, self): # define module
 	
 	# inputs: ----------------------------
 	# lowersize - the smallest bound on the particle size range (um)
@@ -43,6 +43,7 @@ def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc,
 	#		linearly)
 	# testf - flag for whether in testing mode
 	# pconct - the timings of particle injection
+	# self - PyCHAM object containing multiple variables
 	# ------------------------------------
 	
 	# prepare figure
@@ -60,8 +61,10 @@ def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc,
 		# get particle number concentration per size bin (# particles/cm3)
 		# and radius at particle size bin centres (um)
 		[N_perbin, x, rbou, Vbou, Varr, 
-			upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
-			num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf)
+   			upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
+							  						num_asb, uppersize, mean_radn, 
+					 	      						stdn, pmode, pconcn, space_mode, 
+							  						testf, self)
 
 		# prepare dN/dlogDp
 		# don't use the first boundary as it could be zero, which will error when log10 taken

@@ -187,5 +187,5 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	# concatenate kw onto kimt, ready for ode solver
 	if (self.wall_on > 0):
 		kimt = np.concatenate((kimt, self.kw), axis = 0)
-
+	
 	return(kimt, kelv)

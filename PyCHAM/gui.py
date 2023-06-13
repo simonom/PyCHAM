@@ -4198,7 +4198,7 @@ class PyCHAM(QWidget):
 		
 			# call on plotting script
 			plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
-			space_mode, 0, pconct)
+			space_mode, 0, pconct, self)
 
 		if (input_check_text == 'Gas-phase Diffusion Coefficients'):
 			import plotter_simulate_tab
