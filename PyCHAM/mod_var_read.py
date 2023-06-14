@@ -33,6 +33,8 @@ def mod_var_read(self):
 	
 	def read(self):
 	
+		err_mess = '' # initial (blank) error message
+
 		# prepare by opening existing model variables, ready for modification
 		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		
@@ -51,8 +53,30 @@ def mod_var_read(self):
 		
 		if (self.inname != 'Default' and self.inname != 'Not found' and type(self.param_const) != dict): # if not using defaults
 			inputs = open(self.inname, mode= 'r' ) # open model variables file
-			in_list = inputs.readlines() # read file and store everything into a list
-			inputs.close() # close file
+			try: # in case reading in model variables fine
+				in_list = inputs.readlines() # read file and store everything into a list
+				inputs.close() # close file
+				
+			except: # in case problem with reading in model variables
+				while True:
+					line = file.readline()
+					if not line:
+						err_mess = str('Error: could not interpret the following line in the model variables file: ' + str(line))
+						self.l81b.setText('') # remove old progress message	
+						self.l81b.setText(err_mess)
+						# change border accordingly
+						if (self.bd_st == 1):
+							self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
+						if (self.bd_st >= 2):
+							self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
+
+						self.bd_st += 2 # prepare for change to border status
+						# change border status
+						if (self.bd_st == 3):
+							self.bd_st = 2
+						if (self.bd_st >= 4):
+							self.bd_st = 1
+						return()
 		else: # if using defaults
 			in_list = []
 
@@ -65,8 +89,7 @@ def mod_var_read(self):
 					in_list.append(str(str(key) + ' = ' + value.replace(' ', '; ')))
 				else:
 					in_list.append(str(str(key) + ' = ' + str(value)))
-		
-		err_mess = '' # initial (blank) error message
+			
 		self.bd_st = 3 # change border/error message status to ready for change
 		# default value for number of modes represented by particle number concentration
 		pmode_cnt = 1
@@ -679,9 +702,13 @@ def mod_var_read(self):
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
-		
+
+		return() # end function	
 			
 	read(self) # call on function to read the model variables
+
+	return()
+
 	
 def const_infl_open(self): # define function to read in values relevant to constant influxes
 
@@ -693,58 +720,6 @@ def const_infl_open(self): # define function to read in values relevant to const
 	except: # if file not found tell user
 		self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
 		return(self)
-
-	sheet = wb['const_infl']
-	# component names are in first column, times are in headers of first row		
-	ic = 0 # count on row iteration
-	
-	# prepare to store component names
-	self.con_infl_nam = []
-	
-	for i in sheet.iter_rows(values_only=True): # loop through rows
-		if (ic == 0): # get times of influx (s through experiment)
-			self.con_infl_t = np.array((i[1::]))
-
-			# column number limit of times
-			col_lim_indx = len(self.con_infl_t)
-
-			# check whether columns affected by None
-			# get index of end of times in
-			for it in range(len(self.con_infl_t)):
-				if (self.con_infl_t[it] is None):
-					col_lim_indx = it
-					break
-			
-			self.con_infl_t = self.con_infl_t[0:col_lim_indx]
-			# prepare to store emission rates
-			self.con_infl_C = np.zeros((1, len(self.con_infl_t)))
-				
-			# get abundance unit (ppb or molecules/cm3)
-			self.abun_unit = str(i[0])				
-
-		# get names of components (matching chemical scheme names) 
-		# and their emission rates (abundance unit given above/s)
-		else:
-			if (i[0] is None): # reached end of contiguous components
-				break
-			# append component name
-			self.con_infl_nam.append(i[0])
-			
-			# emission rates
-			if (ic > self.con_infl_C.shape[0]): # if we need to concatenate
-				self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:col_lim_indx+1])).reshape(1, -1)), axis=0)
-			else:
-				self.con_infl_C[ic-1, :] = i[1:col_lim_indx+1]
-			
-			
-		ic += 1 # count on row iteration
-
-	wb.close() # close excel file
-
-	# ensure numpy array
-	self.con_infl_nam = np.array((self.con_infl_nam))
-
-	return(self)
 
 # function for converting excel spreasheet of surface depositions 
 # into a string that commands above can interpret

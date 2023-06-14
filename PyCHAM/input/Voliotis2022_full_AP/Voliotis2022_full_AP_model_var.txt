@@ -1,0 +1,32 @@
+# inputs for autumn 2022 campaign in HIRAC, see notes in shared document:
+# https://docs.google.com/document/d/1yPCQVAdOFtAsjP7foiDpe3KZrRMx1slKQbOLSR7qLC4/edit
+# inputs required to match observed alpha-pinene yields in
+# https://doi.org/10.5194/acp-22-14147-2022
+res_file_name = Voliotis22_fullAP
+pars_skip = 0
+obs_file = /PyCHAM/input/Voliotis2022_full_AP/obs.xlsx
+total_model_time = 2.16e4
+update_step = 2.16e2
+recording_time_step = 1.08e3
+light_status = 0, 1
+light_time = 0., 3600.
+act_flux_path = MAC_Actinic_Flux_Spectrum_wUVC.csv
+tf_UVC = 0.
+tf_UVCt = 0.
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.5
+C0 =    0.,1.5e2,2.e3, 309.
+Comp0 = O3,  CO,  CH4, APINENE
+#const_infl = NO
+#Cinfl = 0., 8.e-3
+#const_infl_t = 3.6e3, 4.2e3
+number_size_bins = 1
+pconc = 1.8e6
+wall_on = 1
+mass_trans_coeff = 1e-2; OH_wall1_1e3
+eff_abs_wall_massC = 1.e0
+vol_Comp = OH_wall1
+volP = 0.0
+tracked_comp = OH, HO2, PINALO2, APINENE, O3, NO2

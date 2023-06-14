@@ -1,0 +1,34 @@
+# inputs for the seed particle expriment of Garmash et al. 2020
+# https://doi.org/10.5194/acp-20-515-2020 
+res_file_name = Garmash20
+pars_skip = 0
+total_model_time = 3.96e4
+update_step = 3.6e2
+recording_time_step = 1.8e3
+light_status = 0, 1
+light_time = 0., 1.08e4
+act_flux_path = UV.csv
+tf_UVC = 2.e-1
+tf_UVCt = 0.
+temperature = 293.15
+tempt = 0.
+p_init = 101325.
+rh = 0.5
+const_comp = H2O
+C0 =    0., 0.0,  0.0, 0.0
+Comp0 = O3,  CO,  CH4, BENZENE
+const_infl = O3, BENZENE
+Cinfl = 5.e-3; 7.e-3
+const_infl_t = 0.
+number_size_bins = 1
+pconc = 0.; 1.8e2
+pconct = 0.; 1.62e4
+pcont = 1; 1
+dil_fac = 3.7e-4
+dil_fact = 0.
+wall_on = 1
+mass_trans_coeff = 1e-2
+eff_abs_wall_massC = 1.e0
+#vol_Comp = OH_wall1
+#volP = 0.0
+tracked_comp = OH, HO2, BENZENE, O3, NO2

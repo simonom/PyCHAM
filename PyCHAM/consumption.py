@@ -190,8 +190,10 @@ def cons(self, caller):
 			dil_facst = dil_fac[sum(dil_fact<=min(timehr[indxt]))]
 			dil_fac = np.mean(dil_fac[dil_facst:dil_facfi+1])
 		except:
-			dil_fac = dil_fac			
-
+			try:
+				dil_fac = dil_fac			
+			except:
+				dil_fac = 0.
 
 
 		# integrate loss of SOA due to dilution over time interval
