@@ -25,7 +25,6 @@
 # by means other than through injection
 
 import scipy.constants as si # scientific constants
-import retr_out # retrieving information
 import numpy as np # for arithmetic
 
 def cons(self, caller):
@@ -162,6 +161,14 @@ def cons(self, caller):
 		# sum for total (ug/m3)
 		SOAst = np.sum(SOA)
 
+		# get model variables file name
+		try:
+			inname = inname[::-1][0:inname[::-1].index('/')][::-1]
+		except:
+			inname = inname[::-1][0:inname[::-1].index('\\')][::-1]
+		
+		inname = str(self.dir_path + '/inputs/' + inname)	
+		
 		inputs = open(inname, mode= 'r' ) # open model variables file
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
