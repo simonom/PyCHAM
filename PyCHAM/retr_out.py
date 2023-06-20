@@ -51,7 +51,19 @@ def retr_out(self):
 			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 			self.bd_pl = 1
 		return()
-		
+
+	# output format changed in version 4 of PyCHAM to accelerate 
+	# loading of results, therefore check which version saved 
+	# the results in question and treat accordingly
+	try:
+		# if v4 of later this will work
+		load_path = str(self.dir_path + '/nom_mass.npy') # path
+		nom_mass = np.load(load_path, allow_pickle=True)
+		v4_flag = 1
+	except:
+		# if earlier than v4 then flag
+		v4_flag = 0
+
 	const = {} # create empty dictionary to hold constants
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
@@ -64,139 +76,139 @@ def retr_out(self):
 		dlist = [] # empty list to hold values
 
 		# get chemical scheme names
-		#if (str(line.split(',')[0]) == 'chem_scheme_names'):
+		if (str(line.split(',')[0]) == 'chem_scheme_names'):
 			# find index of first [ and index of last ]
-			#icnt = 0 # count on characters
-			#for i in line:
-			#	if i == '[':
-			#		st_indx = icnt
-			#		break
-			#	icnt += 1 # count on characters
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
 
-			#for cnt in range(10):
-			#	if line[-cnt] == ']':
-			#		fi_indx = -cnt+1
-			#		break
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
 
-			#comp_names = ast.literal_eval(line[st_indx:fi_indx])
-			#yield (37.)
+			comp_names = ast.literal_eval(line[st_indx:fi_indx])
+			yield (37.)
 
-		#if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
+		if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
 			# find index of first [ and index of last ]
-			#icnt = 0 # count on characters
-			#for i in line:
-			#	if i == '[':
-			#		st_indx = icnt
-			#		break
-			#	icnt += 1 # count on characters
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
 
-			#for cnt in range(10):
-			#	if line[-cnt] == ']':
-			#		fi_indx = -cnt+1
-			#		break
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
 
-			#y_MW = ast.literal_eval(line[st_indx:fi_indx])
-			#yield (7.)
-		#if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
-		#	# find index of first [ and index of last ]
-		#	icnt = 0 # count on characters
-		#	for i in line:
-		#		if i == '[':
-		#			st_indx = icnt
-		#			break
-		#		icnt += 1 # count on characters
-
-		#	for cnt in range(10):
-		#		if line[-cnt] == ']':
-		#			fi_indx = -cnt+1
-		#			break
-
-		#	MV = ast.literal_eval(line[st_indx:fi_indx])
-		#	yield (17.)
-		#if (str(line.split(',')[0]) == 'nominal_molar_mass_g/mol'):
+			y_MW = ast.literal_eval(line[st_indx:fi_indx])
+			yield (7.)
+		if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
 			# find index of first [ and index of last ]
-			#icnt = 0 # count on characters
-			#for i in line:
-			#	if i == '[':
-			#		st_indx = icnt
-			#		break
-			#	icnt += 1 # count on characters
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
 
-			#for cnt in range(10):
-			#	if line[-cnt] == ']':
-			#		fi_indx = -cnt+1
-			#		break
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
+
+			MV = ast.literal_eval(line[st_indx:fi_indx])
+			yield (17.)
+		if (str(line.split(',')[0]) == 'nominal_molar_mass_g/mol'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
 
 			# nominal molar masses (g/mol)
-			#nom_mass = ast.literal_eval(line[st_indx:fi_indx])
-			#yield (12.)
+			nom_mass = ast.literal_eval(line[st_indx:fi_indx])
+			yield (12.)
 
-		#if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
-		#	# find index of first [ and index of last ]
-		#	icnt = 0 # count on characters
-		#	for i in line:
-		#		if i == '[':
-		#			st_indx = icnt
-		#			break
-		#		icnt += 1 # count on characters
+		if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
 
-		#	for cnt in range(10):
-		#		if line[-cnt] == ']':
-		#			fi_indx = -cnt+1
-		#			break
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt+1
+					break
 
-		#	PsatPa = ast.literal_eval(line[st_indx:fi_indx])
-		#	yield (55.)
-		#if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
+			PsatPa = ast.literal_eval(line[st_indx:fi_indx])
+			yield (55.)
+		if (str(line.split(',')[0]) == 'oxygen_to_carbon_ratios_of_components'):
 			
 			# find index of first [ and index of last ]
-			#icnt = 0 # count on characters
-			#for i in line:
-			#	if line[icnt:icnt+2] == '[[':
-			#		st_indx = icnt+1
-			#		break
-			#	icnt += 1 # count on characters
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt:icnt+2] == '[[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
 
-			#for cnt in range(10):
-			#	if line[-cnt:-cnt+2] == ']]':
-			#		fi_indx = -cnt+1
-			#		break
+			for cnt in range(10):
+				if line[-cnt:-cnt+2] == ']]':
+					fi_indx = -cnt+1
+					break
 			
-			#OC = ast.literal_eval(line[st_indx:fi_indx])
-			#yield (60.)
+			OC = ast.literal_eval(line[st_indx:fi_indx])
+			yield (60.)
 
-		#if (str(line.split(',')[0]) == 'hydrogen_to_carbon_ratios_of_components'):
-		#	# find index of first [ and index of last ]
-		#	icnt = 0 # count on characters
-		#	for i in line:
-		#		if line[icnt:icnt+2] == '[[':
-		#			st_indx = icnt+1
-		#			break
-		#		icnt += 1 # count on characters
-		#
-		#	for cnt in range(10):
-		#		if line[-cnt:-cnt+2] == ']]':
-		#			fi_indx = -cnt+1
-		#			break
-		#
-		#	HC = ast.literal_eval(line[st_indx:fi_indx])
-		#	yield (65.)	
-
-		#if (str(line.split(',')[0]) == 'SMILES'):
+		if (str(line.split(',')[0]) == 'hydrogen_to_carbon_ratios_of_components'):
 			# find index of first [ and index of last ]
-			#icnt = 0 # count on characters
-			#for i in line:
-			#	if line[icnt] == '[':
-			#		st_indx = icnt
-			#		break
-			#	icnt += 1 # count on characters
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt:icnt+2] == '[[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+		
+			for cnt in range(10):
+				if line[-cnt:-cnt+2] == ']]':
+					fi_indx = -cnt+1
+					break
+		
+			HC = ast.literal_eval(line[st_indx:fi_indx])
+			yield (65.)	
 
-			#for cnt in range(10):
-			#	if line[-cnt:] == ']':
-			#		fi_indx = -cnt+1
-			#		break
-			#rel_SMILES = ast.literal_eval(line[st_indx:fi_indx])
-			#yield (42.)
+		if (str(line.split(',')[0]) == 'SMILES'):
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if line[icnt] == '[':
+					st_indx = icnt
+					break
+				icnt += 1 # count on characters
+
+			for cnt in range(10):
+				if line[-cnt:] == ']':
+					fi_indx = -cnt+1
+					break
+			rel_SMILES = ast.literal_eval(line[st_indx:fi_indx])
+			yield (42.)
 
 		# get indices of organic peroxy radicals
 		if (str(line.split(',')[0]) == 'organic_peroxy_radical_index'):		
@@ -339,7 +351,7 @@ def retr_out(self):
 
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
-		
+	
 	# extract required data from dictionary, note this prepared above
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
 	num_comp = int((const['number_of_components'])[0]) # number of components
@@ -351,31 +363,30 @@ def retr_out(self):
 	H2Oi = int((const['index_of_water'])[0]) # index of water
 	
 	seedi = const['index_of_seed_components'] # index of seed components
-	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
-	
-	load_path = str(self.dir_path + '/nom_mass.npy') # path
-	nom_mass = np.load(load_path, allow_pickle=True)
+	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']	
 
-	load_path = str(self.dir_path + '/y_mw.npy') # path
-	y_MW = np.load(load_path, allow_pickle=True)
+	if v4_flag == 1: # if results in question saved in version 4 or later
 
-	load_path = str(self.dir_path + '/MV.npy') # path
-	MV = np.load(load_path, allow_pickle=True)
-	
-	load_path = str(self.dir_path + '/comp_namelist.npy') # path
-	comp_names = (np.load(load_path, allow_pickle=True)).tolist()
-	
-	load_path = str(self.dir_path + '/rel_SMILES.npy') # path
-	rel_SMILES = (np.load(load_path, allow_pickle=True)).tolist()
-	
-	load_path = str(self.dir_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
-	PsatPa = (np.load(load_path, allow_pickle=True)).tolist()
-	
-	load_path = str(self.dir_path + '/oxygen_to_carbon_ratios_of_components.npy') # path
-	OC = (np.load(load_path, allow_pickle=True)).tolist()
+		load_path = str(self.dir_path + '/y_mw.npy') # path
+		y_MW = np.load(load_path, allow_pickle=True)
 
-	load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
-	HC = (np.load(load_path, allow_pickle=True)).tolist()
+		load_path = str(self.dir_path + '/MV.npy') # path
+		MV = np.load(load_path, allow_pickle=True)
+		
+		load_path = str(self.dir_path + '/comp_namelist.npy') # path
+		comp_names = (np.load(load_path, allow_pickle=True)).tolist()
+		
+		load_path = str(self.dir_path + '/rel_SMILES.npy') # path
+		rel_SMILES = (np.load(load_path, allow_pickle=True)).tolist()
+		
+		load_path = str(self.dir_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
+		PsatPa = (np.load(load_path, allow_pickle=True)).tolist()
+		
+		load_path = str(self.dir_path + '/oxygen_to_carbon_ratios_of_components.npy') # path
+		OC = (np.load(load_path, allow_pickle=True)).tolist()
+
+		load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
+		HC = (np.load(load_path, allow_pickle=True)).tolist()
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]

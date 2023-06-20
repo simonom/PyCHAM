@@ -4471,7 +4471,7 @@ class PyCHAM(QWidget):
 		# filler for original starter simulation name
 		starter_name0 = 'fill'
 
-		if (self.param_const['sim_num'] == 'set'):
+		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'finisher'):
 			
 			# loop through starter simulations
 			for starteri in range(len(param_range['starter_paths'])):
@@ -4497,17 +4497,24 @@ class PyCHAM(QWidget):
 
 				if ('loJ' in starter_name):
 					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_loJ')
+				if ('meJ' in starter_name):
+					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_meJ')
 				if ('hiJ' in starter_name):
 					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_hiJ')
 		
 				if ('loT' in starter_name):
 					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loT')
-					if ('hiT' in starter_name0):
+					if ('loT' not in starter_name0):
+						# if temperature changes, need to renew property estimation 
+						self.param_const['pars_skip'] = 0
+				if ('meT' in starter_name):
+					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meT')
+					if ('meT' not in starter_name0):
 						# if temperature changes, need to renew property estimation 
 						self.param_const['pars_skip'] = 0
 				if ('hiT' in starter_name):
 					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiT')
-					if ('loT' in starter_name0):
+					if ('hiT' not in starter_name0):
 						# if temperature changes, need to renew property estimation 
 						self.param_const['pars_skip'] = 0
 
@@ -4523,7 +4530,6 @@ class PyCHAM(QWidget):
 				# set influx rate for methane and carbon monoxide (ppb/s)
 				self.param_const['Cinfl'] = np.zeros((len(const_influxers)))
 
-
 				if 'loCH4' in starter_name:
 					# get index for methane
 					CH4indx = const_influxers.index('CH4')
@@ -4532,14 +4538,21 @@ class PyCHAM(QWidget):
 					COindx = const_influxers.index('CO')
 					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][0]
 
+				if 'meCH4' in starter_name:
+					# get index for methane
+					CH4indx = const_influxers.index('CH4')
+					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][1]	
+					# get index for carbon monoxide
+					COindx = const_influxers.index('CO')
+					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][1]
 
 				if 'hiCH4' in starter_name:
 					# get index for methane
 					CH4indx = const_influxers.index('CH4')
-					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][1]
+					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][2]
 					# get index for carbon monoxide
 					COindx = const_influxers.index('CO')
-					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][1]
+					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][2]
 		
 				# get alpha-pinene index
 				APindx = const_influxers.index('APINENE')
@@ -4556,39 +4569,202 @@ class PyCHAM(QWidget):
 					if (iap == 0):
 						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loAP')
 					if (iap == 1):
+						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meAP')
+					if (iap == 2):
 						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiAP')
+					
+					# loop through benzene influxes
 					for ibz in range(len(param_range['Cinfl'][BZindx])):
 						self.param_const['Cinfl'][BZindx] = param_range['Cinfl'][BZindx][ibz]
 						self.param_const['Cinfl'][NOindx] = param_range['Cinfl'][NOindx][ibz]
 						self.param_const['Cinfl'][NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
 						if (ibz == 0):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ_nint')
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
 						if (ibz == 1):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ_nint')	
-
-						# establish parameters provided by user by calling mod_var_read
-						import mod_var_read
-						mod_var_read.mod_var_read(self)
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meBZ')
+						if (ibz == 2):
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ')	
+						# finally, either add (no interaction) or exclude (interaction) 
+						# nint label from results save name
+						if ('nint' in self.param_const['sch_name']):
+							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_nint')
 						
-						self.on_click2() # assign chemical scheme
-						self.on_click3() # assign xml file
-						self.on_click4() # provide model variables label
-						
-						self.on_click81sing() # run simulation
+						if os.path.exists(self.param_const['res_file_name']):
+							print('already exists!')
+						else:
+							# establish parameters provided by user by calling mod_var_read
+							import mod_var_read
+							mod_var_read.mod_var_read(self)
+							
+							self.on_click2() # assign chemical scheme
+							self.on_click3() # assign xml file
+							self.on_click4() # provide model variables label
+							
+							self.on_click81sing() # run simulation
+							# ensure that after the first call parsing and property estimation is skipped 
+							self.param_const['pars_skip'] = 1
 
 						# remove benzene tag, ready for new one
 						if 'nint' in self.param_const['res_file_name']:
-							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-10]						
+							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-10]
 						else:
 							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
 
-						# ensure that after the first call parsing and property estimation is skipped 
-						self.param_const['pars_skip'] = 1
-
-
 					# reset saving name to original
-					self.param_const['res_file_name'] = res_file_name0 
+					self.param_const['res_file_name'] = res_file_name0
+		
+		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'starter'):
 
+			# loop through light flux
+			for Ji in range(len(param_range['trans_fac'])):
+				
+				# reset results save name
+				res_name = '' 
+				self.param_const['trans_fac'] = param_range['trans_fac'][Ji]
+
+				if (Ji == 0):
+					res_name = 'loJ' 
+				if (Ji == 1):
+					res_name = 'meJ'
+				if (Ji == 2):
+					res_name = 'hiJ' 
+
+				# prepare for starting concentrations
+				C0_0 = np.zeros((len(self.param_const['Comp0'].split(','))))
+				# prepare for influxes
+				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))*2))
+				
+				# loop through NOx emission
+				for Ni in range(len(param_range['Cinfl'][0])):
+				
+					# reset results name to just the lighting part
+					res_name = res_name[0:3]
+
+					# index for NO starting concentration in supplied values
+					NOi = self.param_const['Comp0'].split(',').index('NO')
+					# NO starting concentration (ppb)
+					C0_0[NOi] = param_range['C0'][NOi][Ni]
+
+					# index for NO influx in supplied values
+					NOi = self.param_const['const_infl'].split(',').index('NO')
+					# NO emission rate (ppb/s)
+					Cinfl_0[NOi*2] = param_range['Cinfl'][NOi][Ni]
+
+					# index for NO2 starting concentration in supplied values
+					NO2i = self.param_const['Comp0'].split(',').index('NO2')
+					# NO2 starting concentration (ppb)
+					C0_0[NO2i] = param_range['C0'][NO2i][Ni]
+
+					# index for NO2 in supplied values
+					NO2i = self.param_const['const_infl'].split(',').index('NO2')
+					# NO emission rate (ppb/s)
+					Cinfl_0[NO2i*2] = param_range['Cinfl'][NO2i][Ni]
+
+					if (Ni == 0):
+						res_name = str(res_name  + '_loNOx')
+					if (Ni == 1):
+						res_name = str(res_name  + '_meNOx')
+					if (Ni == 2):
+						res_name = str(res_name  + '_hiNOx')
+
+					# loop through CH4 and CO emission
+					for Ci in range(len(param_range['Cinfl'][0])):
+						
+						# reset results name to the lighting and NOx part
+						res_name = res_name[0:9]
+						
+						# index for CH4 starting concentration in supplied values
+						CH4i = self.param_const['Comp0'].split(',').index('CH4')
+						# CH4 starting concentration (ppb)
+						C0_0[CH4i] = param_range['C0'][CH4i][Ci]
+
+						# index for CH4 in supplied values
+						CH4i = self.param_const['const_infl'].split(',').index('CH4')
+						# CH4 emission rate (ppb/s)
+						Cinfl_0[CH4i*2] = param_range['Cinfl'][CH4i][Ci]
+
+						# index for CO starting concentration in supplied values
+						COi = self.param_const['Comp0'].split(',').index('CO')
+						# CO starting concentration (ppb)
+						C0_0[COi] = param_range['C0'][COi][Ci]
+
+						# index for CO in supplied values
+						COi = self.param_const['const_infl'].split(',').index('CO')
+						# CO emission rate (ppb/s)
+						Cinfl_0[COi*2] = param_range['Cinfl'][COi][Ci]
+										
+						if (Ci == 0):
+							res_name = str(res_name  + '_loCH4') 
+						if (Ci == 1):
+							res_name = str(res_name  + '_meCH4')
+						if (Ci == 2):
+							res_name = str(res_name  + '_hiCH4')
+						
+						for ti in range(len(param_range['temperature'])):
+
+							# reset results name to the lighting, NOx and CH4 part
+							res_name = res_name[0:15]
+
+							self.param_const['temperature'] = param_range['temperature'][ti]
+							if (ti == 0):
+								res_name = str(res_name + '_loT') 
+							if (ti == 1):
+								res_name = str(res_name + '_meT')
+							if (ti == 2):
+								res_name = str(res_name + '_hiT')
+						
+							save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\\'
+							# check if this result already present
+							print(str(save_path_start + res_name))
+							
+							# set results path
+							self.param_const['res_file_name'] = str(save_path_start + res_name)
+
+							if os.path.exists(self.param_const['res_file_name']):
+								print('already exists!')
+								continue
+							
+							# ensure correct format for mod_var_read
+							self.param_const['C0'] = ''
+						
+							for i in C0_0:
+								if i == '[' or i == ']':
+									continue
+								if i == ' ':
+									continue
+								self.param_const['C0'] = str(self.param_const['C0'] + str(i) + ', ')
+							if self.param_const['C0'][-2::] == ', ':
+								self.param_const['C0'] = self.param_const['C0'][0:-2] 	
+							self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
+							# loop through characters, replacing odd white spaces with , 
+							# (times) and even white spaces with ; (components)
+							cci = 1
+							cc_all = -1
+							for ccn in self.param_const['Cinfl']: # loop through characters
+								cc_all += 1
+								if (ccn == ' ' and cci % 2. > 0.):
+									
+									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+','+self.param_const['Cinfl'][cc_all+1::])
+									cci += 1
+									continue
+								if (ccn == ' ' and cci % 2. < 1.):
+									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
+									cci += 1
+									continue
+							
+							# establish parameters provided by user by calling mod_var_read
+							import mod_var_read
+							mod_var_read.mod_var_read(self)
+							
+							self.on_click2() # assign chemical scheme
+							self.on_click3() # assign xml file
+							self.on_click4() # provide model variables label
+							
+							self.on_click81sing() # run simulation
+						
+							# ensure that after first simulation equation parsing is skipped
+							self.param_const['pars_skip'] = 1
+							
 		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int):
 	
 			# prepare for randomness
@@ -4663,16 +4839,6 @@ class PyCHAM(QWidget):
 
 					param_range['starter_paths'] = [] # prepare to list starter folders
 					starter_names = [] # just the folder name
-
-					starter_path = str(os.getcwd() + '/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme')
-
-					# get names of all folders in working folder
-					all_folders = [item for item in os.listdir(starter_path)]
-		
-					for all_foldi in all_folders:
-						if 'ambient_run_num' in all_foldi:
-								param_range['starter_paths'].append(str(starter_path + '/' + all_foldi))			
-								starter_names.append(all_foldi)
 
 					# loop through starter simulations
 					for starteri in range(len(param_range['starter_paths'])):

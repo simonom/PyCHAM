@@ -241,8 +241,8 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		col_tracker = np.unique(self.rindx_su)
 		# track rows affected per column
 		row_tracker = np.ones((max(self.nreac_su+self.nprod_su), len(col_tracker)))*-1.
-		# note that size bins are dealt with below loops
-		for eqni in range(self.eqn_num[2]): # loop through reactions
+		# note that surfaces are dealt with below loops
+		for eqni in range(self.eqn_num[2]): # loop through surface reactions
 			# total number of components affected per reactant
 			tot_affcomp = self.nreac_su[eqni]+self.nprod_su[eqni]
 			# combined index of reactants and products in this equation
@@ -262,19 +262,22 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, coli]!=-1], totindx))
 				row_tracker[0:len(unirow), coli] = unirow.reshape(-1, 1)
 
-		# account for the the gas-phase and particle Jacobian indices
-		row_tracker[row_tracker != -1] += (comp_num+2) + (comp_num+2)*num_asb
+		# account for the any particle Jacobian indices (note that gas-phase 
+		# Jacobian already accounted for in self.rindx_su and self.pindx_su)
+		row_tracker[row_tracker != -1] += (comp_num+2)*num_asb
 		# flatten ready for appendage
 		row_trackerf = row_tracker.flatten(order='F')
 		# append to rowvals
 		rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
+		
 		# sum number of unique rows affected per component
 		col_num = (row_tracker != -1).sum(axis = 0)
-		# account for new rows in first size bin, add 1 to index because this represents the
+		# account for new rows in first surface, add 1 to index because this represents the
 		# number of elements per component
-		colptrs[col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1] += np.cumsum(col_num)
+		colptrs[col_tracker+((comp_num+2) + (comp_num+2)*(num_asb-1))+1] += np.cumsum(col_num)
+		
 		# ensure latter inidices are consistent 
-		colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1)::] = colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1)] 
+		colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*(num_asb-1))+1)::] = colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*(num_asb-1))+1)] 
 
 		# because above jac_indx_su contains the indices of data assuming
 		# a full, rather than sparse matrix, now correct to affect
@@ -319,6 +322,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	
 	if (self.eqn_num[2] == 0):
 		self.jac_indx_su = np.zeros((1)) # filler
+	
 	
 	# particle partitioning influence on Jacobian part -------------------------------------------------
 	# loop through jacobian index to check whether the centre 

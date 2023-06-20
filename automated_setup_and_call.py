@@ -50,7 +50,7 @@ param_const['pars_skip'] = 0 # need to parse equations and estimate properties o
 
 # state path to chemical scheme and xml files
 if sys.platform == 'win32':
-	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_nint_scheme.dat'
+	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
 	param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 
 if sys.platform == 'darwin':
@@ -65,7 +65,7 @@ if (param_const['sim_type'] == 'starter'): # 24 hours (8.64e4s) spin up
 	param_const['total_model_time'] = 8.64e4
 	param_const['update_step'] = 6.e2
 	param_const['recording_time_step'] = 3.6e3
-	param_const['light_status'] = 2 # sinusoidal light
+	param_const['light_status'] = 1 # set to 2 for sinusoidal light, 1 for constant light
 
 # at 38o North (Athens, Greece), http://www.csgnetwork.com/degreelenllavcalc.html says that
 # 1o longitude is 9e4 m and 1o latitude is 1e5 m, 
@@ -85,10 +85,10 @@ param_const['light_time'] = 0.
 # 12km altitude cloud-free solar actinic flux spectrum from Greece in June: https://doi.org/10.1029/2001JD900142
 param_const['act_flux_path'] = 'Greece_obs_doi_10dot10292001JD900142.csv'
 # affects all wavelengths
-param_range['trans_fac'] = [0.1, 1.]
+param_range['trans_fac'] = [0.1, 0.55, 1.]
 
 # minimum temperature and relative humidity ranges given by Porter et al. 2021 (doi.org/10.1021/acsearthspacechem.1c00090)
-param_range['temperature'] = [273.15, 313.15]
+param_range['temperature'] = [273.15, 293.15, 313.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
 param_const['rh'] = [0.50]
@@ -125,12 +125,11 @@ benzC = OHreac/(2.3e-12*np.exp(-190/max(param_range["temperature"]))*0.352)/Cfac
 # the components to keep at constant concentration throughout the simulation
 #param_const['const_comp'] = 'CH4, CO'
 
-# if starting a simulation, components will undergo an influx 
-# during the first hour to allow spin-up, so can start at zero
+# the range of starting concentrations for starter simulations 
 if (param_const['sim_type'] == 'starter'):
-	# the components present at the start of the simulation
-	param_const['Comp0'] = 'APINENE, BENZENE, CH4, CO, NO2, NO, SO2'
-	param_const['C0'] = '0., 0., 0., 0., 0., 0., 0.'
+	# the components present at the start of the simulation, note do not leave white space
+	param_const['Comp0'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
+	param_range['C0'] = [[0.], [0.], [3.e2,1.*10**2.9,2.e3], [1.5,1.*10.**1.2,1.5e2], [1.e-2,1.e0,1.e2], [1.e-2,1.e0,1.e2], [0.]]
 
 # if finishing a simulation, we want to use the end 
 # result of the starter simulation as initial concentration
@@ -159,12 +158,13 @@ if (param_const['sim_type'] == 'finisher'):
 	
 	for path in dirlist: # loop through objects in this directory
 		
-		if (path[-9::] == '.DS_Store'): # ignore any .DS_Store folders 	
+		if (path[-9::] == '.DS_Store' or path[-7::] == 'lab_sim'): # ignore any irrelevant folders 	
 			continue
 		# extract initial concentrations in gas-phase (ppb)
 		# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
 		fname = str(init_conc_path + path + '/concentrations_all_components_all_times_gas_particle_wall')
 		# note, just keep results from final time
+		print(fname)
 		y = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
 		# convert gas-phase concentration from ppb to # molecules/cm3
@@ -237,7 +237,7 @@ param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
 #param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
 
 
-param_range['Cinfl'] = [[1.e-5, 1.e-2], [benzC*1.e-7, benzC*1.e-4], [1.e-7, 1.e-6], [1.e-12, 1.e-10], [1.e-6, 2.e-3], [1.e-6, 2.e-3], [0., 0.]]
+param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 2.e-3], [1.e-6, 1.*10.**-4.3, 2.e-3], [0., 0.]]
 
 # time over which influx of components occurs
 if (param_const['sim_type'] == 'starter'):

@@ -84,12 +84,9 @@ def mod_var_read(self):
 		if type(self.param_const) == dict:
 			in_list = [] # prepare list
 			for key, value in self.param_const.items(): # loop through supplied parameters
-				if str(key) == 'Cinfl':
-					value = (str(value)).strip('[').strip(']')
-					in_list.append(str(str(key) + ' = ' + value.replace(' ', '; ')))
-				else:
-					in_list.append(str(str(key) + ' = ' + str(value)))
-			
+				# if no editing needed, then just append
+				in_list.append(str(str(key) + ' = ' + str(value)))
+		
 		self.bd_st = 3 # change border/error message status to ready for change
 		# default value for number of modes represented by particle number concentration
 		pmode_cnt = 1
@@ -685,7 +682,7 @@ def mod_var_read(self):
 		# but just one mode given for the particle number size distribution
 		if (num_sb > 1 and pmode_cnt == 1):
 			pmode = 0 # modal particle concentrations
-		
+	
 		# prepare for pickling
 		list_vars = [sav_nam, comp0, y0, Press, 
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
