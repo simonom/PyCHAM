@@ -56,7 +56,7 @@ def middle(self): # define function
 		chamSA, chamV] = ui.share(self)
 	
 	
-
+	
 	if (self.pars_skip == 0): # if not skipping parsing of chemical scheme
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
@@ -65,7 +65,7 @@ def middle(self): # define function
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
 		pcont, self)
-	
+		
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, jac_wall_indx, 
 		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
@@ -128,7 +128,7 @@ def middle(self): # define function
 	
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
-	
+		
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 

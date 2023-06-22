@@ -1788,13 +1788,7 @@ class PyCHAM(QWidget):
 		self.b290_aa = QPushButton('PDF graph', self)
 		self.b290_aa.setToolTip('Plot the probability distribution function causing mass:charge resolution')
 		self.b290_aa.clicked.connect(self.on_click290_aa)
-		self.CIMSscrolllayout.addWidget(self.b290_aa, 0, 1)
-		
-		# button to plot probability distribution function demonstrating mass:charge resolution
-		self.b290_aaa = QPushButton('Save in CIMS form', self)
-		self.b290_aaa.setToolTip('Save the results in CIMS format at all time steps')
-		self.b290_aaa.clicked.connect(self.on_click290_aaa)
-		self.CIMSscrolllayout.addWidget(self.b290_aaa, 4, 1)
+		self.CIMSscrolllayout.addWidget(self.b290_aa, 0, 1)	
 
 		# button to plot sensitivity dependence on molar mass
 		self.b290_a = QPushButton('Sensitivity', self)
@@ -1802,12 +1796,32 @@ class PyCHAM(QWidget):
 		self.b290_a.clicked.connect(self.on_click290_a)
 		self.CIMSscrolllayout.addWidget(self.b290_a, 3, 1)
 	
+		# drop-down button to select linear or logarithmic y-axis	
+		self.b290_ab = QComboBox(self)
+		self.b290_ab.addItem('Linear y')
+		self.b290_ab.addItem('Logarithmic y')	
+		self.b290_ab.setToolTip('Select whether to have a linear or logarithmic spacing on the CIMS y-axis')	
+		self.CIMSscrolllayout.addWidget(self.b290_ab, 4, 0)	
+
+		# drop-down button to select histogram or markers	
+		self.b290_abb = QComboBox(self)
+		self.b290_abb.addItem('Bars')
+		self.b290_abb.addItem('Markers')	
+		self.b290_abb.setToolTip('Select whether to have histogram or markers layout')	
+		self.CIMSscrolllayout.addWidget(self.b290_abb, 4, 1)
+
 		# button to plot mass spectrum
 		self.b290 = QPushButton('CIMS observations', self)
 		self.b290.setToolTip('Plot the mass spectrum as observed by a chemical ionisation mass spectrometer')
 		self.b290.clicked.connect(self.on_click290)
-		self.CIMSscrolllayout.addWidget(self.b290, 4, 0)
+		self.CIMSscrolllayout.addWidget(self.b290, 5, 0)
 		
+		# button to save output in CIMS form
+		self.b290_aaa = QPushButton('Save in CIMS form', self)
+		self.b290_aaa.setToolTip('Save the results in CIMS format at all time steps')
+		self.b290_aaa.clicked.connect(self.on_click290_aaa)
+		self.CIMSscrolllayout.addWidget(self.b290_aaa, 5, 1)
+
 		# properties of CIMS scroll area ----------------
 		self.scrollwidget.setLayout(self.CIMSscrolllayout)
 		self.scroll.setWidget(self.scrollwidget)

@@ -589,5 +589,5 @@ def ui_check(self):
 		
 	import mod_var_up # update displayed model variables in case checking has modified any
 	mod_var_up.mod_var_up(self)
-
+	
 	return()

@@ -746,7 +746,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			# number of reactants in this equation
 			nreac[eqn_step] = int(reactant_step)
 		
-			# record 1D array of stoichiometries per equation
+			# record 1D array of stoichiometries per equation	
 			rstoi_flat = np.append(rstoi_flat, rstoi[eqn_step, 0:int(reactant_step)])
 		
 			# right hand side of equations (gains)
@@ -906,5 +906,5 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			self.jac_den_indx_su = jac_den_indx.astype(int)
 			self.njac_su = njac.astype(int)
 			self.jac_indx_su = jac_indx.astype(int)
-
+	
 	return(comp_list, Pybel_objects, comp_num, self)

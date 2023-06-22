@@ -81,12 +81,11 @@ def extr_mech(int_tol, num_sb,
 	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
 
 	# get equation information for chemical reactions
-	[comp_list, Pybel_objects, comp_num, self] = eqn_interr.eqn_interr(comp_name, comp_smil, num_sb, self)                                                        
-	
+	[comp_list, Pybel_objects, comp_num, self] = eqn_interr.eqn_interr(comp_name, comp_smil, num_sb, self)                                                        	
 	# prepare aqueous-phase and surface (e.g. wall) reaction matrices for applying to reaction rate calculation
 	if (self.eqn_num[1] > 0 or self.eqn_num[2] > 0): # if aqueous-phase or surface (e.g. wall) reactions present
 		[] = aq_mat_prep.aq_mat_prep(num_sb, comp_num, self)                                                  
-
+	
 	# if particle-phase equations are provided by particles not turned on then raise an error
 	if (self.eqn_num[1] > 0 and num_sb-self.wall_on == 0):
 		erf = 1 # raise error

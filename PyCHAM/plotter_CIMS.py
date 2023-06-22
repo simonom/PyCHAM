@@ -125,9 +125,23 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
-	ax0.semilogy(mm_all, gpres, '+m', markersize = 14, markeredgewidth = 5,  label = str('gas-phase'))
-	ax0.semilogy(mm_all, ppres, 'xb', markersize = 14, markeredgewidth = 5, label = str('particle-phase'))
+	if (self.b290_abb.currentText()[0:4] == 'Bars'):	 
+			
+		ax0.stairs(gpres, [0.5]+(mm_all+0.5).tolist(), color = 'm',  label = str('gas-phase'))
+		ax0.stairs(ppres, [0.5]+(mm_all+0.5).tolist(), color = 'b', label = str('particle-phase'))
+			
+		if (self.b290_ab.currentText()[0:3] == 'Log'):	
+			ax0.set_yscale('log')
 	
+	if (self.b290_abb.currentText()[0:7] == 'Markers'):
+
+		if (self.b290_ab.currentText()[0:3] == 'Lin'):
+			ax0.plot(mm_all, gpres, '+m', markersize = 14, markeredgewidth = 5,  label = str('gas-phase'))
+			ax0.plot(mm_all, ppres, 'xb', markersize = 14, markeredgewidth = 5, label = str('particle-phase'))
+		if (self.b290_ab.currentText()[0:3] == 'Log'):
+			ax0.semilogy(mm_all, gpres, '+m', markersize = 14, markeredgewidth = 5,  label = str('gas-phase'))
+			ax0.semilogy(mm_all, ppres, 'xb', markersize = 14, markeredgewidth = 5, label = str('particle-phase'))	
+
 	ax0.set_title(str('Mass spectrum at ' + str(timehr[ti]) + ' hours'), fontsize = 14)
 	ax0.set_xlabel(r'Mass/charge (Th)', fontsize = 14)
 	ax0.set_ylabel(r'Concentration (ppt)', fontsize = 14)

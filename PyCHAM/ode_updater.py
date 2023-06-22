@@ -573,7 +573,7 @@ def ode_updater(y, H2Oi,
 				jac_part_indxn, jac_extr_indx,
 				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
-		
+			
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
