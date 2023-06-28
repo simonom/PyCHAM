@@ -1,4 +1,4 @@
-##########################################################################################
+
 #                                                                                        											 #
 #    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
@@ -61,14 +61,14 @@ def middle(self): # define function
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
 		[rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		jac_part_indx, jac_extr_indx, comp_num, 
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
 		pcont, self)
 		
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		jac_part_indx, jac_extr_indx, comp_num, 
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, 
 		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 	
@@ -85,10 +85,9 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self, 
-	rel_SMILES] = init_conc.init_conc(comp_num, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
 	comp0, y0, Pnow, Pybel_objects, 0, pconc, self.eqn_num[0], Compt, seed_name,
-	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self)
+	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, self)
 
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
@@ -98,7 +97,7 @@ def middle(self): # define function
 	
 	if (self.pars_skip == 0): # if not skipping component properties
 		# get component properties
-		[self, err_mess, erf] = prop_calc.prop_calc(rel_SMILES, Pybel_objects, 
+		[self, err_mess, erf] = prop_calc.prop_calc(Pybel_objects, 
 			H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 			uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
 			seed_name, y_mw, tempt_cnt, self)
@@ -144,7 +143,7 @@ def middle(self): # define function
 		uppsize, std, rbou, MV,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
-		rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
+		rbou00, ub_rad_amp, indx_plot, comp0,
 		wat_hist, Pybel_objects, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):

@@ -32,8 +32,7 @@ import pickle
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
 	time_taken, seed_name, x2, rbou_rec, space_mode, rbou00, upper_bin_rad_amp, 
-	indx_plot, comp0, rel_SMILES, H2Oi,
-	siz_str, cham_env, self):
+	indx_plot, comp0, H2Oi, siz_str, cham_env, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	
@@ -74,7 +73,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	#	size bin (# molecules/cm3)
 	# self.sch_name - path to chemical scheme file
 	# self.inname - path to model variables file
-	# rel_SMILES - SMILES strings for components in chemical scheme
+	# self.rel_SMILES - SMILES strings for components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K (Pa)
 	# self.OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
@@ -145,11 +144,12 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	#const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(y_mw[:, 0]).tolist())
 	#const["nominal_molar_mass_g/mol"] = self.nom_mass.tolist()
 	#const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
-	const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
-	const["organic_alkoxy_radical_index"] = self.RO_indx
-	const["organic_HOM_peroxy_radical_index"] = self.aoRO2_indx
+	#const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
+	#const["organic_alkoxy_radical_index"] = self.RO_indx
+	#const["organic_HOM_peroxy_radical_index"] = self.HOMRO2_indx
+	#const["organic_HOMs_index"] = self.HOMs_indx	
 	#const["chem_scheme_names"] = self.comp_namelist
-	#const["SMILES"] = rel_SMILES
+	#const["SMILES"] = self.rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = seed_name
@@ -168,7 +168,6 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
 
-	# testing area starts --------------------------------------------------------
 	# save
 	save_path = str(output_by_sim + '/nom_mass') # path
 	np.save(save_path, self.nom_mass, allow_pickle=True)
@@ -182,8 +181,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	save_path = str(output_by_sim + '/comp_namelist') # path
 	np.save(save_path, self.comp_namelist, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/rel_SMILES') # path
-	np.save(save_path, rel_SMILES, allow_pickle=True)
+	save_path = str(output_by_sim + '/self.rel_SMILES') # path
+	np.save(save_path, self.rel_SMILES, allow_pickle=True)
 
 	save_path = str(output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
 	np.save(save_path, self.Psat_Pa_rec, allow_pickle=True)
@@ -194,7 +193,42 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	save_path = str(output_by_sim + '/hydrogen_to_carbon_ratios_of_components') # path
 	np.save(save_path, self.HC, allow_pickle=True)
 
-	# testing area finishes ------------------------------------------------------
+	save_path = str(output_by_sim + '/OOH_index') # path
+	np.save(save_path, self.OOH, allow_pickle=True)
+ 
+	save_path = str(output_by_sim + '/HOM_OOH_index') # path
+	np.save(save_path, self.HOM_OOH, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/OH_index') # path
+	np.save(save_path, self.OH, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/HOM_OH_index') # path
+	np.save(save_path, self.HOM_OH, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/carbonyl_index') # path
+	np.save(save_path, self.carbonyl, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/HOM_carbonyl_index') # path
+	np.save(save_path, self.HOM_carbonyl, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/NO3_index') # path
+	np.save(save_path, self.NO3, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/HOM_NO3_index') # path
+	np.save(save_path, self.HOM_NO3, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/organic_peroxy_radical_index') # path
+	np.save(save_path, self.RO2_indices[:, -1], allow_pickle=True)	
+	
+	save_path = str(output_by_sim + '/organic_alkoxy_radical_index') # path
+	np.save(save_path, self.RO_indx, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/organic_HOM_peroxy_radical_index') # path
+	np.save(save_path, self.HOM_RO2_indx, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/organic_HOMs_index') # path
+	np.save(save_path, self.HOMs_indx, allow_pickle=True)
+	
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
@@ -302,10 +336,44 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# store group indices as in retr_out
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
-	group_indx['RO2i'] = const['organic_peroxy_radical_index']
-	group_indx['ROi'] = const['organic_alkoxy_radical_index']
-	group_indx['HOMRO2'] = const['organic_HOM_peroxy_radical_index']
-	
+
+	group_indx['OOH'] = self.OOH
+	group_indx['HOM_OOH'] = self.HOM_OOH
+	group_indx['OH'] = self.OH
+	group_indx['HOM_OH'] = self.HOM_OH
+	group_indx['carbonyl'] = self.carbonyl
+	group_indx['HOM_carbonyl'] = self.HOM_carbonyl
+	group_indx['NO3'] = self.NO3
+	group_indx['HOM_NO3'] = self.HOM_NO3
+	group_indx['RO2i'] = self.RO2_indices[:, -1]
+	group_indx['ROi'] = self.RO_indx
+	group_indx['HOMRO2'] = self.aoRO2_indx 
+	group_indx['HOMs'] = self.HOMs_indx 
+	print('RO')
+	print(self.RO_indx)
+	print('RO2')
+	print(self.RO2_indices[:, -1])
+	print('HOMRO2')
+	print(self.aoRO2_indx)
+	print('HOMs')
+	print(self.HOMs_indx)
+	print('OOH')
+	print(self.OOH)
+	print('HOM_OOH')
+	print(self.HOM_OOH)
+	print('OH')
+	print(self.OH)
+	print('HOM_OH')
+	print(self.HOM_OH)
+	print('carbonyl')
+	print(self.carbonyl)
+	print('HOM_carbonyl')
+	print(self.HOM_carbonyl)
+	print('NO3')
+	print(self.NO3)
+	print('HOM_NO3')
+	print(self.HOM_NO3)	
+
 	if ((numsb-self.wall_on) == 0): # if zero size bins
 		# ensure numpy arrays, rather than float
 		Nresult_wet = (np.array((Nresult_wet))).reshape(-1, 1)
@@ -335,7 +403,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		rad = rbou_rec
 		cen_size = x2
 		thr = t_out/3600.
-		rSMILES = rel_SMILES
+		rSMILES = self.rel_SMILES
 		comp_MW = y_mw
 		Nrec_wet = Nresult_wet
 		names_of_comp = self.comp_namelist

@@ -28,7 +28,6 @@ import sch_interr
 import xml_interr
 import eqn_interr
 import photo_num
-import RO2_indices
 import write_dydt_rec
 import write_ode_solv
 import write_rate_file
@@ -233,12 +232,6 @@ def extr_mech(int_tol, num_sb,
 	# relative humidities as a function of temperature
 	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 	
-	# get index of components in the peroxy radical list
-	self = RO2_indices.RO2_indices(RO2_names, self)
-	
-	# get index of HOM-RO2 radicals
-	self = RO2_indices.HOMRO2_indices(self)
-	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
 
@@ -249,5 +242,5 @@ def extr_mech(int_tol, num_sb,
 	self.comp_xmlname = comp_name; self.comp_smil = comp_smil
 
 	return(rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, comp_list, 
+		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, 
 		Pybel_objects, Jlen, comp_name, comp_smil, erf, err_mess, self)

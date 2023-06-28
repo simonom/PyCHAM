@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)'''
 # module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2023-06-22 16:31:05.785450
+# File Created at 2023-06-23 10:47:59.724292
 
 import numpy as np
 

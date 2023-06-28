@@ -34,16 +34,17 @@ import scipy.constants as si
 import errno
 import stat
 from water_calc import water_calc
+import group_indices
 
-def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
+def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
 			volP, testf, corei, pconc, umansysprop_update, core_dens,
 			ode_gen_flag, nuci, nuc_comp, dens_comp, dens, seed_name,
 			y_mw, tempt_cnt, self):
 
 	# inputs: ------------------------------------------------------------
-	# rel_SMILES - array of SMILE strings for components 
+	# self.rel_SMILES - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# Pybel_objects - list of Pybel objects representing the components in rel_SMILES
+	# Pybel_objects - list of Pybel objects representing the components in self.rel_SMILES
 	# (omitting water and core, if present)
 	# self.TEMP - temperature (K) in chamber at all times
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
@@ -124,8 +125,25 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HC = np.zeros((1, num_comp))
 	# nominal molar mass of components
 	self.nom_mass = np.zeros((1, num_comp))
+	# prepare indices of groups
+	self.RO2_indices = np.zeros((0, 2)) # peroxy radicals
+	self.HOM_RO2_indx = [] # HOM peroxy radicals
+	self.RO_indx = [] # empty list for holding indices of alkoxy components
+	self.HOMs_indx = [] # HOMs
+	self.OOH = [] # hydroperoxides
+	self.HOM_OOH = [] # HOMs hydroperoxides
+	self.OH = [] # alcohols
+	self.HOM_OH = [] # HOMs alcohols
+	self.carbonyl = [] # carbonyls
+	self.HOM_carbonyl = [] # HOMs carbonyls
+	self.NO3 = [] # nitrates	
+	self.HOM_NO3 = [] # HOMs nitrates
+	# index for HO2, used in identifying components with 
+	# functional groups in group_indices.py
+	self.HO2i = (self.comp_namelist == 'HO2') 
 
-	
+		
+
 	if (ode_gen_flag == 0): # estimate densities if called from middle
 		
 		for i in range (num_comp): # loop through components
@@ -138,7 +156,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			if (i == corei[0]): # density of core
 				self.y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
 				continue
-			if rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
+			if self.rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
 				# liquid density code does not like H2, so manually input kg/m3
 				self.y_dens[i] = 1.e3
 			else:
@@ -164,24 +182,27 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.Cnum = np.zeros((num_comp, 1))
 	self.Onum = np.zeros((num_comp, 1))
 	
-	# prepare for gathering the indices of any HOM-RO2-MCM-RO2 accretion products
-	self.aoRO2_indx = []
+	# prepare for gathering the indices of any HOM-RO2 components	
+	self.Hn_list = [] # prepare for storing hydrogen numbers of components
+
 	
 	# estimate vapour pressures (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
 	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
+	# also get inidces of components that can be categorised by 
+	# functional group
 	for i in range (num_comp):
 	
 		# note, rec_now_flag is only changed below if alternative vapour pressure estimation 
 		# method uncommented for HOMs
 		rec_now_flag = 0
+		
+		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6): # if highly oxidised
+			self.HOMs_indx.append(i) # add to index of HOM		
+			if (self.comp_namelist[i][-2::] == 'O2'): # if tagged as a peroxy radical	
+				self.aoRO2_indx.append(i) # add to index of HOMRO2	
 
-		if ('_ao' in self.comp_namelist[i]): # if part of the extension
-			# if it's the peroxy radical formed from autoxidation
-			if (self.comp_namelist[i][-4::] == '_ao1'):
-				self.aoRO2_indx.append(i)
-				
 		if (i == corei[0]): # if this component is 'core'
 			# core component not included in Pybel_objects
 			# assign an assumed O:C ratio of 0.
@@ -221,13 +242,13 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		
 		#if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
-		#	Psatnow = -2.63+-0.50*rel_SMILES[i].count('O') + (rel_SMILES[i].count('C')-5)*-0.80
+		#	Psatnow = -2.63+-0.50*self.rel_SMILES[i].count('O') + (self.rel_SMILES[i].count('C')-5)*-0.80
 		#	rec_now_flag = 1 # record this vapour pressure
-		if (rel_SMILES[i].count('O') + rel_SMILES[i].count('o') >= 6): # if six or more oxygens in component
+		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6): # if six or more oxygens in component
 			# log(C* (ug/m3)) (natural logarithm of effective saturation concentration) of component (Eq. 1 Mohr et al. 2019)
-			nC = rel_SMILES[i].count('C') + rel_SMILES[i].count('c')
-			nO = rel_SMILES[i].count('O') + rel_SMILES[i].count('o')
-			nN = rel_SMILES[i].count('N') + rel_SMILES[i].count('n')
+			nC = self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c')
+			nO = self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o')
+			nN = self.rel_SMILES[i].count('N') + self.rel_SMILES[i].count('n')
 			Psatnow = (25.-nC)*0.475-(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/(nC+nO-3.*nN))*0.9-nN*2.5
 			# convert to vapour pressure (log10(atm)) (eq. 1 O'Meara et al. 2014)
 			Psatnow = np.exp(Psatnow) # ug/m3
@@ -240,7 +261,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 					boiling_points.nannoolal(Pybel_objects[i]))))
 
 		# in case you want to ensure small molecules don't contribute to particle mass
-		#if rel_SMILES[i].count('C')<=5:
+		#if self.rel_SMILES[i].count('C')<=5:
 		#	 Psatnow += 10 # ensure no condensation of small molecules
 
 
@@ -265,7 +286,7 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 				self.Psat_Pa_rec[i] = Psatnow
 		
 		# if component is chlorine, then H:C is 0 and can continue
-		if (rel_SMILES[i] == 'ClCl'):
+		if (self.rel_SMILES[i] == 'ClCl'):
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 70.
 			continue
@@ -294,29 +315,49 @@ def prop_calc(rel_SMILES, Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			Hcount = 0.
 			self.HC[0, i] = 0.
 
-		self.nom_mass[0, i] = Hcount*1.+rel_SMILES[i].count('O')*16.+rel_SMILES[i].count('C')*12.+rel_SMILES[i].count('N')*14.+rel_SMILES[i].count('S')*32.
+		# list hydrgogen numbers per component
+		self.Hn_list.append(Hcount)	
+
+		self.nom_mass[0, i] = Hcount*1.+self.rel_SMILES[i].count('O')*16.+self.rel_SMILES[i].count('C')*12.+self.rel_SMILES[i].count('N')*14.+self.rel_SMILES[i].count('S')*32.
 		
-		#if (rel_SMILES[i] == '[N+](=O)(O)[O-]'):
+		#if (self.rel_SMILES[i] == '[N+](=O)(O)[O-]'):
 		#	print(Hcount, self.nom_mass[0, i])
 		#	import ipdb; ipdb.set_trace()
 
 		# carbon and oxygen numbers in this component
-		self.Cnum[i, 0] = rel_SMILES[i].count('C')
-		self.Onum[i, 0] = rel_SMILES[i].count('O')
+		self.Cnum[i, 0] = self.rel_SMILES[i].count('C')
+		self.Onum[i, 0] = self.rel_SMILES[i].count('O')
 
 		# O:C ratio determined from SMILES string
-		if (rel_SMILES[i].count('C') > 0):
+		if (self.rel_SMILES[i].count('C') > 0):
 			self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
 			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
+			# get indices of components with particular functional groups
+			group_indices.group_indices(Hcount, self.rel_SMILES[i], i, self)
 		else: # if no carbons in this component
 			self.OC[0, i] = 0.
-	
+
+
+		
 	ish = (self.Psat == 0.) # non-volatiles
 	
 	self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm
 	self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325. # convert to Pa from atm
 	# retain low volatility where wanted following unit conversion
 	self.Psat[ish] = 0.
+
+	# get group indices in correct format
+	self.RO2_indices = np.asarray(self.RO2_indices, dtype=int)
+	self.HOM_RO2_indx = np.asarray(self.HOM_RO2_indx, dtype=int)
+	self.RO_indx = np.asarray(self.RO_indx, dtype=int)	
+	self.OOH = np.asarray(self.OOH, dtype=int)
+	self.HOM_OOH = np.asarray(self.HOM_OOH, dtype=int)
+	self.OH = np.asarray(self.OH, dtype=int)
+	self.HOM_OH = np.asarray(self.HOM_OH, dtype=int)
+	self.carbonyl = np.asarray(self.carbonyl, dtype=int)
+	self.HOM_carbonyl = np.asarray(self.HOM_carbonyl, dtype=int)
+	self.NO3 = np.asarray(self.NO3, dtype=int)
+	self.HOM_NO3 = np.asarray(self.HOM_NO3, dtype=int)	
 	
 	# in preparation for ode solver, tile over size and wall bins if present
 	if (self.num_asb+self.wall_on > 0):

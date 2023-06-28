@@ -70,6 +70,15 @@ def retr_out(self):
 	group_indx['RO2i'] = [] # filler in case of no RO2i
 	group_indx['ROi'] = [] # filler in case of no ROi
 	group_indx['HOMRO2'] = [] # filler in case of no HOMRO2
+	group_indx['HOMs'] = [] # filler	
+	group_indx['OOH'] = [] # filler
+	group_indx['HOM_OOH'] = [] # filler
+	group_indx['OH'] = [] # filler
+	group_indx['HOM_OH'] = [] # filler	
+	group_indx['carbonyl'] = [] # filler	
+	group_indx['HOM_carbonyl'] = [] # filler
+	group_indx['NO3'] = [] # filler
+	group_indx['HOM_NO3'] = [] # filler	
 
 	for line in const_in.readlines():
 		
@@ -269,6 +278,27 @@ def retr_out(self):
 				group_indx['HOMRO2'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
 			yield (32.)
 
+		if (str(line.split(',')[0]) == 'organic_HOMs_index'):
+			
+			# find index of first [ and index of last ]
+			icnt = 0 # count on characters
+			for i in line:
+				if i == '[':
+					st_indx = icnt+1
+					break
+				icnt += 1 # count on characters
+			for cnt in range(10):
+				if line[-cnt] == ']':
+					fi_indx = -cnt
+					break
+
+			if (st_indx == len(line)+fi_indx): # if empty list
+				continue
+			else: # if list has contents
+				group_indx['HOMs'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))	
+			yield (32.)
+
+
 		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
 
 			# find index of first [ and index of last ]
@@ -365,7 +395,7 @@ def retr_out(self):
 	seedi = const['index_of_seed_components'] # index of seed components
 	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']	
 
-	if v4_flag == 1: # if results in question saved in version 4 or later
+	if (v4_flag == 1): # if results in question saved in version 4 or later
 
 		load_path = str(self.dir_path + '/y_mw.npy') # path
 		y_MW = np.load(load_path, allow_pickle=True)
@@ -387,6 +417,69 @@ def retr_out(self):
 
 		load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
 		HC = (np.load(load_path, allow_pickle=True)).tolist()
+
+		
+		load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy') # path
+		group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+		load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy') # path
+		group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+		load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy') # path
+		group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
+	
+		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
+		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()	
+
+		load_path = str(self.dir_path + '/OOH_index.npy') # path
+		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+		load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
+		group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+		load_path = str(self.dir_path + '/OH_index.npy') # path
+		group_indx['OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+			
+		load_path = str(self.dir_path + '/HOM_OH_index.npy') # path
+		group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+		load_path = str(self.dir_path + '/carbonyl_index.npy') # path
+		group_indx['carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+		load_path = str(self.dir_path + '/HOM_carbonyl_index.npy') # path
+		group_indx['HOM_carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+		load_path = str(self.dir_path + '/NO3_index.npy') # path
+		group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
+		load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
+		group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+		print('RO')
+		print(group_indx['ROi'])
+		print('RO2')
+		print(group_indx['RO2i'])
+		print('HOMRO2')
+		print(group_indx['HOMRO2'])
+		print('HOMs')
+		print(group_indx['HOMs'])
+		print('OOH')
+		print(group_indx['OOH'])
+		print('HOM_OOH')
+		print(group_indx['HOM_OOH'])
+		print('OH')
+		print(group_indx['OH'])
+		print('HOM_OH')
+		print(group_indx['HOM_OH'])
+		print('carbonyl')
+		print(group_indx['carbonyl'])
+		print('HOM_carbonyl')
+		print(group_indx['HOM_carbonyl'])
+		print('NO3')
+		print(group_indx['NO3'])
+		print('HOM_NO3')
+		print(group_indx['HOM_NO3'])	
+
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]

@@ -67,7 +67,7 @@ def ode_updater(y, H2Oi,
 	uppsize, std, rbou, MV, 
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
 	sav_nam, space_mode, 
-	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
+	rbou00, ub_rad_amp, indx_plot, comp0,
 	wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
@@ -249,7 +249,7 @@ def ode_updater(y, H2Oi,
 	# indx_plot - indices of components to plot the gas-phase temporal profile of
 	# comp0 - names of components to plot the gas-phase temporal profile of
 	# self.inname - path to model variables file
-	# rel_SMILES - SMILES strings of components in chemical scheme
+	# self.rel_SMILES - SMILES strings of components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
 	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
 	# self.OC - oxygen to carbon ratio of components
@@ -808,6 +808,6 @@ def ode_updater(y, H2Oi,
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
 		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, rel_SMILES, H2Oi, siz_str, cham_env, self)
+		comp0, H2Oi, siz_str, cham_env, self)
 	
 	return() # end of function

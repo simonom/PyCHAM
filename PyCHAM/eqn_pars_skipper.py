@@ -134,10 +134,10 @@ def eqn_pars_skipper(self): # define function
 	# use eqn_pars output from previous simulation
 	rowvals = self.rowvals; colptrs = self.colptrs; jac_wall_indx = self.jac_wall_indx 
 	jac_part_indx = self.jac_part_indx; jac_extr_indx = self.jac_extr_indx
-	comp_num = self.comp_num; rel_SMILES = self.rel_SMILES; Pybel_objects = self.Pybel_objects
+	comp_num = self.comp_num; Pybel_objects = self.Pybel_objects
 	Jlen = self.Jlen; comp_xmlname = self.comp_xmlname; comp_smil = self.comp_smil; 
 	erf = 0.; err_mess = ''
 
 	return(rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, rel_SMILES, 
+		jac_part_indx, jac_extr_indx, comp_num, 
 		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess)

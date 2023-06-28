@@ -116,7 +116,14 @@ def ui_check(self):
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
 	# -------------------------------------------------------------------
-	
+
+	# check on skipping parsing
+	if self.pars_skip == 1:
+		try:
+			rowvals = self.rowvals
+		except:
+			self.pars_skip = 0	
+
 	# check on gas-wall partitioning inputs ---------------------------------
 	# check that number of effective absorbing masses for walls matches number of walls
 	if len(self.Cw)!=self.wall_on and self.wall_on > 0:

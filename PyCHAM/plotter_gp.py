@@ -67,17 +67,20 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 	
 	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
+	num_asb = (num_sb-wall_on)	
 
 	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or caller == 5 or caller == 6):
 		plt.ion() # show results to screen and turn on interactive mode
-		
+	
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
 	if (comp_names_to_plot): # if component names specified
 	
 		# gas-phase concentration sub-plot ---------------------------------------------	
+		ip_fail = 0 # start by assuming all requested components available
+		group_flag = 0 # start by assuming single components wanted
+
 		for i in range(len(comp_names_to_plot)):
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
@@ -85,11 +88,79 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				indx_plot = np.array((indx_plot))
 			if (comp_names_to_plot[i].strip() == 'RO2'):
 				indx_plot = (np.array((group_indx['RO2i'])))
+				group_flag = 1
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
+				group_flag = 1	
 			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
 				indx_plot = (np.array((group_indx['HOMRO2'])))
-			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'):
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == 'HOM'):
+				indx_plot = (np.array((group_indx['HOMs'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == 'OOH'):
+				indx_plot = (np.array((group_indx['OOH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM_OOH'):
+				indx_plot = (np.array((group_indx['HOM_OOH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == 'OH'):
+				indx_plot = (np.array((group_indx['OH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1			
+			if (comp_names_to_plot[i].strip() == 'HOM_OH'):
+				indx_plot = (np.array((group_indx['HOM_OH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'carbonyl'):	
+				indx_plot = (np.array((group_indx['carbonyl'])))			
+					
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM_carbonyl'):
+				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
+				
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'NO3'):
+				indx_plot = (np.array((group_indx['NO3'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM_NO3'):
+				indx_plot = (np.array((group_indx['HOM_NO3'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+
+			if (ip_fail == 1):	
+					
+				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+				# set border around error message
+				if (self.bd_pl == 1):
+					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+					self.bd_pl = 2
+				else:
+					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+					self.bd_pl = 1
+
+				plt.ioff() # turn off interactive mode
+				plt.close() # close figure window
+				return()
+
+			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
 					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
@@ -130,7 +201,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = np.sum(conc, axis=1) # sum multiple components
 			
 			# plot this component
-			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'): # if not the sum of organic peroxy radicals
+			if (group_flag == 0): # if not a sum of components
 				if (caller == 4 or caller == 5 or caller == 6): # log10 y axis
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
@@ -150,8 +221,53 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
-					
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))	
+			if (comp_names_to_plot[i].strip() == 'HOM'): # if is the sum of HOM 
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'OOH'): # if is the sum of hydroperoxides 
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))	
+			if (comp_names_to_plot[i].strip() == 'HOM_OOH'): # if is the sum of hydroperoxides 
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))	
+			if (comp_names_to_plot[i].strip() == 'OH'): # if is the sum of alcohols 
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'HOM_OH'): # if is the sum of HOM alcohols
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'carbonyl'): # if is the sum of carbonyls 
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'): # if is the sum of HOM carbonyls
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))	
+			if (comp_names_to_plot[i].strip() == 'NO3'): # if is the sum of nitrates
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$NO3 (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$NO3 (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'HOM-NO3'): # if is the sum of HOM nitrates
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
+
 		if (caller == 0 or caller == 5): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		if (caller == 1 or caller == 4): # ppb plot

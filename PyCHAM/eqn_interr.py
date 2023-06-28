@@ -90,8 +90,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
 	# list of Pybel objects of components in chemical scheme
 	Pybel_objects = []
-	comp_num = 0 # count the number of unique components in the chemical scheme
-	self.RO_indx = [] # empty list for holding indices of alkoxy components
+	comp_num = 0 # count the number of unique components in the chemical scheme	
 	self.gen_num = [] # for holding generation numbers of components
 	# ---------------------------------------------------------------------
 
@@ -229,6 +228,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		stoich_regex = r"^\d*\.\d*|^\d*"
 		numr = len(reactants) # number of reactants in this equation
 		
+		reac_SMILES = []
 		
 		# left hand side of equations (losses)
 		for reactant in reactants:
@@ -252,7 +252,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				# index where xml file name matches reaction component name
 				name_indx = comp_name.index(name_only)
 				name_SMILE = comp_smil[name_indx] # SMILES of component
-				
+				reac_SMILES.append(name_SMILE)
+
 				comp_list.append(name_SMILE) # list SMILE names
 				name_indx = comp_num # allocate index to this species
 				# generate pybel object
@@ -263,11 +264,11 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				
 				# check if alkoxy radical present in this component and that component is organic
 				if ('[O]' in name_SMILE):
-					if ('C' in name_SMILE or 'C' in name_SMILE):
+					if ('C' in name_SMILE or 'c' in name_SMILE):
 						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
 						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
 							self.RO_indx.append(comp_num)			
-
+	
 				comp_num += 1 # number of unique species
 				
 
@@ -275,14 +276,15 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				# existing index
 				name_indx = self.comp_namelist.index(name_only)
 				name_SMILE = comp_list[name_indx]
+				reac_SMILES.append(name_SMILE)
 			
 			# store reactant SMILE for this equation
 			SMILES_this_eq.append(name_SMILE)
 			name_only_this_eq.append(name_only)
 			
 			# store reactant index
-			# check if index already present - i.e. component appears more than once
-			if sum(rindx[eqn_step, 0:reactant_step]==int(name_indx))>0:
+			# check if index already present in this reaction - i.e. component appears more than once
+			if (sum(rindx[eqn_step, 0:reactant_step] == int(name_indx)) > 0):
 				# get existing index of this component
 				exist_indx = (np.where(rindx[eqn_step, 0:reactant_step]==(int(name_indx))))[0]
 				# add to existing stoichiometry
@@ -334,15 +336,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				# Generate pybel object
 				Pybel_object = pybel.readstring('smi', name_SMILE)
 				# append to Pybel object list
-				Pybel_objects.append(Pybel_object)
-				
-				# check if alkoxy radical present in this component and that component is organic
-				if ('[O]' in name_SMILE):
-					if ('C' in name_SMILE or 'C' in name_SMILE):
-						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
-						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
-							self.RO_indx.append(comp_num)					
-
+				Pybel_objects.append(Pybel_object)		
+											
 				comp_num += 1 # number of unique species
 				
 			else: # if it's a species already encountered

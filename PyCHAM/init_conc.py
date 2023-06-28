@@ -32,7 +32,7 @@ import write_dydt_rec
 
 def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
-	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self):
+	core_diss, nuc_comp, comp_xmlname, comp_smil, self):
 		
 	# inputs:------------------------------------------------------
 	
@@ -61,7 +61,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
 	# comp_xmlname - component names in xml file
 	# comp_smil - all SMILES strings in xml file
-	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
+	# self.self.rel_SMILES - only the SMILES strings of components present in the chemical scheme file
 	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
 	# self.RO2_indices - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
 	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
@@ -207,7 +207,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 		# check for water presence in chemical scheme via its SMILE string
 		# count on components
 		indx = -1
-		for single_chem in rel_SMILES:
+		for single_chem in self.rel_SMILES:
 			indx += 1
 			# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
 			# (O is the MCM chemical scheme name for single oxygen))
@@ -234,7 +234,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
 			self.comp_namelist.append('H2O') # append water's name to component name list
 			# add to SMILES list
-			rel_SMILES.append('HOH')
+			self.rel_SMILES.append('HOH')
 
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
@@ -252,7 +252,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 		num_comp += 1
 		self.num_comp = num_comp # prepare for skipping of parsing in following simulations
 		# add to SMILES list
-		rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
+		self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
 		# append core gas-phase concentration (molecules/cm3 (air)) and molar 
 		# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
@@ -474,4 +474,4 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
-			HO2i, NO3i, self, rel_SMILES)
+			HO2i, NO3i, self)
