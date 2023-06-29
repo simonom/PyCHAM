@@ -63,7 +63,7 @@ def retr_out(self):
 	except:
 		# if earlier than v4 then flag
 		v4_flag = 0
-
+	
 	const = {} # create empty dictionary to hold constants
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
@@ -394,7 +394,7 @@ def retr_out(self):
 	
 	seedi = const['index_of_seed_components'] # index of seed components
 	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']	
-
+	
 	if (v4_flag == 1): # if results in question saved in version 4 or later
 
 		load_path = str(self.dir_path + '/y_mw.npy') # path
@@ -405,7 +405,7 @@ def retr_out(self):
 		
 		load_path = str(self.dir_path + '/comp_namelist.npy') # path
 		comp_names = (np.load(load_path, allow_pickle=True)).tolist()
-		
+			
 		load_path = str(self.dir_path + '/rel_SMILES.npy') # path
 		rel_SMILES = (np.load(load_path, allow_pickle=True)).tolist()
 		
@@ -414,23 +414,22 @@ def retr_out(self):
 		
 		load_path = str(self.dir_path + '/oxygen_to_carbon_ratios_of_components.npy') # path
 		OC = (np.load(load_path, allow_pickle=True)).tolist()
-
+		
 		load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
 		HC = (np.load(load_path, allow_pickle=True)).tolist()
-
 		
 		load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy') # path
 		group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
 
 		load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy') # path
 		group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
-
+		
 		load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy') # path
 		group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
-	
+		
 		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
 		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()	
-
+		
 		load_path = str(self.dir_path + '/OOH_index.npy') # path
 		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
 		
@@ -453,32 +452,7 @@ def retr_out(self):
 		group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
-		group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-		print('RO')
-		print(group_indx['ROi'])
-		print('RO2')
-		print(group_indx['RO2i'])
-		print('HOMRO2')
-		print(group_indx['HOMRO2'])
-		print('HOMs')
-		print(group_indx['HOMs'])
-		print('OOH')
-		print(group_indx['OOH'])
-		print('HOM_OOH')
-		print(group_indx['HOM_OOH'])
-		print('OH')
-		print(group_indx['OH'])
-		print('HOM_OH')
-		print(group_indx['HOM_OH'])
-		print('carbonyl')
-		print(group_indx['carbonyl'])
-		print('HOM_carbonyl')
-		print(group_indx['HOM_carbonyl'])
-		print('NO3')
-		print(group_indx['NO3'])
-		print('HOM_NO3')
-		print(group_indx['HOM_NO3'])	
+		group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()	
 
 	
 	try:

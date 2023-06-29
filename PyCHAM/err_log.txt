@@ -1,4 +1,4 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_PRAMAP_scheme\HIRAC_O3_AP
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/MCM_PRAMAP_scheme/HIRAC_O3_AP_CO
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter

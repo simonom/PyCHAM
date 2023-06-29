@@ -181,7 +181,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	save_path = str(output_by_sim + '/comp_namelist') # path
 	np.save(save_path, self.comp_namelist, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/self.rel_SMILES') # path
+	save_path = str(output_by_sim + '/rel_SMILES') # path
 	np.save(save_path, self.rel_SMILES, allow_pickle=True)
 
 	save_path = str(output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
@@ -348,31 +348,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	group_indx['RO2i'] = self.RO2_indices[:, -1]
 	group_indx['ROi'] = self.RO_indx
 	group_indx['HOMRO2'] = self.HOM_RO2_indx 
-	group_indx['HOMs'] = self.HOMs_indx 
-	print('RO')
-	print(self.RO_indx)
-	print('RO2')
-	print(self.RO2_indices[:, -1])
-	print('HOMRO2')
-	print(self.HOM_RO2_indx)
-	print('HOMs')
-	print(self.HOMs_indx)
-	print('OOH')
-	print(self.OOH)
-	print('HOM_OOH')
-	print(self.HOM_OOH)
-	print('OH')
-	print(self.OH)
-	print('HOM_OH')
-	print(self.HOM_OH)
-	print('carbonyl')
-	print(self.carbonyl)
-	print('HOM_carbonyl')
-	print(self.HOM_carbonyl)
-	print('NO3')
-	print(self.NO3)
-	print('HOM_NO3')
-	print(self.HOM_NO3)	
+	group_indx['HOMs'] = self.HOMs_indx	
 
 	if ((numsb-self.wall_on) == 0): # if zero size bins
 		# ensure numpy arrays, rather than float

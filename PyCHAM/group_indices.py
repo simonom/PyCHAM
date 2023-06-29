@@ -76,7 +76,7 @@ def group_indices(Hcount, SMILES, i, self):
 		# reactions with both HO2 as reactant and this component as 
 		# product
 		eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i, axis=1) == 1)  
-
+		
 		# check if reactant in any of these equations is HO2
 		if (sum(eqn_of_inter) > 0): 
 			# loop through the reactions of interest
@@ -92,33 +92,55 @@ def group_indices(Hcount, SMILES, i, self):
 				# oxygen count
 				On_pre = pre_RO2_SMILE.count('O')+pre_RO2_SMILE.count('o')
 
-				# get hydrogen number of precursor component	
-				try: # if H count already found for this precursor component
-					Hn_pre = self.Hn_list[pre_RO2i[0]]
-				except: # if H count not already found for this precursor component
-					# if hydrogen is present in this molecule
-					if ('H' in self.Pybel_objects[pre_RO2i[0]].formula):
+				# check on whether hydrogen number given in product component name
+				if 'H' in self.comp_namelist[i]:
+					try: # check if number comes after H letter
+						# get index of H character
+						Hindx = self.comp_namelist[i].index('H')	
+						Hcount = float(self.comp_namelist[i][Hindx+1])
+						try: # in case two digit number after H character
+							Hcount = float(self.comp_namelist[i][Hindx+1:Hindx+3])	
+						except: # just one number
+							Hcount = Hcount
+					except:
+						Hcount = Hcount
 
-						Hindx_start = self.Pybel_objects[pre_RO2i[0]].formula.index('H')+1
-						Hindx_end = Hindx_start
-						for Hnum_test in self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start::]:
-							try:
-								float(Hnum_test) # only continue if this character is a number
-								Hindx_end += 1
-								if (Hindx_end == len(self.Pybel_objects[pre_RO2i[0]].formula)):
-									Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
-							except:
-								if (Hindx_end != Hindx_start):
-									Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
-								else:
-									Hn_pre = 1. # if no number then Hydrogen must be alone
-								break
+				# do the same hydrogen number in name check for precursor	
+				try: # check if number comes after H letter
+					# get index of H character
+					Hindx = self.comp_namelist[pre_RO2i[0]].index('H')	
+					Hn_pre = float(self.comp_namelist[pre_RO2i[0]][Hindx+1])
+					try: # in case two digit number after H character
+						Hn_pre = float(self.comp_namelist[pre_RO2i[0]][Hindx+1:Hindx+3])	
+					except: # just one number
+						Hn_pre = Hn_pre
+				except:
 
-					else: # if no hydrocarbons
-						Hn_pre = 0.
-							
-				# hydroperoxides are formed when a peroxy radical reacts with HO2,
-				# and the hydroperoxide has one H atom more than the orginal 
+					# get hydrogen number of precursor component	
+					try: # if H count already found for this precursor component
+						Hn_pre = self.Hn_list[pre_RO2i[0]]
+					except: # if H count not already found for this precursor component
+						# if hydrogen is present in this molecule
+						if ('H' in self.Pybel_objects[pre_RO2i[0]].formula):
+
+							Hindx_start = self.Pybel_objects[pre_RO2i[0]].formula.index('H')+1
+							Hindx_end = Hindx_start
+							for Hnum_test in self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start::]:
+								try:
+									float(Hnum_test) # only continue if this character is a number
+									Hindx_end += 1
+									if (Hindx_end == len(self.Pybel_objects[pre_RO2i[0]].formula)):
+										Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+								except:
+									if (Hindx_end != Hindx_start):
+										Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+									else:
+										Hn_pre = 1. # if no number then Hydrogen must be alone
+									break
+
+						else: # if no hydrocarbons
+							Hn_pre = 0.
+								
 				# peroxy radical
 				if (Hcount-1 == Hn_pre and Cn == Cn_pre and On == On_pre):	
 					self.OOH.append(int(i))
@@ -132,49 +154,97 @@ def group_indices(Hcount, SMILES, i, self):
 	# carbonyls form from peroxy radical reaction with the RO2 pool,
 	# leading to a carbonyl with one less oxygen and one less
 	# hydrogen that the precursor peroxy radical
-	if (Cn >= 1):
+	if (Cn >= 1 and On >= 1):
 
 		# get the equations where this component formed
-		produci = np.sum(self.pindx_g == i, axis = 1)
-		
-		# get equations where RO2 in reaction rate coefficient
-		RO2_rrci = 'RO2' in self.reac_coef_g
+		produci = np.sum(self.pindx_g == i, axis = 1)	
+
+		# get the equations where just one reactant present
+		eqi_single_reac = (self.nreac_g == 1)
 
 		# get equations where both this component produced and RO2 in reaction
-		# rate coefficient
-		eq_of_inter = (produci*RO2_rrci)
+		# rate coefficient and no other reactants beside the precursor
+		eq_of_inter = (produci*eqi_single_reac*self.RO2_in_rrc)
 
 		# check if RO2 present in the reaction rate coefficient in any of these equations
-		if (sum(eq_of_inter) > 0): 
-		
+		if (sum(eq_of_inter) > 0): 	
+			# get index of zeros
+			eoi_zindx = (eq_of_inter == 0)
 			# cumulative sum of equation indices where this component formed
-			produci_cs = (np.cumsum(eq_of_inter))[eq_of_inter == 0] = 0.
+			produci_cs = (np.cumsum(eq_of_inter))
+			# ensure zeros remain as zeros
+			produci_cs[eoi_zindx] = 0.
+			
 			# get the reaction number where RO2 present
-			for pi in range(max(produci_cs)):
+			for pi in range(int(max(produci_cs))):
 				# reaction index
-				reac_now = np.where(produci_cs == pi)[0][0]
+				reac_now = np.where(produci_cs == pi+1)[0][0]
 				
 				# get the precursor index
-				prei = self.rindx_g[reac_now, 0]
+				pre_RO2i = self.rindx_g[reac_now, 0]
 				# get the precursor carbon and oxygen count
-				pCn = self.rel_SMILES.count('C')+self.rel_SMILES.count('c')
-				pOn = self.rel_SMILES.count('O')+self.rel_SMILES.count('o')
-				pHn = self.Hn_list[prei]
+				pCn = self.rel_SMILES[pre_RO2i].count('C')+self.rel_SMILES[pre_RO2i].count('c')
+				pOn = self.rel_SMILES[pre_RO2i].count('O')+self.rel_SMILES[pre_RO2i].count('o')
+				
+				# check on whether hydrogen number given in product component name
+				if 'H' in self.comp_namelist[i]:
+					try: # check if number comes after H letter
+						# get index of H character
+						Hindx = self.comp_namelist[i].index('H')	
+						Hcount = float(self.comp_namelist[i][Hindx+1])
+						try: # in case two digit number after H character
+							Hcount = float(self.comp_namelist[i][Hindx+1:Hindx+3])	
+						except: # just one number
+							Hcount = Hcount
+					except:
+						Hcount = Hcount
 
-				if (Hcount-1 == pHn and Cn == pCn and On+1 == pOn):
-					print('OH count check', self.comp_namelist[i])
-					import ipdb; ipdb.set_trace()
+				# do the same hydrogen number in name check for precursor	
+				try: # check if number comes after H letter
+					# get index of H character
+					Hindx = self.comp_namelist[pre_RO2i].index('H')	
+					Hn_pre = float(self.comp_namelist[pre_RO2i][Hindx+1])
+					try: # in case two digit number after H character
+						Hn_pre = float(self.comp_namelist[pre_RO2i][Hindx+1:Hindx+3])	
+					except: # just one number
+						Hn_pre = Hn_pre
+				except:
+
+					# get hydrogen number of precursor component	
+					try: # if H count already found for this precursor component
+						Hn_pre = self.Hn_list[pre_RO2i]
+					except: # if H count not already found for this precursor component
+						# if hydrogen is present in this molecule
+						if ('H' in self.Pybel_objects[pre_RO2i].formula):
+
+							Hindx_start = self.Pybel_objects[pre_RO2i].formula.index('H')+1
+							Hindx_end = Hindx_start
+							for Hnum_test in self.Pybel_objects[pre_RO2i].formula[Hindx_start::]:
+								try:
+									float(Hnum_test) # only continue if this character is a number
+									Hindx_end += 1
+									if (Hindx_end == len(self.Pybel_objects[pre_RO2i].formula)):
+										Hn_pre = float(self.Pybel_objects[pre_RO2i].formula[Hindx_start:Hindx_end])
+								except:
+									if (Hindx_end != Hindx_start):
+										Hn_pre = float(self.Pybel_objects[pre_RO2i].formula[Hindx_start:Hindx_end])
+									else:
+										Hn_pre = 1. # if no number then Hydrogen must be alone
+									break
+
+						else: # if no hydrocarbons
+							Hn_pre = 0.
+				
+				if (Hcount-1 == Hn_pre and Cn == pCn and On+1 == pOn):
 					self.OH.append(int(i))
 					if (On >= 6): # HOMs alcohols
 						self.HOM_OH.append(int(i))
-				
-				if (Hcount+1 == pHn and Cn == pCn and On+1 == pOn):
-					print('=O count check', self.comp_namelist[i])
-					import ipdb; ipdb.set_trace()
+					break # don't loop through anymore reactions	
+				if (Hcount+1 == Hn_pre and Cn == pCn and On+1 == pOn):	
 					self.carbonyl.append(int(i))
 					if (On >= 6): # HOMs carbonyls
 						self.HOM_carbonyl.append(int(i))
-
+					break # don't loop through anymore reactions
 	# nitrates
 	if (self.comp_namelist[i][-3::] == 'NO3'): # MCM and PRAM carbonyl
 		if (Cn >= 1):

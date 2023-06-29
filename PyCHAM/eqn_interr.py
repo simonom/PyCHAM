@@ -92,6 +92,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	Pybel_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme	
 	self.gen_num = [] # for holding generation numbers of components
+	self.RO2_in_rrc = np.empty(0) # whether 'RO2' in the reaction rate coefficient
 	# ---------------------------------------------------------------------
 
 	max_no_reac = 0. # log maximum number of reactants in a reaction
@@ -221,7 +222,10 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		# store the reaction rate coefficient for this equation 
 		# (/s once any inputs applied)
 		reac_coef.append(rate_ex)
-		
+		if 'RO2' in rate_ex:
+			self.RO2_in_rrc = np.concatenate((self.RO2_in_rrc, np.ones(1)))
+		else:
+			self.RO2_in_rrc = np.concatenate((self.RO2_in_rrc, np.zeros(1)))	
 		# extract the stoichiometric number of the component in current equation
 		reactant_step = 0
 		product_step = 0
@@ -662,7 +666,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			# store the reaction rate coefficient for this equation 
 			# (/s once any inputs applied)
 			reac_coef.append(rate_ex)
-		
+				
 			# extract the stoichiometric number of the component in current equation
 			reactant_step = 0
 			product_step = 0

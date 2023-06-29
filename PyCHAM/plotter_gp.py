@@ -252,7 +252,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'): # if is the sum of HOM carbonyls
+			if (comp_names_to_plot[i].strip() == 'HOM_carbonyl'): # if is the sum of HOM carbonyls
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis

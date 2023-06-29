@@ -67,7 +67,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# self - reference to PyCHAM
 	# tempt_cnt - count on temperatures
 	# ------------------------------------------------------------
-	
+		
 	if (testf == 1):
 		return(0, 0, 0) # return dummies
 	
@@ -140,8 +140,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HOM_NO3 = [] # HOMs nitrates
 	# index for HO2, used in identifying components with 
 	# functional groups in group_indices.py
-	self.HO2i = self.comp_namelist.index('HO2')	
-		
+	try:
+		self.HO2i = self.comp_namelist.index('HO2')	
+	except: # in case HO2 not present in scheme
+		self.HO2i = []
 
 	if (ode_gen_flag == 0): # estimate densities if called from middle
 		
