@@ -36,7 +36,7 @@ import stat
 from water_calc import water_calc
 import group_indices
 
-def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp, 
+def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp, 
 			volP, testf, corei, pconc, umansysprop_update, core_dens,
 			ode_gen_flag, nuci, nuc_comp, dens_comp, dens, seed_name,
 			y_mw, tempt_cnt, self):
@@ -44,7 +44,7 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	# inputs: ------------------------------------------------------------
 	# self.rel_SMILES - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# Pybel_objects - list of Pybel objects representing the components in self.rel_SMILES
+	# self.Pybel_objects - list of Pybel objects representing the components in self.rel_SMILES
 	# (omitting water and core, if present)
 	# self.TEMP - temperature (K) in chamber at all times
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
@@ -140,8 +140,7 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HOM_NO3 = [] # HOMs nitrates
 	# index for HO2, used in identifying components with 
 	# functional groups in group_indices.py
-	self.HO2i = (self.comp_namelist == 'HO2') 
-
+	self.HO2i = self.comp_namelist.index('HO2')	
 		
 
 	if (ode_gen_flag == 0): # estimate densities if called from middle
@@ -161,7 +160,7 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 				self.y_dens[i] = 1.e3
 			else:
 				# density (convert from g/cm3 to kg/m3)
-				self.y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
+				self.y_dens[i] = liquid_densities.girolami(self.Pybel_objects[i])*1.e3
 			# ----------------------------------------------------------------------------
 		
 	# account for any manually assigned component densities (kg/m3)
@@ -198,13 +197,8 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		# method uncommented for HOMs
 		rec_now_flag = 0
 		
-		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6): # if highly oxidised
-			self.HOMs_indx.append(i) # add to index of HOM		
-			if (self.comp_namelist[i][-2::] == 'O2'): # if tagged as a peroxy radical	
-				self.aoRO2_indx.append(i) # add to index of HOMRO2	
-
 		if (i == corei[0]): # if this component is 'core'
-			# core component not included in Pybel_objects
+			# core component not included in self.Pybel_objects
 			# assign an assumed O:C ratio of 0.
 			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
@@ -215,7 +209,7 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			continue
 		
 		# water vapour pressure already given by Psat_water (log10(atm))
-		# and water not included in Pybel_objects
+		# and water not included in self.Pybel_objects
 		if (i == H2Oi):
 			self.Psat[0, i] = Psat_water
 			if (self.TEMP[tempt_cnt] == 298.15):
@@ -257,8 +251,8 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
 		else: 
-			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], self.TEMP[tempt_cnt], 
-					boiling_points.nannoolal(Pybel_objects[i]))))
+			Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], 
+					boiling_points.nannoolal(self.Pybel_objects[i]))))
 
 		# in case you want to ensure small molecules don't contribute to particle mass
 		#if self.rel_SMILES[i].count('C')<=5:
@@ -277,8 +271,8 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			except: # in case float
 				self.Psat_Pa_rec[i] = Psatnow # note transfer to Pa is below
 		else: 
-			Psatnow = ((vapour_pressures.nannoolal(Pybel_objects[i], 298.15, 
-					boiling_points.nannoolal(Pybel_objects[i]))))
+			Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15, 
+					boiling_points.nannoolal(self.Pybel_objects[i]))))
 			
 			try: # in case array
 				self.Psat_Pa_rec[i]  = Psatnow[0]
@@ -292,21 +286,21 @@ def prop_calc(Pybel_objects, H2Oi, num_comp, Psat_water, vol_Comp,
 			continue
 
 		# if hydrogen is present in this molecule
-		if ('H' in Pybel_objects[i].formula):
+		if ('H' in self.Pybel_objects[i].formula):
 
 			
 
-			Hindx_start = Pybel_objects[i].formula.index('H')+1
+			Hindx_start = self.Pybel_objects[i].formula.index('H')+1
 			Hindx_end = Hindx_start
-			for Hnum_test in Pybel_objects[i].formula[Hindx_start::]:
+			for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
 				try:
 					float(Hnum_test) # only continue if this character is a number
 					Hindx_end += 1
-					if (Hindx_end == len(Pybel_objects[i].formula)):
-						Hcount = float(Pybel_objects[i].formula[Hindx_start:Hindx_end])
+					if (Hindx_end == len(self.Pybel_objects[i].formula)):
+						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
 				except:
 					if (Hindx_end != Hindx_start):
-						Hcount = float(Pybel_objects[i].formula[Hindx_start:Hindx_end])
+						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
 					else:
 						Hcount = 1. # if no number then Hydrogen must be alone
 					break

@@ -43,7 +43,7 @@ def rec_prep(nrec_step, y, y0,
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, 
-	Pybel_objects, nuci, nuc_comp, t0, pcont, pcontf, 
+	nuci, nuc_comp, t0, pcont, pcontf, 
 	NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
@@ -146,7 +146,7 @@ def rec_prep(nrec_step, y, y0,
 	# self.RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on chamber temperatures
 	# RHt_cnt - chamber relative humidity counts
-	# Pybel_objects - the pybel objects for components
+	# self.Pybel_objects - the pybel objects for components
 	# nuci - index of nucleating component
 	# nuc_comp - name of nucleating component
 	# t0 - initial integration step (s)
@@ -199,7 +199,7 @@ def rec_prep(nrec_step, y, y0,
 		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
 		lowsize, uppsize, num_sb, MV, rad0, radn, std, H2Oi, rbou, 
 		infx_cnt, Cfactor, diff_vol, 
-		DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp,
+		DStar_org, tempt_cnt, RHt_cnt, nuci, nuc_comp,
 		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
 		tot_in_res, Compti, self, vol_Comp, volP)
 	

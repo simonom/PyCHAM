@@ -347,14 +347,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	group_indx['HOM_NO3'] = self.HOM_NO3
 	group_indx['RO2i'] = self.RO2_indices[:, -1]
 	group_indx['ROi'] = self.RO_indx
-	group_indx['HOMRO2'] = self.aoRO2_indx 
+	group_indx['HOMRO2'] = self.HOM_RO2_indx 
 	group_indx['HOMs'] = self.HOMs_indx 
 	print('RO')
 	print(self.RO_indx)
 	print('RO2')
 	print(self.RO2_indices[:, -1])
 	print('HOMRO2')
-	print(self.aoRO2_indx)
+	print(self.HOM_RO2_indx)
 	print('HOMs')
 	print(self.HOMs_indx)
 	print('OOH')

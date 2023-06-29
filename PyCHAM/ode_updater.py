@@ -68,7 +68,7 @@ def ode_updater(y, H2Oi,
 	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
 	sav_nam, space_mode, 
 	rbou00, ub_rad_amp, indx_plot, comp0,
-	wat_hist, Pybel_objects, pcont, NOi, 
+	wat_hist, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
 	chamV, tempt_cnt, self, vol_Comp, volP):
@@ -256,7 +256,7 @@ def ode_updater(y, H2Oi,
 	# wat_hist - flag for history of particle-phase with respect to water partitioning,
 	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
 	#	(therefore on the efflorescence curve)
-	# Pybel_objects - the pybel objects for components
+	# self.Pybel_objects - the pybel objects for components
 	# pcont - flag for whether particle injection continuous or instantaneous
 	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
 	# NOi - NO index
@@ -357,7 +357,7 @@ def ode_updater(y, H2Oi,
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
-	tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
+	tempt_cnt, RHt_cnt, nuci, 
 	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
@@ -446,7 +446,7 @@ def ode_updater(y, H2Oi,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			DStar_org, tempt_cnt0, RHt_cnt0, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			
@@ -771,7 +771,7 @@ def ode_updater(y, H2Oi,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
 			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			DStar_org, tempt_cnt0, RHt_cnt0, nuci, nuc_comp,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			

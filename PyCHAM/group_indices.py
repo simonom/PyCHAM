@@ -46,20 +46,20 @@ def group_indices(Hcount, SMILES, i, self):
 			if (self.RO2_indices.shape[0] == 0): # if first installment
 				self.RO2_indices = np.array((1, i)).reshape(1, 2)
 			else:
-				self.RO2_indices = np.concatenate((self.RO2_indices, np.array((self.RO2_indices[-1, 0]+1, i))), axis = 0)
-			if (SMILES.count('O') + SMILES.count('o') >= 6):
+				self.RO2_indices = np.concatenate((self.RO2_indices, np.array((self.RO2_indices[-1, 0]+1, i)).reshape(1, 2)), axis = 0)
+			if (On >= 6):
 				# HOMs peroxy radicals
-				self.HOM_RO2_index.append(i) 
+				self.HOM_RO2_indx.append(i) 
 
 	# check if alkoxy radical present in this component and that component is organic
 	if ('[O]' in SMILES):
 		if (Cn > 0):
 			# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
 			if ('O[O]' not in SMILES and '[O]O' not in SMILES): # ensure it's not alkyl peroxy radical
-				self.RO_indx.append(comp_num)					
+				self.RO_indx.append(i)					
 
 	# check for HOMs
-	if (SMILES.count('O') + SMILES.count('o') >= 6):
+	if (On >= 6):
 		# HOMs radicals
 		self.HOMs_indx.append(i)
 
@@ -68,8 +68,8 @@ def group_indices(Hcount, SMILES, i, self):
 	# not be named identifiably in HOM extensions, so need to 
 	# rely on reactants and SMILES	
 	# get equation number where this component formed	
-	if (Cn >= 1 and On >=2 and Hn >= 1):
-		print('Cn check', self.comp_namelist[i])
+	if (Cn >= 1 and On >=2 and Hcount >= 1):
+		
 		# get the equations where this component formed
 		produci = np.sum(self.pindx_g == i, axis = 1) == 1
 	
@@ -82,25 +82,45 @@ def group_indices(Hcount, SMILES, i, self):
 			# loop through the reactions of interest
 			for eqni in np.where(eqn_of_inter == 1)[0]:
 
-				print('HO2 check', self.comp_namelist[i])
 				# get the index of the precursor peroxy radical
-				pre_RO2i = self.rindx_g[eqni, :] != self.HO2i
-				
+				pre_RO2i = self.rindx_g[eqni, :][self.rindx_g[eqni, :] != self.HO2i]
 				# get SMILE string of precursor RO2
-				import ipdb; ipdb.set_trace()
-				pre_RO2_SMILE = self.rel_SMILES[pre_RO2i]
+				
+				pre_RO2_SMILE = self.rel_SMILES[pre_RO2i[0]]
 				# carbon count
 				Cn_pre = pre_RO2_SMILE.count('C')+pre_RO2_SMILE.count('c')			
 				# oxygen count
 				On_pre = pre_RO2_SMILE.count('O')+pre_RO2_SMILE.count('o')
 
+				# get hydrogen number of precursor component	
+				try: # if H count already found for this precursor component
+					Hn_pre = self.Hn_list[pre_RO2i[0]]
+				except: # if H count not already found for this precursor component
+					# if hydrogen is present in this molecule
+					if ('H' in self.Pybel_objects[pre_RO2i[0]].formula):
+
+						Hindx_start = self.Pybel_objects[pre_RO2i[0]].formula.index('H')+1
+						Hindx_end = Hindx_start
+						for Hnum_test in self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start::]:
+							try:
+								float(Hnum_test) # only continue if this character is a number
+								Hindx_end += 1
+								if (Hindx_end == len(self.Pybel_objects[pre_RO2i[0]].formula)):
+									Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+							except:
+								if (Hindx_end != Hindx_start):
+									Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+								else:
+									Hn_pre = 1. # if no number then Hydrogen must be alone
+								break
+
+					else: # if no hydrocarbons
+						Hn_pre = 0.
+							
 				# hydroperoxides are formed when a peroxy radical reacts with HO2,
 				# and the hydroperoxide has one H atom more than the orginal 
 				# peroxy radical
-				
-				if (Hcount-1 == self.Hn_list[pre_RO2i] and Cn == Cn_pre and On == On_pre):
-					print('count check', self.comp_namelist[i])
-					import ipdb; ipdb.set_trace()
+				if (Hcount-1 == Hn_pre and Cn == Cn_pre and On == On_pre):	
 					self.OOH.append(int(i))
 					if (On >= 6): # HOMs hydroperoxides
 						self.HOM_OOH.append(int(i))
@@ -156,10 +176,10 @@ def group_indices(Hcount, SMILES, i, self):
 						self.HOM_carbonyl.append(int(i))
 
 	# nitrates
-	if (name_only[-3::] == 'NO3'): # MCM and PRAM carbonyl
+	if (self.comp_namelist[i][-3::] == 'NO3'): # MCM and PRAM carbonyl
 		if (Cn >= 1):
-			self.NO3.append(int(comp_num))
+			self.NO3.append(int(i))
 			if (On >= 6):
-				self.HOM_NO3.append(int(comp_num)) 
+				self.HOM_NO3.append(int(i)) 
 
 	return(self)

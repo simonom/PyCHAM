@@ -26,7 +26,7 @@ import numpy as np
 import scipy.constants as si
 import part_nsd # calculating number size distributions
 
-def pp_intro(y, num_comp, Pybel_objects, TEMP, H2Oi,
+def pp_intro(y, num_comp, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
 		pconct, nuc_comp, testf, std, mean_rad, therm_sp,

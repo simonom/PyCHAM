@@ -30,7 +30,7 @@ import diff_vol_est
 
 def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp, 
 	accom_coeff_user, num_sb, num_asb, Pnow, 
-	Pybel_object, name_SMILE, self):
+	name_SMILE, self):
 	
 	# ------------------------------------------------------------------
 	# inputs:
@@ -50,7 +50,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# num_sb - number of size bins (including wall)
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
-	# Pybel_object - Pybel objects for components
+	# self.Pybel_objects - Pybel objects for components
 	# name_SMILE - SMILE strings of components
 	# self - reference to program
 	# self.kw - rate of transfer of components to wall (/s)
@@ -83,7 +83,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
 	
 	# get diffusion volumes
-	diff_vol = diff_vol_est.diff_vol_est(Pybel_object)
+	diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
 	
 	# append water and core (water from Table 4.1 of the Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)

@@ -62,15 +62,14 @@ def middle(self): # define function
 		# into usable code
 		[rowvals, colptrs, jac_wall_indx, 
 		jac_part_indx, jac_extr_indx, comp_num, 
-		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, err_mess, 
-		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), drh_str, erh_str, sav_nam,
-		pcont, self)
+		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
+		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
+							 drh_str, erh_str, sav_nam, pcont, self)
 		
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, jac_wall_indx, 
 		jac_part_indx, jac_extr_indx, comp_num, 
-		Pybel_objects, Jlen, comp_xmlname, comp_smil, erf, 
-		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
+		Jlen, comp_xmlname, comp_smil, erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 	
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
@@ -86,7 +85,7 @@ def middle(self): # define function
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
-	comp0, y0, Pnow, Pybel_objects, 0, pconc, self.eqn_num[0], Compt, seed_name,
+	comp0, y0, Pnow, 0, pconc, self.eqn_num[0], Compt, seed_name,
 	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, self)
 
 	# if error raised, then tell GUI to display it and to stop programme
@@ -97,8 +96,8 @@ def middle(self): # define function
 	
 	if (self.pars_skip == 0): # if not skipping component properties
 		# get component properties
-		[self, err_mess, erf] = prop_calc.prop_calc(Pybel_objects, 
-			H2Oi, num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
+		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
+			num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 			uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
 			seed_name, y_mw, tempt_cnt, self)
 	
@@ -111,14 +110,14 @@ def middle(self): # define function
 		R_gas, NA, diff_vol, Dstar_org, err_mess, self] = partit_var_prep.prep(y_mw, 
 		self.TEMP[0], num_comp, act_comp, act_user, accom_comp, 
 		accom_coeff_user, num_sb+self.wall_on, num_sb, Pnow, 
-		Pybel_objects, comp_smil, self)
+		comp_smil, self)
 	
 	if (err_mess != ''): # if error raised or in testing mode then stop
 		yield err_mess
 	
 	# prepare particle phase
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
-	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, Pybel_objects, self.TEMP[0],
+	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, self.TEMP[0],
 	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
 		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
 		therm_sp, core_diss, space_mode, seedx,
@@ -144,7 +143,7 @@ def middle(self): # define function
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0,
-		wat_hist, Pybel_objects, pcont, NOi, 
+		wat_hist, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):
 

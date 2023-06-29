@@ -40,7 +40,7 @@ def cham_up(sumt, Pnow,
 	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin0, 
 	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
 	H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
-	DStar_org, tempt_cnt, RHt_cnt, Pybel_objects, nuci, nuc_comp, y_mw, 
+	DStar_org, tempt_cnt, RHt_cnt, nuci, nuc_comp, y_mw, 
 	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
 	tot_in_res, Compti, self, vol_Comp, volP):
 
@@ -116,7 +116,7 @@ def cham_up(sumt, Pnow,
 	# self.RHt - times through experiment at which relative humidities reached (s)
 	# tempt_cnt - count on temperatures
 	# RHt_cnt - relative humidity counts
-	# Pybel_objects - the pybel identifiers for components
+	# self.Pybel_objects - the pybel identifiers for components
 	# nuci - index of nucleating component
 	# nuc_comp - the nucleating component
 	# y_mw - molar weight of components (g/mol)
@@ -246,7 +246,7 @@ def cham_up(sumt, Pnow,
 
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
-			[self, _] = volat_calc.volat_calc(0, Pybel_objects, temp_nown, H2Oi,   
+			[self, _] = volat_calc.volat_calc(0, temp_nown, H2Oi,   
 							num_comp, Psat_water, vol_Comp, volP, 0, corei, seed_name, 
 							pconc, 0, 0.0, [], 1, nuci, nuc_comp, self)
 			

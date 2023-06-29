@@ -243,4 +243,4 @@ def extr_mech(int_tol, num_sb,
 
 	return(rowvals, colptrs, 
 		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, 
-		Pybel_objects, Jlen, comp_name, comp_smil, erf, err_mess, self)
+		Jlen, comp_name, comp_smil, erf, err_mess, self)

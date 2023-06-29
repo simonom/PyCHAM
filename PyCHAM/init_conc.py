@@ -30,7 +30,7 @@ from water_calc import water_calc
 import write_dydt_rec
 
 
-def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
+def init_conc(num_comp, Comp0, init_conc, PInit,
 	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
 	core_diss, nuc_comp, comp_xmlname, comp_smil, self):
 		
@@ -181,7 +181,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
 	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
 	for i in range(num_comp): # loop through all components to get molar weights
-		y_mw[i] = Pybel_objects[i].molwt # molecular weight (g/mol)
+		y_mw[i] = self.Pybel_objects[i].molwt # molecular weight (g/mol)
 	
 	# ------------------------------------------------------------------------------------
 	# account for water's properties

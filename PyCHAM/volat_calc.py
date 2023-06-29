@@ -36,14 +36,14 @@ import scipy.constants as si
 import errno
 import stat
 
-def volat_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
+def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
 				volP, testf, corei, seed_name, pconc, umansysprop_update, core_dens, comp_namelist,
 				ode_gen_flag, nuci, nuc_comp, self):
 
 	# inputs: ------------------------------------------------------------
 	# comp_list - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# Pybel_objects - list of Pybel objects representing the species in comp_list
+	# self.Pybel_objects - list of Pybel objects representing the species in comp_list
 	# (omitting water and core, if present)
 	# TEMP - temperature (K) in chamber at time function called
 	# Psat_water - pure component saturation vapour pressure of water (log10(atm)) 
@@ -120,7 +120,7 @@ def volat_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 				y_dens[i] = 1.e3
 			else:
 				# density (convert from g/cc to kg/m3)
-				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
+				y_dens[i] = liquid_densities.girolami(self.Pybel_objects[i])*1.e3
 			# ----------------------------------------------------------------------------
 	
 	# note that self.Psat already tiled over size bins and wall bins
@@ -140,8 +140,8 @@ def volat_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_C
 		
 		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
-		self.Psat[:, i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
-						boiling_points.nannoolal(Pybel_objects[i]))))
+		self.Psat[:, i] = ((vapour_pressures.nannoolal(self.Pybel_objects[i], TEMP, 
+						boiling_points.nannoolal(self.Pybel_objects[i]))))
 	
 	ish = (self.Psat == 0.) # non-volatiles
 	
