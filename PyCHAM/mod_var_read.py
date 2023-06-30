@@ -510,7 +510,6 @@ def mod_var_read(self):
 				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
 					self.const_infl_path = str(value.strip())
 					self = const_infl_open(self)
-					err_mess = self.err_mess
 					
 				else: # treat as list of components 
 					self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
@@ -717,6 +716,43 @@ def const_infl_open(self): # define function to read in values relevant to const
 	except: # if file not found tell user
 		self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
 		return(self)
+
+	sheet = wb['cont_infl']
+	# component names are in first column, continuous influxes are in following columns		
+	ir = -1 # count on row iteration
+	
+	# prepare to store component names and continuous influxes
+	value = ''
+
+	self.con_infl_nam = np.empty((0))	
+	
+	for i in sheet.iter_rows(values_only=True): # loop through rows
+		ir += 1 # count on row iteration
+		if (ir == 0): # header provides unit of emission rate and times
+			self.abun_unit = str(i[0])	
+			clim = 0 # count on columns
+			for ic in i[0::]:	
+				if ic is None:
+					break # stop looping through columns
+				clim +=1 # count on columns	
+			self.con_infl_t = np.array((i[1:clim]))
+			self.con_infl_C = np.empty((0, clim-1))	
+			continue				
+
+		# get names of components (matching chemical scheme names) 
+		# and their continuous influx rates (abundance unit given above)
+		else:
+			if (i[1] is None): # reached end of contiguous components
+				break
+			
+			# component name
+			self.con_infl_nam = np.concatenate((self.con_infl_nam, np.array((str(i[0]))).reshape(1)))
+			self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:clim])).reshape(1, -1)))
+	
+	wb.close() # close excel file
+	
+
+	return(self)
 
 # function for converting excel spreasheet of surface depositions 
 # into a string that commands above can interpret
