@@ -4484,7 +4484,7 @@ class PyCHAM(QWidget):
 
 		# filler for original starter simulation name
 		starter_name0 = 'fill'
-
+		
 		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'finisher'):
 			
 			# loop through starter simulations
@@ -4507,8 +4507,11 @@ class PyCHAM(QWidget):
 				# set transmission factor for light (0-1)
 				self.param_const['trans_fac'] = param_range['js'][starteri]
 
-				save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\'
-
+				if sys.platform == 'win32':
+					save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\'
+				if sys.platform == 'darwin':
+					save_path_start = '/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/'
+				
 				if ('loJ' in starter_name):
 					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_loJ')
 				if ('meJ' in starter_name):
@@ -4603,6 +4606,23 @@ class PyCHAM(QWidget):
 						if ('nint' in self.param_const['sch_name']):
 							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_nint')
 						
+						# ensure correct format
+						self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
+						# loop through characters, replacing odd white spaces with , 
+						# (times) and even white spaces with ; (components)
+						cci = 1
+						cc_all = -1
+						for ccn in self.param_const['Cinfl']: # loop through characters
+							cc_all += 1
+							if (ccn == ' ' and cci % 2. > 0.):
+								
+								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+','+self.param_const['Cinfl'][cc_all+1::])
+								cci += 1
+								continue
+							if (ccn == ' ' and cci % 2. < 1.):
+								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
+								cci += 1
+								continue		
 						if os.path.exists(self.param_const['res_file_name']):
 							print('already exists!')
 						else:
@@ -4749,6 +4769,8 @@ class PyCHAM(QWidget):
 								self.param_const['C0'] = str(self.param_const['C0'] + str(i) + ', ')
 							if self.param_const['C0'][-2::] == ', ':
 								self.param_const['C0'] = self.param_const['C0'][0:-2] 	
+							
+							# ensure correct format
 							self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
 							# loop through characters, replacing odd white spaces with , 
 							# (times) and even white spaces with ; (components)

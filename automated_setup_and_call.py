@@ -164,7 +164,7 @@ if (param_const['sim_type'] == 'finisher'):
 		# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
 		fname = str(init_conc_path + path + '/concentrations_all_components_all_times_gas_particle_wall')
 		# note, just keep results from final time
-		print(fname)
+		
 		y = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
 		# convert gas-phase concentration from ppb to # molecules/cm3
@@ -215,7 +215,7 @@ if (param_const['sim_type'] == 'finisher'):
 		press_arrays.append(cham_env[-1, 1]) # store pressure (Pa)
 		rh_arrays.append(cham_env[-1, 2]) # store relative humidity (0-1)
 		j_arrays.append(cham_env[-1, 3])
-
+		break
 
 			
 
