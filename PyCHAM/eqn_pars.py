@@ -213,8 +213,7 @@ def extr_mech(int_tol, num_sb,
 	# ensure integer
 	self.con_infl_indx = self.con_infl_indx.astype('int')
 	
-	[rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self] = jac_setup.jac_setup(comp_num, 
-		num_sb, (num_sb-self.wall_on), self)
+	[rowvals, colptrs, self] = jac_setup.jac_setup(comp_num, num_sb, (num_sb-self.wall_on), self)
 
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
@@ -236,11 +235,9 @@ def extr_mech(int_tol, num_sb,
 	Jlen = photo_num.photo_num(self.photo_path)
 
 	# in case equation parsing to be skipped in further simulations
-	self.rowvals = rowvals; self.colptrs = colptrs; self.jac_wall_indx = jac_wall_indx 
-	self.jac_part_indx = jac_part_indx; self.jac_extr_indx = jac_extr_indx; self.comp_num = comp_num
+	self.rowvals = rowvals; self.colptrs = colptrs; self.comp_num = comp_num;
 	self.rel_SMILES = comp_list; self.Pybel_objects = Pybel_objects; self.Jlen = Jlen 
 	self.comp_xmlname = comp_name; self.comp_smil = comp_smil
 
-	return(rowvals, colptrs, 
-		jac_wall_indx, jac_part_indx, jac_extr_indx, comp_num, 
+	return(rowvals, colptrs, comp_num, 
 		Jlen, comp_name, comp_smil, erf, err_mess, self)

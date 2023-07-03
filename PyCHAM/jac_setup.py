@@ -333,7 +333,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# and particle on particle effect
 
 	# Jacobian index for particle effects
-	jac_part_indx = np.zeros((comp_num+2)*(num_asb+1)+((comp_num+2)*(num_asb*2)))
+	self.jac_part_indx = np.zeros((comp_num+2)*(num_asb+1)+((comp_num+2)*(num_asb*2)))
 	
 	part_cnt = 0 # count on jac_part_indx inputs
 	
@@ -354,13 +354,13 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx] == compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					jac_part_indx[part_cnt] = exist_indx
+					self.jac_part_indx[part_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then include
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					jac_part_indx[part_cnt] = new_indx # gas-particle partitioning
+					self.jac_part_indx[part_cnt] = new_indx # gas-particle partitioning
 					self.jac_indx_g[self.jac_indx_g>=new_indx] += 1 # gas-phase reactions
 					self.jac_indx_aq[self.jac_indx_aq>=new_indx] += 1 # aqueous-phase reactions
 					self.jac_indx_su[self.jac_indx_su>=new_indx] += 1 # surface (e.g. wall) reactions
@@ -375,7 +375,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				jac_part_indx[part_cnt] = st_indx # gas-particle partitioning
+				self.jac_part_indx[part_cnt] = st_indx # gas-particle partitioning
 				self.jac_indx_g[self.jac_indx_g>=st_indx] += 1 # gas-phase reactions
 				self.jac_indx_aq[self.jac_indx_aq>=st_indx] += 1 # aqueous-phase reactions
 				self.jac_indx_su[self.jac_indx_su>=st_indx] += 1 # surface (e.g. wall) reactions
@@ -392,7 +392,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# already know that the gas-phase reactions will not
 			# have affected this part of the Jacobian, so just need to
 			# modify sparse Jacobian inputs accordingly
-			jac_part_indx[part_cnt:part_cnt+num_asb] = range(en_indx, en_indx+num_asb)
+			self.jac_part_indx[part_cnt:part_cnt+num_asb] = range(en_indx, en_indx+num_asb)
 			self.jac_indx_g[self.jac_indx_g>=en_indx] += num_asb # gas-phase reaction
 			self.jac_indx_aq[self.jac_indx_aq>=en_indx] += num_asb # aqueous-phase reactions
 			self.jac_indx_su[self.jac_indx_su>=en_indx] += num_asb # surface (e.g. wall) reactions
@@ -413,7 +413,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				# relevant start index for colptrs
 				stc_indx = int((comp_num+2)*(sbi+1)+(compi))
 				st_indx = int(colptrs[stc_indx]) # start index for rowvals		
-				jac_part_indx[part_cnt] = st_indx
+				self.jac_part_indx[part_cnt] = st_indx
 				new_el = np.array((compi)).reshape(-1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
 				colptrs[(comp_num+2)*(sbi+1)+(compi+1)::] += 1
@@ -425,7 +425,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				new_el = np.array(((comp_num+2)*(sbi+1)+compi)).reshape(-1)
 				# account for any aqueous-phase or surface (e.g. wall) reactions
 				st_indx = (st_indx) + sum(rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])] < new_el)
-				jac_part_indx[part_cnt] = st_indx
+				self.jac_part_indx[part_cnt] = st_indx
 				# check if diagonal already in use by aqueous-phase reactions
 				if any(rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])] == new_el):
 					part_cnt += 1
@@ -447,7 +447,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# and wall-on-wall affect
 	
 	# empty results array, 1st term is gas-on-gas, 2nd is gas-on-wall, 3rd is wall-on-gas, 4th is wall-on-wall
-	jac_wall_indx = np.zeros(((comp_num+2)+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))))
+	self.jac_wall_indx = np.zeros(((comp_num+2)+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))))
 	wall_cnt = 0 # count on jac_wall_indx inputs
 	
 	if (self.wall_on > 0): # if surface present
@@ -469,13 +469,13 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					jac_wall_indx[wall_cnt] = exist_indx
+					self.jac_wall_indx[wall_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then add
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					jac_wall_indx[wall_cnt] = new_indx
+					self.jac_wall_indx[wall_cnt] = new_indx
 					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
 					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
 					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
@@ -489,7 +489,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				jac_wall_indx[wall_cnt] = st_indx
+				self.jac_wall_indx[wall_cnt] = st_indx
 				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
 				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
 				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
@@ -506,7 +506,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# already know that the gas-phase photochemistry will not
 			# have affected this part of the Jacobian, so just need to
 			# modify sparse Jacobian inputs accordingly
-			jac_wall_indx[wall_cnt:wall_cnt+self.wall_on] = range(en_indx, en_indx+self.wall_on)
+			self.jac_wall_indx[wall_cnt:wall_cnt+self.wall_on] = range(en_indx, en_indx+self.wall_on)
 			# increase gas, aqueous and particle (if present) effect indices up by number of surface bins to 
 			# account for addition to Jacobian
 			self.jac_indx_g[self.jac_indx_g >= en_indx] += self.wall_on
@@ -514,7 +514,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			self.jac_indx_su[self.jac_indx_su >= en_indx] += self.wall_on
 			
 			if (num_asb > 0):
-				jac_part_indx[jac_part_indx >= en_indx] += self.wall_on
+				self.jac_part_indx[self.jac_part_indx >= en_indx] += self.wall_on
 				
 			new_el = (np.array(range((comp_num+2)*(num_asb+1)+compi, (comp_num+2)*(num_asb+1)+(comp_num+2)*self.wall_on+compi, comp_num+2))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
@@ -533,7 +533,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				stc_indx = int((comp_num+2)*(wbi+num_asb+1)+(compi))
 				st_indx = colptrs[stc_indx]
 
-				jac_wall_indx[wall_cnt] = st_indx # include in wall index for Jacobian
+				self.jac_wall_indx[wall_cnt] = st_indx # include in wall index for Jacobian
 				# include in rowvals
 				rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx])], [compi], rowvals[int(colptrs[stc_indx])::]])
 				# include in colptrs
@@ -548,7 +548,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				# just above in this loop
 				if ((colptrs[stc_indx]+1) == (colptrs[stc_indx+1])): # surface reaction is not present
 					
-					jac_wall_indx[wall_cnt] = st_indx+1 # include in wall index for Jacobian
+					self.jac_wall_indx[wall_cnt] = st_indx+1 # include in wall index for Jacobian
 					# include in rowvals, note that using stc_indx as the value means that 
 					# we use the index for component on wall effect on itself on wall - see 
 					# the stc_indx definition further up in this loop
@@ -567,7 +567,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					# sum Jacobian indices between the wall on gas effect and this wall on wall effect
 					wall_indx_add = sum(rows_reac < comp_num+2)
 					# get the wall index
-					jac_wall_indx[wall_cnt] = st_indx+1+wall_indx_add # include in wall index for Jacobian
+					self.jac_wall_indx[wall_cnt] = st_indx+1+wall_indx_add # include in wall index for Jacobian
 
 					if (sum(rows_reac == stc_indx) == 0.): # if reaction does not cover wall effect on wall
 						
@@ -575,7 +575,8 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 						rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [stc_indx], rowvals[int(colptrs[stc_indx]+1)::]])
 						# include in colptrs
 						colptrs[stc_indx+1::] += 1
-						self.jac_indx_su[self.jac_indx_su > jac_wall_indx[wall_cnt]] += 1 # adjust surface (e.g. wall) reactions
+						# adjust surface (e.g. wall) reactions
+						self.jac_indx_su[self.jac_indx_su > self.jac_wall_indx[wall_cnt]] += 1 
 										
 
 				wall_cnt += 1 # move up index for wall index for Jacobian
@@ -583,7 +584,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# end of wall influence on Jacobian part ---------------------------------------------------
 
 	# index of the Jacobian affected by air extraction
-	jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
+	self.jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
 	
 	# extraction effect on Jacobian part -----------------------
 	if (len(self.dil_fac) > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
@@ -591,7 +592,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		extr_cnt = 0 # count on jac_extr_indx inputs
 		
 		# loop through all gas- and particle-phase components
-		for compi in range((comp_num+2)*(num_asb)):
+		for compi in range((comp_num+2)*(num_asb+1)):
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
@@ -602,7 +603,6 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# relevant starting and finishing index in rowvals
 			st_indx = int(colptrs[compi])
 			en_indx = int(colptrs[compi+1])
-			
 			# check if any rows already attributed to this column
 			if ((st_indx < en_indx) == True):
 			
@@ -614,20 +614,20 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					jac_extr_indx[extr_cnt] = exist_indx
+					self.jac_extr_indx[extr_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then add
 				
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					jac_extr_indx[extr_cnt] = new_indx
+					self.jac_extr_indx[extr_cnt] = new_indx
 					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
 					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
 					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
 					if (num_asb > 0):
-						jac_part_indx[jac_part_indx >= new_indx] += 1
-					jac_wall_indx[jac_wall_indx >= new_indx] += 1
+						self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
+					self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
 					
 					new_el = np.array((compi)).reshape(1)
 					rowvals = np.concatenate([rowvals[0:new_indx], 
@@ -637,14 +637,14 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				jac_extr_indx[extr_cnt] = st_indx
+				self.jac_extr_indx[extr_cnt] = st_indx
 				# adjust other indices
 				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
 				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
 				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
 				if (num_asb > 0):
-					jac_part_indx[jac_part_indx >= st_indx] += 1
-				jac_wall_indx[jac_wall_indx >= st_indx] += 1
+					self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
+				self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
 				
 				new_el = np.array((compi)).reshape(1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
@@ -701,8 +701,8 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
 					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
 					if (num_asb > 0):
-						jac_part_indx[jac_part_indx >= new_indx] += 1
-					jac_wall_indx[jac_wall_indx >= new_indx] += 1
+						self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
+					self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
 					
 					new_el = np.array((compi)).reshape(1)
 					rowvals = np.concatenate([rowvals[0:new_indx], 
@@ -718,8 +718,8 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
 				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
 				if (num_asb > 0):
-					jac_part_indx[jac_part_indx >= st_indx] += 1
-				jac_wall_indx[jac_wall_indx >= st_indx] += 1
+					self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
+				self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
 				
 				new_el = np.array((compi)).reshape(1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
@@ -750,10 +750,10 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	self.jac_indx_g = self.jac_indx_g.astype(int)
 	self.jac_indx_aq = self.jac_indx_aq.astype(int)
 	self.jac_indx_su = self.jac_indx_su.astype(int)
-	jac_part_indx = jac_part_indx.astype(int)
-	jac_wall_indx = jac_wall_indx.astype(int)	
-	jac_extr_indx = jac_extr_indx.astype(int)
+	self.jac_part_indx = self.jac_part_indx.astype(int)
+	self.jac_wall_indx = self.jac_wall_indx.astype(int)	
+	self.jac_extr_indx = self.jac_extr_indx.astype(int)
 	rowvals = rowvals.astype(int)	
 	colptrs = colptrs.astype(int)
 	
-	return(rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self)
+	return(rowvals, colptrs, self)

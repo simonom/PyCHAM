@@ -102,44 +102,44 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'OOH'):
+			if (comp_names_to_plot[i].strip() == '-OOH'):
 				indx_plot = (np.array((group_indx['OOH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM_OOH'):
+			if (comp_names_to_plot[i].strip() == 'HOM-OOH'):
 				indx_plot = (np.array((group_indx['HOM_OOH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'OH'):
+			if (comp_names_to_plot[i].strip() == '-OH'):
 				indx_plot = (np.array((group_indx['OH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1			
-			if (comp_names_to_plot[i].strip() == 'HOM_OH'):
+			if (comp_names_to_plot[i].strip() == 'HOM-OH'):
 				indx_plot = (np.array((group_indx['HOM_OH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'carbonyl'):	
+			if (comp_names_to_plot[i].strip() == '-carbonyl'):	
 				indx_plot = (np.array((group_indx['carbonyl'])))			
 					
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM_carbonyl'):
+			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'):
 				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
 				
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'NO3'):
+			if (comp_names_to_plot[i].strip() == '-NO3'):
 				indx_plot = (np.array((group_indx['NO3'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM_NO3'):
+			if (comp_names_to_plot[i].strip() == 'HOM-NO3'):
 				indx_plot = (np.array((group_indx['HOM_NO3'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
@@ -227,37 +227,37 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'OOH'): # if is the sum of hydroperoxides 
+			if (comp_names_to_plot[i].strip() == '-OOH'): # if is the sum of hydroperoxides 
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == 'HOM_OOH'): # if is the sum of hydroperoxides 
+			if (comp_names_to_plot[i].strip() == 'HOM-OOH'): # if is the sum of hydroperoxides 
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == 'OH'): # if is the sum of alcohols 
+			if (comp_names_to_plot[i].strip() == '-OH'): # if is the sum of alcohols 
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM_OH'): # if is the sum of HOM alcohols
+			if (comp_names_to_plot[i].strip() == 'HOM-OH'): # if is the sum of HOM alcohols
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'carbonyl'): # if is the sum of carbonyls 
+			if (comp_names_to_plot[i].strip() == '-carbonyl'): # if is the sum of carbonyls 
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM_carbonyl'): # if is the sum of HOM carbonyls
+			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'): # if is the sum of HOM carbonyls
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == 'NO3'): # if is the sum of nitrates
+			if (comp_names_to_plot[i].strip() == '-NO3'): # if is the sum of nitrates
 				if (caller == 4 or caller == 5 or caller == 6): 
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$NO3 (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis

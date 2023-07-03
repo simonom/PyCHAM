@@ -60,16 +60,14 @@ def middle(self): # define function
 	if (self.pars_skip == 0): # if not skipping parsing of chemical scheme
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
-		[rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, 
+		[rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
 							 drh_str, erh_str, sav_nam, pcont, self)
 		
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
-		[rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, 
-		Jlen, comp_xmlname, comp_smil, erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
+		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, comp_smil, 
+			erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 	
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
@@ -133,8 +131,7 @@ def middle(self): # define function
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
-		x, Varr, act_coeff, Cfactor, rowvals, 
-		colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou, 
+		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 		nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 

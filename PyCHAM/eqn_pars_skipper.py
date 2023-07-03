@@ -132,11 +132,9 @@ def eqn_pars_skipper(self): # define function
 		self.con_infl_nam = (self.con_infl_nam[si])
 
 	# use eqn_pars output from previous simulation
-	rowvals = self.rowvals; colptrs = self.colptrs; jac_wall_indx = self.jac_wall_indx 
-	jac_part_indx = self.jac_part_indx; jac_extr_indx = self.jac_extr_indx
+	rowvals = self.rowvals; colptrs = self.colptrs 
 	comp_num = self.comp_num; Jlen = self.Jlen; comp_xmlname = self.comp_xmlname; comp_smil = self.comp_smil; 
 	erf = 0.; err_mess = ''
 
-	return(rowvals, colptrs, jac_wall_indx, 
-		jac_part_indx, jac_extr_indx, comp_num, 
+	return(rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess)

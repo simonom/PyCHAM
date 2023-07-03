@@ -191,7 +191,8 @@ def mod_var_read(self):
 				
 				# check if this is a path to a file containing continuous 
 				# influxes, if not treat as a list of component names
-				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+				# treat as path to file containing mass transfer coefficients
+				if '/' in value or '\\' in value: 
 					self.mtc_path = str(value.strip())
 					value = mass_trans_coeff_open(self)
 					err_mess = self.err_mess
@@ -223,7 +224,7 @@ def mod_var_read(self):
 				
 				# ensure final wall is registered
 				prescribes.append(reader)
-
+				
 				max_of_all.append(max_comp) # ensure final wall accounted for
 
 				# remember the components that are prescribed, their wall number and mass transfer coefficient
@@ -787,12 +788,22 @@ def mass_trans_coeff_open(self):
 				break
 			# if all components then just need mass transfer coefficient value
 			if i[1] == 'all_other_components':
-				value = str(value + str(i[2])  + ';')
+				if (value == ''): # first installment
+					walln_0 = i[3]	
+				value = str(value + str(i[2]))
+
 			else: # if component specified then get name, coefficient and wall number (in spreadsheet first wall = 1)
-				value = str(value + i[1] + '_wall' + str(i[3]) + '_' + str(i[2]) + ';')
-	
-	if value[-1] == ';': # remove final ;
-		value = value[0:-1]
+				if (value == ''): # if first installment
+					value = str(value + i[1] + '_wall' + str(i[3]) + '_' + str(i[2]))
+					walln_0 = i[3]
+				else:
+					# get wall number
+					walln_now = i[3]
+					if (walln_now == walln_0):
+						value = str(value + ';'  + i[1] + '_wall' + str(i[3]) + '_' + str(i[2]))
+					else:	
+						value = str(value + ',' + i[1] + '_wall' + str(i[3]) + '_' + str(i[2]))
+					walln_0 = i[3]	
 	wb.close() # close excel file
 	
 	return(value)

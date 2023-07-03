@@ -29,10 +29,9 @@ from scipy.integrate import solve_ivp
 # define function
 def ode_solv(y, integ_step, Cinfl_now,
 	rowvals, colptrs, num_comp, num_sb,
-	act_coeff, jac_wall_indx,
-	core_diss, kelv_fac, kimt, num_asb,
-	jac_part_indx,jac_mod_len,
-	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self):
+	act_coeff, core_diss, kelv_fac, kimt, num_asb,
+	jac_mod_len, jac_part_hmf_indx, rw_indx, 
+	N_perbin, jac_part_H2O_indx, H2Oi, self):
 
 	# inputs: -------------------------------------
 	# y - initial concentrations (molecules/cm3)
@@ -48,13 +47,11 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# self.wall_on - flag saying whether to include wall partitioning
 	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
-	# jac_wall_indx - index of inputs to Jacobian by wall partitioning
 	# self.seedi - index of seed material
 	# core_diss - dissociation constant of seed material
 	# kelv_fac - kelvin factor for particles
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
 	# num_asb - number of actual size bins (excluding wall)
-	# jac_part_indx - index for sparse Jacobian for particle influence 
 	# self.eqn_num - number of gas- and aqueous-phase reactions 
 	# jac_mod_len - modification length due to high fraction of component(s)
 	# 	in particle phase

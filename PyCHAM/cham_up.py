@@ -508,7 +508,7 @@ def cham_up(sumt, Pnow,
 
 				# ensure correct shape
 				self.Cinfl_H2O_now = np.float64(self.Cinfl_H2O_now.reshape(-1, 1))
-
+			
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
 		

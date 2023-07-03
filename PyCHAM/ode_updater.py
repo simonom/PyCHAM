@@ -58,8 +58,7 @@ def ode_updater(y, H2Oi,
 	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
-	x, Varr, act_coeff, Cfactor, rowvals, 
-	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
+	x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
 	nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
@@ -157,11 +156,11 @@ def ode_updater(y, H2Oi,
 	# colptrs - indices of  rowvals corresponding to each column of
 	# 	the Jacobian
 	# self.wall_on - marker for whether wall partitioning turned on
-	# jac_wall_indx - index of inputs to Jacobian from wall 
+	# self.jac_wall_indx - index of inputs to Jacobian from wall 
 	# 	partitioning
-	# jac_part_indx - index of inputs to Jacobian from particle
+	# self.jac_part_indx - index of inputs to Jacobian from particle
 	#	partitioning
-	# jac_extr_indx - index of inputs to Jacobian from extraction
+	# self.jac_extr_indx - index of inputs to Jacobian from extraction
 	#	of chamber air
 	# Vbou - volume boundary of size bins (um3)
 	# N_perbin - number concentration of particles per size bin 
@@ -502,23 +501,24 @@ def ode_updater(y, H2Oi,
 				yield(err_mess)
 			
 			# update Jacobian inputs based on particle-phase fractions of components
-			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
-			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
-			colptrs, (num_sb-self.wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
-			
-			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
-
+			[rowvalsn, colptrsn, jac_mod_len, jac_part_hmf_indx, rw_indx, 
+				jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
+				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, self)
+				
+			# if water gas-particle partitioning serialised
+			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): 
+				
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-					
+				
+					self.odsw_flag = 1 # flag that water gas-particle partitioning solved separately
+	
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
 					Cinfl_now, rowvalsn, colptrsn, num_comp, 
-					num_sb, act_coeff, jac_wall_indxn,
-					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
-					jac_part_indxn, jac_mod_len, 
-					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
+					num_sb, act_coeff, core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
+					jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
 				
 					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
 						
@@ -558,19 +558,24 @@ def ode_updater(y, H2Oi,
 						
 					else: # if solution stable, change stability flag to represent this
 						gpp_stab = 1 # change to stable flag
-					
+				else:
+					# water gas-particle partitioning not solved separately
+					self.odsw_flag = 0
 				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
 				if (num_sb > self.wall_on): # if particles present
 					kimt[0:num_sb-self.wall_on, H2Oi] = 0.
 			
+			else:
+				# water gas-particle partitioning not solved separately
+				self.odsw_flag = 0
+
 			# model component concentration changes to get new concentrations
-			# (# molecules/cm3 (air))
+			# (# molecules/cm3 (air))	
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
-				num_sb, act_coeff, jac_wall_indxn,
-				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
-				jac_part_indxn, jac_extr_indx,
+				num_sb, act_coeff,
+				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
 				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
 			
