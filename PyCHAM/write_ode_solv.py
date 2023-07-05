@@ -289,8 +289,9 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		
 		f.write('		# account for components with continuous gas-phase influx\n')	
 		f.write('		dd[[self.con_infl_indx], 0] += Cinfl_now[:, 0]\n')
-		f.write('		if self.odsw_flag == 0: # if water not solved separately\n')
-		f.write('			dd[H2Oi, 0] += self.Cinfl_H2O_now\n')
+		if ('H2O' in self.con_infl_nam): 
+			f.write('		if self.odsw_flag == 0: # if water not solved separately\n')
+			f.write('			dd[H2Oi, 0] += self.Cinfl_H2O_now\n')
 	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
 		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') # index for estimating dilution factors\n')

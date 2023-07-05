@@ -1,145 +1,2883 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/test_chem_scheme/INGENIOUS_2excel_1wall
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
-Warning: underflow encountered in nextafter
+C:\Users\Psymo\OneDrive - The University of Manchester\PyCHAM\outputs\interact\hiJ_hiNOx_hiCH4_hiT_hiJ_hiT_meAP_loBZ
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in power
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in reduce
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar power
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in divide
+Warning: underflow encountered in divide
+Warning: underflow encountered in nextafter
+Warning: underflow encountered in divide
+Warning: underflow encountered in scalar multiply
+Warning: underflow encountered in scalar multiply

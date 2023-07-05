@@ -4545,31 +4545,31 @@ class PyCHAM(QWidget):
 				const_influxers = self.param_const['const_infl'].split(',')
 
 				# set influx rate for methane and carbon monoxide (ppb/s)
-				self.param_const['Cinfl'] = np.zeros((len(const_influxers)))
+				Cinfl_0 = np.zeros((len(const_influxers)))
 
 				if 'loCH4' in starter_name:
 					# get index for methane
 					CH4indx = const_influxers.index('CH4')
-					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][0]	
+					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][0]	
 					# get index for carbon monoxide
 					COindx = const_influxers.index('CO')
-					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][0]
+					Cinfl_0[COindx] = param_range['Cinfl'][COindx][0]
 
 				if 'meCH4' in starter_name:
 					# get index for methane
 					CH4indx = const_influxers.index('CH4')
-					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][1]	
+					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][1]	
 					# get index for carbon monoxide
 					COindx = const_influxers.index('CO')
-					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][1]
+					Cinfl_0[COindx] = param_range['Cinfl'][COindx][1]
 
 				if 'hiCH4' in starter_name:
 					# get index for methane
 					CH4indx = const_influxers.index('CH4')
-					self.param_const['Cinfl'][CH4indx] = param_range['Cinfl'][CH4indx][2]
+					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][2]
 					# get index for carbon monoxide
 					COindx = const_influxers.index('CO')
-					self.param_const['Cinfl'][COindx] = param_range['Cinfl'][COindx][2]
+					Cinfl_0[COindx] = param_range['Cinfl'][COindx][2]
 		
 				# get alpha-pinene index
 				APindx = const_influxers.index('APINENE')
@@ -4582,7 +4582,7 @@ class PyCHAM(QWidget):
 				# now loop through alpha-pinene influxes in combination with 
 				# influxes of benzene, nitrogen oxide and nitrogen dioxide
 				for iap in range(len(param_range['Cinfl'][APindx])):
-					self.param_const['Cinfl'][APindx] = param_range['Cinfl'][APindx][iap]
+					Cinfl_0[APindx] = param_range['Cinfl'][APindx][iap]
 					if (iap == 0):
 						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loAP')
 					if (iap == 1):
@@ -4592,9 +4592,9 @@ class PyCHAM(QWidget):
 					
 					# loop through benzene influxes
 					for ibz in range(len(param_range['Cinfl'][BZindx])):
-						self.param_const['Cinfl'][BZindx] = param_range['Cinfl'][BZindx][ibz]
-						self.param_const['Cinfl'][NOindx] = param_range['Cinfl'][NOindx][ibz]
-						self.param_const['Cinfl'][NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
+						Cinfl_0[BZindx] = param_range['Cinfl'][BZindx][ibz]
+						Cinfl_0[NOindx] = param_range['Cinfl'][NOindx][ibz]
+						Cinfl_0[NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
 						if (ibz == 0):
 							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
 						if (ibz == 1):
@@ -4608,21 +4608,28 @@ class PyCHAM(QWidget):
 						
 						# ensure correct format
 						self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
-						# loop through characters, replacing odd white spaces with , 
-						# (times) and even white spaces with ; (components)
+						# loop through characters, white spaces with ; (components)
 						cci = 1
 						cc_all = -1
 						for ccn in self.param_const['Cinfl']: # loop through characters
 							cc_all += 1
 							if (ccn == ' ' and cci % 2. > 0.):
 								
-								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+','+self.param_const['Cinfl'][cc_all+1::])
+								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
 								cci += 1
 								continue
 							if (ccn == ' ' and cci % 2. < 1.):
 								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
 								cci += 1
 								continue		
+						print(self.param_const['res_file_name'])
+						print(self.param_const['Cinfl'])
+						print(self.param_const['const_infl'])
+						print(self.param_const['temperature'])									
+						print(self.param_const['rh'])
+						print(self.param_const['p_init'])
+						print(self.param_const['trans_fac'])
+
 						if os.path.exists(self.param_const['res_file_name']):
 							print('already exists!')
 						else:
@@ -4643,7 +4650,7 @@ class PyCHAM(QWidget):
 							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-10]
 						else:
 							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
-
+						
 					# reset saving name to original
 					self.param_const['res_file_name'] = res_file_name0
 		

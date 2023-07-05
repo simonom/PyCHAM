@@ -215,7 +215,7 @@ if (param_const['sim_type'] == 'finisher'):
 		press_arrays.append(cham_env[-1, 1]) # store pressure (Pa)
 		rh_arrays.append(cham_env[-1, 2]) # store relative humidity (0-1)
 		j_arrays.append(cham_env[-1, 3])
-		break
+		print(path)
 
 			
 
