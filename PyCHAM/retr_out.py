@@ -429,10 +429,11 @@ def retr_out(self):
 		
 		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
 		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
+		load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
+		group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
+
 		load_path = str(self.dir_path + '/OOH_index.npy') # path
-		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
+		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()		
 		load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
 		group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
 		

@@ -4631,6 +4631,7 @@ class PyCHAM(QWidget):
 						print(self.param_const['trans_fac'])
 
 						if os.path.exists(self.param_const['res_file_name']):
+							self.param_const['pars_skip'] = 0
 							print('already exists!')
 						else:
 							# establish parameters provided by user by calling mod_var_read

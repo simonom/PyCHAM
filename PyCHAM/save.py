@@ -229,6 +229,9 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	save_path = str(output_by_sim + '/organic_HOMs_index') # path
 	np.save(save_path, self.HOMs_indx, allow_pickle=True)
 	
+	save_path = str(output_by_sim + '/organic_ROOR_index') # path
+	np.save(save_path, self.ROOR_indx, allow_pickle=True)
+
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
@@ -349,6 +352,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	group_indx['ROi'] = self.RO_indx
 	group_indx['HOMRO2'] = self.HOM_RO2_indx 
 	group_indx['HOMs'] = self.HOMs_indx	
+	group_indx['ROOR'] = self.ROOR_indx	
 
 	if ((numsb-self.wall_on) == 0): # if zero size bins
 		# ensure numpy arrays, rather than float

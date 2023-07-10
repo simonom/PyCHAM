@@ -130,6 +130,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HOM_RO2_indx = [] # HOM peroxy radicals
 	self.RO_indx = [] # empty list for holding indices of alkoxy components
 	self.HOMs_indx = [] # HOMs
+	self.ROOR_indx = [] # HOMs accretion products
 	self.OOH = [] # hydroperoxides
 	self.HOM_OOH = [] # HOMs hydroperoxides
 	self.OH = [] # alcohols
@@ -144,33 +145,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		self.HO2i = self.comp_namelist.index('HO2')	
 	except: # in case HO2 not present in scheme
 		self.HO2i = []
-
-	if (ode_gen_flag == 0): # estimate densities if called from middle
-		
-		for i in range (num_comp): # loop through components
-			
-			# density estimation ---------------------------------------------------------
-			if (i == H2Oi): # liquid-phase density of water
-				self.y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
-				continue
-			# core component properties
-			if (i == corei[0]): # density of core
-				self.y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
-				continue
-			if self.rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
-				# liquid density code does not like H2, so manually input kg/m3
-				self.y_dens[i] = 1.e3
-			else:
-				# density (convert from g/cm3 to kg/m3)
-				self.y_dens[i] = liquid_densities.girolami(self.Pybel_objects[i])*1.e3
-			# ----------------------------------------------------------------------------
-		
-	# account for any manually assigned component densities (kg/m3)
-	if (len(dens_comp) > 0  and ode_gen_flag == 0):
-		for i in range (len(dens_comp)):
-			# index of component in list of components
-			dens_indx = self.comp_namelist.index(dens_comp[i])
-			self.y_dens[dens_indx] = dens[i]
 
 	# for records (e.g. plotting volatility basis set), 
 	# estimate and list the pure component saturation vapour 
@@ -187,7 +161,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.Hn_list = [] # prepare for storing hydrogen numbers of components
 
 	
-	# estimate vapour pressures (log10(atm)) and O:C ratio
+	# estimate condensed-phase densitites (kg/m3) vapour pressures 
+	# (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
 	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
@@ -198,9 +173,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# note, rec_now_flag is only changed below if alternative vapour pressure estimation 
 		# method uncommented for HOMs
 		rec_now_flag = 0
-		
+			
 		if (i == corei[0]): # if this component is 'core'
 			# core component not included in self.Pybel_objects
+			self.y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
 			# assign an assumed O:C ratio of 0.
 			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
@@ -213,6 +189,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# water vapour pressure already given by Psat_water (log10(atm))
 		# and water not included in self.Pybel_objects
 		if (i == H2Oi):
+			self.y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
 			self.Psat[0, i] = Psat_water
 			if (self.TEMP[tempt_cnt] == 298.15):
 				self.Psat_Pa_rec[i] = self.Psat[0, i]
@@ -222,7 +199,15 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
 			continue
-		
+	
+		if self.rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
+			# liquid density code does not like H2, so manually input kg/m3
+			self.y_dens[i] = 1.e3
+
+		if (i != corei[0] and i != H2Oi and self.rel_SMILES[i] != '[HH]'):
+			# density (convert from g/cm3 to kg/m3)
+			self.y_dens[i] = liquid_densities.girolami(self.Pybel_objects[i])*1.e3
+
 		if (self.comp_namelist[i] == 'O3'):
 			# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
 			self.Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
@@ -334,7 +319,13 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.OC[0, i] = 0.
 
 
-		
+	# account for any manually assigned component densities (kg/m3)
+	if (len(dens_comp) > 0  and ode_gen_flag == 0):
+		for i in range (len(dens_comp)):
+			# index of component in list of components
+			dens_indx = self.comp_namelist.index(dens_comp[i])
+			self.y_dens[dens_indx] = dens[i]
+
 	ish = (self.Psat == 0.) # non-volatiles
 	
 	self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm

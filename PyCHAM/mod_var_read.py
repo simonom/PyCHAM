@@ -198,7 +198,7 @@ def mod_var_read(self):
 					err_mess = self.err_mess
 					if err_mess[0:5] == 'Error':
 						break
-				
+					
 				max_comp = 1
 				max_of_all = []
 				reader = '' # prepare to read in string between semi-colons
@@ -250,15 +250,16 @@ def mod_var_read(self):
 						self.wmtc.append(float(prei[prei.index('_')+1 + prei[prei.index('_')+1::].index('_')+1::]))
 						self.kw[int(self.wmtc_wn[-1]), ind_wall_cnt-1] = -1.e-7
 					else: # if just a generic mass transfer coefficient for this wall
-						self.wmtc_names
-						self.kw[wall_num, ind_wall_cnt-1] = float(prei)
+						self.wmtc_names.append('all_other_components')
+						self.wmtc.append(float(prei))
+						self.kw[wall_num, ind_wall_cnt-1] = -1.e-7
 					
 					pre_cnt += 1 # count on number of prescribed mass transfer coefficients
 					ind_wall_cnt += 1 # number of entries for each wall
 					if pre_cnt == sum(max_of_all[0:wall_num+1]): # if moving up a wall
 						wall_num += 1
 						ind_wall_cnt = 1 # number of entries for each wall
-				
+			
 			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
 				chamSA = float(value.strip())
 

@@ -92,7 +92,7 @@ def eqn_pars_skipper(self): # define function
 		
 		# water not included explicitly in chemical schemes but accounted for later in init_conc
 		if (self.con_infl_nam[icon] == 'H2O'):
-			self.con_infl_indx[icon] = int(comp_num)
+			self.con_infl_indx[icon] = int(self.comp_num)
 			icon += 1 # count on constant influxes
 			continue
 

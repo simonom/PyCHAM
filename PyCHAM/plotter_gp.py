@@ -144,7 +144,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1	
-
+			if (comp_names_to_plot[i].strip() == 'ROOR'):
+				indx_plot = (np.array((group_indx['ROOR'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
 			if (ip_fail == 1):	
 					
 				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -267,6 +271,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'ROOR'): # if is the sum of accretion products
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$ROOR (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$ROOR (gas-phase)'))
 
 		if (caller == 0 or caller == 5): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)

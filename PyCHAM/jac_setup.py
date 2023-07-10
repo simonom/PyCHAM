@@ -515,12 +515,18 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			
 			if (num_asb > 0):
 				self.jac_part_indx[self.jac_part_indx >= en_indx] += self.wall_on
-				
+			
+			# the new rows to consider for gas effect on wall,
+			# note that the indexing for the count on
+			# components in this loop (compi) begins at 0 for
+			# the first component, and so there is no need to
+			# -1 from the count on preceding phases 
+			# ((comp_num+2)*number of preceding phases)
 			new_el = (np.array(range((comp_num+2)*(num_asb+1)+compi, (comp_num+2)*(num_asb+1)+(comp_num+2)*self.wall_on+compi, comp_num+2))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += self.wall_on
 			wall_cnt += self.wall_on # keep count on wall index
-
+			
 		# wall effect on gas phase and on wall components for the Jacobian, note this will include the
 		# final row in the final column of the Jacobian
 		for wbi in range(self.wall_on): # wall bin loop
@@ -580,11 +586,11 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 										
 
 				wall_cnt += 1 # move up index for wall index for Jacobian
-				
+			
 	# end of wall influence on Jacobian part ---------------------------------------------------
 
 	# index of the Jacobian affected by air extraction
-	self.jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
+	self.jac_extr_indx = np.zeros(((comp_num+2)*(num_asb+1)))
 	
 	# extraction effect on Jacobian part -----------------------
 	if (len(self.dil_fac) > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
@@ -655,79 +661,80 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# end of extraction effect on Jacobian part -------------
 
 
-	# index of the Jacobian affected by continuous influx
-	self.jac_cont_infl_indx = np.zeros((len(self.con_infl_indx)))
+	# index of the Jacobian affected by continuous influx - note this commented out 
+	# since influx rate is not a function concentration inside box in any phase
+	#self.jac_cont_infl_indx = np.zeros((len(self.con_infl_indx)))
 	
 	# continuous influx effect on Jacobian part -----------------------
-	if (len(self.con_infl_indx) > 0): # if component continuously injected
+	#if (len(self.con_infl_indx) > 0): # if component continuously injected
 	
-		extr_cnt = 0 # count on jac_cont_infl_indx inputs
+		#extr_cnt = 0 # count on jac_cont_infl_indx inputs
 		
 		# loop through gas-phase components with continuous influx, note that
 		# self.con_infl_indx and associated arrays are ordered ascending in
 		# eqn_pars.py
-		for compi in self.con_infl_indx:
+		#for compi in self.con_infl_indx:
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
-			st_indx = int(colptrs[compi])
-			en_indx = int(colptrs[compi+1])
+			#st_indx = int(colptrs[compi])
+			#en_indx = int(colptrs[compi+1])
 			
 			# check whether the diagonal of Jacobian for this component is already affected
 			# relevant starting and finishing index in rowvals
-			st_indx = int(colptrs[compi])
-			en_indx = int(colptrs[compi+1])
+			#st_indx = int(colptrs[compi])
+			#en_indx = int(colptrs[compi+1])
 			
 			# check if any rows already attributed to this column
-			if ((st_indx < en_indx) == True):
+			#if ((st_indx < en_indx) == True):
 			
 				# if rows are already attributed, check 
 				# whether the diagonal is already affected
-				if ((sum(rowvals[st_indx:en_indx]==compi)) > 0):
+			#	if ((sum(rowvals[st_indx:en_indx]==compi)) > 0):
 				
 					# get index
-					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
+			#		exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					self.jac_cont_infl_indx[extr_cnt] = exist_indx
+			#		self.jac_cont_infl_indx[extr_cnt] = exist_indx
 					
-				else: # if diagonal not already affected, then add
+			#	else: # if diagonal not already affected, then add
 				
 					# get index
-					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
+			#		new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					self.jac_cont_infl_indx[extr_cnt] = new_indx
-					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
-					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
-					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
-					if (num_asb > 0):
-						self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
-					self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
+			#		self.jac_cont_infl_indx[extr_cnt] = new_indx
+			#		self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
+			#		self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
+			#		self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
+			#		if (num_asb > 0):
+			#			self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
+			#		self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
 					
-					new_el = np.array((compi)).reshape(1)
-					rowvals = np.concatenate([rowvals[0:new_indx], 
-						new_el, rowvals[new_indx::]])
-					colptrs[compi+1::] += 1
+			#		new_el = np.array((compi)).reshape(1)
+			#		rowvals = np.concatenate([rowvals[0:new_indx], 
+			#			new_el, rowvals[new_indx::]])
+			#		colptrs[compi+1::] += 1
 					
-			else: # no rows yet attributed to this column, so need to include
+			#else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				self.jac_cont_infl_indx[extr_cnt] = st_indx
+			#	self.jac_cont_infl_indx[extr_cnt] = st_indx
 				# adjust other indices
-				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
-				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
-				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
-				if (num_asb > 0):
-					self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
-				self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
+			#	self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
+			#	self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
+			#	self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
+			#	if (num_asb > 0):
+			#		self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
+			#	self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
+			#	
+			#	new_el = np.array((compi)).reshape(1)
+			#	rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
+			#	colptrs[compi+1::] += 1
 				
-				new_el = np.array((compi)).reshape(1)
-				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
-				colptrs[compi+1::] += 1
-				
-			extr_cnt += 1 # keep count on continous influx for jacobian index
+			#extr_cnt += 1 # keep count on continous influx for jacobian index
 
-		self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
+		#self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
 	
 	# end of continuous influx effect on Jacobian part -------------
 	

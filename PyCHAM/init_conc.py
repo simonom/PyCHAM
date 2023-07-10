@@ -306,7 +306,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 					return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
-					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+					0, 0, erf, err_mess, 0, 0, 0, 0)
 				# remember index for plotting gas-phase concentrations later
 				dydt_traki.append([int(y_indx)])
 			

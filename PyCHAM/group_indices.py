@@ -58,11 +58,13 @@ def group_indices(Hcount, SMILES, i, self):
 			if ('O[O]' not in SMILES and '[O]O' not in SMILES): # ensure it's not alkyl peroxy radical
 				self.RO_indx.append(i)					
 
-	# check for HOMs
+	# check for HOMs and accretion products
 	if (On >= 6):
 		# HOMs radicals
 		self.HOMs_indx.append(i)
-
+		if (Cn > 10):
+			# HOMs accretion products
+			self.ROOR_indx.append(i)
 
 	# check on hydroperoxides and HOM-OOH. Note that HOM-OOH may 
 	# not be named identifiably in HOM extensions, so need to 

@@ -237,50 +237,51 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	
 	# empty array ready to hold useful mass transfer rate coefficient to wall matrix
 	kwn = np.zeros((self.wall_on, num_comp))
-	pre_count = 0 # count on prescribed components
+	pre_count = 0 # count on prescribed components over all walls
 	mask = np.zeros((self.wall_on, num_comp)) # masking matrix
 	mask = mask == 0.
 	
 	if (self.wall_on > 0): # if wall present
 		# loop through user-defined inputs
 		for wi in range(self.kw.shape[0]): # loop through walls
-			for ci in range(self.kw.shape[1]): # loop through components	
-				if self.kw[wi,ci] == -1.e-6: # flag for empty space in array
+			# loop through number of components partitioning with this wall
+			for ci in range(sum(self.kw[wi, :]==-1.e-7)): 	
+					
+				if self.wmtc_names[pre_count]== 'all_other_components':
+					# coefficient specified for all components of this wall
+					kwn[wi, mask[wi, :]] = self.wmtc[pre_count]
+					pre_count += 1 # count on components
 					continue
-				
-				if self.kw[wi,ci] == -1.e-7: # coefficient specified for a component
-
-					# becuase water may not be in chemical scheme
-					if self.wmtc_names[pre_count] == 'H2O':
-						kwn[wi, self.H2Oi] = self.wmtc[pre_count]
-						mask[wi, self.H2Oi] = False
-						pre_count += 1 # count on prescribed components
-						continue
-
-					if (self.remove_influx_not_in_scheme == 1):
-						
-						try:
-							# coefficient of this component on this wall
-							kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
-							mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
-						except:
-							# just ignore if told to by user-defined 
-							# self.remove_influx_not_in_scheme, and leave as zero
-							continue
-					if (self.remove_influx_not_in_scheme == 0):
-						try:
-							# coefficient of this component on this wall
-							kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
-							mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
-						except:
-							# give error message
-							err_mess = str('Error: component ' + str(self.wmtc_names[pre_count]) + ' has a gas-wall mass transfer coefficient but has not been identified in the chemical scheme')
-							break
-
+				# becuase water may not be in chemical scheme
+				if self.wmtc_names[pre_count] == 'H2O':
+					kwn[wi, self.H2Oi] = self.wmtc[pre_count]
+					mask[wi, self.H2Oi] = False
 					pre_count += 1 # count on prescribed components
+					continue
 
-				else: # coefficient specified for all components
-					kwn[wi, mask[wi, :]] = self.kw[wi, ci]
+				if (self.remove_influx_not_in_scheme == 1):
+						
+					try:
+						# coefficient of this component on this wall
+						kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
+						mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
+					except:
+						# just ignore if told to by user-defined 
+						# self.remove_influx_not_in_scheme, and leave as zero
+						pre_count += 1 # count on prescribed components	
+						continue
+				
+				if (self.remove_influx_not_in_scheme == 0):
+					try:
+						# coefficient of this component on this wall
+						kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
+						mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
+					except:
+						# give error message
+						err_mess = str('Error: component ' + str(self.wmtc_names[pre_count]) + ' has a gas-wall mass transfer coefficient but has not been identified in the chemical scheme')
+						break
+
+				pre_count += 1 # count on prescribed components	
 	
 	# finally convert kw to kwn
 	self.kw = np.zeros((((self.wall_on, num_comp))))
