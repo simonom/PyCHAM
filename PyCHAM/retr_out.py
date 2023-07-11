@@ -79,7 +79,7 @@ def retr_out(self):
 	group_indx['HOM_carbonyl'] = [] # filler
 	group_indx['NO3'] = [] # filler
 	group_indx['HOM_NO3'] = [] # filler	
-
+	
 	for line in const_in.readlines():
 		
 		dlist = [] # empty list to hold values
@@ -428,18 +428,21 @@ def retr_out(self):
 		group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
-		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
-		group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
-
+		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()
+		try: # this output added after others in version 4 of PyCHAM
+			load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
+			group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
+		except:
+			group_indx['ROOR'] = []
 		load_path = str(self.dir_path + '/OOH_index.npy') # path
-		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()		
+		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
 		load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
 		group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
 		
 		load_path = str(self.dir_path + '/OH_index.npy') # path
 		group_indx['OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-			
+		
 		load_path = str(self.dir_path + '/HOM_OH_index.npy') # path
 		group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
 		
@@ -574,7 +577,7 @@ def retr_out(self):
 		tot_in_res = []
 	
 	yield (95.)
-
+	
 	# create a class to hold outputs
 	class ro_outputs:
 		

@@ -91,7 +91,7 @@ param_range['trans_fac'] = [0.1, 0.55, 1.]
 param_range['temperature'] = [273.15, 293.15, 313.15]
 param_const['tempt'] = 0.
 param_const['p_init'] = 101325.
-param_const['rh'] = [0.50]
+param_const['rh'] = 0.50
 # allow wall to be on so that particles can be lost as they would be in the real atmosphere
 param_const['wall_on'] = 0
 #param_const['McMurry_flag'] = 1
@@ -158,7 +158,7 @@ if (param_const['sim_type'] == 'finisher'):
 	
 	for path in dirlist: # loop through objects in this directory
 		
-		if (path[-9::] == '.DS_Store' or path[-7::] == 'lab_sim'): # ignore any irrelevant folders 	
+		if (path[-9::] == '.DS_Store' or path[-7::] == 'lab_sim' or path[-9::] == 'filter.py'): # ignore any irrelevant folders 	
 			continue
 		# extract initial concentrations in gas-phase (ppb)
 		# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
@@ -259,9 +259,6 @@ if (param_const['sim_type'] == 'finisher'):
 # setup dictionary items to hold chosen values
 param_const['trans_fac'] = 0.
 param_const['temperature'] = 0.
-param_const['trans_fac'] = 0.
-param_const['rh'] = 0.
-param_const['pconc'] = 0.
 param_const['Cinfl'] = 0.
 
 # save ranges inside constants, for use inside gui

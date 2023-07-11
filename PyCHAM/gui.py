@@ -4631,8 +4631,24 @@ class PyCHAM(QWidget):
 						print(self.param_const['trans_fac'])
 
 						if os.path.exists(self.param_const['res_file_name']):
-							self.param_const['pars_skip'] = 0
-							print('already exists!')
+							if ('me' not in self.param_const['res_file_name']):
+								self.param_const['pars_skip'] = 0
+								print('already exists!, so skipping')
+							else:
+								print('already exists!, but needs correcting')
+								# establish parameters provided by user by calling mod_var_read
+								import mod_var_read
+								mod_var_read.mod_var_read(self)
+								
+								self.on_click2() # assign chemical scheme
+								self.on_click3() # assign xml file
+								self.on_click4() # provide model variables label
+								
+								self.on_click81sing() # run simulation
+								# ensure that after the first call parsing and property estimation is skipped 
+								self.param_const['pars_skip'] = 1
+
+
 						else:
 							# establish parameters provided by user by calling mod_var_read
 							import mod_var_read
