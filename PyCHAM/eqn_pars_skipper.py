@@ -136,5 +136,9 @@ def eqn_pars_skipper(self): # define function
 	comp_num = self.comp_num; Jlen = self.Jlen; comp_xmlname = self.comp_xmlname; comp_smil = self.comp_smil; 
 	erf = 0.; err_mess = ''
 
+	# if not using vapour pressures saved to file
+	# get vapour pressure at first temperature (# molecules/cm3)
+	self.Psat = self.Psat_rec0
+	
 	return(rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess)

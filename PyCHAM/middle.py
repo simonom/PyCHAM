@@ -57,18 +57,16 @@ def middle(self): # define function
 	
 	
 	
-	if (self.pars_skip == 0): # if not skipping parsing of chemical scheme
+	if (self.pars_skip == 0 or self.pars_skip == 2): # if not skipping parsing of chemical scheme
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
 		[rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
 							 drh_str, erh_str, sav_nam, pcont, self)
-		
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, comp_smil, 
 			erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
-	
 	# if needed, then run operations to produce variable checker plot 
 	# from the simulate tab
 	if (self.testf == 4):
@@ -92,13 +90,12 @@ def middle(self): # define function
 	
 	tempt_cnt = 0 # count on chamber temperatures
 	
-	if (self.pars_skip == 0): # if not skipping component properties
+	if (self.pars_skip == 0 or self.pars_skip == 2): # if not skipping component properties
 		# get component properties
 		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
 			num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
 			uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
 			seed_name, y_mw, tempt_cnt, self)
-	
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
 		yield err_mess
@@ -146,5 +143,4 @@ def middle(self): # define function
 
 		yield prog # update progress bar	
 
-	
 	return()

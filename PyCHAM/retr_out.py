@@ -429,11 +429,13 @@ def retr_out(self):
 		
 		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
 		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
 		try: # this output added after others in version 4 of PyCHAM
 			load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
 			group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
 		except:
 			group_indx['ROOR'] = []
+		
 		load_path = str(self.dir_path + '/OOH_index.npy') # path
 		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()
 		

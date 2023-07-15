@@ -199,7 +199,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			y[self.H2Oi] = self.y[self.H2Oi]
 			y[self.seedi] = self.y[self.seedi]
 
-	if (self.pars_skip == 0): # if this information already gained in previous run then skip 
+	if (self.pars_skip == 0 or self.pars_skip == 2): # if this information already gained in previous run then skip 
 		# holder for water index (will be used if not identified in chemical scheme)
 		H2Oi = num_comp # index for water
 		self.H2Oi = H2Oi # index for water
@@ -241,7 +241,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	# that an index is provided for core material
 	corei = [num_comp] # index for core component
 
-	if (self.pars_skip == 0): # if this information already gained in previous run then skip 
+	if (self.pars_skip == 0 or self.pars_skip == 2): # if this information already gained in previous run then skip 
 
 		# empty array for index of core component
 		self.seedi = (np.zeros((len(seed_name)))).astype(int)

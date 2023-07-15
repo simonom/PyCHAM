@@ -75,6 +75,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.inname - path to model variables file
 	# self.rel_SMILES - SMILES strings for components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K (Pa)
+	# self.Psat_rec0 - pure component saturation vapour pressures at starting temperature of simulation (# molecules/cm3)
 	# self.OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
@@ -186,6 +187,9 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 
 	save_path = str(output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
 	np.save(save_path, self.Psat_Pa_rec, allow_pickle=True)
+
+	save_path = str(output_by_sim + '/pure_component_saturation_vp_at_startT_molec_percm3') # path
+	np.save(save_path, self.Psat_rec0, allow_pickle=True)
 
 	save_path = str(output_by_sim + '/oxygen_to_carbon_ratios_of_components') # path
 	np.save(save_path, self.OC, allow_pickle=True)

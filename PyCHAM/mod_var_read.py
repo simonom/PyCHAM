@@ -122,8 +122,11 @@ def mod_var_read(self):
 					err_mess = 'Could not convert string to float for total_model_time model variable, please check model variables file and see README for guidance'
 
 			if key == 'pars_skip' and (value.strip()): # whether or not to skip parsing of the chemical scheme
-				self.pars_skip = int(value.strip())
-
+				try:
+					self.pars_skip = int(value.strip()) # in case a numerical flag
+				except:
+					self.pars_skip_path = str(value.strip()) # in case a path to saved variables
+					self.pars_skip = 2
 			if key == 'Comp0' and (value.strip()): # names of components present at experiment start
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 

@@ -77,8 +77,16 @@ def group_indices(Hcount, SMILES, i, self):
 	
 		# reactions with both HO2 as reactant and this component as 
 		# product
-		eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i, axis=1) == 1)  
+		if self.HO2i != []:
 		
+			if (self.rindx_g.ndim == 2):
+				eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i, axis=1) == 1)  
+			if (self.rindx_g.ndim == 1):
+				eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i) == 1)  
+
+		else:
+			eqn_of_inter = np.zeros((self.rindx_g.shape[0]))
+
 		# check if reactant in any of these equations is HO2
 		if (sum(eqn_of_inter) > 0): 
 			# loop through the reactions of interest
