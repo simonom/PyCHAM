@@ -66,20 +66,6 @@ def eqn_pars_skipper(self): # define function
 		for i in range(len(self.obs_comp)):
 			self.obs_comp_i[i] = self.comp_namelist.index(self.obs_comp[i])
 
-
-	if ('H2O' in self.con_infl_nam): # check if water in constant influx components 
-
-		# index of water in continuous influx array
-		wat_indx = (np.array(self.con_infl_nam) == 'H2O').reshape(-1)
-
-		# do not allow continuous influx of water in the standard ode 
-		# solver, instead deal with it inside the water ode-solver
-		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
-
-		if self.comp_num in self.con_infl_indx:
-			wat_indx = (np.array(self.con_infl_indx == self.comp_num))
-			self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
-
 	# get index of components with constant influx/concentration -----------
 	# empty array for storing index of components with constant influx
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
@@ -122,12 +108,30 @@ def eqn_pars_skipper(self): # define function
 	
 		icon += 1 # count on constant influxes
 
+	if ('H2O' in self.con_infl_nam): # check if water in constant influx components 
+
+		# index of water in continuous influx array
+		wat_indx = (np.array(self.con_infl_nam) == 'H2O').reshape(-1)
+		# get influx rate of water
+		self.con_infl_H2O = self.con_infl_C[self.con_infl_indx==self.comp_num, :]
+
+		# do not allow continuous influx of water in the standard ode 
+		# solver, instead deal with it inside the water ode-solver
+		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
+
+		if self.comp_num in self.con_infl_indx:
+			wat_indx = (np.array(self.con_infl_indx == self.comp_num))
+			self.con_infl_nam = np.delete(self.con_infl_nam, wat_indx, axis=0)
+			self.H2Oin = 1 # flag for continuous influx of water
+
 	if len(self.con_infl_nam) > 0:
 
 		# get ascending indices of components with continuous influx
 		si = self.con_infl_indx.argsort()
 		# order constant influx indices, influx rates and names ascending by component index
 		self.con_infl_indx = (self.con_infl_indx[si]).astype('int')
+		print('131 of eqn_pars_skipper', self.con_infl_C.shape, self.con_infl_indx.shape)
+		import ipdb; ipdb.set_trace()
 		self.con_infl_C = (self.con_infl_C[si])
 		self.con_infl_nam = (self.con_infl_nam[si])
 

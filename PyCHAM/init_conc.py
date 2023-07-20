@@ -76,7 +76,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	
 	if (testf == 1): # testing mode
 		# return dummies
-		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	# empty array for storing component gas-phase concentrations, must be an array
@@ -130,7 +130,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 				err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 				return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
-					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+					0, 0, erf, err_mess, 0, 0, 0, 0)
 			
 		
 			y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3

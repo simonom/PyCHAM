@@ -237,7 +237,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		#if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
 		#	Psatnow = -2.63+-0.50*self.rel_SMILES[i].count('O') + (self.rel_SMILES[i].count('C')-5)*-0.80
 		#	rec_now_flag = 1 # record this vapour pressure
-		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6): # if six or more oxygens in component
+		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6 and 'PAN' not in self.comp_namelist[i]): # if six or more oxygens in component
 			# log(C* (ug/m3)) (natural logarithm of effective saturation concentration) of component (Eq. 1 Mohr et al. 2019)
 			nC = self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c')
 			nO = self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o')

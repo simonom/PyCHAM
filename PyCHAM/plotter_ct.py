@@ -321,16 +321,41 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		import sch_interr # for interpeting chemical scheme
 		import re # for parsing chemical scheme
 		import scipy.constants as si
+		
+		try:
+			sch_name = self.ro_obj.sp
+			inname = self.ro_obj.vp
+			f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
+			inputs = open(inname, mode= 'r' ) # open model variables file
+		except:
+			# get index of slashes in path to scheme
+			try:
+				slashi = (sch_name[::-1]).index('/') # in case saved on UNIX
+			except:
+				slashi = (sch_name[::-1]).index('\\') # in case saved on windows
+			# get scheme name
+			sch_name = sch_name[-slashi::]
+			sch_name = str(dir_path + '/inputs/' + sch_name)
+			
+			f_open_eqn = open(sch_name, mode= 'r' ) # open chemical scheme file
 
-		sch_name = self.ro_obj.sp
+			# get index of slashes in path to model variables
+			try:
+				slashi = (inname[::-1]).index('/') # in case saved on UNIX
+			except:
+				slashi = (inname[::-1]).index('\\') # in case saved on windows
+			# get scheme name
+			inname = inname[-slashi::]
+			inname = str(dir_path + '/inputs/' + inname)
+			
+			inputs = open(inname, mode= 'r' ) # open model variables file
 		inname = self.ro_obj.vp
 		
-		f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
+		
 		# read the file and store everything into a list
 		total_list_eqn = f_open_eqn.readlines()
 		f_open_eqn.close() # close file
 		
-		inputs = open(inname, mode= 'r' ) # open model variables file
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
 

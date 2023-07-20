@@ -1,14 +1,6 @@
-/Users/user/OneDrive - The University of Manchester/INGENIOUS/PyCHAM_outputs/Rikki_peak_list_full_wPRAM
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/INGENIOUS/PyCHAM_outputs/practise2
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
-Warning: underflow encountered in divide
-Warning: underflow encountered in divide
-Warning: underflow encountered in divide
-Warning: underflow encountered in divide
-Warning: underflow encountered in multiply
-Warning: underflow encountered in divide
-Warning: underflow encountered in divide
-Warning: underflow encountered in divide
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
