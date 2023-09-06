@@ -15,10 +15,10 @@ import scipy.constants as si
 class self:
 
 	# path where results saved	
-	dir_path = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\output\\Lunderberg_scheme\\Lundenberg2020'
+	dir_path = '/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/inputs/EAC23_poster_input_output/Lunderberg2020/outputs/Lundenberg2020'
 
 	# path where retr_out module saved (note that by default this is saved in 'PyCHAM home directory/PyCHAM' folder
-	ret_path = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM'
+	ret_path = '/Users/user/Documents/GitHub/PyCHAM/PyCHAM'
 	
 	# allow access to retr_out module
 	sys.path.insert(0, ret_path)
@@ -155,6 +155,10 @@ class self:
 
 		fig.tight_layout() # space out subplots
 		plt.show() # show figure
+
+		# remember these results
+		res_very_vol = np.zeros((res.shape[0], res.shape[1]))
+		res_very_vol[:, :] = res[:, :]
 		
 		# remember gradients
 		mtempers = np.zeros((len(m)))
@@ -264,30 +268,44 @@ class self:
 		# setup figure
 		fig3 = plt.figure(figsize=(7, 3))
 
+		xobs = np.array((288., 292.))
+		yobs = -183.+0.672*xobs
+
+		mPyCHAM = str(round(mtempers[0], 3))
+
 		ax0 = fig3.add_subplot(1, 2, 1)
-		ax0.plot(tempers, res[0, :], 'x-')
+		ax0.plot(tempers, res_very_vol[0, :], 'x-', label = str('PyCHAM (m = ' + mPyCHAM + ')'))
+		ax0.plot(xobs, yobs, '-', label = 'obs. (m = 0.672)')
 		ax0.set_title('C13 bin', fontsize = 18)
-		ax0.set_ylim((0., 0.15))
-		ax0.set_yticks([0.00, 0.05, 0.10, 0.15])
-		ax0.set_yticklabels([0.00, 0.05, 0.10, 0.15], fontsize=18)
+		ax0.set_ylim((9., 16.))
+		ax0.set_yticks([10., 15.])
+		ax0.set_yticklabels([10., 15.], fontsize=18)
 		ax0.set_xticks([288., 290., 292.])
 		ax0.set_xticklabels([288., 290., 292.], fontsize=18)
-		ax0.text(288., 0.13, str('m = ' + str(round(mtempers[0], 3))), fontsize = 18)
+		#ax0.text(288., 0.13, str('$\mathrm{m_{PyCHAM}}$ = ' + str(round(mtempers[0], 3))), fontsize = 18)
 		ax0.set_ylabel(r'SVOC Concentration ' + cunit, fontsize = 18)
 		ax0.set_xlabel('Temperature (K)', fontsize = 18)
-		
+		ax0.legend(fontsize=18, loc=1, fancybox=True, framealpha=0.5)
+
+		xobs = np.array((0.2, 1.5))
+		yobs = 0.02+0.028*xobs
+
+		mPyCHAM = str(round(m[7], 3))
 
 		ax1 = fig3.add_subplot(1, 2, 2)
-		ax1.plot(PM2p5, res[7, :], 'x-')
+		ax1.plot(PM2p5, res[7, :], 'x-', label = str('PyCHAM (m = ' + mPyCHAM + ')'))
+		ax1.plot(xobs, yobs, '-', label = 'obs. (m = 0.028)')
 		ax1.set_title('C31 bin', fontsize = 18)
-		ax1.set_ylim((0., 0.05))
+		ax1.set_ylim((0., 0.075))
 		ax1.set_yticks([0.000, 0.025, 0.050])
 		ax1.set_yticklabels([0.000, 0.025, 0.050], fontsize=18)
 		ax1.set_xticks([0.0, 0.5, 1.0, 1.5])
 		ax1.set_xticklabels([0.0, 0.5, 1.0, 1.5], fontsize=18)
-		ax1.text(1., 0.04, str('m = ' + str(round(m[7], 3))), fontsize = 18)
+		#ax1.text(1., 0.04, str('m = ' + str(round(m[7], 3))), fontsize = 18)
 		ax1.set_xlabel(r'PM2.5 Concentration ' + cunit, fontsize = 18)
+		ax1.legend(fontsize=18, loc=1, fancybox=True, framealpha=0.5)
 		fig2.tight_layout() # space out subplots
+		
 		plt.show() # show figure
 
 		return() # end function

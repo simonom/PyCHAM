@@ -571,7 +571,7 @@ def ode_updater(y, H2Oi,
 				self.odsw_flag = 0
 
 			# model component concentration changes to get new concentrations
-			# (# molecules/cm3 (air))	
+			# (# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,

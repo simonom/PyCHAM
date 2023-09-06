@@ -418,48 +418,62 @@ def retr_out(self):
 		load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
 		HC = (np.load(load_path, allow_pickle=True)).tolist()
 		
-		load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy') # path
-		group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-		load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy') # path
-		group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy') # path
-		group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
-		group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		try: # this output added after others in version 4 of PyCHAM
+
+			load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy') # path
+			group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy') # path
+			group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
+			load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy') # path
+			group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+			load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
+			group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()
+
 			load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
 			group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
-		except:
-			group_indx['ROOR'] = []
-		
-		load_path = str(self.dir_path + '/OOH_index.npy') # path
-		group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
-		group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-		load_path = str(self.dir_path + '/OH_index.npy') # path
-		group_indx['OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-		load_path = str(self.dir_path + '/HOM_OH_index.npy') # path
-		group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-		load_path = str(self.dir_path + '/carbonyl_index.npy') # path
-		group_indx['carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-		load_path = str(self.dir_path + '/HOM_carbonyl_index.npy') # path
-		group_indx['HOM_carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-		load_path = str(self.dir_path + '/NO3_index.npy') # path
-		group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
-		group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()	
 
+			load_path = str(self.dir_path + '/OOH_index.npy') # path
+			group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
+			load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
+			group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/OH_index.npy') # path
+			group_indx['OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/HOM_OH_index.npy') # path
+			group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/carbonyl_index.npy') # path
+			group_indx['carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/HOM_carbonyl_index.npy') # path
+			group_indx['HOM_carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/NO3_index.npy') # path
+			group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
+		
+			load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
+			group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+		except:
+			group_indx['RO2i'] = []
+			group_indx['ROi'] = []
+			group_indx['HOMRO2'] = []
+			group_indx['HOMs'] = []
+			group_indx['ROOR'] = []
+			group_indx['OOH']  = []
+			group_indx['HOM_OOH'] = []
+			group_indx['OH'] = []
+			group_indx['HOM_OH'] = []
+			group_indx['carbonyl'] = []
+			group_indx['HOM_carbonyl'] = []
+			group_indx['NO3'] = []
+			group_indx['HOM_NO3'] = []
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]

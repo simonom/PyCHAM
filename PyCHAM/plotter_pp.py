@@ -63,7 +63,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	y_MW = self.ro_obj.comp_MW
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	
 	# number of actual particle size bins

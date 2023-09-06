@@ -1,4 +1,4 @@
-res_file_name = Lundenberg2020
+res_file_name = C:\Users\Psymo\OneDrive - The University of Manchester\PyCHAM\inputs\EAC23_poster_input_output\Lunderberg2020\outputs\Lundenberg2020
 total_model_time = 9.0e4
 update_step = 2.e3
 recording_time_step = 2.e3
