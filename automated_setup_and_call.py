@@ -19,8 +19,10 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
-'''code to automatically setup a series of simulations and run PyCHAM without using the PyCHAM graphical user interface'''
-# useful for users that want to setup and run simulations in an automated manner, e.g. because manual selection 
+'''code to automatically setup a series of simulations 
+and run PyCHAM without using the PyCHAM graphical user interface'''
+# useful for users that want to setup and run simulations in 
+# an automated manner, e.g. because manual selection 
 # of simulations via the graphical user interface is not practical 
 
 
@@ -84,8 +86,8 @@ param_const['light_time'] = 0.
 
 # 12km altitude cloud-free solar actinic flux spectrum from Greece in June: https://doi.org/10.1029/2001JD900142
 param_const['act_flux_path'] = 'Greece_obs_doi_10dot10292001JD900142.csv'
-# affects all wavelengths
-param_range['trans_fac'] = [0.1, 0.55, 1.]
+# affects all wavelengths, note that we want 0 so that darkness is represented
+param_range['trans_fac'] = [0.0, 0.5, 1.]
 
 # minimum temperature and relative humidity ranges given by Porter et al. 2021 (doi.org/10.1021/acsearthspacechem.1c00090)
 param_range['temperature'] = [273.15, 293.15, 313.15]

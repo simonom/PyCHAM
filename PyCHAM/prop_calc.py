@@ -157,7 +157,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.Cnum = np.zeros((num_comp, 1))
 	self.Onum = np.zeros((num_comp, 1))
 	
-	# prepare for gathering the indices of any HOM-RO2 components	
 	self.Hn_list = [] # prepare for storing hydrogen numbers of components
 
 	# if using vapour pressures saved to file
