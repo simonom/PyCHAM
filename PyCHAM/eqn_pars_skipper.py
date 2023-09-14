@@ -24,7 +24,8 @@
 def eqn_pars_skipper(self): # define function
 
 	import numpy as np # matrix functions
-
+	import scipy.constants as si
+	from water_calc import water_calc
 	# imports: ---------------------------------
 	# self - reference to PyCHAM class
 	# ------------------------------------------
@@ -127,13 +128,11 @@ def eqn_pars_skipper(self): # define function
 	if len(self.con_infl_nam) > 0:
 
 		# get ascending indices of components with continuous influx
-		si = self.con_infl_indx.argsort()
+		sindx = self.con_infl_indx.argsort()
 		# order constant influx indices, influx rates and names ascending by component index
-		self.con_infl_indx = (self.con_infl_indx[si]).astype('int')
-		print('131 of eqn_pars_skipper', self.con_infl_C.shape, self.con_infl_indx.shape)
-		import ipdb; ipdb.set_trace()
-		self.con_infl_C = (self.con_infl_C[si])
-		self.con_infl_nam = (self.con_infl_nam[si])
+		self.con_infl_indx = (self.con_infl_indx[sindx]).astype('int')
+		self.con_infl_C = (self.con_infl_C[sindx])
+		self.con_infl_nam = (self.con_infl_nam[sindx])
 
 	# use eqn_pars output from previous simulation
 	rowvals = self.rowvals; colptrs = self.colptrs 
@@ -143,6 +142,14 @@ def eqn_pars_skipper(self): # define function
 	# if not using vapour pressures saved to file
 	# get vapour pressure at first temperature (# molecules/cm3)
 	self.Psat = self.Psat_rec0
-	
+
+	# get saturation vapour pressure of water (log10(atm))
+	[_, Psat_water, _] = water_calc(self.TEMP[0], self.RH[0], si.N_A)	
+
+	# convert to Pa
+	Psat_water = (10**Psat_water)*101325.
+	# convert to # molecules/cm3
+	self.Psat[0, self.comp_namelist.index('H2O')] = Psat_water*(si.N_A/((si.R*1.e6)*self.TEMP[0]))
+
 	return(rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess)

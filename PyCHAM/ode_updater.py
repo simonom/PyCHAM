@@ -612,7 +612,7 @@ def ode_updater(y, H2Oi,
 				if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, 
-						num_comp, (num_sb-self.wall_on), Cw, act_coeff, kw, 
+						num_comp, (num_sb-self.wall_on), act_coeff, 
 						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
 						kimt, 1, H2Oi, y, self)
 

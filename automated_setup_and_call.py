@@ -42,7 +42,7 @@ param_const = {}
 # number of simulations (in which case provide a number), or whether to work through given values (in which case state 'set')
 param_const['sim_num'] = 'set'
 # either 'starter' or 'finisher'
-param_const['sim_type'] = 'finisher'
+param_const['sim_type'] = 'starter'
 
 # markers for interpreting chemical scheme - note that all chemical scheme markers should be 
 # included inside quotation marks, e.g.: 

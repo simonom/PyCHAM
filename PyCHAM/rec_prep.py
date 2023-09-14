@@ -282,8 +282,10 @@ def rec_prep(nrec_step, y, y0,
 	
 	cham_env[0, 0] = temp_now # temperature (K)
 	cham_env[0, 1] = Pnow # pressure (Pa)
-	cham_env[0, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
-	
+	# relative humidity (fraction (0-1))
+	cham_env[0, 2] = y[H2Oi]/self.Psat[0, H2Oi] 
+	# transmission factor of light
+	cham_env[0, 3] = self.tf[0]
 	# --------------------------------------------------------------------------------
 
 	# relative humidity now
