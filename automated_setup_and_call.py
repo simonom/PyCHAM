@@ -217,9 +217,6 @@ if (param_const['sim_type'] == 'finisher'):
 		press_arrays.append(cham_env[-1, 1]) # store pressure (Pa)
 		rh_arrays.append(cham_env[-1, 2]) # store relative humidity (0-1)
 		j_arrays.append(cham_env[-1, 3])
-		print(path, cham_env[-1, 2])
-
-			
 
 	# store required outputs
 	param_range['ys'] = y_arrays
@@ -230,24 +227,27 @@ if (param_const['sim_type'] == 'finisher'):
 	param_range['rhs'] = rh_arrays
 	param_range['pressures'] = press_arrays
 # the components with constant influx, note, do not leave whitespace
-param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
+param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2,O3'
+
 # range of concentration of components present throughout simulation  - see above in this module for provenance of benzene,
 # a maximum of alpha-pinene of 10 ppb is given by doi.org/10.1016/j.scitotenv.2020.144129, the range in CH4 is from a minimum of 400 ppb,
 # which is from ice-core data (https://data.ess-dive.lbl.gov/view/doi:10.3334/CDIAC/ATG.030) and a maximum of 2000 ppb (2 ppm), which is
-# from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2, and the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005
+# from NOAA (https://gml.noaa.gov/ccgg/trends_ch4/). for carbon monoxide minimum is from doi.org/10.3402/tellusb.v50i3.16101, maximum is from https://scied.ucar.edu/learning-zone/air-quality/carbon-monoxide and https://earthobservatory.nasa.gov/global-maps/MOP_CO_M, for NO2, and the maximum is from doi.org/10.1007/s41810-023-00175-8, which sees a maximum NOx of 150 ug/m3 in urban India, which equates to 150*1e-12/32g/mol*si.N_A/Cfac  = 124 ppb, whilst the minimum for NOx is likely below the detection limit of instruments, as indicated by this paper: 10.5194/acp-22-12025-2022. For SO2, the minimum is from this paper: doi.org/10.1007/s10874-011-9185-2, maximum from Fig. 4 of doi.org/10.1016/j.partic.2012.09.005. For O3, we apply a constant influx to match the constant influx observed by measurements during Boreal winter in the Arctic (which gives around 30 ppb in Alert during winter in Figure 2A of doi.org/10.1016/j.atmosenv.2006.09.053), even though there is no photochemical production in winter, therefore background influx is the only source. Note that the loJ simulations for starter runs show that the influx stated below are sufficient to reproduce the observed O3 in high latitude Boreal winter. 
 # note that we divide the absolute concentration (ppb) ranges by the time influx occurs over to get the emission rate (ppb/s)
 #param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
 
 
-param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 2.e-3], [1.e-6, 1.*10.**-4.3, 2.e-3], [0., 0.]]
+param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 2.e-3], [1.e-6, 1.*10.**-4.3, 2.e-3], [0.], [5.e-5, 3.e-4]]
+# index of these continuous influxes that are constant (used in gui.py)
+param_const['Cinfl_const_indx']  = [6] 
 
 # time over which influx of components occurs
 if (param_const['sim_type'] == 'starter'):
-	param_const['const_infl_t'] = '0.0, 3.6e3'
+	param_const['const_infl_t'] = '0.'
 	param_const['pconct'] = '0.1; 3.6e3'
 	param_const['number_size_bins'] = 0
 if (param_const['sim_type'] == 'finisher'):
-	param_const['const_infl_t'] = '0.0'
+	param_const['const_infl_t'] = '0.'
 	#param_const['pconct'] = '0.1; 3.75e3'
 	#param_const['number_size_bins'] = 3
 

@@ -4675,7 +4675,11 @@ class PyCHAM(QWidget):
 				# prepare for starting concentrations
 				C0_0 = np.zeros((len(self.param_const['Comp0'].split(','))))
 				# prepare for influxes
-				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))*2))
+				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))))
+				# setup constant continuous influxes 
+				# (not changing between scenarios)
+				for const_infl_i in self.param_const['Cinfl_const_indx']:
+					Cinfl_0[const_infl_i] = param_range['Cinfl'][const_infl_i][0]
 				
 				# loop through NOx emission
 				for Ni in range(len(param_range['Cinfl'][0])):
@@ -4691,7 +4695,7 @@ class PyCHAM(QWidget):
 					# index for NO influx in supplied values
 					NOi = self.param_const['const_infl'].split(',').index('NO')
 					# NO emission rate (ppb/s)
-					Cinfl_0[NOi*2] = param_range['Cinfl'][NOi][Ni]
+					Cinfl_0[NOi] = param_range['Cinfl'][NOi][Ni]
 
 					# index for NO2 starting concentration in supplied values
 					NO2i = self.param_const['Comp0'].split(',').index('NO2')
@@ -4700,15 +4704,24 @@ class PyCHAM(QWidget):
 
 					# index for NO2 in supplied values
 					NO2i = self.param_const['const_infl'].split(',').index('NO2')
-					# NO emission rate (ppb/s)
-					Cinfl_0[NO2i*2] = param_range['Cinfl'][NO2i][Ni]
+					# NO2 emission rate (ppb/s)
+					Cinfl_0[NO2i] = param_range['Cinfl'][NO2i][Ni]
+
+					# index for O3 in supplied values
+					O3i = self.param_const['const_infl'].split(',').index('O3')
 
 					if (Ni == 0):
 						res_name = str(res_name  + '_loNOx')
+						# O3 transport rate (ppb/s)
+						Cinfl_0[O3i] = param_range['Cinfl'][O3i][0]
 					if (Ni == 1):
 						res_name = str(res_name  + '_meNOx')
+						# O3 transport rate (ppb/s)
+						Cinfl_0[O3i] = param_range['Cinfl'][O3i][1]
 					if (Ni == 2):
 						res_name = str(res_name  + '_hiNOx')
+						# O3 transport rate (ppb/s)
+						Cinfl_0[O3i] = param_range['Cinfl'][O3i][1]
 
 					# loop through CH4 and CO emission
 					for Ci in range(len(param_range['Cinfl'][0])):
@@ -4724,7 +4737,7 @@ class PyCHAM(QWidget):
 						# index for CH4 in supplied values
 						CH4i = self.param_const['const_infl'].split(',').index('CH4')
 						# CH4 emission rate (ppb/s)
-						Cinfl_0[CH4i*2] = param_range['Cinfl'][CH4i][Ci]
+						Cinfl_0[CH4i] = param_range['Cinfl'][CH4i][Ci]
 
 						# index for CO starting concentration in supplied values
 						COi = self.param_const['Comp0'].split(',').index('CO')
@@ -4734,7 +4747,7 @@ class PyCHAM(QWidget):
 						# index for CO in supplied values
 						COi = self.param_const['const_infl'].split(',').index('CO')
 						# CO emission rate (ppb/s)
-						Cinfl_0[COi*2] = param_range['Cinfl'][COi][Ci]
+						Cinfl_0[COi] = param_range['Cinfl'][COi][Ci]
 										
 						if (Ci == 0):
 							res_name = str(res_name  + '_loCH4') 
@@ -4755,8 +4768,10 @@ class PyCHAM(QWidget):
 								res_name = str(res_name + '_meT')
 							if (ti == 2):
 								res_name = str(res_name + '_hiT')
-						
-							save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\\'
+							if (sys.platform == 'win32'):
+								save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\\'
+							if (sys.platform == 'darwin'):
+								save_path_start = '/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/'
 							# check if this result already present
 							print(str(save_path_start + res_name))
 							
@@ -4789,7 +4804,7 @@ class PyCHAM(QWidget):
 								cc_all += 1
 								if (ccn == ' ' and cci % 2. > 0.):
 									
-									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+','+self.param_const['Cinfl'][cc_all+1::])
+									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
 									cci += 1
 									continue
 								if (ccn == ' ' and cci % 2. < 1.):
