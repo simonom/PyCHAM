@@ -4674,6 +4674,19 @@ class PyCHAM(QWidget):
 
 				# prepare for starting concentrations
 				C0_0 = np.zeros((len(self.param_const['Comp0'].split(','))))
+				
+				# index for NO3 starting concentration in supplied 
+				# values (constant between scenarios)
+				NO3i = self.param_const['Comp0'].split(',').index('NO3')
+				# NO3 starting concentration (ppb)
+				C0_0[NO3i] = param_range['C0'][NO3i]
+
+				# index for O3 starting concentration in supplied 
+				# values (constant between scenarios)
+				O3i = self.param_const['Comp0'].split(',').index('O3')
+				# O3 starting concentration (ppb)
+				C0_0[O3i] = param_range['C0'][O3i]
+
 				# prepare for influxes
 				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))))
 				# setup constant continuous influxes 
@@ -4721,7 +4734,7 @@ class PyCHAM(QWidget):
 					if (Ni == 2):
 						res_name = str(res_name  + '_hiNOx')
 						# O3 transport rate (ppb/s)
-						Cinfl_0[O3i] = param_range['Cinfl'][O3i][1]
+						Cinfl_0[O3i] = param_range['Cinfl'][O3i][2]
 
 					# loop through CH4 and CO emission
 					for Ci in range(len(param_range['Cinfl'][0])):

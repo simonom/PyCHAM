@@ -130,8 +130,8 @@ benzC = OHreac/(2.3e-12*np.exp(-190/max(param_range["temperature"]))*0.352)/Cfac
 # the range of starting concentrations for starter simulations 
 if (param_const['sim_type'] == 'starter'):
 	# the components present at the start of the simulation, note do not leave white space
-	param_const['Comp0'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2'
-	param_range['C0'] = [[0.], [0.], [3.e2,1.*10**2.9,2.e3], [1.5,1.*10.**1.2,1.5e2], [1.e-2,1.e0,1.e2], [1.e-2,1.e0,1.e2], [0.]]
+	param_const['Comp0'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2,NO3,O3'
+	param_range['C0'] = [[0.], [0.], [3.e2,1.*10**2.9,2.e3], [1.5,1.*10.**1.2,1.5e2], [1.e-2,1.e0,1.e2], [1.e-2,1.e0,1.e2], [0.], [1.e-6], [1.e-6]]
 
 # if finishing a simulation, we want to use the end 
 # result of the starter simulation as initial concentration
@@ -237,7 +237,7 @@ param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2,O3'
 #param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
 
 
-param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 2.e-3], [1.e-6, 1.*10.**-4.3, 2.e-3], [0.], [5.e-5, 3.e-4]]
+param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 1.e-3], [1.e-6, 1.*10.**-4.3, 1.e-3], [0.], [5.e-5, 9.e-5, 3.e-4]]
 # index of these continuous influxes that are constant (used in gui.py)
 param_const['Cinfl_const_indx']  = [6] 
 

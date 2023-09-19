@@ -122,47 +122,47 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 		# gas-phase reactions -------------------------
 		# empty array to hold relevant concentrations for
 		# reaction rate coefficient calculation
-		rrc_y = np.ones((rindx.shape[0]*rindx.shape[1]))
-		rrc_y[y_arr] = y0[y_rind]
-		rrc_y = rrc_y.reshape(rindx.shape[0], rindx.shape[1], order = 'C')
+		rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))
+		rrc_y[self.y_arr_g] = y0[self.y_rind_g]
+		rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = 'C')
 		# reaction rate (molecules/cm3/s) 
-		rr = rrc[0:rindx.shape[0]]*((rrc_y**rstoi).prod(axis=1))
+		rr = rrc[0:self.rindx_g.shape[0]]*((rrc_y**self.rstoi_g).prod(axis=1))
 		rr = rr.reshape(-1, 1) # allow multiplication across multiple columns
 		# loss of reactants
-		reac_loss_rate = rr*rstoi # loss values (# molecules/cm3/s)
+		reac_loss_rate = rr*self.rstoi_g # loss values (# molecules/cm3/s)
 		# gain of products
-		prod_gain_rate = rr*pstoi # gain values (# molecules/cm3/s)
+		prod_gain_rate = rr*self.pstoi_g # gain values (# molecules/cm3/s)
 
 		f.write('\n')
 		f.write('Gas-phase reaction fluxes with equation numbers starting at 1 (# molecules/cm3/s):\n')
 
-		for i in range(rindx.shape[0]):
-			f.write(str('Eq. ' + str(i+1) + ' reac: ' + str(reac_loss_rate[i, 0:nreac[i]]) + '\n'))
-			f.write(str('Eq. ' + str(i+1) + ' prod: ' + str(prod_gain_rate[i, 0:nprod[i]]) + '\n'))
+		for i in range(self.rindx_g.shape[0]):
+			f.write(str('Eq. ' + str(i+1) + ' reac: ' + str(reac_loss_rate[i, 0:self.nreac_g[i]]) + '\n'))
+			f.write(str('Eq. ' + str(i+1) + ' prod: ' + str(prod_gain_rate[i, 0:self.nprod_g[i]]) + '\n'))
 
 	if (self.eqn_num[1] > 0):# if particle-phase reactions present
 
 		# particle-phase reactions -------------------------
 		# tile aqueous-phase reaction rate coefficients
-		rr_aq = np.tile(rrc[rindx.shape[0]::], num_asb)
+		rr_aq = np.tile(rrc[self.rindx_aq.shape[0]::], num_asb)
 		# prepare for aqueous-phase concentrations
-		rrc_y = np.ones((rindx_aq.shape[0]*rindx_aq.shape[1]))
-		rrc_y[y_arr_aq] = y0[y_rind_aq]
-		rrc_y = rrc_y.reshape(rindx_aq.shape[0], rindx_aq.shape[1], order = 'C')
+		rrc_y = np.ones((self.rindx_aq.shape[0]*self.rindx_aq.shape[1]))
+		rrc_y[self.y_arr_aq] = y0[self.y_rind_aq]
+		rrc_y = rrc_y.reshape(self.rindx_aq.shape[0], self.rindx_aq.shape[1], order = 'C')
 		# reaction rate (molecules/cc/s) 
-		rr = rr_aq*((rrc_y**rstoi_aq).prod(axis=1))
+		rr = rr_aq*((rrc_y**self.rstoi_aq).prod(axis=1))
 		rr = rr.reshape(-1, 1) # allow multiplication across multiple columns
 		# loss of reactants
-		reac_loss_rate = rr*rstoi_aq # prepare loss values
+		reac_loss_rate = rr*self.rstoi_aq # prepare loss values
 		# gain of products
-		prod_gain_rate = rr*pstoi_aq # gain values (# molecules/cm3/s)
+		prod_gain_rate = rr*self.pstoi_aq # gain values (# molecules/cm3/s)
 		
 		f.write('\n')
 		f.write('Particle-phase reaction fluxes with both size bin numbers and equation numbers starting at 1 (# molecules/cm3/s):\n')
 		for sbi in range(num_asb): # loop through size bins
 			for i in range(self.eqn_num[1]): # loop through equations
-				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*self.eqn_num[1]+i, 0:nreac_aq[i]]) + '\n'))
-				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*self.eqn_num[1]+i, 0:nprod_aq[i]]) + '\n'))
+				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*self.eqn_num[1]+i, 0:self.nreac_aq[i]]) + '\n'))
+				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*self.eqn_num[1]+i, 0:self.nprod_aq[i]]) + '\n'))
 	
 	if (self.wall_on == 1): # include fluxes of trouble components to wall if wall is considered
 		
