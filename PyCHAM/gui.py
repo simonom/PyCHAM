@@ -4677,15 +4677,21 @@ class PyCHAM(QWidget):
 				
 				# index for NO3 starting concentration in supplied 
 				# values (constant between scenarios)
-				NO3i = self.param_const['Comp0'].split(',').index('NO3')
+				#NO3i = (self.param_const['Comp0'].split(',').index('NO3'))
 				# NO3 starting concentration (ppb)
-				C0_0[NO3i] = param_range['C0'][NO3i]
+				#C0_0[NO3i] = param_range['C0'][NO3i][0]
+
+				# index for HNO3 starting concentration in supplied 
+				# values (constant between scenarios)
+				#HNO3i = (self.param_const['Comp0'].split(',').index('HNO3'))
+				# HNO3 starting concentration (ppb)
+				#C0_0[HNO3i] = param_range['C0'][HNO3i][0]
 
 				# index for O3 starting concentration in supplied 
 				# values (constant between scenarios)
-				O3i = self.param_const['Comp0'].split(',').index('O3')
+				#O3i = (self.param_const['Comp0'].split(',').index('O3'))
 				# O3 starting concentration (ppb)
-				C0_0[O3i] = param_range['C0'][O3i]
+				#C0_0[O3i] = param_range['C0'][O3i][0]
 
 				# prepare for influxes
 				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))))

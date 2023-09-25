@@ -486,8 +486,8 @@ def lamp_photo(J, TEMP, self):
 			try: # omit headers
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
-				xsA = float(line.split('	')[1])*1.0e-20
-				xsB = float(line.split('	')[2])
+				xsA = float(line.split('	')[1])*1.e-20
+				xsB = float(line.split('	')[2])*1.e-3
 				xss = xsA*np.exp(xsB*(TEMP-298.0))
 				wl_xs = np.append(wl_xs, (np.array(wl)).reshape(1), axis=0)
 				xs = np.append(xs, (np.array(xss)).reshape(1), axis=0)
@@ -495,6 +495,7 @@ def lamp_photo(J, TEMP, self):
 			except:
 				continue
 		f.close() # close file
+		
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl_xs, xs)
 		
@@ -503,7 +504,6 @@ def lamp_photo(J, TEMP, self):
 		
 		# photolysis rate
 		J[8] = sum(xs*1.0*act_chm)
-		
 		# --------------------------------------------------------------
 		# J<11> for HCHO (formaldehyde) photolysis: HCHO = CO + HO2 + HO2;
 		# cross-section file

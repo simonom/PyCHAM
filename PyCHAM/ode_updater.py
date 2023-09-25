@@ -496,7 +496,7 @@ def ode_updater(y, H2Oi,
 			# reaction rate coefficient going into this time step
 			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
-			
+				
 			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)
 			
@@ -571,14 +571,14 @@ def ode_updater(y, H2Oi,
 				self.odsw_flag = 0
 
 			# model component concentration changes to get new concentrations
-			# (# molecules/cm3 (air))
+			# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
 				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
-			
+				
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant

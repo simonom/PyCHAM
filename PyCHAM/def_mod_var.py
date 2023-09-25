@@ -52,7 +52,7 @@ def def_mod_var(caller, self): # define function
 		uman_up = 0 # marker for whether to update the UManSysProp folder
 	if (caller == 1): # called from Travis
 		uman_up = 1
-	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
+	int_tol = [1.e9, 1.e-3] # integration tolerances (absolute first, relative second)
 	self.testf = 0 # whether in testing mode or not
 	self.pars_skip = 0 # whether to skip chemical scheme parsing
 	# whether to remove influxes of components that aren't seen in chemical scheme
