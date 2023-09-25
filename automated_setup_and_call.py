@@ -237,7 +237,7 @@ param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2,O3'
 #param_range['Cinfl'] = [[1.e-4/3.6e3, 1.e1/3.6e3], [1.e-4/3.6e3, benzC/3.6e3], [4.e2/3.6e3, 2.e3/3.6e3], [4.e1/3.6e3, 2.e4/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [5.e-5/3.6e3, 1.e2/3.6e3], [1.e-1/3.6e3, 1.e2/3.6e3]]
 
 
-param_range['Cinfl'] = [[1.e-5, 1.*10**-3.5, 1.e-2], [benzC*1.e-7, benzC*1.*10.**-5.5, benzC*1.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 5.e-4], [1.e-6, 1.*10.**-4.3, 5.e-4], [0.], [5.e-5, 9.e-5, 3.e-4]] 
+param_range['Cinfl'] = [[1.e-6, 5.7e-5, 3.3e-3], [benzC*5.e-8, benzC*4.e-6, benzC*3.e-4], [1.e-7, 5.e-7, 1.e-6], [1.e-12, 1.e-11, 1.e-10], [1.e-6, 1.*10.**-4.3, 5.e-4], [1.e-6, 1.*10.**-4.3, 5.e-4], [0.], [5.e-5, 9.e-5, 3.e-4]] 
 
 # time over which influx of components occurs
 if (param_const['sim_type'] == 'starter'):
