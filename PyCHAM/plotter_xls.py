@@ -81,7 +81,7 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 
 	# loop through observed components to plot in order to plot
 	for i in range(yce-ycs+1):
-		print(i, obsy.shape, len(llab))
+		
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
 			eby = obsy[:, i]*0.0 # error bar array
 			markers, caps, bars = ax0.errorbar(obsx, obsy[:, i], yerr = eby, label = llab[i])

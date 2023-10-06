@@ -7,6 +7,7 @@ Recommended by IUPAC 2003
 sigma(T) = A * exp(B*(T-298))					
 				
 A is in (10^-20) cm2					
+B is in (10^-3) (though this not stated originally in MCM)
 
 wavelength (nm)	A	B	sigma (298K)
 186	1580	1.7	1.58E-17

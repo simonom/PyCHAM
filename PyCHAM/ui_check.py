@@ -493,7 +493,7 @@ def ui_check(self):
 	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
 		try: # try opening as in eqn_pars module
 			import openpyxl # require module
-			self.obs_file = str(os.getcwd() + self.obs_file) # path to file
+			self.obs_file = str(self.obs_file) # path to file
 			wb = openpyxl.load_workbook(filename = self.obs_file) # open file
 			wb.close() # close excel file
 		except:

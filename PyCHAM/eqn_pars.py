@@ -159,7 +159,7 @@ def extr_mech(int_tol, num_sb,
 
 		import openpyxl
 		import os
-		#os.getcwd() + 
+		
 		self.obs_file = str(self.obs_file)
 		wb = openpyxl.load_workbook(filename = self.obs_file)
 		sheet = wb['PyCHAMobs']

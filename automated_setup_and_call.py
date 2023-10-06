@@ -52,7 +52,7 @@ param_const['pars_skip'] = 0 # need to parse equations and estimate properties o
 
 # state path to chemical scheme and xml files
 if sys.platform == 'win32':
-	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat'
+	param_const['sch_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_nint_scheme.dat'
 	param_const['xml_name'] = 'C:\\Users\\Psymo\\Desktop\\PyCHAM\\PyCHAM\\PyCHAM\\input\\auto_call_test\\MCM_PRAM_xml.xml'
 
 if sys.platform == 'darwin':
@@ -166,7 +166,6 @@ if (param_const['sim_type'] == 'finisher'):
 		# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
 		fname = str(init_conc_path + path + '/concentrations_all_components_all_times_gas_particle_wall')
 		# note, just keep results from final time
-		
 		y = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
 
 		# convert gas-phase concentration from ppb to # molecules/cm3
@@ -229,6 +228,8 @@ if (param_const['sim_type'] == 'finisher'):
 # the components with constant influx, note, do not leave whitespace
 param_const['const_infl'] = 'APINENE,BENZENE,CH4,CO,NO2,NO,SO2,O3'
 
+# index of constant influxes between scenarios
+param_const['Cinfl_const_indx'] = [6] 
 # range of concentration of components present throughout simulation  - see above in this module for provenance of benzene,
 # a maximum of alpha-pinene of 10 ppb is given by doi.org/10.1016/j.scitotenv.2020.144129, the range in CH4 is from a minimum of 400 ppb,
 # which is from ice-core data (https://data.ess-dive.lbl.gov/view/doi:10.3334/CDIAC/ATG.030) and a maximum of 2000 ppb (2 ppm), which is

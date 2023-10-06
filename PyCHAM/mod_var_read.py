@@ -466,8 +466,11 @@ def mod_var_read(self):
 			if key == 'lon': # longitude (degrees)
 				if (value.strip()): self.lon = float(value.strip())
 
-			if key == 'act_flux_path' and (value.strip()): # for specified actinic flux
-				self.af_path = str(value.strip())
+			# for specified actinic flux, note 'act_flux_file' 
+			# is old version
+			if (key == 'act_flux_path' or key == 'act_flux_file'): 
+				if (value.strip()): 					
+	   				self.af_path = str(value.strip())
 
 			if key == 'DayOfYear' and (value.strip()):
 				self.dayOfYear = int(value.strip())		

@@ -174,7 +174,8 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 		# saturation vapour pressure on wall (# molecules/cm3 (air))
 		# note, just using the top rows of Psat and act_coeff
 		# as do not need the repetitions over size bins
-		if (any(self.Cw > 0.)):
+		
+		if (sum(sum(self.Cw > 0.)) > 0.):
 			Csit = self.Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
 			# rate of transfer (# molecules/cm3/s), note sum over wall bins
 			dd_trouble = np.sum((-1.*self.kw[:, neg_comp_indx]*(y0[neg_comp_indx].reshape(1, -1)-Csit)), axis=0)

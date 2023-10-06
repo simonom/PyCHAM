@@ -295,7 +295,7 @@ def ode_updater(y, H2Oi,
 	
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
-
+	
 	# current status of whether injection of particles instantaneous or continuous,
 	# if not stated assume instantaneous
 	pcontf = 0
@@ -641,7 +641,7 @@ def ode_updater(y, H2Oi,
 				# get observed concentrations now
 				for ci in range(len(self.obs_comp_i)): # loop through components
 					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
-			
+					
 		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside particles (and in the gas-phase) will have been
 		# reduced due to dilution inside the ODE solver
