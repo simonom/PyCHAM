@@ -503,7 +503,7 @@ def cham_up(sumt, Pnow,
 				if ('ppb' in self.abun_unit):
 					# continuous influx rate of water now
 					self.Cinfl_H2O_now = (self.con_infl_H2O[:, infx_cnt]*self.Cfactor)
-				if ('molecules/cm3' in self.abun_unit):
+				if ('mol' in self.abun_unit):
 					self.Cinfl_H2O_now = self.con_infl_H2O[:, infx_cnt]
 
 				# ensure correct shape
@@ -529,7 +529,7 @@ def cham_up(sumt, Pnow,
 				if ('ppb' in self.abun_unit):
 					# continuous influx rate of water now
 					self.Cinfl_H2O_now = np.float64(self.con_infl_H2O[:, infx_cnt]*self.Cfactor)
-				if ('molecules/cm3' in self.abun_unit):
+				if ('mol' in self.abun_unit):
 					self.Cinfl_H2O_now = np.float64(self.con_infl_H2O[:, infx_cnt])
 
 				# ensure correct shape

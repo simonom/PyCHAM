@@ -738,6 +738,12 @@ def const_infl_open(self): # define function to read in values relevant to const
 		ir += 1 # count on row iteration
 		if (ir == 0): # header provides unit of emission rate and times
 			self.abun_unit = str(i[0])	
+			
+			if ('ppb' not in self.abun_unit):
+				if ('mol' not in self.abun_unit and 'cm' not in self.abun_unit):
+					self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
+					return(self)
+
 			clim = 0 # count on columns
 			for ic in i[0::]:	
 				if ic is None:
