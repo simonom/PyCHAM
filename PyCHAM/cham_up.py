@@ -493,7 +493,7 @@ def cham_up(sumt, Pnow,
 			# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
 			if ('ppb' in self.abun_unit):
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt]*self.Cfactor)
-			if ('molecules/cm3' in self.abun_unit):
+			if ('mol' in self.abun_unit):
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt])
 
 			# ensure correct shape
@@ -519,7 +519,7 @@ def cham_up(sumt, Pnow,
 				# influx of components now, convert from ppb/s to # molecules/cm3/s (air)
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt]*Cfactor)
 
-			if ('molecules/cm3' in self.abun_unit):
+			if ('mol' in self.abun_unit):
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt])
 			
 			# ensure correct shape
