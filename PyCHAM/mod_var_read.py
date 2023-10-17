@@ -319,7 +319,10 @@ def mod_var_read(self):
 				# times in columns
 				pconct = np.zeros((1, time_cnt))
 				pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
-				
+			# whether to repeat particle influxes every 24 hours
+			if (key == 'pconctf' and (value.strip())):
+				self.pconctf = float(value.strip())
+
 			# whether seed particle injection continuous or instantaneous
 			if key == 'pcont' and (value.strip()):
 				time_cnt = 1 # track number of times
@@ -508,25 +511,39 @@ def mod_var_read(self):
 			if key == 'cosx' and (value.strip()): # to keep solar intensity constant
 				self.cosx = float(value.strip())
 
-			if (key == 'const_infl' and (value.strip())): # names of components with continuous influx
-				
-				# start by assuming that constant influx unit is ppb
-				self.abun_unit = 'ppb'
+			# names of components with continuous influx
+			if (key == 'const_infl' or key == 'cont_infl'):
+				if (value.strip()):				
+					# start by assuming that constant influx unit is ppb
+					self.abun_unit = 'ppb'
 
-				# check if this is a path to a file containing continuous 
-				# influxes, if not treat as a list of component names
-				if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
-					self.const_infl_path = str(value.strip())
-					self = const_infl_open(self)
+					# check if this is a path to a file containing continuous 
+					# influxes, if not treat as a list of component names
+					if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+						self.const_infl_path = str(value.strip())
+						self = const_infl_open(self)
 					
-				else: # treat as list of components 
-					self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
+					else: # treat as list of components 
+						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
 
+
+			if (key == 'const_infl_t' or key == 'cont_infl_t'):
+				if (value.strip()): # times of continuous influxes (s)
+					self.con_infl_t = [float(i.strip()) for i in (value.split(','))]
+					self.con_infl_t = np.array((self.con_infl_t))
+
+			# flag for how to treat times of continuous influxes
+			if (key == 'cont_infl_tf' and value.strip()):
+				self.con_infl_tf = float(value.strip())
 				
-
-			if key == 'const_infl_t' and (value.strip()): # times of continuous influxes (s)
-				self.con_infl_t = [float(i.strip()) for i in (value.split(','))]
-				self.con_infl_t = np.array((self.con_infl_t))
+				# in case continuous influxes and times
+				# allocated to variables prior to this
+				if (self.con_infl_tf == 1):
+						
+					if hasattr(self, 'con_infl_t'):
+						clim = sum(self.con_infl_t < 24.*3.6e3)
+						self.con_infl_t = self.con_infl_t[0:clim]
+						self.con_infl_C = self.con_infl_C[:, 0:clim]
 
 			if (key == 'Cinfl' and (value.strip())): # influx rate of components with continuous influx (ppb/s)
 				
@@ -548,7 +565,7 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					self.con_infl_C = np.empty(0)
-			
+				
 			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
 				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 
@@ -749,6 +766,13 @@ def const_infl_open(self): # define function to read in values relevant to const
 				if ic is None:
 					break # stop looping through columns
 				clim +=1 # count on columns	
+			
+			# if looping over a 24 hour period
+			# then limit influxes to the first 
+			# provided 24 hours
+			if (self.con_infl_tf == 1): 
+				clim = sum(i[1:clim] < 24.*3.6e3)
+
 			self.con_infl_t = np.array((i[1:clim]))
 			self.con_infl_C = np.empty((0, clim-1))	
 			continue				

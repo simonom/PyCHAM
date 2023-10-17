@@ -75,6 +75,8 @@ def def_mod_var(caller, self): # define function
 	# concentration of particles (# particles/cm3 (air))
 	pconc = np.zeros((1, 1))
 	pconct = np.zeros((1, 1)) # times of particle injection (s)
+	# whether to repeat particle influx every 24 hours
+	self.pconctf = 0 
 	pcont = np.zeros((1, 1), dtype=int) # whether particle injection instantaneous or continuous
 	seed_mw = (np.array((132.14))).reshape(1) # molecular weight of seed material (g/mol)
 	seed_diss = [1.] # dissociation constant of seed material
@@ -123,6 +125,9 @@ def def_mod_var(caller, self): # define function
 	self.con_infl_C = np.empty(0)
 	# times of component influx (s)
 	self.con_infl_t = np.empty(0)
+	# flag for how to treat times of continuous influxes
+	self.con_infl_tf = 0 
+
 	# chemical scheme name of components with constant concentration	
 	self.const_comp = []
 	# Chemical scheme names of components injected instantaneously after start of experiment
