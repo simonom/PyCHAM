@@ -109,15 +109,16 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 			Nres_dry[save_cnt, Ni] = pconc[ish, 0].sum()
 		Nres_wet[save_cnt, :] = pconc[:, 0] # record with water
 	
-	# end of number size distribution part ----------------------------------------
-	
+	# end of number size distribution part ------------------------------
+
 	# chamber environmental conditions ----------------------------------
 	
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
 	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
-	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	# relative humidity (fraction (0-1))	
+	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] 	
 	cham_env[save_cnt, 3] = self.tf[sum(self.tft<=sumt)-1]
-	# --------------------------------------------------------------------------------
+	# -------------------------------------------------------------------
 
 	# cumulative influx of injected components (ug/m3)
 	self.tot_in_res_ft[save_cnt+1, :] += tot_in_res

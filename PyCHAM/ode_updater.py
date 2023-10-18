@@ -425,9 +425,9 @@ def ode_updater(y, H2Oi,
 			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
-				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
-				Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, core_diss, 
-				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
+				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, 
+				yrec, Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, 
+				core_diss, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
@@ -812,7 +812,7 @@ def ode_updater(y, H2Oi,
 	# save results
 	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
-		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
-		comp0, H2Oi, siz_str, cham_env, self)
+		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, 
+		indx_plot, comp0, H2Oi, siz_str, cham_env, self)
 	
 	return() # end of function

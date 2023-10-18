@@ -94,11 +94,10 @@ def plotter(caller, dir_path, self):
 	make_patch_spines_invisible(par2)
 	# second, show the right spine
 	par2.spines['right'].set_visible(True)
-	# -------------------------------------------------------------------------
-	
+	# ------------------------------------------------------------------
 	# plot temporal profiles
 	# temperature on original vertical axis
-	p0, = ax0.plot(timehr, cham_env[:, 0], 'k', label = 'temperature (K)')
+	p0, = ax0.plot(timehr, [float(i) for i in cham_env[:, 0]], 'k', label = 'temperature (K)')
 	ax0.set_ylabel('Temperature (K)', size=16)
 	ax0.yaxis.label.set_color('black')
 	ax0.tick_params(axis='y', colors='black')
@@ -106,7 +105,7 @@ def plotter(caller, dir_path, self):
 	ax0.yaxis.set_tick_params(direction = 'in', which = 'both')
 	
 	# pressure on first parasite axis
-	p1, = par1.plot(timehr, cham_env[:, 1], '--m', label = 'pressure (Pa)')
+	p1, = par1.plot(timehr, [float(i) for i in cham_env[:, 1]], '--m', label = 'pressure (Pa)')
 	par1.set_ylabel('Pressure (Pa)', rotation=270, size=16, labelpad = 15)
 	par1.yaxis.label.set_color('magenta')
 	par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e')) # set tick format for vertical axis
@@ -115,7 +114,7 @@ def plotter(caller, dir_path, self):
 	par1.yaxis.set_tick_params(direction = 'in', which = 'both')
 	
 	# relative humidity on second parasite axis
-	p2, = par2.plot(timehr, cham_env[:, 2], '-.b', label = 'relative humidity (fraction)')
+	p2, = par2.plot(timehr, [float(i) for i in cham_env[:, 2]], '-.b', label = 'relative humidity (fraction)')
 	par2.set_ylabel('Relative Humidity (0-1)', rotation=270, size=16, labelpad = 15)
 	par2.yaxis.label.set_color('blue')
 	par2.tick_params(axis='y', colors='blue')
