@@ -41,7 +41,7 @@ def ui_check(self):
 	# --------------------------------------------------------------------------------
 	
 	# path to store for variables
-	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
@@ -298,7 +298,7 @@ def ui_check(self):
 	# for UManSysProp if no update requested, check that there 
 	# is an existing UManSysProp folder
 	if (uman_up == 0): # check for existing umansysprop folder
-		if not os.path.isdir(os.getcwd() + '/umansysprop'): # if no existing folder then force update
+		if not os.path.isdir(self.PyCHAM_path + '/umansysprop'): # if no existing folder then force update
 			uman_up = 1
 	
 	if (uman_up == 1): # test whether UManSysProp can be updated
@@ -459,7 +459,7 @@ def ui_check(self):
 	if (em_flag < 2):
 		# write the module for hysteresis
 		importlib.reload(write_hyst_eq)
-		write_hyst_eq.write_hyst_eq(drh_str, erh_str)
+		write_hyst_eq.write_hyst_eq(drh_str, erh_str, self)
 		# test the module for hysteresis works
 		importlib.reload(hyst_eq)
 		try:
@@ -514,7 +514,6 @@ def ui_check(self):
 			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
 
-	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close

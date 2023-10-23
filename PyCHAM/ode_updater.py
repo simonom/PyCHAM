@@ -310,7 +310,7 @@ def ode_updater(y, H2Oi,
 	conPin_cnt0 = 0 # remember count at start of integration step
 	# count on recording results, note starting on two because results at t=0 already stored
 	save_cnt = 2
-	
+		
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
@@ -578,7 +578,7 @@ def ode_updater(y, H2Oi,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
 				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
-				
+			
 			# if any components set to have constant gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -797,7 +797,7 @@ def ode_updater(y, H2Oi,
 		# remember the gas-phase water concentration from previous 
 		# integration step (# molecules/cm3)
 		y_H2O0 = y[H2Oi]
-		
+			
 	time_taken = time.time()-st_time
 	
 	# re-merge continuous influx of water with that of other components, 

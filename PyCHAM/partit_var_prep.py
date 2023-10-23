@@ -164,7 +164,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# generate module that contains any accommodation coefficient functions, note, do 
 	# this even if no functions supplied so that the accomm_coeff_calc is updated and
 	# accurate for this simulation
-	f = open('PyCHAM/accom_coeff_calc.py', mode='w')
+	f = open(self.PyCHAM_path + '/PyCHAM/accom_coeff_calc.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
 	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')

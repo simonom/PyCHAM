@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -26,11 +26,19 @@ import os
 
 def write(msg): # define function
 
-	err_log = str(os.getcwd() + '/PyCHAM/err_log.txt')
+	# inputs -----------
+	# msg - the error message
+	# ------------------
+
+	err_log = str(os.getcwd() + '/err_log.txt')
 	
 	# open file for logging errors
-	with open(err_log, 'a') as el:
-		el.write(msg)
-		el.close()
-	
+	try:
+		with open(err_log, 'a') as el:
+			el.write(msg)
+			el.close()
+	except:	
+		with open(err_log, 'w+') as el:
+			el.write(msg)
+			el.close()
 	return()

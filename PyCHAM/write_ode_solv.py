@@ -49,7 +49,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
-	f = open('PyCHAM/ode_solv.py', mode='w')
+	f = open(self.PyCHAM_path + '/PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
 	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')

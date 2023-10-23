@@ -55,8 +55,6 @@ def middle(self): # define function
 		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
 	
-	
-	
 	if (self.pars_skip == 0 or self.pars_skip == 2): # if not skipping parsing of chemical scheme
 		# parse the chemical scheme equation file to convert equations
 		# into usable code
@@ -121,7 +119,7 @@ def middle(self): # define function
 	
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
-		
+	
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 

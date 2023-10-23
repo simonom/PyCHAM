@@ -35,8 +35,8 @@ def def_mod_var(caller, self): # define function
 
 	# default input files ------------------------------
 	# default chemical scheme
-	self.sch_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
-	self.xml_name = os.getcwd()+'/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
+	self.sch_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
+	self.xml_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
 	self.inname = 'Default' # model variables file name
 	
 	# general ---------------------------------------------------------------------------------
@@ -225,7 +225,7 @@ def def_mod_var(caller, self): # define function
 
 	
 	# path to store for variables
-	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'wb') as f: # the file to be used for pickling
 		pickle.dump(list_vars,f) # pickle

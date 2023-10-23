@@ -82,7 +82,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# download latest version of umansysprop
 		
 		# check if there is an existing umansysprop folder
-		if os.path.isdir(cwd + '/umansysprop'): 
+		if os.path.isdir(self.PyCHAM_path + '/umansysprop'): 
 			def handleRemoveReadonly(func, path, exc):
 				excvalue = exc[1]
 				if not os.access(path, os.W_OK):
@@ -93,13 +93,13 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					raise
 			# remove existing folder, onerror will change permission of directory if 
 			# needed
-			shutil.rmtree(cwd + '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly)
+			shutil.rmtree(self.PyCHAM_path+ '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly)
 		
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
-		Repo.clone_from(git_url, (cwd + '/umansysprop'))
+		Repo.clone_from(git_url, (self.PyCHAM-path + '/umansysprop'))
 		
 		# now check on whether import pybel written in data/__init__.py
-		f_init = open(str(cwd + '/umansysprop/umansysprop/data/__init__.py'), mode='r')
+		f_init = open(str(self.PyCHAM_path + '/umansysprop/umansysprop/data/__init__.py'), mode='r')
 		lines = f_init.readlines()
 		if 'import pybel' in lines[21]:
 			lines[21] = 'import openbabel.pybel as pybel\n'	
@@ -108,7 +108,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		f_init.close()
 
 	# point to umansysprop folder
-	sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
+	sys.path.insert(1, (self.PyCHAM_path + '/umansysprop')) # address for updated version
 	
 	from umansysprop import boiling_points
 	from umansysprop import vapour_pressures

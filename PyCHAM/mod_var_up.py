@@ -31,7 +31,7 @@ def mod_var_up(self):
 	# ---------------------------------
 	
 	# open model variables
-	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, Press,

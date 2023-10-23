@@ -34,7 +34,7 @@ def share(self):
 	# -------------------------------------------------------------------------------
 
 	# path to store for variables
-	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, Press,
 		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 

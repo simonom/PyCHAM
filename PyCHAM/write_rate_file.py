@@ -38,9 +38,9 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 
 	# open/create relevant file to write module to
 	if (testf == 0):
-		f = open('PyCHAM/rate_coeffs.py', mode='w')
+		f = open(str(self.PyCHAM_path + '/PyCHAM/rate_coeffs.py'), mode='w')
 	if (testf == 3):
-		f = open('PyCHAM/rate_coeffs_aq.py', mode='w')
+		f = open(str(self.PyCHAM_path + '/PyCHAM/rate_coeffs_aq.py'), mode='w')
 	if (testf == 2):
 		f = open('rate_coeffs.py', mode='w')
 	f.write('##########################################################################################\n')

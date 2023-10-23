@@ -36,7 +36,7 @@ def mod_var_read(self):
 		err_mess = '' # initial (blank) error message
 
 		# prepare by opening existing model variables, ready for modification
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, Press,
@@ -50,8 +50,9 @@ def mod_var_read(self):
 			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
-		
-		if (self.inname != 'Default' and self.inname != 'Not found' and type(self.param_const) != dict): # if not using defaults
+	
+		# if not using defaults	
+		if (self.inname != 'Default' and self.inname != 'Not found'): 
 			inputs = open(self.inname, mode= 'r' ) # open model variables file
 			try: # in case reading in model variables fine
 				in_list = inputs.readlines() # read file and store everything into a list
@@ -81,7 +82,7 @@ def mod_var_read(self):
 			in_list = []
 
 		# if parameters automatically supplied via the automated_setup_and_call module
-		if type(self.param_const) == dict:
+		if (type(self.param_const) == dict and self.inname == 'Not found'):
 			in_list = [] # prepare list
 			for key, value in self.param_const.items(): # loop through supplied parameters
 				# if no editing needed, then just append
@@ -116,6 +117,7 @@ def mod_var_read(self):
 				self.update_stp = float(value.strip())
 
 			if key == 'total_model_time' and (value.strip()):
+			
 				try:
 					self.tot_time = float(value.strip())
 				except:
@@ -681,7 +683,7 @@ def mod_var_read(self):
 		# for UManSysProp if no update requested, check that there 
 		# is an existing UManSysProp folder
 		if (uman_up == 0): # check for existing umansysprop folder
-			if not os.path.isdir(os.getcwd() + '/umansysprop'): # if no existing folder then force update
+			if not os.path.isdir(self.PyCHAM_path + '/umansysprop'): # if no existing folder then force update
 				uman_up = 1
 		# -------------------------------------------
 		
@@ -719,7 +721,6 @@ def mod_var_read(self):
 				e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 				erh_str, pcont, z_prt_coeff, chamV]
 
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close

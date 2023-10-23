@@ -48,13 +48,16 @@ class PyCHAM(QWidget):
 
 		self.param_const = param_const
 
+		# get path to PyCHAM folder
+		self.PyCHAM_path = os.path.dirname(__file__)[0:-7]	
+		
 		self.title = 'PyCHAM'
 		self.left = 10
 		self.top = 10
 		self.width = 800
 		self.height = 530
-		self.initUI() # call on initialisation function to fill window
-		
+		self.initUI() # call on initialisation function to fill window	
+
 		# changing the background color
 		#self.setStyleSheet("background-color: darkCyan;")
   
@@ -67,7 +70,6 @@ class PyCHAM(QWidget):
 		# then automatically setup and run the simulation, e.g. using the
 		# automated_setup_and_call.py
 		if (type(param_const) == dict):
-			
 			self.autorun() # call on automatic setup and run
 			
 		return
@@ -1944,7 +1946,7 @@ class PyCHAM(QWidget):
 		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
-		input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, Press,
@@ -2054,7 +2056,7 @@ class PyCHAM(QWidget):
 		if type(self.param_const) != dict: # if not called from automatic script (automated_setup_and_call.py)
 			# user chooses path of file to model variables file
 			self.inname, _ = QFileDialog.getOpenFileName(self, "Select Model Variables File", "./PyCHAM/input/")
-		else: # if run from automatic script (automated_setup_and_call.py)
+		if (type(self.param_const) == dict and self.inname == 'Not found'): # if run from automatic script (automated_setup_and_call.py)
 			self.inname = 'Automatically Set'
 
 		if (self.inname == ''): # if no file selected, e.g. because selection was cancelled
@@ -2149,7 +2151,7 @@ class PyCHAM(QWidget):
 				return()
 
 			# get the save path name variables
-			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+			input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
 				[sav_nam, comp0, y0, Press,
 				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
@@ -2206,7 +2208,7 @@ class PyCHAM(QWidget):
 			self.b80s.hide()
 			
 			# path to error log
-			err_log = str(os.getcwd() + '/PyCHAM/err_log.txt')
+			err_log = str(self.PyCHAM_path + '/PyCHAM/err_log.txt')
 			if (sim_num == 0): # delete any existing error log and create new log
 				# list upcoming simulation in the error log
 				with open(err_log, 'w') as el:
@@ -4194,7 +4196,7 @@ class PyCHAM(QWidget):
 			import plotter_nsd # for plotting supplied number size distributions
 		
 			# path for pickle file
-			input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+			input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
@@ -4486,7 +4488,10 @@ class PyCHAM(QWidget):
 		starter_name0 = 'fill'
 		
 		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'finisher'):
-			
+	
+			# tells mod_var_read that model variables not contained in a file
+			self.inname = 'Not found'
+		
 			# loop through starter simulations
 			for starteri in range(len(param_range['starter_paths'])):
 
@@ -4657,6 +4662,9 @@ class PyCHAM(QWidget):
 					self.param_const['res_file_name'] = res_file_name0
 		
 		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'starter'):
+
+			# tells mod_var_read that model variables not in a model variables file 
+			self.inname = 'Not found'
 
 			# loop through light flux
 			for Ji in range(len(param_range['trans_fac'])):
@@ -4844,11 +4852,16 @@ class PyCHAM(QWidget):
 							# ensure that after first simulation equation parsing is skipped
 							self.param_const['pars_skip'] = 1
 							
-		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int):
+		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int and self.param_const['sim_type'] != 'standard_call'):
 	
 			# prepare for randomness
 			from numpy.random import default_rng
 			rng = default_rng()
+
+			# tells mod_var_read that model variables are 
+			# not in a model variables file 
+			self.inname = 'Not found'
+
 
 			# loop through simulations
 			for simi in range(self.param_const['sim_num']):
@@ -4981,15 +4994,38 @@ class PyCHAM(QWidget):
 
 			if (self.param_const['sim_type'] == 'starter'):
 
+				# tells mod_var_read that model variables are 
+				# not in a model variables file
+				self.inname = 'Not found'
+
 				# establish parameters provided by user by calling mod_var_read
 				import mod_var_read
 				mod_var_read.mod_var_read(self)
 			
+				param_const['sch_name']
+				param_const['xml_name']
+
 				self.on_click2() # assign chemical scheme
 				self.on_click3() # assign xml file
 				self.on_click4() # provide model variables label
 			
 				self.on_click81sing() # run simulation
+
+		if (self.param_const['sim_type'] == 'standard_call'):
+
+			self.sch_name = self.param_const['sch_name']
+			self.xml_name = self.param_const['xml_name']
+			self.inname = self.param_const['mod_var_name']
+
+			# establish parameters provided by user by calling mod_var_read
+			import mod_var_read
+			mod_var_read.mod_var_read(self)
+	
+			self.on_click2() # assign chemical scheme
+			self.on_click3() # assign xml file
+			self.on_click4() # provide model variables label
+			
+			self.on_click81sing() # run simulation
 
 		QWidget.close(self) # quit and close gui window
 

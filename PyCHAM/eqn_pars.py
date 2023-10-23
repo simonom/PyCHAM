@@ -225,11 +225,11 @@ def extr_mech(int_tol, num_sb,
 
 	# call function to generate module that tracks change tendencies
 	# of certain components
-	write_dydt_rec.write_dydt_rec()
+	write_dydt_rec.write_dydt_rec(self)
 	
 	# write the module for estimating deliquescence and efflorescence 
 	# relative humidities as a function of temperature
-	write_hyst_eq.write_hyst_eq(drh_str, erh_str)
+	write_hyst_eq.write_hyst_eq(drh_str, erh_str, self)
 	
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)

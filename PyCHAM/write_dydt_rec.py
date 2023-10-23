@@ -27,9 +27,13 @@
 
 import datetime
 
-def write_dydt_rec(): # define function
+def write_dydt_rec(self): # define function
 
-	f = open('PyCHAM/dydt_rec.py', mode='w')
+	# inputs -------
+	# self - the PyCHAM class
+	# --------------
+
+	f = open(self.PyCHAM_path + '/PyCHAM/dydt_rec.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
 	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
