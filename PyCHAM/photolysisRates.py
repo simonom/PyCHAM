@@ -26,7 +26,6 @@
 import scipy
 import os
 import numpy as np
-import requests, zipfile, io # for downloading
 import shutil
 from lamp_photo import lamp_photo
 import zenith

@@ -383,7 +383,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		
 		# call on write_dydt_rec to generate the module that will process
 		# the tendency to change during the simulation
-		write_dydt_rec.write_dydt_rec()
+		write_dydt_rec.write_dydt_rec(self)
 	
 	# --------------------------------------
 	

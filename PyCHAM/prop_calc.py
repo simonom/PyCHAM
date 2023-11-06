@@ -96,7 +96,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			shutil.rmtree(self.PyCHAM_path+ '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly)
 		
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
-		Repo.clone_from(git_url, (self.PyCHAM-path + '/umansysprop'))
+		Repo.clone_from(git_url, (self.PyCHAM_path + '/umansysprop'))
 		
 		# now check on whether import pybel written in data/__init__.py
 		f_init = open(str(self.PyCHAM_path + '/umansysprop/umansysprop/data/__init__.py'), mode='r')
