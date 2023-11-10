@@ -9,7 +9,6 @@ dependencies:
   - matplotlib
   - netcdf4
   - numpy
-  - openbabel
   - openpyxl
   - python
   - pyqt
