@@ -533,6 +533,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 	return()
 
+# function for when calling from button for plotting size-segregated mass
+# concentration without water
 def part_mass_vs_time_sizeseg(self):
 
 	import scipy.constants as si
@@ -584,8 +586,9 @@ def part_mass_vs_time_sizeseg(self):
 
 	# get the index of particle size bins
 	for psb_dubi in psb_dub:
+		
 		psb_ind += dbou_rec[:, 1::]<psb_dubi
-
+		
 	# then use this index to find the mass concentrations 
 	# inside each size bound
 

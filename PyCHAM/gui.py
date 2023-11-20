@@ -1860,7 +1860,8 @@ class PyCHAM(QWidget):
 		# drop down button for what to plot
 		self.b402 = QComboBox(self)
 		self.b402.addItem('Gas-phase Concentrations (ppb)')
-		self.b402.addItem('Total Particle Concentrations')
+		self.b402.addItem(str('Particle Concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' + ')  with Standard Results Plot'))
+		self.b402.addItem(str('Particle Concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' +') with Cumulative particle mass concentration without water plot'))
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)')
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)')
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over _ Extension Hydrocarbons)')
@@ -4397,9 +4398,12 @@ class PyCHAM(QWidget):
 
 		
 		# if total particle concenrations
-		if ('Particle Concentrations' in om_choice):
-			self.oandm = 1.1
-		
+		if ('Particle Concentrations' in om_choice): 
+			if ('Standard Results Plot' in om_choice):
+				self.oandm = 1.1
+			if ('Cumulative particle mass concentration without water' in om_choice):
+				self.oandm = 1.2
+	
 		# if Van Krevelen
 		if ('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)' in om_choice):
 			self.oandm = 2
@@ -4456,7 +4460,11 @@ class PyCHAM(QWidget):
 		
 		if (self.oandm == 1): # if the gas-phase temporal profiles to be plotted
 			plotter_xls.plotter_gp_mod_n_obs(self)
-		if (self.oandm == 1.1): # if the total particle concentrations temporal profiles to be plotted
+		# if the total particle concentrations temporal profiles 
+		# to be plotted against the standard plot
+		if (self.oandm == 1.1):
+			plotter_xls.plotter_pp_mod_n_obs(self)
+		if (self.oandm == 1.2):
 			plotter_xls.plotter_pp_mod_n_obs(self)
 		if (self.oandm >= 2 and self.oandm <= 7): # if the Van Krevelen to be plotted
 			plotter_xls.plotter_VK_mod_n_obs(self)
