@@ -737,59 +737,65 @@ def const_infl_open(self): # define function to read in values relevant to const
 	import openpyxl
 	import os
 
-	try: # try to open the file at the user-supplied path
-		wb = openpyxl.load_workbook(filename = self.const_infl_path)
-	except: # if file not found tell user
-		self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
+	if 'xls' in self.const_infl_path:
+		try: # try to open the file at the user-supplied path
+			wb = openpyxl.load_workbook(filename = self.const_infl_path)
+			
+			sheet = wb['cont_infl']
+			
+			# component names are in first column, continuous influxes are in following columns		
+			ir = -1 # count on row iteration
+	
+			# prepare to store component names and continuous influxes
+			value = ''
+
+			self.con_infl_nam = np.empty((0))	
+	
+			for i in sheet.iter_rows(values_only=True): # loop through rows
+				
+				ir += 1 # count on row iteration
+				if (ir == 0): # header provides unit of emission rate and times
+					self.abun_unit = str(i[0])	
+			
+					if ('ppb' not in self.abun_unit):
+						if ('mol' not in self.abun_unit and 'cm' not in self.abun_unit):
+							self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
+							
+							return(self)
+
+					clim = 0 # count on columns
+					for ic in i[0::]:	
+						if ic is None:
+							break # stop looping through columns
+						clim +=1 # count on columns	
+					
+					# if looping over a 24 hour period
+					# then limit influxes to the first 
+					# provided 24 hours
+					if (self.con_infl_tf == 1): 
+						clim = sum(i[1:clim] < 24.*3.6e3)
+
+					self.con_infl_t = np.array((i[1:clim])).astype('float')
+					self.con_infl_C = np.empty((0, clim-1)).astype('float')	
+					continue				
+
+				# get names of components (matching chemical scheme names) 
+				# and their continuous influx rates (abundance unit given above)
+				else:
+					if (i[1] is None): # reached end of contiguous components
+						break
+			
+					# component name
+					self.con_infl_nam = np.concatenate((self.con_infl_nam, np.array((str(i[0]))).reshape(1)))
+					# continuous influx rate
+					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:clim])).reshape(1, -1).astype('float')))
+	
+			wb.close() # close excel file
+			
+		except: # if file not found tell user
+			self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
+		
 		return(self)
-
-	sheet = wb['cont_infl']
-	# component names are in first column, continuous influxes are in following columns		
-	ir = -1 # count on row iteration
-	
-	# prepare to store component names and continuous influxes
-	value = ''
-
-	self.con_infl_nam = np.empty((0))	
-	
-	for i in sheet.iter_rows(values_only=True): # loop through rows
-		ir += 1 # count on row iteration
-		if (ir == 0): # header provides unit of emission rate and times
-			self.abun_unit = str(i[0])	
-			
-			if ('ppb' not in self.abun_unit):
-				if ('mol' not in self.abun_unit and 'cm' not in self.abun_unit):
-					self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
-					return(self)
-
-			clim = 0 # count on columns
-			for ic in i[0::]:	
-				if ic is None:
-					break # stop looping through columns
-				clim +=1 # count on columns	
-			
-			# if looping over a 24 hour period
-			# then limit influxes to the first 
-			# provided 24 hours
-			if (self.con_infl_tf == 1): 
-				clim = sum(i[1:clim] < 24.*3.6e3)
-
-			self.con_infl_t = np.array((i[1:clim]))
-			self.con_infl_C = np.empty((0, clim-1))	
-			continue				
-
-		# get names of components (matching chemical scheme names) 
-		# and their continuous influx rates (abundance unit given above)
-		else:
-			if (i[1] is None): # reached end of contiguous components
-				break
-			
-			# component name
-			self.con_infl_nam = np.concatenate((self.con_infl_nam, np.array((str(i[0]))).reshape(1)))
-			self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:clim])).reshape(1, -1)))
-	
-	wb.close() # close excel file
-	
 
 	return(self)
 
