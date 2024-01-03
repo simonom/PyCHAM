@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -101,11 +101,11 @@ def aq_mat_prep(num_sb, comp_num, self):
 			if (sbi > 0): # larger size bin
 				self.rindx_aq = np.append(self.rindx_aq, self.rindx_aq[0:rindxs[0], 0:rindxs[1]]+(sbi)*(comp_num+2), axis=0)
 				self.pindx_aq = np.append(self.pindx_aq, self.pindx_aq[0:pindxs[0], 0:pindxs[1]]+(sbi)*(comp_num+2), axis=0)
-				self.y_arr_aq = np.append(self.y_arr_aq, self.y_arr_aq[0:y_arrl]+(sbi)*(max(y_arr[0:y_arrl])+1)+en_cum, axis=0)
+				self.y_arr_aq = np.append(self.y_arr_aq, self.y_arr_aq[0:y_arrl]+(sbi)*(max(y_arr_aq[0:y_arrl])+1)+en_cum, axis=0)
 				self.y_rind_aq = np.append(self.y_rind_aq, self.y_rind_aq[0:y_rindl]+(sbi)*(comp_num+2))
 				self.y_pind_aq = np.append(self.y_pind_aq, self.y_pind_aq[0:y_pindl]+(sbi)*(comp_num+2))
-				self.rr_arr_aq = np.append(self.rr_arr_aq, self.rr_arr_aq[0:rr_arrl]+(sbi)*(max(rr_arr[0:rr_arrl])+1), axis=0)
-				self.rr_arr_p_aq = np.append(self.rr_arr_p_aq, self.rr_arr_p_aq[0:rr_arr_pl]+(sbi)*(max(rr_arr_p[0:rr_arr_pl])+1), axis=0)
+				self.rr_arr_aq = np.append(self.rr_arr_aq, self.rr_arr_aq[0:rr_arrl]+(sbi)*(max(rr_arr_aq[0:rr_arrl])+1), axis=0)
+				self.rr_arr_p_aq = np.append(self.rr_arr_p_aq, self.rr_arr_p_aq[0:rr_arr_pl]+(sbi)*(max(rr_arr_p_aq[0:rr_arr_pl])+1), axis=0)
 				self.reac_col_aq = np.append(self.reac_col_aq, self.reac_col_aq[reac_coll-1]+reac_col[-reac_coll+1::])
 				self.prod_col_aq = np.append(self.prod_col_aq, self.prod_col_aq[prod_coll-1]+prod_col[-prod_coll+1::])
 				self.uni_y_rind_aq = np.append(self.uni_y_rind_aq, self.uni_y_rind_aq[0:uni_y_rindl]+(sbi)*(comp_num+2), axis=0)

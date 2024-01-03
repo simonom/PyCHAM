@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -66,12 +66,13 @@ def SN_conversion(RateExp):
 		RateExp = RateExp.replace('@', '**')
 	return RateExp
 
-# This function ensures that the function names can be recognized by python
-# future development.  The output rate_coef has length equal to the number of
+# This function ensures that the function names can be recognized.  
+# The output rate_coef has length equal to the number of
 # equations and values giving the reaction rate coefficient.
 def convert_rate_mcm(rate_coef):
 
     # create a list that contains commonly used math functions
+    # and MCM names
     # ('illegal_func_name', func_regex,'legal_func_name')
 	math_func_list = [
 		('exp', 'numpy.exp'),
@@ -80,7 +81,8 @@ def convert_rate_mcm(rate_coef):
         ('dlog', 'numpy.log'),
         ('LOG', 'numpy.log'),
         ('dabs', 'numpy.abs'),
-        ('LOG10', 'numpy.log10')
+        ('LOG10', 'numpy.log10'),
+        ('C(ind_H2O)', 'H2O')
     ]
 
     

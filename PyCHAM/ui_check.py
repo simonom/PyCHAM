@@ -389,7 +389,8 @@ def ui_check(self):
 
 	# ----------------------------------------------------------
 	# check on presence of actinic flux file for photolysis - note this has to 
-	# be before chemical scheme check to stop that check crashing when actinic flux file has a problem
+	# be before chemical scheme check to stop that check crashing when 
+	# actinic flux file has a problem
 	if hasattr(self, 'af_path') and self.af_path != [] and self.af_path != 'no' and self.af_path != 'nat_act_flux': # if file provided
 		try: # try opening as in lamp_photo module
 			f = open(self.af_path, 'r') # open file

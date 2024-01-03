@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -100,11 +100,17 @@ def extr_mech(int_tol, num_sb,
 
 	for i in range (len(self.con_infl_nam)):
 		
-		# water not included explicitly in chemical schemes but accounted for later in init_conc
-		if (self.con_infl_nam[icon] == 'H2O'):
-			self.con_infl_indx[icon] = int(comp_num)
-			icon += 1 # count on constant influxes
-			continue
+		if (self.con_infl_nam[icon] == 'H2O'): # if water influxed
+			# if water not included explicitly in chemical schemes 
+			# (note it is accounted for later in init_conc)
+			if (self.H2O_in_cs == 2):
+				self.con_infl_indx[icon] = int(comp_num)
+				icon += 1 # count on constant influxes
+				continue
+			else: # if water in chemical scheme
+				self.con_infl_indx[icon] = self.comp_namelist.index(self.con_infl_nam[icon])
+				icon += 1 # count on constant influxes
+				continue
 
 		# if we want to remove constant influxes 
 		# not present in the chemical scheme
@@ -147,15 +153,16 @@ def extr_mech(int_tol, num_sb,
 			# of components
 			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
 		except:
-			# if water then we know it will be the next component to be appended to the component list
+			# if water then we know it will be the next component to 
+			# be appended to the component list
 			if (self.const_comp[i] == 'H2O'):
 				self.con_C_indx[i] = len(self.comp_namelist)
 			else: # if not water
 				erf = 1 # raise error
 				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
-	
-	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
+	# if observation file provided for constraint
+	if hasattr(self, 'obs_file') and self.obs_file != []:
 
 		import openpyxl
 		import os
@@ -217,7 +224,7 @@ def extr_mech(int_tol, num_sb,
 
 	# call function to generate ordinary differential equation (ODE)
 	# solver module, add two to comp_num to account for water and core component
-	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+2, 
+	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+self.H2O_in_cs, 
 			(num_sb-self.wall_on), 0, sav_nam, pcont, self)
 
 	# call function to generate reaction rate calculation module

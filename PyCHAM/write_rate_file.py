@@ -94,6 +94,7 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 	f.write('\n')
 	
 	f.write('	erf = 0; err_mess = \'\' # begin assuming no errors\n')
+
 	# determine whether to bypass calculations because no chemical reactions were found
 	if (len(self.reac_coef_g)+len(self.reac_coef_aq)+len(self.reac_coef_su) > 0):
 		
@@ -102,13 +103,16 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 		f.write('\n')
 		if rrc:
 			f.write('	try:\n')
+			f.write('		gprn=0\n')
 			# code to calculate any generic rate coefficients given by chemical scheme file
 			for line in rrc:
+				f.write('		gprn += 1 # keep count on reaction number\n')
 				f.write('		%s \n' %line)
 			f.write('\n')
 			f.write('	except:\n')
 			f.write('		erf = 1 # flag error\n')
-			f.write('		err_mess = \'Error: generic reaction rates failed to be calculated inside rate_coeffs.py, please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\' # error message\n')
+			f.write('		err_mess = str(\'Error: generic reaction rates failed to be calculated inside rate_coeffs.py at number \' + str(gprn) + \', please check chemical scheme and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
+			f.write('		return([], erf, err_mess)\n')
 	
 		f.write('	# estimate and append photolysis rates\n')
 		f.write('	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)\n')
@@ -129,7 +133,6 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 			f.write('		rate_values[%s] = %s\n' %(eqn_key, self.reac_coef_g[eqn_key]))
 		f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
 		f.write('		erf = 1 # flag error\n')
-		f.write('		err_mess = str(\'Error: estimating reaction rate for reaction number \' + str(gprn) + \' failed, please check chemical scheme (including whether definitions for generic rate coefficients have been included), and associated chemical scheme markers, which are stated in the model variables input file\') # error message\n')
 		f.write('	\n')
 		f.write('	# aqueous-phase reactions\n')
 		for eqn_key_aq in range (len(self.reac_coef_aq)):

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -148,7 +148,7 @@ def lamp_photo(J, TEMP, self):
 	
 	# determine whether to use MCM-recommended wavelength-dependent absorption 
 	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
-	if self.photo_path != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
+	if (self.photo_path[-26::] != '/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
 		 
 		# open file to read
 		f = open(self.photo_path, 'r')
@@ -231,7 +231,7 @@ def lamp_photo(J, TEMP, self):
 	# Using MCM recommended component absorption cross-sections 
 	# and quantum yields (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	# in combination with the actinic flux found above
-	if (self.photo_path == str(cwd+'/PyCHAM/photofiles/MCMv3.2')):
+	else:
 	
 		# --------------------------------------------------------------
 		# J<1> and J<2> for O3 (ozone) photolysis

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -87,8 +87,13 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	
 	# append water and core (water from Table 4.1 of the Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
-	diff_vol = (np.append(diff_vol, np.array((13.1, 1.)))).reshape(-1, 1)
-	
+	# if water present in component names
+	if (self.H2O_in_cs == 1):
+		diff_vol = (np.append(diff_vol, np.array((1.)))).reshape(-1, 1)
+		diff_vol[self.comp_namelist.index('H2O')] = 13.1
+	else:
+		diff_vol = (np.append(diff_vol, np.array((13.1, 1.)))).reshape(-1, 1)
+
 	# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
 	# the Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion volume for air 

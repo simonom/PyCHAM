@@ -88,7 +88,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 	# ---------------------------------------
 	# enhance upper radius bound (um) to reduce possibility of particles growing beyond 
 	# this (reversed in saving.py)
-	upper_bin_rad_amp = 1.0e6
+	upper_bin_rad_amp = 1.e6
 	rad_bounds[-1] = rad_bounds[-1]*upper_bin_rad_amp
 	
 	if (pmode == 0): # calculating the number size distribution from modes
@@ -113,7 +113,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			except: # if scale is single number
 				 scale = scale
 
-			pdf_output = stats.lognorm.pdf(hires, std[i], loc, scale[i])
+			pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
 			# remove any excess dimensions
 			pdf_output = np.squeeze(pdf_output)
 			# probability distribution function scaled to actual size bin radii

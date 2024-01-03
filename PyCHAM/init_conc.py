@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -213,6 +213,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			# (O is the MCM chemical scheme name for single oxygen))
 			if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
 				H2Oi = indx
+				self.H2Oi = H2Oi # index for water
 				y[H2Oi] = C_H2O # include initial concentration of water (# molecules/cm3)
 				y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
 			
@@ -220,7 +221,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 				# first rearrange matrix so that components in rows, surface number in columns
 				y_w = y_w.reshape(self.wall_on, num_comp+2)
 				# remove the excess water column
-				y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
+				y_w = np.concatenate((y_w[:, 0:-2], y_w[:, -1].reshape(-1, 1)), axis=1)
 				# then flatten back to 1D array
 				y_w = y_w.flatten()
 

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -192,7 +192,7 @@ def ode_updater(y, H2Oi,
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
 	# pmode - whether number size distributions expressed as modes or explicitly
-	# pconc - concentration of injected particles (#/cc (air))
+	# pconc - concentration of injected particles (#/cm3 (air))
 	# pconct - times of particle injection (s)
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
@@ -296,8 +296,8 @@ def ode_updater(y, H2Oi,
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
 	
-	# current status of whether injection of particles instantaneous or continuous,
-	# if not stated assume instantaneous
+	# current status of whether injection of particles instantaneous 
+	# or continuous, if not stated assume instantaneous
 	pcontf = 0
 	if (pconct[0, 0] == 0 and pcont[0, 0] == 1):
 		pcontf = 1
@@ -368,7 +368,8 @@ def ode_updater(y, H2Oi,
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
 		
-		# remembering variables at the start of the integration step ------------------------------------------
+		# remembering variables at the start of the 
+		# integration step ------------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
 		x0[:] = x[:] # remember initial particle sizes (um)

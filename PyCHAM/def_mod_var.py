@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -25,6 +25,7 @@
 import numpy as np
 import os
 import pickle # used for storing values
+import pathlib
 
 def def_mod_var(caller, self): # define function
 
@@ -150,7 +151,10 @@ def def_mod_var(caller, self): # define function
 	self.lon = 0. # longitude of experiment (degrees)
 	self.af_path = 'no' # path to customised (non-MCM) actinic flux file
 	# path to file containing absorption cross-sections and quantum yields
-	self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + 'MCMv3.2')
+	photopath = (str(pathlib.Path(__file__).parent.resolve()))
+	# ensure that permission to photolysis files allowed
+	photopath = str(photopath[0:-7] + '/PyCHAM')
+	self.photo_path = str(photopath + '/photofiles/' + 'MCMv3.2')
 	self.dayOfYear = 1 # number of days since 31st December that experiment conducted
 	self.tf = np.ones((1)).astype('float') # transmission factor for natural sunlight (0-1 fraction)
 	self.tft = np.zeros((1)).astype('float') # time (s) through simulation that self.tf applies to

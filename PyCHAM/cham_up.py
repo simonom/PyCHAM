@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -379,13 +379,21 @@ def cham_up(sumt, Pnow,
 	# filler for fraction of new seed particles injected so far
 	pconcn_frac = 0.
 	
+	# if we are at start of simulation and there is 
+	# continuous injection of particles from start, 
+	# then set flag to solve continuous injection 
+	# of particles. Note that pcontf set in 
+	# ode_updater
+	if (sumt == 0. and pcontf == 1):
+		self.pcont_ongoing = 1
+
 	# if influx occurs and we are not on the cham_up 
 	# call from the rec module (which has tnew=0)
 	# note, if this particle influx section called 
 	# during the call to rec, then continuous influx is 
 	# cancelled when called later
 	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and tnew > 0.):
-	
+		
 		# in case particle influx repeated every 24 hours
 		if (self.pconctf == 1 and sumt >= 24.*3.6e3):
 			pinsumt = (sumt % (24.*3.6e3))
@@ -407,6 +415,7 @@ def cham_up(sumt, Pnow,
 		
 		# check whether changes occur at start of this time step
 		if (pinsumt >= pconct[0, seedt_cnt]):
+			
 			# if no linear interpolation required, 
 			# or injection continuous
 			if (gpp_stab != -1 or pcontf == 1): 				
@@ -443,9 +452,10 @@ def cham_up(sumt, Pnow,
 					
 				# turn off flag for ongoing injection of particles
 				self.pcont_ongoing = 0
-		
+			
 			# account for new continuous change in seed particles
-			if (pcontf == 1):	
+			if (pcontf == 1):
+					
 				# turn on flag for ongoing injection of particles
 				self.pcont_ongoing = 1
 			

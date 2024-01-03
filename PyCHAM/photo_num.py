@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -33,8 +33,8 @@ def photo_num(photo_file):
 	# quantum yields
 	# ---------------------------------------------------------------------
 	# number of photolysis reactions, if this relevant
-	cwd = os.getcwd() # address of current working directory
-	if photo_file == str(cwd + '/PyCHAM/photofiles/MCMv3.2'):
+	# if using the MCM photofiles
+	if (photo_file[-26::] == '/PyCHAM/photofiles/MCMv3.2'):
 		Jlen = 62 # for MCM (default name of photolysis parameters)
 	else: # need to find out number of photolysis reactions
 		# use Fortran indexing to be consistent with MCM photochemical reaction numbers

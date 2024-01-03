@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -1258,6 +1258,25 @@ class PyCHAM(QWidget):
 		self.b220c.clicked.connect(self.on_click220c)
 		self.SEClayout.addWidget(self.b220c, 6, 0, 1, 1)
 
+		# horizontal separator line -------------------------------
+		self.separatorLine3a = QFrame()
+		self.separatorLine3a.setFrameShape(QFrame.HLine)
+		self.separatorLine3a.setFrameShadow(QFrame.Raised)
+		self.SEClayout.addWidget(self.separatorLine3a, 7, 0, 1, 4)
+		self.separatorLine3a.show()
+
+		# input bar for name of component to view molar mass (g/mol) of
+		self.e218c = QLineEdit(self)
+		self.e218c.setText('Provide the chemical scheme name of component for displaying molar mass (g/mol)')
+		self.e218c.setStyleSheet('qproperty-cursorPosition : 0')
+		self.SEClayout.addWidget(self.e218c, 8, 0, 1, 1)
+
+		# button to display molar mass of component
+		self.b220d = QPushButton('Molar Mass (g/mol)', self)
+		self.b220d.setToolTip('View molar mass (g/mol) of this component')
+		self.b220d.clicked.connect(self.on_click220d)
+		self.SEClayout.addWidget(self.b220d, 9, 0, 1, 1)
+
 		# column and row relative lengths---------------------------------
 		
 		# relative stretching (height-wise) of each row in Plot tab
@@ -1963,29 +1982,41 @@ class PyCHAM(QWidget):
 			chamV] = pickle.load(pk)
 			pk.close()
 		
-		# button to get path to folder containing relevant files
+		# button to get path to folder/file containing relevant files
 		options = QFileDialog.Options()
-		fol_nme = QFileDialog.getExistingDirectory(self, "Select Folder Containing Required Input Files", "./PyCHAM/input/")
+		#QFileDialog.getOpenFileName
+		fol_nme = getExistingFilesAndDirs(self, "Select Input", "./PyCHAM/input/")
 		
-		if (fol_nme == ''): # if no folder selected (e.g. because selection cancelled)
+		if (fol_nme == []): # if no folder selected (e.g. because selection cancelled)
 			return()
-		
-		# list of files (and any folders) here
-		dir_con = os.listdir(fol_nme)
+		fol_nme = fol_nme[0]
 		
 		# unknown names
 		self.sch_name = self.xml_name = self.inname = 'Not found'
 		
-		# look for corresponding files here
-		for i in dir_con:
-			if ('chem' in i): # chemical scheme file
-				self.sch_name = str(fol_nme+'/'+i)
-			if ('xml' in i): # xml file
-				self.xml_name = str(fol_nme+'/'+i)
+		try: # in case this is a directory
+			# list of files (and any folders) here
+			dir_con = os.listdir(fol_nme)
+		
+			# look for corresponding files here
+			for i in dir_con:
+				if ('chem' in i): # chemical scheme file
+					self.sch_name = str(fol_nme+'/'+i)
+				if ('xml' in i): # xml file
+					self.xml_name = str(fol_nme+'/'+i)
 			if ('var' in i): # model variables file
 				self.inname = str(fol_nme+'/'+i)
-			
-		# read in model variables of this model variables file and store to pickle
+		
+		# if not a directory then assume it is a model variable file
+		except:
+			self.inname = fol_nme
+
+		# read in model variables of this model variables file 
+		# and store to pickle
+		# Note that doing this call after searching for 
+		# files with names containing 'chem' means that any chemical 
+		# scheme files specified in the model variables overide
+		# any foun by automatic search
 		import mod_var_read
 		mod_var_read.mod_var_read(self)
 
@@ -3076,6 +3107,18 @@ class PyCHAM(QWidget):
 		# call on plotter for reaction rate ratios
 		import plotter_ct
 		plotter_ct.plotter_carb_res(self)
+
+	@pyqtSlot() # button to display molar mass of a single component
+	def on_click220d(self):
+
+		self.dir_path = self.l201.text() # name of folder with results
+
+		# get name of single component
+		self.mm_comp_name = self.e218c.text().strip()
+
+		# call on code for molar mass
+		import plotter_ct
+		plotter_ct.plotter_individ_molar_mass(self)
 		
 	# button to plot volatility basis set mass fractions with water
 	@pyqtSlot()
@@ -5029,13 +5072,21 @@ class PyCHAM(QWidget):
 
 		if (self.param_const['sim_type'] == 'standard_call'):
 
-			self.sch_name = self.param_const['sch_name']
-			self.xml_name = self.param_const['xml_name']
+			
 			self.inname = self.param_const['mod_var_name']
-
 			# establish parameters provided by user by calling mod_var_read
 			import mod_var_read
 			mod_var_read.mod_var_read(self)
+			
+			
+			try: # in case chemical scheme and xml file names contained in model variables file
+				self.param_const['sch_name'] = self.sch_name
+				self.param_const['xml_name'] = self.xml_name
+				
+			except:
+				self.sch_name = self.param_const['sch_name']
+				self.xml_name = self.param_const['xml_name']
+				self.inname = self.param_const['mod_var_name']
 	
 			self.on_click2() # assign chemical scheme
 			self.on_click3() # assign xml file
@@ -5088,5 +5139,49 @@ class ScrollLabel(QScrollArea):
 
 	def clear(self): # the clear method
 		self.label.clear() # clearing text
-		
+
+# function to allow opening of both file and directories
+def getExistingFilesAndDirs(parent, caption, directory, 
+                        filter='', initialFilter='', options=None):
+	def updateText():
+		# update the contents of the line edit widget with the selected files
+		selected = []
+		for index in view.selectionModel().selectedRows():
+			selected.append('"{}"'.format(index.data()))
+			lineEdit.setText(' '.join(selected))
+
+	dialog = QFileDialog(parent, windowTitle=caption)
+	dialog.setFileMode(dialog.ExistingFiles)
+	if options:
+		dialog.setOptions(options)
+	dialog.setOption(dialog.DontUseNativeDialog, True)
+	if directory:
+		dialog.setDirectory(directory)
+	if filter:
+		dialog.setNameFilter(filter)
+		if initialFilter:
+			dialog.selectNameFilter(initialFilter)
+
+	# by default, if a directory is opened in file listing mode, 
+	# QFileDialog.accept() shows the contents of that directory, but we 
+	# need to be able to "open" directories as we can do with files, so we 
+	# just override accept() with the default QDialog implementation which 
+	# will just return exec_()
+	dialog.accept = lambda: QDialog.accept(dialog)
+
+	# there are many item views in a non-native dialog, but the ones displaying 
+	# the actual contents are created inside a QStackedWidget; they are a 
+	# QTreeView and a QListView, and the tree is only used when the 
+	# viewMode is set to QFileDialog.Details, which is not this case
+	stackedWidget = dialog.findChild(QStackedWidget)
+	view = stackedWidget.findChild(QListView)
+	view.selectionModel().selectionChanged.connect(updateText)
+
+	lineEdit = dialog.findChild(QLineEdit)
+	# clear the line edit contents whenever the current directory changes
+	dialog.directoryEntered.connect(lambda: lineEdit.setText(''))
+
+	dialog.exec_()
+
+	return(dialog.selectedFiles())
 		

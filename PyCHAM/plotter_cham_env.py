@@ -60,7 +60,7 @@ def plotter(caller, dir_path, self):
 
 	# check whether chamber environment variables were saved and therefore
 	# retrieved
-	if (cham_env == []):
+	if (len(cham_env) == 0):
 		mess = str('Please note, no chamber environmental variables were found, perhaps the simulation was completed in a PyCHAM version predating this functionality')
 		self.l203a.setText(mess)
 		# set border around error message

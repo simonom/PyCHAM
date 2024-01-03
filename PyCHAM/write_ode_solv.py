@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -37,7 +37,8 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	# rowvals - indices of rows for Jacobian
 	# self.wall_on - marker for whether to consider wall 
 	# 	partitioning
-	# num_comp - number of components
+	# num_comp - number of components in chemical scheme, plus 
+	# any additional components needing consideration
 	# num_asb - number of actual size bins (excluding wall)
 	# testf - marker for whether in test mode or not
 	# self.eqn_num - number of gas- and particle-phase reactions
@@ -52,7 +53,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	f = open(self.PyCHAM_path + '/PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -142,7 +143,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	f.write('	# jac_part_hmf_indx - index of Jacobian affected by water\n')
 	f.write('	#	 in the particle phase\n')
 	f.write('	# rw_indx - indices of rows affected by water in particle phase\n')
-	f.write('	# N_perbin - number concentration of particles per size bin (#/cc)\n')
+	f.write('	# N_perbin - number concentration of particles per size bin (#/cm3)\n')
 	f.write('	# jac_part_H2O_indx - sparse Jacobian indices for the effect of\n')
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
@@ -560,13 +561,16 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	f.write('	#rrc[((rrc_y**self.rstoi_g).prod(axis=1)) == 0.0] = 0.\n')
 	f.write('	\n')
 	f.write('	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) and must be 1D even though y in dydt and jac has shape (number of elements, 1)\n')
+	
 	f.write('	sol = solve_ivp(dydt, [0, integ_step], y, atol = atol, rtol = rtol, method = \'BDF\', t_eval = [integ_step], vectorized = True, jac = jac)\n')
 	f.write('	\n')
 	f.write('	if (sol.status == -1): # if integration step failed, then we want to reduce the time step and try again \n')
 	f.write('		y[0] = -1.e6\n')
 	f.write('	else:\n')	
 	f.write('		# force all components in size bins with no particle to zero\n')
+	
 	f.write('		y = np.squeeze(sol.y)\n')
+	
 	f.write('		y = y.reshape(num_sb+1, num_comp)\n')
 	f.write('		if (num_asb > 0):\n')
 	f.write('			y[1:num_asb+1, :][N_perbin[:, 0] == 0, :] = 0\n')

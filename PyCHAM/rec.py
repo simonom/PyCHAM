@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -38,7 +38,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# yrec - concentration record (# molecules/cm3 (air))
 	# Cfactor_vst - record of the conversion factor for # molecules/cm3 
 	# to ppb
-	# y - concentrations (molecules/cc (air))
+	# y - concentrations (molecules/cm3 (air))
 	# sumt - cumulative time through simulation (s)
 	# num_sb - number of size bins
 	# num_comp - number of components

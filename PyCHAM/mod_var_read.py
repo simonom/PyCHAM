@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -112,6 +112,12 @@ def mod_var_read(self):
 				
 			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
 				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+
+			if key == 'chem_sch_name' and (value.strip()): # path to chemical scheme
+				self.sch_name = str(value.strip())
+
+			if key == 'xml_name' and (value.strip()): # path to xml file
+				self.xml_name = str(value.strip())
 			
 			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
 				self.update_stp = float(value.strip())

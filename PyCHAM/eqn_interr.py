@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -906,4 +906,11 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			self.njac_su = njac.astype(int)
 			self.jac_indx_su = jac_indx.astype(int)
 	
+	# flag for whether water included in chemical scheme 
+	# and number of components to add to chemical scheme 
+	# components in other parts of code
+	if ('H2O' in comp_list):
+		self.H2O_in_cs = 1
+	else:
+		self.H2O_in_cs = 2
 	return(comp_list, Pybel_objects, comp_num, self)

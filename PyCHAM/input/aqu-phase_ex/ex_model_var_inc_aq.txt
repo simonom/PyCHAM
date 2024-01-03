@@ -31,4 +31,4 @@ core_diss = 3.
 vol_Comp = AMM_SUL, C3H7N2O, C6H8N2
 volP = 0., 1.e-10, 1.e-6
 umansysprop_update = 0
-chem_scheme_markers = %, RO2, +, , , ;, +, ;, $, %, :, ;
+chem_scheme_markers = %, RO2, +, , , ;, +, ;, $, %, :, ;, 

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -133,6 +133,21 @@ def eqn_pars_skipper(self): # define function
 		self.con_infl_indx = (self.con_infl_indx[sindx]).astype('int')
 		self.con_infl_C = (self.con_infl_C[sindx])
 		self.con_infl_nam = (self.con_infl_nam[sindx])
+
+	# components with constant concentration
+	for i in range (len(self.const_comp)):
+		try:
+			# index of where constant concentration components occur in list 
+			# of components
+			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
+		except:
+			# if water then we know it will be the next component to 
+			# be appended to the component list
+			if (self.const_comp[i] == 'H2O'):
+				self.con_C_indx[i] = len(self.comp_namelist)
+			else: # if not water
+				erf = 1 # raise error
+				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 
 	# use eqn_pars output from previous simulation
 	rowvals = self.rowvals; colptrs = self.colptrs 
