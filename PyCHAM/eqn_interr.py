@@ -909,7 +909,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	# flag for whether water included in chemical scheme 
 	# and number of components to add to chemical scheme 
 	# components in other parts of code
-	if ('H2O' in comp_list):
+	if ('H2O' in self.comp_namelist):
 		self.H2O_in_cs = 1
 	else:
 		self.H2O_in_cs = 2

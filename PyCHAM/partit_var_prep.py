@@ -143,7 +143,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		ax0.set_title(str('Gas-phase mean thermal speeds at ' + str(TEMP) + ' K'), fontsize = 14)
 		err_mess = 'Stop'
 	
-	# accommodation coefficient of components in each size bin
+	# accommodation coefficient of components in each particle size bin
 	accom_coeff = np.ones((num_comp, num_sb))*1.e0
 	
 	# list containing accommodation coefficients that are functions
@@ -166,32 +166,36 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 			if isinstance(accom_coeff_user[i], str) == True:
 				accom_coeff_func.append(str('accom_coeff[' + str(ac_indx[i]) + ', :]' + ' = ' + accom_coeff_user[i]))
 	
+	else: # if no components specified
+		if (len(accom_coeff_user) == 1): # but one accommodation coefficient is specified 
+			accom_coeff = accom_coeff*float(accom_coeff_user[0])
+
 	# generate module that contains any accommodation coefficient functions, note, do 
 	# this even if no functions supplied so that the accomm_coeff_calc is updated and
 	# accurate for this simulation
 	f = open(self.PyCHAM_path + '/PyCHAM/accom_coeff_calc.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
 	f.write('#                                                                                       											 #\n')
-	f.write('#    All Rights Reserved.                                                                									 #\n')
-	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#    All Rights Reserved.                                                                 #\n')
+	f.write('#    This file is part of PyCHAM                                                          #\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
-	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
-	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
-	f.write('#    version.                                                                            										 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software        #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later           #\n')
+	f.write('#    version.                                                                             #\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
-	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
-	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
-	f.write('#    details.                                                                            										 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS        #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more               #\n')
+	f.write('#    details.                                                                             #\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
-	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with         #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 #\n')
 	f.write('#                                                                                        											 #\n')
 	f.write('##########################################################################################\n')
-	f.write('\'\'\'module for calculating accommodation coefficients, automatically generated by kimt_prep\'\'\'\n')
+	f.write('\'\'\'module for calculating accommodation coefficients, automatically generated by partit_var_prep\'\'\'\n')
 	f.write('\n')
 	f.write('# code that expresses and performs the functions for accommodation \n')
 	f.write('# coefficients that are given by the user in the model variables file \n')

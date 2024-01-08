@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -399,12 +399,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		init_comp = comp0
 		part_to_wall = self.yrec_p2w
 		vpPa = self.Psat_Pa_rec
+		vpPa0 = self.Psat_rec0
 		O_to_C = self.OC.tolist()
 		H2O_ind = H2Oi
 		seed_ind = self.seedi.tolist()
 		siz_struc = siz_str
 		env_cond = cham_env
 		total_influx = self.tot_in_res_ft
+		
 	self.ro_obj = ro_outputs() # create object to hold outputs
 	
 	return()

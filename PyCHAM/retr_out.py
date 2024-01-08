@@ -1,22 +1,22 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
 #                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              #
+#    the terms of the GNU General Public License as published by the Free Software        #
+#    Foundation, either version 3 of the License, or (at your option) any later           #
 #    version.                                                                            										 #
 #                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS        #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more               #
 #    details.                                                                            										 #
 #                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#    You should have received a copy of the GNU General Public License along with         #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 #
 #                                                                                        											 #
 ##########################################################################################
 '''code to open saved files and return useful variables'''
@@ -26,6 +26,7 @@ import numpy as np
 import os
 import ast
 import pickle
+import scipy.constants as si
 
 # define function, note that retr_out is called by the click202 function in gui.py 
 # and it can return progress updates on loading results
@@ -411,6 +412,9 @@ def retr_out(self):
 		
 		load_path = str(self.dir_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		PsatPa = (np.load(load_path, allow_pickle=True)).tolist()
+
+		load_path = str(self.dir_path + '/pure_component_saturation_vp_at_startT_molec_percm3.npy') # path
+		PsatPa0 = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		load_path = str(self.dir_path + '/oxygen_to_carbon_ratios_of_components.npy') # path
 		OC = (np.load(load_path, allow_pickle=True)).tolist()
@@ -594,6 +598,9 @@ def retr_out(self):
 	
 	yield (95.)
 	
+	# convert vapour pressure at starting simulation temperature 
+	# from molecules/cm3 to Pa using ideal gas law
+	PsatPa0 = PsatPa0[0]/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0])) 
 	# create a class to hold outputs
 	class ro_outputs:
 		
@@ -623,6 +630,7 @@ def retr_out(self):
 		init_comp = comp0
 		part_to_wall = yrec_p2w
 		vpPa = PsatPa
+		vpPa0 = PsatPa0
 		O_to_C = OC
 		H2O_ind = H2Oi
 		seed_ind = seedi

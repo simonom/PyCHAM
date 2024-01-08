@@ -1,21 +1,21 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
 #                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              #
+#    the terms of the GNU General Public License as published by the Free Software        #
+#    Foundation, either version 3 of the License, or (at your option) any later           #
 #    version.                                                                            										 #
 #                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS        #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more               #
 #    details.                                                                            										 #
 #                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
+#    You should have received a copy of the GNU General Public License along with         #
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
 #                                                                                        											 #
 ##########################################################################################
@@ -1013,8 +1013,8 @@ def const_infl_open(self): # define function to read in values relevant to const
 
 	return(self)
 
-# display molar mass of individual components
-def plotter_individ_molar_mass(self):
+# display properties of individual components
+def plotter_individ_prop(self):
 	
 	# inputs: ------------------------------------------------------------------
 	# self - reference to PyCHAM
@@ -1046,14 +1046,35 @@ def plotter_individ_molar_mass(self):
 	Cfac = self.ro_obj.cfac
 	wall_on = self.ro_obj.wf
 	PsatPa = self.ro_obj.vpPa
+	PsatPa0 = self.ro_obj.vpPa0
 	OC = self.ro_obj.O_to_C
 	mv_path = self.ro_obj.vp
 	yrec_p2w = self.ro_obj.part_to_wall
 
-	# get molar mass of component of interest
-	mm_int = y_mw[0, comp_names.index(self.mm_comp_name)]
+	if ('Molar Mass' in self.single_comp_prop):
+
+		# get molar mass of component of interest
+		mm_interest = y_mw[0, comp_names.index(self.mm_comp_name)]
 	
-	# display in text area of GUI
-	self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + str(mm_int) + ' g/mol'))
+		# display in text area of GUI
+		self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + str(mm_interest) + ' g/mol'))
+
+	if ('saturation vapour pressure at starting temperature' in self.single_comp_prop):
+
+		PsatPa0 = np.squeeze(PsatPa0) # ensure minimum number of dimensions
+
+		# get saturation vapour pressure at starting temperature of simulation
+		vp0_interest = PsatPa0[comp_names.index(self.mm_comp_name)]
+	
+		# display in text area of GUI
+		self.l203a.setText(str('Vapour pressure at starting temperature for ' + str(self.mm_comp_name) + ': ' + str(vp0_interest) + ' Pa'))
+
+	if ('saturation vapour pressure at 298.15 K' in self.single_comp_prop):
+
+		# get saturation vapour pressure at 298.15 K
+		vp_interest = PsatPa[comp_names.index(self.mm_comp_name)]
+	
+		# display in text area of GUI
+		self.l203a.setText(str('Vapour pressure at 298.15 K for ' + str(self.mm_comp_name) + ': ' + str(vp_interest) + ' Pa'))
 
 	return(self)

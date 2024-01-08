@@ -1216,7 +1216,7 @@ class PyCHAM(QWidget):
 		self.separatorLine4 = QFrame()
 		self.separatorLine4.setFrameShape(QFrame.VLine)
 		self.separatorLine4.setFrameShadow(QFrame.Raised)
-		self.SEClayout.addWidget(self.separatorLine4, 3, 1, 7, 1)
+		self.SEClayout.addWidget(self.separatorLine4, 3, 1, 5, 1)
 		self.separatorLine4.show()
 
 		# ---------------------------------------------------------
@@ -1267,15 +1267,23 @@ class PyCHAM(QWidget):
 
 		# input bar for name of component to view molar mass (g/mol) of
 		self.e218c = QLineEdit(self)
-		self.e218c.setText('Provide the chemical scheme name of component for displaying molar mass (g/mol)')
+		self.e218c.setText('Provide the chemical scheme name of component for displaying the property selected below')
 		self.e218c.setStyleSheet('qproperty-cursorPosition : 0')
 		self.SEClayout.addWidget(self.e218c, 8, 0, 1, 1)
 
-		# button to display molar mass of component
-		self.b220d = QPushButton('Molar Mass (g/mol)', self)
-		self.b220d.setToolTip('View molar mass (g/mol) of this component')
+		# selection button for property of component to display
+		# drop down button to select units for change tendencies
+		self.b220e = QComboBox(self)
+		self.b220e.addItem('Molar Mass (g/mol)')
+		self.b220e.addItem('Pure component saturation vapour pressure at starting temperature of simulation (Pa)')
+		self.b220e.addItem('Pure component saturation vapour pressure at 298.15 K (Pa)')
+		self.SEClayout.addWidget(self.b220e, 8, 2, 1, 1)
+
+		# button to plot carbon reservoirs with time
+		self.b220d = QPushButton('Display Property', self)
+		self.b220d.setToolTip('View selected property in dialogue box above')
 		self.b220d.clicked.connect(self.on_click220d)
-		self.SEClayout.addWidget(self.b220d, 9, 0, 1, 1)
+		self.SEClayout.addWidget(self.b220d, 8, 3, 1, 1)
 
 		# column and row relative lengths---------------------------------
 		
@@ -2458,7 +2466,7 @@ class PyCHAM(QWidget):
 	# plot functions -----------------------------------------
 	
 	@pyqtSlot()
-	def on_click202(self): # when different model results folder requires selection
+	def on_click202(self): # when model results folder requires selection
 
 		# button to get path to folder containing relevant files
 		options = QFileDialog.Options()
@@ -3116,9 +3124,12 @@ class PyCHAM(QWidget):
 		# get name of single component
 		self.mm_comp_name = self.e218c.text().strip()
 
-		# call on code for molar mass
+		# get property to display
+		self.single_comp_prop = self.b220e.currentText()
+
+		# call on code for property display
 		import plotter_ct
-		plotter_ct.plotter_individ_molar_mass(self)
+		plotter_ct.plotter_individ_prop(self)
 		
 	# button to plot volatility basis set mass fractions with water
 	@pyqtSlot()

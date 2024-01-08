@@ -1,1 +1,1 @@
-C:\Users\Psymo\OneDrive - The University of Manchester\SOAPRA\EMEP\PyCHAM_outputs\EMEP_cham_style_wint_zeJ_meT_meCO_meNO_meBZ_meAP
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/PyCHAM_output/SAPHIR_STAR/AP_OH_WOSEED_Kw6e-3_Cw1e0
