@@ -1,25 +1,26 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
-'''The module that generates the Graphical User Interface (GUI) for PyCHAM, and connects that GUI with the core PyCHAM model'''
+'''The module that generates the Graphical User Interface (GUI) for PyCHAM, and connects 
+that GUI with the core PyCHAM model'''
 # first module called when PyCHAM started from the terminal/command window, takes inputs
 # and sends to model modules, also calls the saving module
 
@@ -1951,7 +1952,8 @@ class PyCHAM(QWidget):
 		if (self.fab == 1): # if showing, remove single simulation widgets
 			self.b81.deleteLater()
 			self.l81.deleteLater()
-			self.fab = 0 # remember that single simulation widgets not showing
+			# remember that single simulation widgets not showing
+			self.fab = 0
 		if (self.atb == 1): # if showing then remove add to batch button
 			self.b82.deleteLater()
 			self.l81.deleteLater() # 'or' label
@@ -1963,15 +1965,18 @@ class PyCHAM(QWidget):
 				self.l81b.setStyleSheet(0., '0px', 0., 0.)
 		
 		# prepare by enforcing default variables
-		# default variables for all required input model variables -------------------------
+		# default variables for all required input model variables --------
 		[sav_nam, comp0, 
 		y0, Press, siz_stru, num_sb, pmode, pconc, 
 		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
 		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
-		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
-		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
-		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, 
+		nucv1, nucv2, nucv3, 
+		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, 
+		chamSA, Rader, 
+		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+		erh_str, pcont, 
 		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
 		
 		# then open default variables, ready for modification
@@ -2012,8 +2017,8 @@ class PyCHAM(QWidget):
 					self.sch_name = str(fol_nme+'/'+i)
 				if ('xml' in i): # xml file
 					self.xml_name = str(fol_nme+'/'+i)
-			if ('var' in i): # model variables file
-				self.inname = str(fol_nme+'/'+i)
+				if ('var' in i): # model variables file
+					self.inname = str(fol_nme+'/'+i)
 		
 		# if not a directory then assume it is a model variable file
 		except:
