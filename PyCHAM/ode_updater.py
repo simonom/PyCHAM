@@ -472,7 +472,6 @@ def ode_updater(y, H2Oi,
 				ic_red = 1
 			
 			# ------------------------------------------------------------------		
-			
 			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0): # if particles and/or wall present
 				
 				# update partitioning variables
@@ -570,7 +569,7 @@ def ode_updater(y, H2Oi,
 			else:
 				# water gas-particle partitioning not solved separately
 				self.odsw_flag = 0
-
+			
 			# model component concentration changes to get new concentrations
 			# molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,

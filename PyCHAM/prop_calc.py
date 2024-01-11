@@ -435,7 +435,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					try: # first see if an individual component has been named
 						vol_indx = self.comp_namelist.index(vol_Comp[i])
 					except: # could be a group of components
-						group_name = vol_Comp[i][0:-6]
+						group_name = vol_Comp[i]
 						
 						# check if an inequality present
 						if '<' or '>' or '==' in group_name:
@@ -443,7 +443,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 							us_indx = group_name.rfind('_') 
 							# get inequality
 							inequal =  group_name[us_indx+1::]
-
+							
 							# get index of components in this group
 							if '<' in inequal:
 								if '=' in inequal: # less than or equal to

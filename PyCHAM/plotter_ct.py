@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              #
-#    the terms of the GNU General Public License as published by the Free Software        #
-#    Foundation, either version 3 of the License, or (at your option) any later           #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS        #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more               #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with         #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''plots results for the change tendency temporal profiles of specified components'''
 # simulation results are represented graphically
@@ -741,7 +741,7 @@ def plotter_carb_res(self):
 			self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
 
 	# get carbon reservoir at start of simulation
-	if init_flag == 1:
+	if (init_flag == 1):
 		# molar mass of carbon in each component present at start (g/mol)
 		mm_C = np.zeros((len(comp0), 1))
 
@@ -749,7 +749,7 @@ def plotter_carb_res(self):
 			compi = comp_names.index(comp0[i])
 			mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
 		# now convert influxes to # molecules/cm3 from ppb
-		y0 = y0*Cfac[0]
+		y0 = y0*np.array((Cfac[0]))
 		# now divide by Avogadro's constant to convert # molecules/cm3 to mol/cm3
 		y0 = y0/si.N_A
 		# now multiply by molar mass of carbon and g/cm3 to ug/m3 conversion factor to get ug/m3
@@ -767,6 +767,7 @@ def plotter_carb_res(self):
 	for i in range(len(self.con_infl_nam)): # loop through influxed components
 		compi = comp_names.index(self.con_infl_nam[i])
 		mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
+	
 	
 	# now convert influxes to # molecules/cm3/s from ppb/s
 	self.con_infl_C = self.con_infl_C*Cfac[0]
@@ -851,7 +852,7 @@ def plotter_carb_res(self):
 	# by air exchange (ug/m3)
 	ax_removed = np.cumsum(dil_fac_align*yrecg)
 
-	# calculation of carbon lost through particle loss during air exchange --------
+	# calculation of carbon lost through particle loss through air flushout --------
 	if (num_sb-wall_on > 0):
 		# concentration of all components in the particle phase (# molecules/cm3)
 		yrecp = yrec[:, num_comp:num_comp*(num_sb-wall_on+1)]
@@ -962,7 +963,7 @@ def plotter_carb_res(self):
 
 
 	ax0.plot((self.con_infl_t/3.6e3), user_influx_C[0, :], 'k', label = 'total in')
-	ax0.stackplot(timehr, ax_removed, ax_part_removed, yrec_p2w, yrec_w, yrec_g, yrec_p, labels = ['exchange of gas', 'exchange of particle', 'particle on wall', 'vapour on wall', 'gas phase', 'particle phase'])
+	ax0.stackplot(timehr, ax_removed, ax_part_removed, yrec_p2w, yrec_w, yrec_g, yrec_p, labels = ['gas flushout', 'particle flushout', 'particle on wall', 'vapour on wall', 'gas phase', 'particle phase'])
 	ax0.set_xlabel('Time through experiment (hours)')
 	ax0.set_ylabel(str('Cumulative Concentration (' + u'\u03BC' + 'g/m' +u'\u00B3' + ')'))
 		
