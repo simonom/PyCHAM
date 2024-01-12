@@ -44,7 +44,7 @@ def def_mod_var(caller, self): # define function
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
-	self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';', '']
+	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '>', ';', '']
 	# time interval between updates to integration inputs (s)
 	self.update_stp = 1.
 	self.tot_time = 1. # total time to integrate over (s)

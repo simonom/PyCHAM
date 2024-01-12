@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module to interrogate equations to withdraw essential information for solution'''
 # code to extract the equation information for chemical reactions required for 
@@ -93,6 +93,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	comp_num = 0 # count the number of unique components in the chemical scheme	
 	self.gen_num = [] # for holding generation numbers of components
 	self.RO2_in_rrc = np.empty(0) # whether 'RO2' in the reaction rate coefficient
+	self.RO_indx = [] # indices of alkoxy radicals
 	# ---------------------------------------------------------------------
 
 	max_no_reac = 0. # log maximum number of reactants in a reaction
@@ -215,6 +216,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		rate_ex = formatting.SN_conversion(rate_ex)
 		# convert the rate coefficient expressions into Python readable commands
 		rate_ex = formatting.convert_rate_mcm(rate_ex)
+
 		if (rate_ex.find('EXP') != -1):
 			print('Error in reaction rate coefficient expression: ', rate_ex)
 			sys.exit()

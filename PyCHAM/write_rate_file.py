@@ -133,6 +133,7 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 			f.write('		rate_values[%s] = %s\n' %(eqn_key, self.reac_coef_g[eqn_key]))
 		f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
 		f.write('		erf = 1 # flag error\n')
+		f.write('		err_mess = (str(\'Error: Could not calculate rate coefficient for equation number \' + str(gprn)))\n')
 		f.write('	\n')
 		f.write('	# aqueous-phase reactions\n')
 		for eqn_key_aq in range (len(self.reac_coef_aq)):
