@@ -153,7 +153,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# transpose kimt ready for multiplication inside ode solver, so size bins
 		# in rows and components in columns
 		kimt = np.transpose(kimt)
-
+		
 		# zero partitioning to particles for any components with low condensability
 		if (partit_cutoff): # if a value provided (default is empty list)
 
@@ -178,7 +178,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		vc = 1.*therm_sp/4.
 		self.kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
 		self.kw = np.tile(self.kw.reshape(1, num_comp), (self.wall_on, 1)) # spread over wall bins
-
+		
 	# make any necessary adjustments for vapour pressure of components as a function of
 	# wall, as defined by the user
 	if 'self.P_wfunc' in locals():

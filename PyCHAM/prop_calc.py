@@ -233,9 +233,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# possibly use different method for vapour pressure (log10(atm)) of HOMs
 		
-		#if ('_ao' in self.comp_namelist[i] or 'C10H' in self.comp_namelist[i]  or 'C18H' in self.comp_namelist[i] or 'C19H' in self.comp_namelist[i] or 'C20H' in self.comp_namelist[i]):
-		#	Psatnow = -2.63+-0.50*self.rel_SMILES[i].count('O') + (self.rel_SMILES[i].count('C')-5)*-0.80
-		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6 and 'PAN' not in self.comp_namelist[i]): # if six or more oxygens in component
+		# if HOMs
+		if ((self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c') >= 10) and (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6) and 'PAN' not in self.comp_namelist[i]):
 			
 			# log(C* (ug/m3)) (natural logarithm of effective saturation concentration) of component (Eq. 1 Mohr et al. 2019)
 			nC = self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c')
@@ -253,9 +252,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		else: 
 			if (self.pars_skip != 2):
 				
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], 
-						boiling_points.nannoolal(self.Pybel_objects[i]))))
-				
+				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], \ 
+						#boiling_points.nannoolal(self.Pybel_objects[i]))))
+				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))
+				#Psatnow += 1
 		# in case you want to ensure small molecules don't contribute to particle mass
 		#if self.rel_SMILES[i].count('C')<=5:
 		#	 Psatnow += 10 # ensure no condensation of small molecules
@@ -274,9 +274,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.Psat_Pa_rec[i] = Psatnow # note transfer to Pa is below
 			else: 
 			
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15, 
-						boiling_points.nannoolal(self.Pybel_objects[i]))))
-			
+				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15, \
+						#boiling_points.nannoolal(self.Pybel_objects[i]))))
+				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))	
+				#Psatnow += 0
 				try: # in case array
 					self.Psat_Pa_rec[i]  = Psatnow[0]
 				except: # in case float

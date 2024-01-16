@@ -169,7 +169,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is treated as negative')
 		ax0.set_xlabel('Time through experiment (hours)')
-		ax0.set_ylabel('Change tendency ($\mathrm{\{mu} g\, m^{-3}\, s^{-1}}$)')
+		ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
+		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		ax0.xaxis.set_tick_params(direction = 'in')

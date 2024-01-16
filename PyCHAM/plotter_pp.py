@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''plots results for the particle-phase stuff'''
 # simulation results are represented graphically:
@@ -65,6 +65,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	seedi = self.ro_obj.seed_ind
 	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
 	
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
@@ -77,21 +78,97 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 	if (comp_names_to_plot): # if component names specified
 	
+		ip_fail = 0 # start by assuming all requested components available
+		group_flag = 0 # start by assuming single components wanted
+
 		# concentration plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
-				indx_plot = [self.ro_obj.H2O_ind]
+				indx_plot = [H2Oi]
 				indx_plot = np.array((indx_plot))
 			if (comp_names_to_plot[i].strip() == 'RO2'):
-				indx_plot = (np.array((self.ro_obj.indx_for_groups['RO2i'])))
+				indx_plot = (np.array((group_indx['RO2i'])))
+				group_flag = 1
 			if (comp_names_to_plot[i].strip() == 'RO'):
-				indx_plot = (np.array((self.ro_obj.indx_for_groups['ROi'])))
+				indx_plot = (np.array((group_indx['ROi'])))
+				group_flag = 1	
+			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
+				indx_plot = (np.array((group_indx['HOMRO2'])))
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == 'HOM'):
+				indx_plot = (np.array((group_indx['HOMs'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == '-OOH'):
+				indx_plot = (np.array((group_indx['OOH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM-OOH'):
+				indx_plot = (np.array((group_indx['HOM_OOH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == '-OH'):
+				indx_plot = (np.array((group_indx['OH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1			
+			if (comp_names_to_plot[i].strip() == 'HOM-OH'):
+				indx_plot = (np.array((group_indx['HOM_OH'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == '-carbonyl'):	
+				indx_plot = (np.array((group_indx['carbonyl'])))			
+					
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'):
+				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
 				
-			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'):
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == '-NO3'):
+				indx_plot = (np.array((group_indx['NO3'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOM-NO3'):
+				indx_plot = (np.array((group_indx['HOM_NO3'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (comp_names_to_plot[i].strip() == 'ROOR'):
+				indx_plot = (np.array((group_indx['ROOR'])))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1	
+			if (ip_fail == 1):	
+					
+				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+				# set border around error message
+				if (self.bd_pl == 1):
+					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+					self.bd_pl = 2
+				else:
+					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+					self.bd_pl = 1
+					
+				plt.ioff() # turn off interactive mode
+				plt.close() # close figure window
+				return()
+			
+			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
-					indx_plot = [self.ro_obj.names_of_comp.index(comp_names_to_plot[i].strip())]
+					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
 					indx_plot = np.array((indx_plot))
 				except:
 					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -102,11 +179,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					else:
 						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 						self.bd_pl = 1
-					
+
 					plt.ioff() # turn off interactive mode
 					plt.close() # close figure window
 					return()
-			
+
 			import scipy.constants as si # for scientific constants
 			
 			yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
@@ -125,23 +202,20 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				# particle-phase concentration (ug/m3)
 				conc[:, :] += ((concf/si.N_A)*self.ro_obj.comp_MW[indxn])*1.e12
 			
-			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'): # if not a sum
+			if (group_flag != 1): # if not a sum over a group of components
 				# plot this component
 				ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
 			
-			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
-				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (particle-phase)'))
+			else: # if a sum over a group of components
+				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (particle-phase)'))
 			
-			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
-				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$RO (particle-phase)'))
-				
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 
-		# end of gas-phase concentration sub-plot ---------------------------------------
+		# end of particle-phase concentration sub-plot ---------------------------------------
 	
 	# if called by button to plot temporal profile of total particle-phase concentration 
 	# excluding water and seed
