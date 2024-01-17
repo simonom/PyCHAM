@@ -149,8 +149,26 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1	
-			if (ip_fail == 1):	
-					
+
+			if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
+				# if a number given after carbon atom
+				if comp_names_to_plot[i].strip()[1::].isnumeric():
+					# get carbon number
+					Cn = float(comp_names_to_plot[i].strip()[1::])
+					# get all components with this many carbons
+					# empty list
+					indx_plot = []
+					indx_cnt = 0 # keep count on species
+					for SMILESi in rel_SMILES:
+						if (SMILESi.count('C') + SMILESi.count('c')) == Cn:
+							indx_plot.append(indx_cnt)
+						indx_cnt += 1 # keep count on species
+
+					indx_plot = (np.array((indx_plot)))			
+					group_flag = 1
+					if (indx_plot.shape[0] == 0):
+						ip_fail = 1
+			if (ip_fail == 1):
 				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
 				# set border around error message
 				if (self.bd_pl == 1):
@@ -210,72 +228,12 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
-				
-			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
+			
+			else: # if a sum over a group of components
+				if (caller == 4 or caller == 5 or caller == 6): # log y axis
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOMRO2'): # if is the sum of HOM organic peroxy radicals
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == 'HOM'): # if is the sum of HOM 
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == '-OOH'): # if is the sum of hydroperoxides 
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OOH (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == 'HOM-OOH'): # if is the sum of hydroperoxides 
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OOH (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == '-OH'): # if is the sum of alcohols 
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$OH (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM-OH'): # if is the sum of HOM alcohols
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-OH (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == '-carbonyl'): # if is the sum of carbonyls 
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$=O (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'): # if is the sum of HOM carbonyls
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-=O (gas-phase)'))	
-			if (comp_names_to_plot[i].strip() == '-NO3'): # if is the sum of nitrates
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$NO3 (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$NO3 (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'HOM-NO3'): # if is the sum of HOM nitrates
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOM-NO3 (gas-phase)'))
-			if (comp_names_to_plot[i].strip() == 'ROOR'): # if is the sum of accretion products
-				if (caller == 4 or caller == 5 or caller == 6): 
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$ROOR (gas-phase)'))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$ROOR (gas-phase)'))
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
 
 		if (caller == 0 or caller == 5): # ug/m3 plot
 			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)

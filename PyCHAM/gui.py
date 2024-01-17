@@ -1319,23 +1319,17 @@ class PyCHAM(QWidget):
 		self.b221a.addItem('Particle and Gas Phase Combined')
 		self.b221a.addItem('Particle Phase Excluding Seed and Water')
 		self.b221a.addItem('Gas Phase Only C>1, O>0')
-		self.VOLlayout.addWidget(self.b221a, 0, 1, 2, 1)
+		self.VOLlayout.addWidget(self.b221a, 0, 1, 1, 1)
 
 		# volatility basis set ------------------
 		
-		# button to plot temporal profile of volatility basis set mass fractions with water
-		self.b220 = QPushButton('Volatility Basis Set With Water', self)
-		self.b220.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
-		self.b220.clicked.connect(self.on_click220)
-		#self.b220.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b220, 0, 0)
 		
 		# button to plot temporal profile of volatility basis set mass fractions without water
-		self.b221 = QPushButton('Volatility Basis Set Without Water', self)
+		self.b221 = QPushButton('Volatility Basis Set', self)
 		self.b221.setToolTip('Plot the temporal profile of volatility basis set mass fractions')
 		self.b221.clicked.connect(self.on_click221)
 		#self.b221.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.VOLlayout.addWidget(self.b221, 1, 0)
+		self.VOLlayout.addWidget(self.b221, 0, 0)
 		
 		# two-dimensional volatility basis set ------------------
 		
@@ -1346,7 +1340,7 @@ class PyCHAM(QWidget):
 		self.VOLlayout.addWidget(self.e222, 2, 0)
 		
 		# button to plot 2D VBS
-		self.b223 = QPushButton('2D Volatility Basis Set', self)
+		self.b223 = QPushButton('2D Volatility Basis Set (excluding seed and water)', self)
 		self.b223.setToolTip('Plot the two-dimensional volatility basis set (O:C ratio and vapour pressures) at the time through experiment specified above')
 		self.b223.clicked.connect(self.on_click223)
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
@@ -2510,7 +2504,6 @@ class PyCHAM(QWidget):
 			self.b212.setEnabled(True)
 			self.b215.setEnabled(True)
 			self.b218.setEnabled(True)
-			self.b220.setEnabled(True)
 			self.b221.setEnabled(True)
 			self.b223.setEnabled(True)
 			
@@ -2552,7 +2545,6 @@ class PyCHAM(QWidget):
 			self.b212.setEnabled(False)
 			self.b215.setEnabled(False)
 			self.b218.setEnabled(False)
-			self.b220.setEnabled(False)
 			self.b221.setEnabled(False)
 			self.b223.setEnabled(False)
 		QApplication.processEvents() # allow message panel to update
@@ -3136,19 +3128,6 @@ class PyCHAM(QWidget):
 		import plotter_ct
 		plotter_ct.plotter_individ_prop(self)
 		
-	# button to plot volatility basis set mass fractions with water
-	@pyqtSlot()
-	def on_click220(self):
-
-		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
-		self.l203a.setText('')
-		
-		# get the phase to consider
-		self.phase4vol = self.b221a.currentText()
-
-		import vol_contr_analys	
-		dir_path = self.l201.text() # name of folder with results
-		vol_contr_analys.plotter_wiw(0, dir_path, self, 0) # plot results
 	
 	# button to plot volatility basis set mass fractions without water
 	@pyqtSlot()
@@ -3159,10 +3138,13 @@ class PyCHAM(QWidget):
 			
 		# get the phase to consider
 		self.phase4vol = self.b221a.currentText()
+
+		if 'Seed' in self.phase4vol and 'Water' in self.phase4vol:
+			now = 1
 		
 		import vol_contr_analys
 		dir_path = self.l201.text() # name of folder with results
-		vol_contr_analys.plotter_wiw(0, dir_path, self, 1) # plot results
+		vol_contr_analys.plotter_wiw(0, dir_path, self, now) # plot results
 	
 	# button to plot two-dimensional volatility basis set mass fractions (VBS and O:C)
 	@pyqtSlot()
@@ -3184,7 +3166,12 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 
 			return()
-			
+		
+		import vol_contr_analys	
+		dir_path = self.l201.text() # name of folder with results
+		vol_contr_analys.plotter_2DVBS(0, dir_path, self, t_thro) # plot results
+
+		return()	
 	# button to plot concentrations ordered by volatility
 	@pyqtSlot()
 	def on_click223a(self):

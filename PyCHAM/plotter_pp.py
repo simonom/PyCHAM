@@ -149,7 +149,27 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				indx_plot = (np.array((group_indx['ROOR'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
+					ip_fail = 1
+			if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
+				# if a number given after carbon atom
+				if comp_names_to_plot[i].strip()[1::].isnumeric():
+					# get carbon number
+					Cn = float(comp_names_to_plot[i].strip()[1::])
+					# get all components with this many carbons
+					# empty list
+					indx_plot = []
+					indx_cnt = 0 # keep count on species
+					for SMILESi in rel_SMILES:
+						if ((SMILESi.count('C') + SMILESi.count('c')) == Cn and (SMILESi.count('O') + SMILESi.count('o')) >= 6):
+							indx_plot.append(indx_cnt)
+						indx_cnt += 1 # keep count on species
+
+					indx_plot = (np.array((indx_plot)))			
+					group_flag = 1
+					if (indx_plot.shape[0] == 0):
+						ip_fail = 1
+
+	
 			if (ip_fail == 1):	
 					
 				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -195,7 +215,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (self.ro_obj.wf == 0): # wall off
 				ppc = yrec[:, self.ro_obj.nc::]
 			
-			# particle-phase concentration of this component over all size bins (# molecules/cm3)
+			# particle-phase concentration of this component over all 
+			# size bins (# molecules/cm3)
 			conc = np.zeros((ppc.shape[0], self.ro_obj.nsb-self.ro_obj.wf))
 			for indxn in indx_plot: # loop through the indices
 				concf = ppc[:, indxn::self.ro_obj.nc]

@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module for calculating photolysis rates''' 
 # photolysis rates calculated for specified absorption cross-section 
@@ -136,7 +136,7 @@ def lamp_photo(J, TEMP, self):
 		UVCindx[wl_chm<280.] += 1
 		UVCindx = UVCindx == 2
 		act_chm[UVCindx] = act_chm[UVCindx]*tf_UVCn
-
+	
 	# --------------------------------------------------------------
 	# in the below sections photolysis rates are calculated using either the
 	# user-supplied file of absorption cross-sections and quantum yields
@@ -1226,7 +1226,8 @@ def lamp_photo(J, TEMP, self):
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl, xs)
 		
-		# quantum yield uses value given in MCM website table (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
+		# quantum yield uses value given in MCM website 
+		# table (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 		# (true on 4/12/2019)
 		qy=0.9
 		

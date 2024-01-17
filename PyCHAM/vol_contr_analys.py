@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''script for plotting volatility basis set mass fraction of particle phase with time and tabulating component volatilities and particle-phase concentrations'''
 # aids interpretation of gas-particle partitioning results, 
@@ -39,13 +39,14 @@ import matplotlib.ticker as ticker # set colormap tick labels to standard notati
 import scipy.constants as si
 import retr_out
 
+# volatility basis set without water
 def plotter_wiw(caller, dir_path, self, now): # define function
 
 	# inputs: -------------------------------
 	# caller - the module calling (0 for gui)
 	# dir_path - path to results
 	# self - reference to PyCHAM
-	# now - whether to include (0) or exclude water (1)
+	# now - whether to include (0) or exclude seed and water (1)
 	# self.phase4vol - the phase to consider for plotting results
 	# -----------------------------------------
 
@@ -114,14 +115,17 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	y_mw_rep = np.tile(y_mw, (1, num_asb))
 	y_mw_rep = np.tile(y_mw_rep, (len(t_array), 1))
 	
-	if (self.phase4vol == 'Particle Phase'):
+	if ('Particle Phase' in self.phase4vol):
 	
-		# particulate concentrations of individual components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
+		# particulate concentrations of individual components 
+		# (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
 		# including any water and core
 		pc = (y[:, num_comp:num_comp*(num_asb+1)]/si.N_A)*y_mw_rep*1.e12
 	
-		if (now == 1): # if water to be excluded, zero its contribution
+		if (now == 1): # if water and seed to be excluded, zero its contribution
 			pc[:, H2Oi::num_comp] = 0.
+			for seedii in seedi:
+				pc[:, seedii::num_comp] = 0.
 	
 	if (self.phase4vol == 'Gas Phase'):
 		# gaseous concentrations of individual components (*1.e-12 to convert from g/cm3 (air) to ug/m3 (air))
@@ -244,6 +248,8 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 # e.g. https://doi.org/10.5194/acp-20-1183-2020
 def plotter_2DVBS(caller, dir_path, self, t_thro):
 
+	import scipy.constants as si
+
 	# inputs: -------------------------------
 	# caller - the module calling (0 for gui)
 	# dir_path - path to results
@@ -260,13 +266,32 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	fig.subplots_adjust(hspace = 0.7)
 	
 	# prepare plot data --------------------------------------
-	# required outputs from full-moving
-	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
-		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
+	# required outputs
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
+
 	
 	# subtract recorded times from requested time and absolute
-	t_diff = np.abs(t_thro-(t_array*3600.))
+	t_diff = np.abs(t_thro-(timehr*3600.))
 	
 	# find closest recorded time to requested time to plot
 	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
@@ -275,33 +300,34 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	TEMP = 298.15
 	
 	# convert lists to numpy array
-	y_mw = np.array((y_mw))
+	y_MW = np.array((y_MW))
 	PsatPa = np.array((PsatPa))
 	
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
 	# saturation concentrations in ug/m3
 	# using eq. 1 of O'Meara et al. 2014
-	Psat_Cst = (1.e6*y_mw)*(PsatPa/101325.)/(8.2057e-5*TEMP)
+	Psat_Cst = (1.e6*y_MW)*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
 	# get particle concentrations at this time (# molecules/cm3)
-	pc = y[t_indx, num_comp:num_comp*(num_sb-wall_on)] 
+	pc = yrec[t_indx, num_comp:num_comp*(num_sb-wall_on+1)] 
 
 	# zero water and seed components
-	pc[H2Oi[0]::num_comp] = 0.
+	pc[H2Oi::num_comp] = 0.
 	for seed_indxs in seedi:
 		pc[seed_indxs::num_comp] = 0.
 	
-	# tile molecular weights over size bins
-	y_mw = np.tile(y_mw, (num_sb-wall_on-1))
+	# tile molecular weights over particle size bins
+	y_MW = np.tile(y_MW, (num_sb-wall_on))
 	
 	# convert concentrations from # molecules/cm3 to ug/m3
-	pc = ((pc/si.N_A)*y_mw)*1.e12
+	pc = ((pc/si.N_A)*y_MW)*1.e12
 	
 	# sum particle concentrations (ug/m3) at this time, without water and seed
 	tot_pc = pc.sum()
 	
-	OC_range = np.arange(0., 2., 0.2) # the O:C range
-	VP_range = np.arange(-2.5, 7.5, 1.) # the log10 of the vapour pressure (ug/m3) at 298.15 K range
+	OC_range = np.arange(0., 2., 0.1) # the O:C range
+	# the log10 of the vapour pressure (ug/m3) at 298.15 K range
+	VP_range = np.arange(-2.5, 7.5, 1.)
 	
 	# empty mass fractions matrix
 	mf = np.zeros((len(OC_range), len(VP_range)))
@@ -339,7 +365,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 
 			# mass fractions of components with this combination of properties
 			if (tot_pc > 0):
-				mf[OCi, VPi] = sum(pc[compi])/tot_pc
+				mf[OCi, VPi] = sum(pc[compi[0, :]])/tot_pc
 
 			VPo = VPn # reset lower vapour pressure limit (ug/m3)
 	
@@ -352,8 +378,11 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	# create the colormap
 	cm = LinearSegmentedColormap.from_list(cmap_name, colors, N = n_bin)
 	
+	# get maximum mass fraction
+	max_mf = np.max(mf)
+
 	# set contour levels
-	levels = (MaxNLocator(nbins = 100).tick_values(0., 1.))
+	levels = (MaxNLocator(nbins = 100).tick_values(0., max_mf))
 	
 	# associate colours and contour levels
 	norm1 = BoundaryNorm(levels, ncolors = cm.N, clip=True)
@@ -361,7 +390,7 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	p0 = ax1.pcolormesh(VP_range, OC_range, mf, cmap=cm, norm=norm1, shading='auto')
 
 	cax = plt.axes([0.875, 0.40, 0.02, 0.18]) # specify colour bar position
-	cb = plt.colorbar(p0, cax = cax, ticks=[0.00, 0.25, 0.50, 0.75, 1.00], orientation = 'vertical')
+	cb = plt.colorbar(p0, cax = cax, ticks=[0.00, max_mf*0.25, max_mf*0.50, max_mf*0.75, max_mf], orientation = 'vertical')
 	cb.ax.tick_params(labelsize = 12)
 	cb.set_label('mass fraction', size = 12, rotation = 270, labelpad = 10.)
 
