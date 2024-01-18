@@ -83,107 +83,148 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 		# concentration plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
+
+			# begin array containing indices of components to consider
+			indx_plot = (np.arange(num_comp)).astype('int')
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
 				indx_plot = [H2Oi]
 				indx_plot = np.array((indx_plot))
+
 			if (comp_names_to_plot[i].strip() == 'RO2'):
 				indx_plot = (np.array((group_indx['RO2i'])))
 				group_flag = 1
+
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
-				group_flag = 1	
-			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
-				indx_plot = (np.array((group_indx['HOMRO2'])))
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'HOM'):
-				indx_plot = (np.array((group_indx['HOMs'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == '-OOH'):
+				group_flag = 1		
+				
+			if ('-OOH' in comp_names_to_plot[i].strip()):
 				indx_plot = (np.array((group_indx['OOH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-OOH'):
-				indx_plot = (np.array((group_indx['HOM_OOH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == '-OH'):
+				
+			if ('-OH' in comp_names_to_plot[i].strip()):
 				indx_plot = (np.array((group_indx['OH'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1			
-			if (comp_names_to_plot[i].strip() == 'HOM-OH'):
-				indx_plot = (np.array((group_indx['HOM_OH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == '-carbonyl'):	
+			
+			if ('-carbonyl' in comp_names_to_plot[i].strip()):	
 				indx_plot = (np.array((group_indx['carbonyl'])))			
 					
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'):
-				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
-				
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == '-NO3'):
+			
+			if ('-NO3' in comp_names_to_plot[i].strip()):
 				indx_plot = (np.array((group_indx['NO3'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-NO3'):
-				indx_plot = (np.array((group_indx['HOM_NO3'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'ROOR'):
+			
+			if ('ROOR' in comp_names_to_plot[i].strip()):
 				indx_plot = (np.array((group_indx['ROOR'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
-			if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
-				# if a number given after carbon atom
-				if comp_names_to_plot[i].strip()[1::].isnumeric():
-					# get carbon number
-					Cn = float(comp_names_to_plot[i].strip()[1::])
-					# get all components with this many carbons
-					# empty list
-					indx_plot = []
-					indx_cnt = 0 # keep count on species
-					for SMILESi in rel_SMILES:
-						if ((SMILESi.count('C') + SMILESi.count('c')) == Cn and (SMILESi.count('O') + SMILESi.count('o')) >= 6):
-							indx_plot.append(indx_cnt)
-						indx_cnt += 1 # keep count on species
 
-					indx_plot = (np.array((indx_plot)))			
-					group_flag = 1
-					if (indx_plot.shape[0] == 0):
-						ip_fail = 1
+			# check on whether this could be an individual component
+			try: # will work if provided components were in simulation chemical scheme
+				# get index of this specified component, removing any white space
+				indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+				indx_plot = np.array((indx_plot))
+				group_flag = -1
+			except:
+				group_flag = 1
+			if (group_flag != -1):
+				if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
+					try:
+						cindx = comp_names_to_plot[i].strip().index('C') # index of C letter
+					except:
+						cindx = comp_names_to_plot[i].strip().index('c') # index of c letter
+				
+					# if a number given after carbon atom
+					if comp_names_to_plot[i].strip()[cindx+1].isnumeric():
+						numb_indx = cindx+1 # number index finishes
+						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
+							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
+								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
+									numb_indx += 1
+					
+						# get carbon number
+						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
+					
+						# get all components with this many carbons
+						indx_plot_nw = np.zeros((len(indx_plot)))
+						indx_plot_nw[:] = indx_plot[:]
+						for indxi in indx_plot:
+							# get the relevant SMILES
+							SMIi = rel_SMILES[indxi]
+							if ((SMIi.count('C') + SMIi.count('c')) != Cn):
+								indx_to_remove = np.where(indx_plot_nw == indxi)[0][0]
+								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
+						indx_plot = (np.array((indx_plot_nw))).astype('int')
+							
+						group_flag = 1
+						if (indx_plot.shape[0] == 0):
+							ip_fail = 1
 
-	
-			if (ip_fail == 1):	
+				if ('O' in comp_names_to_plot[i].strip() or 'o' in comp_names_to_plot[i].strip()):
+					try:
+						cindx = comp_names_to_plot[i].strip().index('O') # index of O letter
+					except:
+						cindx = comp_names_to_plot[i].strip().index('o') # index of o letter
+				
+					# if a number given after the atom letter
+					if (comp_names_to_plot[i].strip()[cindx+1].isnumeric()):
+						numb_indx = cindx+1 # number index finishes
+						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
+							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
+								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
+									numb_indx += 1
 					
-				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
-				# set border around error message
-				if (self.bd_pl == 1):
-					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-					self.bd_pl = 2
-				else:
-					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-					self.bd_pl = 1
+						# get number of atoms of interest
+						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
 					
-				plt.ioff() # turn off interactive mode
-				plt.close() # close figure window
-				return()
+						# get all components with this many atoms of interest
+						indx_plot_nw = np.zeros((len(indx_plot)))
+						indx_plot_nw[:] = indx_plot[:]
+						for indxi in indx_plot:
+							# get the relevant SMILES
+							SMIi = rel_SMILES[indxi]
+							if ((SMIi.count('O') + SMIi.count('o')) != Cn):
+								indx_to_remove = np.where(indx_plot_nw == indxi)[0][0]
+								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
+						indx_plot = (np.array((indx_plot_nw))).astype('int')
+							
+						group_flag = 1
+						if (indx_plot.shape[0] == 0):
+							ip_fail = 1
+
+			
+				if (ip_fail == 1):	
+					# in case code thought this was a group but couldn't make the group work
+					try: # will work if provided components were in simulation chemical scheme
+						# get index of this specified component, removing any white space
+						indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+						indx_plot = np.array((indx_plot))
+						group_flag = 0
+					except:
+
+						self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+						# set border around error message
+						if (self.bd_pl == 1):
+							self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+							self.bd_pl = 2
+						else:
+							self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+							self.bd_pl = 1
+					
+						plt.ioff() # turn off interactive mode
+						plt.close() # close figure window
+						return()
 			
 			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
 				try: # will work if provided components were in simulation chemical scheme

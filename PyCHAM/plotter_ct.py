@@ -76,7 +76,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
 		
-		fname = str(dir_path+ '/' +comp_name +'_rate_of_change')
+		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
 		try: # try to open
 			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header	
 		except:
@@ -318,7 +318,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			mess = str('Please note that ' + str(len(res_sort)) + ' relevant reactions were found, although a maximum of ' + str(top_num[0]) + ' were requested by the user.')
 			self.l203a.setText(mess)
 		
-		# get all reactions out of the used chemical scheme --------------------------------------------------------------------
+		# get all reactions out of the used chemical scheme -------------
 		import sch_interr # for interpeting chemical scheme
 		import re # for parsing chemical scheme
 		import scipy.constants as si
@@ -361,7 +361,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		inputs.close() # close file
 
 		# start by assuming default chemical scheme markers
-		self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';', '']
+		self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '>', ';', '']
 
 		for i in range(len(in_list)): # loop through supplied model variables to interpret
 
@@ -382,11 +382,17 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		# interrogate scheme to list equations
 		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	
-		for cnum in range(np.min([top_num[0], len(res_sort)])): # loop through chemical reactions
+		# keep just the unique chemical reaction rates, as duplicates 
+		# will mean that the same group of reactions (of identical 
+		# reaction rates) will be repeatdely displayed
+		res_sort = np.unique(res_sort)
+
+		# loop through chemical reactions
+		for cnum in range(np.min([top_num[0], len(res_sort)])):
 			
 			# identify this chemical reaction
 			cindx = np.where((res_sort[-(cnum+1)] ==  res_sum) == 1)[0]
-			
+		
 			for indx_two in (cindx):
 				
 				reac_txt = str(self.eqn_list[int(res[0, indx_two])]) # get equation text
