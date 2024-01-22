@@ -1,1 +1,2 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_AP_ISO_PRAM_AP_SIMON_ISOAPRO2int_chem_scheme\AP_C5H8_Evap0_Mohr50_C5zero_HO2wl_2nd_gen_OHadj
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_AP_ISO_PRAM_AP_SIMON_ISOAPRO2int_2ndgen_chem_scheme\AP_only_Evap0_Mohr25_C5allow_HO2wl_2nd_gen
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\MCM_AP_ISO_PRAM_AP_SIMON_ISOAPRO2int_2ndgen_chem_scheme\AP_C5H8_Evap0_Mohr25_C5allow_HO2wl_2nd_gen

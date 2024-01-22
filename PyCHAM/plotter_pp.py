@@ -70,6 +70,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
 
+	# prepare to store summed results
+	if (self.sum_ornot_flag == 1):
+		sum_conc = np.zeros((len(timehr)))
+		sum_comp_names_to_plot = comp_names_to_plot[0]
+
 	if (caller == 0 or caller >= 3):
 		plt.ion() # show results to screen and turn on interactive mode
 		
@@ -264,13 +269,25 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				# particle-phase concentration (ug/m3)
 				conc[:, :] += ((concf/si.N_A)*self.ro_obj.comp_MW[indxn])*1.e12
 			
-			if (group_flag != 1): # if not a sum over a group of components
-				# plot this component
-				ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
+			# if summing values
+			if (self.sum_ornot_flag == 1):
+				sum_conc += conc.sum(axis = 1)
+				if (i > 0):
+					sum_comp_names_to_plot = str(sum_comp_names_to_plot + ', ' + comp_names_to_plot[i].strip())
+				if (i == len(comp_names_to_plot)-1):
+					ax0.plot(timehr, sum_conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + sum_comp_names_to_plot + ' (particle-phase)'))
+
+			# if showing inidividual values
+			if (self.sum_ornot_flag == 0):
+				if (group_flag != 1): # if not a sum over a group of components
+					# plot this component
+					ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
 			
-			else: # if a sum over a group of components
-				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (particle-phase)'))
+				else: # if a sum over a group of components
+					ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (particle-phase)'))
 			
+			
+
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')

@@ -1079,6 +1079,14 @@ class PyCHAM(QWidget):
 		self.e205.setStyleSheet('qproperty-cursorPosition : 0')
 		self.PRIMlayout.addWidget(self.e205, 2, 0)
 
+		# drop down button for whether to display abundances of single 
+		# components, or the sum of their abundances
+		self.b205 = QComboBox(self)
+		self.b205.setToolTip('Chose whether to display abundances of single components, or the sum of their abundances')
+		self.b205.addItem('Individual Values')
+		self.b205.addItem('Sum Value')
+		self.PRIMlayout.addWidget(self.b205, 2, 1, 1, 1)
+
 		# gas-phase concentrations temporal profiles -------------
 		
 		# button to plot temporal profile of gas-phase concentrations
@@ -1097,7 +1105,8 @@ class PyCHAM(QWidget):
 		self.b206b.addItem(str(u'\u0023' + ' molecules/cm' + u'\u00B3' + ' log.'))
 		self.PRIMlayout.addWidget(self.b206b, 3, 1, 1, 1)
 
-		# button to plot ozone isopleth as relevant to the used chemical scheme and the oberved
+		# button to plot ozone isopleth as relevant to the used 
+		# chemical scheme and the oberved
 		# range of VOC and NOx
 		self.b206c = QPushButton(str('Ozone isopleth'), self)
 		self.b206c.setToolTip('Plot equilibrium ozone concentrations over the range of simulated concentrations of NOx and VOC')
@@ -1112,7 +1121,8 @@ class PyCHAM(QWidget):
 		self.b209.clicked.connect(self.on_click209)
 		self.PRIMlayout.addWidget(self.b209, 4, 0)
 
-		# button to plot temporal profile of total particle-phase concentration excluding seed and water 
+		# button to plot temporal profile of total particle-phase 
+		# concentration excluding seed and water 
 		self.b209a = QPushButton(str('Particle-phase concentrations (summed over components and size bins) \n('+u'\u03BC'+'g/m'+u'\u00B3'+') excluding seed and water'), self)
 		self.b209a.setToolTip('Plot total particle-phase concentration of all components except for seed and water')
 		self.b209a.clicked.connect(self.on_click209a)
@@ -1448,7 +1458,7 @@ class PyCHAM(QWidget):
 		self.b302.setToolTip('See the particle-phase mass contribution by different generations of oxidised organic molecules')
 		self.b302.clicked.connect(self.on_click302)
 		self.b302.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b302, 2, 2, 2, 1)
+		self.PARlayout.addWidget(self.b302, 3, 2, 1, 1)
 	
 		return(PARTab)
 
@@ -2653,7 +2663,8 @@ class PyCHAM(QWidget):
 	
 		plotter_gp.O3_iso(self)
 
-	# button to plot total particle-phase concentration for individual components temporal profile
+	# button to plot total particle-phase abundance for 
+	# components' temporal profile
 	@pyqtSlot()
 	def on_click209(self):	
 		
@@ -2678,6 +2689,13 @@ class PyCHAM(QWidget):
 		# get names of components to plot
 		comp_names = [str(i) for i in self.e205.text(). split(',')]
 		
+		# get whether to sum components or not
+		sum_ornot = self.b205.currentText()
+		if (sum_ornot[0] == 'I'):
+			self.sum_ornot_flag = 0
+		if (sum_ornot[0] == 'S'):
+			self.sum_ornot_flag = 1
+
 		import plotter_pp
 		dir_path = self.l201.text() # name of folder with results
 		plotter_pp.plotter(0, dir_path, comp_names, self) # plot results

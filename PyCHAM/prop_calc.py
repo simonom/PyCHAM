@@ -253,8 +253,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		else: 
 			if (self.pars_skip != 2):
 				
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], boiling_points.nannoolal(self.Pybel_objects[i]))))
-				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))
+				#Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], boiling_points.nannoolal(self.Pybel_objects[i]))))
+				Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))
 				#Psatnow += 2
 				# in case you want to ensure small molecules don't contribute to particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
@@ -274,8 +274,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.Psat_Pa_rec[i] = Psatnow # note transfer to Pa is below
 			else: 
 			
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
-				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))	
+				#Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
+				Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))	
 				#Psatnow += 2
 				# in case you want to ensure small molecules don't contribute to particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
