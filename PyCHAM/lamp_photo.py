@@ -41,7 +41,7 @@ def lamp_photo(J, TEMP, self):
 		act_chm = np.empty(0) # actinic flux
 	
 		for line in f: # loop through line
-		
+			
 			try: # omit any headers
 				wl = float((line.strip()).split(',')[0])
 				act = float((line.strip()).split(',')[1])
@@ -51,7 +51,7 @@ def lamp_photo(J, TEMP, self):
 			except:
 				continue
 		f.close() # close file
-		
+	
 		# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
 		# to ensure correct integration of photolysis rate over full spectrum
 		wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)

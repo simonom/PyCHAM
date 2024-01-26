@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/MCM_AP_ISO_PRAM_AP_SIMON_ISOAPRO2int_chem_scheme/AP_only_noO3HOMCS_origVOL_test
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\DMS_Oxidation_Anwar_chem_scheme\DMS_MAN_OFR_hiCO
