@@ -1,0 +1,57 @@
+# mac
+#res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/PyCHAM_output/McFiggans2019/AP_only_0p2UVCtf
+# windows
+#res_file_name = C:\Users\Psymo\OneDrive - The University of Manchester\SOAPRA\PyCHAM_output\McFiggans2019\AP_only_0p2UVCtf
+res_file_name = AP_only_noO3HOMCS_origVOL
+# 6 hours is 2.14e4 secods
+total_model_time = 1.8e4
+update_step = 1.8e2
+recording_time_step = 1.8e2
+pars_skip = 0
+# 21.2 oC
+temperature = 294.25
+tempt = 0.
+p_init = 101325.0
+# 50.4 %
+rh = 0.504
+rht = 0
+# UVC lights on
+light_status = 0, 1
+light_time = 0., 1.08e4
+tf_UVC = 0.20
+tf_UVCt = 0.
+# mac
+#act_flux_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/PyCHAM_input/SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+# windows
+#act_flux_file = C:\Users\Psymo\OneDrive - The University of Manchester\SOAPRA\PyCHAM_input\SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+act_flux_file = JPAC_Actinic_Flux_Spectrum_UVConly.csv
+# cylinder with diameter 1 m, length 2.5 m
+#ChamSA = 9.42
+inflectDp = 1.
+Grad_pre_inflect = 0.
+Grad_post_inflect = 0.
+Rate_at_inflect = 3.03e-4
+McMurry_flag = 0
+part_charge_num = 0
+elec_field = 0
+const_comp = H2O
+const_infl = O3, APINENE, C5H8
+const_infl_t = 0.
+# 0.01 for C5H8
+Cinfl = 0.020; 0.004; 0.00
+# residence time of 50.0 minutes
+dil_fac = 0.000333
+tracked_comp = C10H17O4O2, C108O2, C98O2, C812O2, APINAO2, APINBO2, APINCO2, C107O2, C109O2, C96O2, APINENE
+wall_on = 0
+# gas-wall partitioning
+#mass_trans_coeff = 6.e-3
+#eff_abs_wall_massC = 1.e0
+number_size_bins = 1
+pconc = 2.e1
+pconct = 0.
+pcont = 1 
+mean_rad = 3.5e-2
+#std = 1.5
+# 125 nm radius
+upper_part_size = 1.25e-1
+chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;,

@@ -2705,6 +2705,9 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click209a(self):	
 		
+		# to ensure no confusion with plotting single components
+		self.sum_ornot_flag = 0
+
 		# test whether upload has happened
 		try:
 			a_test = self.ro_obj.wf

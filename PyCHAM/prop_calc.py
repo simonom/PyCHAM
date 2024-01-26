@@ -291,7 +291,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 70.
 			continue
-
+		
 		# if hydrogen is present in this molecule
 		if ('H' in self.Pybel_objects[i].formula):
 
@@ -313,27 +313,27 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		else: # if no hydrocarbons
 			Hcount = 0.
 			self.HC[0, i] = 0.
-
+		
 		# list hydrgogen numbers per component
 		self.Hn_list.append(Hcount)	
 
 		self.nom_mass[0, i] = Hcount*1.+self.rel_SMILES[i].count('O')*16.+self.rel_SMILES[i].count('C')*12.+self.rel_SMILES[i].count('N')*14.+self.rel_SMILES[i].count('S')*32.
 
 		# carbon and oxygen numbers in this component
-		self.Cnum[i, 0] = self.rel_SMILES[i].count('C')
-		self.Onum[i, 0] = self.rel_SMILES[i].count('O')
+		self.Cnum[i, 0] = self.rel_SMILES[i].count('C')+self.rel_SMILES[i].count('c')
+		self.Onum[i, 0] = self.rel_SMILES[i].count('O')+self.rel_SMILES[i].count('o')
 
 		# O:C ratio determined from SMILES string
-		if (self.rel_SMILES[i].count('C') > 0):
+		if (self.Cnum[i, 0] > 0):
 			 
 			self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
 			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
 			# get indices of components with particular functional groups
 			group_indices.group_indices(Hcount, self.rel_SMILES[i], i, self)
-			
+		
 		else: # if no carbons in this component
 			self.OC[0, i] = 0.
-	
+		
 	# account for any manually assigned component densities (kg/m3)
 	if (len(dens_comp) > 0  and ode_gen_flag == 0):
 		for i in range (len(dens_comp)):
