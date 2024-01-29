@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''checking that user inputs are valid and providing appropriate modification to the PyCHAM GUI'''
 # once model variables are validated, this module also allows options in the GUI for continuing with simulations
@@ -492,15 +492,30 @@ def ui_check(self):
 		
 	# ------------------------------------
 	# check on presence of observation file for tracking specific components
-	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
+	# if observation file provided for constraint
+	if hasattr(self, 'obs_file') and self.obs_file != []:
 		try: # try opening as in eqn_pars module
 			import openpyxl # require module
 			self.obs_file = str(self.obs_file) # path to file
 			wb = openpyxl.load_workbook(filename = self.obs_file) # open file
 			wb.close() # close excel file
 		except:
-			err_mess = str('Error - observation file ' + self.obs_file + ' could not be found, please check observation file and/or the obs_file model variable in the model variable file.')
-			em_flag = 2
+			try:
+				# see if present inside same folder as model variables
+				# strip path to model variables file back to home directory
+				try:
+					path_start = -1*self.inname[::-1].index('/')
+				except:
+					path_start = -1*self.inname[::-1].index('\\')
+				# path to file
+				self.obs_file = str(self.inname[0:path_start] + self.obs_file)
+				import openpyxl # require module
+				wb = openpyxl.load_workbook(filename = self.obs_file) # open file
+				wb.close() # close excel file
+			except:
+
+				err_mess = str('Error - observation file ' + self.obs_file + ' could not be found, please check observation file and/or the obs_file model variable in the model variable file.')
+				em_flag = 2
 	# ------------------------------------
 
 	# check on gas-particle partitioning inputs --------------

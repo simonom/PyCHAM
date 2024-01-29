@@ -1,0 +1,29 @@
+res_file_name = ambient_contrained_ex_output
+total_model_time = 7.2e3
+update_step = 3.e2
+recording_time_step = 9.e2
+lat = 1.29
+lon = 103.85
+DayOfYear = 180
+# 1am GMT is 9am Singapore time
+daytime_start = 3.24e4
+# assume starting at 9am, finishing at 3pm
+temperature = 288., 292, 296, 300, 300, 298
+tempt = 0., 3.6e3, 7.2e3, 1.08e4, 1.44e4, 1.8e3
+p_init = 101300
+rh = 0.90, 0.89, 0.88, 0.85, 0.83, 0.8, 0.78, 0.75, 0.75, 0.75, 0.78, 0.80
+rht = 0., 9.e2, 1.8e2, 3.6e3, 5.4e3, 7.2e3, 9.e3, 1.08e4, 1.26e4, 1.44e4, 1.62e4, 1.8e3
+# zero to turn surface losses off
+wall_on = 0
+size_structure = 0
+number_size_bins = 0
+#lower_part_size = 0.
+#upper_part_size = 5.e-2
+#space_mode = log
+#coag_on = 1
+# -1 to turn off particle deposition to surfaces
+McMurry_flag = -1
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+obs_file = ambient_constrained_ex_obs.xlsx
+tracked_comp = O3
+pars_skip = 1

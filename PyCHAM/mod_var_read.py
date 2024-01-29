@@ -400,7 +400,8 @@ def mod_var_read(self):
 			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
 				self.const_comp = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'obs_file' and (value.strip()): # name of file containing observations to constrain by
+			# name of file containing observations to constrain by
+			if (key == 'obs_file' and (value.strip())):
 				self.obs_file = str(value.strip())
 			
 			# names of components with instantaneous gas-phase injections

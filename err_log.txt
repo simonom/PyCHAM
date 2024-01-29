@@ -84278,3 +84278,485 @@ Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
 Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
+Warning: invalid value encountered in divide
+Warning: underflow encountered in nextafter
