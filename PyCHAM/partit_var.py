@@ -37,7 +37,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 	
 	# y - concentrations of components (# molecules/cm3 (air))
 	# mfp - mean free path of gas molecules (m) (num_comp, 1)
-	# accom_coeff - accommodation coefficients of components in each size bin
+	# accom_coeff - accommodation coefficients of components in each size bin 
+	#	including wall
 	# y_mw - molecular weight of components (g/mol)
 	# radius - particle radius (m)
 	# surfT - surface tension (g/s2==mN/m==dyn/cm)
@@ -89,7 +90,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# update accommodation coefficients
 		import accom_coeff_calc
 		importlib.reload(accom_coeff_calc) # import most recent version
-		accom_coeff_now = accom_coeff_calc.accom_coeff_func(accom_coeff, radius)
+		accom_coeff_now = accom_coeff_calc.accom_coeff_func(accom_coeff, radius, self)
 		
 		# Non-continuum regime correction 
 		# calculate a correction factor according to the continuum versus non-continuum 

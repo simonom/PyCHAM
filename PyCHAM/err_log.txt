@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/example_run_output2
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\fig01_scheme\fig01_res_16sb_newD
