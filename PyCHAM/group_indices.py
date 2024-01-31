@@ -29,12 +29,12 @@ import numpy as np
 
 def group_indices(Hcount, SMILES, i, self):
 
-	# inputs: -----------------------------------------------------------------------------------------
+	# inputs: ----------------------------------------------------------------
 	# Hcount - number of hydrogens in component
 	# SMILES - SMILES being considered
 	# i - index of component being considered
 	# self - reference to PyCHAM
-	# ---------------------------------------------------------------------------------------------------
+	# ------------------------------------------------------------------------
 
 	# carbon and oxygen numbers of this component
 	Cn = SMILES.count('C') + SMILES.count('c')

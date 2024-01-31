@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''generate the module to solve ODEs'''
 # writes a module based on the supplied chemical scheme and user inputs,
@@ -52,25 +52,25 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	# create new  file to store solver module
 	f = open(self.PyCHAM_path + '/PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
-	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
-	f.write('#                                                                                       											 #\n')
-	f.write('#    All Rights Reserved.                                                                									 #\n')
-	f.write('#    This file is part of PyCHAM                                                         									 #\n')
-	f.write('#                                                                                        											 #\n')
-	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
-	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
-	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
-	f.write('#    version.                                                                            										 #\n')
-	f.write('#                                                                                        											 #\n')
-	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
-	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
-	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
-	f.write('#    details.                                                                            										 #\n')
-	f.write('#                                                                                        											 #\n')
-	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
-	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
-	f.write('#                                                                                        											 #\n')
+	f.write('#                                                                                        #\n')
+	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#                                                                                        #\n')
+	f.write('#    All Rights Reserved.                                                                #\n')
+	f.write('#    This file is part of PyCHAM                                                         #\n')
+	f.write('#                                                                                        #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under             #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          #\n')
+	f.write('#    version.                                                                            #\n')
+	f.write('#                                                                                        #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #\n')
+	f.write('#    details.                                                                            #\n')
+	f.write('#                                                                                        #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #\n')
+	f.write('#                                                                                        #\n')
 	f.write('##########################################################################################\n')
 	f.write('\'\'\'solution of ODEs, generated by eqn_pars.py\'\'\'\n')
 	f.write('# module to solve system of ordinary differential equations (ODEs) using solve_ivp of Scipy \n')
@@ -237,7 +237,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		f.write('		rr_aq = np.tile(rrc[self.rindx_g.shape[0]::], num_asb)\n')
 		f.write('		# prepare aqueous-phase concentrations\n')
 		f.write('		rrc_y = np.ones((self.rindx_aq.shape[0]*self.rindx_aq.shape[1]))\n')
-		f.write('		rrc_y[self.y_arr_aq] = y[self.rindx_aq, 0]\n')
+		f.write('		rrc_y[self.y_arr_aq] = y[self.y_rind_aq, 0]\n')
 		f.write('		rrc_y = rrc_y.reshape(self.rindx_aq.shape[0], self.rindx_aq.shape[1], order = \'C\')\n')
 		f.write('		# reaction rate (# molecules/cm3/s) \n')
 		f.write('		rr = rr_aq*((rrc_y**self.rstoi_aq).prod(axis=1))\n')
@@ -246,13 +246,13 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		f.write('		# convert to sparse matrix\n')
 		f.write('		loss = SP.csc_matrix((data, self.y_rind_aq, self.reac_col_aq))\n')
 		f.write('		# register loss of reactants\n')
-		f.write('		dd[self.uni_y_rind_g, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_g])[:, 0]\n')
+		f.write('		dd[self.uni_y_rind_aq, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_aq])[:, 0]\n')
 		f.write('		# gain of products\n')
 		f.write('		data = rr[self.rr_arr_p_aq]*self.pstoi_flat_aq # prepare loss values\n')
 		f.write('		# convert to sparse matrix\n')
 		f.write('		loss = SP.csc_matrix((data, self.y_pind_aq, self.prod_col_aq))\n')
 		f.write('		# register gain of products\n')
-		f.write('		dd[self.uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[self.uni_self.y_pind_aq])[:, 0]\n')
+		f.write('		dd[self.uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[self.uni_y_pind_aq])[:, 0]\n')
 		f.write('		\n')
 
 	if (self.eqn_num[2] > 0): # if surface reactions present
@@ -293,9 +293,16 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		if ('H2O' in self.con_infl_nam): 
 			f.write('		if self.odsw_flag == 0: # if water not solved separately\n')
 			f.write('			dd[H2Oi, 0] += self.Cinfl_H2O_now\n')
+
+	if (any(self.obs_comp_i)): # if a component has a fixed concentration
+		
+		f.write('		# account for components with fixed gas-phase concentration\n')	
+		f.write('		dd[[self.obs_comp_i], 0] = 0.\n')
+	
 	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
-		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') # index for estimating dilution factors\n')
+		f.write('		# index for estimating dilution factors \n')
+		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') \n')
 		f.write('		if (self.odsw_flag == 1): # if water solver used \n')
 		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
 		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0 # cannot dilute what is on wall \n')

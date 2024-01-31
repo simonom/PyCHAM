@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''update the chamber variables depending on time'''
 # based on the user inputs and time through simulation,
@@ -443,6 +443,7 @@ def cham_up(sumt, Pnow,
 			# account for instantaneous change in 
 			# seed particles (continuous change dealt with below)
 			if (pcontf == 0):
+				
 				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 					N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
@@ -546,10 +547,10 @@ def cham_up(sumt, Pnow,
 		uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
 		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], self)
-		
-	# ----------------------------------------------------------------------------------------------------------
 	
-	# check on continuous influx of gas-phase components ----------------------------------------------
+	# --------------------------------------------------------------------------
+	
+	# check on continuous influx of gas-phase components -------------
 	if (len(self.con_infl_t) > 0): # if influx occurs
 
 		# set relevant time if loop involved
@@ -670,9 +671,9 @@ def cham_up(sumt, Pnow,
 			update_count = 0.
 			bc_red = 1
 			
-	# nucleation check end -------------------------------------------------------------------------
+	# nucleation check end -----------------------------------------
 	
-	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products ---------------------
+	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products -------------
 	
 	# convert y into components in rows and phases in columns
 	if ('RO2_POOL' in self.comp_namelist):

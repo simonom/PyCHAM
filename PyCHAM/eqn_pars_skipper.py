@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''code for alterantive to eqn_pars when eqn_pars being skipped'''
 
@@ -120,10 +120,10 @@ def eqn_pars_skipper(self): # define function
 		# solver, instead deal with it inside the water ode-solver
 		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
 
-		if self.comp_num in self.con_infl_indx:
-			wat_indx = (np.array(self.con_infl_indx == self.comp_num))
-			self.con_infl_nam = np.delete(self.con_infl_nam, wat_indx, axis=0)
-			self.H2Oin = 1 # flag for continuous influx of water
+	if (self.H2Oi in self.con_infl_indx):
+		wat_indx = (np.array(self.con_infl_indx == self.H2Oi))
+		self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
+		self.H2Oin = 1 # flag for continuous influx of water
 
 	if len(self.con_infl_nam) > 0:
 

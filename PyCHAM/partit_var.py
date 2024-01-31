@@ -128,27 +128,30 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		if (z_prt_coeff > 0.):
 			kimt[:, np.sum(kimt, axis = 0)/np.sum(np.sum(kimt)) < z_prt_coeff] = 0.
 		
-		# zero partitioning coefficient for any components with relatively tiny abundance in the gas and particle phase
+		# zero partitioning coefficient for any components with relatively tiny abundance 
+		# in the gas and particle phase
 		# when compared against non-water and non-seed components
-		#if (z_prt_coeff > 0.):
-		#	# get gas and particle phase concentrations
-		#	if (num_sb > 0) and (self.wall_on > 0): # if wall present
-		#		y_gp[:] = np.zeros((len(y[0:-(num_comp)])))
-		#		y_gp = y[0:-(num_comp)]
-		#	if (num_sb > 0) and (self.wall_on == 0): # if wall absent
-		#		y_gp = np.zeros((len(y[:])))
-		#		y_gp[:] = y[:]
-		#	# rearrange so that components in rows and gas/size bins in columns
-		#	y_gp = y_gp.reshape(num_comp, num_sb-self.wall_on+1, order='F')
-		#	# zero water
-		#	y_gp[H2Oi, :] = 0.
-		#	# zero seed
-		#	y_gp[self.seedi, :] = 0.
-		#	y_gp = np.sum(y_gp, axis=1) # sum over gas/size bins
-		#	y_gp_frac = y_gp/np.sum(y_gp)
-		#	# if any components in tiny abundance but are present
-		#	if (sum((y_gp_frac < z_prt_coeff)*(y_gp > 0)) >  0): 
-		#		kimt[((y_gp_frac < z_prt_coeff)*(y_gp > 0)), :] = 0.
+		if (z_prt_coeff > 0. and num_sb-self.wall_on > 0):
+			
+			# get gas and particle phase concentrations
+			if (self.wall_on > 0): # if wall present
+				y_gp = np.zeros((len(y[0:-(num_comp)])))
+				y_gp[:] = y[0:-(num_comp)]
+			if (self.wall_on == 0): # if wall absent
+				y_gp = np.zeros((len(y[:])))
+				y_gp[:] = y[:]
+			# rearrange so that components in rows and gas/size bins in columns
+			y_gp = y_gp.reshape(num_comp, num_sb-self.wall_on+1, order='F')
+			# zero water
+			y_gp[H2Oi, :] = 0.
+			# zero seed
+			y_gp[self.seedi, :] = 0.
+			# sum over gas/size bins for each component
+			y_gp = np.sum(y_gp, axis=1)
+			y_gp_frac = y_gp/np.sum(y_gp)
+			# if any components in tiny abundance but are present
+			if (sum((y_gp_frac < z_prt_coeff)*(y_gp > 0)) >  0): 
+				kimt[((y_gp_frac < z_prt_coeff)*(y_gp > 0)), :] = 0.
 		
 		# transpose kimt ready for multiplication inside ode solver, so size bins
 		# in rows and components in columns

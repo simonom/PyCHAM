@@ -746,7 +746,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 					
 			# number of reactants in this equation
 			nreac[eqn_step] = int(reactant_step)
-		
+			
 			# record 1D array of stoichiometries per equation	
 			rstoi_flat = np.append(rstoi_flat, rstoi[eqn_step, 0:int(reactant_step)])
 		
@@ -861,7 +861,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			self.rstoi_aq = rstoi
 			self.pstoi_aq = pstoi
 			self.jac_stoi_aq = jac_stoi
-			self.rstoi_flat_aq = rstoi_flat
+			self.rstoi_flat_aq = np.squeeze(rstoi_flat)
 			self.pstoi_flat_aq = pstoi_flat
 			self.nreac_aq = nreac
 			self.nprod_aq = nprod

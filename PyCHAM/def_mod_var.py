@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''default model variables'''
 # the default model variables, loaded by PyCHAM on starting
@@ -56,10 +56,11 @@ def def_mod_var(caller, self): # define function
 	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
 	self.testf = 0 # whether in testing mode or not
 	self.pars_skip = 0 # whether to skip chemical scheme parsing
+	self.spin_up = 0 # whether to spin up chemistry
 	# whether to remove influxes of components that aren't seen in chemical scheme
 	self.remove_influx_not_in_scheme = 0
 	
-	# chamber environment -----------------------------------------------------------------
+	# environment -----------------------------------------------------------------
 	self.TEMP = np.array((298.15)).reshape(1) # temperature of experiment (K)
 	self.tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
 	self.RH = np.array(([0.65])) # humidity of experiment (fraction of 1)

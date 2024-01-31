@@ -496,7 +496,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		self.Psat_rec0 = np.zeros((self.Psat.shape))
 		self.Psat_rec0[:, :] = self.Psat[:, :]
 
-	# if vapour pressure plot requested then make this now --------------------------------------------------------------------
+	# if vapour pressure plot requested then make this now ------------
 	if (self.testf == 3.2): 
 		
 		import matplotlib.pyplot as plt

@@ -122,14 +122,15 @@ def mod_var_read(self):
 			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
 				self.update_stp = float(value.strip())
 
-			if key == 'total_model_time' and (value.strip()):
+			if (key == 'total_model_time' and (value.strip())):
 			
 				try:
 					self.tot_time = float(value.strip())
 				except:
 					err_mess = 'Could not convert string to float for total_model_time model variable, please check model variables file and see README for guidance'
 
-			if key == 'pars_skip' and (value.strip()): # whether or not to skip parsing of the chemical scheme
+			# whether or not to skip parsing of the chemical scheme
+			if (key == 'pars_skip' and (value.strip())):
 				try:
 					self.pars_skip = int(value.strip()) # in case a numerical flag
 					# if 1, then check that local variables are stored, ready for use
@@ -141,6 +142,14 @@ def mod_var_read(self):
 				except:
 					self.pars_skip_path = str(value.strip()) # in case a path to saved variables
 					self.pars_skip = 2
+
+			if (key == 'spin_up' and (value.strip())):
+			
+				try:
+					self.spin_up = int(value.strip())
+				except:
+					err_mess = 'Could not convert string to integer for spin_up variable, please check model variables file and see README for guidance'
+
 			if key == 'Comp0' and (value.strip()): # names of components present at experiment start
 				comp0 = [str(i).strip() for i in (value.split(','))]			
 
@@ -405,7 +414,7 @@ def mod_var_read(self):
 				self.obs_file = str(value.strip())
 			
 			# names of components with instantaneous gas-phase injections
-			if key == 'Compt' and (value.strip()):
+			if (key == 'Compt' and (value.strip())):
 				Compt = [str(i).strip() for i in (value.split(','))]
 
 			# times of later gas-phase instantaneous injections (s)
@@ -467,7 +476,7 @@ def mod_var_read(self):
 
 			# fraction below which gas-particle partitioning coefficient treated as zero,
 			# e.g. because size bin has relatively very small surface area
-			if key == 'z_prt_coeff'  and value.strip():
+			if (key == 'z_prt_coeff'  and value.strip()):
 				z_prt_coeff = float(value.strip())			
 
 			if key == 'light_status' and value.strip(): # status of lights (on or off)
@@ -534,12 +543,17 @@ def mod_var_read(self):
 
 					# check if this is a path to a file containing continuous 
 					# influxes, if not treat as a list of component names
-					if '/' in value or '\\' in value: # treat as path to file containing continuous influxes
+					# attempt as path to file containing continuous influxes
+					try: 
 						self.const_infl_path = str(value.strip())
 						self = const_infl_open(self)
 					
-					else: # treat as list of components 
+					
+					except: # treat as list of components 
 						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
+
+					if ('not in a file' in self.con_infl_nam):
+						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))	
 
 
 			if (key == 'const_infl_t' or key == 'cont_infl_t'):
@@ -560,7 +574,8 @@ def mod_var_read(self):
 						self.con_infl_t = self.con_infl_t[0:clim]
 						self.con_infl_C = self.con_infl_C[:, 0:clim]
 
-			if (key == 'Cinfl' and (value.strip())): # influx rate of components with continuous influx (ppb/s)
+			# influx rate of components with continuous influx (ppb/s)
+			if (key == 'Cinfl' and (value.strip())):
 				
 				comp_count = 1 # count number of components
 				time_count = 1 # track number of times
@@ -580,11 +595,12 @@ def mod_var_read(self):
 				# error message from the user input check module
 				except:
 					self.con_infl_C = np.empty(0)
-				
-			if key == 'tracked_comp' and (value.strip()): # names of components whose tendency to change will be tracked
+
+			# names of components whose tendency to change will be tracked
+			if (key == 'tracked_comp' and (value.strip())):
 				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
 
-			if key == 'dens_Comp' and (value.strip()):
+			if (key == 'dens_Comp' and (value.strip())):
 				dens_comp = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'dens' and (value.strip()):
@@ -750,13 +766,30 @@ def const_infl_open(self): # define function to read in values relevant to const
 	import openpyxl
 	import os
 
-	if 'xls' in self.const_infl_path:
+	if ('xls' in self.const_infl_path):
 		try: # try to open the file at the user-supplied path
-			wb = openpyxl.load_workbook(filename = self.const_infl_path)
+
+			try:
+				wb = openpyxl.load_workbook(filename = self.const_infl_path)
+			except:
+				# see if present inside same folder as model variables
+				# strip path to model variables file back to home directory
+				try:
+					path_start = -1*self.inname[::-1].index('/')
+				except:
+					path_start = -1*self.inname[::-1].index('\\')
+				# path to file
+				self.const_infl_path = str(self.inname[0:path_start] + self.const_infl_path)
 			
-			sheet = wb['cont_infl']
+				wb = openpyxl.load_workbook(filename = self.const_infl_path)				
 			
-			# component names are in first column, continuous influxes are in following columns		
+			try:
+				sheet = wb['cont_infl']
+			except:
+				sheet = wb['const_infl']
+			
+			# component names are in first column, continuous influxes are in 
+			# following columns		
 			ir = -1 # count on row iteration
 	
 			# prepare to store component names and continuous influxes
@@ -807,8 +840,9 @@ def const_infl_open(self): # define function to read in values relevant to const
 			
 		except: # if file not found tell user
 			self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
-		
-		return(self)
+
+	else:
+		self.con_infl_nam = 'not in a file'
 
 	return(self)
 

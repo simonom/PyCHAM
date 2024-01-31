@@ -1,4 +1,4 @@
-res_file_name = Flow_Reactor_Example_Run_Output2
+res_file_name = flow_reactor_example_run_output2
 total_model_time = 21600.
 update_step = 60.
 recording_time_step = 60.

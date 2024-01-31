@@ -33,6 +33,7 @@ import time
 import save
 import os
 import ode_updater
+import ode_updater_su
 import tot_in # preparing record of gas-phase influxes
 
 def middle(self): # define function
@@ -120,6 +121,29 @@ def middle(self): # define function
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
 	
+	# in case user has specified to spin-up simulation
+	if (self.spin_up == 1):
+
+		# spin-up problem
+		[y, N_perbin, x, Varr, rbou, Vbou] = ode_updater_su.ode_updater_su(y, H2Oi, 
+		Pnow, Jlen, nrec_steps, 
+		siz_str, num_sb, num_comp, seed_name, seedx, 
+		core_diss, mfp, therm_sp,  
+		accom_coeff, y_mw, surfT, R_gas, NA, 
+		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
+		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
+		nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
+		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
+		uppsize, std, rbou, MV,
+		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
+		sav_nam, space_mode, 
+		rbou00, ub_rad_amp, indx_plot, comp0,
+		wat_hist, pcont, NOi, 
+		HO2i, NO3i, z_prt_coeff, tot_in_res,
+		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP)
+
+
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 

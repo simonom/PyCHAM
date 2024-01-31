@@ -925,7 +925,8 @@ class PyCHAM(QWidget):
 		self.NSlayout.addWidget(self.scroll, 1, self.mvpn, 3, 3)
 		
 		# --------------------------------------------------------------------
-		# label to let user know preparedness of simulation - displayed text updated in ui_check module below
+		# label to let user know preparedness of simulation - displayed text 
+		# updated in ui_check module below
 		self.l80 = ScrollLabel(self)
 		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 3)
 		self.bd_st = 2 # border status

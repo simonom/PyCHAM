@@ -37,7 +37,8 @@ import openbabel.pybel as pybel
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
-	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) 
+	# or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
@@ -79,9 +80,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 		# gas-phase concentration sub-plot ---------------------------------------------	
 		ip_fail = 0 # start by assuming all requested components available
-		group_flag = 0 # start by assuming single components wanted
 
 		for i in range(len(comp_names_to_plot)):
+
+			group_flag = 0 # start by assuming single components wanted
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
 				indx_plot = [H2Oi]
@@ -124,13 +126,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ip_fail = 1
 			if (comp_names_to_plot[i].strip() == '-carbonyl'):	
 				indx_plot = (np.array((group_indx['carbonyl'])))			
-					
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
 			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'):
 				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
-				
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1

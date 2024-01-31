@@ -280,7 +280,8 @@ def ode_updater(y, H2Oi,
 	# ------------------------------------------------------------
 	
 	# start timer
-	st_time = time.time()
+	if (self.spin_up == 0): # if no spin-up
+		self.st_time = time.time()
 	
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
@@ -314,15 +315,20 @@ def ode_updater(y, H2Oi,
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
-	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1])) # remember initial particle number concentrations (# particles/cm3)
+	y0[:] = y[:]
+	# remember initial particle number concentrations (# particles/cm3)
+	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))
+	N_perbin0[:, :] = N_perbin[:, :]
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
+	x0[:] = x[:]
 	t0 = self.update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = self.update_stp # the time to integrate over (s)
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
-	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
+	# numpy array version of chemical scheme names
+	self.comp_namelist_np = np.array(self.comp_namelist)
 	# turn off flag for ongoing injection of particles
 	self.pcont_ongoing = 0
 	
@@ -576,8 +582,8 @@ def ode_updater(y, H2Oi,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
 				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
-				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
-				H2Oi, self)
+				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, 
+				jac_part_H2O_indx, H2Oi, self)
 			
 			# if any components set to have constant gas-phase 
 			# concentration
@@ -798,7 +804,7 @@ def ode_updater(y, H2Oi,
 		# integration step (# molecules/cm3)
 		y_H2O0 = y[H2Oi]
 			
-	time_taken = time.time()-st_time
+	time_taken = time.time()-self.st_time
 	
 	# re-merge continuous influx of water with that of other components, 
 	# this will allow further commands from the GUI

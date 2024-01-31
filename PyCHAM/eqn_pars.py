@@ -81,8 +81,10 @@ def extr_mech(int_tol, num_sb,
 
 	# get equation information for chemical reactions
 	[comp_list, Pybel_objects, comp_num, self] = eqn_interr.eqn_interr(comp_name, comp_smil, num_sb, self)                                                        	
-	# prepare aqueous-phase and surface (e.g. wall) reaction matrices for applying to reaction rate calculation
-	if (self.eqn_num[1] > 0 or self.eqn_num[2] > 0): # if aqueous-phase or surface (e.g. wall) reactions present
+	# prepare aqueous-phase and surface (e.g. wall) reaction matrices for applying 
+	# to reaction rate calculation
+	# if aqueous-phase or surface (e.g. wall) reactions present
+	if (self.eqn_num[1] > 0 or self.eqn_num[2] > 0):
 		[] = aq_mat_prep.aq_mat_prep(num_sb, comp_num, self)                                                  
 	
 	# if particle-phase equations are provided by particles not turned on then raise an error
@@ -160,7 +162,7 @@ def extr_mech(int_tol, num_sb,
 			else: # if not water
 				erf = 1 # raise error
 				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
-
+	
 	# if observation file provided for constraint
 	if hasattr(self, 'obs_file') and self.obs_file != []:
 
@@ -207,7 +209,7 @@ def extr_mech(int_tol, num_sb,
 		self.con_infl_H2O = self.con_infl_C[self.con_infl_indx==comp_num, :]
 		
 		# index of water in continuous influx array
-		wat_indx = self.con_infl_indx==comp_num
+		wat_indx = (self.con_infl_indx == comp_num)
 
 		# do not allow continuous influx of water in the standard ode 
 		# solver, instead deal with it inside the water ode-solver
@@ -216,7 +218,6 @@ def extr_mech(int_tol, num_sb,
 	else:
 		self.H2Oin = 0 # flag for no water influx
 
-	
 	# ensure integer
 	self.con_infl_indx = self.con_infl_indx.astype('int')
 	

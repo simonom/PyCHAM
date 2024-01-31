@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module to prepare the recording matrices'''
 # recording matrices are prepared and initial conditions stored
@@ -77,7 +77,7 @@ def rec_prep(nrec_step, y, y0,
 	# therm_sp - thermal speed (m/s)
 	# H2Oi - index for water
 	# act_coeff - activity coefficient
-	# self.RO2_indx - index of alkyl peroxy radicals
+	# self.RO2_indices - index of alkyl peroxy radicals in second column
 	# sumt - cumulative time through simulation (s)
 	# Pnow - chamber pressure (Pa)
 	# self.light_stat - light status
@@ -208,7 +208,7 @@ def rec_prep(nrec_step, y, y0,
 	trec = np.zeros((nrec_step))
 	# array to record concentrations with time (# molecules/cm3)
 	yrec = np.zeros((nrec_step, len(y)))
-	yrec[0, :] = y # record initial concentrations (# molecules/cm3)
+	yrec[0, :] = y[:] # record initial concentrations (# molecules/cm3)
 	# array to record conversion factor
 	Cfactor_vst = np.zeros((nrec_step, 1))
 	Cfactor_vst[0] = Cfactor

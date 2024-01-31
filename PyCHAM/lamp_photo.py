@@ -115,7 +115,8 @@ def lamp_photo(J, TEMP, self):
 		# cosine of the solar zenith angle (radians), note that solar declination angle 
 		# (self.dec), latitude (in radians) (self.lat_rad) and local hour angle (lha) are 
 		# from zenith.py
-		self.mu0 = np.sin(self.dec)*np.sin(self.lat_rad)+np.cos(self.dec)*np.cos(self.lat_rad)*np.cos(self.lha)
+		self.mu0 = np.sin(self.dec)*np.sin(self.lat_rad) \
+			+ np.cos(self.dec)*np.cos(self.lat_rad)*np.cos(self.lha)
 		
 		# get wavelengths (nm) and their associated actinic fluxes (photon/cm2/nm/s)
 		

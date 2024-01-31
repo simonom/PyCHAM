@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''function to initiate concentrations of components'''
 # based on inputs, initial concentrations and their holding arrays 
@@ -240,7 +240,10 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
-	corei = [num_comp] # index for core component
+	if (self.pars_skip == 0):
+		corei = [num_comp] # index for core component
+	if (self.pars_skip == 1):
+		corei = [num_comp-1] # index for core component
 
 	if (self.pars_skip == 0 or self.pars_skip == 2): # if this information already gained in previous run then skip 
 
@@ -413,6 +416,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 
 	# ensure index arrays are integer type
 	inj_indx = inj_indx.astype('int')
+	
 	corei = np.array((corei)).astype('int')
 	
 	# get indices of NO, HO2 and NO3 (for reaction rate calculations)

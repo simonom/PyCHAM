@@ -1,5 +1,8 @@
 <mechanism xmlns="http://mcm.york.ac.uk/mechanism.xsd">
 <species_defs>
+<species species_number="s0" species_name="PROD">
+<smiles>OO</smiles>
+</species>
 <species species_number="s1" species_name="O">
 <smiles>[O]</smiles>
 </species>

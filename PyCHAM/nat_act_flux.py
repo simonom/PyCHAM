@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module for actinic flux by natural light'''
 # uses Eq. 1 of Madronich (1987) (doi.org/10.1029/JD092iD08p09740),
@@ -51,11 +51,13 @@ def nat_act_flux(A, a, F0, theta, tau, callf, mu0, NL, g, Pfunc_text):
 
 	# inputs: ---------------------------------------------
 	# A - surface (ground) albedo (fraction of radiation (reflected 0-1))
-	# a - single scattering albedo (probability that radiation scattered rather than absorbed) (fraction 0-1)
+	# a - single scattering albedo (probability that radiation scattered rather than 
+	# 	absorbed) (fraction 0-1)
 	# F0 - solar irradiance at top of atmosphere (W/m2)
 	# theta - solar zenith angle (angle between the perpendicular to planet surface 
 	#	and incident solar radiance at top of atmosphere) (radians)
-	# tau - optical depth of each vertical layer of atmosphere (not cumulative) (natural logarithm 
+	# tau - optical depth of each vertical layer of atmosphere (not cumulative) 
+	#	(natural logarithm 
 	# 	of ratio of incident radiation/transmitted radiation)
 	# callf - flag for the calling function (0 for unit testing)
 	# mu0 - cosine of the angle between the perpendicular of the 

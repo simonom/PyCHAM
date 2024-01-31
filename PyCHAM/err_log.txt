@@ -1,1 +1,1 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\urban_chem_scheme\ambient_contrained_ex_output
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/example_run_output2

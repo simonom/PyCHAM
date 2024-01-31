@@ -28,8 +28,10 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 	
 	# inputs: ----------------------------------------------------------------------------
 	# self.reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
-	# self.reac_coef_aq - aqueous-phase reaction rate coefficient expression from the equation file
-	# self.reac_coef_su - surface (e.g. wall) reaction rate coefficient expression from the equation file
+	# self.reac_coef_aq - aqueous-phase reaction rate coefficient expression from the 
+	# equation file
+	# self.reac_coef_su - surface (e.g. wall) reaction rate coefficient expression from 
+	# the equation file
 	# rrc - expression for generic reaction rate coefficients
 	# rrc_name - name given to generic reaction rate coefficients	
 	# testf - flag for mode: 0 in gas-phase equation mode, 2 for test mode, 3 for

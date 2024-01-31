@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module to produce plot to check on variables provided as input'''
 # using the variable checker buttons from the simulate tab in the GUI,
@@ -58,7 +58,25 @@ def var_checker(Jlen, err_mess, erf, self): # define function
 		# ensure numpy arrays
 		self.tempt = np.array(self.tempt)
 		self.TEMP = np.array(self.TEMP)
-		
+
+		if any(self.light_stat == 0):
+			self.l81b.setText('')
+			if any(self.light_stat == 1):
+				self.l80.setText(str('Note that lights status is set to off during some of the simulation'))		
+			else:
+				self.l80.setText(str('Note that lights status is set to off during all of the simulation'))		
+			if (self.bd_st == 1):
+				self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
+			if (self.bd_st >= 2):
+				self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
+
+			self.bd_st += 2 # prepare for change to border status
+			# change border status
+			if (self.bd_st == 3):
+				self.bd_st = 2
+			if (self.bd_st >= 4):
+				self.bd_st = 1
+
 		while (sumt < self.tot_time-self.tot_time*1.e-10):
 
 			# identify relevant light status
