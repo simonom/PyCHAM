@@ -1,1 +1,1 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\fig01_scheme\fig01_res_16sb_newD
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/20130801_apinene_OH_low_NOx

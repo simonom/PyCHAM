@@ -102,7 +102,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# Pruppacher and Klett 1997
 		Inverse_Kn = Kn**-1.
 		correct_1 = (1.33+0.71*Inverse_Kn)/(1.+Inverse_Kn)
-		correct_2 = (4.*(1.-accom_coeff_now[:, 0:num_sb-self.wall_on]))/(3.*accom_coeff_now[:, 0:num_sb-self.wall_on])
+		correct_2 = (4.*(1.-accom_coeff_now[:, 0:num_sb-self.wall_on]))/\
+			(3.*accom_coeff_now[:, 0:num_sb-self.wall_on])
 		correct_3 = 1.e0+(correct_1+correct_2)*Kn
 		correction = correct_3**-1.
 
@@ -111,7 +112,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		# 1e7 for units g cm2/s2.mol.K, 
 		# TEMP is K, radius is multiplied by 1e2 to give cm and tot_rho is g/cm3
 		kelv = np.zeros((num_sb-self.wall_on, 1))
-		kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*1.e2*tot_rho[ish]))
+		kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/(R_gas*1.e7*TEMP*radius[0, ish]*\
+			1.e2*tot_rho[ish]))
 	
 		# ------------------------------------------------
 		# gas-phase diffusion coefficient*Fuch-Sutugin correction (cm2/s)
@@ -166,7 +168,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 			partit_cutoff_Pa = partit_cutoff[0]*(NA/((R_gas*1.e6)*TEMP))
 			highVPi = (self.Psat*act_coeff) > partit_cutoff_Pa
 			highVPi[:, H2Oi] = 0 # mask water to allow its partitioning
-			kimt[highVPi] = 0.
+			kimt[highVPi[0:num_sb-self.wall_on, :]] = 0.
 	
 	else: # if no particles
 		kimt = np.zeros((num_sb-self.wall_on, num_comp))
@@ -181,8 +183,20 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, R_gas, TEMP, N
 		ve = ((2./np.pi)*((1./40.*DStar_org*1.e-4)**0.5))
 		vc = 1.*therm_sp/4.
 		self.kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
-		self.kw = np.tile(self.kw.reshape(1, num_comp), (self.wall_on, 1)) # spread over wall bins
-		
+		# spread over wall bins
+		self.kw = np.tile(self.kw.reshape(1, num_comp), (self.wall_on, 1))
+	
+	# zero partitioning to walls for any components with low condensability
+	if (partit_cutoff): # if a value provided (default is empty list)
+
+		# convert partit_cutoff from Pa to molecules/cm3 (air), note README states
+		# that just one value accepted for partit_cutoff input
+		partit_cutoff_Pa = partit_cutoff[0]*(NA/((R_gas*1.e6)*TEMP))
+		highVPi = (self.Psat*act_coeff) > partit_cutoff_Pa
+		highVPi[:, H2Oi] = 0 # mask water to allow its partitioning
+		self.kw[:, highVPi[-1, :]] = 0.
+
+
 	# make any necessary adjustments for vapour pressure of components as a function of
 	# wall, as defined by the user
 	if 'self.P_wfunc' in locals():

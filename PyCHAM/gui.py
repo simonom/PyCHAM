@@ -2533,7 +2533,8 @@ class PyCHAM(QWidget):
 				self.progress.setValue(int(prog)) # display progress	
 				QApplication.processEvents() # allow message panel to update
 
-			self.l203a.setText('Results loaded') # remove any old progress message from previous run
+			# remove any old progress message from previous run
+			self.l203a.setText('Results loaded')
 			# remove the progress bar after each simulation
 			self.progress.deleteLater()
 			QApplication.processEvents() # allow message panel to update

@@ -397,6 +397,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	f.write('		# return to array, note that consistent with the solve_ivp manual, this ensures dd is\n')
 	f.write('		# a vector rather than matrix, since y0 is a vector\n')
 	f.write('		dd = dd.flatten()\n')
+	f.write('		nzindx = dd != 0.\n')
 	f.write('		return (dd)\n')
 	f.write('\n')
 	

@@ -324,13 +324,17 @@ def cham_up(sumt, Pnow,
 					Ct_gain[inj_cntn] = np. interp(tnew, [0, t00], [y0[inj_indxi]/Cfactor, Ct[inj_cntn, gasinj_cnt]])
 					inj_cntn += 1  # keep count on components
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
-		
+
 			# record additional injection of components (ug/m3)
 			tot_in_res[Compti] += (((Ct_gain*Cfactor-y[inj_indx])/si.N_A)*(y_mw[inj_indx].squeeze()))*1.e12
 
+			# keep just the non-zero Ct gains, since injection to create a 0 abundance
+			# is impossible
+			nz_indx = (Ct_gain != 0.)
+
 			# account for change in gas-phase concentration,
 			# convert from ppb to molecules/cm3 (air)
-			y[inj_indx] = Ct_gain*Cfactor
+			y[inj_indx[nz_indx]] = Ct_gain[nz_indx]*Cfactor
 			
 		# check whether changes occur during proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solver
@@ -392,7 +396,8 @@ def cham_up(sumt, Pnow,
 	# note, if this particle influx section called 
 	# during the call to rec, then continuous influx is 
 	# cancelled when called later
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and tnew > 0.):
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and \
+		tnew > 0.):
 		
 		# in case particle influx repeated every 24 hours
 		if (self.pconctf == 1 and sumt >= 24.*3.6e3):
@@ -405,7 +410,7 @@ def cham_up(sumt, Pnow,
 		else:
 			pinsumt = sumt
 
-		if (seedt_cnt == 0):
+		if (seedt_cnt == 0 and self.pconctf == 1): # if repeating every 24 hours
 			# if on first 24 hours
 			if (sumt > 0. and sumt < (24.*3.6e3)):
 				pinsumt = -1
@@ -418,6 +423,7 @@ def cham_up(sumt, Pnow,
 			
 			# if no linear interpolation required, 
 			# or injection continuous
+			
 			if (gpp_stab != -1 or pcontf == 1): 				
 				pconcn = pconc[:, seedt_cnt]
 
@@ -432,24 +438,28 @@ def cham_up(sumt, Pnow,
 			# instantaneous injection of seed
 			if (gpp_stab == -1 and pcont[0, seedt_cnt] == 0):
 				pconcn = np.zeros((pconc.shape[0])) # empty results array
-				# loop through size bins for interpolation since interpolation is one dimensional
+				# loop through size bins for interpolation since interpolation 
+				# is one dimensional
 				for i in range(num_sb-self.wall_on):
-					pconcn[i] = np.interp(tnew, [0, t00], [pconc[i, seedt_cnt-1], pconc[i, seedt_cnt]])
+					pconcn[i] = np.interp(tnew, [0, t00], \
+						[pconc[i, seedt_cnt-1], pconc[i, seedt_cnt]])
 				# remember the fraction of the number concentration added so far
 				pconcn_frac = pconcn/pconc[:, seedt_cnt]
-				bc_red = 1 # reset flag for time step reduction due to boundary conditions
+				# reset flag for time step reduction due to boundary conditions
+				bc_red = 1
 
 
 			# account for instantaneous change in 
 			# seed particles (continuous change dealt with below)
 			if (pcontf == 0):
 				
-				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
-					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-self.wall_on+1)], 
+				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, \
+					_] = pp_dursim.pp_dursim(y0[num_comp:num_comp*(num_sb-\
+					self.wall_on+1)], 
 					N_perbin0, mean_radn, pmode, pconcn, seedx, lowsize, 
 					uppsize, num_comp, (num_sb-self.wall_on), MV, rad0, radn, 
-					stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
-					pcontf, y[H2Oi], self)
+					stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], \
+					act_coeff, pcontf, y[H2Oi], self)
 					
 				# turn off flag for ongoing injection of particles
 				self.pcont_ongoing = 0

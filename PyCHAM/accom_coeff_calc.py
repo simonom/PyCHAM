@@ -37,7 +37,5 @@ def accom_coeff_func(accom_coeff, radius, self):
 	# ------------------------------------------------------------------ 
 
 	# calculate accommodation coefficients 
-	accom_coeff[3, 0:self.num_asb] = 1. 
-	accom_coeff[6, 0:self.num_asb] =  6.088102904564315e-08/radius 
 
 	return(accom_coeff)

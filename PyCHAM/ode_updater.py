@@ -456,6 +456,7 @@ def ode_updater(y, H2Oi,
 			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			
+			
 			# aligning time interval with pre-requisites -------------------------
 			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
@@ -477,15 +478,16 @@ def ode_updater(y, H2Oi,
 				tnew = (self.tot_time-sumt)
 				ic_red = 1
 			
-			# ------------------------------------------------------------------		
-			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0): # if particles and/or wall present
+			# ------------------------------------------------------------------
+			# if particles and/or wall present		
+			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
 				
 				# update partitioning variables
-				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
-				y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
+				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, \
+				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
-			
+				
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
 				# the cham_up module prior to this call
@@ -508,24 +510,28 @@ def ode_updater(y, H2Oi,
 			
 			# update Jacobian inputs based on particle-phase fractions of components
 			[rowvalsn, colptrsn, jac_mod_len, jac_part_hmf_indx, rw_indx, 
-				jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
-				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, self)
-				
+				jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*\
+				((num_sb-self.wall_on+1))], rowvals, 
+				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, \
+				self)
+			
 			# if water gas-particle partitioning serialised
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): 
 				
 				# if on the deliquescence curve rather than the 
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-				
-					self.odsw_flag = 1 # flag that water gas-particle partitioning solved separately
-	
+					# flag that water gas-particle partitioning solved separately
+					self.odsw_flag = 1
+					
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
 					Cinfl_now, rowvalsn, colptrsn, num_comp, 
-					num_sb, act_coeff, core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
-					jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
-				
+					num_sb, act_coeff, core_diss, kelv_fac, kimt, \
+					(num_sb-self.wall_on), 
+					jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, \
+					jac_part_H2O_indx, H2Oi, self)
+					print('woop1', tnew)
 					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
 						
 						# identify components with negative concentrations
@@ -703,12 +709,14 @@ def ode_updater(y, H2Oi,
 
 				if (nucv1 > 0.): # nucleation
 					
-					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
-						N_perbin, y, y_mw.reshape(-1, 1),  
+					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt,\
+						 np_sum, N_perbin, y, y_mw.reshape(-1, 1),  
 						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
-						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on), self)
+						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-\
+						self.wall_on), self)
 				
-				# reset count that tracks when next operator-split should be called (s)
+				# reset count that tracks when next operator-split should be 
+				# called (s)
 				update_count = 0.
 		
 		# update the percentage time in the GUI progress bar

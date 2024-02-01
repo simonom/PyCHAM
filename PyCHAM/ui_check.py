@@ -116,6 +116,17 @@ def ui_check(self):
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
 	# -------------------------------------------------------------------
+	# check on chemical scheme markers. In older PyCHAM versions only 12
+	# markers were needed, but at least as of v4.4.0, 13 are needed. But
+	# if only 12 are provided then assume the final marker (relating to 
+	# start of reaction lines for surfaces) is empty
+	if (len(self.chem_sch_mrk) == 12):
+		self.chem_sch_mrk.append('')
+	else:
+		if (len(self.chem_sch_mrk) != 13):
+			err_mess = str('Error - the number chemical scheme markers (' + str(len(self.chem_sch_mrk)) + ') is not 13, and it must; please check the guidelines in README')
+
+	# -------------------------------------------------------------------
 
 	# check on skipping parsing
 	if self.pars_skip == 1:

@@ -35,7 +35,7 @@ def retr_out(self):
 	# inputs: -------------------------------
 	# self.dir_path - path of directory requested by the calling code to be looked at
 	# ---------------------------------------
-
+	
 	# name of file where experiment constants saved
 	fname = str(self.dir_path + '/model_and_component_constants')
 	

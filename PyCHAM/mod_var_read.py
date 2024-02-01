@@ -40,7 +40,8 @@ def mod_var_read(self):
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, Press,
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
 			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -109,8 +110,9 @@ def mod_var_read(self):
 			# ----------------------------------------------------
 			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
 				sav_nam = str(value.strip())
-				
-			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+			
+			# formatting for chemical scheme
+			if key == 'chem_scheme_markers' and (value.strip()):
 				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 			if key == 'chem_sch_name' and (value.strip()): # path to chemical scheme
@@ -624,16 +626,19 @@ def mod_var_read(self):
 			if key == 'accom_coeff_user' and (value.strip()): # value(s) of accommodation coefficient set by user
 				accom_val = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'partit_cutoff' and (value.strip()): # value(s) of the gas-particle partitioning cutoff
+			# value(s) of the gas-particle and gas-wall partitioning cutoff
+			if (key == 'partit_cutoff' and (value.strip())):
 				partit_cutoff = [float(i) for i in (((value.strip()).split(',')))]
-
-			if key == 'umansysprop_update' and (value.strip()): # marker for whether to clone latest version of UManSysProp from web
+			
+			# marker for whether to clone latest version of UManSysProp from web
+			if key == 'umansysprop_update' and (value.strip()): 
 				uman_up = int(value.strip())
 
 			if key == 'int_tol' and (value.strip()): # tolerances for integration
 				int_tol = [float(i) for i in (value.split(','))]
 
-			if key == 'new_partr' and (value.strip()): # radius of newly nucleated particles (cm)
+			# radius of newly nucleated particles (cm)
+			if key == 'new_partr' and (value.strip()):
 				new_partr = float(value.strip())
 
 			if key == 'nucv1' and (value.strip()): # first parameter in the nucleation equation
