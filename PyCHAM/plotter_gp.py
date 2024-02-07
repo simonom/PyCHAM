@@ -1,32 +1,33 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''plots results for the gas-phase temporal profiles of specified components'''
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''plots results for the gas-phase temporal profiles of specified 
+components'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-from matplotlib.colors import LinearSegmentedColormap # for customised colormap
-import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+# for customised colormap
+from matplotlib.colors import LinearSegmentedColormap
+# set colormap tick labels to standard notation
+import matplotlib.ticker as ticker 
 import os
 import retr_out
 import numpy as np
@@ -71,14 +72,15 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	num_asb = (num_sb-wall_on)	
 
 	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or caller == 5 or caller == 6):
-		plt.ion() # show results to screen and turn on interactive mode
+		# show results to screen and turn on interactive mode
+		plt.ion() 
 	
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
 	if (comp_names_to_plot): # if component names specified
 	
-		# gas-phase concentration sub-plot ---------------------------------------------	
+		# gas-phase concentration sub-plot --------------------	
 		ip_fail = 0 # start by assuming all requested components available
 
 		for i in range(len(comp_names_to_plot)):
@@ -248,7 +250,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 		
-		# end of gas-phase concentration sub-plot ---------------------------------------
+		# end of gas-phase concentration sub-plot --------------
 	
 
 	if (caller == 2): # display
@@ -260,7 +262,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 # for time series of the average organic peroxy radical molecule
 def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	
-	# inputs: ------------------------------------------------------------------
+	# inputs: ------------------------------------------------------
 	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot

@@ -1,25 +1,27 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''module to read and store (via pickle file and self parameter) model variables from file'''
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''module to read and store (via pickle file and self parameter) model 
+variables from file'''
 
 import pickle
 import numpy as np
@@ -40,14 +42,17 @@ def mod_var_read(self):
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, Press,
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			siz_stru, num_sb, pmode, pconc, pconct, 
+			lowsize, uppsize, 
 			space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
+			dens_comp, dens, vol_comp, volP, act_comp, 
+			act_user, accom_comp, accom_val, uman_up, 
+			int_tol, new_partr, coag_on, 
+			inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, 
+			partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
@@ -121,17 +126,28 @@ def mod_var_read(self):
 			if key == 'xml_name' and (value.strip()): # path to xml file
 				self.xml_name = str(value.strip())
 			
-			if key == 'update_step' and (value.strip()): # time step (s) for updating ODE initial conditions
+			# time step (s) for updating ODE initial 
+			# conditions
+			if (key == 'update_step' and (value.strip())): 
 				self.update_stp = float(value.strip())
 
-			if (key == 'total_model_time' and (value.strip())):
-			
+			if (key == 'total_model_time' and 
+				(value.strip())):
 				try:
-					self.tot_time = float(value.strip())
+					self.tot_time = float(
+						value.strip())
 				except:
-					err_mess = 'Could not convert string to float for total_model_time model variable, please check model variables file and see README for guidance'
+					err_mess = str('Could not \
+					convert \
+					string to float for \
+					total_model_time model \
+					variable, \
+					please check the model \
+					variables file and see README \
+					for guidance')
 
-			# whether or not to skip parsing of the chemical scheme
+			# whether or not to skip parsing of the 
+			# chemical scheme
 			if (key == 'pars_skip' and (value.strip())):
 				try:
 					self.pars_skip = int(value.strip()) # in case a numerical flag
@@ -171,19 +187,26 @@ def mod_var_read(self):
 					
 						err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
 			
-			if key == 'temperature' and (value.strip()): # chamber temperature (K)
+			# chamber temperature (K)
+			if (key == 'temperature' and (value.strip())):
 				self.TEMP = [float(i) for i in ((value.strip()).split(','))]
-
-			if key == 'tempt' and (value.strip()): # times (s) that temperature values correspond to
+			# times (s) that temperature values correspond to
+			if (key == 'tempt' and (value.strip())): 
 				self.tempt = [float(i) for i in ((value.strip()).split(','))]
 
-			if key == 'rh' and (value.strip()): # relative humidity in chamber (0-1)
-				self.RH = np.array(([float(i) for i in ((value.strip()).split(','))]))
+			# relative humidity in chamber (0-1)
+			if (key == 'rh' and (value.strip())):
+				self.RH = np.array(([float(i) for i in
+					((value.strip()).split(','))]))
 				
-			if key == 'rht' and (value.strip()): # times through simulation (s) at which relative humidity reached
-				self.RHt = np.array(([float(i) for i in ((value.strip()).split(','))]))
+			# times through simulation (s) at which 
+			# relative humidity reached
+			if (key == 'rht' and (value.strip())):
+				self.RHt = np.array(([float(i) for i 
+					in ((value.strip()).split(','))]))
 
-			if key == 'p_init' and (value.strip()): # pressure inside chamber
+			# pressure inside chamber
+			if (key == 'p_init' and (value.strip())):
 				Press = float(value.strip())
 
 			if key == 'daytime_start' and (value.strip()): # time of day at experiment start (s)
@@ -641,20 +664,26 @@ def mod_var_read(self):
 			if key == 'new_partr' and (value.strip()):
 				new_partr = float(value.strip())
 
-			if key == 'nucv1' and (value.strip()): # first parameter in the nucleation equation
-				nucv1 = float(value.strip())
+			# first parameter in the nucleation equation
+			if (key == 'nucv1' and (value.strip())): 
+				self.nucv1 = float(value.strip())
 
-			if key == 'nucv2' and (value.strip()): # second nucleation parameter (onset)
-				nucv2 = float(value.strip())
+			# second nucleation parameter (onset)
+			if (key == 'nucv2' and (value.strip())): 
+				self.nucv2 = float(value.strip())
 
-			if key == 'nucv3' and (value.strip()): # third nucleation parameter (duration)
-				nucv3 = float(value.strip())
+			# third nucleation parameter (duration)
+			if (key == 'nucv3' and (value.strip())): 
+				self.nucv3 = float(value.strip())
 
-			if key == 'nuc_comp' and (value.strip()): # chemical scheme name of nucleating component
-				nuc_comp = [str(i).strip() for i in (value.split(','))]
+			# chemical scheme name of nucleating component
+			if (key == 'nuc_comp' and (value.strip())): 
+				self.nuc_comp = [str(i).strip() for i in 					(value.split(','))]
 
-			if key == 'nuc_adapt' and (value.strip()): # marker for whether to adapt time interval to nucleation
-				nuc_ad = int(value.strip())
+			# marker for whether to adapt time interval to 
+			# nucleation
+			if (key == 'nuc_adapt' and (value.strip())): 
+				self.nuc_ad = int(value.strip())
 
 			if key == 'coag_on' and (value.strip()): # marker for whether to model coagulation
 				coag_on = int(value.strip())
@@ -745,17 +774,23 @@ def mod_var_read(self):
 	
 		# prepare for pickling
 		list_vars = [sav_nam, comp0, y0, Press, 
-				siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+				siz_stru, num_sb, pmode, pconc, pconct, 
+				lowsize, 
 				uppsize, space_mode, std, mean_rad, 
-				Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+				Compt, injectt, Ct, seed_name, seed_mw, 
+				seed_diss, seed_dens, 
 				seedx, dens_comp, dens, vol_comp, volP, 
-				act_comp, act_user, accom_comp, accom_val, uman_up, int_tol, 
-				new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
-				inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, p_char, 
-				e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
+				act_comp, act_user, accom_comp, 
+				accom_val, uman_up, int_tol, 
+				new_partr, coag_on, 
+				inflectDp, pwl_xpre, pwl_xpro, inflectk,
+				 chamSA, Rader, p_char, 
+				e_field, partit_cutoff, ser_H2O, 
+				wat_hist, drh_str, 
 				erh_str, pcont, z_prt_coeff, chamV]
 
-		with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
+		# the file to be used for pickling
+		with open(input_by_sim, 'wb') as pk: 
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
 

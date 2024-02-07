@@ -75,14 +75,14 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 		
 	# calculate concentrations of third body (M), nitrogen and oxygen
 	# calculate gas-phase concentrations of M, N2 and O2 (# molecules/cm3 (air))
-	# 1.0e-6 converts from molecules/m3 to molecules/cc
+	# 1.0e-6 is the 1 cm3 volume expressed as m3
 	# R and Avogadro's constant set the same as in atmosphereFunctions.f90 of AtChem2
-	M_val = (PInit/(8.3144621*TEMP)*si.N_A)*1.e-6
+	M_val = ((PInit*1.e-6)/(8.3144621*TEMP))*si.N_A
 	
 	# N2 and O2 given the same multiplication as in atmosphereFunctions.f90 of AtChem2
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
-		
+	
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, TEMP, time, 

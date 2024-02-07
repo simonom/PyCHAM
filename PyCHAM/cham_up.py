@@ -1,24 +1,22 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''update the chamber variables depending on time'''
 # based on the user inputs and time through simulation,
 # chamber variables are updated before calling the 
@@ -34,15 +32,16 @@ from water_calc import water_calc
 
 # define function
 def cham_up(sumt, Pnow, 
-	light_time_cnt, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	light_time_cnt, tnew, 
 	new_part_sum1, update_count,
 	injectt, gasinj_cnt, inj_indx, 
-	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, N_perbin0, 
-	mean_rad, corei, seedx, seed_name, lowsize, uppsize, num_sb, MV, rad0, radn, std, 
+	Ct, pmode, pconc, pconct, seedt_cnt, num_comp, y0, y, 
+	N_perbin0, mean_rad, corei, seedx, seed_name, lowsize, 
+	uppsize, num_sb, MV, rad0, radn, std, 
 	H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
-	DStar_org, tempt_cnt, RHt_cnt, nuci, nuc_comp, y_mw, 
-	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, act_coeff, 
-	tot_in_res, Compti, self, vol_Comp, volP):
+	DStar_org, tempt_cnt, RHt_cnt, nuci, y_mw, 
+	temp_now, gpp_stab, t00, x, pcont, pcontf, Cinfl_now, surfT, 
+	act_coeff, tot_in_res, Compti, self, vol_Comp, volP):
 
 	# inputs: ------------------------------------------------
 	# sumt - cumulative time through simulation (s)
@@ -55,11 +54,11 @@ def cham_up(sumt, Pnow,
 	# self.light_ad - marker for whether to change time interval 
 	#	in response to changing natural light intensity
 	# tnew - time interval between chamber updates (s)
-	# nuc_ad - flag for whether user wants time step adapted 
+	# self.nuc_ad - flag for whether user wants time step adapted 
 	# to nucleation
-	# nucv1 - nucleation parameter one
-	# nucv2 - nucleation parameter two
-	# nucv3 - nucleation parameter three
+	# self.nucv1 - nucleation parameter one
+	# self.nucv2 - nucleation parameter two
+	# self.nucv3 - nucleation parameter three
 	# new_part_sum1 - total number concentration of new 
 	#	particles so far (#/cm3 (air))
 	# self.update_stp - time interval between operator-split 
@@ -78,18 +77,24 @@ def cham_up(sumt, Pnow,
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
-	# pmode - whether particle number size distributions stated explicitly or by mode
-	# pconc - concentration of injected particles (# particles/cm3 (air))
+	# pmode - whether particle number size distributions stated 
+	#	explicitly or by mode
+	# pconc - concentration of injected particles 
+	#	(# particles/cm3 (air))
 	# pconct - times of particle injection (s)
 	# seedt_cnt - count on injections of particles
 	# num_comp - number of components
-	# y0 - concentration of components prior to integration (# molecules/cm3 (air))
-	# y - variable concentration of components prior to integration (# molecules/cm3 (air))
-	# N_perbin0 - concentration of particles (# particles/cm3 (air)) at start of time interval
+	# y0 - concentration of components prior to integration 
+	# 	(# molecules/cm3 (air))
+	# y - variable concentration of components prior to 
+	#	integration (# molecules/cm3 (air))
+	# N_perbin0 - concentration of particles 
+	#	(# particles/cm3 (air)) at start of time interval
 	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
-	# seedx - mole ratio of non-water components comprising seed particles
+	# seedx - mole ratio of non-water components comprising seed 
+	#	particles
 	# seed_name - name(s) of component(s) comprising seed 
 	#	particles
 	# lowsize - lower size bin boundary (um)
@@ -105,41 +110,53 @@ def cham_up(sumt, Pnow,
 	# rbou - size bin radius bounds (um)
 	# self.con_infl_t - times for constant influxes (s)
 	# infx_cnt - count on constant influx occurrences
-	# self.Cinfl - influx rate for components with constant influx (ppb/s)
+	# self.Cinfl - influx rate for components with constant influx 
+	#	(ppb/s)
 	# self.wall_on - marker for whether wall is on
 	# Cfactor - conversion factor from ppb to molecules/cm3 (air)
 	# self.seedi - index of seed component(s)
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
-	# DStar_org - gas-phase diffusion coefficients of components (cm2/s)
+	# DStar_org - gas-phase diffusion coefficients of components 
+	#	(cm2/s)
 	# self.RH - relative humidities (fraction 0-1)
-	# self.RHt - times through experiment at which relative humidities reached (s)
+	# self.RHt - times through experiment at which relative 
+	# humidities reached (s)
 	# tempt_cnt - count on temperatures
 	# RHt_cnt - relative humidity counts
 	# self.Pybel_objects - the pybel identifiers for components
 	# nuci - index of nucleating component
-	# nuc_comp - the nucleating component
 	# y_mw - molar weight of components (g/mol)
 	# temp_now - chamber temperature (K) prior to this update
-	# self.Psat - saturation vapour pressures of components at the current 
-	#	chamber temperature (# molecules/cm3)
-	# gpp_stab - flag for whether to linearly interpolate any change 
-	# 	to chamber conditions (equals -1 if change needed)
-	# t00 - the initial integration step on the current integration step (s)
+	# self.Psat - saturation vapour pressures of components at the 
+	#	current chamber temperature (# molecules/cm3)
+	# gpp_stab - flag for whether to linearly interpolate any 
+	#	change to chamber conditions (equals -1 if change 
+	#	needed)
+	# t00 - the initial integration step on the current 
+	# 	integration step (s)
 	# x - starting sizes of particles (um)
-	# pcont - flags for whether particle injection instantaneous or continuous
-	# pcontf - whether current state of particle injection is continuous
-	# Cinfl_now - influx rate of components with continuous influx (ppb/s)
+	# pcont - flags for whether particle injection instantaneous 
+	# 	or continuous
+	# pcontf - whether current state of particle injection is 
+	#	continuous
+	# Cinfl_now - influx rate of components with continuous influx 
+	#	(ppb/s)
 	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
 	# act_coeff - activity coefficient of components
-	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
-	# tot_in_res - count on total injected concentration of injected components (ug/m3)
-	# Compti - index for total injection record for instantaneously injected components
-	# self.cont_inf_reci - index for total injection record for continuously injected components
-	# self.con_infl_indx - index for continuously injected components from all components
-	# -----------------------------------------------------------------------
-	
+	# self.seed_eq_wat - whether seed particles to be equilibrated 
+	#	with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume 
+	#	contains equilibrated water
+	# tot_in_res - count on total injected concentration of 
+	#	injected components (ug/m3)
+	# Compti - index for total injection record for 
+	#	instantaneously injected components
+	# self.cont_inf_reci - index for total injection record for 
+	#	continuously injected components
+	# self.con_infl_indx - index for continuously injected 
+	#	components from all components
+	# --------------------------------------------------------------
 	# ensure N_perbin has a value
 	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
 	N_perbin[:] = N_perbin0[:] # particle number concentration (# particles/cm3)
@@ -246,9 +263,10 @@ def cham_up(sumt, Pnow,
 
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
-			[self, _] = volat_calc.volat_calc(0, temp_nown, H2Oi,   
-							num_comp, Psat_water, vol_Comp, volP, 0, corei, seed_name, 
-							pconc, 0, 0.0, [], 1, nuci, nuc_comp, self)
+			[self, _] = volat_calc.volat_calc(0, temp_nown,
+				 H2Oi, num_comp, Psat_water, vol_Comp, 
+				volP, 0, corei, seed_name, 
+				pconc, 0, 0.0, [], 1, nuci, self)
 			
 			# according to the ideal gas law, air pressure (Pa) inside chamber
 			# is proportional to temperature, therefore pressure changes by 
@@ -662,20 +680,25 @@ def cham_up(sumt, Pnow,
 	else: # if no continuous influxes, provide filler
 		Cinfl_now = np.zeros((1, 1))
 	
-	# check on nucleation ---------------------------------------------------------
-	# if automatic time step adaption to nucleation requested, check whether number of new particles
-	# exceeds 10 % of total number formed during nucleation event.  Second part of condition is that
-	# the specified nucleation event has not yet reached its defined finishing particle number
+	# check on nucleation ------------------------------------------
+	# if automatic time step adaption to nucleation requested, 
+	# check whether number of new particles
+	# exceeds 10 % of total number formed during nucleation event.  	# Second part of condition is that
+	# the specified nucleation event has not yet reached its defined 	# finishing particle number
 	# concentration (# particles/cm3 (air))
-	if ((nuc_ad == 1) and (new_part_sum1 < nucv1*0.9) and ((num_sb-self.wall_on) > 0)):
+	if ((self.nuc_ad == 1) and (new_part_sum1 < self.nucv1*0.9) 
+		and ((num_sb-self.wall_on) > 0)):
 	
-		# the time step (s) needed to increase number concentration of nucleated particles by 10 %
-		t_need = (0.1*nucv1+new_part_sum1)
-		t_need = np.log(t_need/nucv1)
-		t_need = np.log(t_need/nucv2)
-		t_need = t_need*nucv3*-1.-sumt
-	
-		if (tnew > t_need): # if suggested time step exceeds this, then reduce to required time step 
+		# the time step (s) needed to increase number 
+		# concentration of nucleated particles by 10 %
+		t_need = (0.1*self.nucv1+new_part_sum1)
+		t_need = np.log(t_need/self.nucv1)
+		t_need = np.log(t_need/self.nucv2)
+		t_need = t_need*self.nucv3*-1.-sumt
+
+		# if suggested time step exceeds this, 
+		# then reduce to required time step	
+		if (tnew > t_need):  
 			tnew = t_need
 			self.update_stp = t_need
 			update_count = 0.
@@ -683,7 +706,8 @@ def cham_up(sumt, Pnow,
 			
 	# nucleation check end -----------------------------------------
 	
-	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products -------------
+	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion 
+	# products -------------
 	
 	# convert y into components in rows and phases in columns
 	if ('RO2_POOL' in self.comp_namelist):

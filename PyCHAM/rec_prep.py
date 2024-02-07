@@ -1,24 +1,22 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to prepare the recording matrices'''
 # recording matrices are prepared and initial conditions stored
 
@@ -37,21 +35,21 @@ def rec_prep(nrec_step, y, y0,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
-	Jlen, Cfactor, Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
+	Jlen, Cfactor, Vbou, tnew, 
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, 
-	nuci, nuc_comp, t0, pcont, pcontf, 
-	NOi, HO2i, NO3i, z_prt_coeff,
+	nuci, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
 	
-	# inputs: --------------------------------------------------------
+	# inputs: ------------------------------------------------------
 	# nrec_step - number of steps to record on
 	# y - initial concentrations (# molecules/cm3 (air))
-	# y0 - component concentrations prior to integration step (# molecules/cm3 (air))
+	# y0 - component concentrations prior to integration 
+	#	step (# molecules/cm3 (air))
 	# self.rindx_g - indices of reactants
 	# self.rstoi_g - stoichiometries of reactants
 	# self.pindx_g - indices of products
@@ -98,11 +96,11 @@ def rec_prep(nrec_step, y, y0,
 	# self.wall_on - marker for whether wall present
 	# Vbou - volume boundary of particle size bins (um3)
 	# tnew - the proposed integration time interval (s)
-	# nuc_ad - marker for whether to adapt time step based on 
+	# self.nuc_ad - marker for whether to adapt time step based on 
 	#	nucleation
-	# nucv1 - nucleation parameter one
-	# nucv2 - nucleation parameter two
-	# nucv3 - nucleation parameter three
+	# self.nucv1 - nucleation parameter one
+	# self.nucv2 - nucleation parameter two
+	# self.nucv3 - nucleation parameter three
 	# np_sum - cumulative number concentration of new 
 	#	particles so far (#/cm3 (air))
 	# self.update_stp - time interval between operator-split processes
@@ -140,23 +138,28 @@ def rec_prep(nrec_step, y, y0,
 	# diff_vol - diffusion volume of components according to Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficient of components (cm2/s)
 	# self.seedi - index of seed component(s)
-	# self.C_p2w - concentration of components on the wall due to particle
+	# self.C_p2w - concentration of components on the wall due to 
+	#	particle
 	# deposition to wall (# molecules/cm3)
 	# self.RH - relative humidities (fraction 0-1)
-	# self.RHt - times through experiment at which relative humidities reached (s)
+	# self.RHt - times through experiment at which relative 
+	#	humidities reached (s)
 	# tempt_cnt - count on chamber temperatures
 	# RHt_cnt - chamber relative humidity counts
 	# self.Pybel_objects - the pybel objects for components
 	# nuci - index of nucleating component
-	# nuc_comp - name of nucleating component
+	# self.nuc_comp - name of nucleating component
 	# t0 - initial integration step (s)
-	# pcont - flag for whether particle injection instantaneous or continuous
-	# pcontf - current status of particle injection (instantaneous or continuous)
+	# pcont - flag for whether particle injection instantaneous or 
+	#	continuous
+	# pcontf - current status of particle injection (instantaneous 
+	#	or continuous)
 	# NOi - index of NO
 	# HO2i - index of HO2
 	# NO3i - index of NO3
-	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
-	#	below which partitioning to a particle size bin is treated as zero,
+	# z_prt_coeff - fraction of total gas-particle partitioning 
+	#	coefficient below which partitioning to a particle 
+	#	size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny
 	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
 	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
@@ -183,8 +186,8 @@ def rec_prep(nrec_step, y, y0,
 	# array to record carbon flux between reservoirs (influx to gas-phase 
 	# due to emissions that exclude partitioning), net flux to/from 
 	# particles, net flux to/from wall due to gas-wall partitioning,
-	# loss to wall due to particle deposition on wall, net flux due to air 
-	# exchange
+	# loss to wall due to particle deposition on wall, net flux 
+	# due to air exchange
 	self.C_res_flux = np.zeros((nrec_step+1, 5))
 	
 	[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
@@ -193,22 +196,24 @@ def rec_prep(nrec_step, y, y0,
 		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, 
 		self] = cham_up.cham_up(sumt, 
 		Pnow, light_time_cnt, 0, 
-		nuc_ad, nucv1, nucv2, nucv3, np_sum, 
-		update_count, 
-		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, pconct, 
-		seedt_cnt, num_comp, y0, y, N_perbin, mean_rad, corei, seedx, seed_name, 
-		lowsize, uppsize, num_sb, MV, rad0, radn, std, H2Oi, rbou, 
-		infx_cnt, Cfactor, diff_vol, 
-		DStar_org, tempt_cnt, RHt_cnt, nuci, nuc_comp,
-		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., surfT, act_coeff,
-		tot_in_res, Compti, self, vol_Comp, volP)
+		np_sum, update_count, 
+		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, 
+		pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
+		mean_rad, corei, seedx, seed_name, 
+		lowsize, uppsize, num_sb, MV, rad0, radn, std, H2Oi, 
+		rbou, infx_cnt, Cfactor, diff_vol, 
+		DStar_org, tempt_cnt, RHt_cnt, nuci,
+		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., 
+		surfT, act_coeff, tot_in_res, Compti, self, vol_Comp, 
+		volP)
 	
-	# note that recording occurs after any instaneous changes--------------------
+	# note that recording occurs after any instaneous changes-------
 	# array to record time through simulation (s)
 	trec = np.zeros((nrec_step))
 	# array to record concentrations with time (# molecules/cm3)
 	yrec = np.zeros((nrec_step, len(y)))
-	yrec[0, :] = y[:] # record initial concentrations (# molecules/cm3)
+	# record initial concentrations (# molecules/cm3)
+	yrec[0, :] = y[:] 
 	# array to record conversion factor
 	Cfactor_vst = np.zeros((nrec_step, 1))
 	Cfactor_vst[0] = Cfactor

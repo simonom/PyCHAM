@@ -2,9 +2,11 @@ Y. Matsumi, F.J. Comes, G. Hancock, A. Hofzumahaus, A.J Hynes, M. Kawasaki, A.R.
 J. Geophys. Res., 107(D3), 4024, doi:10.1029/2001JD000510, 2002
 
 Recommended by IUPAC 2003:
-http://www.iupac-kinetic.ch.cam.ac.uk						
+http://www.iupac-kinetic.ch.cam.ac.uk
+When searching for data for wavelengths 220-305 nm, https://iupac-aeris.ipsl.fr/datasheets/pdf/POx2.pdf recommends quantum yields for o1d of 0.90+/-0.05 and for o1p of 0.10+/-0.05
 
 wavelength	qyo1d (298)
+248	0.90
 290	0.9
 291	0.9
 292	0.9

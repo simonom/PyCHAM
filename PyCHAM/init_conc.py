@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''function to initiate concentrations of components'''
 # based on inputs, initial concentrations and their holding arrays 
 # are set
@@ -32,33 +33,41 @@ import write_dydt_rec
 
 def init_conc(num_comp, Comp0, init_conc, PInit,
 	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
-	core_diss, nuc_comp, comp_xmlname, comp_smil, self):
+	core_diss, comp_xmlname, comp_smil, self):
 		
 	# inputs:------------------------------------------------------
 	
 	# num_comp - number of unique components
-	# Comp0 - chemical scheme names of components present at start of experiment
+	# Comp0 - chemical scheme names of components present at 
+	# 	start of experiment
 	# init_conc - initial concentrations of components (ppb)	
-	# self.TEMP[0] - temperature in chamber at start of experiment (K)
-	# self.RH - relative humidity in chamber (dimensionless fraction 0-1)
+	# self.TEMP[0] - temperature in chamber at start of 
+	# 	experiment (K)
+	# self.RH - relative humidity in chamber (dimensionless 
+	#	fraction 0-1)
 	# PInit - initial pressure (Pa)
-	# init_SMIL - SMILES of components present at start of experiment (whose 
-	# concentrations are given in init_conc)
-	# testf - flag for whether in normal mode (0) or testing mode (1/2)
-	# pconc - initial concentration of particles (# particles/cc (air))
-	# self.dydt_trak - chemical scheme name of components for which user wants the tendency to  
-	#			change tracked
+	# init_SMIL - SMILES of components present at start of 
+	#	experiment (whose concentrations are given in init_conc)
+	# testf - flag for whether in normal mode (0) or testing 
+	# mode (1/2)
+	# pconc - initial concentration of particles 
+	#	(# particles/cm3 (air))
+	# self.dydt_trak - chemical scheme name of components for 
+	#	which user wants the tendency to  change tracked
 	# self.tot_time - total simulation time (s)
 	# self.save_step - recording frequency (s)
 	# self.rindx_g - indices of reactants per equation
 	# self.pindx_g - indices of products per equation
 	# num_eqn - number of equations
-	# self.comp_namelist - list of names of components as presented in the chemical scheme file
-	# Compt - name of components injected instantaneously after start of experiment
+	# self.comp_namelist - list of names of components as 
+	#	presented in the chemical scheme file
+	# Compt - name of components injected instantaneously after 
+	#	start of experiment
 	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
-	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
+	# self.nuc_comp - name of nucleating component (input by user, 
+	#	or defaults to 'core')
 	# comp_xmlname - component names in xml file
 	# comp_smil - all SMILES strings in xml file
 	# self.self.rel_SMILES - only the SMILES strings of components present in the chemical scheme file
@@ -199,7 +208,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			y[self.H2Oi] = self.y[self.H2Oi]
 			y[self.seedi] = self.y[self.seedi]
 
-	if (self.pars_skip == 0 or self.pars_skip == 2): # if this information already gained in previous run then skip 
+	if (self.pars_skip == 0 or self.pars_skip == 2):
 		# holder for water index (will be used if not identified in chemical scheme)
 		H2Oi = num_comp # index for water
 		self.H2Oi = H2Oi # index for water
@@ -209,12 +218,14 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		indx = -1
 		for single_chem in self.rel_SMILES:
 			indx += 1
-			# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
+			# ensure this is water rather than single 
+			# oxygen (e.g. due to ozone photolysis 
 			# (O is the MCM chemical scheme name for single oxygen))
 			if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
 				H2Oi = indx
 				self.H2Oi = H2Oi # index for water
-				y[H2Oi] = C_H2O # include initial concentration of water (# molecules/cm3)
+				# include initial concentration of water (# molecules/cm3)
+				y[H2Oi] = C_H2O
 				y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
 			
 				# remove the addition of water in the surface concentrations
@@ -392,7 +403,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	# --------------------------------------
 	
 	# if nucleating component formed of core component
-	if (nuc_comp[0] == 'core'):
+	if (self.nuc_comp[0] == 'core'):
 		nuci = num_comp-1 # index of core component
 	else:
 		nuci = -1 # filler

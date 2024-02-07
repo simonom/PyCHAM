@@ -1,27 +1,27 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''The module that generates the Graphical User Interface (GUI) for PyCHAM, and connects 
-that GUI with the core PyCHAM model'''
-# first module called when PyCHAM started from the terminal/command window, takes inputs
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''The module that generates the Graphical User Interface (GUI) for 
+PyCHAM, and connects that GUI with the core PyCHAM model'''
+
+# first module called when PyCHAM started from the terminal/command 
+# window, takes inputs
 # and sends to model modules, also calls the saving module
 
 from PyQt5.QtWidgets import *
@@ -183,19 +183,24 @@ class PyCHAM(QWidget):
 		b0.clicked.connect(self.on_click1)
 		self.NSlayout.addWidget(b0, 0, ffscn, 1, 2)
 		
-		# default variables for all required input model variables -------------------------
+		# default variables for all required input model 
+		# variables -------------------------
 		[sav_nam, comp0, 
 		y0, Press, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		Compt, 
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+		seedx,
 		dens_comp, dens, vol_comp, volP, act_comp, 
-		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
-		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
-		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+		act_user, accom_comp, accom_val, uman_up, int_tol, 
+		new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+		inflectk, chamSA, Rader, 
+		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, 
+		drh_str, erh_str, pcont, 
 		z_prt_coeff, chamV, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
-		# listing input files -----------------------------------------------------------
+		# listing input files ----------------------------------
 		l1 = QLabel(self)
 		l1.setText("The following files have been found: ")
 		self.NSlayout.addWidget(l1, 1, ffscn, 1, 2)
@@ -507,38 +512,49 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(self.l32a, par_row+17, 1)
 		
 		l33 = QLabel(self)
-		l33.setText('First nucleation \nparameterisation parameter: ')
+		l33.setText('First nucleation \nparameterisation ' 
+			'parameter: ')
 		self.varbox.addWidget(l33, par_row+18, 0)
 		self.l33a = QLabel(self)
-		self.l33a.setText((str(nucv1)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l33a.setText((str(self.nucv1)).replace('\'', 
+			'').replace(' ', '').replace('[', 
+			'').replace(']', ''))
 		self.varbox.addWidget(self.l33a, par_row+18, 1)
 		
 		l34 = QLabel(self)
-		l34.setText('Second nucleation \nparameterisation parameter: ')
+		l34.setText('Second nucleation \nparameterisation ' 
+			'parameter: ')
 		self.varbox.addWidget(l34, par_row+19, 0)
 		self.l34a = QLabel(self)
-		self.l34a.setText((str(nucv2)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l34a.setText((str(self.nucv2)).replace('\'', 
+		'').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l34a, par_row+19, 1)
 		
 		l35 = QLabel(self)
-		l35.setText('Third nucleation \nparameterisation parameter: ')
+		l35.setText('Third nucleation \nparameterisation '
+			'parameter: ')
 		self.varbox.addWidget(l35, par_row+20, 0)
 		self.l35a = QLabel(self)
-		self.l35a.setText((str(nucv3)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l35a.setText((str(self.nucv3)).replace('\'', 
+		'').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l35a, par_row+20, 1)
 		
 		l36 = QLabel(self)
-		l36.setText('Chemical scheme name of \nnucleating component: ')
+		l36.setText('Chemical scheme name of \nnucleating '
+			'component: ')
 		self.varbox.addWidget(l36, par_row+21, 0)
 		self.l36a = QLabel(self)
-		self.l36a.setText((str(nuc_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l36a.setText((str(self.nuc_comp)).replace('\'', 
+		'').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l36a, par_row+21, 1)
 		
 		l37 = QLabel(self)
-		l37.setText('Whether (1) or not (0) to adapt \nintegration time interval \nto nucleation: ')
+		l37.setText('Whether (1) or not (0) to adapt \n'
+			'integration time interval \nto nucleation: ')
 		self.varbox.addWidget(l37, par_row+22, 0)
 		self.l37a = QLabel(self)
-		self.l37a.setText((str(nuc_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l37a.setText((str(self.nuc_ad)).replace('\'', 
+		'').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l37a, par_row+22, 1)
 		
 		l38 = QLabel(self)
@@ -941,6 +957,7 @@ class PyCHAM(QWidget):
 		self.b80s.addItem('Gas-phase Mean Thermal Speeds')
 		self.b80s.addItem('Molar Masses')
 		self.b80s.addItem('Vapour Pressures')
+		self.b80s.addItem('Nucleation Function')
 		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
 		
 		# button to run checks on variables selected in drop down button
@@ -1970,37 +1987,46 @@ class PyCHAM(QWidget):
 				self.l81b.setStyleSheet(0., '0px', 0., 0.)
 		
 		# prepare by enforcing default variables
-		# default variables for all required input model variables --------
+		# default variables for all required input model 
+		# variables --------------------------------------------
 		[sav_nam, comp0, 
 		y0, Press, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-		dens_comp, dens, vol_comp, volP, act_comp, 
-		act_user, accom_comp, accom_val, uman_up, int_tol, new_partr, 
-		nucv1, nucv2, nucv3, 
-		nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, 
+		pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		Compt, 
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+		seedx, dens_comp, dens, vol_comp, volP, act_comp, 
+		act_user, accom_comp, accom_val, uman_up, int_tol, 
+		new_partr, 
+		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, 
 		chamSA, Rader, 
-		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-		erh_str, pcont, 
-		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
+		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, 
+		drh_str, erh_str, pcont, 
+		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, 
+			self)
 		
 		# then open default variables, ready for modification
-		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
+		input_by_sim = str(self.PyCHAM_path + 
+			'/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
 			[sav_nam, comp0, y0, Press,
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+			siz_stru, num_sb, pmode, pconc, pconct, 
+			lowsize, uppsize, space_mode, std, mean_rad, 
 			Compt, injectt, Ct, seed_name,
 			seed_mw, seed_diss, seed_dens, seedx,
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-			accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-			nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
+			dens_comp, dens, vol_comp, volP, act_comp, 
+			act_user, 
+			accom_comp, accom_val, uman_up, int_tol, 
+			new_partr, coag_on, inflectDp, pwl_xpre, 
+			pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, 
+			partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 			pk.close()
 		
-		# button to get path to folder/file containing relevant files
+		# button to get path to folder/file containing 
+		# relevant files
 		options = QFileDialog.Options()
 		#QFileDialog.getOpenFileName
 		fol_nme = getExistingFilesAndDirs(self, "Select Input", "./PyCHAM/input/")
@@ -2159,18 +2185,24 @@ class PyCHAM(QWidget):
 			
 			# --------------------------------------------
 		
-			# reset to default variables to allow any new variables to arise
+			# reset to default variables to allow any new 
+			# variables to arise
 			# from the current model variables file only
 			[sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, 
+			siz_stru, num_sb, pmode, pconc, pconct, 
+			lowsize, uppsize, 
 			space_mode, std, mean_rad, Compt, injectt, 
-			Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx, 
-			dens_comp, dens, vol_comp, volP, act_comp, act_user, accom_comp, 
-			accom_val, uman_up, int_tol, new_partr, nucv1, nucv2, nucv3, 
-			nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 
+			Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			seedx, 
+			dens_comp, dens, vol_comp, volP, act_comp, 
+			act_user, accom_comp, 
+			accom_val, uman_up, int_tol, new_partr, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, p_char, e_field, 
+			partit_cutoff, 
 			ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-			z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, self)
+			z_prt_coeff, chamV, 
+			self] = def_mod_var.def_mod_var(0, self)
 			
 			# get text from batch list label
 			btch_list = self.btch_str
@@ -2202,17 +2234,21 @@ class PyCHAM(QWidget):
 				return()
 
 			# get the save path name variables
-			input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
+			input_by_sim = str(self.PyCHAM_path 
+				+ '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
 				[sav_nam, comp0, y0, Press,
-				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+				siz_stru, num_sb, pmode, pconc, pconct,
+				lowsize, uppsize, space_mode, std, 
+				mean_rad, 
 				Compt, injectt, Ct, seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
+				dens_comp, dens, vol_comp, volP, 
+				act_comp, act_user, 
+				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre, 				pwl_xpro, inflectk, chamSA, Rader, 
+				p_char, e_field, partit_cutoff, 
+				ser_H2O, wat_hist, drh_str, erh_str, 
+				pcont, z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
@@ -4272,19 +4308,24 @@ class PyCHAM(QWidget):
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
 				[sav_nam, comp0, y0, Press,
-				siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-				std, mean_rad, Compt, injectt, Ct, seed_name,
+				siz_stru, num_sb, pmode, pconc, pconct,
+				 lowsize, uppsize, space_mode, 
+				std, mean_rad, Compt, injectt, Ct, 
+				seed_name,
 				seed_mw, seed_diss, seed_dens, seedx,
-				dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-				accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-				nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
-				chamV] = pickle.load(pk)
+				dens_comp, dens, vol_comp, volP, 
+				act_comp, act_user, 
+				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre,
+				 pwl_xpro, 
+				inflectk, chamSA, Rader, p_char, 
+				e_field, partit_cutoff, ser_H2O, 
+				wat_hist, drh_str, erh_str, pcont, 
+				z_prt_coeff, chamV] = pickle.load(pk)
 				pk.close()
 		
 			# call on plotting script
-			plotter_nsd.plotter_nsd(lowsize, num_sb, uppsize, mean_rad, std, pmode, pconc, 
+			plotter_nsd.plotter_nsd(lowsize, num_sb, 
+			uppsize, mean_rad, std, pmode, pconc, 
 			space_mode, 0, pconct, self)
 
 		if (input_check_text == 'Gas-phase Diffusion Coefficients'):
@@ -4302,6 +4343,10 @@ class PyCHAM(QWidget):
 		if (input_check_text == 'Vapour Pressures'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_vp(self)
+
+		if (input_check_text == 'Nucleation Function'):
+			import plotter_simulate_tab
+			plotter_simulate_tab.plotter_nucfunc(self)
 
 	@pyqtSlot() # button to retrieve and report component consumption
 	def on_click224(self):

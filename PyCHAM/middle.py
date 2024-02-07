@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''calls modules to setup simulation'''
 # the modules necessary to setup a simulation are called here
 
@@ -49,16 +50,19 @@ def middle(self): # define function
 		Compt, injectt, Ct, seed_name, seed_mw, 
 		core_diss, seed_dens, seedx, 
 		dens_comp, dens, vol_comp, 
-		volP, act_comp, act_user, accom_comp, accom_coeff_user, uman_up, 
-		int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, coag_on, 
-		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, Rader, p_char, 
+		volP, act_comp, act_user, accom_comp, 
+		accom_coeff_user, uman_up, 
+		int_tol, new_partr, coag_on, 
+		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, 
+		Rader, p_char, 
 		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
-	
-	if (self.pars_skip == 0 or self.pars_skip == 2): # if not skipping parsing of chemical scheme
-		# parse the chemical scheme equation file to convert equations
-		# into usable code
+
+	# if not skipping parsing of chemical scheme	
+	if (self.pars_skip == 0 or self.pars_skip == 2): 
+		# parse the chemical scheme equation file to convert 
+		# equations into usable code
 		[rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
@@ -80,9 +84,10 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, self] = init_conc.init_conc(comp_num, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, 
+	self] = init_conc.init_conc(comp_num, 
 	comp0, y0, Pnow, 0, pconc, self.eqn_num[0], Compt, seed_name,
-	seed_mw, core_diss, nuc_comp, comp_xmlname, comp_smil, self)
+	seed_mw, core_diss, comp_xmlname, comp_smil, self)
 
 	# if error raised, then tell GUI to display it and to stop programme
 	if (erf == 1):
@@ -90,12 +95,15 @@ def middle(self): # define function
 	
 	tempt_cnt = 0 # count on chamber temperatures
 	
-	if (self.pars_skip == 0 or self.pars_skip == 2): # if not skipping component properties
+	# if not skipping component properties
+	if (self.pars_skip == 0 or self.pars_skip == 2): 
 		# get component properties
 		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
-			num_comp, Psat_water, vol_comp, volP, 0, corei, pconc,
-			uman_up, seed_dens, 0, nuci, nuc_comp, dens_comp, dens,
+			num_comp, Psat_water, vol_comp, volP, 0, 
+			corei, pconc,
+			uman_up, seed_dens, 0, nuci, dens_comp, dens,
 			seed_name, y_mw, tempt_cnt, self)
+	
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
 		yield err_mess
@@ -111,32 +119,34 @@ def middle(self): # define function
 		yield err_mess
 	
 	# prepare particle phase
-	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, 
-	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, self.TEMP[0],
-	 H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, num_sb, lowsize, 
-		uppsize, pmode, pconc, pconct, nuc_comp, 0, std, mean_rad, 
-		therm_sp, core_diss, space_mode, seedx,
-		act_coeff, partit_cutoff, Pnow, 
-		pcont, seed_mw, R_gas, self)
+	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, 
+	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, 
+	self.TEMP[0], H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, 
+	num_sb, lowsize, uppsize, pmode, pconc, pconct, 0, std, 
+	mean_rad, therm_sp, core_diss, space_mode, seedx,
+	act_coeff, partit_cutoff, Pnow, 
+	pcont, seed_mw, R_gas, self)
 	
 	# estimate total inputs of emitted components (ug/m3)
-	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, Cfactor, comp0, y_mw, Compt, self)
+	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, 
+		Cfactor, comp0, y_mw, Compt, self)
 	
 	# in case user has specified to spin-up simulation
 	if (self.spin_up == 1):
 
 		# spin-up problem
-		[y, N_perbin, x, Varr, rbou, Vbou] = ode_updater_su.ode_updater_su(y, H2Oi, 
+		[y, N_perbin, x, Varr, rbou, 
+		Vbou] = ode_updater_su.ode_updater_su(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, seed_name, seedx, 
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
-		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-		nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+		N_perbin, Vol0, rad0, np_sum, new_partr, 
+		nuci, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
-		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, MV,
+		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, 
+		lowsize, uppsize, std, rbou, MV,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0,
@@ -152,8 +162,8 @@ def middle(self): # define function
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
-		N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-		nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+		N_perbin, Vol0, rad0, np_sum, new_partr, 
+		nuci, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
 		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 		uppsize, std, rbou, MV,

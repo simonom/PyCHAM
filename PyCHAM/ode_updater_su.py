@@ -1,25 +1,27 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''updates integration constants and calls ODE solver for spin-up of simulation'''
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''updates integration constants and calls ODE solver for spin-up of 
+simulation'''
 # constants for the integration of the relevant ODEs are updated
 # at intervals and passed to the ODE solver to obtain solutions
 # in order to spin-up the simulation, ready for passing to ode_updater.py
@@ -60,8 +62,8 @@ def ode_updater_su(y, H2Oi,
 	core_diss, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou,
-	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
-	nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+	N_perbin, Vol0, rad0, np_sum, new_partr, 
+	nuci, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
 	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 	uppsize, std, rbou, MV, 
@@ -161,8 +163,8 @@ def ode_updater_su(y, H2Oi,
 	# 	partitioning
 	# self.jac_part_indx - index of inputs to Jacobian from particle
 	#	partitioning
-	# self.jac_extr_indx - index of inputs to Jacobian from extraction
-	#	of chamber air
+	# self.jac_extr_indx - index of inputs to Jacobian from 
+	# extraction of chamber air
 	# Vbou - volume boundary of size bins (um3)
 	# N_perbin - number concentration of particles per size bin 
 	#	(# particles/cm3 (air))
@@ -171,15 +173,17 @@ def ode_updater_su(y, H2Oi,
 	# np_sum - number concentration of newly nucleated particles 
 	#		(#/cc (air))
 	# new_partr - radius of newly nucleated particles (cm)
-	# nucv1, v2, v3 - nucleation parameters
+	# self.nucv1, self.nucv2, self.nucv3 - nucleation parameters
 	# nuci - index of nucleating component
-	# nuc_comp - the nucleating component
-	# nuc_ad - marker for whether to reduce time step to allow 
+	# self.nuc_comp - the nucleating component
+	# self.nuc_ad - marker for whether to reduce time step to allow 
 	#	for accurate capture of nucleation
 	# self.RH - relative humidities (fraction 0-1)
-	# self.RHt - times through experiment at which relative humidities reached (s)
+	# self.RHt - times through experiment at which relative 
+	#	humidities reached (s)
 	# coag_on - whether coagulation to be modelled
-	# inflectDp - particle diameter at which wall loss inflection occurs (m)
+	# inflectDp - particle diameter at which wall loss inflection 
+	#	occurs (m)
 	# pwl_xpre - x value preceding inflection point
 	# pwl_xpro - x value proceeding inflection point
 	# inflectk - deposition rate at inflection (/s)
@@ -329,13 +333,12 @@ def ode_updater_su(y, H2Oi,
 	x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cfactor, 
-	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
-	np_sum, update_count, injectt, gasinj_cnt, 
+	Vbou, tnew, np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
 	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
 	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
 	tempt_cnt, RHt_cnt, nuci, 
-	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
 
@@ -381,18 +384,23 @@ def ode_updater_su(y, H2Oi,
 			
 			# update chamber variables
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
-			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
-			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
+			update_count, Cinfl_now, seedt_cnt, Cfactor, 
+			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
+			RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
-			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
-			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
-			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
-			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
+			tnew, np_sum, update_count, 
+			injectt, gasinj_cnt0, inj_indx, Ct, pmode, 
+			pconc, pconct, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, 
+			mean_rad, corei, seedx, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, 
+			H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, tempt_cnt0, RHt_cnt0, nuci, nuc_comp,
-			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  
+			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			
 			# aligning time interval with pre-requisites -------------------------
@@ -448,16 +456,21 @@ def ode_updater_su(y, H2Oi,
 				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
 				
-					# flag that water gas-particle partitioning solved separately
+					# flag that water gas-particle 
+					# partitioning solved separately
 					self.odsw_flag = 1
-	
+					print(sumt)
+			
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
 					Cinfl_now, rowvalsn, colptrsn, num_comp, 
-					num_sb, act_coeff, core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
-					jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
+					num_sb, act_coeff, core_diss, kelv_fac, kimt, 
+					(num_sb-self.wall_on), 
+					jac_mod_len, jac_part_hmf_indx, rw_indx, 
+					N_perbin, jac_part_H2O_indx, H2Oi, self)
 				
-					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
+					# check on stability of water partitioning
+					if (any(y[H2Oi::num_comp] < 0.)):
 						
 						# identify components with negative concentrations
 						neg_comp_indx = y < 0.
@@ -636,14 +649,18 @@ def ode_updater_su(y, H2Oi,
 							0, p_char, e_field, (num_sb-self.wall_on), self)
 			
 
-				if (nucv1 > 0.): # nucleation
+				if (self.nucv1 > 0.): # nucleation
 					
-					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
-						N_perbin, y, y_mw.reshape(-1, 1),  
-						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
-						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on), self)
+					[N_perbin, y, x, Varr, np_sum, 
+					rbou, Vbou] = nuc.nuc(sumt, 
+					np_sum, N_perbin, y, 
+					y_mw.reshape(-1, 1),  
+					num_comp, Varr, x, new_partr, 
+					MV, siz_str, rbou, Vbou, 
+					(num_sb-self.wall_on), self)
 				
-				# reset count that tracks when next operator-split should be called (s)
+				# reset count that tracks when next 
+				# operator-split should be called (s)
 				update_count = 0.
 		
 		

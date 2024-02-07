@@ -1,24 +1,22 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to set up particle phase'''
 # using the user-defined or default values, the initial number size distribution is determined here
 
@@ -29,7 +27,7 @@ import part_nsd # calculating number size distributions
 def pp_intro(y, num_comp, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, pmode, pconc, 
-		pconct, nuc_comp, testf, std, mean_rad, therm_sp,
+		pconct, testf, std, mean_rad, therm_sp,
 		core_diss, space_mode, seedx, 
 		act_coeff, partit_cutoff, Press,
 		pcont, seed_mw, R_gas, self):
@@ -42,22 +40,26 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	# num_asb - number of size bins (excluding wall)
 	# lowersize - lowest size bin radius bound (um)
 	# uppersize - largest size bin radius bound (um)
-	# pmode - whether particle number concentrations given as modes or explicitly
-	# pconc - starting particle concentration (# particle/cc (air)) - if scalar then
-	# gets split between size bins in Size_distributions call, or if an array, elements 
-	# are allocated to corresponding size bins
-	# pconct - time(s) through experiment that particle number concentrations 
-	#	correspond to (s)
-	# nuc_comp - name of the nucleating component
-	# testf - test flag to say whether in normal mode (0) or test mode for front.py (1)
-	#       or test mode for pp_intro.py
-	# std - geometric standard deviation of the particle number concentration 
-	# 		(dimensionless)
-	# mean_rad - either the mean radius (um) of particles in lognormal number-size 
-	#			distribution (in which case pconc should be scalar), or mean radius of
-	#			particles where just one size bin present (in which case pconc is also
-	#			scalar)
-	# self.y_dens - liquid density of components (kg/m3) (num_comp, 1)
+	# pmode - whether particle number concentrations given as 
+	#	modes or explicitly
+	# pconc - starting particle concentration (# particle/cm3 (air))
+	#	 - if scalar then gets split between size bins in 
+	#	Size_distributions call, or if an array, elements 
+	# 	are allocated to corresponding size bins
+	# pconct - time(s) through experiment that particle number 
+	#	concentrations correspond to (s)
+	# self.nuc_comp - name of the nucleating component
+	# testf - test flag to say whether in normal mode (0) or test 
+	#	mode for front.py (1) or test mode for pp_intro.py
+	# std - geometric standard deviation of the particle number 
+	#	concentration (dimensionless)
+	# mean_rad - either the mean radius (um) of particles in 
+	#	lognormal number-size distribution (in which case pconc 
+	#	should be scalar), or mean radius of particles where 
+	#	just one size bin present (in which case pconc is also
+	#	scalar)
+	# self.y_dens - liquid density of components (kg/m3) 
+	#	(num_comp, 1)
 	# self.Psat - saturation vapour pressure of components (# molecules/cm3 (air))
 	# core_diss - core dissociation constant
 	# space_mode - string specifying whether to space size bins logarithmically or 
@@ -119,10 +121,10 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 			mean_radn = [mean_rad[:, i[0]]]
 	
 	# index of nucleating component
-	if len(nuc_comp)>0:
-		nuc_compi = self.comp_namelist.index(nuc_comp[0])
-		nuc_comp = np.empty(1, dtype=int)
-		nuc_comp[0] = nuc_compi
+	if (len(self.nuc_comp) > 0):
+		nuc_compi = self.comp_namelist.index(self.nuc_comp[0])
+		self.nuc_comp = np.empty(1, dtype=int)
+		self.nuc_comp[0] = nuc_compi
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	
@@ -338,5 +340,5 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	except: # not called from finisher simulation
 		N_perbin[:] = N_perbin[:]
 	
-	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, nuc_comp, rbou00, 
-			upper_bin_rad_amp, np_sum)
+	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb,
+		 rbou00, upper_bin_rad_amp, np_sum)

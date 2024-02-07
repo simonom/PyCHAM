@@ -1,7 +1,8 @@
-'''Code to plot results for limonene oxidation example (Fig. 1 of GMD paper)'''
-# aim is to exemplify the coupled integration of gas-phase chemistry and partitioning to
-# particles and wall, call from the PyCHAM home directory if inside PyCHAM, or, if 
-# inside the GMD paper folder, call from the Results folder
+'''Code to plot results for limonene oxidation example (Fig. 1 of GMD 
+paper)'''
+# aim is to exemplify the coupled integration of gas-phase chemistry 
+# and partitioning to
+# particles and wall
 
 # For the chemical scheme file use: limonene MCM PRAM sheme (fig01_scheme.txt)
 # For model variable inputs use: PyCHAM/output/GMD_paper_plotting_scripts/Results/fig01_mod_var.txt
@@ -146,14 +147,15 @@ def fig01_res_plot():
 
 
 	ax0.plot([1.5, 1.5], [0.0, 500.0], color='black', linewidth=1, linestyle='dashed')
-	ax0.text(x=1.2, y=1, s='injection 1', size=12, rotation=90, color='black')
+	ax0.text(x=1.2, y=1, s='injection 1', size=12, rotation=90, 
+		color='black')
 	ax0.plot([4.0, 4.0], [0.0, 500.0], color='black', linewidth=1, linestyle='dashed')
 	ax0.text(x=3.7, y=1, s='injection 2', size=12, rotation=90, color='black')
 
 	ax0.legend(fontsize=10)
 	ax0.text(x=(timehr)[0]-0.2, y=1.6e2, s='(a)', size=12)
 	
-	# ----------------------------------------------------------------------------------------
+	# --------------------------------------------------------------
 	# particle-phase properties
 
 	# number size distribution (dN/dlog10(Dp))

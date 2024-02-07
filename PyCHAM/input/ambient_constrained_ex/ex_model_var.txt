@@ -9,11 +9,7 @@ DayOfYear = 151
 # 1am GMT is 9am Singapore time (-8 hours from GMT)
 daytime_start = 3.6e3
 light_status = 1
-temperature = 288.
-tempt = 0.
 p_init = 101300
-rh = 0.90
-rht = 0.
 C0 = 27., 14., 4., 0.039, 150., 2000. 
 Comp0 = NO2, NO, O3, APINENE, CO, CH4
 cont_infl = cont_infl.xlsx

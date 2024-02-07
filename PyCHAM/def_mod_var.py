@@ -1,24 +1,22 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''default model variables'''
 # the default model variables, loaded by PyCHAM on starting
 
@@ -94,13 +92,14 @@ def def_mod_var(caller, self): # define function
 	mean_rad = np.ones((1, 1))*-1.e6 # mean radius for particle number size distribution (um)
 	new_partr = 2.e-7 # radius of newly nucleated particles (cm)
 	# nucleation parameters
-	nucv1 = 0.
-	nucv2 = 0.
-	nucv3 = 0.
-	nuc_comp = ['core'] # chemical scheme name of nucleating component
-	# marker to say whether or not to adapt integration time interval 
-	# and initial condition update to nucleation
-	nuc_ad = 1
+	self.nucv1 = 0.
+	self.nucv2 = 0.
+	self.nucv3 = 0.
+	# chemical scheme name of nucleating component
+	self.nuc_comp = ['core'] 
+	# marker to say whether or not to adapt integration time 
+	# interval and initial condition update to nucleation
+	self.nuc_ad = 1
 	ser_H2O = 1 # whether to serialise gas-particle partitioning of water
 	coag_on = 1 # whether to model coagulation
 	# flag for particle-phase history with respect to water (0 for dry and therefore 
@@ -217,13 +216,17 @@ def def_mod_var(caller, self): # define function
 
 	# prepare for pickling
 	list_vars = [sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			siz_stru, num_sb, pmode, pconc, pconct, 
+			lowsize, 
 			uppsize, space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			Compt, injectt, Ct, seed_name, seed_mw, 
+			seed_diss, seed_dens, 
 			seedx, dens_comp, dens, vol_comp, 
-			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 
-			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
-			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+			volP, act_comp, act_user, accom_comp, 
+			accom_val, uman_up, 
+			int_tol, new_partr, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, 
 			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
@@ -240,10 +243,11 @@ def def_mod_var(caller, self): # define function
 	return(sav_nam, comp0, y0, Press, siz_stru, num_sb, 
 		pmode, pconc, pconct, lowsize, uppsize, 
 		space_mode, std, mean_rad, Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, seedx,  
+		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+		seedx,  
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
+		accom_comp, accom_val, uman_up, int_tol, new_partr,
+		coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 
-		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, pcont, 
-		z_prt_coeff, chamV, self)
+		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, 
+		pcont, z_prt_coeff, chamV, self)

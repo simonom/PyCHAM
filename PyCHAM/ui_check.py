@@ -1,26 +1,29 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''checking that user inputs are valid and providing appropriate modification to the PyCHAM GUI'''
-# once model variables are validated, this module also allows options in the GUI for continuing with simulations
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''checking that user inputs are valid and providing appropriate 
+	modification to the PyCHAM GUI'''
+# once model variables are validated, this module also allows options 
+# in the GUI for continuing with simulations
 
 import os
 import sys
@@ -33,35 +36,36 @@ from PyQt5.QtCore import *
 import write_hyst_eq
 import hyst_eq
 import importlib
+import math
 
 def ui_check(self):
 	
-	# inputs: ----------------------------------------------------------------------
+	# inputs: ------------------------------------------------------
 	# self - reference to GUI
-	# --------------------------------------------------------------------------------
+	# --------------------------------------------------------------
 	
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, Press,
-		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+		uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
-		chamV] = pickle.load(pk)
+		accom_comp, accom_val, uman_up, int_tol, new_partr, 
+		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 		ser_H2O, wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 		chamV] = pickle.load(pk)
 		pk.close()	
 
-	# loaded variables: ------------------------------------------------------------
+	# loaded variables: --------------------------------------------
 	# sav_nam - name of folder to save results to
 	# self.sch_name - name of chemical scheme file
 	# self.wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
 	# num_sb - number of particle size bins
-	# pmode - whether particle number concentrations expressed by mode or explicitly
+	# pmode - whether particle number concentrations expressed 
+	#	by mode or explicitly
 	# pconc - number concentration of particles
 	# pconct - times of particle injection (s)
 	# lowsize - lower bound of particle sizes (um)
@@ -73,37 +77,46 @@ def ui_check(self):
 	# self.chem_sch_mark - markers in chemical scheme
 	# self.af_path - actinic flux path
 	# int_tol - integration tolerances
-	# self.update_stp - time step for updating ODE initial conditions (s)
+	# self.update_stp - time step for updating ODE initial 
+	# conditions (s)
 	# self.tot_time - total experiment time (s)
 	# self.RH - relative humidity (0-1)
 	# uman_up - marker for whether to update UManSysProp folder
 	# self.light_stat - marker for whether lights on or off
 	# self.light_time - time that lights attain status
-	# injectt - times of instantaneous injections of gas-phase components (s)
-	# Ct - concentrations of components instantaneously injected (ppb)
+	# injectt - times of instantaneous injections of gas-phase 
+	# components (s)
+	# Ct - concentrations of components instantaneously injected 
+	# (ppb)
 	# dens_comp - chemical scheme names of components with density 
 	# manually assigned
 	# dens - manually assigned densities (g/cc)
 	# seed_name - name of component(s) comprising seed particles
 	# seedx - mole fraction of dry seed components
-	# seed_diss - dissociation constant for seed particle component(s)
-	# partit_cutoff - product of vapour pressure and activity coefficient
-	# 	above which gas-particle partitioning assumed zero
-	# wat_hist - flag for particle-phase history with respect to water 
-	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
+	# seed_diss - dissociation constant for seed particle 
+	# 	component(s)
+	# partit_cutoff - product of vapour pressure and activity 
+	# 	coefficient above which gas-particle partitioning 
+	# 	assumed zero
+	# wat_hist - flag for particle-phase history with respect to 
+	# 	water (0 on the deliquescence curve, 1 on the 
+	#	efflorescence curve)
 	# self.con_infl_t - times of continuous influx of components
-	# self.con_infl_nam - chemical scheme names of components with continuous influx
-	# self.con_infl_C - influx rate of components with continuous influx (ppb/s)
-	# self.Vwat_inc - flag for whether (1) or not (0) the number size 
-	# distribution of seed particles includes the volume of water
-	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
-	# seeds before experiment starts
-	# z_prt_coeff - fraction of total gas-particle partitioning coefficient
-	#	below which partitioning treated as negligible, e.g. because a 
-	#	size bin has relatively very small surface area
+	# self.con_infl_nam - chemical scheme names of components with 
+	#	continuous influx
+	# self.con_infl_C - influx rate of components with continuous 
+	#	influx (ppb/s)
+	# self.Vwat_inc - flag for whether (1) or not (0) the number 
+	#	size distribution of seed particles includes the volume
+	# 	of water
+	# seed_eq_wat - whether (1) or not (0) to allow water to 
+	#	equilibrate with seeds before experiment starts
+	# z_prt_coeff - fraction of total gas-particle partitioning 
+	#	coefficient below which partitioning treated as 
+	# 	negligible, e.g. because a size bin has relatively 
+	#	very small surface area
 	# self.testf - flag for testing and plotting checks of inputs
-	# --------------------------------------------------------------------
-	
+	# -------------------------------------------------------------
 	# to begin assume no errors, so message is that simulation ready
 	err_mess = 'Model variables fine - simulation ready'
 	em_flag = 0 # flag that no problematic errors detected
@@ -114,20 +127,42 @@ def ui_check(self):
 	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
 	# one folder for one simulation
-	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
-	# -------------------------------------------------------------------
-	# check on chemical scheme markers. In older PyCHAM versions only 12
-	# markers were needed, but at least as of v4.4.0, 13 are needed. But
-	# if only 12 are provided then assume the final marker (relating to 
-	# start of reaction lines for surfaces) is empty
+	output_by_sim = os.path.join(dir_path, output_root, filename, 
+		sav_nam)
+	#--------------------------------------------------------------
+	# check on chemical scheme markers. In older PyCHAM versions 
+	# only 12 markers were needed, but at least as of v4.4.0, 13 
+	# are needed. But if only 12 are provided then assume the final
+	#  marker (relating to start of reaction lines for surfaces) is 
+	# empty
 	if (len(self.chem_sch_mrk) == 12):
 		self.chem_sch_mrk.append('')
 	else:
 		if (len(self.chem_sch_mrk) != 13):
-			err_mess = str('Error - the number chemical scheme markers (' + str(len(self.chem_sch_mrk)) + ') is not 13, and it must; please check the guidelines in README')
+			err_mess = str('Error - the number chemical of \
+				scheme markers (' + str(len(\
+				self.chem_sch_mrk)) + ') is not 13,\
+				and it must be; please check the \
+				guidelines in README')
 
-	# -------------------------------------------------------------------
-
+	# --------------------------------------------------------------
+	# check on nucleation parameters
+	# below taken from nuc
+	# Gompertz function (for asymmetric sigmoid curve): 
+	# https://en.wikipedia.org/wiki/Gompertz_function
+	if (self.nucv3 > 0):
+		nsum1 = self.nucv1*np.exp(self.nucv2*(np.exp(
+			-self.update_stp/self.nucv3)))
+		if (math.isinf(nsum1)):
+			err_mess = str('Error - the provided '
+				'nucleation '
+				'parameters generate an invalid '
+				'function, please modify, using the '
+				'nucleation function checker in the '
+				'\'Check Values\' button of the '
+				'\'Simulate\' tab, and the '
+				'corresponding drop-down selection')
+	# --------------------------------------------------------------
 	# check on skipping parsing
 	if self.pars_skip == 1:
 		try:
@@ -545,18 +580,21 @@ def ui_check(self):
 	
 	# store in pickle file
 	list_vars = [sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-			uppsize, space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 			uppsize, space_mode, std, mean_rad, 
+			Compt, injectt, Ct, seed_name, seed_mw, 
+			seed_diss, seed_dens, 
 			seedx, dens_comp, dens, vol_comp, 
-			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
-			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
-			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+			volP, act_comp, act_user, accom_comp, 
+			accom_val, uman_up, 	
+			int_tol, new_partr,
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, 
 			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
 
-	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
+	# the file to be used for pickling
+	with open(input_by_sim, 'wb') as pk: 
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close
 	

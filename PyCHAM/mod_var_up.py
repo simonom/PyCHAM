@@ -1,24 +1,23 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+
+#########################################################################								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to update displayed model variables in PyCHAM GUI'''
 
 import os
@@ -35,12 +34,13 @@ def mod_var_up(self):
 		
 	with open(input_by_sim, 'rb') as pk:
 		[sav_nam, comp0, y0, Press,
-		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+		uppsize, space_mode, std, mean_rad, 
 		Compt, injectt, Ct, seed_name,
 		seed_mw, seed_diss, seed_dens, seedx,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
-		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+		accom_comp, accom_val, uman_up, int_tol, new_partr, 
+		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
 		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamV] = pickle.load(pk)
@@ -80,11 +80,11 @@ def mod_var_up(self):
 	self.l30a.setText((str(std)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l31a.setText((str(mean_rad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l32a.setText((str(new_partr)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l33a.setText((str(nucv1)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l34a.setText((str(nucv2)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l35a.setText((str(nucv3)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l36a.setText((str(nuc_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l37a.setText((str(nuc_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l33a.setText((str(self.nucv1)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l34a.setText((str(self.nucv2)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l35a.setText((str(self.nucv3)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l36a.setText((str(self.nuc_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l37a.setText((str(self.nuc_ad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l38a.setText((str(ser_H2O)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l38_1a.setText((str(coag_on)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l38_2a.setText((str(wat_hist)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
