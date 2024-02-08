@@ -156,102 +156,30 @@ def extr_mech(int_tol, num_sb,
 			# of components
 			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
 		except:
-			# if water then we know it will be the next component to 
+			# if water then we know it will be the next 
+			# component to
 			# be appended to the component list
 			if (self.const_comp[i] == 'H2O'):
-				self.con_C_indx[i] = len(self.comp_namelist)
+				self.con_C_indx[i] = len(
+					self.comp_namelist)
 			else: # if not water
 				erf = 1 # raise error
-				err_mess = str('Error: constant concentration 
-				component with name ' + str(self.const_comp[i]) + ' 
-				has not been identified in the chemical scheme, 
-				please check it is present and the chemical 
-				scheme markers are correct')
+				err_mess = str('''Error: constant 
+				concentration 
+				component with name ''' + 
+				str(self.const_comp[i]) + ''' 
+				has not been identified in the 
+				chemical scheme, 
+				please check it is present and the 
+				chemical scheme markers are correct''')
 	
 	# if observation file provided for constraint
 	if hasattr(self, 'obs_file') and self.obs_file != []:
 
-		import openpyxl
-		import os
-		
-		self.obs_file = str(self.obs_file)
-		wb = openpyxl.load_workbook(filename = self.obs_file)
-		sheet = wb['PyCHAMobs']
-		# time (seconds) is in first column, other 
-		# variables in later columns
-		ic = 0 # count on row iteration
-		# column indices for temperature and 
-		# relative humidity
-		temper_indx = 0
-		rh_indx = 0
-		# index for columns of components
-		comp_indx = []
-		# loop through rows
-		for i in sheet.iter_rows(values_only = True):
-			if (ic == 0):
-				# get chemical scheme names of variables
-				names_xlsx = i[1::]
-				# prepare for variable names
-				self.obs_comp = []
-				# keep count on column index
-				col_num = 0
-				for oc in names_xlsx:
-					# keep count on column index
-					col_num += 1
-					if (oc == None):
-						continue
-					if (oc == 'Temperature (K)'):
-						temper_indx = col_num
-						self.TEMP = []
-						self.tempt = []
-						continue
-					if (oc == 'RH (0-1)'):
-						rh_indx = col_num
-						self.RH = []
-						self.RHt = []
-						continue
-					# if none of the above, then 
-					# assume it's a chemical components
-					self.obs_comp.append(oc)
-					comp_indx.append(col_num)
+		from obs_file_open import obs_file_open
+		self = obs_file_open(self)
 
-				# get number of components to consider
-				nc_obs = len(self.obs_comp)
-				# prepare to store observations, not 
-				# forgetting a column for time
-				self.obs = np.zeros((1, nc_obs+1))
-				comp_indx = np.array((comp_indx)).astype('int')
-				rh_indx = np.array((rh_indx)).astype('int')
-				temper_indx = np.array((temper_indx)).astype('int')
-			else:
-				if (ic > 1): # add row onto data array
-					self.obs = np.concatenate((self.obs, 
-						(np.zeros((1, nc_obs+1)))), axis=0)
-				
-				self.obs[ic-1, 1::] = np.array((i))[0:col_num+1][comp_indx]
-				# get times (s)
-				self.obs[ic-1, 0] = np.array((i))[0]
-
-				# temperature and relative humidity observations
-				self.TEMP.append(np.array((i))[temper_indx])
-				self.tempt.append(i[0])
-				self.RH.append(np.array((i))[rh_indx])
-				self.RHt.append(i[0])
-				
-			ic += 1 # count on row iteration
-		
-		# ensure numpy array for rh arrays
-		self.RH = np.array((self.RH))
-		self.RHt = np.array((self.RHt))
-		wb.close() # close excel file
-		
-		# get indices of components with concentrations to fit observations
-		self.obs_comp_i = np.zeros((len(self.obs_comp))).astype('int')
-		for i in range(len(self.obs_comp)):
-			self.obs_comp_i[i] = self.comp_namelist.index(self.obs_comp[i])
-
-	# ---------------------------------------------------------------------
-
+	# -------------------------------------------------------------
 	if (comp_num in self.con_infl_indx):
 
 		self.H2Oin = 1 # flag for water influx

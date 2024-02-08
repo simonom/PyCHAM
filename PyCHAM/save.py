@@ -1,26 +1,28 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to save PyCHAM results to files'''
-# module called following simulation in PyCHAM to store generated and input information
+# module called following simulation in PyCHAM to store generated and 
+# input information
 
 import os
 import sys
@@ -43,15 +45,19 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# (air) into ppb
 	# testf - flag to show whether in normal mode (0) or test mode (1)
 	# numsb - number of size bins
-	# self.dydt_vst - tendency to change of user-specified components
+	# self.dydt_vst - tendency to change of user-specified 
+	# components
 	# self.dydt_trak - user-input names of components to track
-	# self.comp_namelist - names of components given by the chemical scheme file
-	# upper_bin_rad_amp - factor upper bin radius found increased by in 
-	#						Size_distributions.py for more than 1 size bin, or in 
-	# 						pp_intro.py for 1 size bin
-	# Cfactor_vst - one billionth the molecular concentration in a unit volume of chamber
-	#				(# molecules/cm3) per recording time step
-	# time_taken - computer processing time for entire simulation (s)
+	# self.comp_namelist - names of components given by the 
+	# chemical scheme file
+	# upper_bin_rad_amp - factor upper bin radius found increased 
+	#	by in Size_distributions.py for more than 1 size bin, 
+	# 	or in pp_intro.py for 1 size bin
+	# Cfactor_vst - one billionth the molecular concentration in a 
+	#	unit volume of chamber (# molecules/cm3) per recording 
+	# time step
+	# time_taken - computer processing time for entire simulation 
+	#	(s)
 	# seed_name - name of seed component
 	# y_mw - molecular weights (g/mol)
 	# self.nom_mass - nominal molar mass (g/mol)
@@ -279,23 +285,73 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	fname = os.path.join(output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')
 	np.savetxt(fname, [indx_plot, comp0], delimiter =', ', header='index (top row) and chemical scheme name (bottom row) of components with initial gas-phase concentrations specified', fmt ='% s') 
 	
-	# if tracking of tendencies to change requested by user, loop through the components
+	# if tracking of tendencies to change requested by user, 
+	# loop through the components
 	# and save the tendency record for each of these (%/hour)
 	if (len(self.dydt_vst) > 0):
 		compind = 0
-		dydtnames = self.dydt_vst['comp_names'] # get names of tracked components
-		# loop through components to record the tendency of change \n')
+		# get names of tracked components
+		dydtnames = self.dydt_vst['comp_names'] 
+		
+
+		if hasattr(self, 'sim_ci_file'):
+			# times (s)
+			self.ci_array = np.concatenate((self.ci_array, 
+				np.zeros((self.ci_array.shape[0], 
+				len(t_out)-1)).astype('str')), axis=1)
+			self.ci_array[0, 1::] = t_out[0:-1].astype(str) 
+			
+
+		# loop through components to record the tendency of 
+		# change 
 		for comp_name in dydtnames:
-			# open relevant dictionary value, to get the 2D numpy array for saving
-			dydt_rec = np.array(self.dydt_vst[str(str(comp_name) + '_res')])
+			# open relevant dictionary value, to get the 
+			# 2D numpy array for saving
+			dydt_rec = np.array(self.dydt_vst[
+				str(str(comp_name) + '_res')])
 			
 			# get user-input name of this component
-			comp_name = str(self.dydt_trak[compind] +'_rate_of_change')
+			comp_name = str(self.dydt_trak[compind] +
+				'_rate_of_change')
 			# save
-			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), penultimate column is gas-particle partitioning and final column is gas-wall partitioning (molecules/cc.s (air))')
+			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), 3rd column from end is gas-particle partitioning, 2nd column from end is gas-wall partitioning, final column is dilution (molecules/cm3/s (air))')
+
+			if hasattr(self, 'sim_ci_file'):
+				# get relevant row
+				ri = self.ci_array[:, 0] == str(
+					self.dydt_trak[compind])
+
+				# influx rate
+				self.ci_array[ri, 1::] = self.dydt_vst[
+					str(str(
+					self.dydt_trak[compind]) + 
+					'_ci')][:, 0]
 			compind += 1
-	
-	
+
+		if hasattr(self, 'sim_ci_file'):
+			from openpyxl.utils.cell import\
+			get_column_letter
+
+			# writing to excel file
+			from openpyxl import Workbook
+			wb = Workbook()
+			ws = wb.active
+			# loop through columns in first row
+			for ic in range(self.ci_array.shape[1]):
+				col_lett = get_column_letter(ic+1)
+				# cell code
+				cc = str(col_lett + '1')
+				ws[cc] = self.ci_array[0, ic]
+			# loop through other rows
+			for ir in range(1, self.ci_array.shape[0]):
+				ws.append(self.ci_array[ir, :].tolist())
+			# parent directory of model variables 
+			# file
+			pd_indx = self.inname[::-1].index('/')
+			pd = self.inname[0:-pd_indx]
+			# save
+			wb.save(pd + self.sim_ci_file)
+		
 	# saving generation of components
 	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised Vself.OC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	

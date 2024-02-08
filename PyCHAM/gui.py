@@ -872,17 +872,23 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(l70b, scp_row+0, 0)
 		
 		l70 = QLabel(self)
-		l70.setText('Chemical scheme name of components \nto track process tendencies: ')
+		l70.setText('''Chemical scheme name of components \nto 
+			track process tendencies: ''')
 		self.varbox.addWidget(l70, scp_row+1, 0)
 		self.l70a = QLabel(self)
-		self.l70a.setText((str(self.dydt_trak)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l70a.setText((str(self.dydt_trak)).replace('\'', 
+			'').replace(' ', '').replace('[', 
+			'').replace(']', ''))
 		self.varbox.addWidget(self.l70a, scp_row+1, 1)
 		
 		l71 = QLabel(self)
-		l71.setText('Chemical scheme name of components \nwith specified densities: ')
+		l71.setText('''Chemical scheme name of components 
+			\nwith specified densities: ''')
 		self.varbox.addWidget(l71, scp_row+2, 0)
 		self.l71a = QLabel(self)
-		self.l71a.setText((str(dens_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l71a.setText((str(dens_comp)).replace('\'', 
+			'').replace(' ', '').replace('[', 
+			'').replace(']', ''))
 		self.varbox.addWidget(self.l71a, scp_row+2, 1)
 		
 		l72 = QLabel(self)
@@ -2045,26 +2051,31 @@ class PyCHAM(QWidget):
 			# look for corresponding files here
 			for i in dir_con:
 				if ('chem' in i): # chemical scheme file
-					self.sch_name = str(fol_nme+'/'+i)
+					self.sch_name = str(fol_nme+'/'
+						+i)
 				if ('xml' in i): # xml file
-					self.xml_name = str(fol_nme+'/'+i)
+					self.xml_name = str(fol_nme+'/'
+						+i)
 				if ('var' in i): # model variables file
 					self.inname = str(fol_nme+'/'+i)
 		
-		# if not a directory then assume it is a model variable file
+		# if not a directory then assume it is a model 
+		# variable file
 		except:
 			self.inname = fol_nme
 
 		# read in model variables of this model variables file 
 		# and store to pickle
 		# Note that doing this call after searching for 
-		# files with names containing 'chem' means that any chemical 
+		# files with names containing 'chem' means that any 
+		# chemical 
 		# scheme files specified in the model variables overide
 		# any foun by automatic search
 		import mod_var_read
 		mod_var_read.mod_var_read(self)
 
-		# end this function if an error thrown by reading of model variables
+		# end this function if an error thrown by reading of 
+		# model variables
 		if (self.bd_st == 1 or self.bd_st == 2):
 			return()
 			

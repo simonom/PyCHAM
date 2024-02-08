@@ -26,7 +26,6 @@ import rrc_calc
 import cham_up
 import scipy.constants as si
 import importlib
-import dydt_rec
 import act_coeff_update
 
 # define function
@@ -303,13 +302,19 @@ def rec_prep(nrec_step, y, y0,
 	dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
 	wat_hist, act_coeff, num_comp, (num_sb-self.wall_on))
 
-	# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-	# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
+	# before solving ODEs for chemistry, gas-particle partitioning 
+	# and gas-wall partitioning, 
+	# estimate and record any change tendencies (# molecules/cm3/s)
+	# resulting from these processes
 	if (self.testf != 5 and len(self.dydt_vst) > 0):
+		import dydt_rec
 		importlib.reload(dydt_rec) # import most recent version
 		dydt_cnt = 0 # index for row to record on
-		self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, num_comp, core_diss, kelv_fac, 
-				kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self)
+		self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, 
+			num_comp, core_diss, kelv_fac, 
+			kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist,
+			 pconc, self)
 						
-	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, seedt_cnt, rbou_rec, Cfactor, 
-		infx_cnt, temp_now, cham_env, Pnow, cham_env[0, 2], Cinfl_now)
+	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
+		seedt_cnt, rbou_rec, Cfactor, infx_cnt, temp_now, 
+		cham_env, Pnow, cham_env[0, 2], Cinfl_now)

@@ -284,51 +284,81 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	# tracked components (dydt)--------------------------------------
 	
 	# check for tracking of all alkyl peroxy radicals
-	if ('RO2_ind' in self.dydt_trak): # append existing list and list of RO2 radicals
-		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO2_indices[:, 1]]).tolist()
+	if ('RO2_ind' in self.dydt_trak):
+		# append existing list and list of RO2 radicals 
+		self.dydt_trak = self.dydt_trak + ((np.array((
+			self.comp_namelist)))[self.RO2_indices[:, 
+			1]]).tolist()
 	
-		# remove the RO2_ind item from the tracked component list
+		# remove the RO2_ind item from the tracked component 
+		# list
 		self.dydt_trak.remove('RO2_ind')
 
 	# check for tracking of all alkoxy radicals
-	if ('RO_ind' in self.dydt_trak): # append existing list and list of RO radicals
-		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO_indx]).tolist()
+	if ('RO_ind' in self.dydt_trak):
+		# append existing list and list of RO radicals 
+		self.dydt_trak = self.dydt_trak + ((np.array((
+		self.comp_namelist)))[self.RO_indx]).tolist()
 	
 		# remove the RO_ind item from the tracked component list
 		self.dydt_trak.remove('RO_ind')
 
-	# get index of user-specified components for tracking their change tendencies (dydt) due to modelled
-	# mechanisms
+	# get index of user-specified components for tracking their 
+	# change tendencies (dydt) due to modelledmechanisms
 	if (len(self.dydt_trak) > 0):
 		
-		dydt_traki = [] # empty list for indices of these components
-		
+		# empty list for indices of these components
+		dydt_traki = [] 	
+
 		for i in range (len(self.dydt_trak)):
 
-			reac_index = [] # indices of reactions involving this component
-			# value for whether this component is reactant or product in a reaction and stoichiometry
+			# indices of reactions involving this component
+			reac_index = [] 
+			# value for whether this component is reactant 
+			# or product in a reaction and stoichiometry
 			reac_sign = []
 			
-			if (self.dydt_trak[i] != 'RO2' and self.dydt_trak[i] != 'HOMRO2'):
+			if (self.dydt_trak[i] != 'RO2' and 
+				self.dydt_trak[i] != 'HOMRO2'):
 			
 				# index of components in component list
 				try:
-					y_indx = self.comp_namelist.index(self.dydt_trak[i])
-				# if component not already listed via interpretation of the chemical scheme
+					y_indx = self.comp_namelist.\
+					index(self.dydt_trak[i])
+				# if component not already listed via 
+				# interpretation of the chemical scheme
 				# then send error message
 				except:
 					erf = 1
-					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+					err_mess = str('''Error: 
+					component called ''' + 
+					str(self.dydt_trak[i]
+					) + ''', which is specified to 
+					be tracked in the model 
+					variables input file has not 
+					been found in the chemical 
+					scheme.  Please check the scheme
+					 and associated chemical scheme 
+					markers, which are stated in 
+					the model variables input 
+					file.''')
 					return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0)
-				# remember index for plotting gas-phase concentrations later
+				# remember index for plotting gas-phase
+				# concentrations later
 				dydt_traki.append([int(y_indx)])
 			
-				# search through reactions to see where this component is reactant or product
+				# search through reactions to see 
+				# where this component is reactant or 
+				# product
 				for ri in range(num_eqn):
-					if sum(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx) > 0:
-						reac_index.append(int(ri)) # append reaction index
+					if sum(self.rindx_g[ri, 
+						0:self.nreac_g[ri]] == 
+						y_indx) > 0:
+						# append reaction index
+						reac_index.append(int(
+						ri)) 
 						reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
 						reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
 					if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
@@ -378,25 +408,46 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 							reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
 				y_indx = self.HOMRO2_indx[:] # ready for storing below
 				
-			# save reaction indices in dictionary value for this component,
-			# when creating empty rec_array, add two columns onto the end for particle- and 
-			# wall-partitioning, respectively
-			rec_array = np.zeros((nrec_steps, len(reac_index)+2))
-			rec_array[0, 0:-2] = reac_index
+			# save reaction indices in dictionary value 
+			# for this component,
+			# when creating empty rec_array, add three 
+			# columns onto the end for 
+			# particle-partitioning, wall-partitioning and 
+			# dilution
+			rec_array = np.zeros((nrec_steps, 
+				len(reac_index)+3))
+			rec_array[0, 0:-3] = reac_index
 
-			comp_indx_str = str(self.dydt_trak[i] + '_comp_indx')
+			comp_indx_str = str(self.dydt_trak[i] + 
+				'_comp_indx')
 			res_string = str(self.dydt_trak[i] + '_res')
-			reac_string = str(self.dydt_trak[i] + '_reac_sign')
-			
-			self.dydt_vst[comp_indx_str] = y_indx # dictionary entry to hold index of tracked component
-			self.dydt_vst[res_string] = rec_array # dictionary entry to hold reaction indices and results
-			self.dydt_vst[reac_string] = reac_sign # dictionary entry to hold results
+			reac_string = str(self.dydt_trak[i] + 
+				'_reac_sign')
+	
+			if hasattr(self, 'sim_ci_file'):
+				ci_string = str(self.dydt_trak[i] + 
+					'_ci')
+				ci_arrayi = np.zeros((nrec_steps-1, 1))
+			# dictionary entry to hold index of tracked 
+			# component	
+			self.dydt_vst[comp_indx_str] = y_indx
+			# dictionary entry to hold reaction indices 
+			# and results 
+			self.dydt_vst[res_string] = rec_array
+			# dictionary entry to hold sign (source or sink
+			# per reaction) 
+			self.dydt_vst[reac_string] = reac_sign 
+			if hasattr(self, 'sim_ci_file'):
+				# dictionary entry to hold continuous 
+				#influx rate
+				self.dydt_vst[ci_string] = ci_arrayi
 
-
-		# dictionary entry to hold component names of components to track
+		# dictionary entry to hold component names of 
+		# components to track
 		self.dydt_vst['comp_names'] = self.dydt_trak
 		
-		# call on write_dydt_rec to generate the module that will process
+		# call on write_dydt_rec to generate the module that 
+		# will process
 		# the tendency to change during the simulation
 		write_dydt_rec.write_dydt_rec(self)
 	

@@ -48,20 +48,26 @@ def def_mod_var(caller, self): # define function
 	self.tot_time = 1. # total time to integrate over (s)
 	self.save_step = 1. # time interval between saving results (s)
 	if (caller == 0): # called from PyCHAM
-		uman_up = 0 # marker for whether to update the UManSysProp folder
+		# marker for whether to update the UManSysProp folder
+		uman_up = 0 
 	if (caller == 1): # called from Travis
 		uman_up = 1
-	int_tol = [1.e-3, 1.e-4] # integration tolerances (absolute first, relative second)
+	# integration tolerances (absolute first, relative second)
+	int_tol = [1.e-3, 1.e-4] 
 	self.testf = 0 # whether in testing mode or not
 	self.pars_skip = 0 # whether to skip chemical scheme parsing
 	self.spin_up = 0 # whether to spin up chemistry
-	# whether to remove influxes of components that aren't seen in chemical scheme
+	# whether to remove influxes of components that aren't seen in 
+	# chemical scheme
 	self.remove_influx_not_in_scheme = 0
 	
-	# environment -----------------------------------------------------------------
-	self.TEMP = np.array((298.15)).reshape(1) # temperature of experiment (K)
-	self.tempt = np.array((0.0)).reshape(1) # time that temperatures reached (s)	
-	self.RH = np.array(([0.65])) # humidity of experiment (fraction of 1)
+	# environment -------------------------------------------------
+	# temperature of experiment (K)
+	self.TEMP = np.array((298.15)).reshape(1)
+	# time that temperatures reached (s) 
+	self.tempt = np.array((0.0)).reshape(1)	
+	# humidity of experiment (fraction of 1)
+	self.RH = np.array(([0.65])) 
 	self.RHt = np.array(([0])) # time through simulation (s) RH reached
 	Press = 9.8e4 # air pressure during experiment (Pa)
 	self.dil_fac = np.zeros(1) # dilution factor (volume fraction per second)
@@ -203,17 +209,19 @@ def def_mod_var(caller, self): # define function
 	# user-specified activity coefficients of components with names given 
 	# in act_comp
 	act_user = []
-	# names of components with user-defined accommodation coefficients	
+	# names of components with user-defined accommodation 
+	# coefficients	
 	accom_comp = []
 	# user-defined accommodation coefficients
 	accom_val = []
 
-	# fixing to observations ---------------------------------------------
+	# fixing to observations --------------------------------------
 	self.obs_file = [] # path to observations file
 	# components to fix to observed
 	self.obs_comp_i = []
-	# --------------------------------------------------------------------
-
+	# name of file to save calculated continuous influx rates to
+	self.sim_ci_file = []
+	# -------------------------------------------------------------
 	# prepare for pickling
 	list_vars = [sav_nam, comp0, y0, Press, 
 			siz_stru, num_sb, pmode, pconc, pconct, 

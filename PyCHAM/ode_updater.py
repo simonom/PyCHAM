@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -41,7 +44,6 @@ except: # in case of a bad function
 	if os.path.exists('ode_solv'): # remove any bad functions
 		os.remove(ode_solv)
 import ode_solv_wat
-import dydt_rec
 import importlib
 import save
 import time
@@ -96,14 +98,16 @@ def ode_updater(y, H2Oi,
 	# self.lat - latitude of experiment (degrees)
 	# self.lon - longitude of experiment (degrees)
 	# self.af_path - path to actinic flux values
-	# self.dayOfYear - number of days since 31st December experiment held on
+	# self.dayOfYear - number of days since 31st December 
+	#	experiment held on
 	# self.photo_path - path to file with absorption cross-sections
 	# 		and quantum yields
 	# Jlen - number of photochemical reactions
-	# self.con_infl_C - influx of components with continuous influx (# molecules/cm3/s)
+	# self.con_infl_C - influx of components with continuous 
+	#	influx (# molecules/cm3/s)
 	# nrec_step - number of recording steps
-	# self.dydt_vst - dictionary for holding change tendencies of specified
-	#		components
+	# self.dydt_vst - dictionary for holding change tendencies of 
+	#	specified components
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
@@ -234,21 +238,26 @@ def ode_updater(y, H2Oi,
 	#		Fuller et al. (1969)
 	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
 	# corei - index of core component
-	# ser_H2O - whether to serialise the gas-particle partitioning of water
-	# self.C_p2w - concentration of components on the wall due to particle
-	# deposition to wall (# molecules/cm3)
+	# ser_H2O - whether to serialise the gas-particle partitioning 
+	#	of water
+	# self.C_p2w - concentration of components on the wall due to 
+	#	particle deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
 	# sav_nam - name of folder to save in
 	# self.comp_namelist - chemical scheme name of components
 	# self.dydt_trak - name of components to track change tendencies
-	# space_mode - type of spacing used in particle size distribution
+	# space_mode - type of spacing used in particle size 
+	#	distribution
 	# rbou00 - original particle size bin bounds
 	# ub_rad_amp - amplificatin factor for upper bin size bound
-	# indx_plot - indices of components to plot the gas-phase temporal profile of
-	# comp0 - names of components to plot the gas-phase temporal profile of
+	# indx_plot - indices of components to plot the gas-phase 
+	#	temporal profile of
+	# comp0 - names of components to plot the gas-phase temporal 
+	#	profile of
 	# self.inname - path to model variables file
-	# self.rel_SMILES - SMILES strings of components in chemical scheme
+	# self.rel_SMILES - SMILES strings of components in chemical 
+	#	scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
 	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
 	# self.OC - oxygen to carbon ratio of components
@@ -368,6 +377,7 @@ def ode_updater(y, H2Oi,
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
 	
 	import ode_solv
+	import dydt_rec
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
@@ -375,7 +385,7 @@ def ode_updater(y, H2Oi,
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
 		
 		# remembering variables at the start of the 
-		# integration step ------------------------------------------
+		# integration step -------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
 		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
 		x0[:] = x[:] # remember initial particle sizes (um)
@@ -416,20 +426,29 @@ def ode_updater(y, H2Oi,
 					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
 						dydt_cnt = save_cnt-1
 
-					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
-					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
+					# before solving ODEs for chemistry, dilution, 
+					# gas-particle partitioning and gas-wall partitioning, 
+					# estimate and record any 
+					# change tendencies (# molecules/cm3/s) resulting from 
+					# these processes
 					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, num_comp, core_diss, 								kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self)
+						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, 
+							num_comp, core_diss, kelv_fac, kimt, 
+							act_coeff, dydt_erh_flag, H2Oi, wat_hist,
+							 pconc, self)
 						
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
 			# instantaneous changes at this time step without interpolation to
 			# smaller instantaneous changes (when interpolation forced due to 
 			# instability)
-			# note also that recording before calling cham_up means that any instantaneous 
-			# changes occurring during this upcoming time step are not recorded at the very start 
+			# note also that recording before calling cham_up means that 
+			# any instantaneous 
+			# changes occurring during this upcoming time step are not 
+			# recorded at the very start 
 			# of the time step
-			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
+			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > 
+				-1.e-10) and self.testf != 5):
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
 				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, 
@@ -458,12 +477,14 @@ def ode_updater(y, H2Oi,
 			H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
-			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  				pcontf, Cinfl_now, surfT,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,
+ 			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
 			volP)
 			
 			
-			# aligning time interval with pre-requisites ---			# ensure end of time interval does not surpass 
+			# aligning time interval with pre-requisites ---			
+			# ensure end of time interval does not surpass 
 			#recording time
 			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
 				tnew = (self.save_step*(save_cnt-1))-sumt
@@ -503,19 +524,28 @@ def ode_updater(y, H2Oi,
 				
 			else: # fillers
 			
-				kimt = np.zeros((num_sb+self.wall_on, num_comp))
-				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
+				kimt = np.zeros((num_sb+self.wall_on, 
+					num_comp))
+				kelv_fac = np.zeros((
+					num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
 			
-			# reaction rate coefficient going into this time step
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
+			# reaction rate coefficient going into this 
+			# time step
+			[rrc, erf, err_mess] = rrc_calc.rrc_calc(
+				y[H2Oi], temp_now, y, 
+				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
+				sumt, self)
 
-			if (erf == 1): # if error message from reaction rate calculation
+			# if error message from reaction rate 
+			# calculation
+			if (erf == 1): 
 				yield(err_mess)
 			
-			# update Jacobian inputs based on particle-phase fractions of components
-			[rowvalsn, colptrsn, jac_mod_len, jac_part_hmf_indx, rw_indx, 
+			# update Jacobian inputs based on 
+			# particle-phase fractions of components
+			[rowvalsn, colptrsn, jac_mod_len, 
+			jac_part_hmf_indx, rw_indx, 
 				jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*\
 				((num_sb-self.wall_on+1))], rowvals, 
 				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, \

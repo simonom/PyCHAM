@@ -59,7 +59,8 @@ def mod_var_read(self):
 	
 		# if not using defaults	
 		if (self.inname != 'Default' and self.inname != 'Not found'): 
-			inputs = open(self.inname, mode= 'r' ) # open model variables file
+			# open model variables file
+			inputs = open(self.inname, mode= 'r' ) 
 			try: # in case reading in model variables fine
 				in_list = inputs.readlines() # read file and store everything into a list
 				inputs.close() # close file
@@ -427,22 +428,36 @@ def mod_var_read(self):
 				mean_rad = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
 					mean_rad[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
-				
-			if key == 'recording_time_step' and (value.strip()): # frequency (s) of storing results
+			# frequency (s) of storing results	
+			if (key == 'recording_time_step' and 
+				(value.strip())): 
 				self.save_step = float(value.strip())
 
-			if key == 'const_comp' and (value.strip()): # names of components with later continuous injections
-				self.const_comp = [str(i).strip() for i in (value.split(','))]
+			# names of components with later continuous 
+			# injections
+			if (key == 'const_comp' and (value.strip())): 
+				self.const_comp = [str(i).strip() for 
+					i in (value.split(','))]
 
-			# name of file containing observations to constrain by
+			# name of file containing observations to 
+			# constrain by
 			if (key == 'obs_file' and (value.strip())):
 				self.obs_file = str(value.strip())
 			
-			# names of components with instantaneous gas-phase injections
-			if (key == 'Compt' and (value.strip())):
-				Compt = [str(i).strip() for i in (value.split(','))]
+			# name of file to save calculated continuous
+			# influx rates to
+			if (key == 'sim_cont_infl_file' and 
+				(value.strip())):
+				self.sim_ci_file = str(value.strip())
 
-			# times of later gas-phase instantaneous injections (s)
+			# names of components with instantaneous 
+			# gas-phase injections
+			if (key == 'Compt' and (value.strip())):
+				Compt = [str(i).strip() for i in 
+					(value.split(','))]
+
+			# times of later gas-phase instantaneous 
+			# injections (s)
 			if key == 'injectt' and (value.strip()):
 				injectt = [float(i.strip()) for i in (value.split(','))]
 				injectt = np.array((injectt))
@@ -566,12 +581,17 @@ def mod_var_read(self):
 					# start by assuming that constant influx unit is ppb
 					self.abun_unit = 'ppb'
 
-					# check if this is a path to a file containing continuous 
-					# influxes, if not treat as a list of component names
-					# attempt as path to file containing continuous influxes
+					# check if this is a path to a 
+					# file containing continuous 
+					# influxes, if not treat as a 
+					# list of component names
+					# attempt as path to file 
+					# containing continuous influxes
 					try: 
-						self.const_infl_path = str(value.strip())
-						self = const_infl_open(self)
+						self.const_infl_path\
+						= str(value.strip())
+						self = const_infl_open(
+							self)
 					
 					
 					except: # treat as list of components 
@@ -616,23 +636,30 @@ def mod_var_read(self):
 						for ii in range(time_count): # loop through times
 							self.con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
 							
-				# in case semicolons and commas messed up on input, note this will invoke an 
-				# error message from the user input check module
+				# in case semicolons and commas messed 
+				# up on input, note this will invoke an 
+				# error message from the user input 
+				# check module
 				except:
 					self.con_infl_C = np.empty(0)
 
-			# names of components whose tendency to change will be tracked
+			# names of components whose tendency to change 
+			# will be tracked
 			if (key == 'tracked_comp' and (value.strip())):
-				self.dydt_trak = [str(i).strip() for i in (value.split(','))]
+				self.dydt_trak = [str(i).strip() for i 
+					in (value.split(','))]
 
 			if (key == 'dens_Comp' and (value.strip())):
-				dens_comp = [str(i).strip() for i in (value.split(','))]
+				dens_comp = [str(i).strip() for i in 
+				(value.split(','))]
 
-			if key == 'dens' and (value.strip()):
-				dens = [float(i) for i in (value.split(','))]
+			if (key == 'dens' and (value.strip())):
+				dens = [float(i) for i in 
+					(value.split(','))]
 
-			if key == 'vol_Comp' and (value.strip()):
-				vol_comp = [str(i).strip() for i in (value.split(','))]
+			if (key == 'vol_Comp' and (value.strip())):
+				vol_comp = [str(i).strip() for i in 
+				(value.split(','))]
 
 			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
@@ -800,8 +827,9 @@ def mod_var_read(self):
 
 	return()
 
-	
-def const_infl_open(self): # define function to read in values relevant to constant influxes
+
+# define function to read in values relevant to constant influxes
+def const_infl_open(self): 
 
 	import openpyxl
 	import os
@@ -810,10 +838,13 @@ def const_infl_open(self): # define function to read in values relevant to const
 		try: # try to open the file at the user-supplied path
 
 			try:
-				wb = openpyxl.load_workbook(filename = self.const_infl_path)
+				wb = openpyxl.load_workbook(filename = 
+					self.const_infl_path)
 			except:
-				# see if present inside same folder as model variables
-				# strip path to model variables file back to home directory
+				# see if present inside same folder as 
+				# model variables
+				# strip path to model variables file 
+				# back to home directory
 				try:
 					path_start = -1*self.inname[::-1].index('/')
 				except:

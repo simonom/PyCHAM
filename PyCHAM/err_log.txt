@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/ambient_constrained_winter_stagnant
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ambient_constrained_ex_chem_scheme/ambient_constrained_winter_stagnant

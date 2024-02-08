@@ -1,29 +1,29 @@
 ##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
+#                                                                                        #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
 ##########################################################################################
 '''module for calculating and recording change tendency (# molecules/cm3/s) of components'''
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2024-02-07 07:59:01.337104
+# File Created at 2024-02-08 16:05:08.726029
 
 import numpy as np 
 
@@ -40,14 +40,18 @@ def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss, kelv_fac, kimt, ac
 		compi = self.dydt_vst[key_name] 
 		# open relevant dictionary value containing reaction numbers and results 
 		key_name = str(str(comp_name) + '_res')
-		dydt_rec = self.dydt_vst[key_name] 
+		dydt_rec = self.dydt_vst[key_name]
+		if hasattr(self, 'sim_ci_file'):
+			# open relevant dictionary value containing estimated continuous influx
+			key_name = str(str(comp_name) + '_ci')
+			ci_array = self.dydt_vst[key_name]
 		# open relevant dictionary value containing flag for whether component is reactant (1) or product (0) in each reaction 
 		key_name = str(str(comp_name) + '_reac_sign')
 		reac_sign = self.dydt_vst[key_name] 
 		# keep count on relevant reactions 
 		reac_count = 0 
 		# loop through relevant reactions 
-		for i in dydt_rec[0, 0:-2]: # final two rows for particle- and wall-partitioning 
+		for i in dydt_rec[0, 0:-3]: # final three rows for particle- and wall-partitioning and dilution 
 			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
 			# estimate gas-phase change tendency for each reaction involving this component 
 			gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]]]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*reac_coef[i] 
@@ -91,4 +95,12 @@ def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss, kelv_fac, kimt, ac
 			# note sum over all wall bins 
 			dydt_rec[step+1, reac_count+1] -= np.sum(dydt_all[:, compi]) 
 		
+		# dilution
+		if (self.dil_fac_now > 0):
+			dydt_rec[step+1, reac_count+2] -= y[compi]*self.dil_fac_now
+	
+		# estimated continuous influx
+		if hasattr(self, 'sim_ci_file'):
+			ci_array[step, 0] = -1*np.sum(dydt_rec[step+1, :])
+	
 	return(self) 

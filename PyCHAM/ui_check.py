@@ -129,7 +129,17 @@ def ui_check(self):
 	# one folder for one simulation
 	output_by_sim = os.path.join(dir_path, output_root, filename, 
 		sav_nam)
-	#--------------------------------------------------------------
+	
+	# ensure that if user wants simulation preparation mode, spin-up
+	# is turned on
+	if (self.sim_ci_file != []):
+		from obs_file_open import obs_file_open
+		#self.spin_up = 1 
+		# also ensure that components to track change tendencies
+		# of are established
+		obs_file_open(self)  
+		 
+	# --------------------------------------------------------------
 	# check on chemical scheme markers. In older PyCHAM versions 
 	# only 12 markers were needed, but at least as of v4.4.0, 13 
 	# are needed. But if only 12 are provided then assume the final
@@ -537,30 +547,43 @@ def ui_check(self):
 				em_flag = 1
 		
 	# ------------------------------------
-	# check on presence of observation file for tracking specific components
-	# if observation file provided for constraint
+	# check on presence of observation file for setting abundances
+	# of specific components
 	if hasattr(self, 'obs_file') and self.obs_file != []:
 		try: # try opening as in eqn_pars module
 			import openpyxl # require module
-			self.obs_file = str(self.obs_file) # path to file
-			wb = openpyxl.load_workbook(filename = self.obs_file) # open file
+			# path to file
+			self.obs_file = str(self.obs_file)					# open file	
+			wb = openpyxl.load_workbook(filename = 
+				self.obs_file) 
 			wb.close() # close excel file
 		except:
 			try:
-				# see if present inside same folder as model variables
-				# strip path to model variables file back to home directory
+				# see if present inside same folder as 
+				# model variables
+				# strip path to model variables file 
+				# back to home directory
 				try:
-					path_start = -1*self.inname[::-1].index('/')
+					path_start = (-1*
+					self.inname[::-1].index('/'))
 				except:
-					path_start = -1*self.inname[::-1].index('\\')
+					path_start = (-1*
+					self.inname[::-1].index('\\'))
 				# path to file
-				self.obs_file = str(self.inname[0:path_start] + self.obs_file)
+				self.obs_file = str(self.inname[0:						path_start] + self.obs_file)
 				import openpyxl # require module
-				wb = openpyxl.load_workbook(filename = self.obs_file) # open file
+				# open file
+				wb = openpyxl.load_workbook(filename = 
+					self.obs_file) 
 				wb.close() # close excel file
 			except:
 
-				err_mess = str('Error - observation file ' + self.obs_file + ' could not be found, please check observation file and/or the obs_file model variable in the model variable file.')
+				err_mess = str('''Error - observation 
+				file
+				''' + self.obs_file + ''' could not be 
+				found, please check observation file 
+				and/or the obs_file model variable in 
+				the model variable file.''')
 				em_flag = 2
 	# ------------------------------------
 

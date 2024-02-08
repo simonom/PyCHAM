@@ -46,7 +46,6 @@ except: # in case of a bad function
 	if os.path.exists('ode_solv'): # remove any bad functions
 		os.remove(ode_solv)
 import ode_solv_wat
-import dydt_rec
 import importlib
 import save
 import time
@@ -317,6 +316,7 @@ def ode_updater_su(y, H2Oi,
 		self.kwf = 0 # filler when no wall
 
 	import ode_solv
+	import dydt_rec
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
@@ -344,16 +344,22 @@ def ode_updater_su(y, H2Oi,
 
 
 	while (RO2_pool_diff) >= (1.e1):
-		
+		print(sumt)	
 		# remembering variables at the start of the 
-		# integration step ------------------------------------------
-		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
-		# remember initial particle number concentration (# particles/cm3)
+		# integration step -------------------------------------
+		# remember initial concentrations (# molecules/cm3 
+		# (air))
+		y0[:] = y[:] 
+		# remember initial particle number concentration 
+		# (# particles/cm3)
 		N_perbin0[:] = N_perbin[:]
 		x0[:] = x[:] # remember initial particle sizes (um)
 		temp_now0 = temp_now # remember temperature (K)
-		wat_hist0 = wat_hist # remember water history flag at start of integration step
-		RH0 = RHn # relative humidity at start of integration step
+		# remember water history flag at start of integration 
+		# step
+		wat_hist0 = wat_hist 
+		# relative humidity at start of integration step
+		RH0 = RHn 
 		Pnow0 = Pnow # pressure (Pa)
 
 		# remember counts at start of integration step
@@ -365,19 +371,27 @@ def ode_updater_su(y, H2Oi,
 		light_time_cnt0 = light_time_cnt
 		conPin_cnt0 = conPin_cnt
 		
-		# --------------------------------------------------------------------------------
-		
-		
-		gpp_stab = 0 # flag for stability in gas-particle partitioning for solver while loop
-		# flag for stability in gas-particle partitioning for time interval reset
-		stab_red = 0
-		lin_int = 0 # flag to linearly interpolate changes to chamber
-		t00 = tnew # remember the initial integration step for this integration step (s)
-		save_cntf = 0 # flag for updating count on number of recordings
-		
-		while (gpp_stab != 1): # whilst ode solver flagged as unstable
+		# -----------------------------------------------------
 
-			# if integration interval decreased, reset concentrations to those 
+		# flag for stability in gas-particle partitioning for 
+		# solver while loop	
+		gpp_stab = 0 
+		# flag for stability in gas-particle partitioning for 
+		# time interval reset
+		stab_red = 0
+		# flag to linearly interpolate changes
+		lin_int = 0 
+		# remember the initial integration step for this 
+		# integration step (s)
+		t00 = tnew 
+		# flag for updating count on number of recordings
+		save_cntf = 0 
+		
+		# whilst ode solver flagged as unstable
+		while (gpp_stab != 1): 
+
+			# if integration interval decreased, reset 
+			# concentrations to those 
 			# at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
