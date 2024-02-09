@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -232,20 +235,25 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 			
 			else: # if a sum over a group of components
-				if (caller == 4 or caller == 5 or caller == 6): # log y axis
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
+				if (caller == 4 or caller == 5 or 
+					caller == 6): # log y axis
+					ax0.semilogy(timehr, conc, '-+',
+					 linewidth = 4., label = 
+					str(r'$\Sigma$' + 
+					comp_names_to_plot[i].strip() + 
+					' (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
 
 		if (caller == 0 or caller == 5): # ug/m3 plot
-			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
+			ax0.set_ylabel(str(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)'), fontsize = 14)
 		if (caller == 1 or caller == 4): # ppb plot
-			ax0.set_ylabel(r'Mixing ratio (ppb)', fontsize = 14)
+			ax0.set_ylabel(str(r'Mixing ratio (ppb)'), fontsize = 14)
 		if (caller == 3 or caller == 6): # # molecules/cm3 plot
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
-			ax0.set_ylabel(r'Concentration ' + gpunit, fontsize = 14)
+			ax0.set_ylabel(str(r'Concentration ' + gpunit), fontsize = 14)
 
-		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+		ax0.set_xlabel(str(r'Time through simulation (hours)'), fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
@@ -345,8 +353,8 @@ def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	ax0.plot(timehr, Oav_cnt, '-+', linewidth = 4., label = 'Oxygen number')
 	ax0.plot(timehr, Hav_cnt, '-+', linewidth = 4., label = 'Hydrogen number')
 	
-	ax0.set_ylabel(r'Average number of atoms per RO2 molecule', fontsize = 14)
-	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.set_ylabel(str(r'Average number of atoms per RO2 molecule'), fontsize = 14)
+	ax0.set_xlabel(str(r'Time through simulation (hours)'), fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.legend(fontsize = 14)
@@ -381,7 +389,7 @@ def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 			ax0.plot(Etime_s/3600., (ECrec[:, Ei]/Cfac), '-x', linewidth = 2., label = str(comp_names_to_plot[i]))
 		
 	
-	ax0.set_ylabel(r'Concentration (ppb)', fontsize = 14)
+	ax0.set_ylabel(str(r'Concentration (ppb)'), fontsize = 14)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -486,14 +494,20 @@ def plotter_rad_pool(self):
 		p3, = par1.plot(timehr, y_rad[:, ord[-(i+1)]], '--', label = str(rad_names[ord[-(i+1)]] + ' conc.'))
 
 	# also plot sum of fractions shown in plot
-	ax0.plot(timehr, frac_sum, '-k', label = str(r'$\Sigma$(frac. shown here)'))
+	ax0.plot(timehr, frac_sum, '-k', 
+		label = str(r'$\Sigma$(frac. shown here)'))
 
 	# in case you want to check that sum of fractions=1
-	#ax0.plot(timehr, np.sum(y_radf, axis=1), label = 'sum of fractions (check)')
+	#ax0.plot(timehr, np.sum(y_radf, axis=1), 
+	#	label = 'sum of fractions (check)')
 
-	ax0.set_ylabel(str('Fraction of all concentrations'), fontsize = 14)
-	par1.set_ylabel('Concentration ($\mathrm{ppb}$)', fontsize = 14, rotation=270, labelpad=20) # right vertical axis label
-	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
+	ax0.set_ylabel(str('Fraction of all concentrations'), 
+		fontsize = 14)
+	# right vertical axis label
+	par1.set_ylabel(str(r'Concentration ($\mathrm{ppb}$)'), 
+		fontsize = 14, rotation=270, labelpad=20) 
+	ax0.set_xlabel(str(r'Time through simulation (hours)'), 
+		fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	par1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -629,16 +643,24 @@ def plotter_rad_flux(self):
 	# loop through top contributors
 	for compi in range(self.rad_ord_num):
 		
-		# plot temporal profiles of fractional change tendencies due to chemical 
+		# plot temporal profiles of fractional change 
+		# tendencies due to chemical 
 		# reaction
-		ax0.plot(timehr, cr_dydt_frac[:, ord[-(compi+1)]], label = str(rad_names[ord[-(compi+1)]] + ' frac.'))
+		ax0.plot(timehr, cr_dydt_frac[:, ord[-(compi+1)]], 
+			label = str(rad_names[ord[-(compi+1)]] + 
+				' frac.'))
 		# plot right axis (absolute flux)
-		p3, = par1.plot(timehr, cr_dydt[:, ord[-(compi+1)]], '--', label = str(rad_names[ord[-(compi+1)]] + ' flux'))
+		p3, = par1.plot(timehr, cr_dydt[:, ord[-(compi+1)]],
+			 '--', label = str(rad_names[ord[-(compi+1)]] +
+			 ' flux'))
 
 
 	ax0.set_xlabel('Time through experiment (hours)', fontsize = 14)
-	ax0.set_ylabel('Fraction of all change tendencies', fontsize = 14)
-	par1.set_ylabel('Change tendency ($\mathrm{molecules \, cm^{-3}\, s^{-1}}$)', fontsize = 14, rotation=270, labelpad=20) # right vertical axis label
+	ax0.set_ylabel('Fraction of all change tendencies', 
+		fontsize = 14)
+	par1.set_ylabel(str(r'''Change tendency ($\mathrm{molecules\,
+		cm^{-3}\, s^{-1}}$)'''), fontsize = 14, rotation=270,
+		 labelpad=20) # right vertical axis label
 		
 
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -786,8 +808,8 @@ def O3_iso(self):
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 
 	# set axis titles
-	ax0.set_xlabel(r'NOx mixing ratio (ppb)', fontsize=14)
-	ax0.set_ylabel(r'VOC mixing ratio (ppb)', fontsize=14)
+	ax0.set_xlabel(str(r'NOx mixing ratio (ppb)'), fontsize=14)
+	ax0.set_ylabel(str(r'VOC mixing ratio (ppb)'), fontsize=14)
 
 	# colour bar
 	cb = plt.colorbar(p1, pad=0.25, ax=ax0)

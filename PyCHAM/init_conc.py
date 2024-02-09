@@ -99,7 +99,8 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	y_indx_plot = []
 	
 	# convert concentrations
-	# total number of molecules in 1 cm3 air using ideal gas law.  R has units cm3.Pa/K.mol
+	# total number of molecules in 1 cm3 air using ideal gas law.  
+	# R has units cm3.Pa/K.mol
 	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
