@@ -1,1 +1,1 @@
-C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\ambient_constrained_ex_chem_scheme\ambient_constrained_LEEDsummer_medwind_obs
+C:\Users\Psymo\Desktop\PyCHAM\PyCHAM\PyCHAM/output\full_chem_scheme\ambient_constrained_hi_poll_site_win_medwind_obs
