@@ -58,27 +58,51 @@ def mod_var_read(self):
 		pk.close()
 	
 		# if not using defaults	
-		if (self.inname != 'Default' and self.inname != 'Not found'): 
+		if (self.inname != 'Default' and 
+			self.inname != 'Not found'): 
 			# open model variables file
 			inputs = open(self.inname, mode= 'r' ) 
 			try: # in case reading in model variables fine
-				in_list = inputs.readlines() # read file and store everything into a list
+				# read file and store everything into 
+				# a list
+				in_list = inputs.readlines() 
 				inputs.close() # close file
-				
-			except: # in case problem with reading in model variables
+			
+			# in case problem with reading in model 
+			# variables
+			except:
 				while True:
 					line = file.readline()
 					if not line:
-						err_mess = str('Error: could not interpret the following line in the model variables file: ' + str(line))
-						self.l81b.setText('') # remove old progress message	
-						self.l81b.setText(err_mess)
-						# change border accordingly
+						err_mess = str('''Error:
+						 could not interpret the 
+						following line in the 
+						model variables file: 
+						''' + str(line))
+						# remove old progress 
+						# message	
+						self.l81b.setText('')
+						self.l81b.setText(
+						err_mess)
+						# change border 
+						# accordingly
 						if (self.bd_st == 1):
-							self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
+							self.l80.\
+							setStyleSheet(
+							0., 
+							'''2px dashed 
+							red''', 0., 
+							0.)
 						if (self.bd_st >= 2):
-							self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
-
-						self.bd_st += 2 # prepare for change to border status
+							self.l80.\
+							setStyleSheet(
+							0., '''2px 
+							solid red''', 
+							0., 0.)
+						
+						# prepare for change to 
+						# border status
+						self.bd_st += 2
 						# change border status
 						if (self.bd_st == 3):
 							self.bd_st = 2
@@ -88,40 +112,52 @@ def mod_var_read(self):
 		else: # if using defaults
 			in_list = []
 
-		# if parameters automatically supplied via the automated_setup_and_call module
-		if (type(self.param_const) == dict and self.inname == 'Not found'):
+		# if parameters automatically supplied via the 
+		# automated_setup_and_call module
+		if (type(self.param_const) == dict and 
+			self.inname == 'Not found'):
 			in_list = [] # prepare list
-			for key, value in self.param_const.items(): # loop through supplied parameters
+			# loop through supplied parameters
+			for key, value in self.param_const.items():
 				# if no editing needed, then just append
-				in_list.append(str(str(key) + ' = ' + str(value)))
+				in_list.append(str(str(key) + ' = ' + 
+					str(value)))
 		
-		self.bd_st = 3 # change border/error message status to ready for change
-		# default value for number of modes represented by particle number concentration
+		# change border/error message status to ready for change
+		self.bd_st = 3
+		# default value for number of modes represented by 
+		# particle number concentration
 		pmode_cnt = 1
 
-		for i in range(len(in_list)): # loop through supplied model variables to interpret
+		# loop through supplied model variables to interpret
+		for i in range(len(in_list)):
 			
-			# ----------------------------------------------------
+			# ----------------------------
 			# if commented out continue to next line
 			if (in_list[i][0] == '#'):
 				continue
 			try:
-				key, value = in_list[i].split('=') # split values from keys
+				# split values from keys
+				key, value = in_list[i].split('=')
+				
 			except:
-				err_mess = 'Did not see an \'=\' symbol in a line in the model variables file, please check model variables file and ensure that any lines supposed to be comments begin with #, and see README for guidance'
+				err_mess = '''Did not see an \'=\' symbol in a line in the 				model variables file, please check model variables file and 				ensure that any lines supposed to be comments begin with #, 				and see README for guidance'''
 				continue
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
 			
-			# ----------------------------------------------------
-			if key == 'res_file_name' and (value.strip()): # name of folder to save results in
+			# ----------------------------------
+			# name of folder to save results in
+			if (key == 'res_file_name' and (value.strip())):
 				sav_nam = str(value.strip())
 			
 			# formatting for chemical scheme
-			if key == 'chem_scheme_markers' and (value.strip()):
-				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+			if (key == 'chem_scheme_markers' and (value.strip())):
+				self.chem_sch_mrk = [str(i).strip() for i 
+				in (value.split(','))]
 
-			if key == 'chem_sch_name' and (value.strip()): # path to chemical scheme
+			# path to chemical scheme
+			if (key == 'chem_sch_name' and (value.strip())): 
 				self.sch_name = str(value.strip())
 
 			if key == 'xml_name' and (value.strip()): # path to xml file
@@ -169,13 +205,20 @@ def mod_var_read(self):
 				except:
 					err_mess = 'Could not convert string to integer for spin_up variable, please check model variables file and see README for guidance'
 
-			if key == 'Comp0' and (value.strip()): # names of components present at experiment start
-				comp0 = [str(i).strip() for i in (value.split(','))]			
+			# names of components present at 
+			# experiment start
+			if (key == 'Comp0' and (value.strip())):
+				comp0 = [str(i).strip() for i in 
+				(value.split(','))]			
 
-			if key == 'C0' and (value.strip()): # initial concentrations of components present at experiment start (ppb)
+			# initial concentrations of components present 
+			# at experiment start (ppb)
+			if (key == 'C0' and (value.strip())):
 				
-				if '/' in value or '\\' in value: # treat as path to file
-					self.path_to_C0 = str(value.strip())
+				# treat as path to file
+				if '/' in value or '\\' in value:
+					self.path_to_C0 = \
+						str(value.strip())
 					[y0, comp0] = C0_open(self)
 					err_mess = self.err_mess
 					if err_mess[0:5] == 'Error':
@@ -186,7 +229,9 @@ def mod_var_read(self):
 						y0 = [float(i) for i in (value.split(','))]
 					except:
 					
-						err_mess = 'Could not read in the C0 model variable, please check the model variables file and see README for guidance'
+						err_mess = '''Error - could not read in the 
+						C0 model variable, please check the model 
+						variables file and see README for guidance'''
 			
 			# chamber temperature (K)
 			if (key == 'temperature' and (value.strip())):
@@ -566,19 +611,25 @@ def mod_var_read(self):
 			if key == 'tf_UVCt' and (value.strip()): # transmission factor times for 254 nm light
 				self.tf_UVCt = np.array(([float(i.strip()) for i in (value.split(','))]))
 
-			if key == 'light_adapt' and (value.strip()): # whether to adapt time step to naturally varying light intensity
+			# whether to adapt time step to naturally 
+			# varying light intensity
+			if key == 'light_adapt' and (value.strip()):
 				self.light_ad = int(value.strip())
 
-			if key == 'secx' and (value.strip()): # to keep solar intensity constant
+			# to keep solar intensity constant
+			if key == 'secx' and (value.strip()):
 				self.secx = float(value.strip())
 
-			if key == 'cosx' and (value.strip()): # to keep solar intensity constant
+			# to keep solar intensity constant
+			if key == 'cosx' and (value.strip()):
 				self.cosx = float(value.strip())
 
 			# names of components with continuous influx
 			if (key == 'const_infl' or key == 'cont_infl'):
 				if (value.strip()):				
-					# start by assuming that constant influx unit is ppb
+					# start by assuming 
+					# that constant influx unit is 
+					# ppb
 					self.abun_unit = 'ppb'
 
 					# check if this is a path to a 
@@ -593,8 +644,8 @@ def mod_var_read(self):
 						self = const_infl_open(
 							self)
 					
-					
-					except: # treat as list of components 
+					# treat as list of components
+					except:
 						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
 
 					if ('not in a file' in self.con_infl_nam):
@@ -763,7 +814,9 @@ def mod_var_read(self):
 					erh_str = str(value)
 				except:
 					erh_str = -1 # will cause error message
-			# whether to remove influxes of components that aren't seen in chemical scheme
+
+			# whether to remove influxes of components that aren't seen in
+			# chemical scheme
 			if (key == 'remove_influx_not_in_scheme' and (value.strip())):
 				self.remove_influx_not_in_scheme = int(value)
 		
@@ -773,27 +826,33 @@ def mod_var_read(self):
 		# for UManSysProp if no update requested, check that there 
 		# is an existing UManSysProp folder
 		if (uman_up == 0): # check for existing umansysprop folder
-			if not os.path.isdir(self.PyCHAM_path + '/umansysprop'): # if no existing folder then force update
+			# if no existing folder then force update
+			if not os.path.isdir(self.PyCHAM_path + '/umansysprop'):
 				uman_up = 1
 		# -------------------------------------------
 		
 		# update model variables message in GUI
-		if (err_mess != ''): # if error message occurs
+		# if error message occurs
+		if (err_mess != '' or self.err_mess != ''):
 			# update error message
-			self.l80.setText(str('Setup Status: \n' + err_mess))
+			if err_mess != '':
+				self.l80.setText(str('Setup Status: \n' + err_mess))
+			if self.err_mess != '':
+				self.l80.setText(str('Setup Status: \n' + self.err_mess))
 			# change border accordingly
 			if (self.bd_st == 1):
 				self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
 			if (self.bd_st >= 2):
 				self.l80.setStyleSheet(0., '2px solid red', 0., 0.)
-
+			
 			self.bd_st += 2 # prepare for change to border status
 			# change border status
 			if (self.bd_st == 3):
 				self.bd_st = 2
 			if (self.bd_st >= 4):
-				self.bd_st = 1		
-
+				self.bd_st = 1
+			
+			return()
 		# a possible situation where there are multiple particle size bins,
 		# but just one mode given for the particle number size distribution
 		if (num_sb > 1 and pmode_cnt == 1):
@@ -838,9 +897,11 @@ def const_infl_open(self):
 		try: # try to open the file at the user-supplied path
 
 			try:
+				
 				wb = openpyxl.load_workbook(filename = 
 					self.const_infl_path)
 			except:
+				
 				# see if present inside same folder as 
 				# model variables
 				# strip path to model variables file 
@@ -850,32 +911,42 @@ def const_infl_open(self):
 				except:
 					path_start = -1*self.inname[::-1].index('\\')
 				# path to file
-				self.const_infl_path = str(self.inname[0:path_start] + self.const_infl_path)
-			
+				self.const_infl_path = str(self.inname[0:path_start] + 
+					self.const_infl_path)
+				
 				wb = openpyxl.load_workbook(filename = self.const_infl_path)				
-			
+				
 			try:
 				sheet = wb['cont_infl']
 			except:
 				sheet = wb['const_infl']
 			
-			# component names are in first column, continuous influxes are in 
+			# component names are in first column, 
+			# continuous influxes are in 
 			# following columns		
 			ir = -1 # count on row iteration
 	
-			# prepare to store component names and continuous influxes
+			# prepare to store component names and 
+			# continuous influxes
 			value = ''
 
 			self.con_infl_nam = np.empty((0))	
-	
-			for i in sheet.iter_rows(values_only=True): # loop through rows
+		
+			# loop through rows
+			for i in sheet.iter_rows(values_only=True):
 				
 				ir += 1 # count on row iteration
-				if (ir == 0): # header provides unit of emission rate and times
+				# header provides unit of emission rate 
+				# and times
+				if (ir == 0):
 					self.abun_unit = str(i[0])	
 			
-					if ('ppb' not in self.abun_unit):
-						if ('mol' not in self.abun_unit and 'cm' not in self.abun_unit):
+					if ('ppb' not in 
+					self.abun_unit):
+						if ('mol' not in 
+						self.abun_unit and 
+						'cm' not in 
+						self.abun_unit):
 							self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
 							
 							return(self)
@@ -883,11 +954,16 @@ def const_infl_open(self):
 					clim = 0 # count on columns
 					for ic in i[0::]:	
 						if ic is None:
-							break # stop looping through columns
-						clim +=1 # count on columns	
+							# stop looping 								# through 
+							# columns
+							break
+						# count on columns	
+						clim +=1 
 					
-					# if looping over a 24 hour period
-					# then limit influxes to the first 
+					# if looping over a 24 hour 
+					# period
+					# then limit influxes to the
+					# first 
 					# provided 24 hours
 					if (self.con_infl_tf == 1): 
 						clim = sum(i[1:clim] < 24.*3.6e3)
@@ -914,7 +990,7 @@ def const_infl_open(self):
 
 	else:
 		self.con_infl_nam = 'not in a file'
-
+	
 	return(self)
 
 # function for converting excel spreasheet of surface depositions 

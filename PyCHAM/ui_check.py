@@ -411,9 +411,16 @@ def ui_check(self):
 			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
 
-	# check consistency between names of initial components and their concentrations ------------------
+	# check consistency between names of initial components and
+	# their concentrations ------------------
 	if (len(comp0) != len(y0) and em_flag < 2):
-		err_mess = str('Error - the number of gas-phase components present at simulation start (the Comp0 model variable) is different to the number of initial concentrations of these components (the C0 model variable), and they must be the same length.  Please see README for guidance')
+		err_mess = str('''Error - the number of gas-phase 
+		components present at simulation start (''' + 
+		str(len(comp0)) + ''') (the Comp0 model variable) is 
+		different to the number of initial concentrations of 
+		these components (''' + str(len(y0)) + ''') (the C0 
+		model variable), and they must be the same length.
+		Please see README for guidance''')
 		em_flag = 2	
 
 	# check on consistency of names of seed component(s) and their dissociation constant --------------

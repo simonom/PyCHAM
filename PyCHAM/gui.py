@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -2070,7 +2073,7 @@ class PyCHAM(QWidget):
 		# files with names containing 'chem' means that any 
 		# chemical 
 		# scheme files specified in the model variables overide
-		# any foun by automatic search
+		# any found by automatic search
 		import mod_var_read
 		mod_var_read.mod_var_read(self)
 
@@ -2086,14 +2089,16 @@ class PyCHAM(QWidget):
 			
 		self.show()
 		
-		import mod_var_up # update displayed model variables to those of the selected model variables file
+		# update displayed model variables to those of the selected model variables file
+		import mod_var_up
 		mod_var_up.mod_var_up(self)
 		
-		# running check on model variables ---------------------------------------------------------------
+		# running check on model variables -------------------------------------------------
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
+		# check on inputs - note this loads the last saved pickle file and saves any change 
+		# to this pickle file
 		ui_check.ui_check(self)
-		# finished check on model variables --------------------------------------------------------------		
+		# finished check on model variables -----------------------------------------------	
 		
 		return()
 		
@@ -2161,15 +2166,16 @@ class PyCHAM(QWidget):
 		# end this function if an error thrown by reading of model variables
 		if (self.bd_st == 1 or self.bd_st == 2):
 			return()
-	
-		import mod_var_up # update displayed model variables to those of the selected model variables file
+		# update displayed model variables to those of the selected model variables file
+		import mod_var_up
 		mod_var_up.mod_var_up(self)
 		
-		# running check on model variables ---------------------------------------------------------------
+		# running check on model variables --------------------------------------------------
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
+		# check on inputs - note this loads the last saved pickle file and saves any change
+		# to this pickle file
 		ui_check.ui_check(self)
-		# finished check on model variables --------------------------------------------------------------
+		# finished check on model variables ------------------------------------------------
 
 		return()
 			

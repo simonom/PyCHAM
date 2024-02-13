@@ -294,7 +294,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		dydtnames = self.dydt_vst['comp_names'] 
 		
 
-		if hasattr(self, 'sim_ci_file'):
+		if hasattr(self, 'ci_array'):
 			# times (s)
 			self.ci_array = np.concatenate((self.ci_array, 
 				np.zeros((self.ci_array.shape[0], 
@@ -316,7 +316,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			# save
 			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), 3rd column from end is gas-particle partitioning, 2nd column from end is gas-wall partitioning, final column is dilution (molecules/cm3/s (air))')
 
-			if hasattr(self, 'sim_ci_file'):
+			if hasattr(self, 'ci_array'):
 				# get relevant row
 				ri = self.ci_array[:, 0] == str(
 					self.dydt_trak[compind])
@@ -326,9 +326,10 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 					str(str(
 					self.dydt_trak[compind]) + 
 					'_ci')][:, 0]
+				
 			compind += 1
 
-		if hasattr(self, 'sim_ci_file'):
+		if hasattr(self, 'ci_array'):
 			from openpyxl.utils.cell import\
 			get_column_letter
 
@@ -336,6 +337,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			from openpyxl import Workbook
 			wb = Workbook()
 			ws = wb.active
+			ws.title = 'cont_infl'
 			# loop through columns in first row
 			for ic in range(self.ci_array.shape[1]):
 				col_lett = get_column_letter(ic+1)
