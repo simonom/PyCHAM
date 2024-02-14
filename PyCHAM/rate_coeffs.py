@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2024-02-14 10:55:05.716220
+# created at 2024-02-14 14:15:10.631241
 
 import numpy
 import photolysisRates
@@ -350,7 +350,7 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 
 	if (self.light_stat_now == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((16704))
+	rate_values = numpy.zeros((16706))
 	
 	# if reactions have been found in the chemical scheme
 	# gas-phase reactions
@@ -33759,11 +33759,15 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		gprn += 1 # keep count on reaction number
 		rate_values[16700] = KDEC
 		gprn += 1 # keep count on reaction number
-		rate_values[16701] = 0.00040299*0.01
+		rate_values[16701] = 0.0
 		gprn += 1 # keep count on reaction number
-		rate_values[16702] = 0.00040299*0.1333
+		rate_values[16702] = 0.0
 		gprn += 1 # keep count on reaction number
-		rate_values[16703] = 0.00040299*0.0433
+		rate_values[16703] = 0.0
+		gprn += 1 # keep count on reaction number
+		rate_values[16704] = 0.0
+		gprn += 1 # keep count on reaction number
+		rate_values[16705] = 0.0
 	except:
 		erf = 1 # flag error
 		err_mess = (str('Error: Could not calculate rate coefficient for equation number ' + str(gprn)))

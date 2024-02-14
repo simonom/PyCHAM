@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -19,8 +22,10 @@
 ########################################################################
 '''module to estimate component volatilities and liquid densities'''
 # This module is responsible for
-# setting key properties of components, including liquid-phase saturation vapour pressures
-# and liquid-phase densities.  It does this using either UManSysProp (default), or with
+# setting key properties of components, including liquid-phase 
+# saturation vapour pressures
+# and liquid-phase densities.  It does this using either UManSysProp 
+#(default), or with
 # user settings
 
 import numpy as np
@@ -224,11 +229,13 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		if (self.comp_namelist[i] == 'O3'):
 			if (self.pars_skip != 2):
 				# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
-				self.Psat[0, i] =  np.log10((8.25313-(814.941587/self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
+				self.Psat[0, i] =  np.log10((8.25313-(814.941587/
+				self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
 				if (self.TEMP[tempt_cnt] == 298.15):
 					self.Psat_Pa_rec[i] = self.Psat[0, i]
 				else:
-					self.Psat_Pa_rec[i] =  np.log10((8.25313-(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
+					self.Psat_Pa_rec[i] =  np.log10((8.25313-
+					(814.941587/298.15)-0.001966943*298.15)*1.31579e-3)
 			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 0.*1.+3.*16.
@@ -256,10 +263,14 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		else: 
 			if (self.pars_skip != 2):
 				
-				#Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], self.TEMP[tempt_cnt], boiling_points.nannoolal(self.Pybel_objects[i]))))
-				Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))
+				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
+					self.TEMP[tempt_cnt], 
+					boiling_points.nannoolal(self.Pybel_objects[i]))))
+				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], 
+					#self.TEMP[tempt_cnt])))
 				#Psatnow += 2
-				# in case you want to ensure small molecules don't contribute to particle mass
+				# in case you want to ensure small molecules don't contribute to 
+				# particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
 				#	Psatnow += 10 # ensure no condensation of small molecules
 
@@ -272,15 +283,20 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	
 			if (self.TEMP[tempt_cnt] == 298.15 or rec_now_flag == 1):
 				try: # in case array
-					self.Psat_Pa_rec[i] = Psatnow[0] # note transfer to Pa is below
+					# note transfer to Pa is below
+					self.Psat_Pa_rec[i] = Psatnow[0]
 				except: # in case float
-					self.Psat_Pa_rec[i] = Psatnow # note transfer to Pa is below
+					# note transfer to Pa is below
+					self.Psat_Pa_rec[i] = Psatnow
 			else: 
 			
-				#Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
-				Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], self.TEMP[tempt_cnt])))	
+				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
+					298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
+				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], 
+				#	self.TEMP[tempt_cnt])))	
 				#Psatnow += 2
-				# in case you want to ensure small molecules don't contribute to particle mass
+				# in case you want to ensure small molecules don't contribute to 
+				# particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
 				#	Psatnow += 10 # ensure no condensation of small molecules
 

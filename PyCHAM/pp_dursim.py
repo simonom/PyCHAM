@@ -1,26 +1,30 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
-'''module to set up particle phase part of box model, calls on init_water_partit to initiate water partitioning with seed particles and wall'''
-# gets called when there is an injection of seed particle during an experiment
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''module to set up particle phase part of box model, calls on 
+init_water_partit to initiate water partitioning with seed particles 
+and wall'''
+# gets called when there is an injection of seed particle during an 
+# experiment
 
 import numpy as np
 from init_water_partit import init_water_partit
@@ -153,24 +157,30 @@ def pp_dursim(y, N_perbin0, mean_rad, pmode, pconc, seedx, lowersize, uppersize,
 				kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(radn)*1.e-4*(sum(self.y_dens[self.seedi[:], 0]*1.e-3)/len(self.seedi)*1.e-3)))
 				
 				# equilibrium mole fraction of water per size bin
-				# from the ode solver equation for vapour-particle partitioning of water
-				xwat = H2Ogc/(self.Psat[0:(num_sb), H2Oi]*kelv*act_coeff[0:(num_sb), H2Oi])
+				# from the ode solver equation for vapour-particle partitioning of 
+				# water
+				xwat = H2Ogc/(self.Psat[0:(num_sb), H2Oi]*kelv*act_coeff[0:(num_sb),
+				 H2Oi])
 				
-				# allow for mole fraction of water in mole fraction of non-water seed components
+				# allow for mole fraction of water in mole fraction of non-water 
+				# seed components
 				# for all size bins
-				seedx = seedx*(1./sum(seedx)) # ensure the non-water mole fractions sum to one
+				# ensure the non-water mole fractions sum to one
+				seedx = seedx*(1./sum(seedx))
 				seedxn = seedx*(1.-xwat)
 				
-				# average molar volume of seed components (cm3/mol) for all size bins
-				avMV = (sum(seedxn*MV[self.seedi[:], 0])+xwat*MV[H2Oi, 0])
-				
+				# average molar volume of seed components (cm3/mol) 
+				# for all size bins
+				avMV = (sum(seedxn*MV[self.seedi[:], 0].reshape(-1, 1))
+						+xwat*MV[H2Oi, 0])
 				# total molecular concentration of seed components including water 
 				# (# molecules/cm3) per size bin, note that volume multiplied by 
 				# 1e-12 to convert from um3 to cm3
 				tmc = ((Vperbin*1.e-12)/avMV)*NA
 
 				# concentration of particle-phase seed components in all size bin
-				for ci in range(len(self.seedi)): # loop through indices of seed components
+				# loop through indices of seed components
+				for ci in range(len(self.seedi)): 
 					
 					# non-water (# molecules/cm3)
 					yn[self.seedi[ci]:(num_comp*(num_sb-1)+self.seedi[ci])+1:num_comp] = tmc*(seedxn[ci, :])
