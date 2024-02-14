@@ -226,10 +226,12 @@ def mod_var_read(self):
 				else:
 
 					try:
-						y0 = [float(i) for i in (value.split(','))]
+						y0 = [float(i) for i 
+						in (value.split(','))]
 					except:
 					
-						err_mess = '''Error - could not read in the 
+						err_mess = '''Error - 
+						could not read in the 
 						C0 model variable, please check the model 
 						variables file and see README for guidance'''
 			
@@ -1051,16 +1053,28 @@ def C0_open(self):
 
 	import os
 	import ast
+	from textwrap import dedent
 
 	try: # try to open the file at the user-supplied path
-		fname = str(self.path_to_C0 + '/concentrations_all_components_all_times_gas_particle_wall')
+		fname = '''\
+		/concentrations_all_components_all
+		_times_gas_particle_wall
+		'''
+		fname = dedent(fname)
+		fname = fname.replace('\n', '')
+		fname = str(self.path_to_C0 + fname)
+		
 		y0 = np.loadtxt(fname, delimiter=',', skiprows=1)
-		# keep just the final time step concentrations (ppb) - note this will need work for unit 
+		# keep just the final time step concentrations (ppb) -
+		# note this will need work for unit 
 		# conversion if more than gas-phase present
 		y0 = y0[-1, :]
 	except: # if file not found tell user
-		self.err_mess = str('Error: file path provided by user in model variables file for initial concentrations of components not found, file path attempted was: ' + str(self.path_to_C0 + '/concentrations_all_components_all_times_gas_particle_wall'))
-		return(self)
+		self.err_mess = str(''''Error: file path provided by
+		 user in model variables file for initial concentrations
+		 of components not found, file path attempted was: ''' 
+		+ fname)
+		return(self, [])
 
 	# now get names of components that concentrations correspond to
 	# get chemical scheme names
@@ -1069,7 +1083,8 @@ def C0_open(self):
 	fname = str(self.path_to_C0 + '/model_and_component_constants')
 	
 	const_in = open(fname)
-
+	comp0 = [] # prepare to store chemical scheme names
+	# get chemical scheme names of components
 	for line in const_in.readlines():
 		if (str(line.split(',')[0]) == 'chem_scheme_names'):
 			# find index of first [ and index of last ]
@@ -1086,7 +1101,15 @@ def C0_open(self):
 					break
 
 			comp0 = ast.literal_eval(line[st_indx:fi_indx])
-	# now just keep the concentrations for components with concentrations above zero
+
+	if (comp0 == []): # if new style of saving results used
+		fname = str(self.path_to_C0 + '/comp_namelist.npy')
+		comp0 = (np.load(fname, 
+			allow_pickle=True)).tolist()
+	
+
+	# now just keep the concentrations for components with
+	# concentrations above zero
 	comp0 = np.array((comp0))[y0 > 0.]
 	y0 = y0[y0 > 0.]
 	# remove water
