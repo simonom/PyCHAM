@@ -1,0 +1,35 @@
+res_file_name = outdoor_win_hp_ref
+total_model_time = 8.64e4
+update_step = 3.6e2
+recording_time_step = 1.8e3
+lat = 53.
+lon = 1.
+DayOfYear = 1
+#DayOfYear = 183
+daytime_start = 0.
+light_status = 1
+p_init = 101300
+C0 = 27., 14., 4., 0.039, 150., 2000. 
+Comp0 = NO2, NO, O3, APINENE, CO, CH4
+#cont_infl = cont_infl.xlsx
+# zero to turn surface losses off
+wall_on = 0
+number_size_bins = 0
+#size_structure = 0
+#lower_part_size = 0.
+#upper_part_size = 5.e-2
+#space_mode = log
+#coag_on = 1
+#pconc = 1e1, 1e0
+#pconct = 3.6e2
+#pcont = 1
+# -1 to turn off particle deposition to surfaces
+#McMurry_flag = -1
+dil_fac = 8.e-4
+obs_file = hi_poll_site_win.xlsx
+#tracked_comp = O3, NO3
+#pars_skip = 1
+#spin_up = 1
+# old kpp
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+sim_cont_infl_file = hi_poll_site_win_cont_infl.xlsx

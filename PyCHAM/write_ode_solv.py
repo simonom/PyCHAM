@@ -303,11 +303,13 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		f.write('		# account for continuous extraction of chamber air\n')
 		f.write('		# index for estimating dilution factors \n')
 		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') \n')
-		f.write('		if (self.odsw_flag == 1): # if water solver used \n')
-		f.write('			df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
+		f.write('		if (self.odsw_flag == 0): # if water solver not used \n')
+		f.write('			dd[H2Oi::num_comp] -= y[H2Oi::num_comp, 0]*self.dil_fac_H2O_now\n')
+		f.write('		# water diluted either in water solver or above \n')
+		f.write('		df_indx[H2Oi::num_comp] = 0 \n')
 		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0 # cannot dilute what is on wall \n')
 		f.write('		df_indx = df_indx==1 # transform to Boolean array \n')
-		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac_now\n')
+		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*self.dil_fac_now\n')
 		f.write('		\n')
 		
 	# note the following needs two indents (as for the reaction section), so that it

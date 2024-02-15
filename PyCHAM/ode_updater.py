@@ -340,7 +340,7 @@ def ode_updater(y, H2Oi,
 	self.comp_namelist_np = np.array(self.comp_namelist)
 	# turn off flag for ongoing injection of particles
 	self.pcont_ongoing = 0
-	
+
 	# find out what to do with the gas-wall partitioning coefficient,
 	# note that self.kw and self.Cw are spread over wall bins in rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
@@ -383,7 +383,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		
+		print('y0', RHt_cnt)
 		# remembering variables at the start of the 
 		# integration step -------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
@@ -550,7 +550,8 @@ def ode_updater(y, H2Oi,
 				((num_sb-self.wall_on+1))], rowvals, 
 				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, \
 				self)
-			
+			print('ode_up')
+			print(self.dil_fac_H2O_now)
 			# if water gas-particle partitioning serialised
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): 
 				
@@ -693,8 +694,10 @@ def ode_updater(y, H2Oi,
 				for ci in range(len(self.obs_comp_i)): # loop through components
 					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
 					
-		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
-		# note that concentrations of components inside particles (and in the gas-phase) will have been
+		# dilute particle number following an integration 
+		# time step, e.g. for flow-reactor -----
+		# note that concentrations of components inside 
+		# particles (and in the gas-phase) will have been
 		# reduced due to dilution inside the ODE solver
 		if (self.dil_fac_now > 0):
 			N_perbin -= N_perbin*(self.dil_fac_now*tnew)

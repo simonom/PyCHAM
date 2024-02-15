@@ -1,1 +1,3 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/ambient_constrained_lo_poll_site_sum_medwind_continfl
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_sum_hp_ref
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_sum_lp_ref
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_win_hp_ref

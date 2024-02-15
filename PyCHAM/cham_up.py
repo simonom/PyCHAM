@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -166,8 +169,10 @@ def cham_up(sumt, Pnow,
 
 	# update dilution factor
 	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
+	# for water vapour
+	self.dil_fac_H2O_now = 0.0
 		
-	# check on change of light setting --------------------------------------
+	# check on change of light setting ------------------------------
 
 	# begin by assuming no change to time interval required due to chamber 
 	# condition/nucleation
@@ -362,25 +367,47 @@ def cham_up(sumt, Pnow,
 			tnew = injectt[gasinj_cnt]-sumt
 			bc_red = 1 # flag for time step reduction due to boundary conditions
 	
-	# check on instantaneous change in relative humidity ---------------------------------------
-	if (len(self.RHt) > 0 and RHt_cnt > -1): # if any injections occur
-	
+	# check on instantaneous change in relative humidity -----------
+	# if any injections occur
+	if (len(self.RHt) > 0 and RHt_cnt > -1):
+		print('y1', RHt_cnt, sumt, self.RHt[RHt_cnt])
 		# check whether changes occur at start of this time step
 		if (sumt >= self.RHt[RHt_cnt] and RHt_cnt != -1):
-		
-			if (gpp_stab != -1): # if no linear interpolation required
+			print('cham_ups1')
+			# if no linear interpolation required
+			if (gpp_stab != -1):
+				print('cham_ups2')
 				RHn = self.RH[RHt_cnt]
 				
 				if (RHt_cnt < (self.RHt.shape[0]-1)):
+					print('cham_ups3', self.RH[RHt_cnt], self.RH[RHt_cnt+1])
+					if (self.RH[RHt_cnt] == self.RH[RHt_cnt+1]):
+						print('cham_ups4')
+						# assume we don't want dilution of 
+						# water vapour
+						self.dil_fac_H2O_now = 0.
 					RHt_cnt += 1 # update count on RH
+					
 				else:
 					RHt_cnt = -1 # reached end
-				# reset flag for time step reduction due to boundary conditions
+					# assume no dilution of water
+					# vapour
+					self.dil_fac_H2O_now = 0.
+ 
+				# reset flag for time step reduction due 
+				# to boundary conditions
 				bc_red = 0				
 			else:
 				RHn = np. interp(tnew, [0, t00], [self.RH[RHt_cnt-1], self.RH[RHt_cnt]])
+				print('cham_ups3a')
+				if (self.RH[RHt_cnt-1] == self.RH[RHt_cnt]):
+					print('cham_ups5')
+					# assume we don't want dilution of 
+					# water vapour
+					self.dil_fac_H2O_now = 0.
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 		
+
 			# update vapour pressure of water (log10(atm)), and change 
 			# gas-phase concentration of water vapour since 
 			# RH stays as stated in the RH and RHt model variables
