@@ -370,19 +370,19 @@ def cham_up(sumt, Pnow,
 	# check on instantaneous change in relative humidity -----------
 	# if any injections occur
 	if (len(self.RHt) > 0 and RHt_cnt > -1):
-		print('y1', RHt_cnt, sumt, self.RHt[RHt_cnt])
+		
 		# check whether changes occur at start of this time step
 		if (sumt >= self.RHt[RHt_cnt] and RHt_cnt != -1):
-			print('cham_ups1')
+			
 			# if no linear interpolation required
 			if (gpp_stab != -1):
-				print('cham_ups2')
+				
 				RHn = self.RH[RHt_cnt]
 				
 				if (RHt_cnt < (self.RHt.shape[0]-1)):
-					print('cham_ups3', self.RH[RHt_cnt], self.RH[RHt_cnt+1])
+					
 					if (self.RH[RHt_cnt] == self.RH[RHt_cnt+1]):
-						print('cham_ups4')
+						
 						# assume we don't want dilution of 
 						# water vapour
 						self.dil_fac_H2O_now = 0.
@@ -398,14 +398,16 @@ def cham_up(sumt, Pnow,
 				# to boundary conditions
 				bc_red = 0				
 			else:
-				RHn = np. interp(tnew, [0, t00], [self.RH[RHt_cnt-1], self.RH[RHt_cnt]])
-				print('cham_ups3a')
+				RHn = np. interp(tnew, [0, t00], [self.RH[RHt_cnt-1], 
+					self.RH[RHt_cnt]])
+				
 				if (self.RH[RHt_cnt-1] == self.RH[RHt_cnt]):
-					print('cham_ups5')
+					
 					# assume we don't want dilution of 
 					# water vapour
 					self.dil_fac_H2O_now = 0.
-				bc_red = 1 # reset flag for time step reduction due to boundary conditions
+				# reset flag for time step reduction due to boundary conditions
+				bc_red = 1
 		
 
 			# update vapour pressure of water (log10(atm)), and change 
@@ -435,14 +437,14 @@ def cham_up(sumt, Pnow,
 	# ode_updater
 	if (sumt == 0. and pcontf == 1):
 		self.pcont_ongoing = 1
-
+	
 	# if influx occurs and we are not on the cham_up 
 	# call from the rec module (which has tnew=0)
 	# note, if this particle influx section called 
 	# during the call to rec, then continuous influx is 
 	# cancelled when called later
-	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and (num_sb-self.wall_on > 0) and \
-		tnew > 0.):
+	if ((sum(pconct[0, :]) > 0) and (seedt_cnt > -1) and 
+		(num_sb-self.wall_on > 0) and tnew > 0.):
 		
 		# in case particle influx repeated every 24 hours
 		if (self.pconctf == 1 and sumt >= 24.*3.6e3):
@@ -468,7 +470,6 @@ def cham_up(sumt, Pnow,
 			
 			# if no linear interpolation required, 
 			# or injection continuous
-			
 			if (gpp_stab != -1 or pcontf == 1): 				
 				pconcn = pconc[:, seedt_cnt]
 
@@ -522,19 +523,24 @@ def cham_up(sumt, Pnow,
 				if (self.pconctf == 1):
 					if (pconct[0, seedt_cnt+1] >= 24.*3.6e3):
 						seedt_cnt = 0 # reset if necessary
+						self.seedx_tcnt = 0
 					else:
 						seedt_cnt += 1
+						self.seedx_tcnt += 1
 
 				if (self.pconctf == 0):
 					seedt_cnt += 1
+					self.seedx_tcnt += 1
 
 			else:
 				# if influx times treated explicitly
 				if (self.pconctf == 0):
 					seedt_cnt = -1 # reached end
+					self.seedx_tcnt = -1
 				# if repeating every 24 hours
 				if (self.pconctf == 1):
 					seedt_cnt = 0 # reset
+					self.seedx_tcnt = 0
 	
 		# check whether changes occur during proposed 
 		# integration time step
@@ -570,6 +576,8 @@ def cham_up(sumt, Pnow,
 		
 		if (seedt_cnt != -1):
 			pconcn = pconc[:, seedt_cnt-1]
+			# index for mole fraction of seed particles
+			self.seedx_tcnt = seedt_cnt-1
 			
 			if (pmode == 0): # if in modal mode
 				mean_radn = mean_rad[:, seedt_cnt-1]

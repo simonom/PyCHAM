@@ -298,10 +298,13 @@ def ode_updater(y, H2Oi,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
-		seedt_cnt = 1 # count on injection times of particles
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0):
+		# count on injection times of particles
+		seedt_cnt = 1
+		self.seedx_tcnt = 1 
 	else:
 		seedt_cnt = 0
+		self.seedx_tcnt = 0
 	
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
@@ -383,7 +386,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		print('y0', RHt_cnt)
+		
 		# remembering variables at the start of the 
 		# integration step -------------------------------------
 		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
@@ -414,22 +417,32 @@ def ode_updater(y, H2Oi,
 		
 		while (gpp_stab != 1): # whilst ode solver flagged as unstable
 
-			# if integration interval decreased, reset concentrations to those at start of interval
+			# if integration interval decreased, reset 
+			# concentrations to those at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
 			
-			# for change tendencies, t=0 recording done inside rec_prep
-			# record any change tendencies of specified components after t=0
+			# for change tendencies, t=0 recording done
+			#  inside rec_prep
+			# record any change tendencies of specified 
+			# components after t=0
 			if (len(self.dydt_vst) > 0 and save_cntf == 0):
-				if ((sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
+				if ((sumt-(self.save_step*(save_cnt-1))
+					 > -1.e-10)):
 					
-					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
+					if (sumt-
+					(self.save_step*(save_cnt-1)) > 
+					-1.e-10):
 						dydt_cnt = save_cnt-1
 
-					# before solving ODEs for chemistry, dilution, 
-					# gas-particle partitioning and gas-wall partitioning, 
+					# before solving ODEs for 
+					# chemistry, dilution, 
+					# gas-particle partitioning and
+					# gas-wall partitioning, 
 					# estimate and record any 
-					# change tendencies (# molecules/cm3/s) resulting from 
+					# change tendencies (# 
+					# molecules/cm3/s) resulting 
+					# from 
 					# these processes
 					if (self.testf != 5):
 						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, 
@@ -546,27 +559,30 @@ def ode_updater(y, H2Oi,
 			# particle-phase fractions of components
 			[rowvalsn, colptrsn, jac_mod_len, 
 			jac_part_hmf_indx, rw_indx, 
-				jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*\
+				jac_part_H2O_indx] = jac_up.jac_up(
+				y[num_comp:num_comp*
 				((num_sb-self.wall_on+1))], rowvals, 
-				colptrs, (num_sb-self.wall_on), num_comp, H2Oi, y[H2Oi], ser_H2O, \
-				self)
-			print('ode_up')
-			print(self.dil_fac_H2O_now)
+				colptrs, (num_sb-self.wall_on), num_comp, 				H2Oi, y[H2Oi], ser_H2O, self)
+			
 			# if water gas-particle partitioning serialised
-			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): 
+			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
+				 and (sum(N_perbin) > 0)): 
 				
-				# if on the deliquescence curve rather than the 
-				# efflorescence curve in terms of water gas-particle partitioning
+				# if on the deliquescence curve rather 					# than the 
+				# efflorescence curve in terms of water 				# gas-particle partitioning
 				if (wat_hist == 1):
-					# flag that water gas-particle partitioning solved separately
+					# flag that water gas-particle 
+					# partitioning solved separately
 					self.odsw_flag = 1
 					
 					# call on ode solver for water
-					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
-					Cinfl_now, rowvalsn, colptrsn, num_comp, 
-					num_sb, act_coeff, core_diss, kelv_fac, kimt, \
+					[y, res_t] = ode_solv_wat.\
+					ode_solv(y, tnew,
+					Cinfl_now, rowvalsn, colptrsn, 
+					num_comp, 
+					num_sb, act_coeff, core_diss, 						kelv_fac, kimt, \
 					(num_sb-self.wall_on), 
-					jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, \
+					jac_mod_len, jac_part_hmf_indx, 					rw_indx, N_perbin, \
 					jac_part_H2O_indx, H2Oi, self)
 				
 					# check on stability of water 
@@ -613,25 +629,32 @@ def ode_updater(y, H2Oi,
 				else:
 					# water gas-particle partitioning not solved separately
 					self.odsw_flag = 0
-				# zero partitioning of water to particles for integration without 
+				# zero partitioning of water to particles 
+				# for integration without 
 				# water gas-particle partitioning
-				if (num_sb > self.wall_on): # if particles present
-					kimt[0:num_sb-self.wall_on, H2Oi] = 0.
+				# if particles present
+				if (num_sb > self.wall_on):
+					kimt[0:num_sb-self.wall_on, 
+						H2Oi] = 0.
 			
 			else:
-				# water gas-particle partitioning not solved separately
+				# water gas-particle partitioning not 
+				# solved separately
 				self.odsw_flag = 0
 			
-			# model component concentration changes to get new concentrations
-			# molecules/cm3 (air))
+			# model component concentration changes to 
+			# get new concentrations molecules/cm3 (air))
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
-				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
-				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, 
+				core_diss, kelv_fac, kimt, 
+				(num_sb-self.wall_on),
+				jac_mod_len, jac_part_hmf_indx, rw_indx, 
+				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
 			
-			# if any components set to have constant gas-phase 
+			# if any components set to have constant 
+			# gas-phase 
 			# concentration
 			if (any(self.con_C_indx)): # then keep constant
 				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)

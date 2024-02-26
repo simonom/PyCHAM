@@ -224,6 +224,19 @@ def ui_check(self):
 		err_mess = str('Error - the size structure must be either 0 for moving-centre or 1 for full-moving, see the notes on the size_structure model variable in README')
 		em_flag = 2
 	
+	# consistency between number of times given for 
+	# particle number concentration and number of
+	# times given for seed component mole fraction
+	if (seedx.shape[2] > 1):
+		if (seedx.shape[2] != pconc.shape[1]):
+			err_mess = str('''Error - the number of times given for seed component mole fractions ''' + str(seedx.shape[2]) + ''' does not match the number of times given for particle concentrations ''' + str(pconc.shape[1]) + ''', and they must be consistent. Please see seedx and pconc model variables in the README''')
+			em_flag = 2 # error message flag for error
+
+	if (seedx.shape[2] == 1 and pconc.shape[1] > 1):
+		# if just one time given for seedx, then
+		# tile over pconc times
+		seedx = np.tile(seedx, (1, 1, pconc.shape[1]))
+
 	# consistency between number of particle size bins and particle number concentration
 	if (num_sb == 0 and (sum(sum(pconc != 0)) > 0) and em_flag < 2):
 		err_mess = str('Error - zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')

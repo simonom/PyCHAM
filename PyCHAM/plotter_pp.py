@@ -21,7 +21,8 @@
 ##########################################################################################
 '''plots results for the particle-phase stuff'''
 # simulation results are represented graphically:
-# plots results for the total particle-phase concentration temporal profiles of specified components
+# plots results for the total particle-phase concentration temporal profiles of 
+# specified components
 # also the temporal profile or non-seed and non-water particle-phase
 
 import matplotlib.pyplot as plt
@@ -71,9 +72,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
 
 	# prepare to store summed results
-	if (self.sum_ornot_flag == 1):
-		sum_conc = np.zeros((len(timehr)))
-		sum_comp_names_to_plot = comp_names_to_plot[0]
+	if hasattr(self, 'sum_ornot_flag'):
+		if (self.sum_ornot_flag == 1):
+			sum_conc = np.zeros((len(timehr)))
+			sum_comp_names_to_plot = comp_names_to_plot[0]
 
 	if (caller == 0 or caller >= 3):
 		plt.ion() # show results to screen and turn on interactive mode
@@ -694,13 +696,16 @@ def part_mass_vs_time_sizeseg(self):
 	
 	# get required variables from self
 	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
+		self.ro_obj.yrec.shape[1]))
 	yrec[:, :] = self.ro_obj.yrec[:, :]
 	num_comp = self.ro_obj.nc
 	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
+		self.ro_obj.Nrec_wet.shape[1]))
 	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
+		self.ro_obj.Nrec_dry.shape[1]))
 	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
@@ -708,7 +713,8 @@ def part_mass_vs_time_sizeseg(self):
 	y_MW = self.ro_obj.comp_MW
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
+		self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 
 	# number of actual particle size bins
@@ -720,7 +726,8 @@ def part_mass_vs_time_sizeseg(self):
 	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 	
 	try: # in case user-supplied values given:
-		psb_dub = [float(i) for i in self.e303p.text().split(',')]
+		psb_dub = [float(i) for i in 
+			self.e303p.text().split(',')]
 	except:
 		# default
 		# particle size bins (upper bounds) diameter (um), 
@@ -969,5 +976,408 @@ def part_area_vs_time_sizeseg(self):
 	
 	# include legend
 	ax0.legend(fontsize=14)
+
+	return()
+
+# function for plotting contribution per user-supplied component by mass
+# against time
+def comp_part_mass_vs_time(self):
+
+	import scipy.constants as si
+
+	# inputs: ----
+	# self - PyCHAM object
+	# ------------
+
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
+		self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
+		self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
+		self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
+		self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+
+	# number of actual particle size bins
+	num_asb = (num_sb-wall_on)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+
+	# components to consider
+	cn = self.comp_names_part_mass_vs_time
+
+	# prepare results matrix
+	res = np.zeros((len(cn), len(timehr)))	
+
+	# particle-phase concentrations of all 
+	# components (# molecules/cm3)
+	if (wall_on > 0): # wall on
+		ppc = yrec[:, num_comp:-num_comp*wall_on]
+	if (wall_on == 0): # wall off
+		ppc = yrec[:, num_comp::]
+	
+	# tile molar masses over size bins and times
+	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
+	y_mwt = np.tile(y_mwt, (len(timehr), 1))
+	# convert from # molecules/cm3 to ug/m3
+	ppc = (ppc/si.N_A)*y_mwt*1.e12
+
+	# loop through components to plot
+	for i in range(len(cn)):	
+
+		# get chemical scheme index
+		try:
+			ci = comp_names.index(cn[i])
+			# sum over size bins
+			res[i, :] = np.sum(ppc[:, ci::num_comp], axis=1)
+						
+		except:
+			if (cn[i] == 'SOA'):
+				
+				y_SOA = np.zeros((ppc.shape[0], 
+					ppc.shape[1]))
+
+				y_SOA[:, :] = ppc[:, :]
+
+				# zero water and seed
+				y_SOA[:, H2Oi::num_comp] = 0.
+				# loop through seed components
+				for si in seedi: 
+					y_SOA[:, si::num_comp] = 0.
+				
+				# sum over components and size bins
+				res[i, :] = np.sum(y_SOA, axis=1)
+	
+	ax0.stackplot(timehr[1:-1]+16, res[:, 1:-1], labels = cn)
+	#plt.yscale('log')
+	ax0.set_ylabel(r'Particle Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
+	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
+
+	return()	
+
+# function for plotting contribution per user-supplied component by
+# risk (as a function of mass) against time
+def comp_part_risk_vs_time(self):
+
+	import scipy.constants as si
+
+	# inputs: ----
+	# self - PyCHAM object
+	# ------------
+
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
+		self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
+		self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
+		self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
+		self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+
+	# number of actual particle size bins
+	num_asb = (num_sb-wall_on)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+
+	# components to consider
+	cn = self.comp_names_part_mass_vs_time
+
+	# prepare results matrix
+	res = np.zeros((len(cn), len(timehr)))	
+
+	# particle-phase concentrations of all 
+	# components (# molecules/cm3)
+	if (wall_on > 0): # wall on
+		ppc = yrec[:, num_comp:-num_comp*wall_on]
+	if (wall_on == 0): # wall off
+		ppc = yrec[:, num_comp::]
+	
+	# tile molar masses over size bins and times
+	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
+	y_mwt = np.tile(y_mwt, (len(timehr), 1))
+	# convert from # molecules/cm3 to ug/m3
+	ppc = (ppc/si.N_A)*y_mwt*1.e12
+
+	# concentration-response function from 
+	# https://assets.publishing.service.gov.uk/
+	# media/623302158fa8f504aa780865/
+	# COMEAP_Statement_on_PM2.5_mortality_quantification.pdf
+	risk_coeff = 1.08
+
+	# loop through components to plot
+	for i in range(len(cn)):	
+
+		# get chemical scheme index
+		try:
+			ci = comp_names.index(cn[i])
+			# sum over size bins
+			res[i, :] = risk_coeff**((
+			np.sum(ppc[:, ci::num_comp], axis=1))/10.)-1.
+						
+		except:
+			if (cn[i] == 'SOA'):
+				
+				y_SOA = np.zeros((ppc.shape[0], 
+					ppc.shape[1]))
+
+				y_SOA[:, :] = ppc[:, :]
+
+				# zero water and seed
+				y_SOA[:, H2Oi::num_comp] = 0.
+				# loop through seed components
+				for si in seedi: 
+					y_SOA[:, si::num_comp] = 0.
+				
+				# sum over components and size bins
+				res[i, :] = risk_coeff**((np.sum(
+				y_SOA, axis=1))/10.)-1.
+	
+	ax0.stackplot(timehr[1:-1]+16, res[:, 1:-1], labels = cn)
+
+	ax0.set_ylabel(r'factor change in all-cause mortality', 
+	fontsize = 14)
+	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
+
+	return()
+
+
+# function for plotting contribution per user-supplied component by
+# carbon oxidation state against time
+def comp_part_cos_vs_time(self):
+
+	import scipy.constants as si
+
+	# inputs: ----
+	# self - PyCHAM object
+	# ------------
+
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
+		self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
+		self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
+		self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	HC = np.array((self.ro_obj.HyC))
+	
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
+		self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+
+	# number of actual particle size bins
+	num_asb = (num_sb-wall_on)
+
+	plt.ion() # show results to screen and turn on interactive mode
+		
+	# prepare plot
+	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
+
+	# components to consider
+	cn = self.comp_names_part_mass_vs_time
+	
+	# remember to include total carbon oxidation state
+	#cn.append('total')
+	
+	# prepare results matrix
+	res = np.zeros((len(cn), len(timehr)))	
+	ros = np.zeros((len(cn), len(timehr)))	
+
+	# particle-phase concentrations of all 
+	# components (# molecules/cm3)
+	if (wall_on > 0): # wall on
+		ppc = yrec[:, num_comp:-num_comp*wall_on]
+	if (wall_on == 0): # wall off
+		ppc = yrec[:, num_comp::]
+	
+	# tile molar masses over size bins and times
+	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
+	y_mwt = np.tile(y_mwt, (len(timehr), 1))
+	# convert from # molecules/cm3 to ug/m3
+	ppc = (ppc/si.N_A)*y_mwt*1.e12
+
+	# now transform ppc matrix so that times in rows,
+	# components in columns and size bins in third dimension
+	ppc = ppc.reshape(len(timehr), num_comp, num_asb, order='F')
+
+	# now sum over size bins
+	ppc = np.sum(ppc, axis=2)
+
+	# carbon oxidation state per component 
+	cos = np.zeros((len(rel_SMILES)))
+	for ci in range(len(rel_SMILES)): # loop through components
+		# get carbon number
+		Cn = (rel_SMILES[ci].count('c')+
+			rel_SMILES[ci].count('C'))
+		if (Cn == 0):
+			cos[ci] = 0.
+		else:
+			
+			cos[ci] = (((HC[0, ci]*Cn)*-1+
+			rel_SMILES[ci].count('o')*2+
+			rel_SMILES[ci].count('O')*2.+
+			rel_SMILES[ci].count('oo')*-2+
+			rel_SMILES[ci].count('oO')*-2+
+			rel_SMILES[ci].count('Oo')*-2+
+			rel_SMILES[ci].count('OO')*-2+
+			rel_SMILES[ci].count('O[O]')*-3+
+			rel_SMILES[ci].count('ON(=O)=O')*-5)/Cn)
+			
+	# tile carbon oxidation states over times
+	cos = np.tile(cos.reshape(1, -1), (len(timehr), 1))	
+	# get the ROS
+	ros0 = cos*1.1+1.51
+	# can't have negative reactive oxidation spaces	
+	ros0[ros0<0.] = 0. 
+
+	# estimate mass fractions
+	# zero mass of water
+	ppc[:, H2Oi] = 0.
+	#ppc[:, comp_names.index('core')] = 0.
+	#ppc[:, comp_names.index('core_ind')] = 0.
+	
+	# mass fraction of each component at each time
+	mf = (ppc/(np.sum(ppc, axis=1).reshape(-1, 1)))
+
+	# multiply by organic mass concentration fraction
+	cos_frac = cos*mf
+	ros_frac = ros0*mf
+
+	# loop through components of known 
+	# oxidative potential
+	op_res = np.zeros((6, len(timehr)))
+	# ammonium sulphate (outdoor core)
+	op_res[0, :] = 180.*mf[:, comp_names.index('core')]
+	
+	
+	# outdoor primary (pri_org)
+	op_res[1, :] = 9.*mf[:, comp_names.index('pri_org')]
+	# outdoor secondary (pri_org)
+	op_res[2, :] = 60.*(mf[:, comp_names.index('sec_org2')]+
+	mf[:, comp_names.index('sec_org1')]+
+	mf[:, comp_names.index('sec_org0')]+
+	mf[:, comp_names.index('sec_org-1')]+
+	mf[:, comp_names.index('sec_org-2')])
+	# indoor elemental carbon (core_ind)
+	op_res[3, :] = 2.*mf[:, comp_names.index('core_ind')]
+	# indoor primary organic
+	op_res[4, :] = 9.*mf[:, comp_names.index('pri_org_ind')]
+	# SOA
+	# zero mass fractions of seed components
+	mf[:, seedi] = 0.
+	mf[:, H2Oi] = 0.
+	op_res[5, :] = 67.*np.sum(mf, axis=1)
+
+	# multiply by total dry mass of PM
+	op_res = op_res*(np.sum(ppc, axis=1).reshape(1, -1))
+
+	# loop through components to plot
+	#for i in range(len(cn)):	
+		
+		# get chemical scheme index
+		#try:
+			#ci = comp_names.index(cn[i])
+			# sum over size bins
+			#res[i, :] = cos_frac[:, ci]
+			#ros[i, :] = ros_frac[:, ci]
+		#except:	
+			#if (cn[i] == 'SOA'):
+				
+				#y_SOA = np.zeros((cos_frac.shape[0], 
+				#	cos_frac.shape[1]))
+				#yr_SOA = np.zeros((ros_frac.shape[0], 
+				#	ros_frac.shape[1]))	
+
+				#y_SOA[:, :] = cos_frac[:, :]
+				#yr_SOA[:, :] = ros_frac[:, :]
+				# zero water and seed
+				#y_SOA[:, H2Oi] = 0.
+				#yr_SOA[:, H2Oi] = 0.
+				
+				# loop through seed components
+				#for si in seedi: 
+				#	y_SOA[:, si] = 0.
+				#	yr_SOA[:, si] = 0.
+					
+				# sum over components
+				#res[i, :] = np.sum(y_SOA, axis=1)
+				#ros[i, :] = np.sum(yr_SOA, axis=1)
+	
+			#if (cn[i] == 'total'):
+				#res[i, :] = np.sum(cos_frac, axis=1)
+				#ros[i, :] = np.sum((ros[0:i, :]),
+				#	 axis=0)
+		#ax0.plot(timehr[1:-1]+16., res[i, 1:-1], label=cn[i])
+
+	# now that we have ROS results for all components, we can
+	# compare the ROS with and without each component, and 
+	# therefore estimate its factor change in ROS	
+	# loop through components contributing to ROS
+	#for i in range(len(cn)-1):	
+		#ros[i, :] = (ros[i, :]/ros[-1, :])
+		#ax1.plot(timehr[1:-1]+16., ros[i, 1:-1], label=cn[i])
+	ax0.stackplot(timehr[1:-1]+16., op_res[:, 1:-1], labels=cn)
+	#ax0.set_ylabel(str('''Carbon oxidation state weighted by ''' +
+	#'''mass'''), fontsize = 14)
+	ax0.set_ylabel(str('''$\mathrm{OP_{DTT}}$ weighted by ''' +
+	'''mass'''), fontsize = 14)
+	#ax1.set_ylabel('''ROS''')
+	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	#ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
+	#ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
+	ax0.legend(fontsize = 14)
 
 	return()

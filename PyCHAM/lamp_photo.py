@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -211,7 +214,9 @@ def lamp_photo(J, TEMP, self):
 			# section for the arranging
 			# of absorption cross-sections and quantum 
 			# yields
-			if line.strip() == str('J_'+str(Ji+1) + '_axs') or line.strip() == str('J_'+str(Ji+1) + '_qy') or line.strip() =='J_end':
+			if (line.strip() == str('J_'+str(Ji+1) + '_axs') 
+				or line.strip() == str('J_'+str(Ji+1) + '_qy') 
+				or line.strip() =='J_end'):
 
 				# absorption cross section (cm2/molecule) interpolation to wavelengths
 				# given in actinic flux file
@@ -273,7 +278,8 @@ def lamp_photo(J, TEMP, self):
 	# in combination with the actinic flux found above
 	else:
 	
-		# ------------------------------------------------------		# J<1> and J<2> for O3 (ozone) photolysis
+		# ------------------------------------------------------		
+		# J<1> and J<2> for O3 (ozone) photolysis
 		# cross-section file
 		f = open(str(self.photo_path + 
 			'/O3/o3_molina86_cs.txt'), 'r')

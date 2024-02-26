@@ -58,7 +58,7 @@ def middle(self): # define function
 		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
 		erh_str, pcont, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
-
+	
 	# if not skipping parsing of chemical scheme	
 	if (self.pars_skip == 0 or self.pars_skip == 2): 
 		# parse the chemical scheme equation file to convert 
@@ -66,8 +66,8 @@ def middle(self): # define function
 		[rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
-							 drh_str, erh_str, sav_nam, pcont, self)
-
+			drh_str, erh_str, sav_nam, pcont, self)
+	
 	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
 		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, comp_smil, 
 			erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)

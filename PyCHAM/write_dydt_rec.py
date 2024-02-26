@@ -19,9 +19,12 @@
 # You should have received a copy of the GNU General Public License    #
 # along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                      #
-########################################################################'''generates module that records change tendencies'''
-# function to automatically generate a module that is used to record the tendency
-# of components (components specified by the user, their index given by rec_comp_index) 
+########################################################################
+'''generates module that records change tendencies'''
+# function to automatically generate a module that is used to record the 
+# tendency
+# of components (components specified by the user, their index given by 
+# the tracked_comp user input) 
 # to change in response to box model 
 # mechanisms - with the resulting function called on each time step
 
@@ -55,7 +58,8 @@ def write_dydt_rec(self): # define function
 	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #\n')
 	f.write('#                                                                                        #\n')
 	f.write('##########################################################################################\n')
-	f.write('\'\'\'module for calculating and recording change tendency (# molecules/cm3/s) of components\'\'\'\n')
+	f.write('\'\'\'module for calculating and recording change tendency (# molecules/cm3/s)\n')
+	f.write(' of components\'\'\'\n')
 	f.write('# changes due to gas-phase photochemistry and partitioning are included; \n')
 	f.write('# generated in init_conc and treats loss from gas-phase as negative\n')
 	f.write('\n')

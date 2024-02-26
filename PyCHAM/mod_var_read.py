@@ -285,8 +285,9 @@ def mod_var_read(self):
 				
 			if key == 'eff_abs_wall_massC' and (value.strip()): # effective absorbing mass concentration of wall
 				self.Cw = np.array([float(i) for i in ((value.strip()).split(','))])
-				
-			if key == 'mass_trans_coeff' and (value.strip()): # mass transfer coefficient of vapours with wall
+			
+			# mass transfer coefficient of vapours with wall
+			if (key == 'mass_trans_coeff' and (value.strip())):
 				
 				# check if this is a path to a file containing continuous 
 				# influxes, if not treat as a list of component names
@@ -302,21 +303,25 @@ def mod_var_read(self):
 				max_of_all = []
 				reader = '' # prepare to read in string between semi-colons
 				prescribes = [] # list of prescribed mass transfer coefficients
-				num_wall_mtfs = 1 # number of walls mentioned in the mass transfer coefficient
+				# number of walls mentioned in the mass transfer coefficient
+				num_wall_mtfs = 1
 				# count maximum number of components for a single wall
 				for i in value.strip():
 					if i == ';': # new component
 						max_comp += 1
-						# remember old component and wall and mass transfer coefficient
+						# remember old component and wall and 
+						# mass transfer coefficient
 						prescribes.append(reader)
-						reader = '' # prepare to read in string between semi-colons
+						# prepare to read in string between semi-colons
+						reader = ''
 						
-					if i == ',': # new wall
+					if (i == ','): # new wall
 						max_of_all.append(max_comp)
 						max_comp = 1
 						num_wall_mtfs += 1
 						prescribes.append(reader)
-						reader = '' # prepare to read in string between semi-colons
+						# prepare to read in string between semi-colons
+						reader = ''
 
 					if (i != ';' and i != ',' and i != ' '):
 						reader = str(reader + i)
@@ -324,13 +329,17 @@ def mod_var_read(self):
 				# ensure final wall is registered
 				prescribes.append(reader)
 				
-				max_of_all.append(max_comp) # ensure final wall accounted for
+				# ensure final wall accounted for
+				max_of_all.append(max_comp)
 
-				# remember the components that are prescribed, their wall number and mass transfer coefficient
+				# remember the components that are 
+				# prescribed, their wall number 
+				# and mass transfer coefficient
 				self.wmtc_names = []
 				self.wmtc_wn = []
 				self.wmtc = []
-				pre_cnt = 0 # count on number of prescribed mass transfer coefficients
+				# count on number of prescribed mass transfer coefficients
+				pre_cnt = 0
 
 				# prepare holding array for rate coefficient information
 				self.kw = np.ones((num_wall_mtfs, max(max_of_all)))*-1.e-6
@@ -339,7 +348,8 @@ def mod_var_read(self):
 				ind_wall_cnt = 1 # number of entries for each wall
 				for prei in prescribes:
 	
-					if prei.count('_') == 2: # if this gives the coefficient for a specific component
+					# if this gives the coefficient for a specific component
+					if prei.count('_') == 2:
 						
 						# get component name
 						self.wmtc_names.append(prei[0:prei.index('_')])
@@ -534,30 +544,65 @@ def mod_var_read(self):
 				except:
 					seed_mw = ['fail']
 		
-			if key == 'seed_diss' and value.strip(): # dissociation constant of seed material
-				seed_diss = [float(i) for i in (value.split(','))]
+			# dissociation constant of seed material
+			if (key == 'seed_diss' and value.strip()):
+				seed_diss = [float(i) for i in 
+				(value.split(','))]
 
-			if key == 'seed_dens' and value.strip():
-				seed_dens = [float(i) for i in (value.split(','))]
+			if (key == 'seed_dens' and value.strip()):
+				seed_dens = [float(i) for i in 
+				(value.split(','))]
 				seed_dens = np.array((seed_dens))
 
-			if key == 'seedx' and value.strip(): # mole fraction of components in dry seed particles
-				comp_count = 1 # count number of components
+			# mole fraction of components in dry seed 
+			# particles
+			if (key == 'seedx' and value.strip()):
+				# count number of components
+				comp_count = 1
 				sb_count = 1 # track number of size bins
+				ti_count = 1 # track number of times
 				for i in value:
-					if i==';':
-						comp_count += 1 # record number of components
-						sb_count = 1 # reset size bin count
-					if i==',':
-						sb_count += 1 # size bin count
-				seedx = np.zeros((comp_count, sb_count))
-				for i in range(comp_count):
-					seedx[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
-			
-			if (key == 'Vwat_inc' and value.strip()): # whether number size distribution includes volume of water
+					if (i == ':'):
+						# count number of times
+						ti_count += 1
+						# reset number of 
+						# components
+						comp_count = 1
+						# reset size bin count
+						sb_count = 1
+					if (i == ';'):
+						# record number of 
+						# components
+						comp_count += 1
+						# reset size bin count
+						sb_count = 1 
+					if (i == ','):
+						# size bin count
+						sb_count += 1
+				seedx = np.zeros((comp_count, sb_count, 
+					ti_count))
+				# count on seed mole fractions through 
+				# time
+				self.seedx_tcnt = 0
+				# split by times
+				seedx_split = value.split(':')
+				# loop through times
+				for i0 in range(ti_count):
+					seedxn = seedx_split[i0]
+					# loop through components
+					for i in range(comp_count):
+						seedx[i, :, i0] = [
+						float(ii.strip()) for ii
+						 in ((seedxn.split(';')
+						[i]).split(','))]
+				
+			# whether number size distribution includes 
+			# volume of water
+			if (key == 'Vwat_inc' and value.strip()):
 				self.Vwat_inc = int(value.strip())
 			
-			# whether to allow water to equilibrate with seed prior to experiment
+			# whether to allow water to equilibrate with 
+			# seed prior to experiment
 			if (key == 'seed_eq_wat' and value.strip()):
 				self.seed_eq_wat = int(value.strip())
 
@@ -594,16 +639,19 @@ def mod_var_read(self):
 			if key == 'photo_par_file' and (value.strip()):
 				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
 			
-			if key == 'trans_fac' and (value.strip()): # transmission factor for light
+			# transmission factor for light
+			if (key == 'trans_fac' and (value.strip())):
 				
-				if '_' in value.strip(): # if wavelength-dependent transmission factors supplied
+				# if wavelength-dependent transmission factors supplied
+				if '_' in value.strip():
 					self.tf = [str(i.strip()) for i in (value.split(','))]
 					self.tf_range = 1 # flag for wavelength-dependency
 				else: # if a single transmission factor supplied
 					self.tf = (([float(i.strip()) for i in (value.split(';'))]))
 					self.tf_range = 0 # flag for no wavelength-dependency
-			
-			if key == 'trans_fact' and (value.strip()): # time through simulation (s) transmission factor for light applies to
+			# time through simulation (s) transmission factor 
+			# for light applies to
+			if (key == 'trans_fact' and (value.strip())):
 				
 				self.tft = np.array(([float(i.strip()) for i in (value.split(';'))]))
 
@@ -701,7 +749,7 @@ def mod_var_read(self):
 			if (key == 'tracked_comp' and (value.strip())):
 				self.dydt_trak = [str(i).strip() for i 
 					in (value.split(','))]
-
+			
 			if (key == 'dens_Comp' and (value.strip())):
 				dens_comp = [str(i).strip() for i in 
 				(value.split(','))]
@@ -1107,6 +1155,11 @@ def C0_open(self):
 		comp0 = (np.load(fname, 
 			allow_pickle=True)).tolist()
 	
+
+	# limit starting concentrations to just the gas-phase
+	# note this may need developing in future if concentrations
+	# of other phases needed
+	y0 = y0[0:len(comp0)]
 
 	# now just keep the concentrations for components with
 	# concentrations above zero

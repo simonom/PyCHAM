@@ -283,7 +283,6 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	y = np.append(y, y_w)
 	
 	# tracked components (dydt)--------------------------------------
-	
 	# check for tracking of all alkyl peroxy radicals
 	if ('RO2_ind' in self.dydt_trak):
 		# append existing list and list of RO2 radicals 
@@ -305,7 +304,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		self.dydt_trak.remove('RO_ind')
 
 	# get index of user-specified components for tracking their 
-	# change tendencies (dydt) due to modelledmechanisms
+	# change tendencies (dydt) due to modelled mechanisms
 	if (len(self.dydt_trak) > 0):
 		
 		# empty list for indices of these components

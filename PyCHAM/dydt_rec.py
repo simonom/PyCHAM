@@ -19,11 +19,12 @@
 #    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
 #                                                                                        #
 ##########################################################################################
-'''module for calculating and recording change tendency (# molecules/cm3/s) of components'''
+'''module for calculating and recording change tendency (# molecules/cm3/s)
+ of components'''
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2024-02-15 04:24:43.547361
+# File Created at 2024-02-26 14:23:00.401750
 
 import numpy as np 
 

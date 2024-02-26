@@ -85,7 +85,7 @@ def obs_file_open(self):
 			# in case of simulation preparation mode, set
 			# these components as ones to track change 
 			# tendencies of
-			if hasattr(self, 'sim_ci_file'):
+			if (self.sim_ci_file != []):
 				self.dydt_trak = self.obs_comp
 					
 			# get number of components to consider

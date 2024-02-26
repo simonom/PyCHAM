@@ -182,12 +182,14 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
-	# basis set, as shown in Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
+	# basis set, as shown in 
+	# Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
 	# also get inidces of components that can be categorised by 
 	# functional group
 	for i in range (num_comp):
 	
-		# note, rec_now_flag is only changed below if alternative vapour pressure estimation 
+		# note, rec_now_flag is only changed below if alternative 
+		# vapour pressure estimation 
 		# method uncommented for HOMs
 		rec_now_flag = 0
 			
@@ -241,17 +243,29 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.nom_mass[0, i] = 0.*1.+3.*16.
 			continue
 
-		# possibly use different method for vapour pressure (log10(atm)) of HOMs
+		# possibly use different method for vapour pressure 
+		# (log10(atm)) of HOMs
 		
 		# if HOMs
-		if ((self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c') >= 10) and (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6) and 'PAN' not in self.comp_namelist[i]):
+		if (((self.rel_SMILES[i].count('C') + 
+			self.rel_SMILES[i].count('c') >= 10) and 
+			(self.rel_SMILES[i].count('O') + 
+			self.rel_SMILES[i].count('o') >= 6) and 
+			'PAN' not in self.comp_namelist[i])):
 			
-			# log(C* (ug/m3)) (natural logarithm of effective saturation concentration) of component (Eq. 1 Mohr et al. 2019)
-			nC = self.rel_SMILES[i].count('C') + self.rel_SMILES[i].count('c')
-			nO = self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o')
-			nN = self.rel_SMILES[i].count('N') + self.rel_SMILES[i].count('n')
+			# log(C* (ug/m3)) (natural logarithm of effective 
+			# saturation concentration) of component 
+			# (Eq. 1 Mohr et al. 2019)
+			nC = (self.rel_SMILES[i].count('C') + 
+				self.rel_SMILES[i].count('c'))
+			nO = (self.rel_SMILES[i].count('O') + 
+				self.rel_SMILES[i].count('o'))
+			nN = (self.rel_SMILES[i].count('N') + 
+				self.rel_SMILES[i].count('n'))
 			if (self.pars_skip != 2):
-				Psatnow = (25.-nC)*0.475-(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/(nC+nO-3.*nN))*0.9-nN*2.5
+				Psatnow = ((25.-nC)*0.475-
+				(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
+				(nC+nO-3.*nN))*0.9-nN*2.5)
 				# convert to vapour pressure (log10(atm)) (eq. 1 O'Meara et al. 2014)
 				Psatnow = np.exp(Psatnow) # ug/m3
 				Psatnow = np.log10((Psatnow*8.2057e-5*self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))

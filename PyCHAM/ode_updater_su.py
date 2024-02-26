@@ -715,11 +715,14 @@ def count_zero(y, pconct, pcont, N_perbin, self, x, num_comp): # for setting cou
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
-		seedt_cnt = 1 # count on injection times of particles
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0):
+		# count on injection times of particles
+		seedt_cnt = 1
+		self.seedx_tcnt = 1 
 	else:
 		seedt_cnt = 0
-	
+		self.seedx_tcnt = 0
+
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
 	

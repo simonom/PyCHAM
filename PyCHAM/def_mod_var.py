@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -82,15 +85,22 @@ def def_mod_var(caller, self): # define function
 	pconc = np.zeros((1, 1))
 	pconct = np.zeros((1, 1)) # times of particle injection (s)
 	# whether to repeat particle influx every 24 hours
-	self.pconctf = 0 
-	pcont = np.zeros((1, 1), dtype=int) # whether particle injection instantaneous or continuous
-	seed_mw = (np.array((132.14))).reshape(1) # molecular weight of seed material (g/mol)
+	self.pconctf = 0
+	# whether particle injection instantaneous or continuous 
+	pcont = np.zeros((1, 1), dtype=int) 
+	# molecular weight of seed material (g/mol)
+	seed_mw = (np.array((132.14))).reshape(1) 
 	seed_diss = [1.] # dissociation constant of seed material
 	seed_dens = np.ones((1)) # density of seed material (g/cc)
 	seed_name = ['core'] # name of component forming seed material
-	seedx = np.ones((1, 1)) # mole fraction of dry seed components
-	self.Vwat_inc = 1 # seed particle number size distribution does include water volume
-	self.seed_eq_wat = 1 # allow water equilibration with seed particle before experiment starts
+	# mole fraction of dry seed components
+	seedx = np.ones((1, 1, 1)) 
+	# seed particle number size distribution and wall does 
+	# include partitioned water
+	self.Vwat_inc = 2
+	# allow water equilibration with seed particle before 
+	# experiment starts 
+	self.seed_eq_wat = 1 
 	lowsize = 0. # smallest size bin boundary (radius) (um)
 	uppsize = 5.e-1 # largest size bin boundary (radius) (um)
 	space_mode = 'lin' # treatment for spacing between size bins

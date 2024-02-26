@@ -293,13 +293,16 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		# get names of tracked components
 		dydtnames = self.dydt_vst['comp_names'] 
 		
-
 		if hasattr(self, 'ci_array'):
-			# times (s)
-			self.ci_array = np.concatenate((self.ci_array, 
-				np.zeros((self.ci_array.shape[0], 
-				len(t_out)-1)).astype('str')), axis=1)
-			self.ci_array[0, 1::] = t_out[0:-1].astype(str) 
+			if (len(self.ci_array) > 0):
+				# times (s)
+				self.ci_array = np.concatenate((
+					self.ci_array, 
+					np.zeros((self.ci_array.shape[0], 
+					len(t_out)-1)).astype('str')), 
+					axis=1)
+				self.ci_array[0, 1::] = t_out[
+					0:-1].astype(str)
 			
 
 		# loop through components to record the tendency of 
@@ -317,19 +320,22 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), 3rd column from end is gas-particle partitioning, 2nd column from end is gas-wall partitioning, final column is dilution (molecules/cm3/s (air))')
 
 			if hasattr(self, 'ci_array'):
-				# get relevant row
-				ri = self.ci_array[:, 0] == str(
-					self.dydt_trak[compind])
+				if (len(self.ci_array) > 0):
+					# get relevant row
+					ri = self.ci_array[:, 0] == str(
+						self.dydt_trak[compind])
 
-				# influx rate
-				self.ci_array[ri, 1::] = self.dydt_vst[
+					# influx rate
+					self.ci_array[ri, 
+					1::] = self.dydt_vst[
 					str(str(
 					self.dydt_trak[compind]) + 
 					'_ci')][:, 0]
 				
 			compind += 1
 
-		if hasattr(self, 'ci_array'):
+		# in case writing continuous influx to a spreadsheet
+		if (self.sim_ci_file != []):
 			from openpyxl.utils.cell import\
 			get_column_letter
 

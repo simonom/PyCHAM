@@ -1187,8 +1187,8 @@ class PyCHAM(QWidget):
 		# chamber conditions temporal profiles -------------
 		
 		# button to plot temporal profile of chamber environmental variables
-		self.b215_a = QPushButton('Chamber Conditions (T, P, RH)', self)
-		self.b215_a.setToolTip('Plot the temporal profile of chamber variables (temperature, pressure, relative humidity)')
+		self.b215_a = QPushButton('Physical Conditions (T, P, RH)', self)
+		self.b215_a.setToolTip('''Plot the temporal profile of chamber variables (temperature, pressure, relative humidity)''')
 		self.b215_a.clicked.connect(self.on_click215_a)
 		self.PRIMlayout.addWidget(self.b215_a, 0, 2)
 		
@@ -1403,21 +1403,22 @@ class PyCHAM(QWidget):
 
 		return(VOLTab)
 
-	def PARtab(self): # more detailed particle-phase plotting tab definition
-
+	# more detailed particle-phase plotting tab definition
+	def PARtab(self): 		
 		PARTab = QWidget()
 		self.PARlayout = QGridLayout() 
 		PARTab.setLayout(self.PARlayout)
 		
-		# input bar for diameter (um) limits for particle-phase concentration properties
+		# input bar for diameter (um) limits for particle-phase
+		# concentration properties
 		self.e303p = QLineEdit(self)
 		self.e303p.setText('Diameter (um) limits for options below, separate multiple values with a comma, e.g. 1.0, 2.5 for PM1 and PM2.5')
 		self.e303p.setStyleSheet('qproperty-cursorPosition : 0')
 		self.PARlayout.addWidget(self.e303p, 0, 0, 1, 3)
 		
-		# button to plot cumulative particle-phase mass concentration by different 
-		# sizes of particle
-		self.b303 = QPushButton(str('Cumulative particle mass \nconcentration without water'))
+		# button to plot cumulative particle-phase mass 
+		# concentration by different sizes of particle
+		self.b303 = QPushButton(str('''Cumulative particle ''') 		+ str('''mass \nconcentration without water'''))
 		self.b303.setToolTip('See the time series of particle mass grouped by upper diameter limits (mass and particle size excludes water)')
 		self.b303.clicked.connect(self.on_click303)
 		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
@@ -1433,59 +1434,127 @@ class PyCHAM(QWidget):
 		
 		# button to plot cumulative particle-phase surface area concentration by different 
 		# sizes of particle
-		self.b303r = QPushButton(str('Cumulative particle surface area \nconcentration without water'))
-		self.b303r.setToolTip('See the time series of particle surface area grouped by upper diameter limits (particle size excludes water)')
+		self.b303r = QPushButton(str('''Cumulative particle ''')
+		+ str('''surface area \nconcentration without water'''))
+		self.b303r.setToolTip(str('''See the time series of ''')
+		+ str('''particle surface area grouped by upper ''') +
+		str('''diameter limits (particle size excludes water)'''		))
 		self.b303r.clicked.connect(self.on_click303r)
-		self.b303r.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
+		self.b303r.setStyleSheet('''background-color : white; 
+		border-width : 1px; border-radius : 7px; 
+		border-color: silver; padding: 2px; 
+		border-style : solid''')
 		self.PARlayout.addWidget(self.b303r, 1, 2, 1, 1)
 		
-		# horizontal separator line -------------------------------
+		# horizontal separator line ---------------------------
 		self.separatorLine3 = QFrame()
 		self.separatorLine3.setFrameShape(QFrame.HLine)
 		self.separatorLine3.setFrameShadow(QFrame.Raised)
-		self.PARlayout.addWidget(self.separatorLine3, 2, 0, 1, 3)
+		self.PARlayout.addWidget(self.separatorLine3, 2, 0, 1, 
+		3)
 		self.separatorLine3.show()
 		
 		# input bar for number of components contributing
 		# to particle-phase concentration
 		self.e300 = QLineEdit(self)
-		self.e300.setText('Provide the top number of components contributing to particle-phase')
+		self.e300.setText(str('''Provide the top number of ''') 
+		+ str('''components contributing to particle-phase'''))
 		self.e300.setStyleSheet('qproperty-cursorPosition : 0')
-		self.PARlayout.addWidget(self.e300, 3, 1, 1, 1)
+		self.PARlayout.addWidget(self.e300, 3, 0, 1, 1)
 	
 		# button to plot particle-phase contributions
 		self.b300 = QPushButton(str('Particle-phase contributions (%)'))
 		self.b300.setToolTip('Show the contribution to particle-phase by the top contributors (number given in box above)')
 		self.b300.clicked.connect(self.on_click300)
 		#self.b300.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b300, 4, 0)
+		self.PARlayout.addWidget(self.b300, 3, 2)
 
 		# drop down button for type of contributors
 		self.b300a = QComboBox(self)
 		self.b300a.addItem('All components')
 		self.b300a.addItem('Excluding Seed and Water')
-		self.PARlayout.addWidget(self.b300a, 4, 1, 1, 1)
+		self.PARlayout.addWidget(self.b300a, 3, 1, 1, 1)
 
 		# button to plot particle-phase surface concentration
 		self.b301 = QPushButton(str('Particle surface area'))
 		self.b301.setToolTip('Graph the temporal profile of particle surface area')
 		self.b301.clicked.connect(self.on_click301)
 		#self.b301.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b301, 5, 0)
+		self.PARlayout.addWidget(self.b301, 4, 2)
 
 		# drop down button for type of surface area
 		self.b301a = QComboBox(self)
 		self.b301a.addItem('All components')
 		self.b301a.addItem('Seed Only')
-		self.PARlayout.addWidget(self.b301a, 5, 1, 1, 1)
+		self.PARlayout.addWidget(self.b301a, 4, 1, 1, 1)
 
-		# button to plot particle-phase mass contribution by different 
-		# generations of oxidised organic molecules
-		self.b302 = QPushButton(str('Organic molecule \ncontribution by generation'))
-		self.b302.setToolTip('See the particle-phase mass contribution by different generations of oxidised organic molecules')
+		# button to plot particle-phase mass contribution by 
+		# different generations of oxidised organic molecules
+		self.b302 = QPushButton(str('''Organic molecule ''') + 
+		str('''contribution by generation'''))
+		self.b302.setToolTip(str('''See the particle-phase ''') 
+		+ str('''mass contribution by different generations ''')
+		+ str('''of oxidised organic molecules'''))
 		self.b302.clicked.connect(self.on_click302)
-		self.b302.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
-		self.PARlayout.addWidget(self.b302, 3, 2, 1, 1)
+		self.b302.setStyleSheet('''background-color : 
+		white; border-width : 1px; border-radius : 7px; 
+		border-color: silver; padding: 2px; 
+		border-style : solid''')
+		self.PARlayout.addWidget(self.b302, 5, 0, 1, 3)
+
+		# input bar for names of individual or groups of 
+		# components contributing to particle mass
+		self.e304 = QLineEdit(self)
+		self.e304.setText(str('''Provide the names of ''') 
+		+ str('''individual components or component groups ''')
+		+ str('''for plotting mass contribution through time''')
+		)
+		self.e304.setStyleSheet('qproperty-cursorPosition : 0')
+		self.PARlayout.addWidget(self.e304, 6, 0, 1, 1)
+
+		# button to plot particle-phase mass contribution by 
+		# different components
+		self.b304 = QPushButton(str('''Contribution by ''') + 
+		str('''mass per component with time'''))
+		self.b304.setToolTip(str('''See the particle-phase ''') 
+		+ str('''mass contribution by the provided ''')
+		+ str('''components'''))
+		self.b304.clicked.connect(self.on_click304)
+		self.b304.setStyleSheet('''background-color : 
+		white; border-width : 1px; border-radius : 7px; 
+		border-color: silver; padding: 2px; 
+		border-style : solid''')
+		self.PARlayout.addWidget(self.b304, 6, 1, 1, 1)	
+
+		# button to plot particle-phase risk contribution by 
+		# different components
+		self.b305 = QPushButton(str('''Contribution by ''') + 
+		str('''risk per component with time'''))
+		self.b305.setToolTip(str('''See the particle-phase ''') 
+		+ str('''risk contribution by the provided ''')
+		+ str('''components'''))
+		self.b305.clicked.connect(self.on_click305)
+		self.b305.setStyleSheet('''background-color : 
+		white; border-width : 1px; border-radius : 7px; 
+		border-color: silver; padding: 2px; 
+		border-style : solid''')
+		self.PARlayout.addWidget(self.b305, 6, 2, 1, 1)
+
+		# button to plot particle-phase carbon oxidation state 
+		# contribution by 
+		# different components
+		self.b306 = QPushButton(str('''Contribution by ''') + 
+		str('''carbon oxidation state per component with ''') +
+		str(''' time'''))
+		self.b306.setToolTip(str('''See the particle-phase ''') 
+		+ str('''carbon oxidation state contribution by the ''')
+		+ str('''provided components'''))
+		self.b306.clicked.connect(self.on_click306)
+		self.b306.setStyleSheet('''background-color : 
+		white; border-width : 1px; border-radius : 7px; 
+		border-color: silver; padding: 2px; 
+		border-style : solid''')
+		self.PARlayout.addWidget(self.b306, 7, 1, 1, 1)
 	
 		return(PARTab)
 
@@ -1495,7 +1564,7 @@ class PyCHAM(QWidget):
 		self.PYIELDlayout = QGridLayout() 
 		PYIELDTab.setLayout(self.PYIELDlayout)
 		
-		# section for consumption and yield calculations ------------------------------
+		# section for consumption and yield calculations -------
 		# input bar for component to estimate consumption for
 		self.e224 = QLineEdit(self)
 		self.e224.setText('Provide the chemical scheme names of components to view consumption/yield for (result displayed in message box above, separate chemical names by a comma, e.g. APINENE, BENZENE)')
@@ -2767,7 +2836,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select New Folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -2785,9 +2854,10 @@ class PyCHAM(QWidget):
 		comp_names = []
 		
 		import plotter_pp
-		dir_path = self.l201.text() # name of folder with results
-		plotter_pp.plotter(3, dir_path, comp_names, self) # plot results
-
+		# name of folder with results
+		dir_path = self.l201.text()
+		# plot results 
+		plotter_pp.plotter(3, dir_path, comp_names, self) 
 
 		return()
 		
@@ -2939,8 +3009,119 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		plotter_pp.plotter(caller, dir_path, comp_names, self) # plot results
 	
-	# graph the particle-phase mass (excluding water) contribution from 
-	# different upper limits of particle radius against time
+	# graph the contribution by user-supplied component by particle
+	# mass against time 
+	@pyqtSlot()
+	def on_click304(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str(('''Ensure that ''') +
+			str('''output is loaded using the Select ''') +
+			str('''New Folder button''')))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., 
+				'2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., 
+				'2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		import plotter_pp
+		# name of folder with results
+		self.dir_path = self.l201.text() 
+		# names of components to plot
+		self.comp_names_part_mass_vs_time = [str(i.strip()) for
+			 i in self.e304.text().split(',')] 	
+		# plot results
+		plotter_pp.comp_part_mass_vs_time(self)	
+
+	
+	# graph the contribution by user-supplied component by particle
+	# risk against time 
+	@pyqtSlot()
+	def on_click305(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str(('''Ensure that ''') +
+			str('''output is loaded using the Select ''') +
+			str('''New Folder button''')))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., 
+				'2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., 
+				'2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		import plotter_pp
+		# name of folder with results
+		self.dir_path = self.l201.text() 
+		# names of components to plot
+		self.comp_names_part_mass_vs_time = [str(i.strip()) for
+			 i in self.e304.text().split(',')] 	
+		# plot results
+		plotter_pp.comp_part_risk_vs_time(self)	
+
+	# graph the contribution by user-supplied component by particle
+	# carbon oxidation state against time 
+	@pyqtSlot()
+	def on_click306(self):	
+		
+		# clear dialogue
+		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str(('''Ensure that ''') +
+			str('''output is loaded using the Select ''') +
+			str('''New Folder button''')))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., 
+				'2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., 
+				'2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
+
+		import plotter_pp
+		# name of folder with results
+		self.dir_path = self.l201.text() 
+		# names of components to plot
+		self.comp_names_part_mass_vs_time = [str(i.strip()) for
+			 i in self.e304.text().split(',')] 	
+	
+		# plot results
+		plotter_pp.comp_part_cos_vs_time(self)
+		
+
+	# graph the particle-phase mass (excluding water) contribution 
+	# from different upper limits of particle radius against time
 	@pyqtSlot()
 	def on_click303(self):	
 		

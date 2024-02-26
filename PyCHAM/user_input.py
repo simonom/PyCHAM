@@ -1,10 +1,13 @@
-#########################################################################								       #
+########################################################################
+#								       #
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #

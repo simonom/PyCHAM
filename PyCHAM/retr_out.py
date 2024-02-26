@@ -21,7 +21,8 @@
 #                                                                      #
 ########################################################################
 '''code to open saved files and return useful variables'''
-# e.g. called by PyCHAM plotting codes to obtain the required model outputs for evaluation
+# e.g. called by PyCHAM plotting codes to obtain the required model 
+# outputs for evaluation
 
 import numpy as np
 import os
@@ -608,8 +609,11 @@ def retr_out(self):
 		sp = output_by_sim_sch_ext # chemical scheme path
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
-		gen_numbers = gen_num # for each component, the generation number
-		HyC = HC # hydrogen:carbon ratios for each component, this output added on 31/05/2022
+		# for each component, the generation number
+		gen_numbers = gen_num 
+		# hydrogen:carbon ratios for each component, this 
+		# output added on 31/05/2022
+		HyC = HC
 		nominal_mass = nom_mass 
 		nsb = num_sb
 		nc = num_comp

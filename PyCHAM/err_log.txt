@@ -1,3 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_sum_hp_ref
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_sum_lp_ref
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/outdoor_win_hp_ref
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/EAC2024_ex_betterpart2

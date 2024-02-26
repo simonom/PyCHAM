@@ -133,11 +133,12 @@ def extr_mech(int_tol, num_sb,
 		else:
 
 			try:
-				# index of where components with constant influx occur in list of components
+				# index of where components with continuous influx occur in list of components
 				self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
 			except:
 				erf = 1 # raise error
-				err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+				
+				err_mess = str('Error: continuous influx component with name ' + str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
 		icon += 1 # count on constant influxes
 
@@ -178,7 +179,7 @@ def extr_mech(int_tol, num_sb,
 
 		from obs_file_open import obs_file_open
 		self = obs_file_open(self)
-
+	
 	# -------------------------------------------------------------
 	if (comp_num in self.con_infl_indx):
 
@@ -198,10 +199,12 @@ def extr_mech(int_tol, num_sb,
 	# ensure integer
 	self.con_infl_indx = self.con_infl_indx.astype('int')
 	
-	[rowvals, colptrs, self] = jac_setup.jac_setup(comp_num, num_sb, (num_sb-self.wall_on), self)
+	[rowvals, colptrs, self] = jac_setup.jac_setup(comp_num, num_sb, 
+		(num_sb-self.wall_on), self)
 
 	# call function to generate ordinary differential equation (ODE)
-	# solver module, add two to comp_num to account for water and core component
+	# solver module, add two to comp_num to account for water 
+	# and core component
 	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+self.H2O_in_cs, 
 			(num_sb-self.wall_on), 0, sav_nam, pcont, self)
 
