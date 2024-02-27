@@ -96,7 +96,8 @@ def plotter(caller, dir_path, uc, self):
 			
 				
 		if (indx_plot):
-			# if there are both gaseous components and particle size bins then prepare figure
+			# if there are both gaseous components and particle 
+			# size bins then prepare figure
 			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
 		# parasite axis setup on particle-phase plot-----------------------------
@@ -106,12 +107,12 @@ def plotter(caller, dir_path, uc, self):
 		# placed on the right by twinx above.
 		par2.spines["right"].set_position(("axes", 1.2))
 		# Having been created by twinx, par2 has its frame off, so the line of its
-		# detached spine is invisible.  First, activate the frame but make the patch
-		# and spines invisible.
+		# detached spine is invisible.  First, activate the frame but 
+		# make the patch and spines invisible.
 		make_patch_spines_invisible(par2)
 		# second, show the right spine
 		par2.spines["right"].set_visible(True)	
-		# ----------------------------------------------------------------------------------------
+		# --------------------------------------------------------------------------------
 
 	if (indx_plot):
 		
@@ -291,7 +292,7 @@ def plotter(caller, dir_path, uc, self):
 		# colour bar label
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
-		# ----------------------------------------------------------------------------------------
+		# --------------------------------------------------------------------------------
 		# total particle number concentration # particles/cm3
 	
 		# include total number concentration (# particles/cm3 (air)) on contour plot

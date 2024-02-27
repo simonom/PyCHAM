@@ -1290,7 +1290,7 @@ def comp_part_cos_vs_time(self):
 	# mass fraction of each component at each time
 	mf = (ppc/(np.sum(ppc, axis=1).reshape(-1, 1)))
 
-	# multiply by organic mass concentration fraction
+	# multiply by mass concentration fraction
 	cos_frac = cos*mf
 	ros_frac = ros0*mf
 

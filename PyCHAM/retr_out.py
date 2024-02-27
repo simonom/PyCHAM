@@ -35,7 +35,8 @@ import scipy.constants as si
 def retr_out(self):
 	
 	# inputs: -------------------------------
-	# self.dir_path - path of directory requested by the calling code to be looked at
+	# self.dir_path - path of directory requested by the calling
+	# code to be looked at
 	# ---------------------------------------
 	
 	# name of file where experiment constants saved
