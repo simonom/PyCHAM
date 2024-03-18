@@ -1,26 +1,28 @@
-##########################################################################################                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module for calculating photolysis rates'''
-# can use ambient sunlight expression or artificial chamber lights for calculating
-# photolysis rates
+# can use ambient sunlight expression or artificial chamber lights for 
+# calculating photolysis rates
 
 import scipy
 import os
@@ -31,7 +33,7 @@ import zenith
 
 def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	
-	# inputs:-----------------------------------------------------------------------------
+	# inputs:------------------------------------------------------
 	# self.daytime - time of day experiment starts (for natural light photolysis) (s)
 	# self.lat - latitude
 	# self.lon - longitude
@@ -45,7 +47,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	# self.tf - the transmission factor (for natural light intensity)
 	# sumt - total time through experiment (s)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
-	# ------------------------------------------------------------------------------------
+	# -----------------------------------------------------------
 	
 	self.sumt = sumt
 	
@@ -111,7 +113,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 
 		J = J*self.tf
 
-	# from MAC spectral analysis and Mainz database (xsproc.py)
+	# from MAC spectral analysis and Mainz database
 # 	J[1] = 2.3706768705670786e-05
 # 	J[2] = 7.128976494635883e-05
 # 	J[3] = 1.26339378672e-05

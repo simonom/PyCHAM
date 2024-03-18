@@ -1,32 +1,35 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''plots results from model and observations'''
 # simulation and observation results are represented graphically
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-from matplotlib.colors import LinearSegmentedColormap # for customised colormap
-import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+# for customised colormap
+from matplotlib.colors import LinearSegmentedColormap
+# set colormap tick labels to standard notation
+import matplotlib.ticker as ticker
 import matplotlib.cm as cm
 import os
 import numpy as np
@@ -46,29 +49,46 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	for co in obs.iter_cols(values_only=True):
 		obs_setup.append(co[0])
 	
-	# open worksheet with observations
-	obs = wb[obs_setup[0]]
-	xrs = int(obs_setup[1].split(':')[0])-1 # starting row for x-axis
-	xre = int(obs_setup[1].split(':')[1])-1 # finishing row for x-axis
-	xcol = int(obs_setup[2].split(':')[1])-1 # x-axis column
-	yrs = int(obs_setup[6].split(':')[0])-1 # starting row for y-axis
-	yre = int(obs_setup[6].split(':')[1])-1 # finishing row for y-axis
-	ycs = int(obs_setup[7].split(':')[0])-1 # starting column for y-axis
-	yce = int(obs_setup[7].split(':')[1])-1 # finishing column for y-axis
-	obsx = np.zeros((xre-xrs)) # empty array for x-axis data
-	obsy = np.zeros((yre-yrs, yce-ycs+1)) # empty array for y-axis data
+	try:
+		# open worksheet with observations
+		obs = wb[str(obs_setup[0])]
+	except:
+		mess = str('Error, could not find worksheet ' + str(obs_setup[0]) + ', available worksheets: ' + str(wb.sheetnames))
+		self.l203a.setText(mess)
+		return()
+
+	# starting row for x-axis
+	xrs = int(obs_setup[1].split(':')[0])-1
+	# finishing row for x-axis
+	xre = int(obs_setup[1].split(':')[1])-1
+	# x-axis column
+	xcol = int(obs_setup[2].split(':')[1])-1
+	# starting row for y-axis
+	yrs = int(obs_setup[6].split(':')[0])-1
+	# finishing row for y-axis
+	yre = int(obs_setup[6].split(':')[1])-1
+	# starting column for y-axis
+	ycs = int(obs_setup[7].split(':')[0])-1
+	# finishing column for y-axis
+	yce = int(obs_setup[7].split(':')[1])-1
+	# empty array for x-axis data
+	obsx = np.zeros((xre-xrs))
+	# empty array for y-axis data
+	obsy = np.zeros((yre-yrs, yce-ycs+1)) 
 	cn = 0 # index counter
 	xcn = 0 # x-axis counter
 	ycn = 0 # y-axis counter
 	# get x-axis data and y-axis data
 	for co in obs.iter_rows(values_only=True):
-		if cn > xrs:
+		if (cn > xrs):
+			# ensure compatability of types
+			obsx = obsx.astype(type(co[xcol]))
 			obsx[xcn] = co[xcol]
 			obsy[ycn, :] = co[ycs:yce+1]
 			xcn += 1 # x-axis counter
 			ycn += 1 # y-axis counter
 		cn += 1 # index counter
-		if cn> xre:
+		if (cn > xre):
 			break # stop loop through rows
 	
 	plt.ion() # show results to screen and turn on interactive mode
@@ -84,7 +104,8 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 		
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
 			eby = obsy[:, i]*0.0 # error bar array
-			markers, caps, bars = ax0.errorbar(obsx, obsy[:, i], yerr = eby, label = llab[i])
+			markers, caps, bars = ax0.errorbar(obsx, 
+			obsy[:, i], yerr = eby, label = llab[i])
 			# loop through error bars to set transparency
 			[bar.set_alpha(0.1) for bar in bars]
 		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis

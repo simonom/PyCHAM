@@ -49,8 +49,8 @@ def obs_file_open(self):
 	ic = 0 # count on row iteration
 	# column indices for temperature and 
 	# relative humidity
-	temper_indx = 0
-	rh_indx = 0
+	temper_indx = -2
+	rh_indx = -2
 	# index for columns of components
 	comp_indx = []
 	# loop through rows
@@ -62,7 +62,9 @@ def obs_file_open(self):
 			self.obs_comp = []
 			# keep count on column index
 			col_num = 0
+			
 			for oc in names_xlsx:
+				
 				# keep count on column index
 				col_num += 1
 				if (oc == None):
@@ -107,12 +109,15 @@ def obs_file_open(self):
 				0:col_num+1][comp_indx]
 			# get times (s)
 			self.obs[ic-1, 0] = np.array((i))[0]
-
+			
 			# temperature and relative humidity observations
-			self.TEMP.append(np.array((i))[temper_indx])
-			self.tempt.append(i[0])
-			self.RH.append(np.array((i))[rh_indx])
-			self.RHt.append(i[0])
+			if (temper_indx != -2):
+				self.TEMP.append(
+				np.array((i))[temper_indx])
+				self.tempt.append(i[0])
+			if (rh_indx != -2):
+				self.RH.append(np.array((i))[rh_indx])
+				self.RHt.append(i[0])
 			
 		ic += 1 # count on row iteration
 

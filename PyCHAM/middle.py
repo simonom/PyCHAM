@@ -39,9 +39,9 @@ import tot_in # preparing record of gas-phase influxes
 
 def middle(self): # define function
 	
-	# inputs: -------------------------------------------------------
+	# inputs: -----------------------------------------------------
 	# self - reference to program
-	# ---------------------------------------------------------------
+	# -------------------------------------------------------------
 	st_time = time.time()
 	# get required inputs
 	[sav_nam, comp0, y0, Pnow,
@@ -65,17 +65,22 @@ def middle(self): # define function
 		# equations into usable code
 		[rowvals, colptrs, comp_num, 
 		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
-		self] = eqn_pars.extr_mech(int_tol, (num_sb+self.wall_on), 
+		self] = eqn_pars.extr_mech(int_tol, 
+			(num_sb+self.wall_on), 
 			drh_str, erh_str, sav_nam, pcont, self)
 	
-	if (self.pars_skip == 1): # if skipping parsing of chemical scheme
-		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, comp_smil, 
-			erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
-	# if needed, then run operations to produce variable checker plot 
-	# from the simulate tab
+	# if skipping parsing of chemical scheme
+	if (self.pars_skip == 1):
+		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, 
+		comp_smil, erf, 
+		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
+
+	# if needed, then run operations to produce variable checker 
+	# plot from the simulate tab
 	if (self.testf == 4):
 		import var_checker
-		[err_mess, erf] = var_checker.var_checker(Jlen, err_mess, erf, self)
+		[err_mess, erf] = var_checker.var_checker(Jlen, 
+			err_mess, erf, self)
 		
 	# if error raised, then tell GUI to display and to stop program
 	if (erf == 1):
@@ -89,7 +94,8 @@ def middle(self): # define function
 	comp0, y0, Pnow, 0, pconc, self.eqn_num[0], Compt, seed_name,
 	seed_mw, core_diss, comp_xmlname, comp_smil, self)
 
-	# if error raised, then tell GUI to display it and to stop programme
+	# if error raised, then tell GUI to display it and to stop 
+	# programme
 	if (erf == 1):
 		yield err_mess
 	
@@ -110,12 +116,14 @@ def middle(self): # define function
 	
 	# prepare for the calculation of partitioning variables
 	[mfp, accom_coeff, therm_sp, surfT, act_coeff, 
-		R_gas, NA, diff_vol, Dstar_org, err_mess, self] = partit_var_prep.prep(y_mw, 
+		R_gas, NA, diff_vol, Dstar_org, err_mess, 
+		self] = partit_var_prep.prep(y_mw, 
 		self.TEMP[0], num_comp, act_comp, act_user, accom_comp, 
 		accom_coeff_user, num_sb+self.wall_on, num_sb, Pnow, 
 		comp_smil, self)
-	
-	if (err_mess != ''): # if error raised or in testing mode then stop
+
+	# if error raised or in testing mode then stop
+	if (err_mess != ''):
 		yield err_mess
 	
 	# prepare particle phase
@@ -152,7 +160,8 @@ def middle(self): # define function
 		rbou00, ub_rad_amp, indx_plot, comp0,
 		wat_hist, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP)
+		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self,
+		vol_comp, volP)
 
 
 	# solve problem
@@ -165,14 +174,15 @@ def middle(self): # define function
 		N_perbin, Vol0, rad0, np_sum, new_partr, 
 		nuci, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
-		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
-		uppsize, std, rbou, MV,
+		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, 
+		lowsize, uppsize, std, rbou, MV,
 		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
 		sav_nam, space_mode, 
 		rbou00, ub_rad_amp, indx_plot, comp0,
 		wat_hist, pcont, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, vol_comp, volP):
+		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, 
+		vol_comp, volP):
 
 		yield prog # update progress bar	
 

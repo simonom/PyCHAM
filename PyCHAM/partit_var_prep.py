@@ -1,27 +1,30 @@
-##########################################################################################                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''module to prepare PyCHAM for partitioning variable calculation (particle and wall)'''
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''module to prepare PyCHAM for partitioning variable calculation 
+(particle and wall)'''
 
-# module responsible for preparing inputs to the calculation of the gas-particle 
-# partitioning coefficient in kimt_calc
+# module responsible for preparing inputs to the calculation of the 
+# gas-particle partitioning coefficient in partit_var.py
 
 import numpy as np
 import scipy.constants as si
@@ -31,21 +34,26 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	accom_coeff_user, num_sb, num_asb, Pnow, 
 	name_SMILE, self):
 	
-	# ------------------------------------------------------------------
+	# --------------------------------------------------------------
 	# inputs:
 	# y_mw - molecular weight of components (g/mol) (num_comp,1)
 	# TEMP - temperature of chamber at start of experiment (K)
 	# num_comp - number of components
-	# self.testf - flag for whether in normal mode (0) or testing mode (1) or 
+	# self.testf - flag for whether in normal mode (0) or testing 
+	#	mode (1) or 
 	#	plotting of gas-phase diffusion coefficients mode (2)
 	# self.Cw - effective absorbing mass of wall (g/m3 (air))
-	# act_comp - names of components (corresponding to chemical scheme name) with 
+	# act_comp - names of components (corresponding to chemical 
+	#	scheme name) with 
 	# 			activity coefficient stated in act_user
-	# act_user - user-specified activity coefficients of components with names given in
+	# act_user - user-specified activity coefficients of components 
+	#	with names given in
 	#			act_comp
-	# accom_comp - names of components with accommodation coefficient set by the user
+	# accom_comp - names of components with accommodation 
+	#	coefficient set by the user
 	# accom_coeff_user - accommodation coefficient set by the user
-	# self.comp_namelist - names of components as stated in the chemical scheme
+	# self.comp_namelist - names of components as stated in the 
+	#	chemical scheme
 	# num_sb - number of size bins (including wall)
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
@@ -53,7 +61,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# name_SMILE - SMILE strings of components
 	# self - reference to program
 	# self.kw - rate of transfer of components to wall (/s)
-	# -----------------------------------------------------------------
+	# -------------------------------------------------------------
 	
 	# start by assuming no error message
 	err_mess = ''
@@ -61,55 +69,92 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	if (self.testf == 1): # if in testing mode (for test_front.py)
 		return(0,0,0,0,0,0,0, err_mess) # return dummies
 	
-	surfT = 72. # assume surface tension of water (g/s2==mN/m==dyn/cm) for all particles
+	# assume surface tension of water (g/s2==mN/m==dyn/cm) for all 
+	# particles
+	surfT = 72.
 	
-	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
-	dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
+	# molecular weight of air (kg/mol) (eq. 16.17 Jacobson 2005)
+	ma = 28.966e-3
 	
-	ma = 28.966e-3 # molecular weight of air (kg/mol) (eq. 16.17 Jacobson 2005)
-	
-	# air density (kg/m3 (air)), ideal gas law
-	rho_a =  (Pnow*ma)/((si.R)*TEMP)
-	
-	# mean thermal speed of each component (m/s) (eq. 2.3 Jacobson 2005)
-	# note that we need the weight of one molecule, which is why y_mw is divided by
-	# Avogadro's constant, and we need it in kg, which is why we multiply by 1e-3
+	# mean thermal speed of each component (m/s) 
+	# (eq. 2.3 Jacobson 2005)
+	# note that we need the weight of one molecule, which is 
+	# why y_mw is divided by
+	# Avogadro's constant, and we need it in kg, which is why 
+	# we multiply by 1e-3
 	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
-	# mean free path (m) for each component (15.24 of Jacobson 2005)
-	mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
-
-	nv = (Pnow/(si.R*TEMP))*si.N_A # concentration of molecules (# molecules/m3)
-	
-	# get diffusion volumes
+		# get diffusion volumes
 	diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
 	
-	# append water and core (water from Table 4.1 of the Taylor (1993) textbook 
+	# append water and core (water from Table 4.1 of the 
+	# Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
 	# if water present in component names
 	if (self.H2O_in_cs == 1):
-		diff_vol = (np.append(diff_vol, np.array((1.)))).reshape(-1, 1)
+		diff_vol = (np.append(diff_vol, 
+		np.array((1.)))).reshape(-1, 1)
 		diff_vol[self.comp_namelist.index('H2O')] = 13.1
 	else:
-		diff_vol = (np.append(diff_vol, np.array((13.1, 1.)))).reshape(-1, 1)
+		diff_vol = (np.append(diff_vol, 
+			np.array((13.1, 1.)))).reshape(-1, 1)
 
-	# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
+	# diffusion coefficient (m2/s) of components in gas phase 
+	# (air), eq 4.1.4 of
 	# the Taylor (1993) textbook 
-	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion volume for air 
-	# (19.7) taken from Table 4.1 of Taylor (1993) and mw of air converted to g/mol from 
-	# kg/mol.  This is a replication of the original method from Fuller et al. (1969): 
+	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, 
+	# note diffusion volume for air 
+	# (19.7) taken from Table 4.1 of Taylor (1993) and mw of air 
+	# converted to g/mol from 
+	# kg/mol.  This is a replication of the original method from 
+	# Fuller et al. (1969): 
 	# doi.org/10.1021/j100845a020
-	Dstar_org = 1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+	Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
+		(y_mw*ma*1.e3))**0.5)/
+		(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
 	
 	# convert to cm2/s
 	Dstar_org = Dstar_org*1.e4
+
+	# mean free path (m) for each component (Eq. 9.15 of 
+	# Seinfeld and Pandis, Atmospheric Chemistry and Physics, 
+	# 3rd edition, 2016, print ISBN 9781118947401). Note, because we
+	# are dealing with some big (compared to N2 and O2) molecules,
+	# we cannot use the equation for mean free path of air through
+	# air (though this is commented out below), in addition, because
+	# the Fuchs-Sutugin correction term for non-continuum regime is
+	# used (in partit_car.py), we must use the mean free path 
+	# equation consistent with
+	# the Fuchs-Sutugin correction term for the transition regime -
+	# as stated in Seinfeld and Pandis, as long as the corresponding
+	# equations for mean free path and transition regime correction
+	# factor are used, the different correction factors mostly 
+	# agree.
+	mfp = 3.*(Dstar_org*1.e-4)/therm_sp
+	
+	# in case mean free path of air in air needed ------------------
+	# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
+	#dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
+
+	# air density (kg/m3 (air)), ideal gas law
+	#rho_a =  (Pnow*ma)/((si.R)*TEMP)
+
+	# mean free path (m) of air in air (15.24 of Jacobson 2005)
+	#mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
+
+	# end of mean free path of air in air --------------------------
+
+	# concentration of molecules (# molecules/m3)
+	nv = (Pnow/(si.R*TEMP))*si.N_A 
 
 	if (self.testf == 2):
 		import matplotlib.pyplot as plt
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
-		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
-		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+		# for customised colormap
+		from matplotlib.colors import LinearSegmentedColormap
+		# set colormap tick labels to standard notation
+		import matplotlib.ticker as ticker
 		plt.ion() # allow plotting
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))

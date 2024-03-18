@@ -174,11 +174,13 @@ def ui_check(self):
 				'corresponding drop-down selection')
 	# --------------------------------------------------------------
 	# check on skipping parsing
-	if self.pars_skip == 1:
+	if (self.pars_skip == 1):
+		
 		try:
 			rowvals = self.rowvals
 		except:
-			self.pars_skip = 0	
+			self.pars_skip = 0
+		
 
 	# check on gas-wall partitioning inputs ---------------------------------
 	# check that number of effective absorbing masses for walls matches number of walls

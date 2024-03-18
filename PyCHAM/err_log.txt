@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/EAC2024_ex_betterpart2
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/DMS_Oxidation_Anwar_chem_scheme/MAN_OFR_wall_effect_moinflux_Cw1e-2

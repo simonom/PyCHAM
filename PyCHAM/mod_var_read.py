@@ -278,41 +278,65 @@ def mod_var_read(self):
 					if (self.wall_on == 0):
 						continue
 					else:
-						self.wall_on = int(value.strip())
+						self.wall_on = int(
+						value.strip())
 				else:
-					self.wall_on = int(value.strip())
+					self.wall_on = int(
+					value.strip())
 				
-				
-			if key == 'eff_abs_wall_massC' and (value.strip()): # effective absorbing mass concentration of wall
-				self.Cw = np.array([float(i) for i in ((value.strip()).split(','))])
+			# effective absorbing mass concentration of wall
+			if (key == 'eff_abs_wall_massC' and 
+				(value.strip())): 
+				self.Cw = np.array([float(i) for i in 
+				((value.strip()).split(','))])
 			
 			# mass transfer coefficient of vapours with wall
-			if (key == 'mass_trans_coeff' and (value.strip())):
+			# set to -1 for Huang et al. 2018 
+			# (Eq. 2 and accompanying text), 
+			# https://doi.org/10.1021/acs.est.7b05575
+			if (key == 'mass_trans_coeff' and 
+				(value.strip())):
 				
-				# check if this is a path to a file containing continuous 
-				# influxes, if not treat as a list of component names
-				# treat as path to file containing mass transfer coefficients
+				# check if this is a path to a file 
+				# containing continuous 
+				# influxes, if not treat as a list of
+				# component names
+				# treat as path to file containing mass 
+				# transfer coefficients
 				if '/' in value or '\\' in value: 
-					self.mtc_path = str(value.strip())
-					value = mass_trans_coeff_open(self)
+					self.mtc_path = str(
+					value.strip())
+					value = mass_trans_coeff_open(
+					self)
 					err_mess = self.err_mess
 					if err_mess[0:5] == 'Error':
 						break
 					
 				max_comp = 1
 				max_of_all = []
-				reader = '' # prepare to read in string between semi-colons
-				prescribes = [] # list of prescribed mass transfer coefficients
-				# number of walls mentioned in the mass transfer coefficient
+				# prepare to read in string between 
+				# semi-colons
+				reader = ''
+				# list of prescribed mass transfer 
+				# coefficients
+				prescribes = []
+				# number of walls mentioned in the 
+				# mass transfer coefficient
 				num_wall_mtfs = 1
-				# count maximum number of components for a single wall
+				# count maximum number of components for 
+				# a single wall
 				for i in value.strip():
 					if i == ';': # new component
 						max_comp += 1
-						# remember old component and wall and 
-						# mass transfer coefficient
-						prescribes.append(reader)
-						# prepare to read in string between semi-colons
+						# remember old component 
+						# and wall and 
+						# mass transfer 		
+						# coefficient
+						prescribes.append(
+						reader)
+						# prepare to read in 
+						# string between 
+						# semi-colons
 						reader = ''
 						
 					if (i == ','): # new wall
@@ -338,17 +362,22 @@ def mod_var_read(self):
 				self.wmtc_names = []
 				self.wmtc_wn = []
 				self.wmtc = []
-				# count on number of prescribed mass transfer coefficients
+				# count on number of prescribed mass 
+				# transfer coefficients
 				pre_cnt = 0
 
-				# prepare holding array for rate coefficient information
-				self.kw = np.ones((num_wall_mtfs, max(max_of_all)))*-1.e-6
+				# prepare holding array for rate 
+				# coefficient information
+				self.kw = np.ones((num_wall_mtfs, 
+				max(max_of_all)))*-1.e-6
 				
 				wall_num = 0 # count on walls
-				ind_wall_cnt = 1 # number of entries for each wall
+				# number of entries for each wall
+				ind_wall_cnt = 1
 				for prei in prescribes:
 	
-					# if this gives the coefficient for a specific component
+					# if this gives the coefficient 
+					# for a specific component
 					if prei.count('_') == 2:
 						
 						# get component name

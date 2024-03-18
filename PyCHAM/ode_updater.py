@@ -83,10 +83,13 @@ def ode_updater(y, H2Oi,
 	# self.nreac_g - number of reactants per equation
 	# self.nprod_g - number of products per equation
 	# self.jac_stoi_g - stoichiometries relevant to Jacobian
-	# self.njac_g - number of elements of Jacobian affected per equation
-	# self.jac_den_indx_g - index of denominator components for Jacobian
+	# self.njac_g - number of elements of Jacobian affected per 
+	# equation
+	# self.jac_den_indx_g - index of denominator components for 
+	# Jacobian
 	# self.jac_indx_g - index of Jacobian affected per equation
-	# self.RO2_indx - index of components in alkyl peroxy radical list
+	# self.RO2_indx - index of components in alkyl peroxy radical 
+	# list
 	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
 	# self.TEMP - temperature in chamber (K)
@@ -128,14 +131,16 @@ def ode_updater(y, H2Oi,
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
 	# act_coeff - activity coefficient
-	# self.Cw - effective absorbing mass of wall (# molecules/cm3 (air))
+	# self.Cw - effective absorbing mass of wall (# molecules/cm3 
+	#	(air))
 	# self.kw - gas-wall mass transfer coefficient (/s)
-	# Cfactor - conversion factor for concentrations (ppb/# molecules/cm3)
+	# Cfactor - conversion factor for concentrations (ppb/# 
+	#	molecules/cm3)
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
-	# self.y_arr_g - index for arranging concentrations into matrix that 
-	# 	allows reaction rate coefficient calculation
+	# self.y_arr_g - index for arranging concentrations into matrix 
+	# that allows reaction rate coefficient calculation
 	# self.y_rind_g - index for the concentration array  that 
 	# 	allows reaction rate coefficient calculation
 	# self.uni_y_rind_g - unique index of reactants
@@ -144,8 +149,8 @@ def ode_updater(y, H2Oi,
 	# self.uni_y_pind_g - unique index of products
 	# self.reac_co_gl - column indices for sparse matrix of reaction 
 	#		losses
-	# self.prod_col_g - column indices for sparse matrix of production
-	#		gains
+	# self.prod_col_g - column indices for sparse matrix of 
+	# production gains
 	# self.rstoi_flat_g - 1D array of reactant stoichiometries per 
 	#	equation
 	# self.pstoi_flat_g - 1D array of product stoichiometries per
@@ -187,15 +192,17 @@ def ode_updater(y, H2Oi,
 	# pwl_xpro - x value proceeding inflection point
 	# inflectk - deposition rate at inflection (/s)
 	# chamR - spherical-equivalent radius of chamber (m2)
-	# McMurry_flag - marker for treament of particle deposition to walls
+	# McMurry_flag - marker for treament of particle deposition to 
+	#	walls
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# injectt - time of injection of components (s)
-	# inj_indx - index of components being instantaneously injected after 
-	#	experiment start
+	# inj_indx - index of components being instantaneously injected 
+	# after experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
-	# pmode - whether number size distributions expressed as modes or explicitly
+	# pmode - whether number size distributions expressed as modes
+	# 	or explicitly
 	# pconc - concentration of injected particles (#/cm3 (air))
 	# pconct - times of particle injection (s)
 	# mean_rad - mean radius for particle number size 
@@ -213,8 +220,10 @@ def ode_updater(y, H2Oi,
 	# self.pstoi_aq - stoichiometry of products for aqueous-phase
 	# self.nreac_aq - number of reactants per aqueous-phase reaction
 	# self.nprod_aq - number of products per aqueous-phase reaction
-	# self.jac_stoi_aq - stoichiometry for Jacobian for aqueous-phase
-	# self.njac_aq - number of Jacobian elements per aqueous-phase reaction 
+	# self.jac_stoi_aq - stoichiometry for Jacobian for 
+	#	aqueous-phase
+	# self.njac_aq - number of Jacobian elements per 
+	#	aqueous-phase reaction 
 	# self.jac_den_indx_aq - index of Jacobian denominators 
 	# self.jac_indx_aq - index of  Jacobian for aqueous-phase
 	# self.y_arr_aq - y indices for aqueous-phase
@@ -236,7 +245,8 @@ def ode_updater(y, H2Oi,
 	#	partitioning assumed negligible
 	# diff_vol - diffusion volumes of components according to 
 	#		Fuller et al. (1969)
-	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
+	# DStar_org - diffusion coefficient of components at initial 
+	#	temperature (cm2/s)
 	# corei - index of core component
 	# ser_H2O - whether to serialise the gas-particle partitioning 
 	#	of water
@@ -258,29 +268,42 @@ def ode_updater(y, H2Oi,
 	# self.inname - path to model variables file
 	# self.rel_SMILES - SMILES strings of components in chemical 
 	#	scheme
-	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
-	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
+	# self.Psat_Pa_rec - pure component saturation vapour pressures 
+	#	(Pa) at 298.15 K
+	# self.Psat_Pa - pure component saturation vapour pressures (Pa) 
+	#	at starting temperature in chamber
 	# self.OC - oxygen to carbon ratio of components
-	# wat_hist - flag for history of particle-phase with respect to water partitioning,
-	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
+	# wat_hist - flag for history of particle-phase with respect to 
+	#	water partitioning,
+	# 	where 0 is dry (therefore on the deliquescence curve) 
+	#	and 1 is wet 
 	#	(therefore on the efflorescence curve)
 	# self.Pybel_objects - the pybel objects for components
-	# pcont - flag for whether particle injection continuous or instantaneous
+	# pcont - flag for whether particle injection continuous or 
+	#	instantaneous
 	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
 	# NOi - NO index
 	# HO2i - HO2 index
 	# NO3i - NO3 index
-	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
-	#	below which partitioning to a particle size bin is treated as zero,
+	# z_prt_coeff - fraction of total gas-particle partitioning 
+	#	coefficient 
+	#	below which partitioning to a particle size bin is 
+	#	treated as zero,
 	#	e.g. because surface area of that size bin is tiny 
 	# self.con_C_indx - index of components with constant 
 	# 	gas-phase concentration
-	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
-	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
-	# tot_in_res - record of total input of injected components (ug/m3)
-	# Compti - index for total injection record for instantaneously injected components
-	# self.cont_inf_reci - index of components with continuous influx in record
-	# self.con_infl_indx - index of components with continuous influx in concentration array
+	# self.seed_eq_wat - whether seed particles to be equilibrated 
+	#	with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains 
+	#	equilibrated water
+	# tot_in_res - record of total input of injected components 
+	#	(ug/m3)
+	# Compti - index for total injection record for instantaneously 
+	#	injected components
+	# self.cont_inf_reci - index of components with continuous 
+	#	influx in record
+	# self.con_infl_indx - index of components with continuous 
+	#	influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
@@ -298,7 +321,8 @@ def ode_updater(y, H2Oi,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0):
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and 
+	pcont[0, 0] == 0):
 		# count on injection times of particles
 		seedt_cnt = 1
 		self.seedx_tcnt = 1 
@@ -344,14 +368,17 @@ def ode_updater(y, H2Oi,
 	# turn off flag for ongoing injection of particles
 	self.pcont_ongoing = 0
 
-	# find out what to do with the gas-wall partitioning coefficient,
-	# note that self.kw and self.Cw are spread over wall bins in rows and components 
+	# find out what to do with the gas-wall partitioning 
+	# coefficient,
+	# note that self.kw and self.Cw are spread over wall bins in 
+	# rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
 	if (self.wall_on > 0):
 		if (sum(sum(self.kw == -1)) > 0 ):
 			self.kwf = -1 # Huang et al. 2018 treatment
 		else:
-			# standard PyCHAM (GMD paper) treatment with same gas-wall 
+			# standard PyCHAM (GMD paper) treatment with 
+			# same gas-wall 
 			# partitioning coefficient for all components
 			self.kwf = 0
 	else:
@@ -523,7 +550,7 @@ def ode_updater(y, H2Oi,
 			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
 				
 				# update partitioning variables
-				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, \
+				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, 
 				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
@@ -562,27 +589,30 @@ def ode_updater(y, H2Oi,
 				jac_part_H2O_indx] = jac_up.jac_up(
 				y[num_comp:num_comp*
 				((num_sb-self.wall_on+1))], rowvals, 
-				colptrs, (num_sb-self.wall_on), num_comp, 				H2Oi, y[H2Oi], ser_H2O, self)
+				colptrs, (num_sb-self.wall_on), num_comp, 
+				H2Oi, y[H2Oi], ser_H2O, self)
 			
 			# if water gas-particle partitioning serialised
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
 				 and (sum(N_perbin) > 0)): 
 				
-				# if on the deliquescence curve rather 					# than the 
-				# efflorescence curve in terms of water 				# gas-particle partitioning
+				# if on the deliquescence curve rather 								# than the 
+				# efflorescence curve in terms of water 							# gas-particle partitioning
 				if (wat_hist == 1):
 					# flag that water gas-particle 
 					# partitioning solved separately
 					self.odsw_flag = 1
 					
 					# call on ode solver for water
-					[y, res_t] = ode_solv_wat.\
-					ode_solv(y, tnew,
+					[y, res_t] = ode_solv_wat.ode_solv(y, 
+					tnew,
 					Cinfl_now, rowvalsn, colptrsn, 
 					num_comp, 
-					num_sb, act_coeff, core_diss, 						kelv_fac, kimt, \
+					num_sb, act_coeff, core_diss, 
+					kelv_fac, kimt, 
 					(num_sb-self.wall_on), 
-					jac_mod_len, jac_part_hmf_indx, 					rw_indx, N_perbin, \
+					jac_mod_len, jac_part_hmf_indx,
+ 					rw_indx, N_perbin, 
 					jac_part_H2O_indx, H2Oi, self)
 				
 					# check on stability of water 
@@ -659,8 +689,9 @@ def ode_updater(y, H2Oi,
 			if (any(self.con_C_indx)): # then keep constant
 				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
 			
-			# if negative, suggests ODE solver instability, but could also be numerical limits, 
-			# especially if concentrations are relatively close to zero, so allow some leeway
+			# if negative, suggests ODE solver instability, but could also be numerical 
+			# limits, especially if concentrations are relatively close to zero, so allow 
+			# some leeway
 			if (any(y/np.sum(np.abs(y))<-1.e-30)):
 			
 				# identify components with negative concentrations
@@ -883,14 +914,14 @@ def ode_updater(y, H2Oi,
 			ic_red = 0 # reset flag
 			stab_red = 0 # reset flag
 		
-		# remember the gas-phase water concentration from previous 
-		# integration step (# molecules/cm3)
+		# remember the gas-phase water concentration from 
+		# previous integration step (# molecules/cm3)
 		y_H2O0 = y[H2Oi]
 			
 	time_taken = time.time()-self.st_time
 	
-	# re-merge continuous influx of water with that of other components, 
-	# this will allow further commands from the GUI
+	# re-merge continuous influx of water with that of other 
+	# components, this will allow further commands from the GUI
 	if (self.H2Oin == 1):
 
 		# index

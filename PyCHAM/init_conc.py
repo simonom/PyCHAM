@@ -193,14 +193,17 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	for i in range(num_comp): # loop through all components to get molar weights
 		y_mw[i] = self.Pybel_objects[i].molwt # molecular weight (g/mol)
 	
-	# ------------------------------------------------------------------------------------
+	# --------------------------------------------------------------
 	# account for water's properties
 	
-	# get initial gas-phase concentration (# molecules/cm3 (air)) and vapour pressure
+	# get initial gas-phase concentration (# molecules/cm3 (air)) 
+	# and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], self.RH[0], si.N_A)
+	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], 
+		self.RH[0], si.N_A)
 	
-	if (self.pars_skip == 1): # if skipping parsing and property estimation
+	# if skipping parsing and property estimation
+	if (self.pars_skip == 1):
 		H2Oi = self.H2Oi # index for water
 		y_mw = self.y_mw
 		num_comp = self.num_comp
@@ -222,33 +225,48 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			# ensure this is water rather than single 
 			# oxygen (e.g. due to ozone photolysis 
 			# (O is the MCM chemical scheme name for single oxygen))
+			
 			if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
+				
 				H2Oi = indx
 				self.H2Oi = H2Oi # index for water
-				# include initial concentration of water (# molecules/cm3)
+				# include initial concentration of water
+				# (# molecules/cm3)
 				y[H2Oi] = C_H2O
-				y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
+				
+				# include molar weight of water (g/mol)
+				y_mw[H2Oi] = H2O_mw
 			
-				# remove the addition of water in the surface concentrations
-				# first rearrange matrix so that components in rows, surface number in columns
-				y_w = y_w.reshape(self.wall_on, num_comp+2)
+				# remove the addition of water in the 
+				# surface concentrations
+				# first rearrange matrix so that 
+				# components in rows, surface number in 
+				#columns
+				y_w = y_w.reshape(self.wall_on, 
+					num_comp+2)
 				# remove the excess water column
-				y_w = np.concatenate((y_w[:, 0:-2], y_w[:, -1].reshape(-1, 1)), axis=1)
+				y_w = np.concatenate((y_w[:, 0:-2], 
+				y_w[:, -1].reshape(-1, 1)), axis=1)
 				# then flatten back to 1D array
 				y_w = y_w.flatten()
 
-		# if not included in chemical scheme file, then add water to end of component list
+		
+		# if not included in chemical scheme file, then add 
+		# water to end of component list
 		if (H2Oi == num_comp):
 	
-			num_comp += 1 # update number of components to account for water
-			# append empty element to y and y_mw to hold water values
+			# update number of components to account for 
+			# water
+			num_comp += 1
+			# append empty element to y and y_mw to hold 
+			# water values
 			y = np.append(y, C_H2O)
 			# append molar weight of water (g/mol)
 			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
 			self.comp_namelist.append('H2O') # append water's name to component name list
 			# add to SMILES list
 			self.rel_SMILES.append('HOH')
-
+			
 	# ------------------------------------------------------------------------------------
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material

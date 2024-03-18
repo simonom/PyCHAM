@@ -298,7 +298,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 				# times (s)
 				self.ci_array = np.concatenate((
 					self.ci_array, 
-					np.zeros((self.ci_array.shape[0], 
+					np.zeros((self.
+					ci_array.shape[0], 
 					len(t_out)-1)).astype('str')), 
 					axis=1)
 				self.ci_array[0, 1::] = t_out[

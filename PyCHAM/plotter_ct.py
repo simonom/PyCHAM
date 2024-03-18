@@ -1,25 +1,27 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''plots results for the change tendency temporal profiles of specified components'''
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''plots results for the change tendency temporal profiles of specified 
+components'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
@@ -1061,9 +1063,13 @@ def plotter_individ_prop(self):
 
 	if ('Molar Mass' in self.single_comp_prop):
 
-		# get molar mass of component of interest
-		mm_interest = y_mw[0, comp_names.index(self.mm_comp_name)]
-	
+		try:
+			# get molar mass of component of interest
+			mm_interest = y_mw[0, comp_names.index(self.mm_comp_name)]
+		except:
+			self.l203a.setText(str('Error: component ' + self.mm_comp_name + 
+			' not identified in chemical scheme'))
+			return(self)
 		# display in text area of GUI
 		self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + str(mm_interest) + ' g/mol'))
 
@@ -1071,8 +1077,11 @@ def plotter_individ_prop(self):
 
 		PsatPa0 = np.squeeze(PsatPa0) # ensure minimum number of dimensions
 
-		# get saturation vapour pressure at starting temperature of simulation
-		vp0_interest = PsatPa0[comp_names.index(self.mm_comp_name)]
+		if (PsatPa0.ndim == 1):
+			# get saturation vapour pressure at starting temperature of simulation
+			vp0_interest = PsatPa0[comp_names.index(self.mm_comp_name)]
+		else:
+			vp0_interest = PsatPa0[0, comp_names.index(self.mm_comp_name)]
 	
 		# display in text area of GUI
 		self.l203a.setText(str('Vapour pressure at starting temperature for ' + str(self.mm_comp_name) + ': ' + str(vp0_interest) + ' Pa'))

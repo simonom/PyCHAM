@@ -170,7 +170,7 @@ def cham_up(sumt, Pnow,
 	# update dilution factor
 	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
 	# for water vapour
-	self.dil_fac_H2O_now = 0.0
+	self.dil_fac_H2O_now = self.dil_fac[self.dil_fac_cnt]
 		
 	# check on change of light setting ------------------------------
 

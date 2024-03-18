@@ -266,24 +266,33 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 				Psatnow = ((25.-nC)*0.475-
 				(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
 				(nC+nO-3.*nN))*0.9-nN*2.5)
-				# convert to vapour pressure (log10(atm)) (eq. 1 O'Meara et al. 2014)
+				# convert to vapour pressure (log10(atm))
+				# (eq. 1 O'Meara et al. 2014)
 				Psatnow = np.exp(Psatnow) # ug/m3
-				Psatnow = np.log10((Psatnow*8.2057e-5*self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
-				
-				rec_now_flag = 1 # tell recording section we are dealing with HOM		
+				Psatnow = np.log10((Psatnow*8.2057e-5*
+				self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
+				# tell recording section we are dealing 
+				# with HOM		
+				rec_now_flag = 1
 			
-		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal et al. (2008), with dB of 
+		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
+		# et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
 		else: 
 			if (self.pars_skip != 2):
 				
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
-					self.TEMP[tempt_cnt], 
-					boiling_points.nannoolal(self.Pybel_objects[i]))))
-				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], 
-					#self.TEMP[tempt_cnt])))
+				Psatnow = ((vapour_pressures.nannoolal(
+				self.Pybel_objects[i],
+				self.TEMP[tempt_cnt], 
+				boiling_points.nannoolal(
+				self.Pybel_objects[i]))))
+				
+				#Psatnow = ((vapour_pressures.
+				#evaporation(self.Pybel_objects[i], 
+				#self.TEMP[tempt_cnt])))
 				#Psatnow += 2
-				# in case you want to ensure small molecules don't contribute to 
+				# in case you want to ensure small
+				# molecules don't contribute to 
 				# particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
 				#	Psatnow += 10 # ensure no condensation of small molecules
@@ -361,8 +370,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			 
 			self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
 			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
-			# get indices of components with particular functional groups
-			group_indices.group_indices(Hcount, self.rel_SMILES[i], i, self)
+			# get indices of components with particular 
+			# functional groups
+			group_indices.group_indices(Hcount, 
+			self.rel_SMILES[i], i, self)
 		
 		else: # if no carbons in this component
 			self.OC[0, i] = 0.
@@ -371,15 +382,18 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	if (len(dens_comp) > 0  and ode_gen_flag == 0):
 		for i in range (len(dens_comp)):
 			# index of component in list of components
-			dens_indx = self.comp_namelist.index(dens_comp[i])
+			dens_indx = self.comp_namelist.index(
+			dens_comp[i])
 			self.y_dens[dens_indx] = dens[i]
 
 	if (self.pars_skip != 2):
 		ish = (self.Psat == 0.) # non-volatiles
-		
-		self.Psat = (10.**self.Psat)*101325. # convert to Pa from atm
-		self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325. # convert to Pa from atm
-		# retain low volatility where wanted following unit conversion
+		# convert to Pa from atm
+		self.Psat = (10.**self.Psat)*101325.
+		# convert to Pa from atm
+		self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325.
+		# retain low volatility where wanted following unit 
+		# conversion
 		self.Psat[ish] = 0.
 
 	# get group indices in correct format
@@ -395,18 +409,23 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.NO3 = np.asarray(self.NO3, dtype=int)
 	self.HOM_NO3 = np.asarray(self.HOM_NO3, dtype=int)	
 	if (self.pars_skip != 2):
-		# in preparation for ode solver, tile over size and wall bins if present
+		# in preparation for ode solver, tile over size and 
+		# wall bins if present
 		if (self.num_asb+self.wall_on > 0):
-			self.Psat = np.tile(self.Psat, (self.num_asb+self.wall_on, 1))
+			self.Psat = np.tile(self.Psat, 
+			(self.num_asb+self.wall_on, 1))
 		else:
 			self.Psat = np.tile(self.Psat, (1, 1))
 		
-		# list to remember which components have vapour pressures specified
+		# list to remember which components have vapour 
+		# pressures specified
 		vi_rec = []
 		
-		# list to remember which walls affected by wall-specific vapour pressures
+		# list to remember which walls affected by 
+		# wall-specific vapour pressures
 		self.P_wfunc_wi = []
-		# list to remember which components affected by wall-specific vapour pressures
+		# list to remember which components affected by 
+		# wall-specific vapour pressures
 		self.P_wfunc_ci = []
 		# list to remember the user-defined vapour pressure
 		self.P_wfunc = []
@@ -414,19 +433,25 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# manually assigned vapour pressures (Pa)
 		if (len(vol_Comp) > 0 and ode_gen_flag == 0):
 			for i in range (len(vol_Comp)):
-
-				if '_wall' in vol_Comp[i]: # this is specific to a wall
+				# this is specific to a wall
+				if '_wall' in vol_Comp[i]:
 					# get wall number
 					# get location of wall number
 					wn = vol_Comp[i].rfind('l')
-					wn = int(float(vol_Comp[i][wn+1::]))
+					wn = int(float(vol_Comp[i]
+					[wn+1::]))
+					# first see if an individual 
+					# component has been named
+					try:
+						vol_indx = [self.
+						comp_namelist.index(
+						vol_Comp[i][0:-6])]
+					# could be a group of components
+					except: 
+						group_name = (vol_Comp[i]						[0:-6])
 
-					try: # first see if an individual component has been named
-						vol_indx = [self.comp_namelist.index(vol_Comp[i][0:-6])]
-					except: # could be a group of components
-						group_name = vol_Comp[i][0:-6]
-
-						# check if an inequality present
+						# check if an inequality
+						# present
 						if '<' or '>' or '==' in group_name:
 							# get locations of underscores
 							us_indx = group_name.rfind('_') 
@@ -528,17 +553,18 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		self.Psat_num_rec = np.zeros((self.Psat.shape))
 		self.Psat_num_rec[:, :] = self.Psat[:, :]
 
-		# remember this first set of component vapour pressures for saving, which can
+		# remember this first set of component vapour 
+		# pressures for saving, which can
 		# speed up initiation time in following simulations
 		self.Psat_rec0 = np.zeros((self.Psat.shape))
 		self.Psat_rec0[:, :] = self.Psat[:, :]
 
-	# if vapour pressure plot requested then make this now ------------
+	# if vapour pressure plot requested then make this now ---------
 	if (self.testf == 3.2): 
 		
 		import matplotlib.pyplot as plt
-		
-		plt.ion() # show results to screen and turn on interactive mode
+		# show results to screen and turn on interactive mode
+		plt.ion()
 		
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
@@ -548,19 +574,26 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		
 		array_names = np.squeeze(np.array(self.comp_namelist))
 
-		# plot vapour pressures against component names in descending order of volatility
-		ax0.semilogy(np.arange(len(self.Psat_Pa_rec)), self.Psat_Pa_rec[des_ind], '+')
+		# plot vapour pressures against component names in 
+		# descending order of volatility
+		ax0.semilogy(np.arange(len(self.Psat_Pa_rec)), 
+		self.Psat_Pa_rec[des_ind], '+')
 		
-		ax0.set_ylabel(r'Pure Component Saturation Vapour Pressure at 298.15 K (Pa)', fontsize = 14)
+		ax0.set_ylabel(str('Pure Component Saturation Vapour\n' +			'Pressure at 298.15 K (Pa)'), fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
 		ax0.set_xticks(np.arange(len(self.comp_namelist)))
 		ax0.set_xticklabels(array_names[des_ind], rotation = 45)
-		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-		ax0.set_title(str('Pure Component Saturation Vapour Pressures at 298.15 K of All Components'), fontsize = 14)
+		ax0.yaxis.set_tick_params(labelsize = 14, direction = 
+		'in', which = 'both')
+		ax0.xaxis.set_tick_params(labelsize = 14, direction = 
+		'in', which = 'both')
+		ax0.set_title(str('Pure Component Saturation Vapour ' +
+		'Pressures at 298.15 K of All Components'), 
+		fontsize = 14)
 		
-		# tell middle that plot made and need to stop running code now
+		# tell middle that plot made and need to stop running
+		# code now
 		err_mess = 'Stop'
 		erf = 1
 	# end of plotting section ----------------------------------------------------------------------------------------------------------
