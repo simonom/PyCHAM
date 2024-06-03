@@ -38,14 +38,16 @@ def def_mod_var(caller, self): # define function
 	# default input files ------------------------------
 	# default chemical scheme
 	self.sch_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
-	self.xml_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_xml.xml' # xml file path
+	# xml file path
+	self.xml_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_xml.xml'
 	self.inname = 'Default' # model variables file name
 	
-	# general ---------------------------------------------------------------------------------
+	# general -----------------------------------------------------------------------------
 	# name of folder to save results to
 	sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
-	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '>', ';', '']
+	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , 
+		'&', '' , '', ':', '>', ';', '']
 	# time interval between updates to integration inputs (s)
 	self.update_stp = 1.
 	self.tot_time = 1. # total time to integrate over (s)
@@ -70,31 +72,41 @@ def def_mod_var(caller, self): # define function
 	# time that temperatures reached (s) 
 	self.tempt = np.array((0.0)).reshape(1)	
 	# humidity of experiment (fraction of 1)
-	self.RH = np.array(([0.65])) 
-	self.RHt = np.array(([0])) # time through simulation (s) RH reached
+	self.RH = np.array(([0.65]))
+	# time through simulation (s) at which RH is reached
+	self.RHt = np.array(([0]))
 	Press = 9.8e4 # air pressure during experiment (Pa)
-	self.dil_fac = np.zeros(1) # dilution factor (volume fraction per second)
-	self.dil_fact = np.zeros(1) # dilution factor times through experiment (s)
+	# dilution factor (volume fraction per second)
+	self.dil_fac = np.zeros(1) 
+	# dilution factor times through experiment (s)
+	self.dil_fact = np.zeros(1)
+	# begin by assuming that particle components
+	# (in ode_solv) and particle
+	# number concentration (in ode_updater)
+	# are subject to any dilution defined by self.dil_fac
+	self.pp_dil = 1
 	
-	# particle section ----------------------------------------------------------------
-	siz_stru = 0 # size structure (0 for moving-centre, 1 for full-moving)
+	# particle section ----------------------------------------------
+	# size structure (0 for moving-centre, 1 for full-moving)
+	siz_stru = 0
 	num_sb = 0 # number of particle size bins
-	# whether particle number concentrations expressed by modes (0) or explicitly	
-	pmode = 0
+	# whether particle number concentrations expressed 
+	# by modes (0) or explicitly (1)
+	self.pmode = 0
 	# concentration of particles (# particles/cm3 (air))
-	pconc = np.zeros((1, 1))
-	pconct = np.zeros((1, 1)) # times of particle injection (s)
+	self.pconc = np.zeros((1, 1))
+	self.pconct = np.zeros((1, 1)) # times of particle injection (s)
 	# whether to repeat particle influx every 24 hours
 	self.pconctf = 0
 	# whether particle injection instantaneous or continuous 
-	pcont = np.zeros((1, 1), dtype=int) 
+	self.pcont = np.zeros((1, 1), dtype=int) 
 	# molecular weight of seed material (g/mol)
 	seed_mw = (np.array((132.14))).reshape(1) 
 	seed_diss = [1.] # dissociation constant of seed material
 	seed_dens = np.ones((1)) # density of seed material (g/cc)
-	seed_name = ['core'] # name of component forming seed material
+	self.seed_name = ['core'] # name of component forming seed material
 	# mole fraction of dry seed components
-	seedx = np.ones((1, 1, 1)) 
+	self.seedx = np.ones((1, 1, 1)) 
 	# seed particle number size distribution and wall does 
 	# include partitioned water
 	self.Vwat_inc = 2
@@ -103,9 +115,10 @@ def def_mod_var(caller, self): # define function
 	self.seed_eq_wat = 1 
 	lowsize = 0. # smallest size bin boundary (radius) (um)
 	uppsize = 5.e-1 # largest size bin boundary (radius) (um)
-	space_mode = 'lin' # treatment for spacing between size bins
+	self.space_mode = 'lin' # treatment for spacing between size bins
 	std = np.ones((1, 1))*1.2 # standard deviation for particle number size distribution
-	mean_rad = np.ones((1, 1))*-1.e6 # mean radius for particle number size distribution (um)
+	# mean radius for particle number size distribution (um)
+	self.mean_rad = np.ones((1, 1))*-1.e6
 	new_partr = 2.e-7 # radius of newly nucleated particles (cm)
 	# nucleation parameters
 	self.nucv1 = 0.
@@ -134,7 +147,7 @@ def def_mod_var(caller, self): # define function
 
 	# gas inputs ------------------------------------------------------------
 	# chemical scheme name of components present initially
-	comp0 = np.array(())
+	self.comp0 = np.array(())
 	# initial concentrations (ppb)
 	y0 = np.array(())	
 	self.con_infl_nam = [] # chemical scheme names of components with continuous influx
@@ -156,7 +169,7 @@ def def_mod_var(caller, self): # define function
 	# experiment start
 	Ct = np.zeros((0, 0))
 	# the gas-particle partitioning cutoff (Pa)
-	partit_cutoff = []
+	self.partit_cutoff = []
 
 	# lights -------------------------------------------------------------------------------
 	self.light_stat = np.zeros((1), dtype='int') # light status
@@ -233,20 +246,20 @@ def def_mod_var(caller, self): # define function
 	self.sim_ci_file = []
 	# -------------------------------------------------------------
 	# prepare for pickling
-	list_vars = [sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, 
+	list_vars = [sav_nam, y0, Press, 
+			siz_stru, num_sb, 
 			lowsize, 
-			uppsize, space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name, seed_mw, 
+			uppsize, std, 
+			Compt, injectt, Ct, seed_mw, 
 			seed_diss, seed_dens, 
-			seedx, dens_comp, dens, vol_comp, 
+			dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, 
 			int_tol, new_partr, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, 
-			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, 
+			Rader, p_char, e_field, ser_H2O, 
+			wat_hist, drh_str, erh_str, 
 			z_prt_coeff, chamV]
 
 	
@@ -258,14 +271,13 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, comp0, y0, Press, siz_stru, num_sb, 
-		pmode, pconc, pconct, lowsize, uppsize, 
-		space_mode, std, mean_rad, Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx,  
+	return(sav_nam, y0, Press, siz_stru, num_sb, 
+		lowsize, uppsize, 
+		std, Compt, 
+		injectt, Ct, seed_mw, seed_diss, seed_dens,  
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 
-		partit_cutoff, ser_H2O, wat_hist, drh_str, erh_str, 
-		pcont, z_prt_coeff, chamV, self)
+		ser_H2O, wat_hist, drh_str, erh_str, 
+		z_prt_coeff, chamV, self)

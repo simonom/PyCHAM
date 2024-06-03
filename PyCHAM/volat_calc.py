@@ -1,10 +1,12 @@
-#########################################################################								       #
+########################################################################								  
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -21,8 +23,10 @@
 
 # called/returned from/to the front.py and ode_gen.py modules, 
 # this module is responsible for
-# setting key properties of components, including liquid-phase saturation vapour pressures
-# and liquid-phase densities.  It does this using either UManSysProp (default), or with
+# setting key properties of components, including liquid-phase 
+# saturation vapour pressures
+# and liquid-phase densities.  It does this using either 
+# UManSysProp (default), or with
 # user settings
 
 import numpy as np
@@ -35,7 +39,7 @@ import errno
 import stat
 
 def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
-		volP, testf, corei, seed_name, pconc, 
+		volP, testf, corei, 
 		umansysprop_update, core_dens, comp_namelist,
 		ode_gen_flag, nuci, self):
 
@@ -52,10 +56,8 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# corei - index of seed particle component
-	# seed_name - name(s) of components(s) comprising seed particles
-	# pconc - initial number concentration of particles (#/cc (air))
 	# umansysprop_update - marker for cloning UManSysProp so that 
-	#	latest version used
+	#	the latest version is used
 	# core_dens - density of core material (g/cm3 
 	#	(liquid/solid density))
 	# comp_namelist - list of components' names in chemical 
@@ -128,7 +130,7 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 				#  so manually input kg/m3
 				y_dens[i] = 1.e3
 			else:
-				# density (convert from g/cc to kg/m3)
+				# density (convert from g/cm3 to kg/m3)
 				y_dens[i] = liquid_densities.girolami(
 					self.Pybel_objects[i])*1.e3
 			# ----------------------------------------------
@@ -149,6 +151,17 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 		if (i == H2Oi):
 			self.Psat[:, i] = Psat_water
 			continue # water not included in Pybel_objects
+
+		# water vapour pressure already given by Psat_water 
+		# (log10(atm))
+		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3'):
+			self.Psat[:, i] = np.log10(
+				(9.9e-07*TEMP-2.5e-4)*9.869e-6)
+			continue # onto next component
+		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3'):
+			self.Psat[:, i] = np.log10(
+				(4.5e-04*TEMP-1.2e-1)*9.869e-6)
+			continue # onto next component
 		
 		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et 
 		# al. (2008), with dB of 

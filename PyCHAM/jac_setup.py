@@ -149,25 +149,38 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# include all components, including water and seed material.
 	# Remember that any final element of colptrs should represent the final
 	# rowval index, so colptrs needs to have a length one greater than the
-	# number of components+number of components*number of size bins (number of size bins includes wall)
+	# number of components+number of components*number of size bins 
+	# (number of size bins includes wall)
 	col_shrt =  ((comp_num+self.H2O_in_cs)+(comp_num+self.H2O_in_cs)*num_sb+1)-len(colptrs)
 	# rowvals indices for final columns of Jacobian		
 	colptrs = np.append(colptrs, np.array((colptrs[-1])).repeat(col_shrt))
-
+	
 	if (self.eqn_num[1] > 0): # if aqueous-phase reactions present
 
-		# aqueous-phase reaction part -----------------------------------------------------
+		# aqueous-phase reaction part -----------------------------------------------
 		# container for Jacobian index affected by aqueous-phase reactions	
-		self.jac_indx_aq = np.zeros((self.eqn_num[1], \
+		self.jac_indx_aq = np.zeros((self.eqn_num[1],
 			max(self.nreac_aq*(self.nreac_aq+self.nprod_aq))))
-		# index of unique rows affected per reactant, if zero acts as a filler
-		# this omitted below
-		col_tracker = np.unique(self.rindx_aq)
-		# maximum number of reactants and products affected by an aqueous-phase reaction
+
+		# index of unique rows affected per reactant, note this
+		# covers all particle size bins
+		col_tracker = np.unique(self.rindx_aq[self.rstoi_aq != 0.])
+
+		# get total number of unique aqueous-phase 
+		# reactants per size bin
+		n_uni_aq_reac = int(len(col_tracker)/num_asb)
+
+		# maximum number of reactants and products 
+		# affected by an aqueous-phase reaction
 		max_affected_n = max(self.nreac_aq+self.nprod_aq)
+		# maximum number of reactants involved in aqueous 
+		# phase reaction
+		max_affected_r = max(self.nreac_aq)
 		# track rows affected per column
 		row_tracker = np.ones((max_affected_n, len(col_tracker)))*-1.
-		# note that size bins are dealt with below these equation and reaction loops
+		
+		# note that size bins are dealt with below these 
+		# equation and reaction loops
 		for eqni in range(self.eqn_num[1]): # loop through reactions
 			# total number of components affected per reactant
 			tot_affcomp = self.nreac_aq[eqni]+self.nprod_aq[eqni]
@@ -177,34 +190,45 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			for ir in range(self.nreac_aq[eqni]):
 				# number of full Jacobian elements passed before reaching 
 				# this reactant, accounting for water and core and gas-phase
-				st_indx = (comp_num+self.H2O_in_cs)*(num_sb+1)*\
-					self.rindx_aq[eqni, ir]
+				st_indx = ((comp_num+self.H2O_in_cs)*(num_sb+1)*
+					self.rindx_aq[eqni, ir])
 				# flat Jacobian index affected by this equation, this then 
-				# reduced to sparse 
-				# matrix index below
-				self.jac_indx_aq[eqni, ir*tot_affcomp:(ir+1)*tot_affcomp] = \
-					st_indx+totindx
+				# reduced to sparse matrix index below
+				self.jac_indx_aq[eqni, ir*tot_affcomp:
+					(ir+1)*tot_affcomp] = st_indx+totindx
 			
 				# the column number affected
 				coli = np.where(col_tracker == self.rindx_aq[eqni, ir])[0]
 				# unique rows affected per reactant
-				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, \
+				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, 
 					coli]!=-1], totindx))
 				row_tracker[0:len(unirow), coli] = unirow.reshape(-1, 1)
-				
-		
+					
 		# flatten ready for appendage
 		row_trackerf = row_tracker.flatten(order='F')
 		# append to rowvals
 		rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
+		
 		# sum number of unique rows affected per component
 		col_num = (row_tracker != -1).sum(axis = 0)
-		# account for new rows in first size bin, add 1 to index because this represents the
-		# number of elements per component
-		colptrs[col_tracker[0:max_affected_n+1]+1] += np.cumsum(col_num)[0:max_affected_n+1]
-		# ensure latter inidices are consistent 
-		colptrs[max(col_tracker[0:max_affected_n+1]+1)::] = \
-			colptrs[max(col_tracker[0:max_affected_n+1]+1)]
+
+		# spread col_num for this first size bin over
+		# all components in this size bin
+		col_num_all = np.zeros((comp_num+self.H2O_in_cs))
+		# insert number of affected components per
+		# aqeuous-phase reactant
+		col_num_all[col_tracker[0:n_uni_aq_reac]-
+		(comp_num+self.H2O_in_cs)] = col_num[0:n_uni_aq_reac]
+
+		# account for new rows in first size bin, add 1 to 
+		# index for the colptrs index since affecting 
+		# components are represented by their index
+		# to their index+1 in colptrs
+		colptrs[(comp_num+self.H2O_in_cs+1):
+		((comp_num+self.H2O_in_cs)*2+1)] += np.cumsum(col_num_all)
+		
+		# ensure latter inidices are updated 
+		colptrs[(comp_num+self.H2O_in_cs)*2::] = max(colptrs)
 		
 		# because above jac_indx_aq contains the indices of data assuming
 		# a full, rather than sparse matrix, now correct to affect
@@ -222,17 +246,18 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		
 		# now account for omission of full Jacobian elements between the gas-phase 
 		# reaction part and the aqueous-phase reaction part
-		self.jac_indx_aq[self.jac_indx_aq != 0.] -= \
-			np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])-np.amax(self.jac_indx_g)-1
+		self.jac_indx_aq[self.jac_indx_aq != 0.
+			] -= np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.]
+			)-np.amax(self.jac_indx_g)-1
 		# range of aqueous-phase sparse jacobian indices
-		ran_aq = np.amax(self.jac_indx_aq[self.jac_indx_aq != 0.])- \
-			np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])+1
+		ran_aq = (np.amax(self.jac_indx_aq[self.jac_indx_aq != 0.])- 
+			np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])+1)
 		# shape of index matrix for just one size bin
 		jsh = self.jac_indx_aq.shape
 
 		# now repeat over particle size bins
 		for sbi in range(1, num_asb):
-			self.jac_indx_aq = np.concatenate((self.jac_indx_aq, \
+			self.jac_indx_aq = np.concatenate((self.jac_indx_aq, 
 				self.jac_indx_aq[0:jsh[0], 0:jsh[1]] + ran_aq*(sbi)), axis = 0)
 			
 			# account for the the gas-phase Jacobian indices
@@ -241,13 +266,15 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			row_trackerf = row_tracker.flatten(order='F')
 			# append to rowvals
 			rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
-			# account for new rows in latter size bin, add 1 to index because 
-			# this represents the number of elements per component
-			colptrs[col_tracker[(max_affected_n+1)*sbi:(max_affected_n+1)*(sbi+1)]+1]\
-				 += np.cumsum(col_num)[0:max_affected_n+1]
-			# ensure latter inidices are consistent 
-			colptrs[max(col_tracker[(max_affected_n+1)*sbi:\
-				(max_affected_n+1)*(sbi+1)])+1::] = max(colptrs)
+			# account for new rows in first size bin, add 1 to 
+			# index for the colptrs index since affecting 
+			# components are represented by their index
+			# to their index+1 in colptrs
+			
+			colptrs[(comp_num+self.H2O_in_cs)*(sbi+1)+1:
+			(comp_num+self.H2O_in_cs)*(sbi+2)+1] += np.cumsum(col_num_all)
+			# ensure latter inidices are updated 
+			colptrs[(comp_num+self.H2O_in_cs)*(sbi+2)+1::] = max(colptrs)
 	
 	if (self.eqn_num[1] == 0):
 		self.jac_indx_aq = np.zeros((1)) # filler

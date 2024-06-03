@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''plot particle number size distributions to be used in simulation'''
 # this module receives the seed particle number size distribution inputs 
 # from the GUI and demonstrates these distributions graphically.  E.g.
@@ -28,21 +29,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import part_nsd # determining particle number size distributions
 
-def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc, 
-		space_mode, testf, pconct, self): # define module
+def plotter_nsd(lowersize, num_asb, uppersize, std, 
+		testf, self): # define module
 	
 	# inputs: ----------------------------
 	# lowersize - the smallest bound on the particle size range (um)
 	# num_asb - number of size bins (excluding wall)
 	# uppersize - the largest bound on the particle size range (um)
-	# mean_rad - mean radius of modes (um)
+	# self.mean_rad - mean radius of modes (um)
 	# std - standard deviation of modes (must be greater than 1)
-	# pmode - whether distribution described as modes or explicitly
-	# pconc - particle number concentration (# particles/cm3)
-	# space_mode - how to space out particles (logarithmically or 
-	#		linearly)
+	# self.pmode - whether distribution described as modes or explicitly
+	# self.pconc - particle number concentration (# particles/cm3)
 	# testf - flag for whether in testing mode
-	# pconct - the timings of particle injection
+	# self.pconct - the timings of particle injection
 	# self - PyCHAM object containing multiple variables
 	# ------------------------------------
 	
@@ -51,20 +50,19 @@ def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc,
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 
 	# loop through number of supplied number size distributions
-	for ti in range(len(pconct[0])):
+	for ti in range(len(self.pconct[0])):
 		
 		# get inputs at this time
-		mean_radn = mean_rad[:, ti]
+		mean_radn = self.mean_rad[:, ti]
 		stdn = std[:, ti]
-		pconcn = pconc[:, ti]
+		pconcn = self.pconc[:, ti]
 	
 		# get particle number concentration per size bin (# particles/cm3)
 		# and radius at particle size bin centres (um)
 		[N_perbin, x, rbou, Vbou, Varr, 
-   			upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
-							  						num_asb, uppersize, mean_radn, 
-					 	      						stdn, pmode, pconcn, space_mode, 
-							  						testf, self)
+   			upper_bin_rad_amp] = part_nsd.part_nsd(lowersize,
+				num_asb, uppersize, mean_radn, 	 	      							stdn, pconcn, 
+				testf, self)
 
 		# prepare dN/dlogDp
 		# don't use the first boundary as it could be zero, which will error when log10 taken
@@ -85,7 +83,7 @@ def plotter_nsd(lowersize, num_asb, uppersize, mean_rad, std, pmode, pconc,
 		dNdlog10D[:] = N_perbin[:, 0]/dlog10D
 
 		# plot this number size distribution against diameter
-		ax0.loglog(x*2., dNdlog10D, label = str('Time = ' + str(pconct[0][ti]) + ' s'))
+		ax0.loglog(x*2., dNdlog10D, label = str('Time = ' + str(self.pconct[0][ti]) + ' s'))
 		
 	ax0.legend() # show legend
 	ax0.set_xlabel(str('Particle Diameter (' + u'\u03BC' + 'm)'), size = 14)

@@ -52,7 +52,7 @@ def chem_scheme_SMILES_extr(self):
 	[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
-	[err_mess_new, comp_smil, comp_name] = xml_interr.xml_interr(self.xml_name)
+	[err_mess_new, self] = xml_interr.xml_interr(self)
 	
 	# in case error given by xml_interr
 	if err_mess_new[0:5] == 'Error':
@@ -85,7 +85,8 @@ def chem_scheme_SMILES_extr(self):
 		
 		# split the line into 2 parts: equation and rate coefficient
 		# . means match with anything except a new line character., when followed by a * 
-		# means match zero or more times (so now we match with all characters in the line
+		# means match zero or more times (so now we match with all 
+		# characters in the line
 		# except for new line characters, so final part is stating the character(s) we 
 		# are specifically looking for, \\ ensures the marker is recognised
 		if eqn_sec == 1:
@@ -165,24 +166,34 @@ def chem_scheme_SMILES_extr(self):
 		
 		for reactant in reactants: # left hand side of equations (losses)
 		
-			if (re.findall(stoich_regex, reactant)[0] != ''): # when stoichiometry included
+			# when stoichiometry included
+			if (re.findall(stoich_regex, reactant)[0] != ''):
 				# name with no stoichiometry number
 				name_only = re.sub(stoich_regex, '', reactant)
-			elif (re.findall(stoich_regex, reactant)[0] == ''): # when stoichiometry excluded
+			# when stoichiometry excluded
+			elif (re.findall(stoich_regex, reactant)[0] == ''):
 				name_only = reactant
 			
-			if (name_only not in comp_namelist): # if new component encountered
+			# if new component encountered
+			if (name_only not in comp_namelist):
 			
-				comp_namelist.append(name_only) # add to chemical scheme name list
+				# add to chemical scheme name list
+				comp_namelist.append(name_only)
 				
 				# convert MCM chemical names to SMILES
-				if (name_only in comp_name):
-					# index where xml file name matches reaction component name
-					name_indx = comp_name.index(name_only)
-					name_SMILE = comp_smil[name_indx] # SMILES of component
-					comp_list.append(name_SMILE) # list SMILE names
+				if (name_only in self.comp_xmlname):
+					# index where xml file name matches 
+					# reaction component name
+					name_indx = self.comp_xmlname.index(name_only)
+					# SMILES of component
+					name_SMILE = self.comp_smil[name_indx]
+					# list SMILE names
+					comp_list.append(name_SMILE)
 				else:
-					err_mess = str('Error - chemical scheme name '+ str(name_only) +' not found in xml file')
+					err_mess = str(
+					'Error - chemical scheme name '
+					+ str(name_only) + 
+					' not found in xml file')
 					H2Oi = 0 # filler
 					
 					return(comp_namelist, comp_list, err_mess, H2Oi)
@@ -195,16 +206,19 @@ def chem_scheme_SMILES_extr(self):
 			elif (re.findall(stoich_regex, product)[0] == ''): # when stoichiometry excluded
 				name_only = product
 			
-			if (name_only not in comp_namelist): # if new component encountered
+			# if new component encountered
+			if (name_only not in comp_namelist):
 			
-				comp_namelist.append(name_only) # add to chemical scheme name list
+				# add to chemical scheme name list
+				comp_namelist.append(name_only)
 			
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				if name_only in comp_name:
-					name_indx = comp_name.index(name_only)
-					name_SMILE = comp_smil[name_indx]
-					comp_list.append(name_SMILE) # list SMILE names
+				if name_only in self.comp_xmlname:
+					name_indx = self.comp_xmlname.index(name_only)
+					name_SMILE = self.comp_smil[name_indx]
+					# list SMILE names
+					comp_list.append(name_SMILE)
 				else:
 					err_mess = str('Error - chemical scheme name '+str(name_only)+' not found in xml file')
 					H2Oi = 0 # filler

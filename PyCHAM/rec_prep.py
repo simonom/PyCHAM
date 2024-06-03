@@ -1,10 +1,12 @@
-#########################################################################								       #
+########################################################################							
 # Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -36,11 +38,11 @@ def rec_prep(nrec_step, y, y0,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cfactor, Vbou, tnew, 
 	np_sum, update_count, injectt, gasinj_cnt, 
-	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
-	seed_name, seedx, lowsize, uppsize, rad0, radn, std, rbou, 
-	infx_cnt, MV, partit_cutoff, diff_vol, 
+	inj_indx, Ct, seedt_cnt, corei, 
+	lowsize, uppsize, radn, std, rbou, 
+	infx_cnt, MV, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, 
-	nuci, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	nuci, t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
 	
@@ -110,18 +112,17 @@ def rec_prep(nrec_step, y, y0,
 	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	# instantaneously after experiment start
-	# pmode - whether number size distributions expressed as modes or explicitly
-	# pconc - concentration of injected particles (# particles/cm3 (air))
-	# pconct - times of particle injection (s)
+	# self.pmode - whether number size distributions expressed as modes or explicitly
+	# self.pconc - concentration of injected particles (# particles/cm3 (air))
+	# self.pconct - times of particle injection (s)
 	# seedt_cnt - count on injection of seed particles
-	# mean_rad - mean radius for particle number size 
+	# self.mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# corei - index of core component
-	# seed_name - name(s) of component(s) comprising seed particles
-	# seedx - mole ratio of components comprising seed particles
+	# self.seed_name - name(s) of component(s) comprising seed particles
+	# self.seedx - mole ratio of components comprising seed particles
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
-	# rad0 - initial radius at size bin centres (um)
 	# radn - current radius at size bin centres (um)	
 	# std - standard deviation for injected particle number size 
 	#	distributions
@@ -131,7 +132,7 @@ def rec_prep(nrec_step, y, y0,
 	# self.con_infl_C - influx rates of components with constant influx 
 	#	(ppb/s)
 	# MV - molar volume (cc/mol)
-	# partit_cutoff - the product of saturation vapour pressure and
+	# self.partit_cutoff - the product of saturation vapour pressure and
 	#		activity coefficient above which gas-particle
 	#		partitioning assumed zero (Pa)
 	# diff_vol - diffusion volume of components according to Fuller et al. (1969)
@@ -149,7 +150,7 @@ def rec_prep(nrec_step, y, y0,
 	# nuci - index of nucleating component
 	# self.nuc_comp - name of nucleating component
 	# t0 - initial integration step (s)
-	# pcont - flag for whether particle injection instantaneous or 
+	# self.pcont - flag for whether particle injection instantaneous or 
 	#	continuous
 	# pcontf - current status of particle injection (instantaneous 
 	#	or continuous)
@@ -160,7 +161,8 @@ def rec_prep(nrec_step, y, y0,
 	#	coefficient below which partitioning to a particle 
 	#	size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny
-	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.seed_eq_wat - whether seed particles to be equilibrated 
+	#	with water prior to ODE solver
 	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
@@ -196,13 +198,13 @@ def rec_prep(nrec_step, y, y0,
 		self] = cham_up.cham_up(sumt, 
 		Pnow, light_time_cnt, 0, 
 		np_sum, update_count, 
-		injectt, gasinj_cnt, inj_indx, Ct, pmode, pconc, 
-		pconct, seedt_cnt, num_comp, y0, y, N_perbin, 
-		mean_rad, corei, seedx, seed_name, 
-		lowsize, uppsize, num_sb, MV, rad0, radn, std, H2Oi, 
+		injectt, gasinj_cnt, inj_indx, Ct, 
+		seedt_cnt, num_comp, y0, y, N_perbin, 
+		corei, 
+		lowsize, uppsize, num_sb, MV, radn, std, H2Oi, 
 		rbou, infx_cnt, Cfactor, diff_vol, 
 		DStar_org, tempt_cnt, RHt_cnt, nuci,
-		y_mw, self.TEMP[0], 0, t0, x, pcont,  pcontf, 0., 
+		y_mw, self.TEMP[0], 0, t0, x,  pcontf, 0., 
 		surfT, act_coeff, tot_in_res, Compti, self, vol_Comp, 
 		volP)
 	
@@ -237,9 +239,10 @@ def rec_prep(nrec_step, y, y0,
 	if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles or wall present
 		
 		# update partitioning variables
-		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw,   
+		[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, 
+		num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, N_perbin, 
-		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
+		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, 
 		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
 		
 	if (num_sb-self.wall_on) > 0: # if particles present
@@ -313,7 +316,7 @@ def rec_prep(nrec_step, y, y0,
 		self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, 
 			num_comp, core_diss, kelv_fac, 
 			kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist,
-			 pconc, self)
+			self)
 						
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 		seedt_cnt, rbou_rec, Cfactor, infx_cnt, temp_now, 

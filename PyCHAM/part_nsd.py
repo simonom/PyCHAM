@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''interpreting and implementing particle number size distribution inputs'''
 # a module that takes the variables relevant to particle number size 
 # distributions and outputs the particle number concentration per size bin
@@ -26,7 +27,7 @@
 import numpy as np
 import size_distr # for allocating particle number size distributions
 
-def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, space_mode, testf, self):
+def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pconcn, testf, self):
 
 	# inputs: ----------------------------
 	# lowersize - the smallest bound on the particle size range (um)
@@ -34,10 +35,8 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 	# uppersize - the largest bound on the particle size range (um)
 	# mean_radn - mean radius of modes (um)
 	# stdn - standard deviation of modes (must be greater than 1)
-	# pmode - whether distribution described as modes or explicitly
+	# self.pmode - whether distribution described as modes or explicitly
 	# pconcn - particle number concentration (# particles/cm3)
-	# space_mode - how to space out particles (logarithmically or 
-	#		linearly)
 	# testf - flag for whether in testing mode
 	# self - reference to PyCHAM
 	# ------------------------------------
@@ -60,11 +59,13 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 	# particle concentration is described by mode, or will assign particles to size bins if
 	# initial particle concentration per size bin provided
 	if (num_asb > 1):
-			
-		# set scale and standard deviation input for lognormal probability distribution 
+		# set scale and standard deviation 
+		# input for lognormal probability distribution 
 		# function, following guidance here: 
-		# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
-		# if mean_radn and stdn are not already arrays then transform to a list 
+		# http://all-geo.org/volcan01010/2013/09/
+		# how-to-use-lognormal-distributions-in-python/
+		# if mean_radn and stdn are not already 
+		# arrays then transform to a list 
 		if type(mean_radn) != np.ndarray:
 			scale = [np.exp(np.log(mean_radn))]
 		else:
@@ -77,8 +78,10 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pmode, pconcn, spac
 			
 		loc = 0. # no shift
 		
-		[N_perbin, x, rbou, Vbou, Varr, upper_bin_rad_amp] = size_distr.lognormal(num_asb, 
-			pmode, pconcn, stdn, lowersize, uppersize, loc, scale, space_mode, self)
+		[N_perbin, x, rbou, Vbou, Varr, 
+		upper_bin_rad_amp] = size_distr.lognormal(num_asb, 
+			pconcn, stdn, lowersize, uppersize, 
+			loc, scale, self)
 		
 		if (testf == 2):
 			print('finished with size_distr.lognormal')

@@ -39,7 +39,8 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	y_asmat = (y.reshape(num_asb, num_comp))
 	y_asmat = y_asmat.transpose() # species in rows and size bins in columns
 	
-	# convert # molecules/cm3 (air) to # moles/cm3 (air) and then multiply by molecular weight  
+	# convert # molecules/cm3 (air) to # moles/cm3 (air) 
+	# and then multiply by molecular weight  
 	# to get g/cm3 (air) of all components in size bins
 	y_mass_array = (y_asmat/NA)*y_mw # mass conc. ind. species
 	

@@ -120,7 +120,7 @@ def eqn_pars_skipper(self): # define function
 
 	# use eqn_pars output from previous simulation
 	rowvals = self.rowvals; colptrs = self.colptrs 
-	comp_num = self.comp_num; Jlen = self.Jlen; comp_xmlname = self.comp_xmlname; comp_smil = self.comp_smil; 
+	comp_num = self.comp_num; Jlen = self.Jlen  
 	erf = 0.; err_mess = ''
 
 	# if not using vapour pressures saved to file
@@ -136,4 +136,4 @@ def eqn_pars_skipper(self): # define function
 	self.Psat[0, self.comp_namelist.index('H2O')] = Psat_water*(si.N_A/((si.R*1.e6)*self.TEMP[0]))
 
 	return(rowvals, colptrs, comp_num, 
-		Jlen, comp_xmlname, comp_smil, erf, err_mess)
+		Jlen, erf, err_mess)

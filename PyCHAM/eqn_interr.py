@@ -29,7 +29,7 @@ import formatting
 import openbabel.pybel as pybel
 import sys
 
-def eqn_interr(comp_name, comp_smil, num_sb, self):
+def eqn_interr(num_sb, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	# self.eqn_num - number of equations
@@ -37,8 +37,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	# self.aqeqn_list - aqueous-phase equations in list of strings
 	# self.sueqn_list - surface (e.g. wall) equations in list of strings
 	# self.chem_sch_mrk - markers for separating sections of the chemical scheme
-	# comp_name - name string of components in xml file (not SMILES)
-	# comp_smil - SMILES from xml file
+	# self.comp_xmlname - name string of components in xml file (not SMILES)
+	# self.comp_smil - SMILES from xml file
 	# num_sb - number of size bins
 	# self - reference to PyCHAM
 	# ------------------------------------------------------------------------------------
@@ -85,9 +85,11 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	njac = np.zeros((self.eqn_num[0], 1))
 	# indices of Jacobian to affect per equation (rows)
 	jac_indx = np.zeros((self.eqn_num[0], 1))
-	# a new list for the name strings of components presented in the scheme (not SMILES)
+	# a list for the name strings of components 
+	# presented in the scheme (not SMILES)
 	self.comp_namelist = []
-	comp_list = [] # list for the SMILE strings of components present in the chemical scheme
+	# list for the SMILE strings of components present in the chemical scheme
+	comp_list = []
 	# list of Pybel objects of components in chemical scheme
 	Pybel_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme	
@@ -101,7 +103,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 
 	# loop through gas-phase equations line by line and extract the required information
 	for eqn_step in range(self.eqn_num[0]):
-		
+
 		line = self.eqn_list[eqn_step] # extract this line
 		
 		# reset list of SMILE strings representing reactants and 
@@ -252,12 +254,13 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			jac_stoi[eqn_step, reactant_step] = -1*stoich_num
 
 			if name_only not in self.comp_namelist: # if new component encountered
-				self.comp_namelist.append(name_only) # add to chemical scheme name list
+				# add to chemical scheme name list
+				self.comp_namelist.append(name_only)
 			
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				name_indx = comp_name.index(name_only)
-				name_SMILE = comp_smil[name_indx] # SMILES of component
+				name_indx = self.comp_xmlname.index(name_only)
+				name_SMILE = self.comp_smil[name_indx] # SMILES of component
 				reac_SMILES.append(name_SMILE)
 
 				comp_list.append(name_SMILE) # list SMILE names
@@ -268,7 +271,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				# append to Pybel object list
 				Pybel_objects.append(Pybel_object)
 				
-				# check if alkoxy radical present in this component and that component is organic
+				# check if alkoxy radical present in this 
+				# component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'c' in name_SMILE):
 						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
@@ -319,7 +323,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 
 			if (re.findall(stoich_regex, product)[0] != ''):
 				stoich_num = float(re.findall(stoich_regex, product)[0])
-				name_only = re.sub(stoich_regex, '', product) # name with no stoich number
+				# name with no stoich number# name with no stoich number
+				name_only = re.sub(stoich_regex, '', product)
 
 			elif (re.findall(stoich_regex, product)[0] == ''):
 				stoich_num = 1.
@@ -334,10 +339,11 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				
 				# convert MCM chemical names to SMILES
 				# index where xml file name matches reaction component name
-				name_indx = comp_name.index(name_only)
-				name_SMILE = comp_smil[name_indx]
+				name_indx = self.comp_xmlname.index(name_only)
+				name_SMILE = self.comp_smil[name_indx]
 				
-				comp_list.append(name_SMILE) # list SMILE string of parsed species
+				# list SMILE string of parsed species
+				comp_list.append(name_SMILE)
 				name_indx = comp_num # allocate index to this species
 				# Generate pybel object
 				Pybel_object = pybel.readstring('smi', name_SMILE)
@@ -396,7 +402,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		reac_min_gen = 0
 		ap_rad_f = 0 # flag for whether reactants include radicals
 		nzr = 0 # flag for non-zero generation number reactants
-		# prepare to store components that appear first as a reactant rather than product
+		# prepare to store components that appear first as 
+		# a reactant rather than product
 		early_comp = []
 
 		# loop through components in this equation
@@ -437,20 +444,27 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 					# index of this reactant
 					reac_index = self.comp_namelist.index(name_only)
 
-					# if first appearance of this componenet is as a reactant, 
+					# if first appearance of this componenet 
+					# is as a reactant, 
 					# then store and wait for when it appears as a product
 					if (reac_index >= len(self.gen_num)):
 						self.gen_num.append(0)
 						early_comp.append(name_only)
 						continue
 
-					# check on whether this component is an alkyl peroxy radical
+					# check on whether this component is 
+					# an alkyl peroxy radical
 					if ('[O]O' in SMILEi or 'O[O]' in SMILEi):
-						ap_rad_f = 1 # flag that an alkyl peroxy radical in reactants
+						# flag that an alkyl peroxy 
+						# radical in reactants
+						ap_rad_f = 1 
 					
-					# if this component appears in the chemical scheme first as a
-					# reactant (rather than product), and is a methane-related 
-					# oxidised molecule, then use it's generation number of one
+					# if this component appears in the chemical 
+					# scheme first as a
+					# reactant (rather than product), and is a 
+					# methane-related 
+					# oxidised molecule, then use it's generation 
+					# number of one
 					if (reac_index >= len(self.gen_num) and numC == 1 and numO >= 1):
 						# if it's the first non-zero generation number reactant
 						if (nzr > 0):
@@ -495,7 +509,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 							self.gen_num[self.comp_namelist.index(name_only)] = prod_gen
 					else: # if this component is on first appearance during this loop
 						self.gen_num.append(prod_gen)
-	
+
 	# remove fillers and flatten index for arranging concentrations 
 	# ready for reaction rate coefficient calculation
 	self.y_arr_g = y_arr[y_arr != -9999]
@@ -530,6 +544,30 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 	self.njac_g = njac.astype(int)
 	self.jac_indx_g = jac_indx.astype(int)
 
+	# check for whether seed components are in gas-phase chemical scheme
+	for sname in self.seed_name:
+		# core dealt with in init_conc
+		if sname not in self.comp_namelist and sname != 'core':
+			# include in chemical scheme name list
+			self.comp_namelist.append(sname)
+			# increase number of components to 
+			# account for this component
+			comp_num += 1
+			# convert MCM chemical names to SMILES
+			# index where xml file name matches reaction component name
+			name_indx = self.comp_xmlname.index(sname)
+				
+			# get SMILES string
+			name_SMILE = self.comp_smil[name_indx]
+			# list SMILE names
+			comp_list.append(name_SMILE)
+			
+			# generate pybel object
+			Pybel_object = pybel.readstring('smi', name_SMILE)
+			
+			# append to Pybel object list
+			Pybel_objects.append(Pybel_object)
+	
 	# same for aqueous-phase and surface (e.g. wall) reactions ------------
 	for phasei in range(2): # 0 for aqueous-phase and 1 for surface (e.g. wall) reactions
 
@@ -577,7 +615,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		max_no_reac = 0. # log maximum number of reactants in a reaction
 		max_no_prod = 0. # log maximum number of products in a reaction
 
-		# loop through chemical equations line by line and extract the required information
+		# loop through chemical equations line by line and extract the 
+		# required information
 		for eqn_step in range(self.eqn_num[phasei+1]):
 		
 			if (phasei == 0): # aqueous-phase reactions
@@ -679,7 +718,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 			for reactant in reactants:
 				
 				if (re.findall(stoich_regex, reactant)[0] != ''):
-					stoich_num = float(re.findall(stoich_regex, reactant)[0])
+					stoich_num = float(re.findall(
+					stoich_regex, reactant)[0])
 					# name with no stoich number
 					name_only = re.sub(stoich_regex, '', reactant)
 				elif (re.findall(stoich_regex, reactant)[0] == ''):
@@ -690,14 +730,18 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				rstoi[eqn_step, reactant_step] = stoich_num
 				jac_stoi[eqn_step, reactant_step] = -1*stoich_num
 
-				if name_only not in self.comp_namelist: # if new component encountered
-					self.comp_namelist.append(name_only) # add to chemical scheme name list
+				# if new component encountered
+				if name_only not in self.comp_namelist:
+					# add to chemical scheme name list
+					self.comp_namelist.append(name_only)
 			
 					# convert MCM chemical names to SMILES
-					if name_only in comp_name:
-						# index where xml file name matches reaction component name
-						name_indx = comp_name.index(name_only)
-						name_SMILE = comp_smil[name_indx] # SMILES of component
+					if name_only in self.comp_xmlname:
+						# index where xml file name 
+						# matches reaction component name
+						name_indx = self.comp_xmlname.index(name_only)
+						# SMILES of component
+						name_SMILE = self.comp_smil[name_indx]
 					else:
 						print(str('Error: inside eqn_parser, chemical scheme name '+str(name_only)+' not found in xml file'))
 						sys.exit()
@@ -724,7 +768,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 					name_indx = self.comp_namelist.index(name_only)
 			
 				# store reactant index
-				# check if index already present - i.e. component appears more than once
+				# check if index already present - i.e. component 
+				# appears more than once
 				# as a reactant in this reaction
 				if sum(rindx[eqn_step, 0:reactant_step] == int(name_indx))>0:
 					# get existing index of this component
@@ -769,14 +814,15 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				
 					# convert MCM chemical names to SMILES
 					# index where xml file name matches reaction component name
-					if name_only in comp_name:
-						name_indx = comp_name.index(name_only)
-						name_SMILE = comp_smil[name_indx]
+					if name_only in self.comp_xmlname:
+						name_indx = self.comp_xmlname.index(name_only)
+						name_SMILE = self.comp_smil[name_indx]
 					else:
 						print('Error: inside eqn_interr, chemical scheme name '+str(name_only)+' not found in xml file')
 						sys.exit()
 				
-					comp_list.append(name_SMILE) # list SMILE string of parsed species
+					# list SMILE string of parsed species
+					comp_list.append(name_SMILE)
 					name_indx = comp_num # allocate index to this species
 				
 					# generate pybel object
@@ -784,7 +830,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 					# append to Pybel object list
 					Pybel_objects.append(Pybel_object)
 
-					# check if alkoxy radical present in this component and that component is organic
+					# check if alkoxy radical present in 
+					# this component and that component is organic
 					if ('[O]' in name_SMILE):
 						if ('C' in name_SMILE or 'C' in name_SMILE):
 							# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
@@ -798,7 +845,8 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 					name_indx = self.comp_namelist.index(name_only)
 				
 				# store product index
-				# check if index already present - i.e. component appears more than once
+				# check if index already present - i.e. 
+				# component appears more than once
 				if sum(pindx[eqn_step, 0:product_step]==int(name_indx))>0:
 					# get existing index of this component
 					exist_indx = (np.where(pindx[eqn_step, 0:product_step]==(int(name_indx))))[0]
@@ -854,7 +902,7 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 				# include final columns
 				self.reac_col_aq = np.append(self.reac_col_aq, self.reac_col_aq[-1] + nreac[-1])
 				self.prod_col_aq = np.append(self.prod_col_aq, self.prod_col_aq[-1] + nprod[-1])
-	
+
 			# tag other aqueous-phase arrays
 			self.rindx_aq = rindx
 			self.pindx_aq = pindx
@@ -915,4 +963,36 @@ def eqn_interr(comp_name, comp_smil, num_sb, self):
 		self.H2O_in_cs = 1
 	else:
 		self.H2O_in_cs = 2
+
+	# check on whether seed components included in chemical scheme
+	for seedi in self.seed_name:
+		if seedi == 'core': # core dealt with in init_conc
+			continue
+		if seedi not in self.comp_namelist:
+			self.comp_namelist.append(seedi)
+			comp_num += 1
+			if seedi in self.comp_xmlname:
+			
+				# get index in xml file
+				name_indx = self.comp_xmlname.index(seedi)
+				# get SMILE string
+				name_SMILE = self.comp_smil[name_indx]
+			else:
+				print('Error: inside eqn_interr, chemical scheme name '+str(name_only)+' not found in xml file')
+				sys.exit()
+				
+			# list SMILE string of parsed species
+			comp_list.append(name_SMILE)
+				
+			# generate pybel object
+			Pybel_object = pybel.readstring('smi', name_SMILE)
+			# append to Pybel object list
+			Pybel_objects.append(Pybel_object)
+
+	# get indices of observed gas-phase components
+	if hasattr(self, 'obs_comp'):
+		for i in range(len(self.obs_comp)):
+			self.obs_comp_i[i] = self.comp_namelist.index(
+			self.obs_comp[i])
+	
 	return(comp_list, Pybel_objects, comp_num, self)

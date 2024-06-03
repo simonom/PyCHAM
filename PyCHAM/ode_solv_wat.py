@@ -175,14 +175,16 @@ def ode_solv(y, integ_step, Cinfl_now,
 		
 		return(j)
 	
+	
 	# set ODE solver (integration) tolerances
 	atol = 1.e-4
 	rtol = 1.e-5
 	
 	# isolate just the water concentrations
 	y_w = y[H2Oi:num_comp*(num_asb+1):num_comp]
-	
-	# transform particle phase concentrations into size bins in rows and components in columns
+
+	# transform particle phase concentrations into size bins in 
+	# rows and components in columns
 	ymat = (y[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)
 	# force all components in size bins with no particle to zero
 	ymat[N_perbin[:, 0] == 0, :] = 0.
@@ -200,10 +202,10 @@ def ode_solv(y, integ_step, Cinfl_now,
 		y_w[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
 	# return to array
 	y_w = y_w.flatten()
-	
+
 	# incorporate new water concentrations (molecules/cm3)
 	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
 	y[H2Oi:num_comp*((num_sb-self.wall_on)+1):num_comp] = y_w
-	
+
 	# return concentration(s) and time(s) following integration
 	return(y, sol.t)

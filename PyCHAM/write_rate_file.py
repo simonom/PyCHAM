@@ -132,10 +132,14 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 		f.write('	try:\n') # in case there are any issues with calculating a rate coefficient
 		for eqn_key in range (len(self.reac_coef_g)):
 			f.write('		gprn += 1 # keep count on reaction number\n')
+			f.write('		# remember equation in case needed for error reporting\n')
+			f.write('		rc_eq_now = \'%s\' \n' %(self.reac_coef_g[eqn_key]))
 			f.write('		rate_values[%s] = %s\n' %(eqn_key, self.reac_coef_g[eqn_key]))
 		f.write('	except:\n') # in case there are any issues with calculating a rate coefficient
 		f.write('		erf = 1 # flag error\n')
-		f.write('		err_mess = (str(\'Error: Could not calculate rate coefficient for equation number \' + str(gprn)))\n')
+		f.write('		err_mess = (str(\'Error: Could not calculate rate coefficient for equation number \' + str(gprn) + \' \' + rc_eq_now + \' (message from rate coeffs.py)\'))\n')
+		# in case pause needed
+		#f.write('		import ipdb; ipdb.set_trace()\n')
 		f.write('	\n')
 		f.write('	# aqueous-phase reactions\n')
 		for eqn_key_aq in range (len(self.reac_coef_aq)):

@@ -29,16 +29,17 @@ import scipy.constants as si
 import math
 from water_calc import water_calc
 import write_dydt_rec
+import openbabel.pybel as pybel
 
 
-def init_conc(num_comp, Comp0, init_conc, PInit,
-	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
-	core_diss, comp_xmlname, comp_smil, self):
+def init_conc(num_comp, init_conc, PInit,
+	testf, num_eqn, Compt, seed_mw,
+	core_diss, self):
 		
 	# inputs:------------------------------------------------------
 	
 	# num_comp - number of unique components
-	# Comp0 - chemical scheme names of components present at 
+	# self.comp0 - chemical scheme names of components present at 
 	# 	start of experiment
 	# init_conc - initial concentrations of components (ppb)	
 	# self.TEMP[0] - temperature in chamber at start of 
@@ -50,8 +51,6 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	#	experiment (whose concentrations are given in init_conc)
 	# testf - flag for whether in normal mode (0) or testing 
 	# mode (1/2)
-	# pconc - initial concentration of particles 
-	#	(# particles/cm3 (air))
 	# self.dydt_trak - chemical scheme name of components for 
 	#	which user wants the tendency to  change tracked
 	# self.tot_time - total simulation time (s)
@@ -63,16 +62,18 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	#	presented in the chemical scheme file
 	# Compt - name of components injected instantaneously after 
 	#	start of experiment
-	# seed_name - name of core component (input by user)
+	# self.seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
 	# self.nuc_comp - name of nucleating component (input by user, 
 	#	or defaults to 'core')
-	# comp_xmlname - component names in xml file
-	# comp_smil - all SMILES strings in xml file
-	# self.self.rel_SMILES - only the SMILES strings of components present in the chemical scheme file
+	# self.comp_xmlname - component names in xml file
+	# self.comp_smil - all SMILES strings in xml file
+	# self.self.rel_SMILES - only the SMILES strings of 
+	# components present in the chemical scheme file
 	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
-	# self.RO2_indices - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
+	# self.RO2_indices - RO2 list indices and chemical 
+	# scheme indices of non-HOM-RO2 molecules
 	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
 	# self.rstoi_g - stoichiometry of reactants per equation
 	# self.pstoi_g - stoichiometry of products per equation
@@ -100,28 +101,43 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	
 	# convert concentrations
 	# total number of molecules in 1 cm3 air using ideal gas law.  
-	# R has units cm3.Pa/K.mol
+	# R has units m3.Pa/K.mol (changing to cm3.Pa/K.mol when 
+	# multiplied by 1e6)
 	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 	self.Cfactor = Cfactor
+	Cfac_flag = 1 # flag to use Cfactor on initial concentrations
 	# prepare dictionary for tracking tendency to change of user-specified components
 	self.dydt_vst = {}
 
-	# insert initial concentrations where appropriate
-	for i in range(len(Comp0)):
+	# if no initial concentrations given in model variables file,
+	# then check if the observed concentrations file has 
+	# concentrations at the starting time
+	if (len(self.comp0) == 0 and sum(self.obs[:, 0] == 0)>0):
+		self.comp0 = (np.array((self.comp_namelist))[self.obs_comp_i]).tolist()
+		# molecules/cm3
+		init_conc = np.squeeze(self.obs[self.obs[:, 0] == 0, 1::])
+		# flag to not use Cfactor on initial concentrations
+		Cfac_flag = 0
 
-		if ('_wall' in Comp0[i]): # in case component concentration relates to wall
+	
+
+	# insert initial concentrations where appropriate
+	for i in range(len(self.comp0)):
+
+		if ('_wall' in self.comp0[i]): # in case component concentration relates to wall
 			wall_flag = 1
 			# get index of string where _wall stated
 			str_cnt = 0 # count way through string
-			for ii in Comp0[i]:
+			for ii in self.comp0[i]:
 				
 				if ii == '_':
-					if Comp0[i][str_cnt:str_cnt+5] == '_wall':
-						comp_now = Comp0[i][0:str_cnt] # component name
+					if self.comp0[i][str_cnt:str_cnt+5] == '_wall':
+						# component name
+						comp_now = self.comp0[i][0:str_cnt]
 						# wall numbers provided by user start from 1
-						wall_number = int(Comp0[i][str_cnt+5])-1
+						wall_number = int(self.comp0[i][str_cnt+5])-1
 					break
 				str_cnt += 1 # count way through string	
 			
@@ -130,30 +146,42 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 
 		if (wall_flag == 0):
     			# index of where initial components occur in list of components
-			try: # in case components already listed via interpretation of the chemical scheme
-				y_indx = self.comp_namelist.index(Comp0[i])
+			# in case components already listed via 
+			# interpretation of the chemical scheme
+			try:
+				y_indx = self.comp_namelist.index(self.comp0[i])
 			
-			# if component not already listed via interpretation of the chemical scheme
+			# if component not already listed via 
+			# interpretation of the chemical scheme
 			# then send error message
 			except:
 				erf = 1
-				err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				err_mess = str('Error: component called ' + str(self.comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 				return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0)
 			
-		
-			y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
+			# set initial concentration
+			if (Cfac_flag == 1):
+				# convert from ppb to # molecules/cm3
+				y[y_indx] = init_conc[i]*Cfactor
+			if (Cfac_flag == 0):
+				# # molecules/cm3
+				y[y_indx] = init_conc[i]
+
 			# remember index for plotting gas-phase concentrations later
 			y_indx_plot.append(y_indx)
 	
 		if (wall_flag == 1):
 
 			# index of where initial components occur in list of components
-			try: # in case components already listed via interpretation of the chemical scheme
+			# in case components already listed via 
+			# interpretation of the chemical scheme
+			try:
 				y_indx = self.comp_namelist.index(comp_now)
 				
-			# if component not already listed via interpretation of the chemical scheme
+			# if component not already listed via interpretation 
+			# of the chemical scheme
 			# then send error message
 			except:
 				erf = 1
@@ -163,9 +191,10 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 
 			# insert surface concentration into surface array 
-			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
+			# convert from ppb to # molecules/cm3
+			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor
 			y_indx_plot.append(y_indx) # remember for plotting
-			
+		
 	# check on whether O3 isopleth due to be made
 	# if isopleth due to be made overide any 
 	# originally provided initial conditions
@@ -182,7 +211,8 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		y[self.O3i] = self.VOCequil+self.NOxequil
 
 		self.O3equil = y[self.O3i] # register first guess at O3
-		# note that for NOx, the NO:NO2 ratio is allowed to change during integration steps,
+		# note that for NOx, the NO:NO2 ratio is allowed to change during 
+		# integration steps,
 		# however, the total NO+NO2 concentration is held constant through commands
 		# contained in ode_updater, likewise inside ode solver the VOC concentration is 
 		# not allowed to change
@@ -191,7 +221,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
 	for i in range(num_comp): # loop through all components to get molar weights
-		y_mw[i] = self.Pybel_objects[i].molwt # molecular weight (g/mol)
+		y_mw[i] = self.Pybel_objects[i].molwt # molecular mass (g/mol)
 	
 	# --------------------------------------------------------------
 	# account for water's properties
@@ -207,7 +237,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		H2Oi = self.H2Oi # index for water
 		y_mw = self.y_mw
 		num_comp = self.num_comp
-		if y.shape[0] == self.y.shape[0]-2:
+		if (y.shape[0] == self.y.shape[0]-2):
 			y = np.append(y, np.zeros((2)))
 			y[self.H2Oi] = self.y[self.H2Oi]
 			y[self.seedi] = self.y[self.seedi]
@@ -263,28 +293,41 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			y = np.append(y, C_H2O)
 			# append molar weight of water (g/mol)
 			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-			self.comp_namelist.append('H2O') # append water's name to component name list
+			# append water's name to component name list
+			self.comp_namelist.append('H2O')
 			# add to SMILES list
-			self.rel_SMILES.append('HOH')
-			
-	# ------------------------------------------------------------------------------------
-	# account for seed properties - note that even if no seed particle, this code ensures
-	# that an index is provided for core material
-	if (self.pars_skip == 0):
-		corei = [num_comp] # index for core component
-	if (self.pars_skip == 1):
-		corei = [num_comp-1] # index for core component
+			H2O_SMILES = 'HOH'
+			self.rel_SMILES.append(H2O_SMILES)
+			# generate pybel object
+			Pybel_object = pybel.readstring('smi', 'O')
+				
+			# append to Pybel object list
+			self.Pybel_objects.append(Pybel_object)
 
-	if (self.pars_skip == 0 or self.pars_skip == 2): # if this information already gained in previous run then skip 
+	# ------------------------------------------------------------------------------------
+	# seed components
+
+	# if this information already gained in previous run then skip
+	if (self.pars_skip == 0 or self.pars_skip == 2): 
 
 		# empty array for index of core component
-		self.seedi = (np.zeros((len(seed_name)))).astype(int)
-	
-		self.comp_namelist.append('core') # append name of core to component name list
+		self.seedi = (np.zeros((len(self.seed_name)))).astype(int)
+
+		# append any seed names that are not seen in the 
+		# chemical scheme file to the list of components
+		for seed_cnt in range(len(self.seed_name)):
+			if self.seed_name[seed_cnt] == 'core':
+				self.seedi[seed_cnt] = num_comp
+			else:
+				self.seedi[seed_cnt] = self.comp_namelist.index(self.seed_name[seed_cnt])
+
+		# append name of core to component name list
+		self.comp_namelist.append('core')
 		
 		# increase number of components to account for 'core' component
 		num_comp += 1
-		self.num_comp = num_comp # prepare for skipping of parsing in following simulations
+		# prepare for skipping of parsing in following simulations
+		self.num_comp = num_comp
 		# add to SMILES list
 		self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
@@ -296,6 +339,10 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		# prepare for skipping of parsing in future simulations
 		self.y_mw = y_mw
 		self.y = y # prepare for skipping of parsing in following simulations 
+	
+	# account for seed properties - note that even if no seed particle, this code ensures
+	# that an index is provided for core material
+	corei = [num_comp-1] # index for core component
 	
 	# finally append surface concentration array to gas-phase array
 	y = np.append(y, y_w)
@@ -479,7 +526,7 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 	
 	# get indices of seed particle component(s)
 	indx = 0 # count on seed component(s)
-	for sname in seed_name:
+	for sname in self.seed_name:
 		# index of core component
 		self.seedi[indx] = int(self.comp_namelist.index(sname))
 		indx += 1 # count on seed component(s)
@@ -520,8 +567,10 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 		import matplotlib.pyplot as plt
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
-		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
-		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+		# for customised colormap
+		from matplotlib.colors import LinearSegmentedColormap
+		# set colormap tick labels to standard notation
+		import matplotlib.ticker as ticker 
 
 		plt.ion() # show results to screen and turn on interactive mode
 		
@@ -555,8 +604,8 @@ def init_conc(num_comp, Comp0, init_conc, PInit,
 			
 	except: # not called from finisher simulation
 		y[:] = y[:]
-	
+
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
-			HO2i, NO3i, self)
+			HO2i, NO3i, init_conc, self)

@@ -188,18 +188,15 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model 
 		# variables -------------------------
-		[sav_nam, comp0, 
-		y0, Press, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, 
-		Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx,
+		[sav_nam, y0, Press, siz_stru, num_sb, 
+		lowsize, uppsize, std, 
+		Compt, injectt, Ct, seed_mw, seed_diss, seed_dens, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, 
-		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, 
-		drh_str, erh_str, pcont, 
+		p_char, e_field, ser_H2O, wat_hist, 
+		drh_str, erh_str, 
 		z_prt_coeff, chamV, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
@@ -413,14 +410,14 @@ class PyCHAM(QWidget):
 		l20.setText('Particle concentrations (#/cc): ')
 		self.varbox.addWidget(l20, par_row+3, 0)
 		self.l20a = QLabel(self)
-		self.l20a.setText((str(pconc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l20a.setText((str(self.pconc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l20a, par_row+3, 1)
 		
 		l21 = QLabel(self)
 		l21.setText('Particle concentration times (s): ')
 		self.varbox.addWidget(l21, par_row+4, 0)
 		self.l21a = QLabel(self)
-		self.l21a.setText((str(pconct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l21a.setText((str(self.pconct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l21a, par_row+4, 1)
 		
 		l22 = QLabel(self)
@@ -448,14 +445,14 @@ class PyCHAM(QWidget):
 		l25.setText('Name of seed component: ')
 		self.varbox.addWidget(l25, par_row+8, 0)
 		self.l25a = QLabel(self)
-		self.l25a.setText((str(seed_name)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l25a.setText((str(self.seed_name)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l25a, par_row+8, 1)
 		
 		l26 = QLabel(self)
 		l26.setText('Mole fraction of non-water \ncomponents in \ndry seed particles: ')
 		self.varbox.addWidget(l26, par_row+9, 0)
 		self.l26a = QLabel(self)
-		self.l26a.setText((str(seedx)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l26a.setText((str(self.seedx)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l26a, par_row+9, 1)
 		
 		l26b = QLabel(self)
@@ -490,7 +487,7 @@ class PyCHAM(QWidget):
 		l29.setText('Method for spacing size bins (lin) \nor (log): ')
 		self.varbox.addWidget(l29, par_row+14, 0)
 		self.l29a = QLabel(self)
-		self.l29a.setText((str(space_mode)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l29a.setText((str(self.space_mode)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l29a, par_row+14, 1)
 		
 		l30 = QLabel(self)
@@ -504,7 +501,7 @@ class PyCHAM(QWidget):
 		l31.setText('Mean radius (um) for particle \nnumber size distribution: ')
 		self.varbox.addWidget(l31, par_row+16, 0)
 		self.l31a = QLabel(self)
-		self.l31a.setText((str(mean_rad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l31a.setText((str(self.mean_rad)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l31a, par_row+16, 1)
 		
 		l32 = QLabel(self)
@@ -599,7 +596,7 @@ class PyCHAM(QWidget):
 		l38_5.setText('Whether injection of seed particle \nis instantaneous or continuous: ')
 		self.varbox.addWidget(l38_5, par_row+28, 0)
 		self.l38_5a = QLabel(self)
-		self.l38_5a.setText((str(pcont)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l38_5a.setText((str(self.pcont)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l38_5a, par_row+28, 1)
 
 		l38_6 = QLabel(self)
@@ -621,7 +618,7 @@ class PyCHAM(QWidget):
 		l40.setText('Chemical scheme name of \ncomponents present at \nexperiment start: ')
 		self.varbox.addWidget(l40, gas_row+1, 0)
 		self.l40a = QLabel(self)
-		self.l40a.setText((str(comp0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l40a.setText((str(self.comp0)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l40a, gas_row+1, 1)
 		
 		l41 = QLabel(self)
@@ -2067,18 +2064,18 @@ class PyCHAM(QWidget):
 		# prepare by enforcing default variables
 		# default variables for all required input model 
 		# variables --------------------------------------------
-		[sav_nam, comp0, 
-		y0, Press, siz_stru, num_sb, pmode, pconc, 
-		pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		[sav_nam, 
+		y0, Press, siz_stru, num_sb, 
+		lowsize, uppsize, std, 
 		Compt, 
-		injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-		seedx, dens_comp, dens, vol_comp, volP, act_comp, 
+		injectt, Ct, seed_mw, seed_diss, seed_dens, 
+		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, 
 		chamSA, Rader, 
-		p_char, e_field, partit_cutoff, ser_H2O, wat_hist, 
-		drh_str, erh_str, pcont, 
+		p_char, e_field, ser_H2O, wat_hist, 
+		drh_str, erh_str, 
 		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, 
 			self)
 		
@@ -2087,19 +2084,19 @@ class PyCHAM(QWidget):
 			'/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, comp0, y0, Press,
-			siz_stru, num_sb, pmode, pconc, pconct, 
-			lowsize, uppsize, space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedx,
+			[sav_nam, y0, Press,
+			siz_stru, num_sb, 
+			lowsize, uppsize, std, 
+			Compt, injectt, Ct,
+			seed_mw, seed_diss, seed_dens,
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, 
 			accom_comp, accom_val, uman_up, int_tol, 
 			new_partr, coag_on, inflectDp, pwl_xpre, 
 			pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, 
-			partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
+			ser_H2O, 
+			wat_hist, drh_str, erh_str, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 			pk.close()
 		
@@ -2274,19 +2271,17 @@ class PyCHAM(QWidget):
 			# reset to default variables to allow any new 
 			# variables to arise
 			# from the current model variables file only
-			[sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, 
+			[sav_nam, y0, Press, 
+			siz_stru, num_sb, 
 			lowsize, uppsize, 
-			space_mode, std, mean_rad, Compt, injectt, 
-			Ct, seed_name, seed_mw, seed_diss, seed_dens, 
-			seedx, 
+			std, Compt, injectt, 
+			Ct, seed_mw, seed_diss, seed_dens,  
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, 
-			partit_cutoff, 
-			ser_H2O, wat_hist, drh_str, erh_str, pcont, 
+			ser_H2O, wat_hist, drh_str, erh_str, 
 			z_prt_coeff, chamV, 
 			self] = def_mod_var.def_mod_var(0, self)
 			
@@ -2323,18 +2318,17 @@ class PyCHAM(QWidget):
 			input_by_sim = str(self.PyCHAM_path 
 				+ '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, comp0, y0, Press,
-				siz_stru, num_sb, pmode, pconc, pconct,
-				lowsize, uppsize, space_mode, std, 
-				mean_rad, 
-				Compt, injectt, Ct, seed_name,
-				seed_mw, seed_diss, seed_dens, seedx,
+				[sav_nam, y0, Press,
+				siz_stru, num_sb,
+				lowsize, uppsize, std,
+				Compt, injectt, Ct,
+				seed_mw, seed_diss, seed_dens,
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, 
-				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre, 				pwl_xpro, inflectk, chamSA, Rader, 
-				p_char, e_field, partit_cutoff, 
+				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
+				p_char, e_field, 
 				ser_H2O, wat_hist, drh_str, erh_str, 
-				pcont, z_prt_coeff, 
+				z_prt_coeff, 
 				chamV] = pickle.load(pk)
 				pk.close() # close pickle file
 			
@@ -4505,26 +4499,25 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, comp0, y0, Press,
-				siz_stru, num_sb, pmode, pconc, pconct,
-				 lowsize, uppsize, space_mode, 
-				std, mean_rad, Compt, injectt, Ct, 
-				seed_name,
-				seed_mw, seed_diss, seed_dens, seedx,
+				[sav_nam, y0, Press,
+				siz_stru, num_sb,
+				 lowsize, uppsize, 
+				std, Compt, injectt, Ct,
+				seed_mw, seed_diss, seed_dens,
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre,
 				 pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, 
-				e_field, partit_cutoff, ser_H2O, 
-				wat_hist, drh_str, erh_str, pcont, 
+				e_field, ser_H2O, 
+				wat_hist, drh_str, erh_str, 
 				z_prt_coeff, chamV] = pickle.load(pk)
 				pk.close()
 		
 			# call on plotting script
 			plotter_nsd.plotter_nsd(lowsize, num_sb, 
-			uppsize, mean_rad, std, pmode, pconc, 
-			space_mode, 0, pconct, self)
+			uppsize, std, 
+			0, self)
 
 		if (input_check_text == 'Gas-phase Diffusion Coefficients'):
 			import plotter_simulate_tab

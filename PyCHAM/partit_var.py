@@ -32,7 +32,7 @@ import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, 
 		R_gas, TEMP, NA, N_perbin, radius, therm_sp,
-		H2Oi, act_coeff, caller, partit_cutoff, Press, 
+		H2Oi, act_coeff, caller, Press, 
 		DStar_org, z_prt_coeff, chamSA, chamV, self):
 	
 	# inputs:-----------------------------------------------------
@@ -56,7 +56,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	# act_coeff - activity coefficient of components (dimensionless)
 	# self.wall_on - marker for whether wall present
 	# caller - marker for the calling function
-	# partit_cutoff - the product of self.Psat and act_coeff above
+	# self.partit_cutoff - the product of self.Psat and act_coeff above
 	#	 which gas-particle partitioning assumed zero (Pa)
 	# Press - air pressure (Pa)
 	# DStar_org - gas-phase diffusion coefficients of components 
@@ -193,16 +193,17 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		kimt = np.transpose(kimt)
 		
 		# zero partitioning to particles for any components with low condensability
-		if (partit_cutoff): # if a value provided (default is empty list)
+		# if a value provided (default is empty list)
+		if (self.partit_cutoff):
 
 			# convert partit_cutoff from Pa to molecules/cm3
 			# (air), note README states
 			# that just one value accepted for partit_cutoff 
 			# input
-			partit_cutoff_Pa = (partit_cutoff[0]*(
+			partit_cutoff_molcm = (self.partit_cutoff[0]*(
 			NA/((R_gas*1.e6)*TEMP)))
 			highVPi = ((self.Psat*act_coeff) > 
-			partit_cutoff_Pa)
+			partit_cutoff_molcm)
 			# mask water to allow its partitioning
 			highVPi[:, H2Oi] = 0
 			kimt[highVPi[0:num_sb-self.wall_on, :]] = 0.
@@ -243,14 +244,14 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	# zero partitioning to walls for any components with low 
 	# condensability
 	# if a value provided (default is empty list)
-	if (partit_cutoff):
+	if (self.partit_cutoff):
 
 		# convert partit_cutoff from Pa to molecules/cm3 (air), 
 		# note README states
 		# that just one value accepted for partit_cutoff input
-		partit_cutoff_Pa = partit_cutoff[0]*(
+		partit_cutoff_molcm = self.partit_cutoff[0]*(
 		NA/((R_gas*1.e6)*TEMP))
-		highVPi = (self.Psat*act_coeff) > partit_cutoff_Pa
+		highVPi = (self.Psat*act_coeff) > partit_cutoff_molcm
 		# mask water to allow its partitioning
 		highVPi[:, H2Oi] = 0 
 		self.kw[:, highVPi[-1, :]] = 0.

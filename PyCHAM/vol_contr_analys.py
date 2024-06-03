@@ -1,25 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''script for plotting volatility basis set mass fraction of particle phase with time and tabulating component volatilities and particle-phase concentrations'''
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################'''script for plotting volatility basis set mass fraction of particle phase with time and tabulating component volatilities and particle-phase concentrations'''
 # aids interpretation of gas-particle partitioning results, 
 # assumes calling from the PyCHAM home directory
 
@@ -230,10 +230,10 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	ytl = []
 	for i in ytloc:
 		if (i == np.min(ytloc)): # if the minimum include less than sign
-			ytl.append(str('$\less$' +str(i+0.5)))
+			ytl.append(str(r'$\less$' +str(i+0.5)))
 			continue
 		if (i == np.max(ytloc)): # if the maximum include the greater than or equal to sign
-			ytl.append(str('$\geq$' +str(i+0.5)))
+			ytl.append(str(r'$\geq$' +str(i+0.5)))
 			continue
 		ytl.append(str(i+0.5)) # otherwise just state number
 		
@@ -410,10 +410,10 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	xtl = []
 	for i in xtloc:
 		if (i == np.min(xtloc)): # if the minimum include less than sign
-			xtl.append(str('$\less$' +str(i+0.5)))
+			xtl.append(str(r'$\less$' +str(i+0.5)))
 			continue
 		if (i == np.max(xtloc)): # if the maximum include the greater than or equal to sign
-			xtl.append(str('$\geq$' +str(i+0.5)))
+			xtl.append(str(r'$\geq$' +str(i+0.5)))
 			continue
 		xtl.append(str(i+0.5)) # otherwise just state number
 		

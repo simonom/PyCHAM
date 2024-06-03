@@ -36,17 +36,16 @@ def share(self):
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, comp0, y0, Press,
-		siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-		uppsize, space_mode, std, mean_rad, 
-		Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedx,
+		[sav_nam, y0, Press,
+		siz_stru, num_sb, lowsize, 
+		uppsize, std, Compt, injectt, Ct,
+		seed_mw, seed_diss, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamSA, Rader, p_char, e_field, 
-		partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
+		ser_H2O, 
+		wat_hist, drh_str, erh_str, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()
 		
@@ -59,7 +58,7 @@ def share(self):
 		# ensure that every variable passed to middle is also available in self.
 		# this allows saving of all initial states of variables
 		self.sav_nam_orig = sav_nam
-		self.comp0_orig = comp0
+		self.comp0_orig = self.comp0
 		self.y0_orig = y0
 		self.RH_orig = self.RH
 		self.RHt_orig = self.RHt
@@ -68,22 +67,22 @@ def share(self):
 		self.kw_orig = self.kw
 		self.siz_stru_orig = siz_stru
 		self.num_sb_orig = num_sb
-		self.pmode_orig = pmode
-		self.pconc_orig = pconc
-		self.pconct_orig = pconct
+		self.pmode_orig = self.pmode
+		self.pconc_orig = self.pconc
+		self.pconct_orig = self.pconct
 		self.lowsize_orig = lowsize
 		self.uppsize_orig = uppsize
-		self.space_mode_orig = space_mode
+		self.space_mode_orig = self.space_mode
 		self.std_orig = std
-		self.mean_rad_orig = mean_rad
+		self.mean_rad_orig = self.mean_rad
 		self.Compt_orig = Compt
 		self.injectt_orig = injectt
 		self.Ct_orig = Ct
-		self.seed_name_orig = seed_name
+		self.seed_name_orig = self.seed_name
 		self.seed_mw_orig = seed_mw
 		self.seed_diss_orig = seed_diss
 		self.seed_dens_orig = seed_dens
-		self.seedx_orig = seedx
+		self.seedx_orig = self.seedx
 		self.con_infl_t_orig = self.con_infl_t
 		self.dens_comp_orig = dens_comp
 		self.dens_orig = dens
@@ -110,12 +109,12 @@ def share(self):
 		self.Rader_orig = Rader
 		self.p_char_orig = p_char
 		self.e_field_orig = e_field
-		self.partit_cutoff_orig = partit_cutoff
+		self.partit_cutoff_orig = self.partit_cutoff
 		self.ser_H2O_orig = ser_H2O
 		self.wat_hist_orig = wat_hist
 		self.drh_str_orig = drh_str
 		self.erh_str_orig = erh_str
-		self.pcont_orig = pcont
+		self.pcont_orig = self.pcont
 		self.Vwat_inc_orig = self.Vwat_inc
 		self.seed_eq_wat_orig = self.seed_eq_wat
 		self.z_prt_coeff_orig = z_prt_coeff
@@ -140,13 +139,13 @@ def share(self):
 		self.tf_UVC_orig = self.tf_UVC
 		self.num_asb = num_sb
 
-	return(sav_nam, comp0, y0, Press,
-		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, 
-		std, mean_rad, Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedx,
+	return(sav_nam, y0, Press,
+		siz_stru, num_sb, lowsize, uppsize, 
+		std, Compt, injectt, Ct,
+		seed_mw, seed_diss, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamR, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
+		inflectk, chamR, Rader, p_char, e_field, ser_H2O, 
+		wat_hist, drh_str, erh_str, z_prt_coeff, 
 		chamSA, chamV)

@@ -41,19 +41,18 @@ def mod_var_read(self):
 		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, comp0, y0, Press,
-			siz_stru, num_sb, pmode, pconc, pconct, 
+			[sav_nam, y0, Press,
+			siz_stru, num_sb, 
 			lowsize, uppsize, 
-			space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name,
-			seed_mw, seed_diss, seed_dens, seedx,
+			std, Compt, injectt, Ct,
+			seed_mw, seed_diss, seed_dens,
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, coag_on, 
 			inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, Rader, p_char, e_field, 
-			partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
+			ser_H2O, 
+			wat_hist, drh_str, erh_str, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
 	
@@ -160,7 +159,7 @@ def mod_var_read(self):
 			if (key == 'chem_sch_name' and (value.strip())): 
 				self.sch_name = str(value.strip())
 
-			if key == 'xml_name' and (value.strip()): # path to xml file
+			if (key == 'xml_name' and (value.strip())): # path to xml file
 				self.xml_name = str(value.strip())
 			
 			# time step (s) for updating ODE initial 
@@ -208,7 +207,7 @@ def mod_var_read(self):
 			# names of components present at 
 			# experiment start
 			if (key == 'Comp0' and (value.strip())):
-				comp0 = [str(i).strip() for i in 
+				self.comp0 = [str(i).strip() for i in 
 				(value.split(','))]			
 
 			# initial concentrations of components present 
@@ -219,7 +218,7 @@ def mod_var_read(self):
 				if '/' in value or '\\' in value:
 					self.path_to_C0 = \
 						str(value.strip())
-					[y0, comp0] = C0_open(self)
+					[y0] = C0_open(self)
 					err_mess = self.err_mess
 					if err_mess[0:5] == 'Error':
 						break
@@ -407,10 +406,13 @@ def mod_var_read(self):
 			if key == 'size_structure' and (value.strip()): # the size structure
 				siz_stru = int(value.strip())
 
-			if key == 'number_size_bins' and (value.strip()): # number of particle size bins
+			# number of particle size bins
+			if (key == 'number_size_bins' and (value.strip())):
 				num_sb = int(value.strip())
+				self.num_asb = int(value.strip())
 
-			if key == 'pconc' and (value.strip()): # seed particle number concentrations (# particles/cm3)
+			# seed particle number concentrations (# particles/cm3)
+			if (key == 'pconc' and (value.strip())):
 			
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
@@ -421,70 +423,88 @@ def mod_var_read(self):
 						time_cnt += 1 # increase time count
 					if (time_cnt == 1 and i == ','):
 						sb_cnt += 1 # increase size bin count
-						pmode = 1 # explicitly stated particle concentrations
+						# explicitly stated particle 
+						# concentrations
+						self.pmode = 1
 						pmode_cnt = 0 # no modes
 					if (time_cnt == 1 and i == ':'):
 						pmode_cnt += 1 # mode count
-						pmode = 0 # particle concentrations expressed as modes
+						# particle concentrations 
+						# expressed as modes
+						self.pmode = 0
 
 				# a possible situation where there is just one size bin and 
 				# therefore only one concentration given for that size bin
 				if (sb_cnt == 1 and pmode_cnt == 1):
-					pmode = 1 # explicitly stated particle concentrations
+					# explicitly stated particle concentrations
+					self.pmode = 1 
 						
 				# see below model input loop for final determination of pmode (
-				# specifically what happens if more than one size bin, but just one mode given)
+				# specifically what happens if more 
+				# than one size bin, but just one mode given)
 					
 				# if number concentration per size bin given explicitly
-				if (pmode == 1):
-					pconc = np.zeros((sb_cnt, time_cnt))
+				if (self.pmode == 1):
+					self.pconc = np.zeros((sb_cnt, time_cnt))
 					for i in range(time_cnt):
-						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 				else: # mode quantities provided
-					pconc = np.zeros((pmode_cnt, time_cnt))
+					self.pconc = np.zeros((pmode_cnt, time_cnt))
 					for i in range(time_cnt):
-						pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
-				
-			if key == 'pconct' and (value.strip()): # seed particle input times (s)
+						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
+			
+			# seed particle input times (s)
+			if (key == 'pconct' and (value.strip())):
 				time_cnt = 1 # track number of times
 				for i in value:
 					if (i == ';'):
 						time_cnt += 1 # increase time count
 					
 				# times in columns
-				pconct = np.zeros((1, time_cnt))
-				pconct[0, :] = [float(i) for i in ((value.strip()).split(';'))]
+				self.pconct = np.zeros((1, time_cnt))
+				self.pconct[0, :] = [float(i) 
+					for i in ((value.strip()).split(';'))]
+
 			# whether to repeat particle influxes every 24 hours
 			if (key == 'pconctf' and (value.strip())):
 				self.pconctf = float(value.strip())
 
-			# whether seed particle injection continuous or instantaneous
-			if key == 'pcont' and (value.strip()):
+			# whether seed particle injection continuous or 
+			# instantaneous
+			if (key == 'pcont' and (value.strip())):
 				time_cnt = 1 # track number of times
 				for i in value:
 					if (i == ';'):
 						time_cnt += 1 # increase time count
 					
 				# times in columns
-				pcont = np.zeros((1, time_cnt), dtype=int)
-				pcont[0, :] = [int(i) for i in ((value.strip()).split(';'))]
+				self.pcont = np.zeros((1, time_cnt), dtype=int)
+				self.pcont[0, :] = [int(i) for i in 
+				((value.strip()).split(';'))]
 			
 
-			if key == 'lower_part_size' and (value.strip()): # lowest size bin bound
+			# lowest size bin bound
+			if (key == 'lower_part_size' and (value.strip())):
 				lowsize = str(value.strip())
-				if ',' in lowsize: # if a list, representing manually set radius (um) bounds
+				# if a list, representing manually 
+				# set radius (um) bounds
+				if ',' in lowsize:
 					self.manual_rbounds = [float(i) for i in ((value.strip()).split(','))]
 					lowsize = self.manual_rbounds[0]
 				else:
 					lowsize = float(value.strip())
 			
-			if key == 'upper_part_size' and (value.strip()): # radius of uppermost size bin boundary
+			# radius of uppermost size bin boundary
+			if key == 'upper_part_size' and (value.strip()):
 				uppsize = float(value.strip())
+			
+			# method of spacing size bin sizes
+			if (key == 'space_mode' and (value.strip())):
+				self.space_mode = str(value.strip())
 
-			if key == 'space_mode' and (value.strip()): # method of spacing size bin sizes
-				space_mode = str(value.strip())
-
-			if key == 'std' and (value.strip()): # seed particle standard deviation of number size distribution
+			# seed particle standard deviation of 
+			# number size distribution
+			if key == 'std' and (value.strip()):
 				time_cnt = 1 # track of number of times
 				mode_cnt =1 # track number of modes 
 				for i in value:
@@ -500,7 +520,8 @@ def mod_var_read(self):
 				for i in range(time_cnt):
 					std[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
 			
-			if key == 'mean_rad' and (value.strip()): # seed particle mean radius (um)
+			# seed particle mean radius (um)
+			if (key == 'mean_rad' and (value.strip())):
 				time_cnt = 1 # track of number of times
 				mode_cnt = 1 # track number of modes
 				for i in value:
@@ -511,9 +532,11 @@ def mod_var_read(self):
 					if (i==':'):
 						mode_cnt += 1 # increase mode count
 				
-				mean_rad = np.zeros((mode_cnt, time_cnt))
+				self.mean_rad = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
-					mean_rad[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
+					self.mean_rad[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
+				
+
 			# frequency (s) of storing results	
 			if (key == 'recording_time_step' and 
 				(value.strip())): 
@@ -560,13 +583,15 @@ def mod_var_read(self):
 						time_count += 1
 				Ct = np.zeros((comp_count, time_count))
 				for i in range(comp_count):
-					Ct[i, :] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+					Ct[i, :] = [float(ii.strip()) for ii 
+					in ((value.split(';')[i]).split(','))]
 
-
-			if key == 'seed_name' and value.strip(): # name(s) of component(s) comprising seed particles
-				seed_name = [str(i).strip() for i in (value.split(','))]
+			# name(s) of component(s) comprising seed particles
+			if (key == 'seed_name' and value.strip()):
+				self.seed_name = [str(i).strip() 
+					for i in (value.split(','))]
 				
-			if key == 'seed_mw' and value.strip():
+			if (key == 'seed_mw' and value.strip()):
 				try:
 					seed_mw =  [float(i) for i in (value.split(','))]
 					seed_mw =  np.array((seed_mw))
@@ -608,7 +633,7 @@ def mod_var_read(self):
 					if (i == ','):
 						# size bin count
 						sb_count += 1
-				seedx = np.zeros((comp_count, sb_count, 
+				self.seedx = np.zeros((comp_count, sb_count, 
 					ti_count))
 				# count on seed mole fractions through 
 				# time
@@ -620,7 +645,7 @@ def mod_var_read(self):
 					seedxn = seedx_split[i0]
 					# loop through components
 					for i in range(comp_count):
-						seedx[i, :, i0] = [
+						self.seedx[i, :, i0] = [
 						float(ii.strip()) for ii
 						 in ((seedxn.split(';')
 						[i]).split(','))]
@@ -794,23 +819,33 @@ def mod_var_read(self):
 			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
 
-			if key == 'act_comp' and (value.strip()): # names of components with specified activity coefficients
-				act_comp = [i for i in (((value.strip()).split(',')))]
+			# names of components with specified activity coefficients
+			if (key == 'act_comp' and (value.strip())):
+				act_comp = [i for i in 
+				(((value.strip()).split(',')))]
 
-			if key == 'act_user' and (value.strip()): # activity coefficients (dimensionless set by user)
-				act_user = [i for i in (((value.strip()).split(',')))]
+			# activity coefficients (dimensionless set by user)
+			if (key == 'act_user' and (value.strip())):
+				act_user = [i for i in 
+				(((value.strip()).split(',')))]
 
-			if key == 'accom_coeff_comp' and (value.strip()): # names of componenets with specified accommodation coefficients
+			# names of componenets with specified 
+			# accommodation coefficients
+			if key == 'accom_coeff_comp' and (value.strip()):
 				accom_comp = [i for i in (((value.strip()).split(',')))]
 
-			if key == 'accom_coeff_user' and (value.strip()): # value(s) of accommodation coefficient set by user
+			# value(s) of accommodation coefficient set by user
+			if key == 'accom_coeff_user' and (value.strip()):
 				accom_val = [i for i in (((value.strip()).split(',')))]
 
-			# value(s) of the gas-particle and gas-wall partitioning cutoff
+			# value(s) of the gas-particle and gas-wall 
+			# partitioning cutoff
 			if (key == 'partit_cutoff' and (value.strip())):
-				partit_cutoff = [float(i) for i in (((value.strip()).split(',')))]
+				self.partit_cutoff = [float(i) for 
+				i in (((value.strip()).split(',')))]
 			
-			# marker for whether to clone latest version of UManSysProp from web
+			# marker for whether to clone latest version 
+			# of UManSysProp from web
 			if key == 'umansysprop_update' and (value.strip()): 
 				uman_up = int(value.strip())
 
@@ -932,27 +967,27 @@ def mod_var_read(self):
 				self.bd_st = 1
 			
 			return()
+
 		# a possible situation where there are multiple particle size bins,
 		# but just one mode given for the particle number size distribution
 		if (num_sb > 1 and pmode_cnt == 1):
-			pmode = 0 # modal particle concentrations
+			self.pmode = 0 # modal particle concentrations
 	
 		# prepare for pickling
-		list_vars = [sav_nam, comp0, y0, Press, 
-				siz_stru, num_sb, pmode, pconc, pconct, 
-				lowsize, 
-				uppsize, space_mode, std, mean_rad, 
-				Compt, injectt, Ct, seed_name, seed_mw, 
+		list_vars = [sav_nam, y0, Press, 
+				siz_stru, num_sb, lowsize, 
+				uppsize, std, 
+				Compt, injectt, Ct, seed_mw, 
 				seed_diss, seed_dens, 
-				seedx, dens_comp, dens, vol_comp, volP, 
+				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, 
 				accom_val, uman_up, int_tol, 
 				new_partr, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk,
 				 chamSA, Rader, p_char, 
-				e_field, partit_cutoff, ser_H2O, 
+				e_field, ser_H2O, 
 				wat_hist, drh_str, 
-				erh_str, pcont, z_prt_coeff, chamV]
+				erh_str, z_prt_coeff, chamV]
 
 		# the file to be used for pickling
 		with open(input_by_sim, 'wb') as pk: 
@@ -1160,7 +1195,7 @@ def C0_open(self):
 	fname = str(self.path_to_C0 + '/model_and_component_constants')
 	
 	const_in = open(fname)
-	comp0 = [] # prepare to store chemical scheme names
+	self.comp0 = [] # prepare to store chemical scheme names
 	# get chemical scheme names of components
 	for line in const_in.readlines():
 		if (str(line.split(',')[0]) == 'chem_scheme_names'):
@@ -1177,25 +1212,25 @@ def C0_open(self):
 					fi_indx = -cnt+1
 					break
 
-			comp0 = ast.literal_eval(line[st_indx:fi_indx])
+			self.comp0 = ast.literal_eval(line[st_indx:fi_indx])
 
-	if (comp0 == []): # if new style of saving results used
+	if (self.comp0 == []): # if new style of saving results used
 		fname = str(self.path_to_C0 + '/comp_namelist.npy')
-		comp0 = (np.load(fname, 
+		self.comp0 = (np.load(fname, 
 			allow_pickle=True)).tolist()
 	
 
 	# limit starting concentrations to just the gas-phase
 	# note this may need developing in future if concentrations
 	# of other phases needed
-	y0 = y0[0:len(comp0)]
+	y0 = y0[0:len(self.comp0)]
 
 	# now just keep the concentrations for components with
 	# concentrations above zero
-	comp0 = np.array((comp0))[y0 > 0.]
+	self.comp0 = np.array((self.comp0))[y0 > 0.]
 	y0 = y0[y0 > 0.]
 	# remove water
-	y0 = y0[comp0 != 'H2O']
-	comp0 = comp0[comp0 != 'H2O']
+	y0 = (y0[self.comp0 != 'H2O']).tolist()
+	self.comp0 = (self.comp0[self.comp0 != 'H2O']).tolist()
 	
-	return(y0, comp0)
+	return(y0)

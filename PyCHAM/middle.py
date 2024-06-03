@@ -44,19 +44,19 @@ def middle(self): # define function
 	# -------------------------------------------------------------
 	st_time = time.time()
 	# get required inputs
-	[sav_nam, comp0, y0, Pnow,
-		siz_str, num_sb, pmode, pconc, pconct,
-		lowsize, uppsize, space_mode, std, mean_rad,
-		Compt, injectt, Ct, seed_name, seed_mw, 
-		core_diss, seed_dens, seedx, 
+	[sav_nam, y0, Pnow,
+		siz_str, num_sb,
+		lowsize, uppsize, std,
+		Compt, injectt, Ct, seed_mw, 
+		core_diss, seed_dens, 
 		dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, 
 		accom_coeff_user, uman_up, 
 		int_tol, new_partr, coag_on, 
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, 
 		Rader, p_char, 
-		e_field, partit_cutoff, ser_H2O, wat_hist, drh_str, 
-		erh_str, pcont, z_prt_coeff, 
+		e_field, ser_H2O, wat_hist, drh_str, 
+		erh_str, z_prt_coeff, 
 		chamSA, chamV] = ui.share(self)
 	
 	# if not skipping parsing of chemical scheme	
@@ -64,16 +64,16 @@ def middle(self): # define function
 		# parse the chemical scheme equation file to convert 
 		# equations into usable code
 		[rowvals, colptrs, comp_num, 
-		Jlen, comp_xmlname, comp_smil, erf, err_mess, 
+		Jlen, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, 
 			(num_sb+self.wall_on), 
-			drh_str, erh_str, sav_nam, pcont, self)
+			drh_str, erh_str, sav_nam, self)
 	
+
 	# if skipping parsing of chemical scheme
 	if (self.pars_skip == 1):
-		[rowvals, colptrs, comp_num, Jlen, comp_xmlname, 
-		comp_smil, erf, 
-		err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
+		[rowvals, colptrs, comp_num, Jlen, 
+		erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 
 	# if needed, then run operations to produce variable checker 
 	# plot from the simulate tab
@@ -89,10 +89,10 @@ def middle(self): # define function
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
 	inj_indx, core_diss, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, 
+	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, y0,
 	self] = init_conc.init_conc(comp_num, 
-	comp0, y0, Pnow, 0, pconc, self.eqn_num[0], Compt, seed_name,
-	seed_mw, core_diss, comp_xmlname, comp_smil, self)
+	y0, Pnow, 0, self.eqn_num[0], Compt,
+	seed_mw, core_diss, self)
 
 	# if error raised, then tell GUI to display it and to stop 
 	# programme
@@ -106,9 +106,9 @@ def middle(self): # define function
 		# get component properties
 		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
 			num_comp, Psat_water, vol_comp, volP, 0, 
-			corei, pconc,
+			corei,
 			uman_up, seed_dens, 0, nuci, dens_comp, dens,
-			seed_name, y_mw, tempt_cnt, self)
+			y_mw, tempt_cnt, self)
 	
 	# if error raised, then tell GUI to display and stop program
 	if (erf == 1):
@@ -120,7 +120,7 @@ def middle(self): # define function
 		self] = partit_var_prep.prep(y_mw, 
 		self.TEMP[0], num_comp, act_comp, act_user, accom_comp, 
 		accom_coeff_user, num_sb+self.wall_on, num_sb, Pnow, 
-		comp_smil, self)
+		self)
 
 	# if error raised or in testing mode then stop
 	if (err_mess != ''):
@@ -130,14 +130,13 @@ def middle(self): # define function
 	[y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb, 
 	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, 
 	self.TEMP[0], H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, 
-	num_sb, lowsize, uppsize, pmode, pconc, pconct, 0, std, 
-	mean_rad, therm_sp, core_diss, space_mode, seedx,
-	act_coeff, partit_cutoff, Pnow, 
-	pcont, seed_mw, R_gas, self)
+	num_sb, lowsize, uppsize, 0, std, 
+	therm_sp, core_diss, act_coeff, Pnow, 
+	seed_mw, R_gas, self)
 	
 	# estimate total inputs of emitted components (ug/m3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, 
-		Cfactor, comp0, y_mw, Compt, self)
+		Cfactor, y_mw, Compt, self)
 	
 	# in case user has specified to spin-up simulation
 	if (self.spin_up == 1):
@@ -146,19 +145,18 @@ def middle(self): # define function
 		[y, N_perbin, x, Varr, rbou, 
 		Vbou] = ode_updater_su.ode_updater_su(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
-		siz_str, num_sb, num_comp, seed_name, seedx, 
+		siz_str, num_sb, num_comp, 
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, 
 		nuci, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
-		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, 
+		injectt, inj_indx, Ct, 
 		lowsize, uppsize, std, rbou, MV,
-		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
-		sav_nam, space_mode, 
-		rbou00, ub_rad_amp, indx_plot, comp0,
-		wat_hist, pcont, NOi, 
+		diff_vol, Dstar_org, corei, ser_H2O, 
+		sav_nam, rbou00, ub_rad_amp, indx_plot,
+		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self,
 		vol_comp, volP)
@@ -167,19 +165,18 @@ def middle(self): # define function
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
-		siz_str, num_sb, num_comp, seed_name, seedx, 
+		siz_str, num_sb, num_comp, 
 		core_diss, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, 
 		nuci, coag_on, inflectDp, pwl_xpre, 
 		pwl_xpro, inflectk, ChamR, Rader, p_char, e_field, 
-		injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, 
+		injectt, inj_indx, Ct, 
 		lowsize, uppsize, std, rbou, MV,
-		partit_cutoff, diff_vol, Dstar_org, corei, ser_H2O, 
-		sav_nam, space_mode, 
-		rbou00, ub_rad_amp, indx_plot, comp0,
-		wat_hist, pcont, NOi, 
+		diff_vol, Dstar_org, corei, ser_H2O, 
+		sav_nam, rbou00, ub_rad_amp, indx_plot,
+		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, 
 		vol_comp, volP):

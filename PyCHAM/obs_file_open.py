@@ -51,6 +51,29 @@ def obs_file_open(self):
 	# relative humidity
 	temper_indx = -2
 	rh_indx = -2
+	# track whether particulate matter mole fractions 
+	# seen in obs_file
+	seedx_flag = 0
+	# track whether PM number concentrations
+	# seen in obs_file
+	pconc_flag = 0
+	# track whether mean radius seen
+	mean_rad_flag = 0
+	# size bin names
+	sb_nam = []
+	# names of particulate matter component
+	pm_comp = []
+	# column indices of PM mole fractions
+	pm_col = []
+	# column indices for PM number concentration
+	pconc_col = []
+	# column indices for PM mean radius
+	mean_rad_col = []
+	# size bin names for pconc
+	sb_nam_pconc = []
+	# size bin names for mean_rad
+	sb_nam_mean_rad = []
+	
 	# index for columns of components
 	comp_indx = []
 	# loop through rows
@@ -62,11 +85,12 @@ def obs_file_open(self):
 			self.obs_comp = []
 			# keep count on column index
 			col_num = 0
-			
+			# loop through found names
 			for oc in names_xlsx:
 				
 				# keep count on column index
 				col_num += 1
+
 				if (oc == None):
 					continue
 				if (oc == 'Temperature (K)'):
@@ -79,8 +103,65 @@ def obs_file_open(self):
 					self.RH = []
 					self.RHt = []
 					continue
+				# if an observed particulate 
+				# matter component
+				if 'PM' in oc or 'pm' in oc:
+			
+					# assume that observations
+					# account for any dilution,
+					# so both particle components
+					# (in ode_solv) and particle
+					# number concentration (in
+					# ode_updater)
+					# are not subject to any
+					# further dilution
+					self.pp_dil = 0
+
+					# if a mole fraction and 
+					# first time a mole fraction 
+					# seen
+					if ('seedx' in oc and seedx_flag == 0):
+						seedx_flag = 1
+					if ('pconc' in oc and pconc_flag == 0):
+						pconc_flag = 1
+					if ('mean_rad' in oc):
+						mean_rad_flag = 1
+					if ('seedx' in oc):
+						# index where size bin 
+						# name starts
+						strfi = oc.index('pm')+2
+						# index where size bin name
+						# finishes
+						strei = -1*(oc[::-1].index('_')+1)
+						
+						# size bin name
+						sb_nam.append(oc[strfi:strei])
+						# hold component name
+						pm_comp.append(oc[0:strfi-3])
+						# hold column index
+						pm_col.append(col_num)
+					if ('pconc' in oc):
+						# index where size bin 
+						# name starts
+						strfi = oc.index('pm')+2
+						# size bin name
+						sb_nam_pconc.append(oc[strfi::])
+						# hold column index
+						pconc_col.append(col_num)
+					# mean radius of size bin (um)
+					if ('mean_rad' in oc):
+						# index where size bin 
+						# name starts
+						strfi = oc.index('pm')+2
+						# size bin name
+						sb_nam_mean_rad.append(oc[strfi::])
+						# hold column index
+						mean_rad_col.append(col_num)
+					continue
+	
 				# if none of the above, then 
-				# assume it's a chemical components
+				# assume it's a gas-phase 
+				# chemical component
 				self.obs_comp.append(oc)
 				comp_indx.append(col_num)
 			
@@ -100,10 +181,60 @@ def obs_file_open(self):
 			temper_indx = np.array((
 				temper_indx)).astype('int')
 		else:
-			if (ic > 1): # add row onto data array
+			# if on first time
+			if (ic == 1 and seedx_flag == 1):
+				
+				# prepare to hold seed component names
+				self.seed_name = []
+				# get unique names of seed components
+				for seedi in pm_comp:
+					if seedi not in self.seed_name:
+						self.seed_name.append(seedi)
+				
+				# get number of unique components
+				# with PM mole fractions
+				uni_comp = len(self.seed_name)
+				# get number of unique size bins
+				uni_sb = len(np.unique(sb_nam))
+				self.seedx = np.zeros((uni_comp, uni_sb, 1))
+				# rearrange pm_col so that components
+				# in columns and size bins in rows
+				pm_col = np.array((pm_col)).reshape(uni_sb, uni_comp)
+
+			if (ic == 1 and pconc_flag == 1):
+				# get number of unique size bins
+				uni_sb_pconc = len(np.unique(sb_nam_pconc))
+				self.pconc = np.zeros((uni_sb_pconc, 1))
+				# times of particle number concentration (s)
+				self.pconct = np.zeros((1, 1))
+
+			if (ic == 1 and mean_rad_flag == 1):
+				# get number of unique size bins
+				uni_sb_mean_rad = len(np.unique(sb_nam_mean_rad))
+				self.mean_rad = np.zeros((uni_sb_mean_rad, 1))
+				
+
+			if (ic > 1): # if past the first time
+				# add row onto data array
 				self.obs = np.concatenate((self.obs, 
 					(np.zeros((1, nc_obs+1)))), 
 					axis=0)
+				# add onto mole fraction array
+				self.seedx = np.concatenate((self.seedx, 
+					(np.zeros((uni_comp, 
+					 uni_sb, 1)))), 
+					axis=2)
+				# add onto PM number concentration array
+				self.pconc = np.concatenate((self.pconc, 
+					(np.zeros((uni_sb_pconc, 1)))), 
+					axis=1)
+				self.pconct = np.concatenate((self.pconct, 
+					(np.zeros((1, 1)))), 
+					axis=1)
+				# add onto mean radius array
+				self.mean_rad = np.concatenate((self.mean_rad, 
+					(np.zeros((uni_sb_mean_rad, 1)))), 
+					axis=1)
 			
 			self.obs[ic-1, 1::] = np.array((i))[
 				0:col_num+1][comp_indx]
@@ -118,12 +249,52 @@ def obs_file_open(self):
 			if (rh_indx != -2):
 				self.RH.append(np.array((i))[rh_indx])
 				self.RHt.append(i[0])
-			
-		ic += 1 # count on row iteration
 
+			# particulate matter observations at this time
+			if (seedx_flag == 1):
+				# loop through size bins
+				for sbi in range(uni_sb):
+					self.seedx[:, sbi, -1] = np.array((i))[0:col_num+1][pm_col[sbi, :]]
+			# PM number concentration at this time (# particles/cm3)
+			if (pconc_flag == 1):
+				self.pconc[:, -1] = np.array((i))[0:col_num+1][pconc_col]
+				self.pconct[0, -1] = np.array((i))[0]
+			
+			# mean radius of size bins at this time (um)
+			if (mean_rad_flag == 1):
+				self.mean_rad[:, -1] = 	np.array((i))[0:col_num+1][mean_rad_col]		
+
+		ic += 1 # count on row iteration
+	
+
+	# whether particle number concentrations expressed 
+	# by modes (0) or explicitly (1)
+	if (self.pconc.shape[0] == self.num_asb):
+		self.pmode = 1
+	else:
+		self.pmode = 0
+
+	# ensure array defining whether particle injection
+	# is continuous or instantaneous is same length as
+	# number of injection times
+	self.pcont = (np.zeros((1, self.pconct.shape[1]))).astype('int')
+
+	# ensure that seed component names are
+	# consistent with those in chemical scheme
+	try:
+		self.seed_name[self.seed_name.index('an')] = 'AMM_NIT'
+		self.seed_name[self.seed_name.index('as')] = 'AMM_SUL'
+		self.seed_name[self.seed_name.index('po')] = 'pri_org'
+		self.seed_name[self.seed_name.index('ulvoc')] = 'sec_org-2'
+		self.seed_name[self.seed_name.index('elvoc')] = 'sec_org-1'
+		self.seed_name[self.seed_name.index('lvoc')] = 'sec_org0'
+		self.seed_name[self.seed_name.index('svoc')] = 'sec_org1'
+	except:
+		self.seed_name = self.seed_name
+	
 	# ensure numpy array for rh arrays
-	self.RH = np.array((self.RH))
-	self.RHt = np.array((self.RHt))
+	self.RH = np.array((self.RH)).astype('float')
+	self.RHt = np.array((self.RHt)).astype('float')
 	wb.close() # close excel file
 	
 	
@@ -136,12 +307,5 @@ def obs_file_open(self):
 	# get indices of components with concentrations to fit 
 	# observations
 	self.obs_comp_i = np.zeros((len(self.obs_comp))).astype('int')
-	
-	# when called from ui_check, comp_namelist may not yet have 
-	# been established
-	if hasattr(self, 'comp_namelist'):
-		for i in range(len(self.obs_comp)):
-			self.obs_comp_i[i] = self.comp_namelist.index(
-				self.obs_comp[i])
 
 	return(self)

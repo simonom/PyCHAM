@@ -40,24 +40,24 @@ from water_calc import water_calc
 import group_indices
 
 def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp, 
-			volP, testf, corei, pconc, umansysprop_update, 
+			volP, testf, corei, umansysprop_update, 
 			core_dens,
-			ode_gen_flag, nuci, dens_comp, dens, seed_name,
+			ode_gen_flag, nuci, dens_comp, dens,
 			y_mw, tempt_cnt, self):
 
 	# inputs: ------------------------------------------------------
 	# self.rel_SMILES - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# self.Pybel_objects - list of Pybel objects representing the components in self.rel_SMILES
+	# self.Pybel_objects - list of Pybel objects representing 
+	# the components in self.rel_SMILES
 	# (omitting water and core, if present)
 	# self.TEMP - temperature (K) in chamber at all times
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
 	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# corei - index of seed particle component
-	# pconc - initial number concentration of particles 
-	#	(# particles/cm3 (air))
-	# umansysprop_update - marker for cloning UManSysProp so that 		#	latest version used
+	# umansysprop_update - marker for cloning UManSysProp so that 		
+	#	the latest version is used
 	# core_dens - density of core material (g/cm3 
 	#	(liquid/solid density))
 	# self.comp_namelist - list of component names from the 
@@ -69,8 +69,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# dens_comp - chemical scheme names of components with 
 	# 	manually assigned densities
 	# dens - manually assigned densities (g/cm3)
-	# seed_name - chemical scheme name(s) of component(s) 
-	#	comprising seed particles
 	# y_mw - molar mass of components (g/mol)
 	# self - reference to PyCHAM
 	# tempt_cnt - count on temperatures
@@ -116,7 +114,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		f_init.close()
 
 	# point to umansysprop folder
-	sys.path.insert(1, (self.PyCHAM_path + '/umansysprop')) # address for updated version
+	# address for updated version
+	sys.path.insert(1, (self.PyCHAM_path + '/umansysprop'))
 	
 	from umansysprop import boiling_points
 	from umansysprop import vapour_pressures
@@ -177,14 +176,33 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# get vapour pressures at 298.15 K (Pa)
 		load_path = str(self.pars_skip_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		self.Psat_Pa_rec = (np.load(load_path, allow_pickle=True))
-	
+
+	# if using archived reference temperature (298.15 K (Pa))
+	# vapour pressure (Pa), which has Nannoolal et al. (2008)
+	# vapour pressures for MCM species and Mohr et al. (2019)
+	# for HOMs
+	if (self.pars_skip == 3):
+		# get vapour pressures at 298.15 K (Pa)
+		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
+		self.Psat_Pa_rec_ref = (np.load(load_path, allow_pickle=True))
+		self.Psat_Pa_rec = np.zeros((num_comp))
+		# loop through components to map reference vapour pressure onto
+		for comp_nami in range(len(self.comp_namelist)):
+			try:
+				# reference index
+				ref_indx = (self.Psat_Pa_rec_ref[0, :] == 
+				self.comp_namelist[comp_nami])
+				self.Psat_Pa_rec[comp_nami] = self.Psat_Pa_rec_ref[1, ref_indx]
+			except:
+				self.pars_skip = 1
+			
 	# estimate condensed-phase densitites (kg/m3) vapour pressures 
 	# (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
 	# basis set, as shown in 
 	# Fig. 1 of https://doi.org/10.5194/acp-20-1183-2020
-	# also get inidces of components that can be categorised by 
+	# also get indices of components that can be categorised by 
 	# functional group
 	for i in range (num_comp):
 	
@@ -214,7 +232,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 				if (self.TEMP[tempt_cnt] == 298.15):
 					self.Psat_Pa_rec[i] = self.Psat[0, i]
 				else:
-					[_, self.Psat_Pa_rec[i], _] = water_calc(298.15, 0.5, si.N_A)
+					[_, self.Psat_Pa_rec[i], _] = water_calc(
+					298.15, 0.5, si.N_A)
 			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
@@ -226,13 +245,17 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 
 		if (i != corei[0] and i != H2Oi and self.rel_SMILES[i] != '[HH]'):
 			# density (convert from g/cm3 to kg/m3)
-			self.y_dens[i] = liquid_densities.girolami(self.Pybel_objects[i])*1.e3
-
+			self.y_dens[i] = liquid_densities.girolami(
+					self.Pybel_objects[i])*1.e3
+			
 		if (self.comp_namelist[i] == 'O3'):
 			if (self.pars_skip != 2):
-				# vapour pressure of ozone from https://doi.org/10.1063/1.1700683
-				self.Psat[0, i] =  np.log10((8.25313-(814.941587/
-				self.TEMP[tempt_cnt])-0.001966943*self.TEMP[tempt_cnt])*1.31579e-3)
+				# vapour pressure of ozone from 
+				# https://doi.org/10.1063/1.1700683
+				self.Psat[0, i] =  np.log10((8.25313-
+				(814.941587/self.TEMP[tempt_cnt])
+				-0.001966943*self.TEMP[tempt_cnt])
+				*1.31579e-3)
 				if (self.TEMP[tempt_cnt] == 298.15):
 					self.Psat_Pa_rec[i] = self.Psat[0, i]
 				else:
@@ -243,6 +266,40 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.nom_mass[0, i] = 0.*1.+3.*16.
 			continue
 
+		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3'):
+			if (self.pars_skip != 2):
+				# effective vapour pressure of ammonium nitrate from 
+				# diurnal_est.py on Simon O'Meara OneDrive
+				# (Pa converted to log10(atm))
+				self.Psat[0, i] = np.log10(
+				(9.9e-07*self.TEMP[tempt_cnt]-2.5e-4)*9.869e-6)
+				if (self.TEMP[tempt_cnt] == 298.15):
+					self.Psat_Pa_rec[i] = self.Psat[0, i]
+				else:
+					self.Psat_Pa_rec[i] = np.log10(
+					(9.9e-07*self.TEMP[tempt_cnt]-2.5e-4)*9.869e-6)
+			self.OC[0, i] = 0.
+			self.HC[0, i] = 0.
+			self.nom_mass[0, i] = 4.*1.+3.*16.+2.*14.
+			continue
+
+		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3'):
+			if (self.pars_skip != 2):
+				# effective vapour pressure of ammonia from 
+				# diurnal_est.py on Simon O'Meara OneDrive
+				self.Psat[0, i] =  np.log10(
+				(4.5e-04*self.TEMP[tempt_cnt]-1.2e-1)*9.869e-6)
+				
+				if (self.TEMP[tempt_cnt] == 298.15):
+					self.Psat_Pa_rec[i] = self.Psat[0, i]
+				else:
+					self.Psat_Pa_rec[i] = np.log10(
+					(4.5e-04*self.TEMP[tempt_cnt]-1.2e-1)*9.869e-6)
+			self.OC[0, i] = 0.
+			self.HC[0, i] = 0.
+			self.nom_mass[0, i] = 4.*1.+0.*16.+1.*14.
+			continue
+
 		# possibly use different method for vapour pressure 
 		# (log10(atm)) of HOMs
 		
@@ -251,7 +308,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.rel_SMILES[i].count('c') >= 10) and 
 			(self.rel_SMILES[i].count('O') + 
 			self.rel_SMILES[i].count('o') >= 6) and 
-			'PAN' not in self.comp_namelist[i])):
+			'PAN' not in self.comp_namelist[i]) and
+			'Mesotrione' not in self.comp_namelist[i]):
 			
 			# log(C* (ug/m3)) (natural logarithm of effective 
 			# saturation concentration) of component 
@@ -295,10 +353,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 				# molecules don't contribute to 
 				# particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
-				#	Psatnow += 10 # ensure no condensation of small molecules
+				# 	ensure no condensation of small molecules
+				#	Psatnow += 10
 
 
-		if (self.pars_skip != 2):
+		if (self.pars_skip != 2 and self.pars_skip != 3):
 			try: # in case array
 				self.Psat[0, i] = Psatnow[0]
 			except: # in case float
@@ -386,12 +445,16 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			dens_comp[i])
 			self.y_dens[dens_indx] = dens[i]
 
+	# in case not parsing
 	if (self.pars_skip != 2):
+		# in case not using archived vapour pressures
+		if (self.pars_skip != 3):
+			# convert to Pa from atm
+			self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325.
+
 		ish = (self.Psat == 0.) # non-volatiles
 		# convert to Pa from atm
 		self.Psat = (10.**self.Psat)*101325.
-		# convert to Pa from atm
-		self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325.
 		# retain low volatility where wanted following unit 
 		# conversion
 		self.Psat[ish] = 0.
@@ -522,10 +585,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 									# get index of all components in this group
 									vol_indx = self.Psat[0, :] > float(inequal[1::])
 							if '==' in inequal:
-								# get index of all components in this group
+								# get index of all components 
+								# in this group
 								vol_indx = self.Psat[0, :] == float(inequal[2::])
-
-						if 'RO2' in group_name: # if RO2, as categorised by the chemical scheme
+						# if RO2, as categorised by the chemical scheme
+						if 'RO2' in group_name:
 							vol_indx = self.RO2_indices
 
 					# assign user-defined vapour pressure (Pa)
@@ -541,7 +605,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# for storing vapour pressures in Pa (Pa)	
 		self.Psat_Pa = np.zeros((1, self.num_comp)) 
 		self.Psat_Pa[0, :] = self.Psat[0, :]
-	    	
+		
 		# convert saturation vapour pressures from Pa to 
 		# # molecules/cm3 (air) using ideal
 		# gas law, R has units cm3.Pa/K.mol
@@ -558,6 +622,17 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# speed up initiation time in following simulations
 		self.Psat_rec0 = np.zeros((self.Psat.shape))
 		self.Psat_rec0[:, :] = self.Psat[:, :]
+
+	# in case you want to
+	# save the standard temperature (298.15 K) vapour pressure (Pa)
+	# prepare component names
+	#array_names = np.array(self.comp_namelist).reshape(-1, 1)
+	#Psat_Pa_rec_saving = self.Psat_Pa_rec.reshape(-1, 1)
+	#Psat_Pa_rec_saving = np.concatenate((array_names, Psat_Pa_rec_saving), axis=1)
+	#save_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/' + 
+	# 'pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
+	#np.save(save_path, Psat_Pa_rec_saving, allow_pickle=True)
+	
 
 	# if vapour pressure plot requested then make this now ---------
 	if (self.testf == 3.2): 
@@ -596,6 +671,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# code now
 		err_mess = 'Stop'
 		erf = 1
-	# end of plotting section ----------------------------------------------------------------------------------------------------------
+	# end of plotting section ---------------------------------------------------------------
 	
 	return(self, err_mess, erf)

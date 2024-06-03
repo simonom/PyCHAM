@@ -29,7 +29,7 @@ import datetime
 
 # function to generate the ordinary differential equation (ODE)
 # solver file
-def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
+def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, self):
 	
 	# inputs: ------------------------------------------------
 	# self.con_infl_indx - indices of components with continuous influx
@@ -44,8 +44,6 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	# self.eqn_num - number of gas- and particle-phase reactions
 	# self.dil_fac - fraction of chamber air extracted/s
 	# sav_nam - name of file to save results to
-	# pcont - flag for whether seed particle injection is 
-	#	instantaneous (0) or continuous (1)
 	# self - reference to PyCHAM
 	# -------------------------------------------------------
 	
@@ -307,8 +305,13 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 		f.write('			dd[H2Oi::num_comp, 0] -= y[H2Oi::num_comp, 0]*self.dil_fac_H2O_now\n')
 		f.write('		# water diluted either in water solver or above \n')
 		f.write('		df_indx[H2Oi::num_comp] = 0 \n')
-		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0 # cannot dilute what is on wall \n')
-		f.write('		df_indx = df_indx==1 # transform to Boolean array \n')
+		f.write('		# cannot dilute what is on wall \n')
+		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0  \n')
+		f.write('		# in case particle-phase components should not be diluted, \n')
+		f.write('		# e.g. when observations already account for dilution, as in obs_file_open \n')
+		f.write('		if (self.pp_dil == 0):\n')
+		f.write('			df_indx[num_comp:num_comp*(num_sb-self.wall_on+1)] = 0  \n')
+		f.write('		df_indx = (df_indx == 1) # transform to Boolean array \n')
 		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*self.dil_fac_now\n')
 		f.write('		\n')
 		

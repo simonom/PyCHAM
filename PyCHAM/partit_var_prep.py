@@ -32,7 +32,7 @@ import diff_vol_est
 
 def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp, 
 	accom_coeff_user, num_sb, num_asb, Pnow, 
-	name_SMILE, self):
+	self):
 	
 	# --------------------------------------------------------------
 	# inputs:
@@ -58,7 +58,6 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# num_asb - number of actual size bins excluding wall
 	# Pnow - air pressure inside chamber (Pa)
 	# self.Pybel_objects - Pybel objects for components
-	# name_SMILE - SMILE strings of components
 	# self - reference to program
 	# self.kw - rate of transfer of components to wall (/s)
 	# -------------------------------------------------------------
@@ -84,21 +83,20 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# we multiply by 1e-3
 	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
-		# get diffusion volumes
+	# get diffusion volumes
 	diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
-	
-	# append water and core (water from Table 4.1 of the 
+
+	# do water and core (water from Table 4.1 of the 
 	# Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
-	# if water present in component names
-	if (self.H2O_in_cs == 1):
-		diff_vol = (np.append(diff_vol, 
-		np.array((1.)))).reshape(-1, 1)
-		diff_vol[self.comp_namelist.index('H2O')] = 13.1
-	else:
-		diff_vol = (np.append(diff_vol, 
-			np.array((13.1, 1.)))).reshape(-1, 1)
-
+	
+	# core
+	diff_vol = (np.append(diff_vol, 
+	np.array((1.)))).reshape(-1, 1)
+	
+	# water	
+	diff_vol[self.comp_namelist.index('H2O')] = 13.1
+	
 	# diffusion coefficient (m2/s) of components in gas phase 
 	# (air), eq 4.1.4 of
 	# the Taylor (1993) textbook 
@@ -109,10 +107,12 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# kg/mol.  This is a replication of the original method from 
 	# Fuller et al. (1969): 
 	# doi.org/10.1021/j100845a020
-	Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
+	try:
+		Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
 		(y_mw*ma*1.e3))**0.5)/
 		(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
-	
+	except:
+		import ipdb; ipdb.set_trace()
 	# convert to cm2/s
 	Dstar_org = Dstar_org*1.e4
 

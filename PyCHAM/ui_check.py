@@ -47,15 +47,17 @@ def ui_check(self):
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, comp0, y0, Press,
-		siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
-		uppsize, space_mode, std, mean_rad, 
-		Compt, injectt, Ct, seed_name,
-		seed_mw, seed_diss, seed_dens, seedx,
+		[sav_nam, y0, Press,
+		siz_stru, num_sb, lowsize, 
+		uppsize, std, 
+		Compt, injectt, Ct,
+		seed_mw, seed_diss, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, 		ser_H2O, wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 		chamV] = pickle.load(pk)
+		inflectk, chamSA, Rader, p_char, e_field, 		
+		ser_H2O, wat_hist, drh_str, erh_str, z_prt_coeff, 		
+		chamV] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: --------------------------------------------
@@ -64,14 +66,14 @@ def ui_check(self):
 	# self.wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
 	# num_sb - number of particle size bins
-	# pmode - whether particle number concentrations expressed 
+	# self.pmode - whether particle number concentrations expressed 
 	#	by mode or explicitly
-	# pconc - number concentration of particles
-	# pconct - times of particle injection (s)
+	# self.pconc - number concentration of particles
+	# self.pconct - times of particle injection (s)
 	# lowsize - lower bound of particle sizes (um)
 	# uppsize - upper bound of particle sizes (um)
 	# std - standard deviation for particle sizes
-	# mean_rad - mean radius of particle size distributions (um)
+	# self.mean_rad - mean radius of particle size distributions (um)
 	# new_partr - radius of newly nucleated particles (cm)
 	# chamSA - chamber surface area (m2)
 	# self.chem_sch_mark - markers in chemical scheme
@@ -91,11 +93,11 @@ def ui_check(self):
 	# dens_comp - chemical scheme names of components with density 
 	# manually assigned
 	# dens - manually assigned densities (g/cc)
-	# seed_name - name of component(s) comprising seed particles
-	# seedx - mole fraction of dry seed components
+	# self.seed_name - name of component(s) comprising seed particles
+	# self.seedx - mole fraction of dry seed components
 	# seed_diss - dissociation constant for seed particle 
 	# 	component(s)
-	# partit_cutoff - product of vapour pressure and activity 
+	# self.partit_cutoff - product of vapour pressure and activity 
 	# 	coefficient above which gas-particle partitioning 
 	# 	assumed zero
 	# wat_hist - flag for particle-phase history with respect to 
@@ -134,11 +136,11 @@ def ui_check(self):
 	# is turned on
 	if (self.sim_ci_file != []):
 		from obs_file_open import obs_file_open
-		#self.spin_up = 1 
+		self.spin_up = 1 
 		# also ensure that components to track change tendencies
 		# of are established
 		obs_file_open(self)  
-		 
+	
 	# --------------------------------------------------------------
 	# check on chemical scheme markers. In older PyCHAM versions 
 	# only 12 markers were needed, but at least as of v4.4.0, 13 
@@ -229,76 +231,84 @@ def ui_check(self):
 	# consistency between number of times given for 
 	# particle number concentration and number of
 	# times given for seed component mole fraction
-	if (seedx.shape[2] > 1):
-		if (seedx.shape[2] != pconc.shape[1]):
-			err_mess = str('''Error - the number of times given for seed component mole fractions ''' + str(seedx.shape[2]) + ''' does not match the number of times given for particle concentrations ''' + str(pconc.shape[1]) + ''', and they must be consistent. Please see seedx and pconc model variables in the README''')
+	if (self.seedx.shape[2] > 1):
+		if (self.seedx.shape[2] != self.pconc.shape[1]):
+			err_mess = str('''Error - the number of times given for seed component mole fractions ''' + str(self.seedx.shape[2]) + ''' does not match the number of times given for particle concentrations ''' + str(self.pconc.shape[1]) + ''', and they must be consistent. Please see seedx and pconc model variables in the README''')
 			em_flag = 2 # error message flag for error
 
-	if (seedx.shape[2] == 1 and pconc.shape[1] > 1):
-		# if just one time given for seedx, then
+	if (self.seedx.shape[2] == 1 and self.pconc.shape[1] > 1):
+		# if just one time given for self.seedx, then
 		# tile over pconc times
-		seedx = np.tile(seedx, (1, 1, pconc.shape[1]))
+		self.seedx = np.tile(self.seedx, (1, 1, self.pconc.shape[1]))
 
 	# consistency between number of particle size bins and particle number concentration
-	if (num_sb == 0 and (sum(sum(pconc != 0)) > 0) and em_flag < 2):
+	if (num_sb == 0 and (sum(sum(self.pconc != 0)) > 0) and em_flag < 2):
 		err_mess = str('Error - zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')
 		em_flag = 2 # error message flag for error
 	
 	# consistency between length of total particle concentration, 
 	# mean particle radius and standard deviation
 	if (num_sb > 0 and em_flag < 2):
-		if (pmode == 0): # particle number concentrations expressed as modes
-			if (mean_rad.shape != pconc.shape and em_flag < 2):
+		if (self.pmode == 0): # particle number concentrations expressed as modes
+			if (self.mean_rad.shape != self.pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the mean radius per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and mean_rad model variables in README.')
 				em_flag = 2 # error message flag for error
-			if (std.shape != pconc.shape and em_flag < 2):
+			if (std.shape != self.pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
 				em_flag = 2 # error message flag for error
 		
-	# ensure that the mean radius of modes (mean_rad) is consistent with the particle size range
+	# ensure that the mean radius of modes (mean_rad) is consistent 
+	# with the particle size range
 	if (num_sb > 0 and em_flag < 2):
 		
-		if (pmode == 0): # particle number concentrations expressed as modes
-			if (sum(sum(mean_rad < lowsize)) > 0 and sum(sum(mean_rad == -1.e6)) == 0):
+		if (self.pmode == 0): # particle number concentrations expressed as modes
+			if (sum(sum(self.mean_rad < lowsize)) > 0 and sum(sum(self.mean_rad == -1.e6)) == 0):
 				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is smaller than the particle size range (determined by the lower_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
 				em_flag = 2 # error message flag for error
-			if (sum(sum(mean_rad > uppsize)) > 0):
+			if (sum(sum(self.mean_rad > uppsize)) > 0):
 				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is greater than the particle size range (determined by the upper_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
 				em_flag = 2 # error message flag for error
 				
 		# if particle concentration per size bin supplied explicitly
 		# check that number of time consistent across relevant variables
-		if (pmode == 1):
-			if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != pcont.shape[1] or pconct.shape[1] != pcont.shape[1]):
-				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+') and/or pcont ('+str(pcont.shape[1])+').  Please see README for guidance.')
-				em_flag = 2 # error message flag for error
+		if (self.pmode == 1):
+
+			if (self.pconc.shape[1] != self.pconct.shape[1] or self.pconc.shape[1] != self.pcont.shape[1] or self.pconct.shape[1] != self.pcont.shape[1]):
+
+				if (self.pcont.shape[1] == 1 and self.pconc.shape[1] > 1):
+					self.pcont = np.ones((1, 
+					self.pconc.shape[1]))*self.pcont[0, 0]
+
+				else:
+					err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(self.pconc.shape[1])+'), pconct ('+str(self.pconct.shape[1])+') and/or pcont ('+str(self.pcont.shape[1])+').  Please see README for guidance.')
+					em_flag = 2 # error message flag for error
 			
 			# in this mode ensure fillers for mean_rad and std match the same
 			# length of first dimension (which represents times)
-			if (mean_rad.shape == (1, 1)):
-				if (mean_rad[0,0] == -1.e-6):
-					mean_rad = np.ones((1, pconct.shape[1]))*-1.e6
+			if (self.mean_rad.shape == (1, 1)):
+				if (self.mean_rad[0,0] == -1.e-6):
+					self.mean_rad = np.ones((1, self.pconct.shape[1]))*-1.e6
 			else: # if insufficient mean_rad values provided then error
-				if mean_rad.shape[1] != pconc.shape[1]:
-					err_mess = str('Error: the mean radius (mean_rad) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+').  Please see README for guidance.')
+				if self.mean_rad.shape[1] != self.pconc.shape[1]:
+					err_mess = str('Error: the mean radius (mean_rad) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(self.pconc.shape[1])+'), mean_rad ('+str(self.mean_rad.shape[1])+').  Please see README for guidance.')
 					em_flag = 2 # error message flag for error
 			if (std.shape == (1, 1)):
 				if (std[0,0] == 1.2):
-					std = np.ones((1, pconct.shape[1]))*1.2
+					std = np.ones((1, self.pconct.shape[1]))*1.2
 			else: # if insufficient std values provided then error
-				if std.shape[1] != pconc.shape[1]:
-					err_mess = str('Error: the standard deviation (std) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
+				if std.shape[1] != self.pconc.shape[1]:
+					err_mess = str('Error: the standard deviation (std) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(self.pconc.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
 					em_flag = 2 # error message flag for error
 				
 		# if particle concentration per size bin supplied by modes
 		# check that number of time consistent across relevant variables
-		if (pmode == 0):
-			if (pconct.shape[1] != std.shape[1] or pconct.shape[1] != mean_rad.shape[1] or pconct.shape[1] != pcont.shape[1] or pconct.shape[1] != pconc.shape[1]):
-				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), pcont ('+str(pcont.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
+		if (self.pmode == 0):
+			if (self.pconct.shape[1] != std.shape[1] or self.pconct.shape[1] != self.mean_rad.shape[1] or self.pconct.shape[1] != self.pcont.shape[1] or self.pconct.shape[1] != self.pconc.shape[1]):
+				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(self.pconc.shape[1])+'), pconct ('+str(self.pconct.shape[1])+'), pcont ('+str(self.pcont.shape[1])+'), mean_rad ('+str(self.mean_rad.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
 				em_flag = 2 # error message flag for error
 
 	# ensure only one particle concentration given at start of experiment
-	if (sum(sum(pconct == 0.)) > 1):
+	if (sum(sum(self.pconct == 0.)) > 1):
 		if (em_flag < 2):
 			err_mess = str('Error: only one initial (pconct = 0.0 s) number size distribution is allowed, but for the input pconct variable, time = 0.0 s has been detected more than once.  If you wish to have injection of particles after experiment start but close to time = 0 s please use a pconct value that is greater than 0.0 s but small compared to the recording time step.')
 			em_flag = 2 # error message flag for error
@@ -307,6 +317,16 @@ def ui_check(self):
 	if (em_flag < 2 and sum(sum(std <= 1.0)) > 0):
 		err_mess = str('Error: a standard deviation for particle number size distribution modes (std model variable) less than or equal to 1.0 has been detected, but values must exceed 1.0.  See sdt in the model variables section of README for more details.')
 		em_flag = 2 # error message flag for error
+
+	# if manual setting of size bin bounds, then ensure that mean radius per
+	# size bin is also supplied
+	if self.space_mode == 'man' and (sum(self.mean_rad == -1.e6) > 0):
+		if (em_flag < 2):
+			err_mess = str('Error: when setting the spacing of ' +
+			'particle size bins manually, the mean_rad variable ' +
+			'must also be defined by the user in the model ' +
+			'variables file, see README for more details.')
+			em_flag = 2 # error message flag for error
 
 	# check on temperature inputs ----------------------------------------------
 	
@@ -409,44 +429,48 @@ def ui_check(self):
 		em_flag = 2
 	
 	# check on consistency of names of seed components, number of size bins and the mole fraction of dry seed components, note components in rows and size bins in columns
-	if (len(seed_name) != seedx.shape[0] and em_flag < 2):
+	if (len(self.seed_name) != self.seedx.shape[0] and em_flag < 2):
 		
-		# if seedx is equal to the default value, then assume equal mole fractions of dry seed components
-		if ((len(seed_name) > 1) and (seedx.shape[0] == 1) and (seedx[0, 0] == 1)):
-			seedx = np.ones((len(seed_name), 1))
-			seedx[:, 0] = 1./len(seed_name)
+		# if self.seedx is equal to the default 
+		# value, then assume equal mole fractions 
+		# of dry seed components
+		if ((len(self.seed_name) > 1) and (self.seedx.shape[0] == 1) 
+			and (self.seedx[0, 0] == 1)):
+			self.seedx = np.ones((len(self.seed_name), 1))
+			self.seedx[:, 0] = 1./len(self.seed_name)
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of mole fractions of dry (excluding water) seed particle components (seedx in model variables input file), please see README for guidance')
 			em_flag = 2
 	
 	# check on consistency of dry seed component mole fractions and number of size bins
 	# note that mole fraction size bins vary with columns
-	if (seedx.shape[1] > 1): # if size bins stated explicitly
-		if (seedx.shape[1] != num_sb): # if inconsistent
+	if (self.seedx.shape[1] > 1): # if size bins stated explicitly
+		if (self.seedx.shape[1] != num_sb): # if inconsistent
 			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
 
 	# check consistency between names of initial components and
 	# their concentrations ------------------
-	if (len(comp0) != len(y0) and em_flag < 2):
+	if (len(self.comp0) != len(y0) and em_flag < 2):
 		err_mess = str('''Error - the number of gas-phase 
 		components present at simulation start (''' + 
-		str(len(comp0)) + ''') (the Comp0 model variable) is 
+		str(len(self.comp0)) + ''') (the Comp0 model variable) is 
 		different to the number of initial concentrations of 
 		these components (''' + str(len(y0)) + ''') (the C0 
 		model variable), and they must be the same length.
 		Please see README for guidance''')
 		em_flag = 2	
 
-	# check on consistency of names of seed component(s) and their dissociation constant --------------
-	if (len(seed_name) != len(seed_diss) and em_flag < 2):
-		if (len(seed_name) > 1) and (len(seed_diss) == 1):
-			seed_diss = np.ones((len(seed_name)))
+	# check on consistency of names of seed component(s) and 
+	# their dissociation constant --------------
+	if (len(self.seed_name) != len(seed_diss) and em_flag < 2):
+		if (len(self.seed_name) > 1) and (len(seed_diss) == 1):
+			seed_diss = np.ones((len(self.seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
 			em_flag = 2
 
-	if (len(partit_cutoff) > 1 and em_flag < 2):
+	if (len(self.partit_cutoff) > 1 and em_flag < 2):
 		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
 		em_flag = 2
 	
@@ -488,14 +512,19 @@ def ui_check(self):
 
 	
 	# chemical scheme check-------------------------------------
-	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
+	# if a chemical scheme has been identified
+	if (em_flag < 2 and self.sch_name != 'Not found'):
 	
-		# get chemical scheme names and SMILE strings of components present in chemical scheme file
-		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
+		# get chemical scheme names and SMILE strings 
+		# of components present in chemical scheme file
+		[comp_namelist, _, err_mess_new, 
+		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
 		
 		if (err_mess_new == '' and em_flag < 2):
 			
-			# check for water presence in components instantaneously injected, note need to call function above to get H2Oi
+			# check for water presence in components 
+			# instantaneously injected, note need to 
+			# call function above to get H2Oi
 			if (comp_namelist[H2Oi] in Compt):
 				err_mess = str('Error - water is included in the components being instantaneously injected via the model variables Ct, Compt and injectt, however changes to water vapour content should be made using the rh and rht model variables.  Please see README for further guidance.')
 				em_flag = 2
@@ -556,16 +585,21 @@ def ui_check(self):
 	# ------------------------------------
 	# check on manually assigned vapour pressure of seed component
 
-	if (seed_name.count('core') < len(seed_name)):
-		for seedi in seed_name: # loop through seed components
+	if (self.seed_name.count('core') < len(self.seed_name)):
+		for seedi in self.seed_name: # loop through seed components
 			# check whether this seed component is not core 
 			# and it has not been allocated a vapour pressure manually
 			if (seedi != 'core' and vol_comp.count(seedi) == 0 and em_flag < 2):
-				# add component to manually assigned vapour pressures
-				vol_comp.append(seedi)
-				# assume low volatility for this seed component (Pa)
-				volP.append(1.e-20)
-				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver, therefore a vapour pressure of 1.e-20 Pa has been assumed.  To change this setting, specify the vapour pressure of the seed components using the vol_Comp and volP model variables.  Please see README for more guidance.')
+				# note that the commands commented out below were 
+				# stopped because it prevented users from 
+				# having seed components that could have their
+				# vaopur pressure estimated in prop_calc and in
+				# volat_calc
+				## add component to manually assigned vapour pressures
+				#vol_comp.append(seedi)
+				## assume low volatility for this seed component (Pa)
+				#volP.append(1.e-20)
+				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver. If you wish to specify the vapour pressure of the seed components, use the vol_Comp and volP model variables.  Please see README for more guidance.')
 				em_flag = 1
 		
 	# ------------------------------------
@@ -575,7 +609,7 @@ def ui_check(self):
 		try: # try opening as in eqn_pars module
 			import openpyxl # require module
 			# path to file
-			self.obs_file = str(self.obs_file)					# open file	
+			self.obs_file = str(self.obs_file)								# open file	
 			wb = openpyxl.load_workbook(filename = 
 				self.obs_file) 
 			wb.close() # close excel file
@@ -624,18 +658,19 @@ def ui_check(self):
 	# --------------------------------------------------------
 	
 	# store in pickle file
-	list_vars = [sav_nam, comp0, y0, Press, 
-			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 			uppsize, space_mode, std, mean_rad, 
-			Compt, injectt, Ct, seed_name, seed_mw, 
+	list_vars = [sav_nam, y0, Press, 
+			siz_stru, num_sb, lowsize, 
+			uppsize, std, 
+			Compt, injectt, Ct, seed_mw, 
 			seed_diss, seed_dens, 
-			seedx, dens_comp, dens, vol_comp, 
+			dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, 	
 			int_tol, new_partr,
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 			inflectk, chamSA, 
-			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
-			wat_hist, drh_str, erh_str, pcont, 
+			Rader, p_char, e_field, ser_H2O, 
+			wat_hist, drh_str, erh_str, 
 			z_prt_coeff, chamV]
 
 	# the file to be used for pickling
@@ -717,7 +752,7 @@ def ui_check(self):
 		if (self.atb == 1): # if showing remove add to batch button
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
-		
+	
 	import mod_var_up # update displayed model variables in case checking has modified any
 	mod_var_up.mod_var_up(self)
 	

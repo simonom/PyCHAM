@@ -26,12 +26,12 @@
 import scipy.constants as si # for scientific constants
 import numpy as np # for arithmetic
 
-def tot_in(init_conc, Cfac, comp0, y_mw, Compt, self): # define function
+def tot_in(init_conc, Cfac, y_mw, Compt, self): # define function
 
 	# inputs: ----------------------------------------------
 	# init_conc - initial concentrations (ppb)
 	# Cfac - factor to convert ppb to # molecules/cm3
-	# comp0 - chemical scheme names of components present 
+	# self.comp0 - chemical scheme names of components present 
 	#	at simulation start
 	# self.comp_namelist - list of all chemical scheme names
 	# y_mw - molar mass of components (g/mol)
@@ -48,7 +48,7 @@ def tot_in(init_conc, Cfac, comp0, y_mw, Compt, self): # define function
 
 	ccnt = 0 # count on components
 
-	for cnam in comp0: # loop through components present initially
+	for cnam in self.comp0: # loop through components present initially
 
 		if '_wall' in cnam:
 

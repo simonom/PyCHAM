@@ -1,38 +1,41 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2024					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to create number size distributions'''
-# Module to create log-normal size distribution. Code copied/modified from            
-# http://all-geo.org/volcan01010/2013/09/how-to-use-lognormal-distributions-in-python/
+# Module to create log-normal size distribution. Code copied/modified 
+# from            
+# http://all-geo.org/volcan01010/2013/09/
+# how-to-use-lognormal-distributions-in-python/
 
 from scipy import stats # import the scipy.stats module
 import numpy as np
 import matplotlib.pyplot as plt
 
-def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, space_mode, self):
+def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 
 	# inputs: -------------------------
 	
 	# num_bins - number of size bins (not including wall)
-	# pmode - whether particle number concentrations given in modes or explicitly
+	# self.pmode - whether particle number concentrations given in modes or explicitly
 	# pconc - starting number concentration of particles (# particle/cm3 (air)), if this
 	# is scalar, the number concentration will be split between size bins, and if it has
 	# the same length as number of size bins, each element will be allocated to its
@@ -44,7 +47,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 	# std - geometric standard deviation (dimensionless)
 	# lowersize - lower radius of particles (um)
 	# uppersize - upper radius of particles (um)
-	# space_mode - string saying whether to space size bins logarithmically or linearly
+	# self.space_mode - string saying whether to space size bins logarithmically or linearly
 	# self - reference to PyCHAM
 	# ---------------------------------
     
@@ -62,7 +65,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 # 		x_output = ((3.0/(4.0*np.pi))*Varr[0:-1])**(1.0/3.0)
 	# ---------------------------------------
 	# logarithmic method
-	if (space_mode == 'log'):
+	if (self.space_mode == 'log'):
 		rad_bounds = 10.0**(np.linspace(np.log10(lowersize), 
 						np.log10(uppersize), num=(num_bins+1)))
 		rwid = (rad_bounds[1::]-rad_bounds[0:-1]) # width of size bins (um)
@@ -70,7 +73,7 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 		
 	# ---------------------------------------
 	# linear method
-	if (space_mode == 'lin' or space_mode == 'none'):
+	if (self.space_mode == 'lin' or self.space_mode == 'none'):
 		rad_bounds = np.linspace(lowersize, uppersize, (num_bins+1))
 		# width of size bins (um)
 		rwid = np.array((rad_bounds[1]-rad_bounds[0])).reshape(1)
@@ -78,20 +81,24 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 
 	# ---------------------------------------
 	# manual method
-	if (space_mode == 'man'):
-		# if manual, then user must have supplied the size bin ranges in the lowersize variable
+	if (self.space_mode == 'man'):
+		# if manual, then user must have 
+		# supplied the size bin ranges in 
+		# the lowersize variable and set the
+		# particle radii in mean_rad 
+		# variable
 		rad_bounds = np.array((self.manual_rbounds))
 		# width of size bins (um)
 		rwid = (rad_bounds[1::]-rad_bounds[0:-1]) # width of size bins (um)
-		x_output = rad_bounds[0:-1]+rwid/2.0 # particle radius (um)
-
+		x_output = scale # particle radius (um)
+		
 	# ---------------------------------------
 	# enhance upper radius bound (um) to reduce possibility of particles growing beyond 
 	# this (reversed in saving.py)
 	upper_bin_rad_amp = 1.e6
 	rad_bounds[-1] = rad_bounds[-1]*upper_bin_rad_amp
 	
-	if (pmode == 0): # calculating the number size distribution from modes
+	if (self.pmode == 0): # calculating the number size distribution from modes
 		# number concentrations for all size bins
 		Nperbin = np.zeros((num_bins))
 		for i in range(len(pconc)):
@@ -122,8 +129,9 @@ def lognormal(num_bins, pmode, pconc, std, lowersize, uppersize, loc, scale, spa
 			# this mode (# particle/cm3 (air))
 			Nperbin += (pdf_out/sum(pdf_out))*pconc[i]
 	
-	# if number concentration (# particles/cm3 (air)) explicitly stated in inputs
-	if (pmode == 1):
+	# if number concentration (# particles/cm3 (air)) 
+	# explicitly stated in inputs
+	if (self.pmode == 1):
 		Nperbin = np.array((pconc))
 	
 	Nperbin = Nperbin.reshape(-1, 1) # ensure correct shape
