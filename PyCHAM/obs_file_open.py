@@ -140,6 +140,7 @@ def obs_file_open(self):
 						pm_comp.append(oc[0:strfi-3])
 						# hold column index
 						pm_col.append(col_num)
+						
 					if ('pconc' in oc):
 						# index where size bin 
 						# name starts
@@ -190,7 +191,7 @@ def obs_file_open(self):
 				for seedi in pm_comp:
 					if seedi not in self.seed_name:
 						self.seed_name.append(seedi)
-				
+						
 				# get number of unique components
 				# with PM mole fractions
 				uni_comp = len(self.seed_name)
@@ -207,6 +208,7 @@ def obs_file_open(self):
 				self.pconc = np.zeros((uni_sb_pconc, 1))
 				# times of particle number concentration (s)
 				self.pconct = np.zeros((1, 1))
+				
 
 			if (ic == 1 and mean_rad_flag == 1):
 				# get number of unique size bins
@@ -254,7 +256,8 @@ def obs_file_open(self):
 			if (seedx_flag == 1):
 				# loop through size bins
 				for sbi in range(uni_sb):
-					self.seedx[:, sbi, -1] = np.array((i))[0:col_num+1][pm_col[sbi, :]]
+					self.seedx[:, sbi, -1] = np.array((i))[
+					0:col_num+1][pm_col[sbi, :]]
 			# PM number concentration at this time (# particles/cm3)
 			if (pconc_flag == 1):
 				self.pconc[:, -1] = np.array((i))[0:col_num+1][pconc_col]
@@ -268,12 +271,12 @@ def obs_file_open(self):
 	
 
 	# whether particle number concentrations expressed 
-	# by modes (0) or explicitly (1)
+	# by modes (0) or explicitly per size bin (1)
 	if (self.pconc.shape[0] == self.num_asb):
 		self.pmode = 1
 	else:
 		self.pmode = 0
-
+	
 	# ensure array defining whether particle injection
 	# is continuous or instantaneous is same length as
 	# number of injection times
@@ -289,6 +292,7 @@ def obs_file_open(self):
 		self.seed_name[self.seed_name.index('elvoc')] = 'sec_org-1'
 		self.seed_name[self.seed_name.index('lvoc')] = 'sec_org0'
 		self.seed_name[self.seed_name.index('svoc')] = 'sec_org1'
+		self.seed_name[self.seed_name.index('ec')] = 'bc'
 	except:
 		self.seed_name = self.seed_name
 	

@@ -218,7 +218,8 @@ def lamp_photo(J, TEMP, self):
 				or line.strip() == str('J_'+str(Ji+1) + '_qy') 
 				or line.strip() =='J_end'):
 
-				# absorption cross section (cm2/molecule) interpolation to wavelengths
+				# absorption cross section (cm2/molecule) 
+				# interpolation to wavelengths
 				# given in actinic flux file
 				all_xs = np.interp(wl_chm, wlxs, all_xs)
 				# quantum yield (fraction) interpolation to wavelengths
@@ -262,12 +263,10 @@ def lamp_photo(J, TEMP, self):
 			
 			if qy_rec == 1: # when looking for quantum yields
 				wl = float(line.split(',')[0]) # get the wavelength part
-				qy = float(line.split(',')[1]) # get the quantum yield at this wavelength
+				# get the quantum yield at this wavelength
+				qy = float(line.split(',')[1])
 				wlqy = np.append(wlqy, (np.array(wl)).reshape(1), axis=0)
 				all_qy = np.append(all_qy, (np.array(xs)).reshape(1), axis=0)
-			
-			
-				
 				
 		f.close() # close file
 	
@@ -528,7 +527,8 @@ def lamp_photo(J, TEMP, self):
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
 				xs = float(line.split('	')[1])
-				wlHONOxs = np.append(wlHONOxs, (np.array(wl)).reshape(1), axis=0)
+				wlHONOxs = np.append(wlHONOxs, 
+				(np.array(wl)).reshape(1), axis=0)
 				xsHONO = np.append(xsHONO, (np.array(xs)).reshape(1), axis=0)
 				
 			except:
@@ -538,7 +538,8 @@ def lamp_photo(J, TEMP, self):
 		xsHONO = np.interp(wl_chm, wlHONOxs, xsHONO)
 		
 		# J<7> quantum yield: HONO = OH + NO
-		# assume quantum yield of 1.0 for J<7> following recommendation of MCM website on
+		# assume quantum yield of 1.0 for J<7> following 
+		# recommendation of MCM website on
 		# 4/12/2019
 		
 		# photolysis rate for J<7>
@@ -1259,9 +1260,12 @@ def lamp_photo(J, TEMP, self):
 	
 		# --------------------------------------------------------------
 		# J<55> for → t-C4H9O + NO2
-		# comparing the link given in the MCM site: http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/t_C4H9ONO2/t_c4h9ono2_Roberts&Fajar89_cs_298.txt
+		# comparing the link given in the MCM site: 
+		# http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/
+		# t_C4H9ONO2/t_c4h9ono2_Roberts&Fajar89_cs_298.txt
 		# for tert-butyl nitrate to the download folder of photolysis rates,
-		# this process does not seem to be included in the download, so manual input provided
+		# this process does not seem to be included in the download, 
+		# so manual input provided
 		wl = np.array(([270.0, 275.0, 280.0, 285.0, 290.0, 295.0, 300.0, 305.0, 310.0, 315.0, 320.0, 325.0, 330.0]))
 		xs = np.array(([4.3e-20, 4.0e-20, 3.7e-20, 3.1e-20, 2.6e-20, 2.0e-20, 1.5e-20, 1.0e-20, 7.0e-21, 4.5e-21, 2.7e-21, 1.50e-21, 8.60e-22]))
 		

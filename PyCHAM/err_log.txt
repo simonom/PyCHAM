@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcm_chem_scheme/flow_reactor_example_run_output2
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/example_run_output2

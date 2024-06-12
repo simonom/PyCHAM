@@ -27,7 +27,8 @@ components'''
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+# for customised colormap
+from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
 import numpy as np
@@ -101,7 +102,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# if all files are available, then proceed without error message
 	mess = str('')
-	self.l203a.setText(mess)
+	# if no priority message, e.g. from gui.py prior to plotter_ct call
+	if (self.pre_mess == 0):
+		self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
@@ -138,38 +141,47 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
 			ci = len(y_mw)-1
 		
-		# note that penultimate column in dydt is gas-particle 
-		# partitioning and final column is gas-wall partitioning, whilst
+		# note that column -3 in dydt is gas-particle 
+		# partitioning and column -2 is gas-wall partitioning
+		# and column -1 is dilution, whilst
 		# the first row contains chemical reaction numbers
 		# extract the change tendency due to gas-particle partitioning
-		gpp = dydt[1::, -2]
+		gpp = dydt[1::, -3]
 		# extract the change tendency due to gas-wall partitioning
-		gwp = dydt[1::, -1]
+		gwp = dydt[1::, -2]
+		# extract the change tendency due to dilution
+		dil = dydt[1::, -1]
 		# sum chemical reaction gains
 		crg = np.zeros((dydt.shape[0]-1, 1))
 		# sum chemical reaction losses
 		crl = np.zeros((dydt.shape[0]-1, 1))
 		for ti in range(dydt.shape[0]-1): # loop through times
-			indx = dydt[ti+1, 0:-2] > 0 # indices of reactions that produce component
+			# indices of reactions that produce component
+			indx = dydt[ti+1, 0:-2] > 0
 			crg[ti] = dydt[ti+1, 0:-2][indx].sum()
-			indx = dydt[ti+1, 0:-2] < 0 # indices of reactions that lose component
+			# indices of reactions that lose component
+			indx = dydt[ti+1, 0:-2] < 0
 			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
 			 
 		# convert change tendencies from molecules/cm3/s to ug/m3/s
 		gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
 		gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
+		dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
 		crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
 		crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 			 
 		# plot temporal profiles of change tendencies due to chemical 
-		# reaction production and loss, gas-particle partitioning and gas-wall partitioning
+		# reaction production and loss, gas-particle p
+		# artitioning and gas-wall partitioning
 		ax0.plot(timehr, gpp, label = str('gas-particle partitioning '+ comp_name))
 		ax0.plot(timehr, gwp, label = str('gas-wall partitioning '+ comp_name))
+		ax0.plot(timehr, dil, label = str('dilution '+ comp_name))
 		ax0.plot(timehr, crg, label = str('chemical reaction gain '+ comp_name))
 		ax0.plot(timehr, crl, label = str('chemical reaction loss '+ comp_name))
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
-		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is treated as negative')
+		ax0.set_title('Change tendencies, where a tendency ' + 
+		'to decrease \ngas-phase concentrations is negative')
 		ax0.set_xlabel('Time through experiment (hours)')
 		ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
 		ax0.set_ylabel(str('Change tendency ' + ct_units))
@@ -247,7 +259,9 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	
 	# if all files are available, then proceed without error message
 	mess = str('')
-	self.l203a.setText(mess)
+	# if no priority message, e.g. from gui.py prior to plotter_ct call
+	if (self.pre_mess == 0):
+		self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
@@ -283,20 +297,22 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
 			ci = len(y_mw)-1
 		
-		# note that penultimate column in dydt is gas-particle 
-		# partitioning and final column is gas-wall partitioning, whilst
-		# the first row contains chemical reaction numbers
-		
 		# prepare to store results of change tendency due to chemical reactions
-		res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
-		res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
+		# note that final three 
+		# columns on the end are for 
+		# gas-particle-partitioning, gas-wall-partitioning and 
+		# dilution, whilst
+		# the first row contains chemical reaction numbers
+		res = np.zeros((dydt.shape[0], dydt.shape[1]-3))
+		res[:, :] = dydt[:, 0:-3] # get chemical reaction numbers and change tendencies
 		
 		import scipy.constants as si
 
 		if (uc == 0):
-			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+			# convert to numpy array from list
+			Cfaca = (np.array(Cfac)).reshape(-1, 1)
 			# convert change tendencies from # molecules/cm3/s to ppb
-			res[1::, :] = (res[1::, :]/Cfaca[1::])
+			res[1::, :] = (res[1::, :]/Cfaca)
 			ct_units = str('(ppb/s)')
 		if (uc == 1):			
 			# convert change tendencies from # molecules/cm3/s to ug/m3/s
@@ -314,7 +330,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		# sort in ascending order
 		res_sort = np.sort(res_sum)
 		
-		if (len(res_sort) < top_num[0]):
+		if (len(res_sort) < top_num[0] and self.pre_mess == 0):
 
 			# if less reactions are present than the number requested inform user
 			mess = str('Please note that ' + str(len(res_sort)) + ' relevant reactions were found, although a maximum of ' + str(top_num[0]) + ' were requested by the user.')
@@ -359,13 +375,16 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		total_list_eqn = f_open_eqn.readlines()
 		f_open_eqn.close() # close file
 		
-		in_list = inputs.readlines() # read file and store everything into a list
+		# read file and store everything into a list
+		in_list = inputs.readlines()
 		inputs.close() # close file
 
 		# start by assuming default chemical scheme markers
-		self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '>', ';', '']
+		self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')',
+		'' , '&', '' , '', ':', '>', ';', '']
 
-		for i in range(len(in_list)): # loop through supplied model variables to interpret
+		# loop through supplied model variables to interpret
+		for i in range(len(in_list)):
 
 			# ----------------------------------------------------
 			# if commented out continue to next line
@@ -373,15 +392,19 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 				continue
 			try:
 				key, value = in_list[i].split('=') # split values from keys
-				# model variable name - a string with bounding white space removed
+				# model variable name - a string with 
+				# bounding white space removed
 				key = key.strip()
 				# ----------------------------------------------------
 
-				if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
-					self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+				# formatting for chemical scheme
+				if key == 'chem_scheme_markers' and (value.strip()):
+					self.chem_sch_mrk = [
+					str(i).strip() for i in (value.split(','))]
 			except:
 				continue
-		# interrogate scheme to list equations
+
+		# interpret scheme to list equations
 		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	
 		# keep just the unique chemical reaction rates, as duplicates 
@@ -397,13 +420,18 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		
 			for indx_two in (cindx):
 				
-				reac_txt = str(self.eqn_list[int(res[0, indx_two])]) # get equation text
-				# plot, note the +1 in the label to bring label into MCM index
-				ax0.plot(timehr[0:-1], res[1::, indx_two], label = str(' Eq. # ' + str(int(res[0, indx_two])+1) + ':  ' + reac_txt))
-		
+				# get equation text
+				reac_txt = str(self.eqn_list[int(res[0, indx_two])])
+				# plot, and note the +1 in the label to 
+				# bring label into MCM index
+				ax0.plot(timehr, res[1::, indx_two], 
+				label = str(' Eq. # ' + str(int(res[0, indx_two])+1) + 
+				':  ' + reac_txt))
+				
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
-		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
+		ax0.set_title(str('Change tendencies, where a ' + 
+		'tendency to decrease \ngas-phase concentrations is negative'))
 		ax0.set_xlabel('Time through experiment (hours)')
 		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
@@ -480,7 +508,9 @@ def plotter_prod(caller, dir_path, comp_names_to_plot, tp, uc, self):
 
 	# if all files are available, then proceed without error message
 	mess = str('')
-	self.l203a.setText(mess)
+	# if no priority message, e.g. from gui.py prior to plotter_ct call
+	if (self.pre_mess == 0):
+		self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)

@@ -449,35 +449,6 @@ def ode_updater(y, H2Oi,
 			# concentrations to those at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
-			
-			# for change tendencies, t=0 recording done
-			#  inside rec_prep
-			# record any change tendencies of specified 
-			# components after t=0
-			if (len(self.dydt_vst) > 0 and save_cntf == 0):
-				if ((sumt-(self.save_step*(save_cnt-1))
-					 > -1.e-10)):
-					
-					if (sumt-
-					(self.save_step*(save_cnt-1)) > 
-					-1.e-10):
-						dydt_cnt = save_cnt-1
-
-					# before solving ODEs for 
-					# chemistry, dilution, 
-					# gas-particle partitioning and
-					# gas-wall partitioning, 
-					# estimate and record any 
-					# change tendencies (# 
-					# molecules/cm3/s) resulting 
-					# from 
-					# these processes
-					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
-							num_sb, 
-							num_comp, core_diss, kelv_fac, kimt, 
-							act_coeff, dydt_erh_flag, H2Oi, 
-							wat_hist, self)
 						
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
@@ -580,11 +551,43 @@ def ode_updater(y, H2Oi,
 				y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
 				sumt, self)
-
+			
 			# if error message from reaction rate 
 			# calculation
 			if (erf == 1): 
 				yield(err_mess)
+
+
+			# for change tendencies, t=0 recording done
+			# inside rec_prep
+			# record any change tendencies of specified 
+			# components after t=0, note this is done after
+			# the call to get reaction rate coefficients
+			# so that the change tendency given at a 
+			# particular time represents the tendency from
+			# that time onwards
+			if (len(self.dydt_vst) > 0):
+				if ((sumt-(self.save_step*(save_cnt-2))
+					 > -1.e-10)):
+					
+					dydt_cnt = save_cnt-2
+
+					# before solving ODEs for 
+					# chemistry, dilution, 
+					# gas-particle partitioning and
+					# gas-wall partitioning, 
+					# estimate and record any 
+					# change tendencies (# 
+					# molecules/cm3/s) resulting 
+					# from 
+					# these processes
+					if (self.testf != 5):
+						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
+							num_sb, 
+							num_comp, core_diss, kelv_fac, kimt, 
+							act_coeff, dydt_erh_flag, H2Oi, 
+							wat_hist, self)
+
 			
 			# update Jacobian inputs based on 
 			# particle-phase fractions of components
@@ -971,6 +974,31 @@ def ode_updater(y, H2Oi,
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, 
 			rbou_rec, cham_env, temp_now, Pnow, 
 			tot_in_res, self)
+
+			# record final change tendency
+			# for change tendencies, t=0 recording done
+			# inside rec_prep
+			# record any change tendencies of specified 
+			# components after t=0
+			
+			if (len(self.dydt_vst) > 0):
+				dydt_cnt = len(trec)-1
+				
+				# before solving ODEs for 
+				# chemistry, dilution, 
+				# gas-particle partitioning and
+				# gas-wall partitioning, 
+				# estimate and record any 
+				# change tendencies (# 
+				# molecules/cm3/s) resulting 
+				# from 
+				# these processes
+				if (self.testf != 5):
+					self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
+						num_sb, 
+						num_comp, core_diss, kelv_fac, kimt, 
+						act_coeff, dydt_erh_flag, H2Oi, 
+						wat_hist, self)
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):

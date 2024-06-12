@@ -139,7 +139,7 @@ def middle(self): # define function
 		Cfactor, y_mw, Compt, self)
 	
 	# in case user has specified to spin-up simulation
-	if (self.spin_up == 1):
+	if (self.spin_up > 0):
 
 		# spin-up problem
 		[y, N_perbin, x, Varr, rbou, 

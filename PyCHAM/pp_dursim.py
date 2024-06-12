@@ -410,7 +410,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 
 		# mole-fraction weighted molar volume (cm3/mole) 
 		# (average molar volume of particles)
-		mfwMV = sum(MV[self.seedi[:], 0]*seedx_now)
+		mfwMV = sum(MV[self.seedi[:], 0].reshape(-1, 1)*seedx_now)
 		# convert to molecular volume (cm3/molecule)
 		mfwMV = mfwMV/NA
 		# total molecular concentration of 
@@ -424,7 +424,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 			# concentration of this component in 
 			# all size bins (# molecules/cm3 (air)):
 			yn[self.seedi[ci]:(num_comp*(num_sb-1)
-			+self.seedi[ci])+1:num_comp] = ytot*seedxn[ci]
+			+self.seedi[ci])+1:num_comp] = ytot*seedx_now[ci]
 	
 	# if instantaneous injection of particles
 	# factor concentrations of components comprising 

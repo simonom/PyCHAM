@@ -320,7 +320,7 @@ def ui_check(self):
 
 	# if manual setting of size bin bounds, then ensure that mean radius per
 	# size bin is also supplied
-	if self.space_mode == 'man' and (sum(self.mean_rad == -1.e6) > 0):
+	if self.space_mode == 'man' and (sum(sum(self.mean_rad == -1.e6)) > 0):
 		if (em_flag < 2):
 			err_mess = str('Error: when setting the spacing of ' +
 			'particle size bins manually, the mean_rad variable ' +
@@ -634,12 +634,12 @@ def ui_check(self):
 				wb.close() # close excel file
 			except:
 
-				err_mess = str('''Error - observation 
-				file
-				''' + self.obs_file + ''' could not be 
-				found, please check observation file 
-				and/or the obs_file model variable in 
-				the model variable file.''')
+				err_mess = str('Error - observation ' +
+				'file ' +
+				self.obs_file + ' could not be ' +
+				'found, please check observation file ' +
+				'and/or the obs_file model variable in ' +
+				'the model variable file.')
 				em_flag = 2
 	# ------------------------------------
 

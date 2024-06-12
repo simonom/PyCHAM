@@ -303,7 +303,8 @@ def retr_out(self):
 			yield (32.)
 
 
-		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
+		if (str(line.split(',')[0]) == 
+			'factor_for_multiplying_ppb_to_get_molec/cm3_with_time'):
 
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -317,8 +318,9 @@ def retr_out(self):
 					fi_indx = -cnt+1
 					break
 
-			# conversion factor to change gas-phase concentrations from # molecules/cm3 
-			# (air) into ppb
+			# conversion factor to change gas-phase 
+			# concentrations from ppb into # molecules/cm3 
+			# (air)
 			Cfactor = ast.literal_eval(line[st_indx:fi_indx])
 			
 			yield (47.)
@@ -413,28 +415,37 @@ def retr_out(self):
 		load_path = str(self.dir_path + '/rel_SMILES.npy') # path
 		rel_SMILES = (np.load(load_path, allow_pickle=True)).tolist()
 		
-		load_path = str(self.dir_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
+		# path
+		load_path = str(self.dir_path + 
+		'/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy')
 		PsatPa = (np.load(load_path, allow_pickle=True)).tolist()
 
-		load_path = str(self.dir_path + '/pure_component_saturation_vp_at_startT_molec_percm3.npy') # path
+		# path
+		load_path = str(self.dir_path + 
+		'/pure_component_saturation_vp_at_startT_molec_percm3.npy')
 		PsatPa0 = (np.load(load_path, allow_pickle=True)).tolist()
 		
-		load_path = str(self.dir_path + '/oxygen_to_carbon_ratios_of_components.npy') # path
+		load_path = str(self.dir_path + 
+			'/oxygen_to_carbon_ratios_of_components.npy') # path
 		OC = (np.load(load_path, allow_pickle=True)).tolist()
 		
-		load_path = str(self.dir_path + '/hydrogen_to_carbon_ratios_of_components.npy') # path
+		load_path = str(self.dir_path + 
+			'/hydrogen_to_carbon_ratios_of_components.npy') # path
 		HC = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		
 		try: # this output added after others in version 4 of PyCHAM
 
-			load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy') # path
+			# path
+			load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy')
 			group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
 
-			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy') # path
+			# path
+			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy')
 			group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
-			load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy') # path
+			 # path
+			load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy')
 			group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
 
 			load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
@@ -497,7 +508,8 @@ def retr_out(self):
 		output_by_sim_mv_ext = 0.
 	
 	yield (75.)
-	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
+	# withdraw index and names of components to plot the 
+	# gas-phase concentration temporal profile of
 	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
 	if (os.stat(fname).st_size > 123):
@@ -541,13 +553,17 @@ def retr_out(self):
 	
 	yield (80.)
 
-	# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
-	fname = str(self.dir_path + '/concentrations_all_components_all_times_gas_particle_wall')
+	# withdraw concentrations (ppb in gas, 
+	# # molecules/cm3 in particle and wall)
+	fname = str(self.dir_path + 
+	'/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
-	# following will only load for certain simulation setups (mostly whether particles included)
+	# following will only load for certain simulation setups 
+	# (mostly whether particles included)
 	try:
-		# withdraw the wall concentration of components due to particle deposition to wall
+		# withdraw the wall concentration of components due to 
+		# particle deposition to wall
 		fname = str(self.dir_path + '/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
 		yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
 	except:
@@ -574,9 +590,10 @@ def retr_out(self):
 		Nwet = np.zeros((0, 0))
 	
 	try:
-		# particle sizes (um)
+		# particle radii (um)
 		fname = str(self.dir_path + '/size_bin_radius')
-		x = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
+		# skiprows=1 omits header
+		x = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
 		x = []
 

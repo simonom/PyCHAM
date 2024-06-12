@@ -1,0 +1,12 @@
+number_of_size_bins,17
+number_of_components,19
+factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[25476142822.512726], [25476142822.512726], [25476142822.512726], [25476142822.512726], [25476142822.512726]]
+simulation_computer_time(s),1.0811598300933838
+seed_name,['core']
+wall_on_flag_0forNO_>0forYES,1
+space_mode,log
+index_of_water,17
+index_of_seed_components,[18]
+size_structure_0_for_moving_centre_1_for_full_moving,0
+output_by_sim_sch_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/set_J_directly_example_output/inputs/ex_chem_scheme.txt
+output_by_sim_mv_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/set_J_directly_example_output/inputs/ex_model_var_and_readme.txt

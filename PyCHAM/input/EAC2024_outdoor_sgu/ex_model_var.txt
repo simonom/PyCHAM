@@ -1,0 +1,53 @@
+res_file_name = outprep_sgu
+total_model_time = 8.64e4
+update_step = 3.6e2
+recording_time_step = 1.8e3
+lat = 53.
+lon = 1.
+temperature = 293.15
+#DayOfYear = 1
+DayOfYear = 183
+daytime_start = 0.
+light_status = 1
+p_init = 101300
+# zero to turn surface losses off
+wall_on = 0
+number_size_bins = 2
+space_mode = man
+lower_part_size = 9.e-4, 1.25, 10.
+upper_part_size = 10.
+Vwat_inc = 0
+coag_on = 0
+#vol_Comp = AMM_NIT, AMM_SUL, pri_org, sec_org-2, sec_org-1, sec_org0, sec_org1
+vol_COMP = all_>0.
+# vapour pressure of ammonium nitrate is from 
+# https://doi.org/10.1016/j.jct.2010.01.012, 
+# which reports the temperature-dependent formula: 
+# Pa = np.exp(10.400-4783.16/293.15)*1.e3
+# vapour pressures of specific components (Pa)
+# vapour pressures of secondary organics (ULVOC (300 g/mol), 
+# ELVOC (250 g/mol), LVOC (200 g/mol) and SVOC (150 g/mol))
+# taken from mid-points of their ranges in Fig. 7 of 
+# https://doi.org/10.1016/j.jaerosci.2022.106063, and C* (ug/m3) values 
+# converted to Pa using the Eq. 1 of 10.1039/C4CP00857J:
+# Pa = (((ug m-3 * 1.e-6) * m3 Pa K-1 mol-1 * K)/(g mol-1))
+#volP = 2.6948168439041114, 0., 0., 8.12e-16, 9.75e-12, 1.22e-7, 1.62e-4
+volP = 1.e10
+# activity coefficient for ammonium nitrate, inferred from
+# activity coefficient table for ammonium sulphate in water
+# Table 7 of doi.org/10.1021/je950289d
+act_comp = AMM_NIT
+act_user = 0.0
+partit_cutoff = 0.
+# -1 to turn off particle deposition to surfaces
+#McMurry_flag = -1
+dil_fac = 8.e-4
+# mac
+obs_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/INGENIOUS/Meetings/EAC2024/met_data/sgu_obs_conc.xlsx
+# windows
+#obs_file = \Users\Psymo\OneDrive - The University of Manchester\INGENIOUS\Meetings\EAC2024\met_data\sgr_obs_conc.xlsx
+#tracked_comp = O3, NO3
+#pars_skip = 1
+spin_up = 1
+# old kpp
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , [, :, }, ;,

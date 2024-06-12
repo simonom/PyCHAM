@@ -380,8 +380,8 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 				# equation for vapour-particle 
 				# partitioning
 				xwat = y[H2Oi]/(
-				self.Psat[:, H2Oi]*kelv*
-				act_coeff[:, H2Oi])
+				self.Psat[0:num_aasb, H2Oi]*kelv*
+				act_coeff[0:num_aasb, H2Oi])
 				
 				# ensure the non-water mole fractions
 				# sum to one
@@ -424,7 +424,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 			
 			# mole-fraction weighted molar volume (cm3/mole) 
 			# (average molar volume of particles)
-			mfwMV = sum(MV[self.seedi[:], 0]*(seedx_now/
+			mfwMV = sum(MV[self.seedi[:], 0].reshape(-1, 1)*(seedx_now/
 			sum(seedx_now)))
 			# convert to molecular volume (cm3/molecule)
 			mfwMV = mfwMV/NA

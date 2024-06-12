@@ -167,7 +167,6 @@ def rec_prep(nrec_step, y, y0,
 	# tot_in_res - record of total input of injected components (ug/m3)
 	# Compti - index for total injection record for instantaneously injected components
 	# self.tot_time - total experiment time (s)
-	# self.cont_inf_reci - index of components with continuous influx in record
 	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)

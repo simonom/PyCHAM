@@ -126,7 +126,7 @@ def mod_var_read(self):
 		self.bd_st = 3
 		# default value for number of modes represented by 
 		# particle number concentration
-		pmode_cnt = 1
+		self.pmode_cnt = 0
 
 		# loop through supplied model variables to interpret
 		for i in range(len(in_list)):
@@ -186,8 +186,10 @@ def mod_var_read(self):
 			# chemical scheme
 			if (key == 'pars_skip' and (value.strip())):
 				try:
-					self.pars_skip = int(value.strip()) # in case a numerical flag
-					# if 1, then check that local variables are stored, ready for use
+					# in case a numerical flag
+					self.pars_skip = int(value.strip())
+					# if 1, then check that local 
+					# variables are stored, ready for use
 					if (self.pars_skip == 1):
 						try:
 							self.Psat = self.Psat_rec0
@@ -416,7 +418,7 @@ def mod_var_read(self):
 			
 				time_cnt = 1 # track number of times
 				sb_cnt = 1 # track number of size bins
-				pmode_cnt = 1 # track number of modes
+				self.pmode_cnt = 1 # track number of modes
 			
 				for i in value:
 					if i == ';': # semi-colon represents a time difference
@@ -426,16 +428,16 @@ def mod_var_read(self):
 						# explicitly stated particle 
 						# concentrations
 						self.pmode = 1
-						pmode_cnt = 0 # no modes
+						self.pmode_cnt = 0 # no modes
 					if (time_cnt == 1 and i == ':'):
-						pmode_cnt += 1 # mode count
+						self.pmode_cnt += 1 # mode count
 						# particle concentrations 
 						# expressed as modes
 						self.pmode = 0
 
 				# a possible situation where there is just one size bin and 
 				# therefore only one concentration given for that size bin
-				if (sb_cnt == 1 and pmode_cnt == 1):
+				if (sb_cnt == 1 and self.pmode_cnt == 1):
 					# explicitly stated particle concentrations
 					self.pmode = 1 
 						
@@ -449,7 +451,7 @@ def mod_var_read(self):
 					for i in range(time_cnt):
 						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
 				else: # mode quantities provided
-					self.pconc = np.zeros((pmode_cnt, time_cnt))
+					self.pconc = np.zeros((self.pmode_cnt, time_cnt))
 					for i in range(time_cnt):
 						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
 			
@@ -552,6 +554,9 @@ def mod_var_read(self):
 			# constrain by
 			if (key == 'obs_file' and (value.strip())):
 				self.obs_file = str(value.strip())
+				# get observed values
+				from obs_file_open import obs_file_open
+				self = obs_file_open(self)
 			
 			# name of file to save calculated continuous
 			# influx rates to
@@ -660,16 +665,40 @@ def mod_var_read(self):
 			if (key == 'seed_eq_wat' and value.strip()):
 				self.seed_eq_wat = int(value.strip())
 
-			# fraction below which gas-particle partitioning coefficient treated as zero,
+			# fraction below which gas-particle partitioning 
+			# coefficient treated as zero,
 			# e.g. because size bin has relatively very small surface area
 			if (key == 'z_prt_coeff'  and value.strip()):
 				z_prt_coeff = float(value.strip())			
 
-			if key == 'light_status' and value.strip(): # status of lights (on or off)
-				light_stat = [int(i) for i in (value.split(','))]
-				self.light_stat = np.array((light_stat))
-				
-			if key == 'light_time' and value.strip(): # times (s) corresponding to light status
+			# status of lights (on or off)
+			if key == 'light_status' and value.strip():
+
+				# check if a path to file
+				try:
+					from J_value_file_open import J_value_file_open
+					self = J_value_file_open(str(value.strip()), self)
+					self.light_stat = (np.ones((
+						len(self.light_time)))*3).astype('int')
+				except:
+					light_stat = [int(i) for i in (value.split(','))]
+					self.light_stat = np.array((light_stat))
+
+					# signal to use pre-calculated transmission
+					# factor for solar radiation (Hayman method)
+					# through clear glass (see photolysisRates)
+					# for more information
+					if sum(np.array((self.light_stat)) == 3) > 0:
+						# ensure lights on
+						self.light_stat = np.array((1)).astype('int')
+						# set a tf_range value that tells
+						# photolysisRates to apply
+						# a pre-calcalated transmission factor 
+						self.tf_range = 2
+					
+			
+			# times (s) corresponding to light status
+			if key == 'light_time' and value.strip():
 				light_time = [float(i) for i in (value.split(','))]
 				self.light_time = np.array((light_time))
 				
@@ -688,28 +717,41 @@ def mod_var_read(self):
 			if key == 'DayOfYear' and (value.strip()):
 				self.dayOfYear = int(value.strip())		
 			
-			# name of file with wavelength-dependent absorption cross-section and quantum yield 
+			# name of file with wavelength-dependent absorption 
+			# cross-section and quantum yield 
 			# calculations
 			if key == 'photo_par_file' and (value.strip()):
-				self.photo_path = str(os.getcwd() + '/PyCHAM/photofiles/' + value.strip())
+				self.photo_path = str(os.getcwd() + 
+				'/PyCHAM/photofiles/' + value.strip())
 			
 			# transmission factor for light
 			if (key == 'trans_fac' and (value.strip())):
-				
+
+			
 				# if wavelength-dependent transmission factors supplied
 				if '_' in value.strip():
 					self.tf = [str(i.strip()) for i in (value.split(','))]
-					self.tf_range = 1 # flag for wavelength-dependency
+					# flag for wavelength-dependency
+					self.tf_range = 1
 				else: # if a single transmission factor supplied
-					self.tf = (([float(i.strip()) for i in (value.split(';'))]))
-					self.tf_range = 0 # flag for no wavelength-dependency
+					self.tf = (([float(i.strip()) for i in
+					 (value.split(';'))]))
+	
+					# so long as tf_range not set to
+					# 2 in light_status intepretation above
+					if (self.tf_range != 2):
+						# flag for no wavelength-dependency
+						self.tf_range = 0
+
 			# time through simulation (s) transmission factor 
 			# for light applies to
 			if (key == 'trans_fact' and (value.strip())):
 				
-				self.tft = np.array(([float(i.strip()) for i in (value.split(';'))]))
+				self.tft = np.array(([float(i.strip()) for i 
+				in (value.split(';'))]))
 
-			if key == 'tf_UVC' and (value.strip()): # transmission factors for 254 nm light
+			# transmission factors for 254 nm light
+			if key == 'tf_UVC' and (value.strip()):
 				self.tf_UVC = [float(i.strip()) for i in (value.split(','))]
 				
 			if key == 'tf_UVCt' and (value.strip()): # transmission factor times for 254 nm light
@@ -743,11 +785,12 @@ def mod_var_read(self):
 					# attempt as path to file 
 					# containing continuous influxes
 					try: 
-						self.const_infl_path\
-						= str(value.strip())
-						self = const_infl_open(
+						from cont_infl_file_open import cont_infl_open
+						self.const_infl_path = str(
+						value.strip())
+						self = cont_infl_open(
 							self)
-					
+						
 					# treat as list of components
 					except:
 						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
@@ -970,9 +1013,9 @@ def mod_var_read(self):
 
 		# a possible situation where there are multiple particle size bins,
 		# but just one mode given for the particle number size distribution
-		if (num_sb > 1 and pmode_cnt == 1):
+		if (num_sb > 1 and self.pmode_cnt == 1):
 			self.pmode = 0 # modal particle concentrations
-	
+		
 		# prepare for pickling
 		list_vars = [sav_nam, y0, Press, 
 				siz_stru, num_sb, lowsize, 
@@ -993,119 +1036,12 @@ def mod_var_read(self):
 		with open(input_by_sim, 'wb') as pk: 
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
-
+		
 		return() # end function	
-			
+		
 	read(self) # call on function to read the model variables
 
 	return()
-
-
-# define function to read in values relevant to constant influxes
-def const_infl_open(self): 
-
-	import openpyxl
-	import os
-
-	if ('xls' in self.const_infl_path):
-		try: # try to open the file at the user-supplied path
-
-			try:
-				
-				wb = openpyxl.load_workbook(filename = 
-					self.const_infl_path)
-			except:
-				
-				# see if present inside same folder as 
-				# model variables
-				# strip path to model variables file 
-				# back to home directory
-				try:
-					path_start = -1*self.inname[::-1].index('/')
-				except:
-					path_start = -1*self.inname[::-1].index('\\')
-				# path to file
-				self.const_infl_path = str(self.inname[0:path_start] + 
-					self.const_infl_path)
-				
-				wb = openpyxl.load_workbook(filename = self.const_infl_path)				
-				
-			try:
-				sheet = wb['cont_infl']
-			except:
-				sheet = wb['const_infl']
-			
-			# component names are in first column, 
-			# continuous influxes are in 
-			# following columns		
-			ir = -1 # count on row iteration
-	
-			# prepare to store component names and 
-			# continuous influxes
-			value = ''
-
-			self.con_infl_nam = np.empty((0))	
-		
-			# loop through rows
-			for i in sheet.iter_rows(values_only=True):
-				
-				ir += 1 # count on row iteration
-				# header provides unit of emission rate 
-				# and times
-				if (ir == 0):
-					self.abun_unit = str(i[0])	
-			
-					if ('ppb' not in 
-					self.abun_unit):
-						if ('mol' not in 
-						self.abun_unit and 
-						'cm' not in 
-						self.abun_unit):
-							self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
-							
-							return(self)
-
-					clim = 0 # count on columns
-					for ic in i[0::]:	
-						if ic is None:
-							# stop looping 								# through 
-							# columns
-							break
-						# count on columns	
-						clim +=1 
-					
-					# if looping over a 24 hour 
-					# period
-					# then limit influxes to the
-					# first 
-					# provided 24 hours
-					if (self.con_infl_tf == 1): 
-						clim = sum(i[1:clim] < 24.*3.6e3)
-
-					self.con_infl_t = np.array((i[1:clim])).astype('float')
-					self.con_infl_C = np.empty((0, clim-1)).astype('float')	
-					continue				
-
-				# get names of components (matching chemical scheme names) 
-				# and their continuous influx rates (abundance unit given above)
-				else:
-					if (i[1] is None): # reached end of contiguous components
-						break
-			
-					# component name
-					self.con_infl_nam = np.concatenate((self.con_infl_nam, np.array((str(i[0]))).reshape(1)))
-					# continuous influx rate
-					self.con_infl_C = np.concatenate((self.con_infl_C, np.array((i[1:clim])).reshape(1, -1).astype('float')))
-	
-			wb.close() # close excel file
-			
-		except: # if file not found tell user
-			self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
-
-	else:
-		self.con_infl_nam = 'not in a file'
-	
-	return(self)
 
 # function for converting excel spreasheet of surface depositions 
 # into a string that commands above can interpret

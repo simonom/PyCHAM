@@ -114,12 +114,13 @@ def init_conc(num_comp, init_conc, PInit,
 	# if no initial concentrations given in model variables file,
 	# then check if the observed concentrations file has 
 	# concentrations at the starting time
-	if (len(self.comp0) == 0 and sum(self.obs[:, 0] == 0)>0):
-		self.comp0 = (np.array((self.comp_namelist))[self.obs_comp_i]).tolist()
-		# molecules/cm3
-		init_conc = np.squeeze(self.obs[self.obs[:, 0] == 0, 1::])
-		# flag to not use Cfactor on initial concentrations
-		Cfac_flag = 0
+	if hasattr(self, 'obs'):
+		if (len(self.comp0) == 0 and sum(self.obs[:, 0] == 0)>0):
+			self.comp0 = (np.array((self.comp_namelist))[self.obs_comp_i]).tolist()
+			# molecules/cm3
+			init_conc = np.squeeze(self.obs[self.obs[:, 0] == 0, 1::])
+			# flag to not use Cfactor on initial concentrations
+			Cfac_flag = 0
 
 	
 
@@ -467,19 +468,23 @@ def init_conc(num_comp, init_conc, PInit,
 							reac_index.append(int(ri)) # append reaction index
 							reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
 							reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
-						if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
-							reac_index.append(int(ri)) # append reaction index
-							reac_place = np.where(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx)[0]
-							reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
+						if (sum(self.pindx_g[ri, 0:self.nprod_g[ri]] 
+							== y_indx) > 0):
+							# append reaction index
+							reac_index.append(int(ri))
+							reac_place = np.where(self.pindx_g[
+							ri, 0:self.nprod_g[ri]] == y_indx)[0]
+							reac_sign.append(1*self.pstoi_g[
+							int(ri), reac_place])
 				y_indx = self.HOMRO2_indx[:] # ready for storing below
 				
 			# save reaction indices in dictionary value 
 			# for this component,
 			# when creating empty rec_array, add three 
 			# columns onto the end for 
-			# particle-partitioning, wall-partitioning and 
-			# dilution
-			rec_array = np.zeros((nrec_steps, 
+			# gas-particle-partitioning, gas-wall-partitioning and 
+			# dilution, and include a top row for reaction indices
+			rec_array = np.zeros((nrec_steps+1, 
 				len(reac_index)+3))
 			rec_array[0, 0:-3] = reac_index
 

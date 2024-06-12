@@ -87,14 +87,18 @@ def tot_in(init_conc, Cfac, y_mw, Compt, self): # define function
 	self.cont_inf_reci = [] # index inside record
 	# loop through components with continuous influx
 	for cnam in self.con_infl_nam: 
-		if (cnam != 'H2O'): # omit H2O as this dealt with separately
-			if self.comp_namelist.index(cnam) in tot_in_res_indx:
-				self.cont_inf_reci.append(tot_in_res_indx.index(self.comp_namelist.index(cnam)))
-				continue
-			else:
-				self.cont_inf_reci.append(len(tot_in_res_indx))
-				tot_in_res_indx.append(self.comp_namelist.index(cnam))
-				tot_in_res_con.append(0.)
+		# H2O condition commented out on 9/6/2024 as was causing
+		# an array shape issue in cham_up
+		#if (cnam != 'H2O'): # omit H2O as this dealt with separately
+		if self.comp_namelist.index(cnam) in tot_in_res_indx:
+			self.cont_inf_reci.append(
+			tot_in_res_indx.index(
+			self.comp_namelist.index(cnam)))
+			continue
+		else:
+			self.cont_inf_reci.append(len(tot_in_res_indx))
+			tot_in_res_indx.append(self.comp_namelist.index(cnam))
+			tot_in_res_con.append(0.)
 	
 	# array to hold all information (component indices in first 
 	# column, influxes in second column)

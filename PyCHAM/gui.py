@@ -2142,7 +2142,7 @@ class PyCHAM(QWidget):
 		# any found by automatic search
 		import mod_var_read
 		mod_var_read.mod_var_read(self)
-
+		
 		# end this function if an error thrown by reading of 
 		# model variables
 		if (self.bd_st == 1 or self.bd_st == 2):
@@ -2155,14 +2155,17 @@ class PyCHAM(QWidget):
 			
 		self.show()
 		
-		# update displayed model variables to those of the selected model variables file
+		# update displayed model variables to those of the selected 
+		# model variables file
 		import mod_var_up
 		mod_var_up.mod_var_up(self)
 		
-		# running check on model variables -------------------------------------------------
+		# running check on model variables -----------------------------------------
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change 
+		# check on inputs - note this loads the last saved pickle 
+		# file and saves any change 
 		# to this pickle file
+		
 		ui_check.ui_check(self)
 		# finished check on model variables -----------------------------------------------	
 		
@@ -3276,7 +3279,17 @@ class PyCHAM(QWidget):
 		comp_names = [str(i) for i in self.e217.text().split(',')]
 		
 		# get top number of chemical reactions to plot
-		top_num = [int(i) for i in self.e217a.text().split(',')]
+		try:
+			top_num = [int(i) for i in self.e217a.text().split(',')]
+			self.pre_mess = 0
+		except:
+			# let plotter_ct know there is a 
+			# priority message to user
+			self.pre_mess = 1
+			top_num = [10]
+
+			mess = str('Please note that a user-defined number of reactions to plot was not seen, therefore the default of ' + str(top_num[0]) + ' has been set.')
+			self.l203a.setText(mess)
 
 		ct_units = self.b218aaa.currentText() # change tendency units
 		# convert units into number option
@@ -3287,9 +3300,11 @@ class PyCHAM(QWidget):
 		if (ct_units[2] == 'm'):
 			uc = 2
 		
-		import plotter_ct
-		dir_path = self.l201.text() # name of folder with results
-		plotter_ct.plotter_ind(0, dir_path, comp_names, top_num, uc, self) # plot results
+		import plotter_ct	
+		# name of folder with results
+		dir_path = self.l201.text()
+		plotter_ct.plotter_ind(0, dir_path, comp_names, 
+			top_num, uc, self) # plot results
 	
 	@pyqtSlot() # button to show production
 	def on_click218ab(self):

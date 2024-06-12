@@ -496,7 +496,7 @@ def cham_up(sumt, Pnow,
 				stdn = std[:, seedt_cnt]
 			# if number concentrations given per size bin
 			else:
-				mean_radn = self.mean_rad
+				mean_radn = self.mean_rad[:, seedt_cnt]
 				stdn = std
 			
 			# if linear interpolation required and 
@@ -626,7 +626,7 @@ def cham_up(sumt, Pnow,
 			# if number concentration per size bin 
 			# given explicitly
 			if (self.pmode == 1): 				
-				mean_radn = self.mean_rad
+				mean_radn = self.mean_rad[:, seedt_cnt-1]
 				stdn = std		
 		
 			# injected seed particle number concentration 
@@ -728,7 +728,8 @@ def cham_up(sumt, Pnow,
 			# record cumulative injection of components (ug/m3)
 			tot_in_res[self.cont_inf_reci] += ((((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1))
 
-			# update index counter for constant influxes - used in integrator below
+			# update index counter for continuous influxes - 
+			# used in integrator below
 			if (infx_cnt < (self.con_infl_C.shape[1]-1)):
 				infx_cnt += 1
 			else:

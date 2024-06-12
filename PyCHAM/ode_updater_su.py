@@ -296,10 +296,16 @@ def ode_updater_su(y, H2Oi,
 	cwd = os.getcwd() # address of current working directory
 
 	# if using MCM scheme of solar radidiation
-	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no'):
+	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') 
+		and self.af_path == 'no'):
+
 		# set time after which to decide whether spin-up successful
 		su_comp_time = 3.6e3*24. # 24 hours
-	
+
+	else:
+		# set time after which to decide whether spin-up successful
+		su_comp_time = 3.6e3*24. # 24 hours
+
 	# find out what to do with the gas-wall partitioning coefficient,
 	# note that self.kw and self.Cw are spread over wall bins in rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
@@ -339,7 +345,6 @@ def ode_updater_su(y, H2Oi,
 	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
-
 
 	while (RO2_pool_diff) >= (1.e1):
 		print('Time through spin-up (s): ', sumt)	
@@ -711,6 +716,12 @@ def ode_updater_su(y, H2Oi,
 		
 		# if time reached to compare RO2 radical pool concentration
 		if (sumt >= su_comp_time*0.9999):
+
+			# for this spin up setting just complete
+			# the simulated time once before moving
+			# past spin-up
+			if (self.spin_up == 2):
+				break # break from while loop
 			# get new abundance of RO2 pool (ppb)
 			RO2_pool1 = sum(y[0:num_comp][self.RO2_indices[:, 1]])
 			# get new difference in RO2 pool abundance (%)
