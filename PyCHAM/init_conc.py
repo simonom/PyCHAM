@@ -163,7 +163,7 @@ def init_conc(num_comp, init_conc, PInit,
 					0, 0, erf, err_mess, 0, 0, 0, 0)
 			
 			# set initial concentration
-			if (Cfac_flag == 1):
+			if (Cfac_flag == 1): # gas-phase concentrations
 				# convert from ppb to # molecules/cm3
 				y[y_indx] = init_conc[i]*Cfactor
 			if (Cfac_flag == 0):

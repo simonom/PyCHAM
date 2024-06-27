@@ -471,16 +471,36 @@ def ode_updater(y, H2Oi,
 				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
-			
-			
-			
 
-			# update chamber variables
+			# aligning time interval with pre-requisites --		
+			# ensure end of time interval does not surpass 
+			# recording time
+			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
+				tnew = (self.save_step*(save_cnt-1))-sumt
+				# temporarily set the update step for operator-split processes
+				# to align with recording time step, this ensures that
+				# recording and operator-split intervals don't fall out of sync
+				self.update_stp = tnew
+				update_count = 0.
+				ic_red = 1
+				
+			# ensure update to operator-split processes interval not surpassed
+			if (update_count+tnew > self.update_stp):
+				tnew = (self.update_stp-update_count)
+				ic_red = 1
+				
+			# ensure simulation end time not surpassed
+			if (sumt+tnew > self.tot_time):
+				tnew = (self.tot_time-sumt)
+				ic_red = 1
+
+			# update chamber variables, note this has to come after
+			# updates to tnew, so that things with influx can
+			# have the correct time integration applied
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
-			infx_cnt, 
-			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-			N_perbin, x,
+			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
+			RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
@@ -495,29 +515,7 @@ def ode_updater(y, H2Oi,
 			y_mw, temp_now0, gpp_stab, t00, x0,
  			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
-			volP)
-
-			# aligning time interval with pre-requisites --		
-			# ensure end of time interval does not surpass 
-			# recording time
-			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
-				tnew = (self.save_step*(save_cnt-1))-sumt
-				# temporarily set the update step for operator-split processes
-				# to align with recording time step, this ensures that
-				# recording and operator-split intervals don't fall out of sync
-				self.update_stp = tnew
-				update_count = 0.
-				ic_red = 1
-
-			# ensure update to operator-split processes interval not surpassed
-			if (update_count+tnew > self.update_stp):
-				tnew = (self.update_stp-update_count)
-				ic_red = 1
-			
-			# ensure simulation end time not surpassed
-			if (sumt+tnew > self.tot_time):
-				tnew = (self.tot_time-sumt)
-				ic_red = 1
+			volP, ic_red)
 			
 			# ------------------------------------------------------------
 			# if particles and/or wall present		
@@ -707,8 +705,6 @@ def ode_updater(y, H2Oi,
 				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
 			
-			
-		
 			# if any components set to have constant 
 			# gas-phase concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -806,7 +802,8 @@ def ode_updater(y, H2Oi,
 			(any(N_perbin > 1.e-10))):
 
 				if (siz_str == 0): # moving centre
-					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
+					(N_perbin, Varr, y, x, redt, t, 
+					bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					y0, MV, ic_red, y, res_t, self)
 					
@@ -963,7 +960,7 @@ def ode_updater(y, H2Oi,
 			y_mw, temp_now0, gpp_stab, t00, x0,  
 			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
-			volP)
+			volP, ic_red)
 			
 			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, 
 			Nres_wet,

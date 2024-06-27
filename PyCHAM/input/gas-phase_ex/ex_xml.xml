@@ -4,6 +4,9 @@
 <species species_number="s1" species_name="CH3OH">
 <smiles>OC</smiles>
 </species>
+<species species_number="s1" species_name="bc">
+<smiles>C</smiles>
+</species>
 <species species_number="s2" species_name="OH">
 <smiles>[OH]</smiles>
 </species>

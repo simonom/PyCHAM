@@ -399,6 +399,17 @@ def ode_updater_su(y, H2Oi,
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
 			
+			
+			# aligning time interval with pre-requisites -------------------------
+
+			# ensure update to operator-split processes interval not surpassed
+			if (update_count+tnew > self.update_stp):
+				tnew = (self.update_stp-update_count)
+				ic_red = 1
+			
+			# allow spin-up simulation to surpass user-defined end of 
+			# simulation time
+
 			# update chamber variables
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
@@ -417,17 +428,8 @@ def ode_updater_su(y, H2Oi,
 			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
 			y_mw, temp_now0, gpp_stab, t00, x0,  
 			pcontf, Cinfl_now, surfT,
-			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
-			
-			# aligning time interval with pre-requisites -------------------------
-
-			# ensure update to operator-split processes interval not surpassed
-			if (update_count+tnew > self.update_stp):
-				tnew = (self.update_stp-update_count)
-				ic_red = 1
-			
-			# allow spin-up simulation to surpass user-defined end of 
-			# simulation time
+			act_coeff, tot_in_res, Compti, self, vol_Comp, 
+			volP, ic_red)
 
 			# ------------------------------------------------------------------
 			# if particles and/or wall present		

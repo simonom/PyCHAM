@@ -54,8 +54,9 @@ def cont_infl_open(self):
 			try:
 				wb = openpyxl.load_workbook(filename = 
 					self.const_infl_path)
-			except:
 				
+			except:
+				const_infl_path0 = self.const_infl_path
 				# see if present inside same folder as 
 				# model variables
 				# strip path to model variables file 
@@ -227,7 +228,7 @@ def cont_infl_open(self):
 			wb.close() # close excel file
 			
 		except: # if file not found tell user
-			self.err_mess = str('Error: file path provided by user in model variables file for continuous influx of components was not found, file path attempted was: ' + self.const_infl_path)
+			self.err_mess = str('Error: file provided by user in model variables file for continuous influx of components was either not found or could not be opened, file path attempted was: ' + const_infl_path0)
 
 	else:
 		self.con_infl_nam = 'not in a file'

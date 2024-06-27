@@ -406,6 +406,7 @@ def retr_out(self):
 		load_path = str(self.dir_path + '/y_mw.npy') # path
 		y_MW = np.load(load_path, allow_pickle=True)
 
+		# cm3/mol
 		load_path = str(self.dir_path + '/MV.npy') # path
 		MV = np.load(load_path, allow_pickle=True)
 		

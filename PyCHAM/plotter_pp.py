@@ -1065,13 +1065,13 @@ def comp_part_mass_vs_time(self):
 				# sum over components and size bins
 				res[i, :] = np.sum(y_SOA, axis=1)
 	
-	ax0.stackplot(timehr[1:-1]+16, res[:, 1:-1], labels = cn)
-	#plt.yscale('log')
+	ax0.stackplot(timehr[1:-1], res[:, 1:-1], labels = cn)
+	plt.yscale('log')
 	ax0.set_ylabel(r'Particle Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.legend(fontsize = 14)
+	ax0.legend(fontsize = 14, loc='upper left')
 
 	return()	
 
@@ -1169,7 +1169,7 @@ def comp_part_risk_vs_time(self):
 				res[i, :] = risk_coeff**((np.sum(
 				y_SOA, axis=1))/10.)-1.
 	
-	ax0.stackplot(timehr[1:-1]+16, res[:, 1:-1], labels = cn)
+	ax0.stackplot(timehr[1:-1], res[:, 1:-1], labels = cn)
 
 	ax0.set_ylabel(r'factor change in all-cause mortality', 
 	fontsize = 14)
@@ -1298,26 +1298,32 @@ def comp_part_cos_vs_time(self):
 	# oxidative potential
 	op_res = np.zeros((6, len(timehr)))
 	# ammonium sulphate (outdoor core)
-	op_res[0, :] = 180.*mf[:, comp_names.index('core')]
+	op_res[0, :] = 180.*mf[:, comp_names.index('AMM_SUL')]
 	
 	
 	# outdoor primary (pri_org)
 	op_res[1, :] = 9.*mf[:, comp_names.index('pri_org')]
-	# outdoor secondary (pri_org)
-	op_res[2, :] = 60.*(mf[:, comp_names.index('sec_org2')]+
+	# outdoor secondary (sec_org), e.g. Figure 6 of Zhang et al. 2022:
+	# https://doi.org/10.5194/acp-22-1793-2022
+	op_res[2, :] = 60.*(
 	mf[:, comp_names.index('sec_org1')]+
 	mf[:, comp_names.index('sec_org0')]+
 	mf[:, comp_names.index('sec_org-1')]+
 	mf[:, comp_names.index('sec_org-2')])
-	# indoor elemental carbon (core_ind)
-	op_res[3, :] = 2.*mf[:, comp_names.index('core_ind')]
+
+	# indoor elemental carbon (bcin)
+	op_res[3, :] = 2.*mf[:, comp_names.index('bcin')]
 	# indoor primary organic
-	op_res[4, :] = 9.*mf[:, comp_names.index('pri_org_ind')]
-	# SOA
+	op_res[4, :] = 9.*mf[:, comp_names.index('pri_orgin')]
+
+	# SOA using the factor from e.g. Figure 6 of Zhang et al. 2022:
+	# https://doi.org/10.5194/acp-22-1793-2022, but note that a factor
+	# 67 was used here previously but I can't remember the
+	# reference
 	# zero mass fractions of seed components
 	mf[:, seedi] = 0.
 	mf[:, H2Oi] = 0.
-	op_res[5, :] = 67.*np.sum(mf, axis=1)
+	op_res[5, :] = 60.*np.sum(mf, axis=1)
 
 	# multiply by total dry mass of PM
 	op_res = op_res*(np.sum(ppc, axis=1).reshape(1, -1))
@@ -1367,10 +1373,11 @@ def comp_part_cos_vs_time(self):
 	#for i in range(len(cn)-1):	
 		#ros[i, :] = (ros[i, :]/ros[-1, :])
 		#ax1.plot(timehr[1:-1]+16., ros[i, 1:-1], label=cn[i])
-	ax0.stackplot(timehr[1:-1]+16., op_res[:, 1:-1], labels=cn)
+	print(cn)
+	ax0.stackplot(timehr[1:-1], op_res[:, 1:-1]*1.e-3, labels=['AMM_SUL', 'pri_org', 'SOAout', 'bcin', 'pri_orgin', 'SOAin'])
 	#ax0.set_ylabel(str('''Carbon oxidation state weighted by ''' +
 	#'''mass'''), fontsize = 14)
-	ax0.set_ylabel(str('''$\mathrm{OP_{DTT}}$ weighted by ''' +
+	ax0.set_ylabel(str('''$\mathrm{OP_{DTT}}$ $\mathrm{(nmol\, min^{-1})}$ weighted by ''' +
 	'''mass'''), fontsize = 14)
 	#ax1.set_ylabel('''ROS''')
 	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)

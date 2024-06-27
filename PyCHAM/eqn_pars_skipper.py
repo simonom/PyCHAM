@@ -36,8 +36,8 @@ def eqn_pars_skipper(self): # define function
 		from obs_file_open import obs_file_open
 		self = obs_file_open(self)
 
-	# get index of components with constant influx/concentration -----------
-	# empty array for storing index of components with constant influx
+	# get index of components with continuous influx/concentration -----------
+	# empty array for storing index of components with continuous influx
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
 	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
 	delete_row_list = [] # prepare for removing rows of unrecognised components
@@ -46,62 +46,83 @@ def eqn_pars_skipper(self): # define function
 
 	for i in range (len(self.con_infl_nam)):
 		
-		# water not included explicitly in chemical schemes but accounted for later in init_conc
+		# water not included explicitly in chemical schemes but accounted 
+		# for later in init_conc
 		if (self.con_infl_nam[icon] == 'H2O'):
-			self.con_infl_indx[icon] = int(self.comp_num)
-			icon += 1 # count on constant influxes
-			continue
 
-		# if we want to remove constant influxes 
+			# if water not included explicitly in chemical schemes 
+			# (note it is accounted for later in init_conc)
+			if (self.H2O_in_cs == 2):
+				self.con_infl_indx[icon] = int(self.comp_num)
+				icon += 1 # count on constant influxes
+				continue
+			else: # if water in chemical scheme
+				self.con_infl_indx[icon] = self.comp_namelist.index(
+				self.con_infl_nam[icon])
+				icon += 1 # count on constant influxes
+				continue
+
+		# if we want to remove continuous influxes 
 		# not present in the chemical scheme
 		if (self.remove_influx_not_in_scheme == 1):
 
 			try:
-				# index of where components with constant influx occur in list of components
-				self.con_infl_indx[icon] = self.comp_namelist.index(self.con_infl_nam[icon])
+				# index of where components with continuous 
+				# influx occur in list of components
+				self.con_infl_indx[icon] = self.comp_namelist.index(
+				self.con_infl_nam[icon])
 			except:
 				# remove names of unrecognised components
 				self.con_infl_nam = np.delete(self.con_infl_nam, (icon), axis=0)
 				# remove emissions of unrecognised components
 				self.con_infl_C = np.delete(self.con_infl_C, (icon), axis = 0)
 				# remove empty indices of unrecognised components
-				self.con_infl_indx = np.delete(self.con_infl_indx, (icon), axis = 0)
+				self.con_infl_indx = np.delete(
+				self.con_infl_indx, (icon), axis = 0)
 				icon -= 1 # count on constant influxes
 		else:
 
 			try:
-				# index of where components with constant influx occur in list of components
-				self.con_infl_indx[i] = self.comp_namelist.index(self.con_infl_nam[i])
+				# index of where components with continuous 
+				# influx occur in list of components
+				self.con_infl_indx[i] = self.comp_namelist.index(
+				self.con_infl_nam[i])
 			except:
 				erf = 1 # raise error
-				err_mess = str('Error: constant influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+
+				err_mess = str('Error: continuous influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
 	
-		icon += 1 # count on constant influxes
-
-	if ('H2O' in self.con_infl_nam): # check if water in constant influx components 
-
-		# index of water in continuous influx array
-		wat_indx = (np.array(self.con_infl_nam) == 'H2O').reshape(-1)
-		# get influx rate of water
-		self.con_infl_H2O = self.con_infl_C[self.con_infl_indx==self.comp_num, :]
-
-		# do not allow continuous influx of water in the standard ode 
-		# solver, instead deal with it inside the water ode-solver
-		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
-
-	if (self.H2Oi in self.con_infl_indx):
-		wat_indx = (np.array(self.con_infl_indx == self.H2Oi))
-		self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
-		self.H2Oin = 1 # flag for continuous influx of water
+		icon += 1 # count on continuous influxes
 
 	if len(self.con_infl_nam) > 0:
 
 		# get ascending indices of components with continuous influx
 		sindx = self.con_infl_indx.argsort()
-		# order constant influx indices, influx rates and names ascending by component index
+		# order continuous influx indices, influx rates and 
+		# names ascending by component index
 		self.con_infl_indx = (self.con_infl_indx[sindx]).astype('int')
 		self.con_infl_C = (self.con_infl_C[sindx])
 		self.con_infl_nam = (self.con_infl_nam[sindx])
+
+	# check if water in continuous influx components 
+	if ('H2O' in self.con_infl_nam):
+
+		self.H2Oin = 1 # flag for water influx
+
+		# index of water in continuous influx
+		wat_indx = self.con_infl_nam.tolist().index('H2O')
+
+		# get influx rate of water
+		self.con_infl_H2O = self.con_infl_C[wat_indx, :].reshape(1, -1)
+
+		# do not allow continuous influx of water in the standard ode 
+		# solver, instead deal with it inside the water ode-solver
+		self.con_infl_C = np.delete(self.con_infl_C, wat_indx, axis=0)
+		self.con_infl_indx = np.delete(self.con_infl_indx, wat_indx, axis=0)
+		self.con_infl_nam = np.delete(self.con_infl_nam, wat_indx, axis=0)
+
+	else:
+		self.H2Oin = 0 # flag for no water influx
 
 	# components with constant concentration
 	for i in range (len(self.const_comp)):

@@ -407,7 +407,7 @@ def ui_check(self):
 			err_mess = str('Error - either user has requested cloning of UManSysProp via the model variables input file or no existing UManSysProp folder has been found, but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
 			em_flag = 2
 	# ----------------------------------------------------------------------------
-
+	
 	if (len(self.light_stat) != len(self.light_time) and em_flag < 2):
 		err_mess = str('Error - length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
 		em_flag = 2
@@ -428,7 +428,9 @@ def ui_check(self):
 		err_mess = str('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
 		em_flag = 2
 	
-	# check on consistency of names of seed components, number of size bins and the mole fraction of dry seed components, note components in rows and size bins in columns
+	# check on consistency of names of seed components, number 
+	# of size bins and the mole fraction of dry seed components, 
+	# note components in rows and size bins in columns
 	if (len(self.seed_name) != self.seedx.shape[0] and em_flag < 2):
 		
 		# if self.seedx is equal to the default 
@@ -442,12 +444,19 @@ def ui_check(self):
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of mole fractions of dry (excluding water) seed particle components (seedx in model variables input file), please see README for guidance')
 			em_flag = 2
 	
-	# check on consistency of dry seed component mole fractions and number of size bins
+	# check on consistency of dry seed component 
+	# mole fractions and number of size bins
 	# note that mole fraction size bins vary with columns
 	if (self.seedx.shape[1] > 1): # if size bins stated explicitly
 		if (self.seedx.shape[1] != num_sb): # if inconsistent
 			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
+
+	# if seedx not given per size bin 
+	# then tile over size bins, i.e. assume same
+	# mole fraction applies to all size bins
+	else:
+		self.seedx = np.tile(self.seedx, (1, num_sb, 1))
 
 	# check consistency between names of initial components and
 	# their concentrations ------------------

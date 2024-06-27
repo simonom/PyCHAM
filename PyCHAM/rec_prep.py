@@ -205,7 +205,7 @@ def rec_prep(nrec_step, y, y0,
 		DStar_org, tempt_cnt, RHt_cnt, nuci,
 		y_mw, self.TEMP[0], 0, t0, x,  pcontf, 0., 
 		surfT, act_coeff, tot_in_res, Compti, self, vol_Comp, 
-		volP)
+		volP, 0)
 	
 	# note that recording occurs after any instaneous changes-------
 	# array to record time through simulation (s)

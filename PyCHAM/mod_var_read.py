@@ -41,7 +41,7 @@ def mod_var_read(self):
 		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, y0, Press,
+			[sav_nam, y0_gas, Press,
 			siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, Ct,
@@ -220,14 +220,14 @@ def mod_var_read(self):
 				if '/' in value or '\\' in value:
 					self.path_to_C0 = \
 						str(value.strip())
-					[y0] = C0_open(self)
+					[y0_gas, self] = C0_open(self)
 					err_mess = self.err_mess
 					if err_mess[0:5] == 'Error':
 						break
 				else:
 
 					try:
-						y0 = [float(i) for i 
+						y0_gas = [float(i) for i 
 						in (value.split(','))]
 					except:
 					
@@ -672,7 +672,7 @@ def mod_var_read(self):
 				z_prt_coeff = float(value.strip())			
 
 			# status of lights (on or off)
-			if key == 'light_status' and value.strip():
+			if (key == 'light_status' and value.strip()):
 
 				# check if a path to file
 				try:
@@ -683,14 +683,14 @@ def mod_var_read(self):
 				except:
 					light_stat = [int(i) for i in (value.split(','))]
 					self.light_stat = np.array((light_stat))
-
+					
 					# signal to use pre-calculated transmission
 					# factor for solar radiation (Hayman method)
 					# through clear glass (see photolysisRates)
 					# for more information
 					if sum(np.array((self.light_stat)) == 3) > 0:
 						# ensure lights on
-						self.light_stat = np.array((1)).astype('int')
+						self.light_stat = np.ones((1)).astype('int')
 						# set a tf_range value that tells
 						# photolysisRates to apply
 						# a pre-calcalated transmission factor 
@@ -992,9 +992,9 @@ def mod_var_read(self):
 		# if error message occurs
 		if (err_mess != '' or self.err_mess != ''):
 			# update error message
-			if err_mess != '':
+			if (err_mess != ''):
 				self.l80.setText(str('Setup Status: \n' + err_mess))
-			if self.err_mess != '':
+			if (self.err_mess != ''):
 				self.l80.setText(str('Setup Status: \n' + self.err_mess))
 			# change border accordingly
 			if (self.bd_st == 1):
@@ -1009,7 +1009,7 @@ def mod_var_read(self):
 			if (self.bd_st >= 4):
 				self.bd_st = 1
 			
-			return()
+			()
 
 		# a possible situation where there are multiple particle size bins,
 		# but just one mode given for the particle number size distribution
@@ -1017,7 +1017,7 @@ def mod_var_read(self):
 			self.pmode = 0 # modal particle concentrations
 		
 		# prepare for pickling
-		list_vars = [sav_nam, y0, Press, 
+		list_vars = [sav_nam, y0_gas, Press, 
 				siz_stru, num_sb, lowsize, 
 				uppsize, std, 
 				Compt, injectt, Ct, seed_mw, 
@@ -1113,16 +1113,19 @@ def C0_open(self):
 		fname = str(self.path_to_C0 + fname)
 		
 		y0 = np.loadtxt(fname, delimiter=',', skiprows=1)
-		# keep just the final time step concentrations (ppb) -
-		# note this will need work for unit 
-		# conversion if more than gas-phase present
+		# keep just the final time step concentrations (ppb)
 		y0 = y0[-1, :]
+
 	except: # if file not found tell user
 		self.err_mess = str(''''Error: file path provided by
 		 user in model variables file for initial concentrations
 		 of components not found, file path attempted was: ''' 
 		+ fname)
-		return(self, [])
+		# bypass error, e.g. when you know that the file will
+		# become available following completion of preceding
+		# simulations
+		self.err_mess = ''
+		return([], self)
 
 	# now get names of components that concentrations correspond to
 	# get chemical scheme names
@@ -1155,18 +1158,37 @@ def C0_open(self):
 		self.comp0 = (np.load(fname, 
 			allow_pickle=True)).tolist()
 	
+	# set starting particle properties
+	# withdraw number-size distributions (# particles/cm3 (air))
+	fname = str(self.path_to_C0 + '/particle_number_concentration_wet')
+	self.N_perbin0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
+	# keep just final time
+	self.N_perbin0_prev_sim = self.N_perbin0_prev_sim[-1, :].reshape(-1, 1)	
 
-	# limit starting concentrations to just the gas-phase
-	# note this may need developing in future if concentrations
-	# of other phases needed
-	y0 = y0[0:len(self.comp0)]
+	# particle radii (um)
+	fname = str(self.path_to_C0 + '/size_bin_radius')
+	# skiprows=1 omits header
+	self.x0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
+	# keep just final time
+	self.x0_prev_sim = self.x0_prev_sim[-1, :]
+
+	# particle volumes (um3)
+	self.Varr0_prev_sim = (4./3.)*np.pi*self.x0_prev_sim**3.
+	
+
+	# starting concentrations (ppb) of just the gas-phase
+	y0_gas = y0[0:len(self.comp0)]
+
+	# get concentrations (molecules/cm3) of any other
+	# phases at this final time step
+	self.y0_other_phase = y0[len(self.comp0)::]
 
 	# now just keep the concentrations for components with
 	# concentrations above zero
-	self.comp0 = np.array((self.comp0))[y0 > 0.]
-	y0 = y0[y0 > 0.]
+	self.comp0 = np.array((self.comp0))[y0_gas > 0.]
+	y0_gas = y0_gas[y0_gas > 0.]
 	# remove water
-	y0 = (y0[self.comp0 != 'H2O']).tolist()
+	y0_gas = (y0_gas[self.comp0 != 'H2O']).tolist()
 	self.comp0 = (self.comp0[self.comp0 != 'H2O']).tolist()
 	
-	return(y0)
+	return(y0_gas, self)
