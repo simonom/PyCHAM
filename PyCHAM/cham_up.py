@@ -160,6 +160,10 @@ def cham_up(sumt, Pnow,
 	#	components from all components
 	# ic_red - whether time step reduced
 	# --------------------------------------------------------------
+
+	# number of particle phase size bins
+	num_asb = (num_sb-self.wall_on)
+
 	# ensure N_perbin has a value
 	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
 	N_perbin[:] = N_perbin0[:] # particle number concentration (# particles/cm3)

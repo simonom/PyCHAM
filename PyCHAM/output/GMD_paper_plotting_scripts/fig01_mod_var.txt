@@ -1,4 +1,6 @@
 res_file_name = fig01_res_16sb_newD
+chem_sch_name = fig01_scheme.txt
+xml_name = fig01_xml.xml
 total_model_time = 2.52e4
 update_step = 60.
 recording_time_step = 300.

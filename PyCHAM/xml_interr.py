@@ -35,6 +35,17 @@ def xml_interr(self):
 
 	# start with no error message
 	err_mess_new = ''
+	
+	try:
+		# open the xml file
+		fd = open(self.xml_name, mode='r')
+
+	# in case in same folder as model variables file
+	except:
+		pd_indx = self.inname[::-1].index('/')
+		pd = self.inname[0:-pd_indx]
+		self.xml_name = str(pd + self.xml_name)
+
 
 	with open(self.xml_name) as fd:
 		try:

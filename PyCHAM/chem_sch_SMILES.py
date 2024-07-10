@@ -42,8 +42,17 @@ def chem_scheme_SMILES_extr(self):
 	
 	# initiate with empty error message
 	err_mess = ''
+	
+	try:
+		# open the chemical scheme file
+		f_open_eqn = open(self.sch_name, mode='r')
+	# in case in same folder as model variables file
+	except:
+		pd_indx = self.inname[::-1].index('/')
+		pd = self.inname[0:-pd_indx]
+		self.sch_name = str(pd + self.sch_name)
+		f_open_eqn = open(self.sch_name, mode='r')
 
-	f_open_eqn = open(self.sch_name, mode='r') # open the chemical scheme file
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
 	f_open_eqn.close() # close file

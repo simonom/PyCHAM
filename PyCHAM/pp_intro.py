@@ -90,13 +90,19 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	if (testf == 1): # in test mode
 		return(0,0,0,0,0,0,0,0,0,0,0,0) # return dummies
 	
-	# isolate the starting number size distribution information
 	# index of initial information
 	i = (np.where(self.pconct[0, :] == 0))[0]
+
+	# if seed particle present at start
+	if (sum(self.pconct[0, :] == 0) > 0):
 	
-	# get the starting seed mole fraction
-	seedx_now = np.squeeze(self.seedx[:, :, i]).reshape(self.seedx.shape[0],
-		 self.seedx.shape[1])
+		# get the starting seed mole fraction
+		seedx_now = np.squeeze(self.seedx[:, :, i]).reshape(
+			self.seedx.shape[0], self.seedx.shape[1])
+
+	else: # if no seed particle present at start
+		seedx_now = np.zeros((self.seedx.shape[0], self.seedx.shape[1]))
+		
 	
 	if (i.size == 0): # if no initial information provide fillers
 		# note that this line changed from pconcn = np.zeros((1)) 
