@@ -622,9 +622,9 @@ def cham_up(sumt, Pnow,
 				# due to boundary conditions
 				bc_red = 1
 	
-	# account for ongoing continuous influx of particles
-	# account for new continuous change in seed particles
-	if (self.pcont_ongoing == 1):
+	# account for continuous influx of particles if 
+	# influxing particles are present
+	if (self.pcont_ongoing == 1 and sum(sum(self.pconc))>0.):
 		
 		if (seedt_cnt != -1):
 			

@@ -990,7 +990,7 @@ class PyCHAM(QWidget):
 		
 		self.output_list = [] # begin list of output paths
 		
-		# running check on default model variables ---------------------------------------------------------------
+		# running check on default model variables ---------------------------------
 		# let checking module know this is a first call
 		self.chck_num = 1
 
@@ -999,7 +999,7 @@ class PyCHAM(QWidget):
 		# any change to this pickle file
 		ui_check.ui_check(self)
 		
-		# finished check on model variables -------------------------------------------------------------------------
+		# finished check on model variables -----------------------------------------
 		
 		# relative stretching (width-wise) of each column in Simuate tab
 		self.NSlayout.setColumnStretch(0, 1)

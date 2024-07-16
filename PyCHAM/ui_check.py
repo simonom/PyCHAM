@@ -508,14 +508,28 @@ def ui_check(self):
 			f = open(self.af_path, 'r') # open file
 			f.close() # close file
 		except:
-			try: # if they just gave the name of the file try prefixing with the path to the photofiles folder
-				f = open(str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path), 'r') # open file
+			# if they just gave the name of the file 
+			# try prefixing with the path to the photofiles folder
+			try:
+				# open file
+				f = open(str(os.getcwd()+'/PyCHAM/photofiles/' + 
+				self.af_path), 'r') 
 				# update variable
 				self.af_path = str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path)
 				f.close() # close file
+
 			except:
-				err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
-				em_flag = 2
+
+				# if not in the photofiles folder, try looking inside
+				# the folder containing model variables file
+				try:
+					pd_indx = self.inname[::-1].index('/')
+					pd = self.inname[0:-pd_indx]
+					self.af_path = str(pd + self.af_path)
+					f = open(self.af_path , 'r') 
+				except:
+					err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
+					em_flag = 2
 	
 	
 

@@ -55,7 +55,7 @@ def mod_var_read(self):
 			wat_hist, drh_str, erh_str, z_prt_coeff, 
 			chamV] = pickle.load(pk)
 		pk.close()
-	
+		
 		# if not using defaults	
 		if (self.inname != 'Default' and 
 			self.inname != 'Not found'): 

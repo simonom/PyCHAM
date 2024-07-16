@@ -33,21 +33,22 @@ def cont_infl_open(self):
 	import openpyxl
 	import os
 	import numpy as np
-
-	# size bin names
-	sb_nam = []
-	# names of particulate matter component
-	pm_comp = []
-	# size bin names for particle components
-	sb_nam = []
-	# size bin names for pconc
-	sb_nam_pconc = []
-	# size bin names for mean_rad
-	sb_nam_mean_rad = []
-	# prepare to hold seed component names
-	self.seed_name = []
 	
 	if ('xls' in self.const_infl_path):
+
+		# size bin names
+		sb_nam = []
+		# names of particulate matter component
+		pm_comp = []
+		# size bin names for particle components
+		sb_nam = []
+		# size bin names for pconc
+		sb_nam_pconc = []
+		# size bin names for mean_rad
+		sb_nam_mean_rad = []
+		# prepare to hold seed component names
+		self.seed_name = []
+
 		
 		try: # try to open the file at the user-supplied path
 

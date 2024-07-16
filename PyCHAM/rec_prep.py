@@ -233,7 +233,10 @@ def rec_prep(nrec_step, y, y0,
 		Nres_dry = 0.
 		Nres_wet = 0.
 		rbou_rec = 0.
-		self.yrec_p2w = 0.
+		# create an empty array so that plotter_wp_part.py knows that
+		# there is zero abundance of each component on wall when no
+		# particle size bins are present, even if wall is turned on
+		self.yrec_p2w = np.zeros((nrec_step, (num_sb-self.wall_on)*num_comp))
 	
 	if ((num_sb-self.wall_on) > 0 or self.wall_on == 1): # if particles or wall present
 		

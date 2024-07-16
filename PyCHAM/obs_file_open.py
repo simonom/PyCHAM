@@ -41,7 +41,7 @@ def obs_file_open(self):
 	except: # in case in same folder as model variables file
 		pd_indx = self.inname[::-1].index('/')
 		pd = self.inname[0:-pd_indx]
-		self.obs_file = str(pd +self.obs_file)
+		self.obs_file = str(pd + self.obs_file)
 		wb = openpyxl.load_workbook(filename = self.obs_file)
 	sheet = wb['PyCHAMobs']
 	# time (seconds) is in first column, other 
