@@ -78,7 +78,7 @@ def obs_file_open(self):
 	comp_indx = []
 	# loop through rows
 	for i in sheet.iter_rows(values_only = True):
-		if (ic == 0):
+		if (ic == 0): # if on the first row
 			# get chemical scheme names of variables
 			names_xlsx = i[1::]
 			# prepare for variable names
@@ -181,8 +181,8 @@ def obs_file_open(self):
 			rh_indx = np.array((rh_indx)).astype('int')
 			temper_indx = np.array((
 				temper_indx)).astype('int')
-		else:
-			# if on first time
+		else: # if past the first row
+			# if on first time and seed component seen
 			if (ic == 1 and seedx_flag == 1):
 				
 				# prepare to hold seed component names
@@ -201,6 +201,11 @@ def obs_file_open(self):
 				# rearrange pm_col so that components
 				# in columns and size bins in rows
 				pm_col = np.array((pm_col)).reshape(uni_sb, uni_comp)
+
+			# if on first time and seed component not seen
+			if (ic == 1 and seedx_flag == 0):
+				uni_comp = 0
+				uni_sb = 0
 
 			if (ic == 1 and pconc_flag == 1):
 				# get number of unique size bins
@@ -221,22 +226,26 @@ def obs_file_open(self):
 				self.obs = np.concatenate((self.obs, 
 					(np.zeros((1, nc_obs+1)))), 
 					axis=0)
-				# add onto mole fraction array
-				self.seedx = np.concatenate((self.seedx, 
-					(np.zeros((uni_comp, 
-					 uni_sb, 1)))), 
-					axis=2)
-				# add onto PM number concentration array
-				self.pconc = np.concatenate((self.pconc, 
-					(np.zeros((uni_sb_pconc, 1)))), 
-					axis=1)
-				self.pconct = np.concatenate((self.pconct, 
-					(np.zeros((1, 1)))), 
-					axis=1)
-				# add onto mean radius array
-				self.mean_rad = np.concatenate((self.mean_rad, 
-					(np.zeros((uni_sb_mean_rad, 1)))), 
-					axis=1)
+
+				if (seedx_flag != 0): # if seed component present
+					# add onto mole fraction array
+					self.seedx = np.concatenate((self.seedx, 
+						(np.zeros((uni_comp, 
+					 	uni_sb, 1)))), 
+						axis=2)
+				# if particle number concentration present
+				if (pconc_flag != 0):
+					# add onto PM number concentration array
+					self.pconc = np.concatenate((self.pconc, 
+						(np.zeros((uni_sb_pconc, 1)))), 
+						axis=1)
+					self.pconct = np.concatenate((self.pconct, 
+						(np.zeros((1, 1)))), 
+						axis=1)
+					# add onto mean radius array
+					self.mean_rad = np.concatenate((self.mean_rad, 
+						(np.zeros((uni_sb_mean_rad, 1)))), 
+						axis=1)
 			
 			self.obs[ic-1, 1::] = np.array((i))[
 				0:col_num+1][comp_indx]

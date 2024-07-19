@@ -154,11 +154,13 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 
 		# water vapour pressure already given by Psat_water 
 		# (log10(atm))
-		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3'):
+		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3' and 
+			self.inorg_part_flag == 1):
 			self.Psat[:, i] = np.log10(
 				(9.9e-07*TEMP-2.5e-4)*9.869e-6)
 			continue # onto next component
-		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3'):
+		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3' and 
+			self.inorg_part_flag == 1):
 			self.Psat[:, i] = np.log10(
 				(4.5e-04*TEMP-1.2e-1)*9.869e-6)
 			continue # onto next component

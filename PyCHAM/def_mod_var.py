@@ -144,6 +144,10 @@ def def_mod_var(caller, self): # define function
 	# partitioning coefficient is set to zero, e.g. because surface area of a size bin
 	# is relatively very small
 	z_prt_coeff = 1.e-9
+	# whether (1) or not (0) to set the effective vapour pressure of
+	# inorganic components that are known to partition inside 
+	# prop_calc.py and volat_calc.py
+	self.inorg_part_flag = 0
 
 	# gas inputs ------------------------------------------------------------
 	# chemical scheme name of components present initially

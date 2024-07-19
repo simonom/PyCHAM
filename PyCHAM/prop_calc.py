@@ -266,7 +266,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.nom_mass[0, i] = 0.*1.+3.*16.
 			continue
 
-		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3'):
+		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 
+			'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or 
+			self.comp_namelist[i] == 'HNO3' and 
+			self.inorg_part_flag == 1):
+			
 			if (self.pars_skip != 2):
 				# effective vapour pressure of ammonium nitrate from 
 				# diurnal_est.py on Simon O'Meara OneDrive
@@ -283,7 +287,9 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.nom_mass[0, i] = 4.*1.+3.*16.+2.*14.
 			continue
 
-		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3'):
+		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 
+			'NH3' and self.inorg_part_flag == 1):
+			
 			if (self.pars_skip != 2):
 				# effective vapour pressure of ammonia from 
 				# diurnal_est.py on Simon O'Meara OneDrive
@@ -633,7 +639,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# 'pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
 	#np.save(save_path, Psat_Pa_rec_saving, allow_pickle=True)
 	
-
 	# if vapour pressure plot requested then make this now ---------
 	if (self.testf == 3.2): 
 		
@@ -671,6 +676,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# code now
 		err_mess = 'Stop'
 		erf = 1
-	# end of plotting section ---------------------------------------------------------------
+	# end of plotting section -----------------------------------------------
 	
 	return(self, err_mess, erf)
