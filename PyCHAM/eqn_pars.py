@@ -249,7 +249,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, sav_nam, self):
 
 	# in case equation parsing to be skipped in further simulations
 	self.rowvals = rowvals; self.colptrs = colptrs; self.comp_num = comp_num;
-	self.rel_SMILES = comp_list; self.Pybel_objects = Pybel_objects; self.Jlen = Jlen 
+	self.rel_SMILES = comp_list; self.Pybel_objects = Pybel_objects; self.Jlen = Jlen
 
 	return(rowvals, colptrs, comp_num, 
 		Jlen, erf, err_mess, self)

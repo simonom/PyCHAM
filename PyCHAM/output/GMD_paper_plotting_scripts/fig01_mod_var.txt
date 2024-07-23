@@ -1,4 +1,4 @@
-res_file_name = fig01_res_16sb_newD
+res_file_name = fig01_res_16sb_newD_oldmfp_testing
 chem_sch_name = fig01_scheme.txt
 xml_name = fig01_xml.xml
 total_model_time = 2.52e4

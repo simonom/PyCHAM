@@ -113,7 +113,7 @@ def plotter(caller, dir_path, uc, self):
 		make_patch_spines_invisible(par2)
 		# second, show the right spine
 		par2.spines["right"].set_visible(True)	
-		# --------------------------------------------------------------------------------
+		# -----------------------------------------------------------------------
 
 	if (indx_plot):
 		
@@ -293,7 +293,7 @@ def plotter(caller, dir_path, uc, self):
 		# colour bar label
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
-		# --------------------------------------------------------------------------------
+		# ------------------------------------------------------------------
 		# total particle number concentration # particles/cm3
 	
 		# include total number concentration (# particles/cm3 (air)) on contour plot
@@ -310,7 +310,7 @@ def plotter(caller, dir_path, uc, self):
 		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par1.yaxis.set_tick_params(labelsize=14)
 
-		# mass concentration of particles ---------------------------------------------------------------
+		# mass concentration of particles --------------------------------------------
 		# array for mass concentration with time
 		MCvst = np.zeros((1, len(timehr)))
 		

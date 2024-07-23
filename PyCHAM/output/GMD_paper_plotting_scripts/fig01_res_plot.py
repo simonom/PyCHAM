@@ -38,7 +38,7 @@ def fig01_res_plot():
 	# testing plot ----------------------------------
 
 	# directory to results
-	# replace 'GMD_paper_plotting_scripts' with fig01_scheme
+	# this command replaces 'GMD_paper_plotting_scripts' with fig01_scheme
 	dir_path_value = dir_path.replace('GMD_paper_plotting_scripts', \
 			'fig01_scheme/fig01_res_16sb_newD')
 
@@ -71,7 +71,7 @@ def fig01_res_plot():
 	group_indx = self.ro_obj.gi 
 	comp0 = self.ro_obj.init_comp	
 	
-	# ----------------------------------------------------------------------------------------
+	# --------------------------------------------------------------------------------
 	# get indices of components with a nitrate group
 	org_nitr_ind = np.empty((0))
 	inorg_nitr_ind = np.empty((0))
@@ -92,7 +92,7 @@ def fig01_res_plot():
 	inorg_nitr_ind = (inorg_nitr_ind).astype('int')
 	org_nitr_ind = (org_nitr_ind).astype('int')
 
-	# ----------------------------------------------------------------------------------------
+	# ---------------------------------------------------------------------------------
 	# prepare plot
 	# note, we have to use the gridspec approach because the parasite axis on the lower plot
 	# means that sharex won't bring the x axis of both plots in line
@@ -121,7 +121,7 @@ def fig01_res_plot():
 	make_patch_spines_invisible(par2)
 	# Second, show the right spine.
 	par2.spines["right"].set_visible(True)
-	# ----------------------------------------------------------------------------------------
+	# ----------------------------------------------------------------------------------
 	# gas-phase concentrations
 
 	# get index of components of interest
@@ -246,7 +246,7 @@ def fig01_res_plot():
 	ax1.plot([4.0, 4.0], [0.0, 500.0], color='white', linewidth=1, linestyle='dashed')
 	ax1.text(x=3.7, y=150, s='injection 2', size=12, rotation=90, color='white')
 	
-	# ----------------------------------------------------------------------------------------
+	# -----------------------------------------------------------------------------------
 	# organic aerosol mass concentration in particles (ug/m3)
 	final_i = 0
 

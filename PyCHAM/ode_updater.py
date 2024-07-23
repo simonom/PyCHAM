@@ -705,6 +705,9 @@ def ode_updater(y, H2Oi,
 				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
 			
+			if (sumt> 5400):
+				print('inside ode_updated, conc of C10H16O4iso1: ', y[773])
+
 			# if any components set to have constant 
 			# gas-phase concentration
 			if (any(self.con_C_indx)): # then keep constant

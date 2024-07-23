@@ -107,12 +107,10 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# kg/mol.  This is a replication of the original method from 
 	# Fuller et al. (1969): 
 	# doi.org/10.1021/j100845a020
-	try:
-		Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
+	Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
 		(y_mw*ma*1.e3))**0.5)/
 		(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
-	except:
-		import ipdb; ipdb.set_trace()
+	
 	# convert to cm2/s
 	Dstar_org = Dstar_org*1.e4
 
@@ -123,7 +121,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# we cannot use the equation for mean free path of air through
 	# air (though this is commented out below), in addition, because
 	# the Fuchs-Sutugin correction term for non-continuum regime is
-	# used (in partit_car.py), we must use the mean free path 
+	# used (in partit_var.py), we must use the mean free path 
 	# equation consistent with
 	# the Fuchs-Sutugin correction term for the transition regime -
 	# as stated in Seinfeld and Pandis, as long as the corresponding
@@ -160,7 +158,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 		# plot gas-phase diffusion coefficients (cm2/s)
 		ax0.plot(np.arange(len(self.comp_namelist)), Dstar_org, '+')
-		ax0.set_ylabel(r'Gas-phase diffusion coeffiecient (cm$\rm{^{2}}\,$s$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_ylabel(r'Gas-phase diffusion coefficient (cm$\rm{^{2}}\,$s$\rm{^{-1}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
 		ax0.set_xticks(np.arange(len(self.comp_namelist)))

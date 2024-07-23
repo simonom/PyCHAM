@@ -219,7 +219,7 @@ def def_mod_var(caller, self): # define function
 	p_char = 0. # average number of charges per particle (/particle)
 	e_field = 0. # average electric field inside chamber (g.m/A.s3)
 
-	# specific component properties ---------------------------------------------------------
+	# specific component properties ---------------------------------
 	# chemical scheme name of components to track the change tendencies of	
 	self.dydt_trak = []
 	# chemical scheme names of components with densities manually set
@@ -230,6 +230,8 @@ def def_mod_var(caller, self): # define function
 	vol_comp = []
 	# manually assigned vapour pressures (Pa)
 	volP = []
+	# method for estimating vapour pressures of HOMs
+	self.HOMs_vp = 'Nannoolal2008'
 	# names of components (corresponding to chemical scheme name) with 
 	# activity coefficient stated in act_user
 	act_comp = []

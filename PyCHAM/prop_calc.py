@@ -316,28 +316,41 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.rel_SMILES[i].count('o') >= 6) and 
 			'PAN' not in self.comp_namelist[i]) and
 			'Mesotrione' not in self.comp_namelist[i]):
+
+			# tell recording section we are dealing 
+			# with a HOM		
+			rec_now_flag = 1
 			
-			# log(C* (ug/m3)) (natural logarithm of effective 
-			# saturation concentration) of component 
-			# (Eq. 1 Mohr et al. 2019)
-			nC = (self.rel_SMILES[i].count('C') + 
+			if (self.HOMs_vp == 'Nannoolal2008'):
+				# if Nannoolal method wanted for HOMs
+				Psatnow = ((vapour_pressures.nannoolal(
+					self.Pybel_objects[i],
+					self.TEMP[tempt_cnt], 
+					boiling_points.nannoolal(
+					self.Pybel_objects[i]))))
+
+			# if Mohr et al. 2019 method wanted for HOMs
+			if (self.HOMs_vp == 'Mohr2019'):
+			
+				# log(C* (ug/m3)) (natural logarithm of effective 
+				# saturation concentration) of component 
+				# (Eq. 1 Mohr et al. 2019)
+				nC = (self.rel_SMILES[i].count('C') + 
 				self.rel_SMILES[i].count('c'))
-			nO = (self.rel_SMILES[i].count('O') + 
+				nO = (self.rel_SMILES[i].count('O') + 
 				self.rel_SMILES[i].count('o'))
-			nN = (self.rel_SMILES[i].count('N') + 
-				self.rel_SMILES[i].count('n'))
-			if (self.pars_skip != 2):
-				Psatnow = ((25.-nC)*0.475-
-				(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
-				(nC+nO-3.*nN))*0.9-nN*2.5)
-				# convert to vapour pressure (log10(atm))
-				# (eq. 1 O'Meara et al. 2014)
-				Psatnow = np.exp(Psatnow) # ug/m3
-				Psatnow = np.log10((Psatnow*8.2057e-5*
-				self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
-				# tell recording section we are dealing 
-				# with HOM		
-				rec_now_flag = 1
+				nN = (self.rel_SMILES[i].count('N') + 
+					self.rel_SMILES[i].count('n'))
+				if (self.pars_skip != 2):
+					Psatnow = ((25.-nC)*0.475-
+					(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
+					(nC+nO-3.*nN))*0.9-nN*2.5)
+					# convert to vapour pressure (log10(atm))
+					# (eq. 1 O'Meara et al. 2014)
+					Psatnow = np.exp(Psatnow) # ug/m3
+					Psatnow = np.log10((Psatnow*8.2057e-5*
+					self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
+					
 			
 		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
 		# et al. (2008), with dB of 
@@ -498,7 +511,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		self.P_wfunc_ci = []
 		# list to remember the user-defined vapour pressure
 		self.P_wfunc = []
-		
+
 		# manually assigned vapour pressures (Pa)
 		if (len(vol_Comp) > 0 and ode_gen_flag == 0):
 			for i in range (len(vol_Comp)):
@@ -564,7 +577,9 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 
 					# index of component in list of components
 					try: # first see if an individual component has been named
-						vol_indx = self.comp_namelist.index(vol_Comp[i])
+						
+						vol_indx = self.comp_namelist.index(vol_Comp[i])	
+						
 					except: # could be a group of components
 						group_name = vol_Comp[i]
 						

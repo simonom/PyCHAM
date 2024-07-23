@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/test_scheme/test_original_HNO3vp
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/fig01_scheme/fig01_res_16sb_newD_oldmfp_testing

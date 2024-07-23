@@ -862,6 +862,13 @@ def mod_var_read(self):
 			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
 
+			if key == 'volP' and (value.strip()):
+				volP = [float(i) for i in (value.split(','))]
+
+			# names of components with specified activity coefficients
+			if (key == 'HOMs_vp_method' and (value.strip())):
+				self.HOMs_vp =  str(value.strip())
+
 			# names of components with specified activity coefficients
 			if (key == 'act_comp' and (value.strip())):
 				act_comp = [i for i in 
@@ -935,22 +942,29 @@ def mod_var_read(self):
 			if key == 'Rate_at_inflect' and (value.strip()): # particle deposition to wall rate at inflection
 				inflectk = float(value.strip())
 
-			if key == 'ChamSA' and (value.strip()): # chamber surface area (m2) used for particle loss to walls
+			# chamber surface area (m2) used for particle loss to walls
+			if key == 'ChamSA' and (value.strip()):
 				ChamSA = float(value.strip())
 
-			if key == 'McMurry_flag' and (value.strip()): # marker for whether to use the McMurry model for particle deposition to wall
+			# marker for whether to use the McMurry model 
+			# for particle deposition to wall
+			if key == 'McMurry_flag' and (value.strip()):
 				Rader = int(value.strip())
 
-			if key == 'part_charge_num' and (value.strip()): # average number of charges per particle
+			# average number of charges per particle
+			if key == 'part_charge_num' and (value.strip()):
 				p_char = float(value.strip())
-			
-			if key == 'elec_field' and (value.strip()): # electric field in chamber
+
+			# electric field in chamber
+			if key == 'elec_field' and (value.strip()):
 				e_field = float(value.strip())
 			
-			if key == 'dil_fac' and (value.strip()): # dilution factor rate
+			# dilution factor rate
+			if key == 'dil_fac' and (value.strip()):
 				self.dil_fac = np.array(([float(i) for i in (((value.strip()).split(',')))]))
-				
-			if key == 'dil_fact' and (value.strip()): # dilution factor rate times through experiment (s)
+			
+			# dilution factor rate times through experiment (s)
+			if key == 'dil_fact' and (value.strip()):
 				self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
 				
 			if key == 'ser_H2O' and (value.strip()): # whether to serialise water gas-particle partitioning
