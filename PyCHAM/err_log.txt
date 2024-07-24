@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/fig01_scheme/fig01_res_16sb_newD_oldmfp_testing
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_PRAMAP_scheme/Baker_2024_unseeded
