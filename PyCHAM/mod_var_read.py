@@ -870,6 +870,10 @@ def mod_var_read(self):
 				self.HOMs_vp =  str(value.strip())
 
 			# names of components with specified activity coefficients
+			if (key == 'inorg_part_flag' and (value.strip())):
+				self.inorg_part_flag = 1
+
+			# names of components with specified activity coefficients
 			if (key == 'act_comp' and (value.strip())):
 				act_comp = [i for i in 
 				(((value.strip()).split(',')))]
