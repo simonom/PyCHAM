@@ -383,14 +383,18 @@ def ui_check(self):
 	
 	# check on UManSysProp ---------------------------------------------------
 
-	# note that whilst conditionally setting uman_up below is required for this section to work, it does not
-	# change the input to the model, rather this is done, if needed (and it's needed when umansysprop 
-	# needs downloading even when the user hasn't specified this), by mod_var_read
+	# note that whilst conditionally setting uman_up below is 
+	# required for this section to work, it does not
+	# change the input to the model, rather this is done, if 
+	# needed (and it's needed when umansysprop 
+	# needs downloading even when the user hasn't specified this), 
+	# by mod_var_read
 
 	# for UManSysProp if no update requested, check that there 
 	# is an existing UManSysProp folder
 	if (uman_up == 0): # check for existing umansysprop folder
-		if not os.path.isdir(self.PyCHAM_path + '/umansysprop'): # if no existing folder then force update
+		# if no existing folder then force update
+		if not os.path.isdir(self.PyCHAM_path + '/umansysprop'):
 			uman_up = 1
 	
 	if (uman_up == 1): # test whether UManSysProp can be updated
