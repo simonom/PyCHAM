@@ -80,7 +80,7 @@ class PyCHAM(QWidget):
 		
 	def initUI(self):
 	
-		# general window setup ---------------------------------------------------------------------
+		# general window setup --------------------------------------------------------
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.left, self.top, self.width, self.height)
 		
@@ -88,7 +88,7 @@ class PyCHAM(QWidget):
 		grid = QGridLayout() 
 		self.setLayout(grid)
 		
-		# title --------------------------------------------------------------------------------------------
+		# title ------------------------------------------------------------------------
 		# PyCHAM logo
 		l00 = QLabel(self)
 		pixmap = QPixmap('PyCHAM/PyCHAM_logo_transparent.png')
@@ -104,7 +104,8 @@ class PyCHAM(QWidget):
 
 		#l0 = QLabel(self)
 		#l0.setOpenExternalLinks(True)
-		#l0.setText("Welcome to PyCHAM - please see <a href=\"\">README</a> for guidance")
+		#l0.setText(str('Welcome to PyCHAM - please see ' + 
+		#'<a href=\"\">README</a> for guidance'))
 		#l0.setFont(QFont('Arial', 20))
 		#grid.addWidget(l0, 0, 0, 1, 1)
 		
@@ -161,7 +162,6 @@ class PyCHAM(QWidget):
 		grid.addWidget(b89p, 0, PyCHlogo_hindx+1)
 
 		# Quit pane ----------------------------------------------
-		
 		b89 = QPushButton('Quit', self)
 		b89.setToolTip('Finish with PyCHAM and close this window')
 		b89.clicked.connect(self.on_click89)
@@ -180,7 +180,7 @@ class PyCHAM(QWidget):
 		# folder and file starting column number
 		ffscn = 0
 		
-		# folder selection for new simulation -------------------------------------------------------------------------
+		# folder selection for new simulation -----------------------------------------
 		b0 = QPushButton('Select Folder Containing Input Files', self)
 		b0.setToolTip('Select the folder containing the required input files')
 		b0.clicked.connect(self.on_click1)
@@ -2482,7 +2482,8 @@ class PyCHAM(QWidget):
 		self.btch_no = 1 # ensure just one simulation when single simulation button pressed
 		self.btch_str = (str(str(self.btch_no)+'.\n' + cs_file + '\n' + xml_file + '\n' + mv_file + '\n'))
 		
-		# if called from autorun function and if later simulations being conducted (i.e. not the first)  
+		# if called from autorun function and if later simulations 
+		# being conducted (i.e. not the first)  
 		if (type(self.param_const) == dict and 'progress' in self.__dict__):
 			self.progress.setValue(0) # reset to zero
 		else:
@@ -4823,7 +4824,8 @@ class PyCHAM(QWidget):
 		# filler for original starter simulation name
 		starter_name0 = 'fill'
 		
-		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'finisher'):
+		if ((self.param_const['sim_num'] == 'set') and 
+		(self.param_const['sim_type'] == 'finisher')):
 	
 			# tells mod_var_read that model variables not contained in a file
 			self.inname = 'Not found'
@@ -5188,7 +5190,9 @@ class PyCHAM(QWidget):
 							# ensure that after first simulation equation parsing is skipped
 							self.param_const['pars_skip'] = 1
 							
-		if (type(self.param_const['sim_num']) == float or type(self.param_const['sim_num']) == int and self.param_const['sim_type'] != 'standard_call'):
+		if (type(self.param_const['sim_num']) == float or 
+		type(self.param_const['sim_num']) == int and 
+		self.param_const['sim_type'] != 'standard_call'):
 	
 			# prepare for randomness
 			from numpy.random import default_rng
@@ -5349,17 +5353,18 @@ class PyCHAM(QWidget):
 
 		if (self.param_const['sim_type'] == 'standard_call'):
 
-			
 			self.inname = self.param_const['mod_var_name']
 			# establish parameters provided by user by calling mod_var_read
 			import mod_var_read
 			mod_var_read.mod_var_read(self)
 			
-			
-			try: # in case chemical scheme and xml file names contained in model variables file
+			# in case chemical scheme and xml 
+			# file names contained in model variables file
+			try:
 				self.param_const['sch_name'] = self.sch_name
 				self.param_const['xml_name'] = self.xml_name
-				
+			# in case chemical scheme and xml file names contained
+			# in provided self.param_const variable
 			except:
 				self.sch_name = self.param_const['sch_name']
 				self.xml_name = self.param_const['xml_name']
