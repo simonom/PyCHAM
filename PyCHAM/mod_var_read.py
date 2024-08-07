@@ -871,7 +871,7 @@ def mod_var_read(self):
 
 			# names of components with specified activity coefficients
 			if (key == 'inorg_part_flag' and (value.strip())):
-				self.inorg_part_flag = 1
+				self.inorg_part_flag = float(value.strip())
 
 			# names of components with specified activity coefficients
 			if (key == 'act_comp' and (value.strip())):

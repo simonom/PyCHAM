@@ -145,7 +145,8 @@ def def_mod_var(caller, self): # define function
 	# is relatively very small
 	z_prt_coeff = 1.e-9
 	# whether (1) or not (0) to set the effective vapour pressure of
-	# inorganic components that are known to partition inside 
+	# inorganic components (like HNO3 and ammonium nitrate) that are 
+	# known to partition inside 
 	# prop_calc.py and volat_calc.py
 	self.inorg_part_flag = 0
 

@@ -6,6 +6,8 @@ Welcome to the PyCHAM (CHemistry with Aerosol Microphysics in Python Box Model) 
 
 PyCHAM is an open-source computer code (written in Python) for simulating aerosol chambers.  It is supplied under the GNU General Public License v3.0.  The license document is provided with the software (LICENSE) and contains information around modification and conveyancing.
 
+PyCHAM was written by Simon P. O'Meara, Shuxuan Xu and Ademipo Onanuga.
+
 # Table of Content
 1. [Documentation](#Documentation)
 2. [Installation](#Installation)

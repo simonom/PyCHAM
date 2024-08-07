@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_PRAMAP_scheme/Baker_2024_unseeded
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/INGENIOUS/PyCHAM_outputs/homes/monte_carlo_outputs/EAC2024/sgr_0.1acr_0.0tf_0mops_0fry_0sho_0wst
