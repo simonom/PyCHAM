@@ -29,7 +29,7 @@ import datetime
 
 # function to generate the ordinary differential equation (ODE)
 # solver file
-def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, self):
+def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	
 	# inputs: ------------------------------------------------
 	# self.con_infl_indx - indices of components with continuous influx
@@ -43,7 +43,6 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, self):
 	# testf - marker for whether in test mode or not
 	# self.eqn_num - number of gas- and particle-phase reactions
 	# self.dil_fac - fraction of chamber air extracted/s
-	# sav_nam - name of file to save results to
 	# self - reference to PyCHAM
 	# -------------------------------------------------------
 	

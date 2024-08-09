@@ -41,7 +41,7 @@ def mod_var_read(self):
 		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, y0_gas, Press,
+			[y0_gas, Press,
 			siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, Ct,
@@ -148,7 +148,7 @@ def mod_var_read(self):
 			# ----------------------------------
 			# name of folder to save results in
 			if (key == 'res_file_name' and (value.strip())):
-				sav_nam = str(value.strip())
+				self.sav_nam = str(value.strip())
 			
 			# formatting for chemical scheme
 			if (key == 'chem_scheme_markers' and (value.strip())):
@@ -1035,7 +1035,7 @@ def mod_var_read(self):
 			self.pmode = 0 # modal particle concentrations
 		
 		# prepare for pickling
-		list_vars = [sav_nam, y0_gas, Press, 
+		list_vars = [y0_gas, Press, 
 				siz_stru, num_sb, lowsize, 
 				uppsize, std, 
 				Compt, injectt, Ct, seed_mw, 

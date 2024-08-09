@@ -47,7 +47,7 @@ def ui_check(self):
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, y0, Press,
+		[y0, Press,
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, 
 		Compt, injectt, Ct,
@@ -61,7 +61,7 @@ def ui_check(self):
 		pk.close()	
 
 	# loaded variables: --------------------------------------------
-	# sav_nam - name of folder to save results to
+	# self.sav_nam - name of folder to save results to
 	# self.sch_name - name of chemical scheme file
 	# self.wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
@@ -123,14 +123,17 @@ def ui_check(self):
 	err_mess = 'Model variables fine - simulation ready'
 	em_flag = 0 # flag that no problematic errors detected
 	
-	# saving path (copied from saving module) ------------
 	dir_path = os.getcwd() # current working directory
 	output_root = 'PyCHAM/output'
 	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
-	# one folder for one simulation
-	output_by_sim = os.path.join(dir_path, output_root, filename, 
-		sav_nam)
+	# if path and folder name already stated for saving to
+	if (('/' in self.sav_nam) or ('\\' in self.sav_nam)): 
+		# one folder for one simulation
+		output_by_sim = os.path.join(self.sav_nam)
+	else: # if no path given for saving to
+		# one folder for one simulation
+		output_by_sim = os.path.join(dir_path, output_root, filename, self.sav_nam)
 	
 	# ensure that if user wants simulation preparation mode, spin-up
 	# is turned on
@@ -203,17 +206,20 @@ def ui_check(self):
 			err_mess = str('Error - the molecular weight of seed particle component (seed_mw in model variables input file) could not be interpreted, please check it adheres to the guidelines in README')
 		em_flag = 2
 	
-	if (os.path.isdir(output_by_sim) == True and em_flag < 2): # in case proposed results folder already proposed
-		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+	# in case proposed results folder already saved
+	if (os.path.isdir(output_by_sim) == True and em_flag < 2):
+		err_mess = str('Error - results folder (' + output_by_sim + ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
-	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num == 1): # in case proposed results folder already on computer hard drive
+	# in case proposed results folder already proposed by another
+	# simulation in batch
+	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num > 1):
 		err_mess = str('Error - the proposed path for the results folder (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
 	# default name used for folder to save to
-	if (sav_nam == 'default_res_name' and em_flag < 2):
+	if (self.sav_nam == 'default_res_name' and em_flag < 2):
 		err_mess_n = str('Results will not be saved since the default name for folder to save to is chosen as the \'res_file_name\' variable in the model variables input\n')
 		if (em_flag == 0):
 			err_mess = err_mess_n
@@ -685,7 +691,7 @@ def ui_check(self):
 	# --------------------------------------------------------
 	
 	# store in pickle file
-	list_vars = [sav_nam, y0, Press, 
+	list_vars = [y0, Press, 
 			siz_stru, num_sb, lowsize, 
 			uppsize, std, 
 			Compt, injectt, Ct, seed_mw, 
@@ -713,7 +719,7 @@ def ui_check(self):
 		self.l80.setStyleSheet(0., '0px', 0., 0.) # remove any borders
 		self.bd_st = 3 # change border status to ready for change
 		
-		# remember path to output, in it needs adding to list for batch
+		# remember path to output, in case it needs adding to list for batch
 		self.output_by_sim = output_by_sim
 		
 		# if not (yet) in batch mode

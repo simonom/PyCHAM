@@ -44,7 +44,7 @@ def def_mod_var(caller, self): # define function
 	
 	# general -----------------------------------------------------------------------------
 	# name of folder to save results to
-	sav_nam = 'default_res_name'
+	self.sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
 	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , 
 		'&', '' , '', ':', '>', ';', '']
@@ -253,7 +253,7 @@ def def_mod_var(caller, self): # define function
 	self.sim_ci_file = []
 	# -------------------------------------------------------------
 	# prepare for pickling
-	list_vars = [sav_nam, y0, Press, 
+	list_vars = [y0, Press, 
 			siz_stru, num_sb, 
 			lowsize, 
 			uppsize, std, 
@@ -278,7 +278,7 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(sav_nam, y0, Press, siz_stru, num_sb, 
+	return(y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, 
 		std, Compt, 
 		injectt, Ct, seed_mw, seed_diss, seed_dens,  

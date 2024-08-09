@@ -31,12 +31,34 @@ import numpy as np
 # define function
 def share(self):
 
-	# inputs: ------------------------------------------------------	# --------------------------------------------------------------
+	# inputs: ------------------------------------------------------	
+	# self - the PyCHAM variable containing lots of variables
+	# --------------------------------------------------------------
+
+	dir_path = os.getcwd() # current working directory
+	output_root = 'PyCHAM/output'
+	filename = os.path.basename(self.sch_name)
+	filename = os.path.splitext(filename)[0]
+	# if path and folder name already stated for saving to
+	if (('/' in self.sav_nam) or ('\\' in self.sav_nam)): 
+		# one folder for one simulation
+		self.output_by_sim = os.path.join(self.sav_nam)
+	else: # if no path given for saving to
+		# one folder for one simulation
+		self.output_by_sim = os.path.join(dir_path, output_root, filename, self.sav_nam)
+	
+	# create results directory now
+	# to stop parallel (in time) simulations duplicating
+	# one another
+	os.makedirs(self.output_by_sim, exist_ok=False)
+
+	# remember this path in self, in case plotting scripts need it
+	self.dir_path = self.output_by_sim
 
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, y0, Press,
+		[y0, Press,
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, Compt, injectt, Ct,
 		seed_mw, seed_diss, seed_dens,
@@ -57,7 +79,7 @@ def share(self):
 		# in addition to other variables already saved to self, 
 		# ensure that every variable passed to middle is also available in self.
 		# this allows saving of all initial states of variables
-		self.sav_nam_orig = sav_nam
+		self.sav_nam_orig = self.sav_nam
 		self.comp0_orig = self.comp0
 		self.y0_orig = y0
 		self.RH_orig = self.RH
@@ -139,7 +161,7 @@ def share(self):
 		self.tf_UVC_orig = self.tf_UVC
 		self.num_asb = num_sb
 
-	return(sav_nam, y0, Press,
+	return(y0, Press,
 		siz_stru, num_sb, lowsize, uppsize, 
 		std, Compt, injectt, Ct,
 		seed_mw, seed_diss, seed_dens,

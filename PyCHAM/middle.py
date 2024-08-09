@@ -44,7 +44,7 @@ def middle(self): # define function
 	# -------------------------------------------------------------
 	st_time = time.time()
 	# get required inputs
-	[sav_nam, y0, Pnow,
+	[y0, Pnow,
 		siz_str, num_sb,
 		lowsize, uppsize, std,
 		Compt, injectt, Ct, seed_mw, 
@@ -67,7 +67,7 @@ def middle(self): # define function
 		Jlen, erf, err_mess, 
 		self] = eqn_pars.extr_mech(int_tol, 
 			(num_sb+self.wall_on), 
-			drh_str, erh_str, sav_nam, self)
+			drh_str, erh_str, self)
 	
 
 	# if skipping parsing of chemical scheme
@@ -155,7 +155,7 @@ def middle(self): # define function
 		injectt, inj_indx, Ct, 
 		lowsize, uppsize, std, rbou, MV,
 		diff_vol, Dstar_org, corei, ser_H2O, 
-		sav_nam, rbou00, ub_rad_amp, indx_plot,
+		rbou00, ub_rad_amp, indx_plot,
 		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self,
@@ -175,7 +175,7 @@ def middle(self): # define function
 		injectt, inj_indx, Ct, 
 		lowsize, uppsize, std, rbou, MV,
 		diff_vol, Dstar_org, corei, ser_H2O, 
-		sav_nam, rbou00, ub_rad_amp, indx_plot,
+		rbou00, ub_rad_amp, indx_plot,
 		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, 

@@ -170,8 +170,10 @@ class PyCHAM(QWidget):
 		
 		self.show()
 		return
-		
-	def NStab(self): # new Simulation tab
+	
+	# simulate tab - note that this called only once to
+	# set uo the simulation tab when PyCHAM started
+	def NStab(self):
 	
 		NSTab = QWidget()
 		self.NSlayout = QGridLayout() 
@@ -188,7 +190,7 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model 
 		# variables -------------------------
-		[sav_nam, y0, Press, siz_stru, num_sb, 
+		[y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
 		Compt, injectt, Ct, seed_mw, seed_diss, seed_dens, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
@@ -281,14 +283,15 @@ class PyCHAM(QWidget):
 		l9.setText('Folder to save to: ')
 		self.varbox.addWidget(l9, gen_row+1, 0)
 		self.l9a = QLabel(self)
-		self.l9a.setText(sav_nam)
+		self.l9a.setText(self.sav_nam)
 		self.varbox.addWidget(self.l9a, gen_row+1, 1)
 		
 		l10 = QLabel(self)
 		l10.setText('Chemical scheme markers: ')
 		self.varbox.addWidget(l10, gen_row+2, 0)
 		self.l10a = QLabel(self)
-		self.l10a.setText((str(self.chem_sch_mrk)).replace('\'', '').replace(' ', '')[1:-1])
+		self.l10a.setText((str(self.chem_sch_mrk)).replace(
+		'\'', '').replace(' ', '')[1:-1])
 		self.varbox.addWidget(self.l10a, gen_row+2, 1)
 		
 		l11 = QLabel(self)
@@ -323,14 +326,16 @@ class PyCHAM(QWidget):
 		l13_2.setText('Absolute and relative integration \ntolerances: ')
 		self.varbox.addWidget(l13_2, gen_row+7, 0)
 		self.l13_2a = QLabel(self)
-		self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l13_2a.setText((str(int_tol)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l13_2a, gen_row+7, 1)
 		
 		l13_2 = QLabel(self)
 		l13_2.setText('Absolute and relative integration \ntolerances: ')
 		self.varbox.addWidget(l13_2, gen_row+7, 0)
 		self.l13_2a = QLabel(self)
-		self.l13_2a.setText((str(int_tol)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l13_2a.setText((str(int_tol)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l13_2a, gen_row+7, 1)
 		
 		# Chamber Environment ----------
@@ -380,7 +385,8 @@ class PyCHAM(QWidget):
 		l17_1.setText('Dilution factor (volume fraction \nof chamber per second): ')
 		self.varbox.addWidget(l17_1, env_row+6, 0)
 		self.l17_1a = QLabel(self)
-		self.l17_1a.setText((str(self.dil_fac)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l17_1a.setText((str(self.dil_fac)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l17_1a, env_row+6, 1)
 		
 		# particle properties ----------------
@@ -410,60 +416,70 @@ class PyCHAM(QWidget):
 		l20.setText('Particle concentrations (#/cc): ')
 		self.varbox.addWidget(l20, par_row+3, 0)
 		self.l20a = QLabel(self)
-		self.l20a.setText((str(self.pconc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l20a.setText((str(self.pconc)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l20a, par_row+3, 1)
 		
 		l21 = QLabel(self)
 		l21.setText('Particle concentration times (s): ')
 		self.varbox.addWidget(l21, par_row+4, 0)
 		self.l21a = QLabel(self)
-		self.l21a.setText((str(self.pconct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l21a.setText((str(self.pconct)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l21a, par_row+4, 1)
 		
 		l22 = QLabel(self)
 		l22.setText('Molecular weight of seed particle \ncomponent (g/mol): ')
 		self.varbox.addWidget(l22, par_row+5, 0)
 		self.l22a = QLabel(self)
-		self.l22a.setText((str(seed_mw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l22a.setText((str(seed_mw)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l22a, par_row+5, 1)
 		
 		l23 = QLabel(self)
 		l23.setText('Dissociation constant(s) of seed \ncomponent(s): ')
 		self.varbox.addWidget(l23, par_row+6, 0)
 		self.l23a = QLabel(self)
-		self.l23a.setText((str(seed_diss)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l23a.setText((str(seed_diss)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l23a, par_row+6, 1)
 		
 		l24 = QLabel(self)
 		l24.setText('Density of seed particles (g/cc): ')
 		self.varbox.addWidget(l24, par_row+7, 0)
 		self.l24a = QLabel(self)
-		self.l24a.setText((str(seed_dens)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l24a.setText((str(seed_dens)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l24a, par_row+7, 1)
 		
 		l25 = QLabel(self)
 		l25.setText('Name of seed component: ')
 		self.varbox.addWidget(l25, par_row+8, 0)
 		self.l25a = QLabel(self)
-		self.l25a.setText((str(self.seed_name)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l25a.setText((str(self.seed_name)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l25a, par_row+8, 1)
 		
 		l26 = QLabel(self)
 		l26.setText('Mole fraction of non-water \ncomponents in \ndry seed particles: ')
 		self.varbox.addWidget(l26, par_row+9, 0)
 		self.l26a = QLabel(self)
-		self.l26a.setText((str(self.seedx)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l26a.setText((str(self.seedx)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l26a, par_row+9, 1)
 		
 		l26b = QLabel(self)
-		l26b.setText('Whether (1) or not (0) \nvolume of water included \nin seed particle \nnumber size distribution: ')
+		l26b.setText(str('Whether (1) or not (0) \nvolume of water ' +
+			'included \nin seed particle \nnumber size distribution: '))
 		self.varbox.addWidget(l26b, par_row+10, 0)
 		self.l26b = QLabel(self)
-		self.l26b.setText((str(self.Vwat_inc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l26b.setText((str(self.Vwat_inc)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l26b, par_row+10, 1)
 		
 		l26c = QLabel(self)
-		l26c.setText('Whether (1) or not (0) \nwater to be equilibrated \nwith seed particle \nprior to experiment start: ')
+		l26c.setText(str('Whether (1) or not (0) \nwater to be ' +
+			'equilibrated \nwith seed particle \nprior to experiment start: '))
 		self.varbox.addWidget(l26c, par_row+11, 0)
 		self.l26c = QLabel(self)
 		self.l26c.setText((str(self.seed_eq_wat)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
@@ -843,24 +859,28 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(self.l66aaa, wall_row+9, 1)
 		
 		l67 = QLabel(self)
-		l67.setText('Whether particle deposition to \nwall treated by Rader and \nMcMurry (1) or customised (0): ')
+		l67.setText(str('Whether particle deposition to \nwall ' + 
+		'treated by Rader and \nMcMurry (1) or customised (0): '))
 		self.varbox.addWidget(l67, wall_row+10, 0)
 		self.l67a = QLabel(self)
-		self.l67a.setText((str(Rader)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l67a.setText((str(Rader)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l67a, wall_row+10, 1)
 		
 		l68 = QLabel(self)
 		l68.setText('Average number of charges per \nparticle (/particle): ')
 		self.varbox.addWidget(l68, wall_row+11, 0)
 		self.l68a = QLabel(self)
-		self.l68a.setText((str(p_char)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l68a.setText((str(p_char)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l68a, wall_row+11, 1)
 		
 		l69 = QLabel(self)
 		l69.setText('Average electric field inside chamber \n(g.m/A.s3): ')
 		self.varbox.addWidget(l69, wall_row+12, 0)
 		self.l69a = QLabel(self)
-		self.l69a.setText((str(e_field)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l69a.setText((str(e_field)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l69a, wall_row+12, 1)
 		
 		# specific component properties ----------------------
@@ -895,49 +915,59 @@ class PyCHAM(QWidget):
 		l72.setText('Specified densities of \ncomponents (g/cc): ')
 		self.varbox.addWidget(l72, scp_row+3, 0)
 		self.l72a = QLabel(self)
-		self.l72a.setText((str(dens)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l72a.setText((str(dens)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l72a, scp_row+3, 1)
 		
 		l73 = QLabel(self)
-		l73.setText('Chemical scheme name of components \nwith specified vapour pressures: ')
+		l73.setText(str('Chemical scheme name of components ' +
+		'\nwith specified vapour pressures: '))
 		self.varbox.addWidget(l73, scp_row+4, 0)
 		self.l73a = QLabel(self)
-		self.l73a.setText((str(vol_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l73a.setText((str(vol_comp)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l73a, scp_row+4, 1)
 		
 		l74 = QLabel(self)
 		l74.setText('Specified vapour pressures of \ncomponents (Pa): ')
 		self.varbox.addWidget(l74, scp_row+5, 0)
 		self.l74a = QLabel(self)
-		self.l74a.setText((str(volP)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l74a.setText((str(volP)).replace('\'', '').replace(
+			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l74a, scp_row+5, 1)
 		
 		l75 = QLabel(self)
-		l75.setText('Chemical scheme name of components \nwith specified activity coefficients: ')
+		l75.setText(str('Chemical scheme name of components ' +
+		'\nwith specified activity coefficients: '))
 		self.varbox.addWidget(l75, scp_row+6, 0)
 		self.l75a = QLabel(self)
-		self.l75a.setText((str(act_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l75a.setText((str(act_comp)).replace(
+		'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l75a, scp_row+6, 1)
 		
 		l76 = QLabel(self)
 		l76.setText('Specified activity coefficients of \ncomponents:  ')
 		self.varbox.addWidget(l76, scp_row+7, 0)
 		self.l76a = QLabel(self)
-		self.l76a.setText((str(act_user)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l76a.setText((str(act_user)).replace(
+		'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l76a, scp_row+7, 1)
 
 		l77 = QLabel(self)
-		l77.setText('Chemical scheme name of components \nwith specified accommodation \ncoefficients: ')
+		l77.setText(str('Chemical scheme name of components \nwith ' + 
+			'specified accommodation \ncoefficients: '))
 		self.varbox.addWidget(l77, scp_row+8, 0)
 		self.l77a = QLabel(self)
-		self.l77a.setText((str(accom_comp)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l77a.setText((str(accom_comp)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l77a, scp_row+8, 1)
 		
 		l78 = QLabel(self)
 		l78.setText('Specified accommodation coefficients of \ncomponents:  ')
 		self.varbox.addWidget(l78, scp_row+9, 0)
 		self.l78a = QLabel(self)
-		self.l78a.setText((str(accom_val)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l78a.setText((str(accom_val)).replace(
+			'\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l78a, scp_row+9, 1)
 		
 		
@@ -968,14 +998,16 @@ class PyCHAM(QWidget):
 		
 		# button to run checks on variables selected in drop down button
 		self.b80 = QPushButton('Check Values', self)
-		self.b80.setToolTip('See the values of the variables selected in the drop down button to the left')
+		self.b80.setToolTip(str('See the values of the variables ' +
+		'selected in the drop down button to the left'))
 		self.b80.clicked.connect(self.on_clickb80)
 		self.NSlayout.addWidget(self.b80, 7, self.mvpn+2, 1, 1)
 
 		# -------------------------------------------------------------------
 
 		# label to let users know file combinations included in batch
-		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
+		self.btch_str = str('File combinations included in batch: ' +
+		'chemical scheme, xml, model variables\n')
 		# begin count on number of simulations in batch
 		self.btch_no = 1
 		
@@ -991,7 +1023,8 @@ class PyCHAM(QWidget):
 		self.output_list = [] # begin list of output paths
 		
 		# running check on default model variables ---------------------------------
-		# let checking module know this is a first call
+		# let checking module know this is the first call
+		# from gui
 		self.chck_num = 1
 
 		import ui_check # module for checking on model variables
@@ -2063,9 +2096,8 @@ class PyCHAM(QWidget):
 		
 		# prepare by enforcing default variables
 		# default variables for all required input model 
-		# variables --------------------------------------------
-		[sav_nam, 
-		y0, Press, siz_stru, num_sb, 
+		# variables -------------------------------------------- 
+		[y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
 		Compt, 
 		injectt, Ct, seed_mw, seed_diss, seed_dens, 
@@ -2084,7 +2116,7 @@ class PyCHAM(QWidget):
 			'/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[sav_nam, y0, Press,
+			[y0, Press,
 			siz_stru, num_sb, 
 			lowsize, uppsize, std, 
 			Compt, injectt, Ct,
@@ -2162,12 +2194,21 @@ class PyCHAM(QWidget):
 		
 		# running check on model variables -----------------------------------------
 		import ui_check # module for checking on model variables
+		
+		# let checking module know that this is the call once user-defined
+		# model variables have been read in (in contrast to the first call
+		# to checking module, which is just for default variables)
+		self.chck_num = 2
+
 		# check on inputs - note this loads the last saved pickle 
 		# file and saves any change 
 		# to this pickle file
 		
 		ui_check.ui_check(self)
-		# finished check on model variables -----------------------------------------------	
+
+		# move check number up by one
+		self.chck_num = 3
+		# finished check on model variables -------------------------------------------
 		
 		return()
 		
@@ -2182,11 +2223,12 @@ class PyCHAM(QWidget):
 		self.l3.setText(str(self.sch_name))
 		self.l3.show()
 	
-		# running check on model variables ---------------------------------------------------------------
+		# running check on model variables -------------------------------------------
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change to this pickle file
+		# check on inputs - note this loads the last saved pickle 
+		# file and saves any change to this pickle file
 		ui_check.ui_check(self)
-		# finished check on model variables --------------------------------------------------------------
+		# finished check on model variables ------------------------------------------
 	
 	@pyqtSlot()
 	def on_click3(self): # when different xml file requires selection
@@ -2201,7 +2243,8 @@ class PyCHAM(QWidget):
 		self.l5.show()
 			
 	@pyqtSlot()
-	def on_click4(self): # when different model variables file requires selection
+	# when different model variables file requires selection
+	def on_click4(self):
 	
 		if (self.fab == 1): # if showing, remove single simulation widgets
 			self.b81.deleteLater()
@@ -2212,16 +2255,20 @@ class PyCHAM(QWidget):
 			self.l81.deleteLater() # 'or' label
 			self.atb = 0 # remember that add to batch button not showing
 		# remove any old 'Simulation complete' message from previous run
-		if ((self.l81b.text() == 'Simulation complete') or (self.l81b.text() == 'Simulations complete')):
+		if ((self.l81b.text() == 'Simulation complete') or 
+		(self.l81b.text() == 'Simulations complete')):
 			self.l81b.setText('')
 
-		if type(self.param_const) != dict: # if not called from automatic script (automated_setup_and_call.py)
+		# if not called from automatic script (automated_setup_and_call.py)
+		if type(self.param_const) != dict:
 			# user chooses path of file to model variables file
 			self.inname, _ = QFileDialog.getOpenFileName(self, "Select Model Variables File", "./PyCHAM/input/")
-		if (type(self.param_const) == dict and self.inname == 'Not found'): # if run from automatic script (automated_setup_and_call.py)
+		# if run from automatic script (automated_setup_and_call.py)
+		if (type(self.param_const) == dict and self.inname == 'Not found'):
 			self.inname = 'Automatically Set'
 
-		if (self.inname == ''): # if no file selected, e.g. because selection was cancelled
+		# if no file selected, e.g. because selection was cancelled
+		if (self.inname == ''):
 			return()
 		
 		self.l7.clear() # clear old label
@@ -2235,16 +2282,23 @@ class PyCHAM(QWidget):
 		# end this function if an error thrown by reading of model variables
 		if (self.bd_st == 1 or self.bd_st == 2):
 			return()
-		# update displayed model variables to those of the selected model variables file
+		# update displayed model variables to those of the 
+		# selected model variables file
 		import mod_var_up
 		mod_var_up.mod_var_up(self)
 		
-		# running check on model variables --------------------------------------------------
+		# running check on model variables -------------------------------------------
 		import ui_check # module for checking on model variables
-		# check on inputs - note this loads the last saved pickle file and saves any change
+
+		# let checking module know that this call comes after user-defined
+		# model variables have been read in
+		self.chck_num = 2
+
+		# check on inputs - note this loads the last saved pickle file 
+		# and saves any change
 		# to this pickle file
 		ui_check.ui_check(self)
-		# finished check on model variables ------------------------------------------------
+		# finished check on model variables ---------------------------------
 
 		return()
 			
@@ -2255,13 +2309,15 @@ class PyCHAM(QWidget):
 		for sim_num in range(self.btch_no):
 			
 			# --------------------------------------------
-			if ((self.btch_no > 1) and (sim_num == self.btch_no-1)): # reach end of list in batch mode
+			# reach end of list in batch mode
+			if ((self.btch_no > 1) and (sim_num == self.btch_no-1)):
 				# once all simulations done tidy up
 				# clear the list of file combinations for simulations in batch
 				self.output_list = [] # reset list of output paths
 				# return to single simulation mode
 				self.btch_no = 1
-				self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
+				self.btch_str = str('File combinations included ' +
+				'in batch: chemical scheme, xml, model variables\n')
 				
 				# remove old progress message
 				self.l81b.setText('')
@@ -2274,7 +2330,7 @@ class PyCHAM(QWidget):
 			# reset to default variables to allow any new 
 			# variables to arise
 			# from the current model variables file only
-			[sav_nam, y0, Press, 
+			[y0, Press, 
 			siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, 
@@ -2292,12 +2348,14 @@ class PyCHAM(QWidget):
 			btch_list = self.btch_str
 			if ((sim_num+1) < (self.btch_no-1)): # if prior to final item in list
 				# get location of text relevant to this simulation
-				txt_st = btch_list.find(str(str(sim_num+1)+'.'+'\n'))+len(str(str(sim_num+1)+'.'+'\n'))
+				txt_st = (btch_list.find(str(str(sim_num+1) + '.' + 
+				'\n')) + len(str(str(sim_num+1)+'.'+'\n')))
 				txt_fi = btch_list.find(str(str(sim_num+2)+'.'+'\n'))
 				txtn = btch_list[txt_st:txt_fi]
 			else: # if final item in list
 				# get location of text relevant to this simulation
-				txt_st = btch_list.find(str(str(sim_num+1)+'.'+'\n'))+len(str(str(sim_num+1)+'.'+'\n'))
+				txt_st = (btch_list.find(str(str(sim_num+1) + '.' + 
+				'\n'))+len(str(str(sim_num+1)+'.'+'\n')))
 				txtn = btch_list[txt_st::]
 					
 			# split into separate file paths
@@ -2321,7 +2379,7 @@ class PyCHAM(QWidget):
 			input_by_sim = str(self.PyCHAM_path 
 				+ '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, y0, Press,
+				[y0, Press,
 				siz_stru, num_sb,
 				lowsize, uppsize, std,
 				Compt, injectt, Ct,
@@ -2338,18 +2396,26 @@ class PyCHAM(QWidget):
 			# let check know this is a second call
 			self.chck_num = 2
 			
-			# run another check on inputs - means any changes made by default are set
+			# run another check on inputs - means any changes 
+			# made by default are set
 			import ui_check; ui_check.ui_check(self)
 
 			# reset check number to a first call
 			self.chck_num = 1
 
-			# saving path - copied from saving module
+			# saving path - copied from user_input.py module
 			dir_path = os.getcwd() # current working directory
 			output_root = 'PyCHAM/output'
 			filename = os.path.basename(self.sch_name)
 			filename = os.path.splitext(filename)[0]
-			output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
+			# if path and folder name already stated for saving to
+			if (('/' in self.sav_nam) or ('\\' in self.sav_nam)): 
+				# one folder for one simulation
+				output_by_sim = os.path.join(self.sav_nam)
+			else: # if no path given for saving to
+				# one folder for one simulation
+				output_by_sim = os.path.join(dir_path, output_root, 
+				filename, self.sav_nam)
 			
 			# display the progress label, including the name of the saving path
 			if (self.btch_no == 1): # single run mode
@@ -2400,7 +2466,8 @@ class PyCHAM(QWidget):
 			# change 'log' below to 'warn'
 			save_err = np.seterr(all='log')
 			
-			err_mess = self.act_81(output_by_sim, sim_num) # call on function to simulate
+			# call on function to simulate
+			err_mess = self.act_81(output_by_sim, sim_num)
 
 			if (err_mess != ''): # state error message if any generated
 				self.l81b.setText('') # remove old progress message
@@ -2417,8 +2484,9 @@ class PyCHAM(QWidget):
 		return(err_mess)
 				
 	
-	@pyqtSlot()		
-	def act_81(self, output_by_sim, sim_num): # start the simulation
+	@pyqtSlot()
+	# start the simulation
+	def act_81(self, output_by_sim, sim_num):
 		
 		from middle import middle # prepare to communicate with main program
 		
@@ -2429,13 +2497,19 @@ class PyCHAM(QWidget):
 		
 			if (isinstance(prog, str)): # check if it's a message
 				mess = prog
-				if (mess[0:5] == 'Error'): # if it's an error message
+				# if it's an error message
+				if (mess[0:5] == 'Error'):
 					# remove the progress bar
 					self.progress.deleteLater()
 					return(mess)
+					
+					# remove the directory that was due to hold results
+					import shutil	
+					shutil.rmtree(self.output_by_sim)
 				else:
 					self.l81b.setText(mess)
-					note_messf = 1 # flag that a note message has been generated 
+					# flag that a note message has been generated
+					note_messf = 1 
 			
 			else: # if no message from model
 			
@@ -4515,7 +4589,7 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[sav_nam, y0, Press,
+				[y0, Press,
 				siz_stru, num_sb,
 				 lowsize, uppsize, 
 				std, Compt, injectt, Ct,

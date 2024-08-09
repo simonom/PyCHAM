@@ -65,7 +65,7 @@ def ode_updater(y, H2Oi,
 	injectt, inj_indx, Ct, lowsize, 
 	uppsize, std, rbou, MV, 
 	diff_vol, DStar_org, corei, ser_H2O, 
-	sav_nam, rbou00, ub_rad_amp, indx_plot,
+	rbou00, ub_rad_amp, indx_plot,
 	wat_hist, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
@@ -253,7 +253,7 @@ def ode_updater(y, H2Oi,
 	#	particle deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
-	# sav_nam - name of folder to save in
+	# self.sav_nam - name of folder to save in
 	# self.comp_namelist - chemical scheme name of components
 	# self.dydt_trak - name of components to track change tendencies
 	# rbou00 - original particle size bin bounds
@@ -516,7 +516,7 @@ def ode_updater(y, H2Oi,
  			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
 			volP, ic_red)
-			
+
 			# ------------------------------------------------------------
 			# if particles and/or wall present		
 			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
@@ -696,7 +696,8 @@ def ode_updater(y, H2Oi,
 
 			# model component concentration changes to 
 			# get new concentrations molecules/cm3 (air))
-			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
+			try:
+				[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
 				core_diss, kelv_fac, kimt, 
@@ -704,7 +705,8 @@ def ode_updater(y, H2Oi,
 				jac_mod_len, jac_part_hmf_indx, rw_indx, 
 				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
-
+			except:
+				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
 			# if any components set to have constant 
 			# gas-phase concentration
 			if (any(self.con_C_indx)): # then keep constant
@@ -1020,7 +1022,7 @@ def ode_updater(y, H2Oi,
 		self.con_infl_C = np.concatenate((self.con_infl_C, self.con_infl_H2O), axis=0)
 	
 	# save results
-	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
+	save.saving(yrec, Nres_dry, Nres_wet, trec, 
 		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
 		x2, rbou_rec, rbou00, ub_rad_amp, 
 		indx_plot, H2Oi, siz_str, cham_env, self)

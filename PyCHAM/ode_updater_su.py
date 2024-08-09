@@ -67,7 +67,7 @@ def ode_updater_su(y, H2Oi,
 	injectt, inj_indx, Ct, lowsize, 
 	uppsize, std, rbou, MV, 
 	diff_vol, DStar_org, corei, ser_H2O, 
-	sav_nam, rbou00, ub_rad_amp, indx_plot,
+	rbou00, ub_rad_amp, indx_plot,
 	wat_hist, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
@@ -242,7 +242,7 @@ def ode_updater_su(y, H2Oi,
 	# deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
-	# sav_nam - name of folder to save in
+	# self.sav_nam - name of folder to save in
 	# self.comp_namelist - chemical scheme name of components
 	# self.dydt_trak - name of components to track change tendencies
 	# rbou00 - original particle size bin bounds

@@ -37,7 +37,7 @@ import jac_setup
 import aq_mat_prep
 
 # define function to extract the chemical mechanism
-def extr_mech(int_tol, num_sb, drh_str, erh_str, sav_nam, self):
+def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	
 	# inputs: ----------------------------------------------------
 	# self.sch_name - file name of chemical scheme
@@ -58,7 +58,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, sav_nam, self):
 	# erh_str - string from user inputs describing 
 	#	efflorescence RH (fraction 0-1) as function of temperature (K)
 	# self.dil_fac - fraction of chamber air extracted/s
-	# sav_nam - name of folder to save results to
+	# self.sav_nam - name of folder to save results to
 	# self.pcont - flag for whether seed particle injection is 
 	#	instantaneous (0) or continuous (1)
 	# self - reference to PyCHAM program
@@ -231,7 +231,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, sav_nam, self):
 	# solver module, add two to comp_num to account for water 
 	# and core component
 	write_ode_solv.ode_gen(int_tol, rowvals, comp_num+self.H2O_in_cs, 
-		(num_sb-self.wall_on), 0, sav_nam, self)
+		(num_sb-self.wall_on), 0, self)
 
 	# call function to generate reaction rate calculation module
 	write_rate_file.write_rate_file(rrc, rrc_name, 0, self)

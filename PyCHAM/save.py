@@ -31,7 +31,7 @@ import csv
 from shutil import copyfile
 import pickle
 
-def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp, 
+def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
 	time_taken, x2, rbou_rec, rbou00, upper_bin_rad_amp, 
 	indx_plot, H2Oi, siz_str, cham_env, self):
@@ -47,6 +47,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# (air) into ppb
 	# testf - flag to show whether in normal mode (0) or test mode (1)
 	# numsb - number of size bins
+	# self.sav_nam - folder name/path to save results to
 	# self.dydt_vst - tendency to change of user-specified 
 	# components
 	# self.dydt_trak - user-input names of components to track
@@ -83,7 +84,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self.inname - path to model variables file
 	# self.rel_SMILES - SMILES strings for components in chemical scheme
 	# self.Psat_Pa_rec - pure component saturation vapour pressures at 298.15 K (Pa)
-	# self.Psat_rec0 - pure component saturation vapour pressures at starting temperature of simulation (# molecules/cm3)
+	# self.Psat_rec0 - pure component saturation vapour pressures 
+	#	at starting temperature of simulation (# molecules/cm3)
 	# self.OC - oxygen to carbon ratio of components
 	# self.HC - hydrogen to carbon ratio of components
 	# H2Oi - index of water
@@ -98,48 +100,34 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
-	if ((numsb-self.wall_on) > 0): # correct for changes to size bin radius bounds
+	# correct for changes to size bin radius bounds
+	if ((numsb-self.wall_on) > 0):
 		rbou_rec[:, 0] = rbou00
 		rbou_rec[:, -1] = rbou_rec[:, -1]/upper_bin_rad_amp
 
 	if (testf == 1):
 		return(0) # return dummy
 
-	dir_path = os.getcwd() # current working directory
-	output_root = 'PyCHAM/output'
-	filename = os.path.basename(self.sch_name)
-	filename = os.path.splitext(filename)[0]
-	# if path and folder name already stated for saving to
-	if (('/' in savefolder) or ('\\' in savefolder)): 
-		# one folder for one simulation
-		output_by_sim = os.path.join(savefolder)
-	else: # if no path given for saving to
-		# one folder for one simulation
-		output_by_sim = os.path.join(dir_path, output_root, filename, savefolder)
-	
-
-	# create folder to store results
-	os.makedirs(output_by_sim)
-	# remember this path in self, in case plotting scripts need it
-	self.dir_path = output_by_sim
+	# note that the directory to save results to (self.output_by_sim) 
+	# is created in user_input.py
 
 	# create folder to store copies of inputs
-	os.makedirs(str(output_by_sim+'/inputs'))
+	os.makedirs(str(self.output_by_sim+'/inputs'))
 	# making a copy of the chemical scheme and model variables input files
 	if '/' in self.sch_name: # if using / to separate path parts
-		output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('/')[-1])
+		output_by_sim_sch_ext = str(self.output_by_sim + '/inputs/' + self.sch_name.split('/')[-1])
 	if '\\' in self.sch_name: # if using \\ to separate path parts
-		output_by_sim_sch_ext = str(output_by_sim + '/inputs/' + self.sch_name.split('\\')[-1])
+		output_by_sim_sch_ext = str(self.output_by_sim + '/inputs/' + self.sch_name.split('\\')[-1])
 	
 	copyfile(self.sch_name, output_by_sim_sch_ext)
-	output_by_sim_mv_ext = str(output_by_sim + '/inputs/' + self.inname.split('/')[-1])
+	output_by_sim_mv_ext = str(self.output_by_sim + '/inputs/' + self.inname.split('/')[-1])
 	# if not in default model variables mode or in automatic calling mode
 	if (self.inname != 'Default' and type(self.param_const) != dict):
 		copyfile(self.inname, output_by_sim_mv_ext)
 	
 	# if in automatic calling mode, then save the specified model variables
 	if (type(self.param_const) == dict):
-		output_by_sim_mv_ext = str(output_by_sim + '/inputs/specified_model_variables.txt')
+		output_by_sim_mv_ext = str(self.output_by_sim + '/inputs/specified_model_variables.txt')
 		with open(output_by_sim_mv_ext, 'w') as f:
 			for key, value in self.param_const.items():
 				f.write('%s = %s\n' % (key, value))
@@ -173,75 +161,75 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 	const["output_by_sim_sch_ext"] = output_by_sim_sch_ext
 	const["output_by_sim_mv_ext"] = output_by_sim_mv_ext
 	
-	with open(os.path.join(output_by_sim,'model_and_component_constants'),'w') as f:
+	with open(os.path.join(self.output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():
 			f.write("%s,%s\n"%(key, const[key]))
 
 	# save
-	save_path = str(output_by_sim + '/nom_mass') # path
+	save_path = str(self.output_by_sim + '/nom_mass') # path
 	np.save(save_path, self.nom_mass, allow_pickle=True)
 	
-	save_path = str(output_by_sim + '/y_mw') # path
+	save_path = str(self.output_by_sim + '/y_mw') # path
 	np.save(save_path, np.squeeze(y_mw), allow_pickle=True)
 
-	save_path = str(output_by_sim + '/MV') # path
+	save_path = str(self.output_by_sim + '/MV') # path
 	np.save(save_path, np.squeeze(MV), allow_pickle=True)
 
-	save_path = str(output_by_sim + '/comp_namelist') # path
+	save_path = str(self.output_by_sim + '/comp_namelist') # path
 	np.save(save_path, self.comp_namelist, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/rel_SMILES') # path
+	save_path = str(self.output_by_sim + '/rel_SMILES') # path
 	np.save(save_path, self.rel_SMILES, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
+	save_path = str(self.output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
 	np.save(save_path, self.Psat_Pa_rec, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/pure_component_saturation_vp_at_startT_molec_percm3') # path
+	save_path = str(self.output_by_sim + '/pure_component_saturation_vp_at_startT_molec_percm3') # path
 	np.save(save_path, self.Psat_rec0, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/oxygen_to_carbon_ratios_of_components') # path
+	save_path = str(self.output_by_sim + '/oxygen_to_carbon_ratios_of_components') # path
 	np.save(save_path, self.OC, allow_pickle=True)
 	
-	save_path = str(output_by_sim + '/hydrogen_to_carbon_ratios_of_components') # path
+	save_path = str(self.output_by_sim + '/hydrogen_to_carbon_ratios_of_components') # path
 	np.save(save_path, self.HC, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/OOH_index') # path
+	save_path = str(self.output_by_sim + '/OOH_index') # path
 	np.save(save_path, self.OOH, allow_pickle=True)
  
-	save_path = str(output_by_sim + '/HOM_OOH_index') # path
+	save_path = str(self.output_by_sim + '/HOM_OOH_index') # path
 	np.save(save_path, self.HOM_OOH, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/OH_index') # path
+	save_path = str(self.output_by_sim + '/OH_index') # path
 	np.save(save_path, self.OH, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/HOM_OH_index') # path
+	save_path = str(self.output_by_sim + '/HOM_OH_index') # path
 	np.save(save_path, self.HOM_OH, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/carbonyl_index') # path
+	save_path = str(self.output_by_sim + '/carbonyl_index') # path
 	np.save(save_path, self.carbonyl, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/HOM_carbonyl_index') # path
+	save_path = str(self.output_by_sim + '/HOM_carbonyl_index') # path
 	np.save(save_path, self.HOM_carbonyl, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/NO3_index') # path
+	save_path = str(self.output_by_sim + '/NO3_index') # path
 	np.save(save_path, self.NO3, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/HOM_NO3_index') # path
+	save_path = str(self.output_by_sim + '/HOM_NO3_index') # path
 	np.save(save_path, self.HOM_NO3, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/organic_peroxy_radical_index') # path
+	save_path = str(self.output_by_sim + '/organic_peroxy_radical_index') # path
 	np.save(save_path, self.RO2_indices[:, -1], allow_pickle=True)	
 	
-	save_path = str(output_by_sim + '/organic_alkoxy_radical_index') # path
+	save_path = str(self.output_by_sim + '/organic_alkoxy_radical_index') # path
 	np.save(save_path, self.RO_indx, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/organic_HOM_peroxy_radical_index') # path
+	save_path = str(self.output_by_sim + '/organic_HOM_peroxy_radical_index') # path
 	np.save(save_path, self.HOM_RO2_indx, allow_pickle=True)
 
-	save_path = str(output_by_sim + '/organic_HOMs_index') # path
+	save_path = str(self.output_by_sim + '/organic_HOMs_index') # path
 	np.save(save_path, self.HOMs_indx, allow_pickle=True)
 	
-	save_path = str(output_by_sim + '/organic_ROOR_index') # path
+	save_path = str(self.output_by_sim + '/organic_ROOR_index') # path
 	np.save(save_path, self.ROOR_indx, allow_pickle=True)
 
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
@@ -272,20 +260,20 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			y_header = str(y_header + str(start + self.comp_namelist[ii]) + end)
 			
 	# saving both gas, particle and wall concentrations of components
-	np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cm3 (air)) and _w is the wall phase (molecules/cm3 (air))\n' + y_header)) 		
+	np.savetxt(os.path.join(self.output_by_sim, 'concentrations_all_components_all_times_gas_particle_wall'), y_mat, delimiter=',', header=str('time changes with rows which correspond to the time output file, components in columns, with _g representing gas phase (ppb), _pi representing particle phase where i is the size bin number (starting at 1) (molecules/cm3 (air)) and _w is the wall phase (molecules/cm3 (air))\n' + y_header)) 		
 	
 	# saving time of outputs
-	np.savetxt(os.path.join(output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
+	np.savetxt(os.path.join(self.output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
 	
 	# saving environmental conditions (temperature, pressure, relative humidity, transmission factor)
 	# prepare to concatenate transmission factor of light (0-1)
 	cham_env = cham_env.astype('str')
 
-	np.savetxt(os.path.join(output_by_sim, 'chamber_environmental_conditions'), cham_env, fmt = '%s', delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa), third is relative humidity (fraction (0-1), fourth is transmission factor of light (0-1))')
+	np.savetxt(os.path.join(self.output_by_sim, 'chamber_environmental_conditions'), cham_env, fmt = '%s', delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa), third is relative humidity (fraction (0-1), fourth is transmission factor of light (0-1))')
 	
 	# saving the index and names of components whose gas-phase 
 	# temporal profiles can be plotted on the standard results plot
-	fname = os.path.join(output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')
+	fname = os.path.join(self.output_by_sim, 'components_with_initial_gas_phase_concentrations_specified')
 	
 	np.savetxt(fname, [indx_plot, self.comp0], delimiter =', ', header='index (top row) and chemical scheme name (bottom row) of components with initial gas-phase concentrations specified', fmt ='% s') 
 	
@@ -322,7 +310,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			comp_name = str(self.dydt_trak[compind] +
 				'_rate_of_change')
 			# save
-			np.savetxt(os.path.join(output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), 3rd column from end is gas-particle partitioning, 2nd column from end is gas-wall partitioning, final column is dilution (molecules/cm3/s (air))')
+			np.savetxt(os.path.join(self.output_by_sim, comp_name), dydt_rec, delimiter=',', header='tendency to change, top row gives equation number (where number 0 is the first equation), 3rd column from end is gas-particle partitioning, 2nd column from end is gas-wall partitioning, final column is dilution (molecules/cm3/s (air))')
 
 			if hasattr(self, 'ci_array'):
 				if (len(self.ci_array) > 0):
@@ -366,26 +354,26 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 			wb.save(pd + self.sim_ci_file)
 		
 	# saving generation of components
-	np.savetxt(os.path.join(output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised Vself.OC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
+	np.savetxt(os.path.join(self.output_by_sim, 'component_generation'), self.gen_num, delimiter=',', header='generation number of each component (where the initial unoxidised Vself.OC is generation number 0), with the order corresponding to that of components in the concentrations_all_components_all_times_gas_particle_wall file.')
 	
 	if ((numsb-self.wall_on) > 0): # if particles present
 	
 		# saving the concentration of components on the wall due to particle deposition to wall
-		np.savetxt(os.path.join(output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), self.yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (# molecules/cm3 (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
+		np.savetxt(os.path.join(self.output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), self.yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (# molecules/cm3 (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
 	
-		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
+		np.savetxt(os.path.join(self.output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
 				header=('particle number concentration assuming water removed from particles (#/cm3 (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
 		
-		np.savetxt(os.path.join(output_by_sim, 'particle_number_concentration_wet'), Nresult_wet, delimiter=',',
+		np.savetxt(os.path.join(self.output_by_sim, 'particle_number_concentration_wet'), Nresult_wet, delimiter=',',
 				header=('particle number concentration assuming water not removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))	
 	
-		np.savetxt(os.path.join(output_by_sim, 'size_bin_radius'), x2, delimiter=',',
+		np.savetxt(os.path.join(self.output_by_sim, 'size_bin_radius'), x2, delimiter=',',
 				header= str('particle radii (um) per size_bin (including water contribution to size), with size bins represented by columns and their number (starting from 1) given in second line of header, per time step which is represented by rows and corresponding times given in the time output file \n'+x2_header))
 	
-		np.savetxt(os.path.join(output_by_sim, 'size_bin_bounds'), rbou_rec, delimiter=',',
+		np.savetxt(os.path.join(self.output_by_sim, 'size_bin_bounds'), rbou_rec, delimiter=',',
 				header=str('particle size bin bounds (um), with size bins represented by columns and their number (starting at 1 and in line with the lower bound) given in second line of header, per time step which is is represented by rows and corresponding times given in the time output file \n'+x2_header))		
 	
-	np.savetxt(os.path.join(output_by_sim, 'total_concentration_of_injected_components'), self.tot_in_res_ft, delimiter=',',
+	np.savetxt(os.path.join(self.output_by_sim, 'total_concentration_of_injected_components'), self.tot_in_res_ft, delimiter=',',
 				header=str('the total concentration (ug/m3) of injected (through initial gas-phase concentration, instantaneous and/or continuous gas-phase influx) components, with component index (relative to all components) in the first row and its cumulative injected concentrations in following rows'))
 	
 	# this save added on 05/05/2022
@@ -400,13 +388,13 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, savefolder, num_comp,
 		if '_orig' in attr or 'sch_name' in attr or 'xml_name' in attr or 'photo_path' in attr or 'chem_sch_mrk' in attr or 'TEMP' in attr or 'tempt' in attr or 'wall_on' in attr or 'update_stp' in attr or 'tot_time' in attr or 'save_step' in attr:
 			# transfer to dictionary
 			model_var_dict.update({attr:value})
-	with open(os.path.join(output_by_sim, 'simulation_self.pickle'), "wb") as f:
+	with open(os.path.join(self.output_by_sim, 'simulation_self.pickle'), "wb") as f:
 		pickle.dump(model_var_dict, f)
 	
 	# if save name is the default, then remove to ensure no duplication in future
-	if (savefolder == 'default_res_name'):
+	if (self.sav_nam == 'default_res_name'):
 		import shutil	
-		shutil.rmtree(output_by_sim)
+		shutil.rmtree(self.output_by_sim)
 		
 	# store group indices as in retr_out
 	# empty dictionary to contain indices of certain groups of components

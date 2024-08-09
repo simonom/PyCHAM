@@ -36,7 +36,7 @@ def mod_var_up(self):
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 	with open(input_by_sim, 'rb') as pk:
-		[sav_nam, y0, Press,
+		[y0, Press,
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, 
 		Compt, injectt, Ct,
@@ -51,7 +51,7 @@ def mod_var_up(self):
 
 	
 	# contents of model variables update
-	self.l9a.setText(sav_nam);
+	self.l9a.setText(self.sav_nam);
 	self.l10a.setText((str(self.chem_sch_mrk)).replace('\'', '').replace(' ', '')[1:-1])
 	self.l11a.setText((str(self.tot_time)).replace('\'', '').replace(' ', ''))
 	self.l12a.setText((str(self.update_stp)).replace('\'', '').replace(' ', ''))
