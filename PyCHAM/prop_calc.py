@@ -146,6 +146,12 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HOM_carbonyl = [] # HOMs carbonyls
 	self.NO3 = [] # nitrates	
 	self.HOM_NO3 = [] # HOMs nitrates
+	# Ademipo start --------------------------------
+	self.ROORBaker_indx = [] # HOM accretion products as defined in Baker 2024
+	self.HOMFragBaker_indx = [] # HOM fragment products as defined in Baker 2024
+	self.HOMRO2Baker_indx = [] # HOM peroxyradical products as defined in Baker 2024
+	self.HOMMonBaker_indx = [] # HOM monomer products as defined in Baker 2024
+	# Ademipo finish -------------------------------
 	# index for HO2, used in identifying components with 
 	# functional groups in group_indices.py
 	try:

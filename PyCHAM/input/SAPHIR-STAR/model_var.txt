@@ -1,0 +1,68 @@
+res_file_name = Baker_2024_unseeded_MCM_only
+chem_sch_name = mcmAP_PRAMAP_scheme.kpp
+total_model_time = 8.64e4
+update_step = 3.6e2
+recording_time_step = 3.6e3
+temperature = 293.15
+tempt = 0.
+p_init = 101325.0
+rh = 0.50
+rht = 0
+# UVC lights on
+light_status = 0, 1
+light_time = 0 , 7.2e3
+# these coverings are from Figure 2 of Baker et al. 2024
+# don't change
+tf_UVC = 0., 0.14, 0.42
+tf_UVCt = 0., 7.2e3, 4.32e4
+# note that the photon intensity for 254 nm in this file
+# has been tuned to give a photolysis rate of J(O1D) 
+# i.e. O3 + hv = O1D of 
+# 8x10-4 /s when the exposed light is at a minimum of 35 %,
+# which Baker et al. 2024 section 3.1 says is the minimum
+# J(O1D) rate. 
+act_flux_file = SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+inflectDp = 1.
+Grad_pre_inflect = 0.
+Grad_post_inflect = 0.
+Rate_at_inflect = 4.41e-5
+const_comp = H2O
+cont_infl = O3, APINENE, CO
+cont_infl_t = 0., 4.32e4
+# based on Figure 2 of Baker et al. 2024,
+# we need to tune the Cinfl values so that
+# in both the with and without CO stages of
+# experiment O3 has a mixing ratio of 25 ppb,
+# alpha-pinene has a mixing ratio of 5 ppb and
+# CO has a mixing ratio of 0 ppm in the first
+# stage and a mixing ratio of 2.5 ppm
+# these give correct results for APINENE, O3 and CO
+# when light intensity
+# in photofile set to 2.3e14 photons/cm2/s, but
+# OH comes out around a factor of two higher than Figure 2
+# observations
+Cinfl = 0.0076, 0.0088; 0.0028, 0.0028; 0., 0.69
+# residence time of 63 minutes
+dil_fac = 0.000265
+wall_on = 1
+# gas-wall partitioning
+# 1.1e-2 /s for all species from Ehn et al. 2013, 
+# from S3 of supplement of Baker et al. 2024:
+# 5.88e-3 /s for all species, OH loss rate
+# (5 /s) is actually due to a 'background reactivity' 
+# and HO2 wall loss rate of 
+mass_trans_coeff = 5.88e-3; OH_wall1_5e0; HO2_wall1_2e-2
+eff_abs_wall_massC = 1.e0
+number_size_bins = 0
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = Mohr2019
+pars_skip = 1
+# only need to use the below variables for the seeded case
+#pconc = 4.e1
+#pconct = 0.
+#pcont = 1 
+#mean_rad = 3.e-2
+#std = 1.5
+# 125 nm radius
+#upper_part_size = 1.25e-1

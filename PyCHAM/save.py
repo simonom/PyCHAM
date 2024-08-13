@@ -232,6 +232,22 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	save_path = str(self.output_by_sim + '/organic_ROOR_index') # path
 	np.save(save_path, self.ROOR_indx, allow_pickle=True)
 
+	# saving Ademipo's group indices for Baker et al. 2024 (
+	# doi.org/10.5194/acp-24-4789-2024) product classes start --------
+	save_path = str(self.output_by_sim + '/ROORBaker_indx') # path
+	np.save(save_path, self.HOMFragBaker_indx, allow_pickle=True)
+
+	save_path = str(self.output_by_sim + '/HOMFragBaker_indx') # path
+	np.save(save_path, self.ROORBaker_indx, allow_pickle=True)
+
+	save_path = str(self.output_by_sim + '/HOMRO2Baker_indx') # path
+	np.save(save_path, self.HOMRO2Baker_indx, allow_pickle=True)
+
+	save_path = str(self.output_by_sim + '/HOMMonBaker_indx') # path
+	np.save(save_path, self.HOMMonBaker_indx, allow_pickle=True)
+
+	# Baker et al. 2024 product classes end --------------------------
+
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))

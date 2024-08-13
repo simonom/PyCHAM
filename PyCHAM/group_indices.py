@@ -66,6 +66,64 @@ def group_indices(Hcount, SMILES, i, self):
 			# HOMs accretion products
 			self.ROOR_indx.append(i)
 
+	# Ademipo start------------------------------------------------------
+	# check for product classes of  HOMs as defined by Baker et al. 2024
+	# doi.org/10.5194/acp-24-4789-2024
+	if (Cn > 10):
+		if (On >= 4):
+			# HOMs accretion products as defined by Baker et al. 2024
+			# i is component index
+			# append is a python command
+			# ROORBaker__index is the list containing the indices
+			# of components that fit the HOM accretion product 
+			# definition
+			# self is a place to store the ROORBaker_indx variable
+			# and self.ROORBaker_indx is defined in 
+			self.ROORBaker_indx.append(i)
+
+        # check for fragment product HOMs as defined by Baker et al. 2024
+	if (5 <= Cn < 10):
+		if (On >= 4):
+                        # HOMs fragment products as defined by Baker at al. 2024
+			# i is component index
+			# append is a python command
+			# HOMFragBaker__index is the list containing the indices
+			# of components that fit the HOM fragment product
+			# defintion
+			# self is a place to store the HOMFragBaker_indx variable
+			# and self.HOMFragBaker_indx is defined in 
+			self.HOMFragBaker_indx.append(i)
+
+        # check for peroxyradical product HOMs as defined by Baker et al. 2024
+	if (Cn == 10 and On >=4):
+		if ('O[O]' in SMILES or '[O]O' in SMILES or 'o[o]' in SMILES or 
+		'[o]o' in SMILES):
+			# HOMs peroxyradical products  as defined  by Baker et al. 2024
+			# i is component index
+			# append is a python command
+			# HOMRO2Baker__index is the list containing the indices 
+			# of components that fit the HOM fragment product
+			# definition
+			# self is a place to store the HOMRO2Baker_indx variable
+			# and self.HOMRO2Baker_indx is defined in 
+			self.HOMRO2Baker_indx.append(i)
+
+	# check for monomer product HOMs as defined by Baker et al. 2024
+	if (Cn == 10 and On >= 4):
+		if ('[O]' not in SMILES and '[o]' not in SMILES):
+			# HOMs monomer products as defined by Baker et al. 2024
+			# i is component index
+			# append is a python command
+			# HOMRO2Baker__index is the list containing the indices
+			# of components that fit the HOM fragment product
+			# definition
+			# self is a place to store the HOMMonBaker_indx variable
+			# and self.HOMMonBaker_indx is defined in 
+			self.HOMMonBaker_indx.append(i)
+
+	# Ademipo finish-----------------------------------------------------
+
+
 	# check on hydroperoxides and HOM-OOH. Note that HOM-OOH may 
 	# not be named identifiably in HOM extensions, so need to 
 	# rely on reactants and SMILES	
