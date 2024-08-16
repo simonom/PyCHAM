@@ -353,7 +353,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					(nC+nO-3.*nN))*0.9-nN*2.5)
 					# convert to vapour pressure (log10(atm))
 					# (eq. 1 O'Meara et al. 2014)
+					# first raise to the natural logarithm
 					Psatnow = np.exp(Psatnow) # ug/m3
+					# now convert ug/m3 to atm and take log10
+					# (log10(atm))
 					Psatnow = np.log10((Psatnow*8.2057e-5*
 					self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
 					

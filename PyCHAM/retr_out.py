@@ -536,7 +536,7 @@ def retr_out(self):
 	
 	
 	try: # this output added on 23/02/2021
-		# withdraw environmental conditions (s)
+		# withdraw environmental conditions (temperature in first column (K))
 		fname = str(self.dir_path + '/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
