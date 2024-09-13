@@ -6,7 +6,7 @@
 # radiation provided in photolysisRates.py
 # note that to set this simulaion up, 
 # light_status has been set to the path of the
-# file containing the photolysis rates. These 
+# file containing the photolysis rates. These example
 # photolysis rates are from spectral analysis of
 # Manchester Aerosol Chamber lights, combined
 # with the Mainz database. The photolysis rates

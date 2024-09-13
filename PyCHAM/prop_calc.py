@@ -539,7 +539,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 						vol_Comp[i][0:-6])]
 					# could be a group of components
 					except: 
-						group_name = (vol_Comp[i]						[0:-6])
+						group_name = (vol_Comp[i][0:-6])
 
 						# check if an inequality
 						# present

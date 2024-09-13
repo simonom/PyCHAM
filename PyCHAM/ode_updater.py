@@ -342,8 +342,12 @@ def ode_updater(y, H2Oi,
 	RHt_cnt0 = 0 # remember count at start of integration step
 	conPin_cnt = 0 # count on continuous influx of seed particles
 	conPin_cnt0 = 0 # remember count at start of integration step
-	# count on recording results, note starting on two because results at t=0 already stored
+	# count on recording results, note starting on two because 
+	# results at t=0 already stored
 	save_cnt = 2
+	# keep count on recording change tendencies, start on 1 because first row
+	# of dydt is reaction numbers
+	dydt_cnt = 1
 		
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
@@ -565,11 +569,9 @@ def ode_updater(y, H2Oi,
 			# particular time represents the tendency from
 			# that time onwards
 			if (len(self.dydt_vst) > 0):
-				if ((sumt-(self.save_step*(save_cnt-2))
+				if ((sumt-(self.save_step*(dydt_cnt-1))
 					 > -1.e-10)):
 					
-					dydt_cnt = save_cnt-2
-
 					# before solving ODEs for 
 					# chemistry, dilution, 
 					# gas-particle partitioning and
@@ -586,6 +588,8 @@ def ode_updater(y, H2Oi,
 							act_coeff, dydt_erh_flag, H2Oi, 
 							wat_hist, self)
 
+					# keep count on recording change tendencies
+					dydt_cnt += 1
 			
 			# update Jacobian inputs based on 
 			# particle-phase fractions of components

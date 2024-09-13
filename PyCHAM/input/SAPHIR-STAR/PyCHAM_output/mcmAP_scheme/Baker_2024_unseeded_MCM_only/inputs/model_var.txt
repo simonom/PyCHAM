@@ -1,5 +1,5 @@
-res_file_name = Baker_2024_unseeded_MCM_only
-chem_sch_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/mcmAP_scheme.kpp
+res_file_name = Baker_2024_unseeded
+chem_sch_name = mcmAP_scheme.kpp
 total_model_time = 8.64e4
 update_step = 3.6e2
 recording_time_step = 3.6e3
@@ -27,6 +27,10 @@ Grad_pre_inflect = 0.
 Grad_post_inflect = 0.
 Rate_at_inflect = 4.41e-5
 const_comp = H2O
+# initial concentrations of components (ppb)
+Comp0 = O3, CO, APINENE, OH
+C0 = 29., 0., 7.5, 3.4e-5
+# continuously influxed components
 cont_infl = O3, APINENE, CO
 cont_infl_t = 0., 4.32e4
 # based on Figure 2 of Baker et al. 2024,

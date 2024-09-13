@@ -1926,27 +1926,39 @@ class PyCHAM(QWidget):
 	
 		# input for mass:charge resolution
 		self.e280 = QTextEdit(self)
-		self.e280.setText('Mass:charge resolution determinants: interval of probability peaks (m:z), width of distribution per peak.  Defaults to 1., 0.3 ')
+		self.e280.setText(str('Mass:charge resolution determinants: ' +
+		'interval of probability peaks (m:z), width of distribution ' +
+		'per peak.  Defaults to 1., 0.3'))
 		self.CIMSscrolllayout.addWidget(self.e280, 0, 0)
 		
 		# input for time to show mass spectrum for
 		self.e281 = QTextEdit(self)
-		self.e281.setText('Time through experiment to show mass spectrum for (s)')
+		self.e281.setText(str('Time through experiment to show mass ' + 
+		'spectrum for (s), set to \'all times\' to integrate over all times'))
 		self.CIMSscrolllayout.addWidget(self.e281, 1, 0)
 		
 		# type of ionisation source
 		self.e282 = QTextEdit(self)
-		self.e282.setText('Ionisation source (I for iodide, N for nitrate, defaults to I), whether to add molar mass to mass of ionised components (1 for yes, 0 for no), defaults to 0 for no')
+		self.e282.setText(str('Ionisation source (I for iodide, ' +
+		'N for nitrate, defaults to I), whether to add molar mass ' +
+		'to mass of ionised components (1 for yes, 0 for no), ' +
+		'defaults to 0 for no'))
 		self.CIMSscrolllayout.addWidget(self.e282, 2, 0)
 		
 		# sensitivity dependence on molar mass
 		self.e283 = QTextEdit(self)
-		self.e283.setText('Sensitivity (Hz/ppt) dependence on molar mass (g/mol), use y_MW to denote molar mass (g/mol) of components.  Defaults to 1.0 which implies no dependency on molar mass.')
+		self.e283.setText(str('Sensitivity (instrument count/real count) ' +
+		'dependence on molar mass (g/mol), use y_MM to denote molar ' +
+		'mass (g/mol) of components.  Defaults to 1.0 which implies ' +
+		'no dependency on molar mass. To zero ranges of m/z use ' +
+		'inequalities, e.g. <200. sets all m/z less than 200 to 0.'))
 		self.CIMSscrolllayout.addWidget(self.e283, 3, 0)
 		
-		# button to plot probability distribution function demonstrating mass:charge resolution
+		# button to plot probability distribution function 
+		# demonstrating mass:charge resolution
 		self.b290_aa = QPushButton('PDF graph', self)
-		self.b290_aa.setToolTip('Plot the probability distribution function causing mass:charge resolution')
+		self.b290_aa.setToolTip(str('Plot the probability ' +
+		'distribution function causing mass:charge resolution'))
 		self.b290_aa.clicked.connect(self.on_click290_aa)
 		self.CIMSscrolllayout.addWidget(self.b290_aa, 0, 1)	
 
@@ -1960,27 +1972,40 @@ class PyCHAM(QWidget):
 		self.b290_ab = QComboBox(self)
 		self.b290_ab.addItem('Linear y')
 		self.b290_ab.addItem('Logarithmic y')	
-		self.b290_ab.setToolTip('Select whether to have a linear or logarithmic spacing on the CIMS y-axis')	
+		self.b290_ab.setToolTip(str('Select whether to have a linear ' +
+		'or logarithmic spacing on the CIMS y-axis'))	
 		self.CIMSscrolllayout.addWidget(self.b290_ab, 4, 0)	
 
 		# drop-down button to select histogram or markers	
 		self.b290_abb = QComboBox(self)
-		self.b290_abb.addItem('Bars')
-		self.b290_abb.addItem('Markers')	
-		self.b290_abb.setToolTip('Select whether to have histogram or markers layout')	
+		self.b290_abb.addItem('Stem (molecules/cm3)')
+		self.b290_abb.addItem('Markers (molecules/cm3)')
+		self.b290_abb.addItem('Stem (normalised)')
+		self.b290_abb.addItem('Markers (normalised)')	
+		self.b290_abb.setToolTip(str('Select whether to have ' +
+		'bars or markers layout'))	
 		self.CIMSscrolllayout.addWidget(self.b290_abb, 4, 1)
 
+		# drop-down button to select which phase is plotted	
+		self.b290_abc = QComboBox(self)
+		self.b290_abc.addItem('Gas')
+		self.b290_abc.addItem('Particle')
+		self.b290_abc.addItem('Gas and Particle')	
+		self.b290_abc.setToolTip(str('Select the phase(s) to plot'))	
+		self.CIMSscrolllayout.addWidget(self.b290_abc, 5, 0)
+
 		# button to plot mass spectrum
-		self.b290 = QPushButton('CIMS observations', self)
-		self.b290.setToolTip('Plot the mass spectrum as observed by a chemical ionisation mass spectrometer')
+		self.b290 = QPushButton('CIMS mass spectrum', self)
+		self.b290.setToolTip(str('Plot the mass spectrum as observed ' +
+		'by a chemical ionisation mass spectrometer'))
 		self.b290.clicked.connect(self.on_click290)
-		self.CIMSscrolllayout.addWidget(self.b290, 5, 0)
+		self.CIMSscrolllayout.addWidget(self.b290, 6, 0)
 		
 		# button to save output in CIMS form
 		self.b290_aaa = QPushButton('Save in CIMS form', self)
 		self.b290_aaa.setToolTip('Save the results in CIMS format at all time steps')
 		self.b290_aaa.clicked.connect(self.on_click290_aaa)
-		self.CIMSscrolllayout.addWidget(self.b290_aaa, 5, 1)
+		self.CIMSscrolllayout.addWidget(self.b290_aaa, 6, 1)
 
 		# properties of CIMS scroll area ----------------
 		self.scrollwidget.setLayout(self.CIMSscrolllayout)
@@ -1994,26 +2019,25 @@ class PyCHAM(QWidget):
 		OBSTab = QWidget()
 		self.OBSlayout = QGridLayout() 
 		OBSTab.setLayout(self.OBSlayout)
+	
+		# create scrollable widget inside tab
+		self.scroll = QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scrollwidget = QWidget()
+		self.OBSscrolllayout  = QGridLayout()
 
-		# show path to observations file --------------------------------------------------------
+		# show path to observations file ----------------------------
 		self.l401 = ScrollLabel(self)
 		cwd = os.getcwd() # current working directory
 		path = str(cwd + '/PyCHAM/output/26_10.xlsx')
 		self.l401.setText(path)
-		self.OBSlayout.addWidget(self.l401, 0, 0, 1, 1)
+		self.OBSscrolllayout.addWidget(self.l401, 0, 0, 1, 1)
 
-		# select observations file --------------------------------------------------------------
-		b400 = QPushButton('Select File Containing Observations', self)
+		# select observations file -----------------------------------
+		b400 = QPushButton('Select file containing observations', self)
 		b400.setToolTip('Select the file containing the required observations')
 		b400.clicked.connect(self.on_click400)
-		self.OBSlayout.addWidget(b400, 0, 1, 1, 1)
-
-		# plot observations and model results
-		# select observations file --------------------------------------------------------------
-		b401 = QPushButton('Observed && Modelled', self)
-		b401.setToolTip('Plot Observations and Model Results')
-		b401.clicked.connect(self.on_click401)
-		self.OBSlayout.addWidget(b401, 1, 1, 1, 1)
+		self.OBSscrolllayout.addWidget(b400, 0, 1, 1, 1)
 
 		# drop down button for what to plot
 		self.b402 = QComboBox(self)
@@ -2028,13 +2052,27 @@ class PyCHAM(QWidget):
 		self.b402.addItem('Van Krevelen (_ Extension Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)')
 		self.b402.addItem('Mass Defect of All Components in Chemical Scheme')
 		self.b402.addItem('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below')
-		self.OBSlayout.addWidget(self.b402, 1, 0, 1, 1)
+		self.b402.addItem('CIMS mass spectrum (as defined in Plot/Convolution/CIMS)')
+		self.OBSscrolllayout.addWidget(self.b402, 1, 0, 1, 1)
 
 		# input for observed and modelled plotting options
 		self.e403 = QTextEdit(self)
-		self.e403.setText('Provide Plotting Options as Described in the Selected Drop-down Button Option Above')
-		self.OBSlayout.addWidget(self.e403, 2, 0, 1, 1)
+		self.e403.setText(str('Provide Plotting Options as ' +
+		'Described in the Selected Drop-down Button Option Above'))
+		self.OBSscrolllayout.addWidget(self.e403, 2, 0, 1, 1)
+
+		# plot observations and model results
+		# select observations file ---------------------------------
+		b401 = QPushButton('Observed && Modelled', self)
+		b401.setToolTip('Plot Observations and Model Results')
+		b401.clicked.connect(self.on_click401)
+		self.OBSscrolllayout.addWidget(b401, 3, 0, 1, 1)
 		
+		# properties of observations scroll area ----------------
+		self.scrollwidget.setLayout(self.OBSscrolllayout)
+		self.scroll.setWidget(self.scrollwidget)
+		self.OBSlayout.addWidget(self.scroll, 0, 0, 1, 1)
+
 		return(OBSTab)
 
 	def EXPtab(self): # preparing for experiments
@@ -4389,7 +4427,9 @@ class PyCHAM(QWidget):
 
 		return()
 
-	@pyqtSlot() # button to plot probability distribution function demonstrating mass:charge resolution
+	# button to plot probability distribution function 
+	# demonstrating mass:charge resolution
+	@pyqtSlot()
 	def on_click290_aa(self):
 		# reset error message
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
@@ -4428,19 +4468,21 @@ class PyCHAM(QWidget):
 		
 		dir_path = self.l201.text() # name of folder with results
 		
-		y_MW = np.arange(1000.)
+		y_MM = np.arange(1000.)
 		
 		# get sensitivity (Hz/ppt) dependence on molar mass
 		try:
 			sensit = str((self.e283.toPlainText()))
 		except:
 			sensit = 'np.ones(len(y_MW))' # default
-		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
-			sensit = 'np.ones(len(y_MW))'
+		# means that the edit label text has not been 
+		# changed from the description
+		if (sensit[0:3] == 'Sen' or sensit == ''):
+			sensit = 'np.ones(len(y_MM))'
 		
 		import plotter_CIMS
 		
-		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MW)
+		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MM)
 
 
 	@pyqtSlot() # button to save results in CIMS format at all times through experiment
@@ -4503,8 +4545,10 @@ class PyCHAM(QWidget):
 		import plotter_CIMS
 		
 		plotter_CIMS.write_CIMS_output(self)
-		
-	@pyqtSlot() # button to plot mass spectrum replication of chemical ionisation mass spectrometer
+	
+	# button to plot mass spectrum replication of 
+	# chemical ionisation mass spectrometer
+	@pyqtSlot()
 	def on_click290(self):
 	
 		# reset error message
@@ -4519,7 +4563,10 @@ class PyCHAM(QWidget):
 			for i in ((self.e280.toPlainText().strip(' ').split(','))):
 				res_in.append(float(i))
 		except:
-			self.l203a.setText('Note - failed to interpret input values for starting point and width of probability distribution function that represents mass:charge resolution, therefore defaulting to 1.0, 0.3')
+			self.l203a.setText(str('Note - failed to interpret input ' +
+			'values for starting point and width of probability ' +
+			'distribution function that represents mass:charge ' +
+			'resolution, therefore defaulting to 1.0, 0.3'))
 			
 			# set border around error message
 			if (self.bd_pl == 1):
@@ -4534,7 +4581,12 @@ class PyCHAM(QWidget):
 		try:
 			tn = float((self.e281.toPlainText()))
 		except:
-			tn = 0. # default
+			try:
+				tn = str((self.e281.toPlainText()))
+				if tn != 'all times':
+					tn = 0. # default
+			except:
+				tn = 0. # default
 		
 		# get ioniser type
 		try:
@@ -4547,7 +4599,13 @@ class PyCHAM(QWidget):
 				1./'a' # force exception
 
 		except: # give error message
-			self.l203a.setText('Note - ionising agent, whether molar mass of ionising agent to be included in molar mass of components, should be a letter (I for iodide or N for nitrate) followed by a comma, followed by a number (1 to add agent molar mass to component mass or 0 not to).  But this information could not be correctly detected, so defaulting to I, 0')
+			self.l203a.setText(str('Note - ionising agent, whether ' +
+			'molar mass of ionising agent to be included in molar mass ' +
+			'of components, should be a letter (I for iodide or N for ' +
+			'nitrate) followed by a comma, followed by a number (1 to ' +
+			'add agent molar mass to component mass or 0 not to). ' +
+			'But this information could not be correctly detected, ' +
+			'so defaulting to I, 0'))
 			
 			# set border around error message
 			if (self.bd_pl == 1):
@@ -4564,7 +4622,9 @@ class PyCHAM(QWidget):
 			sensit = str((self.e283.toPlainText()))
 		except:
 			sensit = '1.' # default
-		if (sensit[0:3] == 'Sen' or sensit == ''): # means that the edit label text has not been changed from the description
+		# means that the edit label text has not been changed 
+		# from the description
+		if (sensit[0:3] == 'Sen' or sensit == ''):
 			sensit = '1.' # default
 		
 		# import required plotting function
@@ -4755,7 +4815,8 @@ class PyCHAM(QWidget):
 
 		# button to get path to folder containing relevant files
 		options = QFileDialog.Options()
-		fil_nme = QFileDialog.getOpenFileName(self, "Select File Containing Required Observations", "./PyCHAM/output/")[0]
+		fil_nme = QFileDialog.getOpenFileName(self, str('Select file ' +
+		'containing required observations'), './PyCHAM/output/')[0]
 		self.l401.clear() # clear old label
 		self.l401.setText(fil_nme) # set new label
 		
@@ -4796,7 +4857,8 @@ class PyCHAM(QWidget):
 		if ('Particle Concentrations' in om_choice): 
 			if ('Standard Results Plot' in om_choice):
 				self.oandm = 1.1
-			if ('Cumulative particle mass concentration without water' in om_choice):
+			if ('Cumulative particle mass concentration without water' 
+			in om_choice):
 				self.oandm = 1.2
 	
 		# if Van Krevelen
@@ -4818,6 +4880,11 @@ class PyCHAM(QWidget):
 			self.oandm = 8
 		if ('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below' in om_choice):
 			self.oandm = 9
+
+		# if CIMS mass spectrum
+		if ('CIMS mass spectrum (as defined in Plot/Convolution/CIMS)' 
+		in om_choice):
+			self.oandm = 10
 
 		# check on inputs and provide message for user if anything missing
 		if (self.xls_path == ''):
@@ -4863,9 +4930,10 @@ class PyCHAM(QWidget):
 			plotter_xls.plotter_pp_mod_n_obs(self)
 		if (self.oandm >= 2 and self.oandm <= 7): # if the Van Krevelen to be plotted
 			plotter_xls.plotter_VK_mod_n_obs(self)
-		if (self.oandm >=8): # if mass defect plot
+		if (self.oandm == 8 or self.oandm == 9): # if mass defect plot
 			plotter_xls.plotter_mass_defect(self)
-
+		if (self.oandm == 10): # if CIMS mass spectrum
+			self.on_click290() # call CIMS plotting button
 	
 		return()
 		

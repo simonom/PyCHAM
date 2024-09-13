@@ -785,14 +785,9 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {245 } CH3CO2H + OH = CH3O2 : 8.00E-13 ;
  {246 } H1CO23CHO + OH = CO + CO + HOCH2CO3 : 1.44E-11 ;
  {247 } H1CO23CHO + hv = CO + CO + HO2 + HOCH2CO3 : J(17)+J(18) ;
-# note that to adjust the branching ratios here to
-# accommodate for the 
-# for the branching ratio of APINENE+OH in the PRAM scheme
-# * the branching ratio of APINENE+OH in the MCM equations
-# by 0.025
- {248 } APINENE + OH = APINAO2 : 1.2E-11*EXP(440./TEMP)*0.572*1. ;
- {249 } APINENE + OH = APINBO2 : 1.2E-11*EXP(440./TEMP)*0.353*1. ;
- {250 } APINENE + OH = APINCO2 : 1.2E-11*EXP(440./TEMP)*0.075*1. ;
+ {248 } APINENE + OH = APINAO2 : 1.2E-11*EXP(440./TEMP)*0.572 ;
+ {249 } APINENE + OH = APINBO2 : 1.2E-11*EXP(440./TEMP)*0.353 ;
+ {250 } APINENE + OH = APINCO2 : 1.2E-11*EXP(440./TEMP)*0.075 ;
  {251 } APINAO2 + NO = APINAO + NO2 : KRO2NO*0.770 ;
  {252 } APINAO2 + NO = APINANO3 : KRO2NO*0.230 ;
  {253 } APINAO = HO2 + PINAL : KDEC ;
@@ -1126,12 +1121,8 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {581 } C719OH + OH = C719O : 6.72E-11 ;
  {582 } APINENE + O3 = APINOOA : 8.05E-16*EXP(-640./TEMP)*0.6 ;
  {583 } APINENE + O3 = APINOOB : 8.05E-16*EXP(-640./TEMP)*0.4 ;
-# note that to adjust the branching ratios of these 
-# reactions to be consistent with the PRAM branching ratios:
-# * the branching ratios for APINOOA decomposition by 0.90
-# and the PRAM reactions below have been commented out
- {584 } APINOOA = C107O2 + OH : KDEC*0.55*1. ;
- {585 } APINOOA = C109O2 + OH : KDEC*0.45*1. ;
+ {584 } APINOOA = C107O2 + OH : KDEC*0.55 ;
+ {585 } APINOOA = C109O2 + OH : KDEC*0.45 ;
  {586 } C107O2 + NO = C107O + NO2 : KRO2NO ;
  {587 } C107O = C108O2 : KDEC ;
  {588 } C108O2 + NO = C108O + NO2 : KRO2NO*0.875 ;
@@ -1430,6 +1421,7 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {881 } HCOCO = HCOCO3 : 5.00E-12*O2*3.2*EXP(-550./TEMP) ;
  {882 } HCOCO = CO + OH : 5.00E-12*O2*3.2*(1.-EXP(-550./TEMP)) ;
  {883 } HMVKANO3 + hv = HMVKAO + NO2 : J(24)*0.91 ;
+ {884 } OH = : 5. ;
 
 # additional components
 {1774.}     C1 = C1     :            0.0 ;

@@ -92,7 +92,7 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	# atmosphereFunctions.f90 of AtChem2
 	N2_val = M_val*0.7809
 	O2_val = M_val*0.2095
-	
+
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, 

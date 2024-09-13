@@ -1,12 +1,12 @@
 number_of_size_bins,1
 number_of_components,332
 factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734]]
-simulation_computer_time(s),13.763360023498535
+simulation_computer_time(s),13.549710273742676
 seed_name,['core']
 wall_on_flag_0forNO_>0forYES,1
 space_mode,lin
 index_of_water,13
 index_of_seed_components,[331]
 size_structure_0_for_moving_centre_1_for_full_moving,0
-output_by_sim_sch_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/Baker_2024_unseeded_MCM_only/inputs/mcmAP_scheme.kpp
-output_by_sim_mv_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/Baker_2024_unseeded_MCM_only/inputs/model_var.txt
+output_by_sim_sch_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/Baker_2024_unseeded/inputs/mcmAP_scheme.kpp
+output_by_sim_mv_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/Baker_2024_unseeded/inputs/model_var.txt

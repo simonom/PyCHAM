@@ -538,6 +538,7 @@ def ui_check(self):
 					self.af_path = str(pd + self.af_path)
 					f = open(self.af_path , 'r') 
 				except:
+					
 					err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
 					em_flag = 2
 	

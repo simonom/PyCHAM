@@ -298,7 +298,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		for wi in range(self.kw.shape[0]): # loop through walls
 			# loop through number of components partitioning with this wall
 			for ci in range(sum(self.kw[wi, :]==-1.e-7)): 	
-					
+				
 				if self.wmtc_names[pre_count]== 'all_other_components':
 					# coefficient specified for all components of this wall
 					kwn[wi, mask[wi, :]] = self.wmtc[pre_count]
@@ -314,20 +314,46 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 				if (self.remove_influx_not_in_scheme == 1):
 						
 					try:
+						# get indices of this component
+						if self.wmtc_names[pre_count] == 'RO2':
+							comp_indx = np.zeros(
+							RO2_indices.shape[0])
+							comp_indx[:] = self.RO2_indices[:, 1]
+						
+						else:
+							comp_indx = self.comp_namelist.index(
+						self.wmtc_names[pre_count])						
+
+						
 						# coefficient of this component on this wall
-						kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
-						mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
+						kwn[wi, comp_indx] = self.wmtc[pre_count]
+						mask[wi, comp_indx] = False
 					except:
 						# just ignore if told to by user-defined 
-						# self.remove_influx_not_in_scheme, and leave as zero
+						# self.remove_influx_not_in_scheme, and leave 
+						# as zero
 						pre_count += 1 # count on prescribed components	
 						continue
 				
 				if (self.remove_influx_not_in_scheme == 0):
 					try:
-						# coefficient of this component on this wall
-						kwn[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = self.wmtc[pre_count]
-						mask[wi, self.comp_namelist.index(self.wmtc_names[pre_count])] = False
+						# get indices of this component
+						if self.wmtc_names[pre_count] == 'RO2':
+							comp_indx = np.zeros(
+							self.RO2_indices.shape[0]).astype('int')
+							comp_indx[:] = self.RO2_indices[:, 1]
+							kwn[wi, comp_indx[:]] = self.wmtc[
+								pre_count]
+							mask[wi, comp_indx[:]] = False
+
+						else:
+							comp_indx = self.comp_namelist.index(
+							self.wmtc_names[pre_count])						
+							# coefficient of this component on
+							# this wall
+							kwn[wi, comp_indx] = self.wmtc[
+								pre_count]
+							mask[wi, comp_indx] = False
 					except:
 						# give error message
 						err_mess = str('Error: component ' + str(self.wmtc_names[pre_count]) + ' has a gas-wall mass transfer coefficient but has not been identified in the chemical scheme')

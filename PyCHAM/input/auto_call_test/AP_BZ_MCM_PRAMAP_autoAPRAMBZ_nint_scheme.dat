@@ -1878,11 +1878,16 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {45.} HO2NO2 = HO2 + NO2 : KMT10 ;
 {46.} APINENE + NO3 = NAPINAO2 : 1.2D-12*EXP(490/TEMP)*0.65 ;
 {47.} APINENE + NO3 = NAPINBO2 : 1.2D-12*EXP(490/TEMP)*0.35 ;
+# note that APINOOA reactions are contained below in PRAM,
+# with adjustments made to branching ratios to accommodate
+# the PRAM reaction
 {48.} APINENE + O3 = APINOOA : 8.05D-16*EXP(-640/TEMP)*0.6 ;
 {49.} APINENE + O3 = APINOOB : 8.05D-16*EXP(-640/TEMP)*0.4 ;
-{50.} APINENE + OH = APINAO2 : 1.2D-11*EXP(440/TEMP)*0.572 ;
-{51.} APINENE + OH = APINBO2 : 1.2D-11*EXP(440/TEMP)*0.353 ;
-{52.} APINENE + OH = APINCO2 : 1.2D-11*EXP(440/TEMP)*0.075 ;
+# note that branching ratios are adjusted to allow for the
+# APINENE reaction(s) in PRAM
+{50.} APINENE + OH = APINAO2 : 1.2D-11*EXP(440/TEMP)*0.558 ;
+{51.} APINENE + OH = APINBO2 : 1.2D-11*EXP(440/TEMP)*0.344 ;
+{52.} APINENE + OH = APINCO2 : 1.2D-11*EXP(440/TEMP)*0.073 ;
 {53.} CL + CH4 = CH3O2 : 6.6D-12*EXP(-1240/TEMP) ;
 {54.} OH + CH4 = CH3O2 : 1.85D-12*EXP(-1690/TEMP) ;
 {55.} BENZENE + OH = BZBIPERO2 : 2.3D-12*EXP(-190/TEMP)*0.352 ;

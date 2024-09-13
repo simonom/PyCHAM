@@ -76,12 +76,9 @@ def plotter(res_path):
 	# convert to hours
 	t_array = t_array/3.6e3
 
-	# setup figure with two subplots
-	#fig, (ax0, ax1, ax2) = plt.subplots(3, 1, figsize=(14, 7),
-	#			sharex=True,
-	#			gridspec_kw={
-        #                  'width_ratios': [1],
-        #                   'height_ratios': [1, 3, 3])
+	# get RO2 indices
+	load_path = str(res_path + '/organic_peroxy_radical_index.npy')
+	RO2i = (np.load(load_path, allow_pickle=True)).tolist()
 
 	fig = plt.figure(constrained_layout=False, figsize=(7,7))
 	spec2 = gridspec.GridSpec(ncols=1, nrows=9, figure=fig, hspace=0.0)
@@ -89,49 +86,70 @@ def plotter(res_path):
 	f2_ax2 = fig.add_subplot(spec2[3:6, 0])
 	f2_ax3 = fig.add_subplot(spec2[6::, 0])
 
-	# distinguish regions by light intensity
-	f2_ax1.plot(t_array, np.ones((len(t_array))), '-w')
+	# light intensity plot (J(O1D) (/s)) values obtained from
+	# PyCHAM GUI (Photolysis Rates drop-down button) and knowing
+	# that O3 photolysis to generate J(O1D) is photolysis
+	# reaction #1 of MCM chemical scheme ( {36 } O3 + hv = O1D : J(1) ;)
+	JO1Dpers = np.zeros((len(t_array)))
+	JO1Dpers[t_array>=2.1] = 3.37e-4
+	JO1Dpers[t_array>=12.0] = 1.008e-3
+	f2_ax1.plot(t_array, JO1Dpers, '-k')
 	# plot concentrations of OH on left axis of centre plot
-	f2_ax2.plot(t_array, yrec[:, 0:num_comp][:, comp_names.index('OH')]*Cfactor[:, 0], 's', mfc = 'hotpink', mec = 'hotpink')
+	f2_ax2.semilogy(t_array, yrec[:, 0:num_comp][:, comp_names.index('OH')]*Cfactor[:, 0], 
+		's', mfc = 'hotpink', mec = 'hotpink', label = 'OH')
+	# plot concentrations of HO2 on left axis of centre plot
+	f2_ax2.semilogy(t_array, yrec[:, 0:num_comp][:, comp_names.index('HO2')]*Cfactor[:, 0], 
+		'x', mfc = 'hotpink', mec = 'hotpink', label = r'$\mathrm{HO_{2}}$')
+	# plot concentrations of RO2 on left axis of centre plot
+	f2_ax2.semilogy(t_array, np.sum(yrec[:, 0:num_comp][:, RO2i], axis=1)*Cfactor[:, 0], 
+		'o', mfc = 'hotpink', mec = 'hotpink', label = r'$\mathrm{RO_{2}}$')
 
 	# plot concentrations of ozone and alpa-pinene on left axis of lower plot
-	f2_ax3.plot(t_array, yrec[:, 0:num_comp][:, comp_names.index('APINENE')], '+g')
-	f2_ax3.plot(t_array, yrec[:, 0:num_comp][:, comp_names.index('O3')], 'sk')
+	f2_ax3.plot(t_array, yrec[:, 0:num_comp][:, comp_names.index('APINENE')], '+g', 
+		label = r'$\mathrm{\alpha}$-pinene')
+	f2_ax3.plot(t_array, yrec[:, 0:num_comp][:, comp_names.index('O3')], 'sk',
+		label = r'$\mathrm{O_{3}}$')
 
 	# set axis properties
-	f2_ax1.fill_betweenx([0., 2.], 0., 2, facecolor='gray', alpha=.5)
-	f2_ax1.fill_betweenx([0., 2.], 2., 12., facecolor='yellow', alpha=.5)
-	f2_ax1.fill_betweenx([0., 2.], 12., 24., facecolor='orange', alpha=.5)
+	f2_ax1.fill_betweenx([0., max(JO1Dpers)*1.1], 0., 2, facecolor='gray', alpha=.5)
+	f2_ax1.fill_betweenx([0., max(JO1Dpers)*1.1], 2., 12., facecolor='yellow', alpha=.5)
+	f2_ax1.fill_betweenx([0., max(JO1Dpers)*1.1], 12., 24., facecolor='orange', alpha=.5)
 
-	f2_ax1.set_ylabel(str(r'$J(O^{1}D)$'), fontsize = 14, rotation='horizontal', labelpad=30)
-	f2_ax1.xaxis.set_tick_params(direction = 'in', which = 'both', length=0)
-	f2_ax1.yaxis.set_tick_params(direction = 'in', which = 'both', length=0)
-	f2_ax1.xaxis.set_major_locator(ticker.NullLocator()) # turn off tick labels
-	f2_ax1.yaxis.set_major_locator(ticker.NullLocator()) # turn off tick labels
-	f2_ax1.set_ylim(1.1, 1.2)	
+	# light intensity plot
+	f2_ax1.set_ylabel(str(r'$J(\mathrm{O^{1}D})\,\mathrm{(s^{-1})}$'), fontsize = 14, 
+		rotation='vertical', labelpad=0)
+	f2_ax1.xaxis.set_tick_params(direction = 'in', which = 'both', length = 5, 
+	labelbottom=False)
+	f2_ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	# set vertical limit of y axis
+	f2_ax1.set_ylim(0., max(JO1Dpers)*1.1)	
 
-	f2_ax2.fill_betweenx([0., 1.e7], 0., 2, facecolor='gray', alpha=.5)
-	f2_ax2.fill_betweenx([0., 1.e7], 2., 12., facecolor='yellow', alpha=.5)
-	f2_ax2.fill_betweenx([0., 1.e7], 12., 24., facecolor='orange', alpha=.5)
-	f2_ax2.set_ylabel(str(r'$\mathrm{OH}$ [$\mathrm{cm^{-3}}$]'), fontsize = 14)
+	# radicals plot
+	# get upper limit of y axis
+	f2_ax2_yup = f2_ax2.get_ylim()[1]
+	f2_ax2.fill_betweenx([0., f2_ax2_yup], 0., 2, facecolor='gray', alpha=.5)
+	f2_ax2.fill_betweenx([0., f2_ax2_yup], 2., 12., facecolor='yellow', alpha=.5)
+	f2_ax2.fill_betweenx([0., f2_ax2_yup], 12., 24., facecolor='orange', alpha=.5)
+	f2_ax2.set_ylabel(str(r'$\mathrm{OH, HO_{2}, RO_{2}}$' +'\n' + r'($\mathrm{cm^{-3}}$)'), fontsize = 14)
 	#f2_ax2.xaxis.set_major_locator(ticker.NullLocator()) # turn off tick labels
 	f2_ax2.xaxis.set_tick_params(direction = 'in', which = 'both', length = 5, 
 	labelbottom=False)
 	f2_ax2.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
-	f2_ax2.set_ylim(0.1, 6.25e6)
+	f2_ax2.set_ylim(6.e5, f2_ax2_yup)
+	f2_ax2.legend()
 
 	f2_ax3.fill_betweenx([-1., 35.], 0., 2, facecolor='gray', alpha=.5)
 	f2_ax3.fill_betweenx([-1., 35.], 2., 12., facecolor='yellow', alpha=.5)
 	f2_ax3.fill_betweenx([-1., 35.], 12., 24., facecolor='orange', alpha=.5)
 	f2_ax3.set_xlabel(r'Time (hours)', fontsize = 14)	
-	f2_ax3.set_ylabel(str(r'$\mathrm{O_{3}}$ [ppbv]' + '\n' + r'$\mathrm{\alpha}$-pinene [ppbv]'), fontsize = 14)
+	f2_ax3.set_ylabel(str(r'$\mathrm{O_{3}}$ (ppbv)' + '\n' + r'$\mathrm{\alpha}$-pinene (ppbv)'), fontsize = 14)
 	f2_ax3.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 	f2_ax3.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both', 
 	length = 5)
-	f2_ax3.set_ylim(-1., 30.)	
+	f2_ax3.set_ylim(-1., 30.)
+	f2_ax3.legend()	
 
-	
-	
+	fig.tight_layout()
 	
 	plt.show()
 	import ipdb; ipdb.set_trace()
