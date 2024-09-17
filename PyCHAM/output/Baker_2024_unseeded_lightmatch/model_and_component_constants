@@ -1,0 +1,12 @@
+number_of_size_bins,1
+number_of_components,607
+factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734], [25034759936.935734]]
+simulation_computer_time(s),14.336870193481445
+seed_name,['core']
+wall_on_flag_0forNO_>0forYES,1
+space_mode,lin
+index_of_water,13
+index_of_seed_components,[606]
+size_structure_0_for_moving_centre_1_for_full_moving,0
+output_by_sim_sch_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_unseeded_lightmatch/inputs/mcmAP_PRAMAP_scheme.kpp
+output_by_sim_mv_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_unseeded_lightmatch/inputs/model_var.txt
