@@ -1,0 +1,35 @@
+HCHO (298K and 1 atm) photolysis quantum yields for the (H + HCO) radical channel			
+
+Recommendation of IUPAC 2003		
+http://www.iupac-kinetic.ch.cam.ac.uk	
+
+taken from:			
+G. D. Smith, L. T. Molina and M. Molina. J.Phys.Chem A, 106, 1233 (2002)			
+
+wavelength (nm)	qy_r (H+HCO)
+240	0.27
+250	0.29
+260	0.3
+268.75	0.425
+278.75	0.57
+283.75	0.673
+288.75	0.746
+293.75	0.694
+298.75	0.642
+301.25	0.725
+303.75	0.78
+306.25	0.684
+308.75	0.735
+311.25	0.704
+313.75	0.715
+316.25	0.673
+321.25	0.663
+326.25	0.528
+328.75	0.373
+331.25	0.476
+333.75	0.311
+336.25	0.072
+338.75	0.041
+340	0
+350	0
+360	0			

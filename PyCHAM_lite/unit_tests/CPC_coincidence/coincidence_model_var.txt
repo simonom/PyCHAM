@@ -1,0 +1,15 @@
+# this very simple (no chemistry only an initial seed particle distribution with coagulation to decrease the total concentration over time) is useful for testing the coincidence model of the CPC plotting tab.  The intenion of the coincidence model is to convolve simulated results to CPC output if a coincidence correction has not been applied to the CPC values.  One can use the following as the coincidence box inputs on the PyCHAM GUI: 5., 2.e-8, 7.e5.  Where the first value is the volumetric flow rate, the second is the instrument dead time and the third is the maximum actual particle concentration coincidence applies to.  Once the CPC observations button is pressed the resulting plot of total particle concentrations with time should give a curve that begins in complete agreement with the simulated results, but then shows a step decrease as actual concentrations fall into the coincidence region and values are convolved to the uncorrected CPC values, before values gradually realign with simulations at lower concentrations where coincidence is decreasingly significant.
+res_file_name = CPC_coincidence_output
+total_model_time = 7200.
+update_step = 60.
+recording_time_step = 60.
+number_size_bins = 128
+lower_part_size = 0.
+upper_part_size = 5.e-1
+space_mode = log
+wall_on = 0
+coag_on = 1
+pconct = 0.
+pconc = 1.e6
+seed_name = core
+mean_rad = 1.e-1

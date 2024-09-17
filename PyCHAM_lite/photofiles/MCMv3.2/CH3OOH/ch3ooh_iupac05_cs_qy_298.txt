@@ -1,0 +1,46 @@
+methyl peroxide (CH3OOH) absorption spectrum (1 bar, 298 K)
+
+IUPAC 2005 Recommendation
+http://www.iupac-kinetic.ch.cam.ac.uk
+
+G. L. Vaghjiani and A. R. Ravishankara, J. Geophys. Res. 94, 3487 (1989)
+
+Quantum yield
+
+G. L. Vaghjiani and A. R. Ravishankara, J. Chem. Phys. 92, 996 (1990)
+
+phi (CH3O + OH) = unity at wavelengths > 290 nm
+
+wavelength (nm)	sigma (10-20 cm2)
+210	31.2
+215	20.9
+220	15.4
+225	12.2
+230	9.62
+235	7.61
+240	6.05
+245	4.88
+250	3.98
+255	3.23
+260	2.56
+265	2.11
+270	1.7
+275	1.39
+280	1.09
+285	0.863
+290	0.691
+295	0.551
+300	0.413
+305	0.313
+310	0.239
+315	0.182
+320	0.137
+325	0.105
+330	0.079
+335	0.061
+340	0.047
+345	0.035
+350	0.027
+355	0.021
+360	0.016
+365	0.012

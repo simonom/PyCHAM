@@ -1,0 +1,20 @@
+C2H5CHO (298K and 1 bar) photolysis quantum yields (C2H5 + HCO)				
+				
+Chen and Zhu J. Phys. Chem. A., 105, 9689 (2001)				
+
+see also discussion from IUPAC 2003
+http://www.iupac-kinetic.ch.cam.ac.uk
+
+wavelength (nm)	qy_hco
+280	0.85
+285	1.01
+290	0.95
+295	0.98
+300	0.92
+305	0.95
+310	0.98
+315	0.04
+320	0.028
+325	0.021
+330	0.023
+
