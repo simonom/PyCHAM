@@ -191,13 +191,17 @@ def mod_var_read(self):
 					# if 1, then check that local 
 					# variables are stored, ready for use
 					if (self.pars_skip == 1):
-						try:
-							self.Psat = self.Psat_rec0
-						except:
+
+						# check whether a chemical scheme has
+						# already been used
+						if (hasattr(self, 'sch_name_orig')):
+							self.pars_skip = 1
+						else:
 							self.pars_skip = 0
 							
 				except:
-					self.pars_skip_path = str(value.strip()) # in case a path to saved variables
+					# in case a path to saved variables
+					self.pars_skip_path = str(value.strip())
 					self.pars_skip = 2
 
 			if (key == 'spin_up' and (value.strip())):
@@ -211,7 +215,13 @@ def mod_var_read(self):
 			# experiment start
 			if (key == 'Comp0' and (value.strip())):
 				self.comp0 = [str(i).strip() for i in 
-				(value.split(','))]			
+				(value.split(','))]
+
+				# if using the concentrations from the end of
+				# the previous simulation, ignore water and
+				# seed as these are set in init_conc.py
+				if ('self' in self.comp0[0]):
+					self.comp0 = self.comp_namelist[0:-2]
 
 			# initial concentrations of components present 
 			# at experiment start (ppb)
@@ -227,15 +237,23 @@ def mod_var_read(self):
 						break
 				else:
 
+					# if starting concentrations are the same
+					# as final concentrations on previous
+					# simulation, ignore water and seed as
+					# these are set in init_conc.py
+					if ('self' in str(value.split(','))):
+						y0_gas = self.yorig[0:-2]
+						continue
+
 					try:
 						y0_gas = [float(i) for i 
 						in (value.split(','))]
 					except:
-					
-						err_mess = '''Error - 
-						could not read in the 
-						C0 model variable, please check the model 
-						variables file and see README for guidance'''
+						err_mess = str('Error - '+
+						'could not read in the '+
+						'C0 model variable, please check the '+
+						'model variables file and see README '+
+						'for guidance')
 			
 			# chamber temperature (K)
 			if (key == 'temperature' and (value.strip())):
@@ -1006,13 +1024,21 @@ def mod_var_read(self):
 			if not os.path.isdir(self.PyCHAM_path[0:(self.PyCHAM_path.index('PyCHAM_lite')-1)] + '/umansysprop'):
 				uman_up = 1
 		# -------------------------------------------
-		
+
+		# check on skipping parsing, note above here is already a check
+		# that an original chemical scheme is present, but now
+		# we need to check that that chemical scheme is the same
+		# as the chemical scheme to be used in this simulation
+		if (self.pars_skip == 1 or self.pars_skip == 2):
+			if (self.sch_name_orig != self.sch_name):
+				self.pars_skip == 0
+
 		# update model variables message in GUI
 		# if error message occurs
 		if (err_mess != '' or self.err_mess != ''):
 			# update error message
 			if (err_mess != ''):
-				self.l80.setText(str('Setup Status: \n' + err_mess))
+				print(err_mess)
 			if (self.err_mess != ''):
 				self.l80.setText(str('Setup Status: \n' + self.err_mess))
 			# change border accordingly

@@ -165,7 +165,10 @@ def init_conc(num_comp, init_conc, PInit,
 			# set initial concentration
 			if (Cfac_flag == 1): # gas-phase concentrations
 				# convert from ppb to # molecules/cm3
-				y[y_indx] = init_conc[i]*Cfactor
+				try:
+					y[y_indx] = init_conc[i]*Cfactor
+				except:
+					import ipdb; ipdb.set_trace()
 			if (Cfac_flag == 0):
 				# # molecules/cm3
 				y[y_indx] = init_conc[i]

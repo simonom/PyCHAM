@@ -247,6 +247,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 
 	# Baker et al. 2024 product classes end --------------------------
 
+	# store concentrations of all components in all phases at the
+	# final time, in case the next simulation wants to use these
+	# (molecules/cm3 (air))
+	self.yorig = y_mat[-1, :]
+
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
 	y_mat[:, 0:num_comp] = y_mat[:, 0:num_comp]/(Cfactor_vst.reshape(len(Cfactor_vst), 1))
