@@ -442,14 +442,16 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		Nresult_dry = (np.array((Nresult_dry)))
 		rbou_rec = (np.array((rbou_rec)))	
 	
-	# to ensure quick use of output, store results in an object in an identical way to retr_out
+	# to ensure quick use of output, store results in an object in an identical 
+	# way to retr_out
 	# create a class to hold outputs
 	class ro_outputs:
 		sp = output_by_sim_sch_ext # chemical scheme path
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
 		gen_numbers = self.gen_num # for each component, the generation number
-		HyC = self.HC.tolist() # hydrogen:carbon ratios for each component, this output added on 31/05/2022
+		# hydrogen:carbon ratios for each component, this output added on 31/05/2022
+		HyC = self.HC.tolist()
 		nominal_mass = self.nom_mass.tolist()
 		nsb = numsb
 		nc = num_comp

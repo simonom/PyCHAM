@@ -67,6 +67,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	group_indx = self.ro_obj.gi
+	y_MV = np.array((self.ro_obj.comp_MV)) # cm3/mol
 	
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
@@ -296,7 +297,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 
-		# end of particle-phase concentration sub-plot ---------------------------------------
+		# end of particle-phase concentration sub-plot ----------------------------
 	
 	# if called by button to plot temporal profile of total particle-phase concentration 
 	# excluding water and seed
@@ -314,7 +315,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			ppc[:, i::num_comp] = 0.
 		
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, self.ro_obj.nsb-self.ro_obj.wf))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
+			(1, self.ro_obj.nsb-self.ro_obj.wf))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 		# convert from # molecules/cm3 to ug/m3
 		ppc = (ppc/si.N_A)*y_mwt*1.e12
@@ -323,7 +325,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc = np.sum(ppc, axis=1)
 		
 		# plot
-		ax0.plot(self.ro_obj.thr, ppc, '+', linewidth = 4., label = 'total particle-phase excluding seed and water')
+		ax0.plot(self.ro_obj.thr, ppc, '+', linewidth = 4., 
+			label = 'total particle-phase excluding seed and water')
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -340,7 +343,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			ppc = yrec[:, self.ro_obj.nc::]
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
+			(1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -351,7 +355,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		# sum particle-phase concentrations over size bins (ug/m3), 
 		# but keeping components separate
-		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, self.ro_obj.nc), axis=0)
+		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, 
+			self.ro_obj.nc), axis=0)
 		
 		# convert to mass contributions
 		ppc_t = ((ppc_t/np.sum(ppc_t))*100.).reshape(-1, 1)
@@ -377,15 +382,18 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., 
+				label = namei)
 	
-		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
+		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', 
+			fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 	
-	# if called by button to plot top contributors to particle-phase excluding seed and water
+	# if called by button to plot top contributors to particle-phase excluding 
+	# seed and water
 	if (caller == 7):
 
 		import scipy.constants as si		
@@ -402,7 +410,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0. # zero water
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
+			(1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -439,7 +448,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', 
+				linewidth = 4., label = namei)
 	
 		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -460,7 +470,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		asp = np.sum(asp, axis=1)
 		# plot
 		ax0.plot(self.ro_obj.thr, asp, '-+', linewidth = 4.)
-		ax0.set_ylabel(r'Total particle-phase surface area concentration ($\rm{m^{2}\,m^{-3}}$)', fontsize = 14)
+		ax0.set_ylabel(str(r'Total particle-phase surface area concentration ' +
+		r'($\rm{m^{2}\,m^{-3}}$)'), fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -480,9 +491,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppcs = np.zeros((ppc.shape[0], (num_sb-wall_on)))
 
 		for i in seedi: # loop through seed indices
+
 			# get just seed component particle-phase volume concentration 
 			# (cm3/cm3)
-			ppcs[:, :] += (ppc[:, i::num_comp]/si.N_A)*(np.array((y_MV))[i])
+			ppcs[:, :] += (ppc[:, i::num_comp]/si.N_A)*y_MV[i]
 		
 		# convert total volume to volume per particle (cm3)
 		ppcs[Nwet>0] = ppcs[Nwet>0]/Nwet[Nwet>0]

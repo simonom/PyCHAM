@@ -45,7 +45,8 @@ def retr_out(self):
 	try: # try opening file
 		const_in = open(fname)
 	except:
-		err_mess = str('Error - no such file ' + fname + ', please check it still exists')
+		err_mess = str('Error - no such file ' + fname + 
+			', please check it still exists')
 		self.l203a.setText(err_mess)
 		# set border around error message
 		if (self.bd_pl == 1):
