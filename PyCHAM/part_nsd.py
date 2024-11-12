@@ -33,8 +33,8 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pconcn, testf, self
 	# lowersize - the smallest bound on the particle size range (um)
 	# num_asb - number of size bins (excluding wall)
 	# uppersize - the largest bound on the particle size range (um)
-	# mean_radn - mean radius of modes (um)
-	# stdn - standard deviation of modes (must be greater than 1)
+	# mean_radn - mean radius of modes (um) at this time
+	# stdn - standard deviation of modes (must be greater than 1) at this time
 	# self.pmode - whether distribution described as modes or explicitly
 	# pconcn - particle number concentration (# particles/cm3)
 	# testf - flag for whether in testing mode

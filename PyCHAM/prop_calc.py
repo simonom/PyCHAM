@@ -97,19 +97,22 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					func(path)
 				else:
 					raise
-			# remove existing folder, onerror will change permission of directory if 
-			# needed
-			shutil.rmtree(self.PyCHAM_path+ '/umansysprop', ignore_errors=False, onerror=handleRemoveReadonly)
+			# remove existing folder, on error will change permission of 
+			# directory if needed
+			shutil.rmtree(self.PyCHAM_path + '/umansysprop', 
+				ignore_errors=False, onerror=handleRemoveReadonly)
 		
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 		Repo.clone_from(git_url, (self.PyCHAM_path + '/umansysprop'))
 		
 		# now check on whether import pybel written in data/__init__.py
-		f_init = open(str(self.PyCHAM_path + '/umansysprop/umansysprop/data/__init__.py'), mode='r')
+		f_init = open(str(self.PyCHAM_path + '/umansysprop/umansysprop/' +
+		'data/__init__.py'), mode='r')
 		lines = f_init.readlines()
 		if 'import pybel' in lines[21]:
 			lines[21] = 'import openbabel.pybel as pybel\n'	
-			f_init = open(str(cwd + '/umansysprop/umansysprop/data/__init__.py'), mode='w')
+			f_init = open(str(cwd + '/umansysprop/umansysprop/data' +
+			'/__init__.py'), mode='w')
 			f_init.writelines(lines)
 		f_init.close()
 
@@ -175,12 +178,14 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# if using vapour pressures saved to file
 	if (self.pars_skip == 2):
 		# get vapour pressure at first temperature (# molecules/cm3)
-		load_path = str(self.pars_skip_path + '/pure_component_saturation_vp_at_startT_molec_percm3.npy') # path
+		load_path = str(self.pars_skip_path + 
+		'/pure_component_saturation_vp_at_startT_molec_percm3.npy') # path
 		self.Psat_rec0 = (np.load(load_path, allow_pickle=True))
 		self.Psat = (np.load(load_path, allow_pickle=True))
 		
 		# get vapour pressures at 298.15 K (Pa)
-		load_path = str(self.pars_skip_path + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
+		load_path = str(self.pars_skip_path + 
+		'/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		self.Psat_Pa_rec = (np.load(load_path, allow_pickle=True))
 
 	# if using archived reference temperature (298.15 K (Pa))
@@ -189,7 +194,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# for HOMs
 	if (self.pars_skip == 3):
 		# get vapour pressures at 298.15 K (Pa)
-		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
+		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/' +
+		'pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		self.Psat_Pa_rec_ref = (np.load(load_path, allow_pickle=True))
 		self.Psat_Pa_rec = np.zeros((num_comp))
 		# loop through components to map reference vapour pressure onto
@@ -578,16 +584,20 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.P_wfunc_ci.append(vol_indx)
 
 					# remember which walls affected
-					self.P_wfunc_wi.append([wn*i for i in [1]*len(vol_indx)])
+					self.P_wfunc_wi.append([wn*i for i in 
+						[1]*len(vol_indx)])
 					# remember the user-defined vapour pressure
 					self.P_wfunc.append(volP[i])
 					
 				else: # not specific to a wall
 
 					# index of component in list of components
-					try: # first see if an individual component has been named
+					# first see if an individual component 
+						#has been named
+					try:
 						
-						vol_indx = self.comp_namelist.index(vol_Comp[i])	
+						vol_indx = self.comp_namelist.index(
+							vol_Comp[i])	
 						
 					except: # could be a group of components
 						group_name = vol_Comp[i]
@@ -599,9 +609,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 							# get inequality
 							inequal =  group_name[us_indx+1::]
 							
-							# get index of components in this group
+							# get index of components in 
+							# this group
 							if '<' in inequal:
-								if '=' in inequal: # less than or equal to
+								# less than or equal to
+								if '=' in inequal:
 									# get index of all components in this group
 									vol_indx = self.Psat[0, :] <= float(inequal[2::])
 								else: # just less than
@@ -701,5 +713,5 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		err_mess = 'Stop'
 		erf = 1
 	# end of plotting section -----------------------------------------------
-	
+
 	return(self, err_mess, erf)

@@ -1,0 +1,59 @@
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                #
+#    You should have received a copy of the GNU General Public License along with #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.        #
+#                                                                #
+##########################################################################################
+# File created at 2024-11-12 13:44:01.256094 by ode_brk_err_mess
+
+Gas and particle-phase concentrations of water prior to solver (molecules/cm3) with size bin numbers starting at 1: 
+Gas: 1.3060546374485062e+17
+Size bin 1: 0.10987263238457909
+Size bin 2: 0.0
+Size bin 3: 0.0
+Size bin 4: 0.0
+Size bin 5: 0.0
+Size bin 6: 0.0
+Size bin 7: 4549410177626.267
+Size bin 8: 0.0
+Size bin 9: 0.0
+Size bin 10: 0.0
+Size bin 11: 0.0
+Size bin 12: 0.0
+
+Gas and particle-phase concentrations of water following solver (molecules/cm3) with size bin numbers starting at 1: 
+Gas: 1.3060546374485062e+17
+Size bin 1: -0.033106772570678664
+Size bin 2: 0.0
+Size bin 3: 0.0
+Size bin 4: 0.0
+Size bin 5: 0.0
+Size bin 6: 0.0
+Size bin 7: 4549390630339.442
+Size bin 8: 0.0
+Size bin 9: 0.0
+Size bin 10: 0.0
+Size bin 11: 0.0
+Size bin 12: 0.0
+
+Wall not turned on so no gas-wall partitioning fluxes reported
+
+Gas-particle partitioning fluxes (molecules/cm3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.
+H2O: [ 2.51174382e+07 -0.00000000e+00 -0.00000000e+00 -0.00000000e+00
+ -0.00000000e+00 -0.00000000e+00  3.43390553e+15 -0.00000000e+00
+ -0.00000000e+00 -0.00000000e+00 -0.00000000e+00 -0.00000000e+00]

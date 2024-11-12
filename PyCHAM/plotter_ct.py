@@ -72,18 +72,19 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	wall_on = self.ro_obj.wf
 	PsatPa = self.ro_obj.vpPa
 	OC = self.ro_obj.O_to_C
-	
-	# no record of change tendency for final experiment time point
-	timehr = timehr[0:-1]
 
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
 		
 		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
 		try: # try to open
-			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header	
+			# skiprows = 1 omits header	
+			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1)
 		except:
-			mess = str('Please note, a change tendency record for the component ' + str(comp_name) + ' was not found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+			mess = str('Please note, a change tendency record for the component ' + 
+			str(comp_name) + ' was not found, note that it must specified in the ' +
+			'tracked_comp input of the model variables file. Please ' + 
+			'see README for more information.')
 			self.l203a.setText(mess)
 			
 			# set border around error message
@@ -171,13 +172,17 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 			 
 		# plot temporal profiles of change tendencies due to chemical 
-		# reaction production and loss, gas-particle p
-		# artitioning and gas-wall partitioning
-		ax0.plot(timehr, gpp, label = str('gas-particle partitioning '+ comp_name))
+		# reaction production and loss, gas-particle
+		# partitioning and gas-wall partitioning
+		
+		ax0.plot(timehr, gpp, 
+			label = str('gas-particle partitioning '+ comp_name))
 		ax0.plot(timehr, gwp, label = str('gas-wall partitioning '+ comp_name))
 		ax0.plot(timehr, dil, label = str('dilution '+ comp_name))
-		ax0.plot(timehr, crg, label = str('chemical reaction gain '+ comp_name))
-		ax0.plot(timehr, crl, label = str('chemical reaction loss '+ comp_name))
+		ax0.plot(timehr, crg, 
+			label = str('chemical reaction gain '+ comp_name))
+		ax0.plot(timehr, crl, 
+			label = str('chemical reaction loss '+ comp_name))
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
 		ax0.set_title('Change tendencies, where a tendency ' + 

@@ -204,7 +204,7 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 					avMM1 = av_MM
 				
 				lcnt += 1 # loop count
-			
+		
 		# if number size distribution does 
 		# not include volume of water, i.e. the volume
 		# represented by the distribution represents
@@ -279,12 +279,13 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 			# by 1e-4 to give cm from um and 
 			# y_dens multiplied by  by 1e-3 to 
 			# convert from kg/m3 to g/cm3
-			kelv = np.exp((2.e0*avMW*surfT)/(R_gas*1.e7*TEMP*(x)*1.e-4*av_dens))
+			kelv = np.exp((2.e0*av_MM*surfT)/(R_gas*1.e7*TEMP*(x)*1.e-4*av_dens))
 								
 			# equilibrium mole fraction of water from the ode solver 
-			# equation for vapour-particle partitioning per size bin
+			# equation for vapour-particle partitioning per size bin, note that
+			# self.Psat has particle size bins and walls in rows
 			xwat = y[self.H2Oi]/(
-			self.Psat[:, self.H2Oi]*kelv*act_coeff[:, self.H2Oi])
+			self.Psat[0:num_asb, self.H2Oi]*kelv*act_coeff[0:num_asb, self.H2Oi])
 				
 			# total molecular concentration of dry (no water) seed 
 			# components 
@@ -299,8 +300,7 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 			# (molecules/cm3), note that (xwat/(1.-wat)) gives 
 			# the fraction of tmc that gives the molecular 
 			# concentration of water
-			wmc = tmc*(xwat/(1.-wat))
-				
+			wmc = tmc*(xwat/(1.-xwat))
 			seed_cnt = 0 # count on seed components
 
 			# concentration of particle-phase seed 

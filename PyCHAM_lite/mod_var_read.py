@@ -221,7 +221,12 @@ def mod_var_read(self):
 				# the previous simulation, ignore water and
 				# seed as these are set in init_conc.py
 				if ('self' in self.comp0[0]):
-					self.comp0 = self.comp_namelist[0:-2]
+					try:
+						self.comp0 = self.comp_namelist[0:-2]
+					except:
+						print(str('trying to set comp0 to ' +
+						'components in previous simulation but ' +
+						'failing in mod_var_red.py'))			
 
 			# initial concentrations of components present 
 			# at experiment start (ppb)

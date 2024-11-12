@@ -1951,7 +1951,9 @@ class PyCHAM(QWidget):
 		'dependence on molar mass (g/mol), use y_MM to denote molar ' +
 		'mass (g/mol) of components.  Defaults to 1.0 which implies ' +
 		'no dependency on molar mass. To zero ranges of m/z use ' +
-		'inequalities, e.g. <200. sets all m/z less than 200 to 0.'))
+		'inequalities, e.g. <200. sets all m/z less than 200 to 0.' +
+		'To zero inorganics, follow any (or blank) molar mass functions ' +
+		'with a comma and the words organics only, e.g.: <73., organics only'))
 		self.CIMSscrolllayout.addWidget(self.e283, 3, 0)
 		
 		# button to plot probability distribution function 
@@ -3374,9 +3376,12 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 			
+		# no priority message to give to plotter module
+		self.pre_mess = 0
+
 		# get names of components to plot
 		comp_names = [str(i) for i in self.e217.text().split(',')]
-		
+
 		import plotter_ct
 		dir_path = self.l201.text() # name of folder with results
 		plotter_ct.plotter(0, dir_path, comp_names, self) # plot results
@@ -3401,7 +3406,9 @@ class PyCHAM(QWidget):
 			self.pre_mess = 1
 			top_num = [10]
 
-			mess = str('Please note that a user-defined number of reactions to plot was not seen, therefore the default of ' + str(top_num[0]) + ' has been set.')
+			mess = str('Please note that a user-defined number of ' +
+			'reactions to plot was not seen, therefore the default of ' + 
+			str(top_num[0]) + ' has been set.')
 			self.l203a.setText(mess)
 
 		ct_units = self.b218aaa.currentText() # change tendency units

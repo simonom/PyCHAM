@@ -297,30 +297,36 @@ def cham_up(sumt, Pnow,
 			Pnow = Pnow*(temp_nown/temp_now)
 			
 			# update ppb to molecules/cm3 conversion factor concentrations
-			# total number of molecules in 1 cc air using ideal gas law.  R has units cc.Pa/K.mol
+			# total number of molecules in 1 cm3 air using ideal gas law.  
+			# R has units cm3.Pa/K.mol
 			ntot = Pnow*(si.N_A/((si.R*1.e6)*temp_nown))
 			# one billionth of number of molecules in chamber unit volume
-			Cfactor = ntot*1.e-9 # ppb to molecules/cc conversion factor
+			Cfactor = ntot*1.e-9 # ppb to molecules/cm3 conversion factor
 			
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_nown+120.))*(temp_nown/296.16)**1.5)
 	
-			ma = 28.966e-3 # molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
+			# molecular weight of air (kg/mol) (Eq. 16.17 Jacobson 2005)
+			ma = 28.966e-3
 			
 			# air density (kg/m3 (air)), ideal gas law
 			rho_a =  (Pnow*ma)/((si.R)*temp_nown)
 						
 			# update mean free path and thermal speed
 			# mean thermal speed of each molecule (m/s) (11.151 Jacobson 2005)
-			# note that we need the weight of one molecule, which is why y_mw is divided by
-			# Avogadro's constant, and we need it in kg, which is why we multiply by 1e-3
+			# note that we need the weight of one molecule, which is why y_mw 
+			#is divided by
+			# Avogadro's constant, and we need it in kg, which is why we 
+			# multiply by 1e-3
 			therm_sp = ((8.*si.k*temp_nown)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 			
 			# mean free path (m) for each component (15.24 of Jacobson 2005)
-			# molecular weight of air (28.966 g/mol taken from table 16.1 Jacobson 2005)
+			# molecular weight of air (28.966 g/mol taken from table 16.1 
+			# Jacobson 2005)
 			mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
 			
-			# diffusion coefficient (m2/s) of components in gas phase (air), eq 4.1.4 of
+			# diffusion coefficient (m2/s) of components in gas phase (air), 
+			# eq 4.1.4 of
 			# the Taylor (1993) textbook 
 			# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion 
 			# volume for air (19.7) taken from Table 4.1 of Taylor (1993) and mw of 
@@ -823,19 +829,29 @@ def cham_up(sumt, Pnow,
 			y_mat = y_mat[:, 0:-self.wall_on]
 	
 		# get the average oxygen and carbon number of the gas- and particle-phase RO2
-		Cnumav = sum(sum((self.Cnum[self.RO2_indices[:, 1], :])*(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
+		Cnumav = sum(sum((self.Cnum[
+			self.RO2_indices[:, 1], :])*
+			(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/
+			sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
 
-		Onumav = sum(sum((self.Onum[self.RO2_indices[:, 1], :])*(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
+		Onumav = sum(sum((self.Onum[
+			self.RO2_indices[:, 1], :])*
+			(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/
+			sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
 	
-		# estimate vapour pressure (Pa) effect of the RO2 pool based on carbon and oxygen number
+		# estimate vapour pressure (Pa) effect of the RO2 pool based 
+		# on carbon and oxygen number
 		RO2pool_effect_Pa = 10**(-0.12*Onumav + Cnumav*-0.22)*101325.
 		
-		# take effect on the HOM-RO2-MCM-RO2 accretion product, note that inside Psat_Pa_rec
+		# take effect on the HOM-RO2-MCM-RO2 accretion product, note that 
+		# inside Psat_Pa_rec
 		# is the estimated vapour pressure of the HOM-RO2 (Pa)
-		self.Psat_Pa[:, self.RO2_POOL_APi] = self.Psat_Pa_rec[self.RO2_POOL_APi] + RO2pool_effect_Pa
+		self.Psat_Pa[:, self.RO2_POOL_APi] = (self.Psat_Pa_rec[self.RO2_POOL_APi] + 
+			RO2pool_effect_Pa)
 		# convert to # molecules/cm3 (air) using ideal
 		# gas law, R has units cm3.Pa/K.mol
-		self.Psat[:, self.RO2_POOL_APi] = self.Psat_Pa[0, self.RO2_POOL_APi]*(si.N_A/((si.R*1.e6)*self.TEMP[tempt_cnt]))
+		self.Psat[:, self.RO2_POOL_APi] = (self.Psat_Pa[0, self.RO2_POOL_APi]*
+			(si.N_A/((si.R*1.e6)*self.TEMP[tempt_cnt])))
 		
 		
 	# end of check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products ----------

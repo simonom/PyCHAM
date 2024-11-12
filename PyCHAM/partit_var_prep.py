@@ -209,7 +209,9 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 				accom_coeff_func.append(str('accom_coeff[' + str(ac_indx[i]) + ', 0:self.num_asb]' + ' = ' + accom_coeff_user[i]))
 	
 	else: # if no components specified
-		if (len(accom_coeff_user) == 1): # but one accommodation coefficient is specified 
+		# but one accommodation coefficient is specified, then apply to all
+		# components
+		if (len(accom_coeff_user) == 1):
 			accom_coeff = accom_coeff*float(accom_coeff_user[0])
 
 	# generate module that contains any accommodation coefficient functions, note, do 

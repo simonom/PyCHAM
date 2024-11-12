@@ -196,7 +196,8 @@ def mod_var_read(self):
 						except:
 							self.pars_skip = 0
 				except:
-					self.pars_skip_path = str(value.strip()) # in case a path to saved variables
+					# in case a path to saved variables
+					self.pars_skip_path = str(value.strip())
 					self.pars_skip = 2
 
 			if (key == 'spin_up' and (value.strip())):
@@ -258,23 +259,32 @@ def mod_var_read(self):
 			if (key == 'p_init' and (value.strip())):
 				Press = float(value.strip())
 
-			if key == 'daytime_start' and (value.strip()): # time of day at experiment start (s)
+			# time of day at experiment start (s)
+			if key == 'daytime_start' and (value.strip()):
 				self.daytime = float(value.strip())
 
-			if key == 'wall_on' and (value.strip()): # marker for whether or not to consider wall
-				if (int(value.strip()) == 0): # in case wall to be turned off
-					self.wall_on = int(value.strip())
-				if (int(value.strip()) == 1): # in case wall to be turned on
-					if (self.wall_on < 1): # turn on wall if it has been turned off prior
-						self.wall_on = int(value.strip())
-					# in case the number of wall bins is already registered, then we don't need to 
+			# marker for whether or not to consider wall
+			if key == 'wall_on' and (value.strip()):
+				if value.strip()[-1] == '.':
+					wall_on_value = value.strip()[0:-1]
+				else:
+					wall_on_value = value.strip()
+				if (int(wall_on_value) == 0): # in case wall to be turned off
+					self.wall_on = int(wall_on_value)
+				if (int(wall_on_value) == 1): # in case wall to be turned on
+					# turn on wall if it has been turned off prior
+					if (self.wall_on < 1):
+						self.wall_on = int(wall_on_value)
+					# in case the number of wall bins is already 
+					# registered, then we don't need to 
 					# adjust the self.wall_on value
 					else:
 						continue
 								
 			if key == 'number_wall_bins' and (value.strip()): # number of wall bins
 				
-				# note, that if wall_on already set to zero, then this overrides any number_wall_bins setting
+				# note, that if wall_on already set to zero, then this 
+				# overrides any number_wall_bins setting
 				if 'self.wall_on' in locals():
 					if (self.wall_on == 0):
 						continue
@@ -520,7 +530,8 @@ def mod_var_read(self):
 
 				std = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
-					std[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
+					std[:, i] = [float(ii.strip()) for ii in 
+						((value.split(';')[i]).split(':'))]
 			
 			# seed particle mean radius (um)
 			if (key == 'mean_rad' and (value.strip())):
@@ -536,7 +547,8 @@ def mod_var_read(self):
 				
 				self.mean_rad = np.zeros((mode_cnt, time_cnt))
 				for i in range(time_cnt):
-					self.mean_rad[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
+					self.mean_rad[:, i] = [float(ii.strip()) for ii in 
+						((value.split(';')[i]).split(':'))]
 				
 
 			# frequency (s) of storing results	
@@ -1176,22 +1188,25 @@ def C0_open(self):
 		self.comp0 = (np.load(fname, 
 			allow_pickle=True)).tolist()
 	
-	# set starting particle properties
-	# withdraw number-size distributions (# particles/cm3 (air))
-	fname = str(self.path_to_C0 + '/particle_number_concentration_wet')
-	self.N_perbin0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
-	# keep just final time
-	self.N_perbin0_prev_sim = self.N_perbin0_prev_sim[-1, :].reshape(-1, 1)	
+	# if particle results are saved from previous simulation
+	if os.path.exists(str(self.path_to_C0 + '/particle_number_concentration_wet')):
 
-	# particle radii (um)
-	fname = str(self.path_to_C0 + '/size_bin_radius')
-	# skiprows=1 omits header
-	self.x0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
-	# keep just final time
-	self.x0_prev_sim = self.x0_prev_sim[-1, :]
+		# set starting particle properties
+		# withdraw number-size distributions (# particles/cm3 (air))
+		fname = str(self.path_to_C0 + '/particle_number_concentration_wet')
+		self.N_perbin0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
+		# keep just final time
+		self.N_perbin0_prev_sim = self.N_perbin0_prev_sim[-1, :].reshape(-1, 1)	
 
-	# particle volumes (um3)
-	self.Varr0_prev_sim = (4./3.)*np.pi*self.x0_prev_sim**3.
+		# particle radii (um)
+		fname = str(self.path_to_C0 + '/size_bin_radius')
+		# skiprows=1 omits header
+		self.x0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
+		# keep just final time
+		self.x0_prev_sim = self.x0_prev_sim[-1, :]
+
+		# particle volumes (um3)
+		self.Varr0_prev_sim = (4./3.)*np.pi*self.x0_prev_sim**3.
 	
 
 	# starting concentrations (ppb) of just the gas-phase
@@ -1199,7 +1214,8 @@ def C0_open(self):
 
 	# get concentrations (molecules/cm3) of any other
 	# phases at this final time step
-	self.y0_other_phase = y0[len(self.comp0)::]
+	if (y0.shape[0]>len(self.comp0)):
+		self.y0_other_phase = y0[len(self.comp0)::]
 
 	# now just keep the concentrations for components with
 	# concentrations above zero

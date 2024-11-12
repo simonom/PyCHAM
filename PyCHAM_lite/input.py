@@ -140,9 +140,11 @@ class PyCHAM_lite():
 		# get the string for checking on change in chemistry
 		wo_str = self.param_const['wo_str']
 
+		ri = 0 # count on simulations
+	
 		# loop through simulations
 		for inname in self.param_const['mod_var_name']:
-
+			
 			# default variables for all required input model 
 			# variables -------------------------
 			[y0, Press, siz_stru, num_sb, 
@@ -184,10 +186,11 @@ class PyCHAM_lite():
 
 			# run simulation
 			self.on_click81sing() # run simulation
-			print('completed ', file_name)
+			print('completed ', file_name, ri)
 			# remember this name
 			sim_name0 = file_name
 			# pause
-			time.sleep(1)
+			time.sleep(0.5)
+			ri += 1 # count on simulations
 
 		return()

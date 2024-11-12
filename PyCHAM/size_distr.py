@@ -43,8 +43,8 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 	# loc - shift of lognormal probability distribution function for seed particles 
 	# number-size distribution (um)
 	# scale - scaling factor of lognormal probability distribution function for seed 
-	# particles (dimensionless) 
-	# std - geometric standard deviation (dimensionless)
+	# particles at this time (mean radius of particles)(dimensionless) 
+	# std - geometric standard deviation (dimensionless) at this time
 	# lowersize - lower radius of particles (um)
 	# uppersize - upper radius of particles (um)
 	# self.space_mode - string saying whether to space size bins logarithmically or linearly
@@ -102,25 +102,28 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 		# number concentrations for all size bins
 		Nperbin = np.zeros((num_bins))
 		for i in range(len(pconc)):
-			# number fraction-size distribution - enforce high resolution to ensure size
+			# number fraction-size distribution - enforce high resolution 
+			# to ensure size
 			# distribution of seed particles fully captured
-			# note dividing rwid[0, 0] by 2.1 rather than 2.0 prevents the lower bound reaching 
+			# note dividing rwid[0, 0] by 2.1 rather than 2.0 
+			# prevents the lower bound reaching 
 			# zero and still gives a useful range
 			# high resolution size bin radii (um)
-			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1), np.log10(uppersize), int(num_bins*1.e2)))
+			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1),
+				np.log10(uppersize), int(num_bins*1.e2)))
 			# probability distribution function
 			try: # if std is an array
-				if (len(std[0]) > 1): # extract array from list
-					std = std[0]
+				if (len(std) > 1): # get this mode
+					stdi = std[i]
 			except: # if std is single number
-				 std = std
+				 stdi = std
 			try: # if scale is an array
-				if (len(scale[0]) > 1): # extract array from list
-					scale = scale[0]
+				if (len(scale) > 1): # extract array from list
+					scalei = scale[i] # get this mode
 			except: # if scale is single number
-				 scale = scale
-
-			pdf_output = stats.lognorm.pdf(hires, std, loc, scale)
+				 scalei = scale
+			import ipdb; ipdb.set_trace()
+			pdf_output = stats.lognorm.pdf(hires, stdi, loc, scalei)
 			# remove any excess dimensions
 			pdf_output = np.squeeze(pdf_output)
 			# probability distribution function scaled to actual size bin radii

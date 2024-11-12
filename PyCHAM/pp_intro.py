@@ -163,12 +163,12 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# particle deposition to wall (# molecules/cm3)
 		self.C_p2w  = 0.
 
-	else: # get the particle number size distribution from inputs
+	else: # if size bins present, get the particle number size distribution from inputs
 	
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pconcn, testf, self)
-		
+
 		# if injection of particles at start of experiment is 
 		# continuous, then even for the 
 		# start of the experiment, this will be dealt with in cham_up
@@ -227,7 +227,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# concentrations of components in new seed particles 
 		# (# molecules/cm3 (air))
 		yn = np.zeros((num_comp*(num_aasb)))
-
+		
 		yn = pp_water_equil(y, yn, seedx_now, num_aasb, y_mw, 
 			R_gas, TEMP, surfT, act_coeff, Vperbin, x, num_comp, self)
 
