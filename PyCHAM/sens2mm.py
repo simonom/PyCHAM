@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)'''
 # module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2024-09-19 11:58:03.392449
+# File Created at 2024-11-12 16:01:23.280466
 
 import numpy as np
 
@@ -34,14 +34,11 @@ def sens2mm(caller, y_MM, Cn):
 	# Cn - carbon number
 	# ---------------------------
 	
-	fac_per_comp = np.ones((len(y_MM))) # sensitivity (Hz/ppt) per molar mass (g/mol) 
-	fac_per_comp[y_MM<73.] = 0. # sensitivity (Hz/ppt) per molar mass (g/mol) 
+	fac_per_comp = 1. # sensitivity (Hz/ppt) per molar mass (g/mol) 
 	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape 
 	if (len(fac_per_comp) == 1): # if just a single value then tile across components 
 		fac_per_comp = np.tile(fac_per_comp, len(y_MM)) # if just a single value then tile across components 
 	
-	inorganic_indx = (Cn == 0.) # get index of inorganics 
-	fac_per_comp[inorganic_indx] = 0. # zero inorganics 
 	if (caller == 3): # called on to plot sensitivity to molar mass
 		import matplotlib.pyplot as plt 
 		plt.ion()

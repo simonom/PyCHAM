@@ -99,19 +99,21 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 
 		time_str = str(str(timehr[ti]) + 'hours through experiment')
 
-	if 'all times' in tn:
+	if isinstance(tn, str): # check whether tn is string
+		if 'all times' in tn: # check whether all times wanted
 
-		# convert yrec from 1D to 2D with times in rows and components in columns
-		yrec = yrec.reshape(len(timehr), num_comp*(num_sb+1))
+			# convert yrec from 1D to 2D with times in rows and 
+			#components in columns
+			yrec = yrec.reshape(len(timehr), num_comp*(num_sb+1))
 
-		# convert gas-phase abundances from ppb to molecules/cm3
-		Cfac_now = np.tile(Cfac.reshape(-1, 1), (1, num_comp))
-		yrec[:, 0:num_comp] = yrec[:, 0:num_comp]*Cfac_now
+			# convert gas-phase abundances from ppb to molecules/cm3
+			Cfac_now = np.tile(Cfac.reshape(-1, 1), (1, num_comp))
+			yrec[:, 0:num_comp] = yrec[:, 0:num_comp]*Cfac_now
+	
+			# sum over times, keeping components in columns
+			yrec = (np.sum(yrec, axis=0)).reshape(1, -1)
 
-		# sum over times, keeping components in columns
-		yrec = (np.sum(yrec, axis=0)).reshape(1, -1)
-
-		time_str = 'all times through experiment'
+			time_str = 'all times through experiment'
 
 	
 	# get gas-phase concentrations (molecules/cm3)
@@ -307,7 +309,7 @@ def write_CIMS_output(self):
 	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
-	Cfac = self.ro_obj.cfac
+	Cfac = np.array((self.ro_obj.cfac))
 	group_indx = self.ro_obj.gi
 	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
 	yrec_p2w = self.ro_obj.part_to_wall
@@ -353,7 +355,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -371,7 +374,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -389,7 +393,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -407,7 +412,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -425,7 +431,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -443,7 +450,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -461,7 +469,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -479,7 +488,8 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(
+						Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -490,7 +500,6 @@ def write_CIMS_output(self):
 			if numiC != 'str':
 				CHON_res[icomp, 3] += numC
 				
-	
 		# concentration of this component at penultimate time step (# molecules/cm3)
 		conc_res[icomp, 0] = yrec[-1, icomp]*Cfac[-1]
 		# rate of change of this component at penultimate time step (# molecules/cm3/s)
@@ -506,8 +515,10 @@ def write_CIMS_output(self):
 	
 	# save
 	np.savetxt(os.path.join(self.dir_path, 'CHON.txt'), CHON_res, delimiter=' ') 		
-	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), conc_res, delimiter=' ')
-	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'), concs_res, delimiter=' ') 
+	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), 
+		conc_res, delimiter=' ')
+	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'),
+		concs_res, delimiter=' ') 
 
 	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
 		if self.iont[0] == 'I': # if iodide
@@ -560,11 +571,16 @@ def write_CIMS_output(self):
 
 	# save CIMS-style output to csv file
 	# saving both gas, particle and wall concentrations of components
-	np.savetxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), CIMS_res, delimiter=',', header=str('time changes with rows which correspond to the time output file, m:z ratios is columns, first row is m:z values')) 		
+	np.savetxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), 
+	CIMS_res, delimiter=',', 
+	header=str('time changes with rows which correspond to the time output file, ' +
+		'm:z ratios is columns, first row is m:z values')) 		
 	 
 	# uncomment below to run check ----------------------------------------------------
-	# check correct results saved (by comparing with output from the 'CIMS observations' button 
-	#check_plot = np.loadtxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), delimiter=',', skiprows=1, dtype='str')
+	# check correct results saved (by comparing with output from the 
+	# 'CIMS observations' button 
+	#check_plot = np.loadtxt(os.path.join(self.dir_path, 
+	#'simulat_res_conv_to_CIMS_output'), delimiter=',', skiprows=1, dtype='str')
 	#import matplotlib.pyplot as plt
 	#plt.ion() # disply plot in interactive mode
 	#fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7)) # prepare plot
