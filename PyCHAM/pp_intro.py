@@ -92,7 +92,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	
 	# index of initial information
 	i = (np.where(self.pconct[0, :] == 0))[0]
-
+	
 	# if seed particle present at start
 	if (sum(self.pconct[0, :] == 0) > 0):
 	

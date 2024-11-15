@@ -29,7 +29,7 @@ import formatting
 import openbabel.pybel as pybel
 import sys
 
-def eqn_interr(num_sb, self):
+def eqn_interr(num_sb, erf, err_mess, self):
 	
 	# inputs: ----------------------------------------------------------------------------
 	# self.eqn_num - number of equations
@@ -554,8 +554,14 @@ def eqn_interr(num_sb, self):
 			# account for this component
 			comp_num += 1
 			# convert MCM chemical names to SMILES
-			# index where xml file name matches reaction component name
-			name_indx = self.comp_xmlname.index(sname)
+			# index where xml file name matches component name
+			try:
+				name_indx = self.comp_xmlname.index(sname)
+			except:
+				erf = 1 # raise error
+				err_mess = str('Error: inside eqn_interr, seed component ' + 
+				str(sname) + ' not found in xml file.')
+				return(comp_list, Pybel_objects, comp_num, erf, err_mess, self)
 				
 			# get SMILES string
 			name_SMILE = self.comp_smil[name_indx]
@@ -995,4 +1001,4 @@ def eqn_interr(num_sb, self):
 			self.obs_comp_i[i] = self.comp_namelist.index(
 			self.obs_comp[i])
 	
-	return(comp_list, Pybel_objects, comp_num, self)
+	return(comp_list, Pybel_objects, comp_num, erf, err_mess, self)

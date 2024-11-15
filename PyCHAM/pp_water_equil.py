@@ -35,7 +35,7 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 	# yp - container for concentration of particle-phase component
 	# concentrations (molecules/cm3)
 	# seedx_now - mole fraction of particle-phase components (may or 
-	#	may not include water)
+	#	may not include water), components in rows, size bins in columns
 	# num_asb - number of particle size bins
 	# y_mm - molar mass of components (g/mol)
 	# R_gas - the universal gas constant (cm3.Pa/K.mol == 

@@ -465,7 +465,12 @@ def ui_check(self):
 	# if seedx not given per size bin 
 	# then tile over size bins, i.e. assume same
 	# mole fraction applies to all size bins
+	
 	else:
+		# ensure seedx has three dimensions before tiling
+		if (self.seedx.ndim < 3):
+			self.seedx = self.seedx.reshape(self.seedx.shape[0], 
+				self.seedx.shape[1], 1)
 		self.seedx = np.tile(self.seedx, (1, num_sb, 1))
 
 	# check consistency between names of initial components and

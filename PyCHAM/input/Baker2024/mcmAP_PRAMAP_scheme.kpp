@@ -1426,6 +1426,10 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {881 } HCOCO = HCOCO3 : 5.00E-12*O2*3.2*EXP(-550./TEMP) ;
  {882 } HCOCO = CO + OH : 5.00E-12*O2*3.2*(1.-EXP(-550./TEMP)) ;
  {883 } HMVKANO3 + hv = HMVKAO + NO2 : J(24)*0.91 ;
+# background reactivity used for OH in supplemntary material of Baker et al. 2024 
+# (10.5194/acp-24-4789-2024-supplement
+ {884 } OH = : 5. ;
+
 # PRAM (Peroxy Radical Autoxidation Mechanism) in Kinetic Pre Processor (KPP) format.
 # This file include the complete PRAM version used by Roldin et al., (NCOMMS 2019), 208 species and 1773 reactions.
 # Combine all PRAM reactions and species with a suitable Master Chemical Mechanism (MCM) KPP file.

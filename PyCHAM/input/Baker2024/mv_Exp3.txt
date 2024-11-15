@@ -1,5 +1,5 @@
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp1_defit
-chem_sch_name = mcmAP_PRAMAP_scheme.kpp
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_scheme/Baker_2024_Exp3_zpc1e-4_it1e-3
+chem_sch_name = mcmAP_scheme.kpp
 xml_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_input/MCM_PRAM_xml.xml
 total_model_time = 8.64e4
 update_step = 3.6e2
@@ -39,8 +39,9 @@ cont_infl_t = 0., 4.32e4
 # observations
 # lights tuned down for O3 and OH agreement
 #Cinfl = 0.0076, 0.0089; 0.0028, 0.0028; 0., 0.69
-# lights set to give same J(O1D) as in Baker paper 
-Cinfl = 0.0083, 0.011; 0.0033, 0.0033; 0., 0.67
+# lights set to give same J(O1D) as in Baker paper
+#Cinfl = 0.0083, 0.011; 0.0033, 0.0033; 0., 0.67
+Cinfl = 0.010, 0.014; 0.0033, 0.0033; 0., 0.67
 # residence time of 63 minutes
 dil_fac = 0.000265
 wall_on = 1
@@ -56,16 +57,21 @@ mass_trans_coeff = RO2_wall1_5.88e-3; HO2_wall1_2e-2
 vol_Comp = RO2_wall1, HO2_wall1
 volP = 0., 0.
 eff_abs_wall_massC = 1.e0
-number_size_bins = 0
 chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
 # set the vapour pressure estimation method for HOMs
 HOMs_vp_method = Mohr2019
 # only need to use the below variables for the seeded case
-#pconc = 4.e1
-#pconct = 0.
-#pcont = 1 
-#mean_rad = 3.e-2
-#std = 1.5
+number_size_bins = 1
+# 2.3e1
+pconc = 1.8e1
+pconct = 0.
+pcont = 1
+mean_rad = 3.0e-2
+std = 1.5
+Vwat_inc = 2
 # 125 nm radius
-#upper_part_size = 1.25e-1
+upper_part_size = 1.25e-1
+z_prt_coeff = 1.e-4
+int_tol = 1.e-3, 1.e-3
 tracked_comp = O3, OH, HO2, APINENE
+pars_skip = 1

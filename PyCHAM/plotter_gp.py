@@ -153,9 +153,41 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				indx_plot = (np.array((group_indx['ROOR'])))			
 				group_flag = 1
 				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
+					ip_fail = 1
+			if (comp_names_to_plot[i].strip() == 'HOMMonBaker'):
+				load_path = str('HOMMonBaker_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
 
-			if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
+			if (comp_names_to_plot[i].strip() == 'HOMFragBaker'):
+				load_path = str('HOMFragBaker_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
+			if (comp_names_to_plot[i].strip() == 'HOMRO2Baker'):
+				load_path = str('HOMRO2Baker_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
+			if (comp_names_to_plot[i].strip() == 'ROORBaker'):
+				load_path = str('ROORBaker_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
+			if ('C' in comp_names_to_plot[i].strip() or 'c' 
+				in comp_names_to_plot[i].strip()):
 				# if a number given after carbon atom
 				if comp_names_to_plot[i].strip()[1::].isnumeric():
 					# get carbon number
@@ -165,7 +197,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					indx_plot = []
 					indx_cnt = 0 # keep count on species
 					for SMILESi in rel_SMILES:
-						if (SMILESi.count('C') + SMILESi.count('c')) == Cn:
+						if ((SMILESi.count('C') + SMILESi.count('c')) 
+							== Cn):
 							indx_plot.append(indx_cnt)
 						indx_cnt += 1 # keep count on species
 
@@ -174,7 +207,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					if (indx_plot.shape[0] == 0):
 						ip_fail = 1
 			if (ip_fail == 1):
-				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + 
+				' not found in chemical scheme used for this simulation'))
 				# set border around error message
 				if (self.bd_pl == 1):
 					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)

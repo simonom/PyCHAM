@@ -306,6 +306,10 @@ def ode_updater_su(y, H2Oi,
 		# set time after which to decide whether spin-up successful
 		su_comp_time = 3.6e3*24. # 24 hours
 
+	# if spin-up time interval is fixed to just time of full simulation
+	if (self.spin_up == 3):
+		su_comp_time = self.tot_time
+
 	# find out what to do with the gas-wall partitioning coefficient,
 	# note that self.kw and self.Cw are spread over wall bins in rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
