@@ -275,8 +275,11 @@ def eqn_interr(num_sb, erf, err_mess, self):
 				# component and that component is organic
 				if ('[O]' in name_SMILE):
 					if ('C' in name_SMILE or 'c' in name_SMILE):
-						# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
-						if ('O[O]' not in name_SMILE and '[O]O' not in name_SMILE): # ensure it's not alkyl peroxy radical
+						# if it is an alkoxy radical (rather than 
+						# alkyl peroxy radical) add its index to list
+						# ensure it's not alkyl peroxy radical
+						if ('O[O]' not in name_SMILE and 
+						'[O]O' not in name_SMILE):
 							self.RO_indx.append(comp_num)			
 	
 				comp_num += 1 # number of unique species
@@ -293,7 +296,8 @@ def eqn_interr(num_sb, erf, err_mess, self):
 			name_only_this_eq.append(name_only)
 			
 			# store reactant index
-			# check if index already present in this reaction - i.e. component appears more than once
+			# check if index already present in this reaction - 
+			# i.e. component appears more than once
 			if (sum(rindx[eqn_step, 0:reactant_step] == int(name_indx)) > 0):
 				# get existing index of this component
 				exist_indx = (np.where(rindx[eqn_step, 0:reactant_step]==(int(name_indx))))[0]

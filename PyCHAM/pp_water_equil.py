@@ -325,7 +325,6 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 
 				seed_cnt += 1 # count on seed components
 
-
 	# if water not to be equilibrated with seed 
 	# particles prior to experiment start (possibly because
 	# particle-phase mole fraction of water already supplied by

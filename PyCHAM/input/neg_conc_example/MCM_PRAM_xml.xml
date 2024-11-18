@@ -55,7 +55,7 @@
 <smiles>[O]</smiles>
 </species>
 <species species_name="O2" species_number="s6062">
-<smiles>OO</smiles>
+<smiles>O=O</smiles>
 </species>
 <species species_name="C1" species_number="s6063">
 <smiles>CC</smiles>
@@ -1660,7 +1660,9 @@
 <species species_name="HYETHO2H" species_number="s520">
 <smiles>OCCOO</smiles>
 </species>
-<species species_name="NO" species_number="s521"></species>
+<species species_name="NO" species_number="s521">
+<smiles>[N]=O</smiles>
+</species>
 <species species_name="ETHOHNO3" species_number="s522">
 <smiles>OCCON(=O)=O</smiles>
 </species>

@@ -533,13 +533,17 @@ def ode_updater_su(y, H2Oi,
 
 						else: # if acceptable
 							gpp_stab = 1 # change to stable flag
-						
-					else: # if solution stable, change stability flag to represent this
+					
+					# if solution stable, change stability flag to 
+					# represent stability
+					else:
 						gpp_stab = 1 # change to stable flag
 				else:
 					# water gas-particle partitioning not solved separately
 					self.odsw_flag = 0
-				# zero partitioning of water to particles for integration without 
+
+				# zero partitioning of water to particles for 
+				# integration without 
 				# water gas-particle partitioning
 				if (num_sb > self.wall_on): # if particles present
 					kimt[0:num_sb-self.wall_on, H2Oi] = 0.

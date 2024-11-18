@@ -87,8 +87,8 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pconcn, testf, self
 			print('finished with size_distr.lognormal')
 		
 	if (num_asb == 1):
-
-		N_perbin = np.array((sum(pconcn))).reshape(-1, 1) # (# particles/cm3 (air) at experiment start)
+		# (# particles/cm3 (air) at experiment start)
+		N_perbin = np.array((sum(pconcn))).reshape(-1, 1)
 		x = np.zeros(1) # radii at size bin centre
 		# mean radius of this one size bin (um)
 		try: # if mean_radn an array

@@ -3,11 +3,101 @@
 <species species_name="H2O" species_number="s6060">
 <smiles>O</smiles>
 </species>
-<species species_number="s6055" species_name="AMM_SUL">
-<smiles>O=S(=O)(O)O.N.N</smiles>
+<species species_number="s1" species_name="core">
+<smiles>NOS(O)(O)ON</smiles>
 </species>
-<species species_name="O" species_number="s6061">
+<species species_number="s1" species_name="core_ind">
+<smiles>CCCCCCCCCC</smiles>
+</species>
+<species species_number="s1" species_name="AMMSUL">
+<smiles>NOS(O)(O)ON</smiles>
+</species>
+<species species_number="s1" species_name="AMMChloride">
+<smiles>NCl</smiles>
+</species>
+<species species_number="s1" species_name="AMMNitrate">
+<smiles>NN(=O)(O)(O)</smiles>
+</species>
+<species species_number="s1" species_name="AMMBiSUL">
+<smiles>OS(=O)(=O)ON</smiles>
+</species>
+<species species_number="s1" species_name="C7H15CHO">
+<smiles>CCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="C8H17CHO">
+<smiles>CCCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="C9H19CHO">
+<smiles>CCCCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="pri_org">
+<smiles>CCCCCCCCCCCCCCCC(=O)O</smiles>
+</species>
+<species species_number="s1" species_name="pri_org_ind">
+<smiles>CCCCCCCCCCCCCCCC(=O)O</smiles>
+</species>
+<species species_number="s1" species_name="sec_org">
+<smiles>CCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_number="s1" species_name="sec_org1">
+<smiles>OOCCCCCCCCCC</smiles>
+</species>
+<species species_number="s1" species_name="sec_org0">
+<smiles>OOCCCOOCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="sec_org-1">
+<smiles>OOCCCOOCCCOOCCCCOO</smiles>
+</species>
+<species species_number="s1" species_name="sec_org-2">
+<smiles>OOCCOOCOOCCOCOOCCCCOO</smiles>
+</species>
+<species species_number="s1" species_name="O">
 <smiles>[O]</smiles>
+</species>
+<species species_name="O2" species_number="s6062">
+<smiles>O=O</smiles>
+</species>
+<species species_name="C1" species_number="s6063">
+<smiles>CC</smiles>
+</species>
+<species species_name="C2" species_number="s6064">
+<smiles>CCCC</smiles>
+</species>
+<species species_name="C3" species_number="s6065">
+<smiles>CCCCCC</smiles>
+</species>
+<species species_name="C4" species_number="s6066">
+<smiles>CCCCCCCC</smiles>
+</species>
+<species species_name="C5" species_number="s6067">
+<smiles>CCCCCCCCCC</smiles>
+</species>
+<species species_name="C6" species_number="s6068">
+<smiles>CCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C7" species_number="s6069">
+<smiles>CCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C8" species_number="s6070">
+<smiles>CCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C9" species_number="s6071">
+<smiles>CCCCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C10" species_number="s6072">
+<smiles>CCCCCCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C11" species_number="s6073">
+<smiles>CCCCCCCCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C12" species_number="s6074">
+<smiles>CCCCCCCCCCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C13" species_number="s6075">
+<smiles>CCCCCCCCCCCCCCCCCCCCCCCCCC</smiles>
+</species>
+<species species_name="C14" species_number="s6076">
+<smiles>CCCCCCCCCCCCCCCCCCCCCCCCCCCC</smiles>
 </species>
 <species species_name="CH3OH" species_number="s1">
 <smiles>OC</smiles>
@@ -1570,7 +1660,9 @@
 <species species_name="HYETHO2H" species_number="s520">
 <smiles>OCCOO</smiles>
 </species>
-<species species_name="NO" species_number="s521"></species>
+<species species_name="NO" species_number="s521">
+<smiles>[N]=O</smiles>
+</species>
 <species species_name="ETHOHNO3" species_number="s522">
 <smiles>OCCON(=O)=O</smiles>
 </species>

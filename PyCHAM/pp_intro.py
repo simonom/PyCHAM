@@ -168,7 +168,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pconcn, testf, self)
-
+		
 		# if injection of particles at start of experiment is 
 		# continuous, then even for the 
 		# start of the experiment, this will be dealt with in cham_up
@@ -221,8 +221,9 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	# contained in seed particles
 	if (sum(pconcn) > 0.):
 		
-		# volume concentration of new seed particles (um3/cm3 (air))
-		Vperbin = Varr*N_perbin[0, :]
+		# volume concentration of new seed particles (um3/cm3 (air)),
+		# note that for N_perbin, size bins are in rows (as set in size_distr.py)
+		Vperbin = Varr*N_perbin[:, 0]
 		
 		# concentrations of components in new seed particles 
 		# (# molecules/cm3 (air))
@@ -234,7 +235,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# include particle-phase concentations in y 
 		# (molecules/cm3)
 		y[num_comp:(num_comp*(num_aasb+1))] = yn[:]
-	
+		
 	# if wall present and water to be equilibrated between wall and
 	# gas
 	if (self.wall_on > 0 and self.Vwat_inc == 2):

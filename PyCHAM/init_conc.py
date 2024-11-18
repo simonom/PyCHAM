@@ -223,7 +223,7 @@ def init_conc(num_comp, init_conc, PInit,
 	
 	for i in range(num_comp): # loop through all components to get molar weights
 		y_mw[i] = self.Pybel_objects[i].molwt # molecular mass (g/mol)
-	
+		
 	# --------------------------------------------------------------
 	# account for water's properties
 	

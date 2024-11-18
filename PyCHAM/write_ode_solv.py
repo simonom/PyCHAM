@@ -129,7 +129,8 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('	# self.seedi - index of seed material\n')
 	f.write('	# core_diss - dissociation constant of seed material\n')
 	f.write('	# kelv_fac - kelvin factor for particles\n')
-	f.write('	# kimt - mass transfer coefficients for gas-particle partitioning (s) and gas-wall partitioning (/s)\n')
+	f.write('	# kimt - mass transfer coefficients for gas-particle \n')
+	f.write('	#	partitioning (s) and gas-wall partitioning (/s)\n')
 	f.write('	# num_asb - number of actual size bins (excluding wall)\n')
 	f.write('	# self.jac_part_indxn - index for sparse Jacobian for particle influence \n')
 	f.write('	# self.jac_extr_indx - index for sparse Jacobian for air extraction influence \n')
@@ -197,10 +198,10 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# ensure y is correct shape\n')
 	f.write('		if (y.shape[1] > 1):\n')
 	f.write('			y = y[:, 0].reshape(-1, 1)\n')
-	f.write('		# empty array to hold rate of change per component (this is the returned value from dydt)\n')
+	f.write('		# empty array to hold rate of change per component\n')
+	f.write('		# (this is the returned value from dydt)\n')
 	f.write('		dd = np.zeros((y.shape[0], 1))\n')
 	f.write('		\n')
-	
 	
 	if (self.eqn_num[0] > 0): # if gas-phase reactions present
 		f.write('		# gas-phase reactions -------------------------\n')
@@ -314,6 +315,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*self.dil_fac_now\n')
 		f.write('		\n')
 		
+
 	# note the following needs two indents (as for the reaction section), so that it
 	# sits within the dydt function
 	if (num_asb > 0 or self.wall_on > 0): # include gas-particle partitioning in ode solver
@@ -363,7 +365,8 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		\n')
 		if (num_asb > 0):
 			f.write('		# mole fractions of components at particle surface\n')
-			f.write('		Csit[0:num_asb, :][isb, :] = (ymat[0:num_asb, :][isb, :]/csum[0:num_asb, :][isb, :])\n')
+			f.write('		Csit[0:num_asb, :][isb, :] = (ymat[0:num_asb, :][isb, :]/\n')
+			f.write('		csum[0:num_asb, :][isb, :])\n')
 		if (self.wall_on > 0):
 			f.write('		# mole fraction of components on walls, note that Cw included in csum above\n')
 			f.write('		Csit[num_asb::, :][wsb, :] = (ymat[num_asb::, :][wsb, :]/csum[num_asb::, :][wsb, :])\n')
@@ -398,7 +401,8 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# force all components in size bins with no particle to zero\n')
 	f.write('		if (num_asb > 0):\n')
 	f.write('			dd[1:num_asb+1, :][N_perbin[:, 0] == 0, :] = 0\n')
-	f.write('		# return to array, note that consistent with the solve_ivp manual, this ensures dd is\n')
+	f.write('		# return to array, note that consistent with the\n')
+	f.write('		# solve_ivp manual, this ensures dd is\n')
 	f.write('		# a vector rather than matrix, since y0 is a vector\n')
 	f.write('		dd = dd.flatten()\n')
 	f.write('		nzindx = dd != 0.\n')

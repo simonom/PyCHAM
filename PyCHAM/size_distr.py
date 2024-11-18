@@ -137,7 +137,8 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 	if (self.pmode == 1):
 		Nperbin = np.array((pconc))
 	
-	Nperbin = Nperbin.reshape(-1, 1) # ensure correct shape
+	# ensure correct shape, with size bins in rows
+	Nperbin = Nperbin.reshape(-1, 1)
 	
 	# volume of single particles per size bin (um3) - use with lognormal method
 	Varr = ((4.0*np.pi)/3.0)*(x_output**3.0)
