@@ -1343,7 +1343,8 @@ class PyCHAM(QWidget):
 		# drop down button to select units for change tendencies
 		self.b220e = QComboBox(self)
 		self.b220e.addItem('Molar Mass (g/mol)')
-		self.b220e.addItem('Pure component saturation vapour pressure at starting temperature of simulation (Pa)')
+		self.b220e.addItem(str('Pure component saturation vapour pressure at ' +
+			'starting temperature of simulation (Pa)'))
 		self.b220e.addItem('Pure component saturation vapour pressure at 298.15 K (Pa)')
 		self.SEClayout.addWidget(self.b220e, 8, 2, 1, 1)
 
@@ -3503,7 +3504,6 @@ class PyCHAM(QWidget):
 	def on_click220d(self):
 
 		self.dir_path = self.l201.text() # name of folder with results
-
 		# get name of single component
 		self.mm_comp_name = self.e218c.text().strip()
 

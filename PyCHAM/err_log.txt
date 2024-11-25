@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/20Nov_0900_0959_Base
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/method_ex_dynpart_1.e-8zpc_1e3inttol_RO2pool

@@ -122,7 +122,8 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	# get index of components with continuous influx/concentration -----------
 	# empty array for storing index of components with constant influx
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
-	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
+	self.con_C_indx = np.zeros((self.const_comp.shape[0], 
+		self.const_comp.shape[1])).astype('int')
 	delete_row_list = [] # prepare for removing rows of unrecognised components
 
 	icon = 0 # count on constant influxes
@@ -185,29 +186,38 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 		self.con_infl_nam = (self.con_infl_nam[si])
 
 	# components with constant concentration
-	for i in range (len(self.const_comp)):
-		try:
-			# index of where constant concentration components occur in list 
-			# of components
-			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
-		except:
-			# if water then we know it will be the next 
-			# component to
-			# be appended to the component list
-			if (self.const_comp[i] == 'H2O'):
-				self.con_C_indx[i] = len(
-					self.comp_namelist)
-			else: # if not water
-				erf = 1 # raise error
-				err_mess = str('''Error: constant 
-				concentration 
-				component with name ''' + 
-				str(self.const_comp[i]) + ''' 
-				has not been identified in the 
-				chemical scheme, 
-				please check it is present and the 
-				chemical scheme markers are correct''')	
-	
+	for i in range(self.const_comp.shape[0]):
+		for it in range(self.const_comp.shape[1]):
+			try:
+				# index of where constant concentration components occur in list 
+				# of components
+				self.con_C_indx[i, it] = self.comp_namelist.index(
+					self.const_comp[i, it])
+				
+			except:
+				# if a component doesn't appear at a given time then provide
+				# a marker for no component
+				if (self.const_comp[i, it] == ''):
+					self.con_C_indx[i, it] = -1e6
+					continue	
+				
+				# if water then we know it will be the next 
+				# component to
+				# be appended to the component list
+				if (self.const_comp[i, it] == 'H2O'):
+					self.con_C_indx[i] = len(
+						self.comp_namelist)
+				else: # if not water
+					erf = 1 # raise error
+					err_mess = str('''Error: constant 
+					concentration 
+					component with name ''' + 
+					str(self.const_comp[i]) + ''' 
+					has not been identified in the 
+					chemical scheme, 
+					please check it is present and the 
+					chemical scheme markers are correct''')	
+
 	# -------------------------------------------------------------
 	# check if water in continuous influx components 
 	if ('H2O' in self.con_infl_nam):

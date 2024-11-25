@@ -102,8 +102,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 
 	else: # if no seed particle present at start
 		seedx_now = np.zeros((self.seedx.shape[0], self.seedx.shape[1]))
-		
-	
+
 	if (i.size == 0): # if no initial information provide fillers
 		# note that this line changed from pconcn = np.zeros((1)) 
 		# on 27/04/2023 so that 
@@ -164,7 +163,6 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		self.C_p2w  = 0.
 
 	else: # if size bins present, get the particle number size distribution from inputs
-	
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pconcn, testf, self)
@@ -174,6 +172,13 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# start of the experiment, this will be dealt with in cham_up
 		if (i.size > 0 and num_asb > 0 and self.pcont[0, 0] == 1):
 			N_perbin[:, :] = 0
+
+	# if the concentration of seed particles has a dimension
+	# for time, but the mean radius has only one element
+	# along the time dimension, then tile the mean radius
+	# over all the times represented by number concentration
+	if (self.pconc.shape[1]>1 and self.mean_rad.shape[1] == 1):
+		self.mean_rad = np.tile(x.reshape(-1, 1), (1, self.pconc.shape[1]))
 
 	# set first volume and radius bound to zero, thereby allowing shrinkage to zero in the 
 	# smallest bin

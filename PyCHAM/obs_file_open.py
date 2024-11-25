@@ -242,8 +242,9 @@ def obs_file_open(self):
 					self.pconct = np.concatenate((self.pconct, 
 						(np.zeros((1, 1)))), 
 						axis=1)
-					# add onto mean radius array
-					self.mean_rad = np.concatenate((self.mean_rad, 
+					# add onto mean radius array, if mean radii are given
+					if (mean_rad_flag == 1):
+						self.mean_rad = np.concatenate((self.mean_rad, 
 						(np.zeros((uni_sb_mean_rad, 1)))), 
 						axis=1)
 			
@@ -277,7 +278,6 @@ def obs_file_open(self):
 				self.mean_rad[:, -1] = 	np.array((i))[0:col_num+1][mean_rad_col]		
 
 		ic += 1 # count on row iteration
-	
 
 	# whether particle number concentrations expressed 
 	# by modes (0) or explicitly per size bin (1)
@@ -302,7 +302,7 @@ def obs_file_open(self):
 		self.seed_name[self.seed_name.index('lvoc')] = 'sec_org0'
 		self.seed_name[self.seed_name.index('svoc')] = 'sec_org1'
 		self.seed_name[self.seed_name.index('ec')] = 'bc'
-	except:
+	except: # filler except command
 		self.seed_name = self.seed_name
 	
 	# ensure numpy array for rh arrays

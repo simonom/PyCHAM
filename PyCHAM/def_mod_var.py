@@ -149,6 +149,9 @@ def def_mod_var(caller, self): # define function
 	# known to partition inside 
 	# prop_calc.py and volat_calc.py
 	self.inorg_part_flag = 0
+	# whether (1) or not (0) to treat gas-particle paritioning as equilibrium, i.e.
+	# not dynamic partitioning
+	self.equi_gtop_partit = 0 
 
 	# gas inputs ------------------------------------------------------------
 	# chemical scheme name of components present initially
@@ -164,8 +167,10 @@ def def_mod_var(caller, self): # define function
 	self.con_infl_tf = 0 
 
 	# chemical scheme name of components with constant concentration	
-	self.const_comp = []
-	# Chemical scheme names of components injected instantaneously after start of experiment
+	self.const_comp = np.zeros((0, 0)).astype('str')
+	# times that constant concentration applies to
+	self.const_compt = np.zeros((1)).astype('float')
+	# chemical scheme names of components injected instantaneously after start of experiment
 	Compt = []
 	# times at which instantaneous injection of component(s) occur after 
 	# experiment start (s)

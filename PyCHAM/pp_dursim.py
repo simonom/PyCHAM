@@ -81,16 +81,15 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	# ranges (um)
 	if (sum(mean_rad[:] == -1.e6) > 0 and num_sb > 0):
 		if (lowersize > 0.):
-			mean_rad = 10**((np.log10(lowersize)+
+			radn = 10**((np.log10(lowersize)+
 			np.log10(uppersize))/2.)
 		else:
-			mean_rad = 10**(np.log10(uppersize)-1)
+			radn = 10**(np.log10(uppersize)-1)
 
 	# if mean radius is given (either per size bin)
 	# or for number-size distribution modes
 	else:
 		radn = mean_rad[:]
-
 	
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)

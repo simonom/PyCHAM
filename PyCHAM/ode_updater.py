@@ -612,7 +612,7 @@ def ode_updater(y, H2Oi,
 					# flag that water gas-particle 
 					# partitioning solved separately
 					self.odsw_flag = 1
-
+		
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, 
 					tnew,
@@ -624,6 +624,7 @@ def ode_updater(y, H2Oi,
 					jac_mod_len, jac_part_hmf_indx,
  					rw_indx, N_perbin, 
 					jac_part_H2O_indx, H2Oi, self)
+					
 
 					
 					
@@ -672,13 +673,16 @@ def ode_updater(y, H2Oi,
 							# integration time step (s) 
 							# if necessary
 							tnew = tnew/2.
-							stab_red = 1 # remember that time step temporarily reduced due to instability
+							# remember that time step temporarily
+							# reduced due to instability
+							stab_red = 1
 							continue
 
 						else: # if acceptable
 							gpp_stab = 1 # change to stable flag
-						
-					else: # if solution stable, change stability flag to represent this
+					# if solution stable, change stability flag to 
+					# represent this	
+					else:
 						gpp_stab = 1 # change to stable flag
 				else:
 					# water gas-particle partitioning not solved separately
@@ -713,8 +717,12 @@ def ode_updater(y, H2Oi,
 				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
 			# if any components set to have constant 
 			# gas-phase concentration
-			if (any(self.con_C_indx)): # then keep constant
-				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
+			# get index of time for constant components
+			if any(self.const_compt):
+				const_comp_tindx = sum(self.const_compt<=sumt)-1
+				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
+				conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
+				y[conCindxn] = y0[conCindxn] # (# molecules/cm3)
 			
 			# if negative, suggests ODE solver instability, 
 			# but could also be numerical 
@@ -814,9 +822,12 @@ def ode_updater(y, H2Oi,
 					y0, MV, ic_red, y, res_t, self)
 					
 				if (siz_str == 1): # full-moving
-					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
-					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-self.wall_on), N_perbin,
- 					num_comp, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], MV*1.e12, 
+					(Varr, x, y[num_comp:(num_comp*(
+					num_sb-self.wall_on+1))], 
+					N_perbin, Vbou, rbou) = fullmov.fullmov((
+					num_sb-self.wall_on), N_perbin,
+ 					num_comp, y[num_comp:(num_comp)*(
+					num_sb-self.wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
 			
 			# time since operator-split processes 
@@ -838,8 +849,10 @@ def ode_updater(y, H2Oi,
 					num_sb-self.wall_on, num_comp))
 					
 					# coagulation
-					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt], temp_now, x*1.e-6, 
+					[N_perbin, y[num_comp:(num_comp)*(
+					num_sb-self.wall_on+1)], x, Gi, eta_ai, 
+						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt],
+						 temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
@@ -848,7 +861,6 @@ def ode_updater(y, H2Oi,
 						Cp, (N_perbin).reshape(1, -1),
 						(Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
-										
 
 					# if particle loss to walls turned on, 
 					# account for this now
@@ -865,6 +877,61 @@ def ode_updater(y, H2Oi,
 							chamR, McMurry_flag, 
 							0, p_char, e_field, 
 							(num_sb-self.wall_on), self)
+
+					# if equilibrium gas-particle partitioning turned on
+					if (self.equi_gtop_partit == 1):
+
+						# note that Cstar is set in cham_up
+
+						# concentrations in gas and particle phase 
+						# (molecules/cm3) of components
+						Cpg = (y[0:(num_comp)*(
+						num_sb-self.wall_on+1)].reshape(
+						(num_sb-self.wall_on+1), num_comp))
+
+						# total molecular concentration of each
+						# component (gas+particle) (molecules/cm3),
+						# note that sum is over size bins
+						tmc_comp =  np.sum(Cpg, axis=0).reshape(1, -1)
+						# get total molecular concentration of each 
+						# component in ug/m3
+						tmc_comp_mc = ((tmc_comp/NA)*
+							y_mw.reshape(1, -1)*1.e12)
+
+						# starting estimate of condensable fraction of 
+						# each component
+						fi_est = np.zeros((num_comp))
+						
+						# set condensable fractions of non-volatile
+						# components to 1
+						fi_est[np.squeeze(self.Psat_Pa)==0.] = 1.
+						
+						# second estimate of condensable fraction of 
+						# each component at equilibrium (0-1)
+						se_est = np.squeeze((1+self.Cstar/
+							np.sum(fi_est*tmc_comp_mc, axis=1))**-1)
+				
+						while (np.abs(sum(fi_est)-sum(se_est))/
+							sum(se_est) > 1.e-5):
+				
+							# new first estimate (0-1)
+							fi_est[:] = se_est[:]
+
+							# new second estimate (0-1)
+							se_est = np.squeeze((1+self.Cstar/
+								np.sum(fi_est*tmc_comp_mc, axis=1))**-1)
+
+						# equilibrium concentrations in gas-phase
+						# (molecules/cm3) 	
+						Cpg[0, :] = (1.-se_est)*tmc_comp
+						# equilibrium concentrations in particle-phase
+						# (molecules/cm3), note this assumes just one
+						# particle size bin, so future work needs
+						# to distribute over size bins 	
+						Cpg[1, :] = (se_est)*tmc_comp
+						# allocate to y array
+						y[0:((num_comp)*(
+						num_sb-self.wall_on+1))] = Cpg.flatten()
 			
 
 				if (self.nucv1 > 0.): # nucleation

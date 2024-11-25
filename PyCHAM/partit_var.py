@@ -206,7 +206,13 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 			partit_cutoff_molcm)
 			# mask water to allow its partitioning
 			highVPi[:, H2Oi] = 0
-			kimt[highVPi[0:num_sb-self.wall_on, :]] = 0.
+			kimt[highVPi[0:(num_sb-self.wall_on), :]] = 0.
+
+		# if equilibrium gas-particle partitioning turned on, then partitioning
+		# is solved in operator-split process
+		if (self.equi_gtop_partit == 1):
+			kimt[0:(num_sb-self.wall_on), :] = 0
+			
 	
 	else: # if no particles
 		kimt = np.zeros((num_sb-self.wall_on, num_comp))

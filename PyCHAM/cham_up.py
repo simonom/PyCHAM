@@ -542,7 +542,6 @@ def cham_up(sumt, Pnow,
 
 				# index for mole fraction of seed particles
 				self.seedx_tcnt = seedt_cnt
-
 				[y[num_comp:num_comp*(num_sb-self.wall_on+1)], 
 				N_perbin, _,_] = pp_dursim.pp_dursim(
 				yp0, N_perbin0, mean_radn, pconcn, lowsize, 
@@ -860,6 +859,16 @@ def cham_up(sumt, Pnow,
 	# cham_up, then keep the signal that this reduction occurred
 	if (ic_red == 1 and bc_red == 0):
 		bc_red = 1
+
+	# if equilibrium gas-particle partitioning turned on
+	if (self.equi_gtop_partit == 1):
+		# effective saturation concentrations of 
+		# components (ug/m3)
+		# eq. 1 of O'Meara et al. (2014)
+		# doi.org/10.1039/C4CP00857J
+		self.Cstar = (10.**6*y_mw.reshape(1, -1)*
+		self.Psat_Pa/
+		(8.314*temp_now))
 
 	return(temp_now, Pnow, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 

@@ -550,17 +550,88 @@ def mod_var_read(self):
 					self.mean_rad[:, i] = [float(ii.strip()) for ii in 
 						((value.split(';')[i]).split(':'))]
 				
+			# whether (1) or not (0) to treat gas-particle paritioning as 
+			# equilibrium (i.e. not dynamic)
+			if (key == 'equi_gtop_partit'and (value.strip())):
+				self.equi_gtop_partit = int(value.strip())
 
 			# frequency (s) of storing results	
 			if (key == 'recording_time_step' and 
 				(value.strip())): 
 				self.save_step = float(value.strip())
 
-			# names of components with later continuous 
-			# injections
+			# names of components with constant abundances
 			if (key == 'const_comp' and (value.strip())): 
-				self.const_comp = [str(i).strip() for 
-					i in (value.split(','))]
+				value = str(value).replace(' ', '')
+				comp_count = 1 # count number of components
+				time_count = 1 # track number of times
+
+				# prepare to hold component names
+				const_comp_list = []
+				ic = 0 # keep count on character in value
+				for i in value:
+					if i==';':
+						time_count += 1 # record number of times
+						self.const_comp = np.concatenate(
+							(self.const_comp, 
+							self.const_comp[:, 0].reshape(-1, 1))
+							, axis=1)
+						self.const_comp[:, -1] = ''
+
+						try:
+							const_comp = value[
+							ic+1:ic+1+value[ic+1::].index(',')]
+							# in case change of time sign included
+							if (';' in const_comp):
+								const_comp = const_comp[
+								0:const_comp.index(';')]
+							const_comp = const_comp.replace(
+								'\n', '')
+						except: # in case at final component
+							const_comp = value[ic+1::]
+						
+						indx = np.where(self.const_comp[
+							:, 0] == const_comp)[0][0]
+						self.const_comp[indx, -1] = const_comp
+						
+					if i==',':
+						try:
+							const_comp = value[
+							ic+1:ic+1+value[ic+1::].index(',')]
+							# in case change of time sign included
+							if (';' in const_comp):
+								const_comp = const_comp[
+								0:const_comp.index(';')]
+						except: # in case at final component
+							const_comp = value[ic+1::]
+							const_comp = const_comp.replace(
+								'\n', '')
+						if (time_count == 1): # if on first time
+							self.const_comp = np.append(
+							self.const_comp, 
+							np.zeros((1,1)), axis=0)
+							self.const_comp[-1, 0] = const_comp
+						else: # if on later times
+							indx = np.where(self.const_comp[
+							:, 0] == const_comp)[0][0]
+							self.const_comp[indx, -1] = const_comp
+
+					# if on first character
+					if (ic == 0):
+						const_comp = (value[
+							ic:value.index(',')])
+						# prepare to hold component names (rows) 
+						# at the required
+						# times (columns)
+						self.const_comp = np.zeros((1, 1)).astype('str')
+						self.const_comp[0, 0] = const_comp
+						
+					ic += 1 # keep count on character in value
+
+			# times that constant components are for
+			if (key == 'const_compt' and (value.strip())):
+				self.const_compt = np.array(([str(i).strip() for i in 
+					(value.split(';'))])).astype('float')
 
 			# name of file containing observations to 
 			# constrain by

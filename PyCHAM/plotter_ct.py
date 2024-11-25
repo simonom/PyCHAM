@@ -1106,7 +1106,8 @@ def plotter_individ_prop(self):
 			' not identified in chemical scheme'))
 			return(self)
 		# display in text area of GUI
-		self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + str(mm_interest) + ' g/mol'))
+		self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + 
+			str(mm_interest) + ' g/mol'))
 
 	if ('saturation vapour pressure at starting temperature' in self.single_comp_prop):
 

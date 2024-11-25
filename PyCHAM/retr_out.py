@@ -69,6 +69,7 @@ def retr_out(self):
 		# if earlier than v4 then flag
 		v4_flag = 0
 	
+	# prepare to hold constants
 	const = {} # create empty dictionary to hold constants
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
@@ -107,7 +108,8 @@ def retr_out(self):
 			comp_names = ast.literal_eval(line[st_indx:fi_indx])
 			yield (37.)
 
-		if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
+		if (str(line.split(',')[0]) == str('molecular_weights_g/'+
+			'mol_corresponding_to_component_names')):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
 			for i in line:
@@ -121,7 +123,7 @@ def retr_out(self):
 					fi_indx = -cnt+1
 					break
 
-			y_MW = ast.literal_eval(line[st_indx:fi_indx])
+			y_MM = ast.literal_eval(line[st_indx:fi_indx])
 			yield (7.)
 		if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
 			# find index of first [ and index of last ]
@@ -376,7 +378,8 @@ def retr_out(self):
 				i = i.strip(' ')
 				dlist.append(float(i))
 				yield (48.)
-			if (str(line.split(',')[0]) == 'size_structure_0_for_moving_centre_1_for_full_moving'):
+			if (str(line.split(',')[0]) == str('size_structure_0_for_'+
+				'moving_centre_1_for_full_moving')):
 				i = i.strip('\n')
 				i = i.strip('[[')
 				i = i.strip(']]')
@@ -405,7 +408,7 @@ def retr_out(self):
 	if (v4_flag == 1): # if results in question saved in version 4 or later
 
 		load_path = str(self.dir_path + '/y_mw.npy') # path
-		y_MW = np.load(load_path, allow_pickle=True)
+		y_MM = np.load(load_path, allow_pickle=True)
 
 		# cm3/mol
 		load_path = str(self.dir_path + '/MV.npy') # path
@@ -425,7 +428,7 @@ def retr_out(self):
 		# path
 		load_path = str(self.dir_path + 
 		'/pure_component_saturation_vp_at_startT_molec_percm3.npy')
-		PsatPa0 = (np.load(load_path, allow_pickle=True)).tolist()
+		Psatmolecpercm3_0 = (np.load(load_path, allow_pickle=True)).tolist()
 		
 		load_path = str(self.dir_path + 
 			'/oxygen_to_carbon_ratios_of_components.npy') # path
@@ -512,7 +515,8 @@ def retr_out(self):
 	yield (75.)
 	# withdraw index and names of components to plot the 
 	# gas-phase concentration temporal profile of
-	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
+	fname = str(self.dir_path + 
+		'/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
 	if (os.stat(fname).st_size > 123):
 		indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
@@ -566,7 +570,9 @@ def retr_out(self):
 	try:
 		# withdraw the wall concentration of components due to 
 		# particle deposition to wall
-		fname = str(self.dir_path + '/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
+		fname = str(self.dir_path + 
+			'/concentrations_all_components_all_times_on_wall_due_to_particle' +
+			'_deposition_to_wall')
 		yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
 	except:
 		yrec_p2w = []
@@ -622,7 +628,7 @@ def retr_out(self):
 	
 	# convert vapour pressure at starting simulation temperature 
 	# from molecules/cm3 to Pa using ideal gas law
-	PsatPa0 = PsatPa0[0]/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0])) 
+	PsatPa0 = Psatmolecpercm3_0/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0])) 
 	# create a class to hold outputs
 	class ro_outputs:
 		
@@ -644,7 +650,7 @@ def retr_out(self):
 		cen_size = x
 		thr = timehr
 		rSMILES = rel_SMILES
-		comp_MW = y_MW
+		comp_MW = y_MM
 		Nrec_wet = Nwet
 		names_of_comp = comp_names
 		comp_MV = MV
@@ -685,13 +691,15 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		col_title = 0
 		data_cnt = -1 # count on lines of data
 		
-		# prepare to create dictionary containing component names, times and concentrations
+		# prepare to create dictionary containing component names, 
+		# times and concentrations
 		data_dic = {}
 		for line in datafile.readlines():
 			
 			dlist = [] # prepare to convert to python list
 			
-			# identify whether tabs used to separate columns (if not then spaces are)
+			# identify whether tabs used to separate columns (if not then 
+			# spaces are)
 			if '\t' in line:
 				sep = '\t'
 			if ' ' in line:

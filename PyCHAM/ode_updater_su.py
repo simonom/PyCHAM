@@ -307,7 +307,7 @@ def ode_updater_su(y, H2Oi,
 		su_comp_time = 3.6e3*24. # 24 hours
 
 	# if spin-up time interval is fixed to just time of full simulation
-	if (self.spin_up == 3):
+	if (self.spin_up == 2 or self.spin_up == 3):
 		su_comp_time = self.tot_time
 
 	# find out what to do with the gas-wall partitioning coefficient,
