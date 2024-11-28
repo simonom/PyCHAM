@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''standard graphical representation of simulation results'''
 # simulation results are represented graphically
 
@@ -97,8 +96,7 @@ def plotter(caller, dir_path, uc, self):
 			
 				
 		if (indx_plot):
-			# if there are both gaseous components and particle 
-			# size bins then prepare figure
+			# if there are both gaseous components and particle size bins then prepare figure
 			fig, (ax0, ax1) = plt.subplots(2, 1, figsize=(14, 7))
 
 		# parasite axis setup on particle-phase plot-----------------------------
@@ -108,12 +106,12 @@ def plotter(caller, dir_path, uc, self):
 		# placed on the right by twinx above.
 		par2.spines["right"].set_position(("axes", 1.2))
 		# Having been created by twinx, par2 has its frame off, so the line of its
-		# detached spine is invisible.  First, activate the frame but 
-		# make the patch and spines invisible.
+		# detached spine is invisible.  First, activate the frame but make the patch
+		# and spines invisible.
 		make_patch_spines_invisible(par2)
 		# second, show the right spine
 		par2.spines["right"].set_visible(True)	
-		# -----------------------------------------------------------------------
+		# ----------------------------------------------------------------------------------------
 
 	if (indx_plot):
 		
@@ -293,7 +291,7 @@ def plotter(caller, dir_path, uc, self):
 		# colour bar label
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
-		# ------------------------------------------------------------------
+		# ----------------------------------------------------------------------------------------
 		# total particle number concentration # particles/cm3
 	
 		# include total number concentration (# particles/cm3 (air)) on contour plot
@@ -310,7 +308,7 @@ def plotter(caller, dir_path, uc, self):
 		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par1.yaxis.set_tick_params(labelsize=14)
 
-		# mass concentration of particles --------------------------------------------
+		# mass concentration of particles ---------------------------------------------------------------
 		# array for mass concentration with time
 		MCvst = np.zeros((1, len(timehr)))
 		

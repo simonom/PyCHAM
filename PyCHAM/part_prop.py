@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''module to calculate density of particles (kg/m3)'''
 
 import numpy as np
@@ -39,8 +38,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	y_asmat = (y.reshape(num_asb, num_comp))
 	y_asmat = y_asmat.transpose() # species in rows and size bins in columns
 	
-	# convert # molecules/cm3 (air) to # moles/cm3 (air) 
-	# and then multiply by molecular weight  
+	# convert # molecules/cm3 (air) to # moles/cm3 (air) and then multiply by molecular weight  
 	# to get g/cm3 (air) of all components in size bins
 	y_mass_array = (y_asmat/NA)*y_mw # mass conc. ind. species
 	

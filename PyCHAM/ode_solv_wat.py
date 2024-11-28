@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''solution of ODEs for water gas-particle partitioning'''
 # module to solve system of ordinary differential equations (ODEs) using solve_ivp of Scipy 
 
@@ -30,9 +29,10 @@ from scipy.integrate import solve_ivp
 # define function
 def ode_solv(y, integ_step, Cinfl_now,
 	rowvals, colptrs, num_comp, num_sb,
-	act_coeff, core_diss, kelv_fac, kimt, num_asb,
-	jac_mod_len, jac_part_hmf_indx, rw_indx, 
-	N_perbin, jac_part_H2O_indx, H2Oi, self):
+	act_coeff, jac_wall_indx,
+	core_diss, kelv_fac, kimt, num_asb,
+	jac_part_indx,jac_mod_len,
+	jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self):
 
 	# inputs: -------------------------------------
 	# y - initial concentrations (molecules/cm3)
@@ -48,11 +48,13 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# self.wall_on - flag saying whether to include wall partitioning
 	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
+	# jac_wall_indx - index of inputs to Jacobian by wall partitioning
 	# self.seedi - index of seed material
 	# core_diss - dissociation constant of seed material
 	# kelv_fac - kelvin factor for particles
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
 	# num_asb - number of actual size bins (excluding wall)
+	# jac_part_indx - index for sparse Jacobian for particle influence 
 	# self.eqn_num - number of gas- and aqueous-phase reactions 
 	# jac_mod_len - modification length due to high fraction of component(s)
 	# 	in particle phase
@@ -69,8 +71,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 	def dydt(t, y): # define the ODE(s)
 		
 		# inputs: ----------------
-		# y - water concentrations (molecules/cm3), note when 
-		# 	using scipy integrator solve_ivp, 
+		# y - water concentrations (molecules/cm3), note when using scipy integrator solve_ivp, 
 		#	this should have shape (number of elements, 1)
 		# t - time interval to integrate over (s)
 		# ---------------------------------------------
@@ -85,9 +86,9 @@ def ode_solv(y, integ_step, Cinfl_now,
 		# check for continuous gas-phase inputs for water
 		if (self.H2Oin == 1):
 			dd[0, 0] += self.Cinfl_H2O_now
-		# check for continuous dilution
-		if (self.dil_fac_H2O_now > 0):
-			dd[0:num_sb+1, 0] -= y[0:num_sb+1, 0]*self.dil_fac_H2O_now
+		# check for continuous dilution of chamber
+		if (self.dil_fac_now > 0):
+			dd[0:num_sb+1, 0] -= y[0:num_sb+1, 0]*self.dil_fac_now
 				
 		# gas-particle partitioning-----------------
 		
@@ -96,8 +97,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 		ymat[:, H2Oi] = y[1::, 0]
 		
 		# total particle-phase concentration per size bin (# molecules/cm3 (air))
-		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((
-		ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
+		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
 		if (any(isb)): # if particle-phase components present
@@ -176,16 +176,14 @@ def ode_solv(y, integ_step, Cinfl_now,
 		
 		return(j)
 	
-	
 	# set ODE solver (integration) tolerances
 	atol = 1.e-4
 	rtol = 1.e-5
 	
 	# isolate just the water concentrations
 	y_w = y[H2Oi:num_comp*(num_asb+1):num_comp]
-
-	# transform particle phase concentrations into size bins in 
-	# rows and components in columns
+	
+	# transform particle phase concentrations into size bins in rows and components in columns
 	ymat = (y[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)
 	# force all components in size bins with no particle to zero
 	ymat[N_perbin[:, 0] == 0, :] = 0.
@@ -193,21 +191,19 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) 
 	# and must be 1D even though y in dydt and jac has shape (number of elements, 1)
 	# as stated in GMD paper, BDF method used as this known to deal with stiff problems well
-	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, 
-	method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
+	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
 	
 	# force all components in size bins with no particle to zero
 	y_w = np.squeeze(sol.y)
-	
 	y_w = y_w.reshape(num_asb+1, 1)
 	if (num_asb > 0):
 		y_w[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
 	# return to array
 	y_w = y_w.flatten()
-
+	
 	# incorporate new water concentrations (molecules/cm3)
 	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
 	y[H2Oi:num_comp*((num_sb-self.wall_on)+1):num_comp] = y_w
-
+	
 	# return concentration(s) and time(s) following integration
 	return(y, sol.t)

@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''generate the module to solve ODEs'''
 # writes a module based on the supplied chemical scheme and user inputs,
@@ -29,7 +29,7 @@ import datetime
 
 # function to generate the ordinary differential equation (ODE)
 # solver file
-def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
+def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, sav_nam, pcont, self):
 	
 	# inputs: ------------------------------------------------
 	# self.con_infl_indx - indices of components with continuous influx
@@ -37,37 +37,39 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	# rowvals - indices of rows for Jacobian
 	# self.wall_on - marker for whether to consider wall 
 	# 	partitioning
-	# num_comp - number of components in chemical scheme, plus 
-	# any additional components needing consideration
+	# num_comp - number of components
 	# num_asb - number of actual size bins (excluding wall)
 	# testf - marker for whether in test mode or not
 	# self.eqn_num - number of gas- and particle-phase reactions
 	# self.dil_fac - fraction of chamber air extracted/s
+	# sav_nam - name of file to save results to
+	# pcont - flag for whether seed particle injection is 
+	#	instantaneous (0) or continuous (1)
 	# self - reference to PyCHAM
 	# -------------------------------------------------------
 	
 	# create new  file to store solver module
-	f = open(self.PyCHAM_path + '/PyCHAM/ode_solv.py', mode='w')
+	f = open('PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    All Rights Reserved.                                                                #\n')
-	f.write('#    This file is part of PyCHAM                                                         #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under             #\n')
-	f.write('#    the terms of the GNU General Public License as published by the Free Software       #\n')
-	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          #\n')
-	f.write('#    version.                                                                            #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #\n')
-	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #\n')
-	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #\n')
-	f.write('#    details.                                                                            #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    You should have received a copy of the GNU General Public License along with        #\n')
-	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #\n')
-	f.write('#                                                                                        #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2023 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
 	f.write('##########################################################################################\n')
 	f.write('\'\'\'solution of ODEs, generated by eqn_pars.py\'\'\'\n')
 	f.write('# module to solve system of ordinary differential equations (ODEs) using solve_ivp of Scipy \n')
@@ -81,7 +83,9 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('def ode_solv(y, integ_step, rrc, \n')
 	f.write('	Cinfl_now, \n')
 	f.write('	rowvals, colptrs, num_comp, num_sb,\n')
-	f.write('	act_coeff, core_diss, kelv_fac, kimt, num_asb,\n')
+	f.write('	act_coeff, jac_wall_indx,\n') 
+	f.write('	core_diss, kelv_fac, kimt, num_asb,\n')
+	f.write('	jac_part_indx, jac_extr_indx,\n')
 	f.write('	jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx,\n')
 	f.write('	H2Oi, self):\n')
 	f.write('\n')
@@ -125,15 +129,14 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)\n')
 	f.write('	# self.Cw - effective absorbing mass concentration of wall (# molecules/cm3) \n')
 	f.write('	# act_coeff - activity coefficient of components\n')
-	f.write('	# self.jac_wall_indxn - index of inputs to Jacobian by wall partitioning\n')
+	f.write('	# jac_wall_indx - index of inputs to Jacobian by wall partitioning\n')
 	f.write('	# self.seedi - index of seed material\n')
 	f.write('	# core_diss - dissociation constant of seed material\n')
 	f.write('	# kelv_fac - kelvin factor for particles\n')
-	f.write('	# kimt - mass transfer coefficients for gas-particle \n')
-	f.write('	#	partitioning (s) and gas-wall partitioning (/s)\n')
+	f.write('	# kimt - mass transfer coefficients for gas-particle partitioning (s) and gas-wall partitioning (/s)\n')
 	f.write('	# num_asb - number of actual size bins (excluding wall)\n')
-	f.write('	# self.jac_part_indxn - index for sparse Jacobian for particle influence \n')
-	f.write('	# self.jac_extr_indx - index for sparse Jacobian for air extraction influence \n')
+	f.write('	# jac_part_indx - index for sparse Jacobian for particle influence \n')
+	f.write('	# jac_extr_indx - index for sparse Jacobian for air extraction influence \n')
 	f.write('	# self.rindx_aq - index of aqueous-phase reactants \n')
 	f.write('	# self.eqn_num - number of gas- and aqueous-phase reactions \n')
 	f.write('	# jac_mod_len - modification length due to high fraction of component(s)\n')
@@ -141,7 +144,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('	# jac_part_hmf_indx - index of Jacobian affected by water\n')
 	f.write('	#	 in the particle phase\n')
 	f.write('	# rw_indx - indices of rows affected by water in particle phase\n')
-	f.write('	# N_perbin - number concentration of particles per size bin (#/cm3)\n')
+	f.write('	# N_perbin - number concentration of particles per size bin (#/cc)\n')
 	f.write('	# jac_part_H2O_indx - sparse Jacobian indices for the effect of\n')
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
@@ -198,10 +201,10 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# ensure y is correct shape\n')
 	f.write('		if (y.shape[1] > 1):\n')
 	f.write('			y = y[:, 0].reshape(-1, 1)\n')
-	f.write('		# empty array to hold rate of change per component\n')
-	f.write('		# (this is the returned value from dydt)\n')
+	f.write('		# empty array to hold rate of change per component (this is the returned value from dydt)\n')
 	f.write('		dd = np.zeros((y.shape[0], 1))\n')
 	f.write('		\n')
+	
 	
 	if (self.eqn_num[0] > 0): # if gas-phase reactions present
 		f.write('		# gas-phase reactions -------------------------\n')
@@ -235,87 +238,38 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		rr_aq = np.tile(rrc[self.rindx_g.shape[0]::], num_asb)\n')
 		f.write('		# prepare aqueous-phase concentrations\n')
 		f.write('		rrc_y = np.ones((self.rindx_aq.shape[0]*self.rindx_aq.shape[1]))\n')
-		f.write('		rrc_y[self.y_arr_aq] = y[self.y_rind_aq, 0]\n')
+		f.write('		rrc_y[self.y_arr_aq] = y[self.y_rindx_aq, 0]\n')
 		f.write('		rrc_y = rrc_y.reshape(self.rindx_aq.shape[0], self.rindx_aq.shape[1], order = \'C\')\n')
 		f.write('		# reaction rate (# molecules/cm3/s) \n')
 		f.write('		rr = rr_aq*((rrc_y**self.rstoi_aq).prod(axis=1))\n')
 		f.write('		# loss of reactants\n')
 		f.write('		data = rr[self.rr_arr_aq]*self.rstoi_flat_aq # prepare loss values\n')
 		f.write('		# convert to sparse matrix\n')
-		f.write('		loss = SP.csc_matrix((data, self.y_rind_aq, self.reac_col_aq))\n')
+		f.write('		loss = SP.csc_matrix((data[0, :], self.y_rindx_aq, self.reac_col_aq))\n')
 		f.write('		# register loss of reactants\n')
-		f.write('		dd[self.uni_y_rind_aq, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_aq])[:, 0]\n')
+		f.write('		dd[self.uni_y_rind_g, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_g])[:, 0]\n')
 		f.write('		# gain of products\n')
 		f.write('		data = rr[self.rr_arr_p_aq]*self.pstoi_flat_aq # prepare loss values\n')
 		f.write('		# convert to sparse matrix\n')
-		f.write('		loss = SP.csc_matrix((data, self.y_pind_aq, self.prod_col_aq))\n')
+		f.write('		loss = SP.csc_matrix((data[0, :], self.y_pind_aq, self.prod_col_aq))\n')
 		f.write('		# register gain of products\n')
-		f.write('		dd[self.uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[self.uni_y_pind_aq])[:, 0]\n')
-		f.write('		\n')
-
-	if (self.eqn_num[2] > 0): # if surface reactions present
-		f.write('		# surface-phase reactions -------------------------\n')
-		f.write('		\n')	
-		f.write('		# empty array to hold relevant concentrations for\n')
-		f.write('		# reaction rate coefficient calculation\n')
-		f.write('		# tile surface-phase reaction rate coefficients\n')
-		f.write('		rr_su = np.tile(rrc[-self.rindx_su.shape[0]::], self.wall_on)\n')
-		f.write('		# prepare surface-phase concentrations\n')
-		f.write('		rrc_y = np.ones((self.rindx_su.shape[0]*self.rindx_su.shape[1]))\n')
-		f.write('		rrc_y[self.y_arr_su] = y[self.y_rind_su, 0]\n')
-		f.write('		rrc_y = rrc_y.reshape(self.rindx_su.shape[0], self.rindx_su.shape[1], order = \'C\')\n')
-		f.write('		# reaction rate (# molecules/cm3/s) \n')
-		f.write('		rr = rr_su*((rrc_y**self.rstoi_su).prod(axis=1))\n')
-		f.write('		# loss of reactants\n')
-		f.write('		data = rr[self.rr_arr_su]*self.rstoi_flat_su # prepare loss values\n')
-		f.write('		# flatten data in column-major order (rows are reaction) (columns are surfaces)\n')
-		f.write('		data = data.flatten(order = \'F\')\n')
-		f.write('		# convert to sparse matrix\n')
-		f.write('		loss = SP.csc_matrix((data, self.y_rind_su, self.reac_col_su))\n')
-		f.write('		# register loss of reactants\n')
-		f.write('		dd[self.uni_y_rind_su, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_su])[:, 0]\n')
-		f.write('		# gain of products\n')
-		f.write('		data = rr[self.rr_arr_p_su]*self.pstoi_flat_su # prepare loss values\n')
-		f.write('		# flatten data in column-major order (rows are reaction) (columns are surfaces)\n')
-		f.write('		data = data.flatten(order = \'F\')\n')
-		f.write('		# convert to sparse matrix\n')
-		f.write('		loss = SP.csc_matrix((data, self.y_pind_su, self.prod_col_su))\n')
-		f.write('		# register gain of products\n')
-		f.write('		dd[self.uni_y_pind_su, 0] += np.array((loss.sum(axis = 1))[self.uni_y_pind_su])[:, 0]\n')
+		f.write('		dd[self.uni_y_pind_aq, 0] += np.array((loss.sum(axis = 1))[self.uni_self.y_pind_aq])[:, 0]\n')
 		f.write('		\n')
 	
 	if (len(self.con_infl_indx) > 0): # if a component has a continuous gas-phase influx
 		
 		f.write('		# account for components with continuous gas-phase influx\n')	
 		f.write('		dd[[self.con_infl_indx], 0] += Cinfl_now[:, 0]\n')
-		if ('H2O' in self.con_infl_nam): 
-			f.write('		if self.odsw_flag == 0: # if water not solved separately\n')
-			f.write('			dd[H2Oi, 0] += self.Cinfl_H2O_now\n')
 
-	if (any(self.obs_comp_i)): # if a component has a fixed concentration
-		
-		f.write('		# account for components with fixed gas-phase concentration\n')	
-		f.write('		dd[[self.obs_comp_i], 0] = 0.\n')
-	
 	if (any(self.dil_fac > 0.)): # if chamber air being extracted
 		f.write('		# account for continuous extraction of chamber air\n')
-		f.write('		# index for estimating dilution factors \n')
-		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') \n')
-		f.write('		if (self.odsw_flag == 0): # if water solver not used \n')
-		f.write('			dd[H2Oi::num_comp, 0] -= y[H2Oi::num_comp, 0]*self.dil_fac_H2O_now\n')
-		f.write('		# water diluted either in water solver or above \n')
-		f.write('		df_indx[H2Oi::num_comp] = 0 \n')
-		f.write('		# cannot dilute what is on wall \n')
-		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0  \n')
-		f.write('		# in case particle-phase components should not be diluted, \n')
-		f.write('		# e.g. when observations already account for dilution, as in obs_file_open \n')
-		f.write('		if (self.pp_dil == 0):\n')
-		f.write('			df_indx[num_comp:num_comp*(num_sb-self.wall_on+1)] = 0  \n')
-		f.write('		df_indx = (df_indx == 1) # transform to Boolean array \n')
-		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*self.dil_fac_now\n')
+		f.write('		df_indx = np.ones((dd.shape[0])).astype(\'int\') # index for estimating dilution factors\n')
+		f.write('		df_indx[H2Oi::num_comp] = 0 # water diluted in water solver \n')
+		f.write('		df_indx[num_comp*(num_sb-self.wall_on+1)::] = 0 # cannot dilute what is on wall \n')
+		f.write('		df_indx = df_indx==1 # transform to Boolean array \n')
+		f.write('		dd[df_indx, 0] -= y[df_indx, 0]*1.*self.dil_fac_now\n')
 		f.write('		\n')
 		
-
 	# note the following needs two indents (as for the reaction section), so that it
 	# sits within the dydt function
 	if (num_asb > 0 or self.wall_on > 0): # include gas-particle partitioning in ode solver
@@ -365,23 +319,22 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		\n')
 		if (num_asb > 0):
 			f.write('		# mole fractions of components at particle surface\n')
-			f.write('		Csit[0:num_asb, :][isb, :] = (ymat[0:num_asb, :][isb, :]/\n')
-			f.write('		csum[0:num_asb, :][isb, :])\n')
+			f.write('		Csit[0:num_asb, :][isb, :] = (ymat[0:num_asb, :][isb, :]/csum[0:num_asb, :][isb, :])\n')
 		if (self.wall_on > 0):
 			f.write('		# mole fraction of components on walls, note that Cw included in csum above\n')
 			f.write('		Csit[num_asb::, :][wsb, :] = (ymat[num_asb::, :][wsb, :]/csum[num_asb::, :][wsb, :])\n')
 		f.write('		\n')
 		if (num_asb > 0):
-			#f.write('		if any(isb):\n')
-			f.write('		# gas-phase concentration of components at\n')
-			f.write('		# particle surface (# molecules/cm3 (air))\n')
-			f.write('		Csit[0:num_asb, :][isb, :] = Csit[0:num_asb, :][isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]\n')	
-			f.write('		# partitioning rate (# molecules/cm3/s)\n')
-			f.write('		dd_all = kimt[0:num_asb, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[0:num_asb, :])\n')
-			f.write('		# gas-phase change\n')
-			f.write('		dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
-			f.write('		# particle change\n')
-			f.write('		dd[num_comp:num_comp*(num_asb+1), 0] += (dd_all.flatten())\n')
+			f.write('		if any(isb):\n')
+			f.write('			# gas-phase concentration of components at\n')
+			f.write('			# particle surface (# molecules/cm3 (air))\n')
+			f.write('			Csit[0:num_asb, :][isb, :] = Csit[0:num_asb, :][isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]\n')	
+			f.write('			# partitioning rate (# molecules/cm3/s)\n')
+			f.write('			dd_all = kimt[0:num_asb, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[0:num_asb, :])\n')
+			f.write('			# gas-phase change\n')
+			f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
+			f.write('			# particle change\n')
+			f.write('			dd[num_comp:num_comp*(num_asb+1), 0] += (dd_all.flatten())\n')
 			f.write('		\n')
 		if (self.wall_on > 0):
 			f.write('		if any(wsb):\n')
@@ -390,22 +343,76 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 			f.write('			Csit[num_asb::, :][wsb, :] = Csit[num_asb::, :][wsb, :]*self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]\n')	
 			f.write('			# partitioning rate (# molecules/cm3/s)\n')
 			f.write('			dd_all = kimt[num_asb::, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[num_asb::, :])\n')
+			f.write('			#print(dd_all); import ipdb; ipdb.set_trace()\n')
 			f.write('			# gas-phase change (summed over all wall bins)\n')
 			f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')
 			f.write('			# wall change\n')
 			f.write('			dd[num_comp*(num_asb+1)::, 0] += (dd_all.flatten())\n')
 			f.write('		\n')
 		
+		f.write('		\n')
+	
+	# non-vectorised code for use with numba compiler
+	#	f.write('	# numba compiler to convert to machine code\n')
+	#	f.write('	@jit(f8[:](f8, f8[:]), nopython=True, cache=False)\n')
+	#	f.write('	# ode solver -------------------------------------\n')
+	#	f.write('	def dydt(t, y): # define the ODE(s)\n')
+	#	f.write('		\n')
+	#	f.write('		# empty array to hold rate of change per component\n')
+	#	f.write('		dd = np.zeros((len(y)))\n')
+	#	f.write('		# gas-phase rate of change -----------------------\n')
+	#	f.write('		for i in range(self.nreac_g.shape[0]): # equation loop\n')
+	#	f.write('			# gas-phase rate of change (molecules/cm3 (air).s)\n')
+	#	f.write('			if (y[self.rindx_g[i, 0:self.nreac_g[i]], 0]==0.0).sum()>0:\n')	
+	#	f.write('				continue # if any reactants not present skip this reaction\n')			
+	#	f.write('			else:\n')
+	#	f.write('				gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]], 0]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*rrc[i]\n')
+	#	f.write('				# loss of reactants\n')
+	#	f.write('				dd[self.rindx_g[i, 0:self.nreac_g[i]]] -= gprate*self.rstoi_g[i, 0:self.nreac_g[i]]\n')
+	#	f.write('				# gain of products\n')
+	#	f.write('				dd[self.pindx_g[i, 0:self.nprod_g[i]]] += gprate*self.pstoi_g[i, 0:self.nprod_g[i]]\n')
+	#	f.write('		\n')
+	#	# only write next section if particles present
+	#	if (num_asb > 0):
+	#		f.write('		# if size bins present estimate gas-particle partitioning\n')
+	#		f.write('		for ibin in range(num_asb): # size bin loop\n')
+	#		f.write('			# particle-phase concentrations in this size bin (moclecules/cc)\n')
+	#		f.write('			Csit = y[num_comp*(ibin+1):num_comp*(ibin+2), 0]\n')
+	#		f.write('			# prepare for # sum of molecular concentrations per bin (molecules/cm3 (air))\n')
+	#		f.write('			conc_sum = np.zeros((1))\n')
+	#		f.write('			conc_sum[0] = ((Csit.sum()-Csit[self.seedi])+Csit[self.seedi]*core_diss)\n')
+	#		f.write('			# only need to continue if particles present\n')
+	#		f.write('			if (conc_sum[0]>1.e-20):\n')
+	#		f.write('				# particle surface gas-phase concentration (# molecules/cm3 (air))\n')
+	#		f.write('				Csit = (Csit/conc_sum)*self.Psat[0, :]*kelv_fac[ibin]*act_coeff[0, :]\n')
+	#		f.write('				# partitioning rate (molecules/cm3.s)\n')
+	#		f.write('				dydt_all = kimt[ibin, :]*(y[0:num_comp, 0]-Csit)\n')
+	#		f.write('				dd[0:num_comp] -= dydt_all # gas-phase change\n')
+	#		f.write('				# particle-phase change\n')
+	#		f.write('				dd[num_comp*(ibin+1):num_comp*(ibin+2)] += dydt_all\n')
+	#		f.write('		\n')
+	#	# only write next section if gas-wall partitioning active
+	#	if (self.wall_on > 0):
+	#		f.write('		if (any(self.Cw[:, 0] > 0.)): # only consider if wall present\n')
+	#		f.write('			# if wall consideration turned on, estimate gas-wall partitioning\n')
+	#		f.write('			# concentration at wall (molecules/cm3 (air))\n')
+	#		f.write('			Csit = y[num_comp*num_sb:num_comp*(num_sb+1), 0].reshape(self.wall_on, num_comp)\n')
+	#		f.write('			Csit = (self.Psat[0, :].reshape(1, -1)*(Csit/self.Cw)*act_coeff[0, :].reshape(1, -1)) # with Raoult term\n')
+	#		f.write('			dydt_all = kimt[num_asb::, :]*(y[0:num_comp, 0]-Csit)\n')
+	#		f.write('			dd[0:num_comp] -= dydt_all # gas-phase change\n')
+	#		f.write('			# wall concentration change \n')
+	#		f.write('			dd[num_comp*num_sb:num_comp*(num_sb+1)] += dydt_all\n')
+	#		f.write('			\n')
+	f.write('		\n')
 	
 	f.write('		dd = (dd[:, 0]).reshape(num_sb+1, num_comp)\n')
 	f.write('		# force all components in size bins with no particle to zero\n')
 	f.write('		if (num_asb > 0):\n')
 	f.write('			dd[1:num_asb+1, :][N_perbin[:, 0] == 0, :] = 0\n')
-	f.write('		# return to array, note that consistent with the\n')
-	f.write('		# solve_ivp manual, this ensures dd is\n')
+	f.write('		# return to array, note that consistent with the solve_ivp manual, this ensures dd is\n')
 	f.write('		# a vector rather than matrix, since y0 is a vector\n')
 	f.write('		dd = dd.flatten()\n')
-	f.write('		nzindx = dd != 0.\n')
+	f.write('		#import ipdb; ipdb.set_trace()\n')
 	f.write('		return (dd)\n')
 	f.write('\n')
 	
@@ -527,7 +534,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('					# starting index update\n')
 		f.write('					sti_rw += (num_comp-1)*2\n')
 		f.write('		\n')
-		f.write('		data[self.jac_part_indxn] += part_eff # diagonal\n')
+		f.write('		data[jac_part_indx] += part_eff # diagonal\n')
 		f.write('		data[jac_part_hmf_indx] += part_eff_rw # rows\n')
 		f.write('		#data[jac_part_H2O_indx] += part_eff_cl # columns\n')
 		f.write('		\n')
@@ -547,17 +554,15 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1):num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = +kimt[num_asb::, :][wsb, :]*(self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
 		f.write('				# effect of wall on wall\n')
 		f.write('				wall_eff[wsb*2*num_comp+num_comp*(self.wall_on+1)+1:num_comp*(self.wall_on+1)+(wsb+1)*2*num_comp:2] = -kimt[num_asb::, :][wsb, :]*(self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]/self.Cw[wsb, :]) \n')
-		f.write('		data[self.jac_wall_indxn] += wall_eff\n')
+		f.write('		data[jac_wall_indx] += wall_eff\n')
 		f.write('		\n')
 	if (any(self.dil_fac > 0)): # include extraction of chamber air in ode Jacobian
-		f.write('		data[self.jac_extr_indx] -= 1.*self.dil_fac_now\n')
+		f.write('		data[jac_extr_indx] -= 1.*self.dil_fac_now\n')
 		f.write('		\n')
-	# note that continuous influx should only be included in Jacobian if the influx is dependent
-	# on the concentration of a component(s), otherwise it differentiates to zero when the 
-	#ordinary differential equation is expressed
-	#if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
-		#f.write('		Cinfl_gr_zero = Cinfl_now[:, 0] > 0. # influxes over zero\n')
-		#f.write('		data[self.jac_cont_infl_indx][Cinfl_gr_zero] += Cinfl_now[Cinfl_gr_zero, 0]/(y[self.con_infl_indx, 0][Cinfl_gr_zero])\n')	
+	if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
+		f.write('		Cinfl_gr_zero = Cinfl_now[:, 0] > 0. # influxes over zero\n')
+		f.write('		data[self.jac_cont_infl_indx][Cinfl_gr_zero] += Cinfl_now[Cinfl_gr_zero, 0]/(y[self.con_infl_indx, 0][Cinfl_gr_zero])\n')
+
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')
 	f.write('		\n')
@@ -571,28 +576,22 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('	# check for underflow issues\n')
 	f.write('	# reaction rate coefficient calculation\n')
 	f.write('	#rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))\n')
-	f.write('	#rrc_y[self.y_arr_g] = y[self.rindx_g]\n')
+	f.write('	#rrc_y[self.y_arr_g] = y[self.y_rindx_g]\n')
 	f.write('	#rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = \'C\')\n')
 	f.write('	# reaction rate coefficient zeroed wherever product of reactant concentrations is zero (including where underflow causes zero, thereby preventing underflows breaking the solver which appears to be an issue on less powerful machines such as HP Spectre Folio) (/s) \n')
 	f.write('	#rrc[((rrc_y**self.rstoi_g).prod(axis=1)) == 0.0] = 0.\n')
 	f.write('	\n')
 	f.write('	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) and must be 1D even though y in dydt and jac has shape (number of elements, 1)\n')
-	
 	f.write('	sol = solve_ivp(dydt, [0, integ_step], y, atol = atol, rtol = rtol, method = \'BDF\', t_eval = [integ_step], vectorized = True, jac = jac)\n')
 	f.write('	\n')
-	f.write('	if (sol.status == -1): # if integration step failed, then we want to reduce the time step and try again \n')
-	f.write('		y[0] = -1.e6\n')
-	f.write('	else:\n')	
-	f.write('		# force all components in size bins with no particle to zero\n')
-	
-	f.write('		y = np.squeeze(sol.y)\n')
-	
-	f.write('		y = y.reshape(num_sb+1, num_comp)\n')
-	f.write('		if (num_asb > 0):\n')
-	f.write('			y[1:num_asb+1, :][N_perbin[:, 0] == 0, :] = 0\n')
-	f.write('		# return to array\n')
-	f.write('		y = y.flatten()\n')
-	f.write('		\n')
+	f.write('	# force all components in size bins with no particle to zero\n')
+	f.write('	y = np.squeeze(sol.y)\n')
+	f.write('	y = y.reshape(num_sb+1, num_comp)\n')
+	f.write('	if (num_asb > 0):\n')
+	f.write('		y[1:num_asb+1, :][N_perbin[:, 0] == 0, :] = 0\n')
+	f.write('	# return to array\n')
+	f.write('	y = y.flatten()\n')
+	f.write('	\n')
 	f.write('	# return concentration(s) and time(s) following integration\n')
 	f.write('	return(y, sol.t)\n')
 	f.close() # close file

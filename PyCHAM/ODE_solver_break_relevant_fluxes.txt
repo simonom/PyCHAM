@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -14,46 +14,37 @@
 #    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
 #    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
 #    details.                                                                            										 #
-#                                                                #
-#    You should have received a copy of the GNU General Public License along with #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.        #
-#                                                                #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
-# File created at 2024-11-12 13:44:01.256094 by ode_brk_err_mess
+# File created at 2022-09-08 10:23:30.769217 by ode_brk_err_mess
 
 Gas and particle-phase concentrations of water prior to solver (molecules/cm3) with size bin numbers starting at 1: 
-Gas: 1.3060546374485062e+17
-Size bin 1: 0.10987263238457909
-Size bin 2: 0.0
-Size bin 3: 0.0
-Size bin 4: 0.0
-Size bin 5: 0.0
-Size bin 6: 0.0
-Size bin 7: 4549410177626.267
-Size bin 8: 0.0
-Size bin 9: 0.0
-Size bin 10: 0.0
-Size bin 11: 0.0
-Size bin 12: 0.0
+Gas: 2.889287438226125e+17
+Size bin 1: 0.00433748478103535
+Size bin 2: 28384.67701926618
+Size bin 3: 8068035.437009814
+Size bin 4: 1468627264.573658
+Size bin 5: 221658626354.8917
+Size bin 6: 24878984351624.465
 
 Gas and particle-phase concentrations of water following solver (molecules/cm3) with size bin numbers starting at 1: 
-Gas: 1.3060546374485062e+17
-Size bin 1: -0.033106772570678664
-Size bin 2: 0.0
-Size bin 3: 0.0
-Size bin 4: 0.0
-Size bin 5: 0.0
-Size bin 6: 0.0
-Size bin 7: 4549390630339.442
-Size bin 8: 0.0
-Size bin 9: 0.0
-Size bin 10: 0.0
-Size bin 11: 0.0
-Size bin 12: 0.0
+Gas: 2.889287438226125e+17
+Size bin 1: -0.2139812572211136
+Size bin 2: 28700.498194842992
+Size bin 3: 8068254.056466927
+Size bin 4: 1468627304.7700033
+Size bin 5: 221658626358.43076
+Size bin 6: 24878984351621.285
+
+Gas-phase reaction fluxes with equation numbers starting at 1 (# molecules/cm3/s):
+Eq. 1 reac: [1.23361992e+08]
+Eq. 1 prod: [1.23361992e+08]
 
 Wall not turned on so no gas-wall partitioning fluxes reported
 
 Gas-particle partitioning fluxes (molecules/cm3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.
-H2O: [ 2.51174382e+07 -0.00000000e+00 -0.00000000e+00 -0.00000000e+00
- -0.00000000e+00 -0.00000000e+00  3.43390553e+15 -0.00000000e+00
- -0.00000000e+00 -0.00000000e+00 -0.00000000e+00 -0.00000000e+00]
+H2O: [ 4.37542801e+05 -6.32951988e+08 -4.38145478e+08 -8.05593754e+07
+ -7.09279567e+06  6.37618702e+06]

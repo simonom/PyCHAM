@@ -1,52 +1,46 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''code to open saved files and return useful variables'''
-# e.g. called by PyCHAM plotting codes to obtain the required model 
-# outputs for evaluation
+# e.g. called by PyCHAM plotting codes to obtain the required model outputs for evaluation
 
 import numpy as np
 import os
 import ast
-import pickle
-import scipy.constants as si
 
 # define function, note that retr_out is called by the click202 function in gui.py 
 # and it can return progress updates on loading results
 def retr_out(self):
 	
 	# inputs: -------------------------------
-	# self.dir_path - path of directory requested by the calling
-	# code to be looked at
+	# self.dir_path - path of directory requested by the calling code to be looked at
 	# ---------------------------------------
-	
+
 	# name of file where experiment constants saved
 	fname = str(self.dir_path + '/model_and_component_constants')
 	
 	try: # try opening file
 		const_in = open(fname)
 	except:
-		err_mess = str('Error - no such file ' + fname + 
-			', please check it still exists')
+		err_mess = str('Error - no such file ' + fname + ', please check it still exists')
 		self.l203a.setText(err_mess)
 		# set border around error message
 		if (self.bd_pl == 1):
@@ -56,36 +50,14 @@ def retr_out(self):
 			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 			self.bd_pl = 1
 		return()
-
-	# output format changed in version 4 of PyCHAM to accelerate 
-	# loading of results, therefore check which version saved 
-	# the results in question and treat accordingly
-	try:
-		# if v4 of later this will work
-		load_path = str(self.dir_path + '/nom_mass.npy') # path
-		nom_mass = np.load(load_path, allow_pickle=True)
-		v4_flag = 1
-	except:
-		# if earlier than v4 then flag
-		v4_flag = 0
-	
-	# prepare to hold constants
+		
 	const = {} # create empty dictionary to hold constants
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
 	group_indx['RO2i'] = [] # filler in case of no RO2i
 	group_indx['ROi'] = [] # filler in case of no ROi
 	group_indx['HOMRO2'] = [] # filler in case of no HOMRO2
-	group_indx['HOMs'] = [] # filler	
-	group_indx['OOH'] = [] # filler
-	group_indx['HOM_OOH'] = [] # filler
-	group_indx['OH'] = [] # filler
-	group_indx['HOM_OH'] = [] # filler	
-	group_indx['carbonyl'] = [] # filler	
-	group_indx['HOM_carbonyl'] = [] # filler
-	group_indx['NO3'] = [] # filler
-	group_indx['HOM_NO3'] = [] # filler	
-	
+
 	for line in const_in.readlines():
 		
 		dlist = [] # empty list to hold values
@@ -108,8 +80,7 @@ def retr_out(self):
 			comp_names = ast.literal_eval(line[st_indx:fi_indx])
 			yield (37.)
 
-		if (str(line.split(',')[0]) == str('molecular_weights_g/'+
-			'mol_corresponding_to_component_names')):
+		if (str(line.split(',')[0]) == 'molecular_weights_g/mol_corresponding_to_component_names'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
 			for i in line:
@@ -123,7 +94,7 @@ def retr_out(self):
 					fi_indx = -cnt+1
 					break
 
-			y_MM = ast.literal_eval(line[st_indx:fi_indx])
+			y_MW = ast.literal_eval(line[st_indx:fi_indx])
 			yield (7.)
 		if (str(line.split(',')[0]) == 'molar_volumes_cm3/mol'):
 			# find index of first [ and index of last ]
@@ -158,7 +129,6 @@ def retr_out(self):
 			# nominal molar masses (g/mol)
 			nom_mass = ast.literal_eval(line[st_indx:fi_indx])
 			yield (12.)
-
 		if (str(line.split(',')[0]) == 'pure_component_saturation_vapour_pressures_at_298.15K_Pa'):
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -201,14 +171,14 @@ def retr_out(self):
 					st_indx = icnt+1
 					break
 				icnt += 1 # count on characters
-		
+
 			for cnt in range(10):
 				if line[-cnt:-cnt+2] == ']]':
 					fi_indx = -cnt+1
 					break
-		
+
 			HC = ast.literal_eval(line[st_indx:fi_indx])
-			yield (65.)	
+			yield (65.)		
 
 		if (str(line.split(',')[0]) == 'SMILES'):
 			# find index of first [ and index of last ]
@@ -285,29 +255,7 @@ def retr_out(self):
 				group_indx['HOMRO2'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
 			yield (32.)
 
-		if (str(line.split(',')[0]) == 'organic_HOMs_index'):
-			
-			# find index of first [ and index of last ]
-			icnt = 0 # count on characters
-			for i in line:
-				if i == '[':
-					st_indx = icnt+1
-					break
-				icnt += 1 # count on characters
-			for cnt in range(10):
-				if line[-cnt] == ']':
-					fi_indx = -cnt
-					break
-
-			if (st_indx == len(line)+fi_indx): # if empty list
-				continue
-			else: # if list has contents
-				group_indx['HOMs'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))	
-			yield (32.)
-
-
-		if (str(line.split(',')[0]) == 
-			'factor_for_multiplying_ppb_to_get_molec/cm3_with_time'):
+		if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
 
 			# find index of first [ and index of last ]
 			icnt = 0 # count on characters
@@ -321,9 +269,8 @@ def retr_out(self):
 					fi_indx = -cnt+1
 					break
 
-			# conversion factor to change gas-phase 
-			# concentrations from ppb into # molecules/cm3 
-			# (air)
+			# conversion factor to change gas-phase concentrations from # molecules/cm3 
+			# (air) into ppb
 			Cfactor = ast.literal_eval(line[st_indx:fi_indx])
 			
 			yield (47.)
@@ -378,8 +325,7 @@ def retr_out(self):
 				i = i.strip(' ')
 				dlist.append(float(i))
 				yield (48.)
-			if (str(line.split(',')[0]) == str('size_structure_0_for_'+
-				'moving_centre_1_for_full_moving')):
+			if (str(line.split(',')[0]) == 'size_structure_0_for_moving_centre_1_for_full_moving'):
 				i = i.strip('\n')
 				i = i.strip('[[')
 				i = i.strip(']]')
@@ -391,7 +337,7 @@ def retr_out(self):
 
 		const[str(line.split(',')[0])] = dlist
 	const_in.close()
-	
+		
 	# extract required data from dictionary, note this prepared above
 	num_sb = int((const['number_of_size_bins'])[0]) # number of size bins
 	num_comp = int((const['number_of_components'])[0]) # number of components
@@ -403,103 +349,11 @@ def retr_out(self):
 	H2Oi = int((const['index_of_water'])[0]) # index of water
 	
 	seedi = const['index_of_seed_components'] # index of seed components
-	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']	
-	
-	if (v4_flag == 1): # if results in question saved in version 4 or later
-
-		load_path = str(self.dir_path + '/y_mw.npy') # path
-		y_MM = np.load(load_path, allow_pickle=True)
-
-		# cm3/mol
-		load_path = str(self.dir_path + '/MV.npy') # path
-		MV = np.load(load_path, allow_pickle=True)
-		
-		load_path = str(self.dir_path + '/comp_namelist.npy') # path
-		comp_names = (np.load(load_path, allow_pickle=True)).tolist()
-			
-		load_path = str(self.dir_path + '/rel_SMILES.npy') # path
-		rel_SMILES = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		# path
-		load_path = str(self.dir_path + 
-		'/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy')
-		PsatPa = (np.load(load_path, allow_pickle=True)).tolist()
-
-		# path
-		load_path = str(self.dir_path + 
-		'/pure_component_saturation_vp_at_startT_molec_percm3.npy')
-		Psatmolecpercm3_0 = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + 
-			'/oxygen_to_carbon_ratios_of_components.npy') # path
-		OC = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		load_path = str(self.dir_path + 
-			'/hydrogen_to_carbon_ratios_of_components.npy') # path
-		HC = (np.load(load_path, allow_pickle=True)).tolist()
-		
-		
-		try: # this output added after others in version 4 of PyCHAM
-
-			# path
-			load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy')
-			group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-			# path
-			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy')
-			group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-			 # path
-			load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy')
-			group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-			load_path = str(self.dir_path + '/organic_HOMs_index.npy') # path
-			group_indx['HOMs'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-			load_path = str(self.dir_path + '/organic_ROOR_index.npy') # path
-			group_indx['ROOR'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-			load_path = str(self.dir_path + '/OOH_index.npy') # path
-			group_indx['OOH'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-			load_path = str(self.dir_path + '/HOM_OOH_index.npy') # path
-			group_indx['HOM_OOH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-			load_path = str(self.dir_path + '/OH_index.npy') # path
-			group_indx['OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-			load_path = str(self.dir_path + '/HOM_OH_index.npy') # path
-			group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-			load_path = str(self.dir_path + '/carbonyl_index.npy') # path
-			group_indx['carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-			load_path = str(self.dir_path + '/HOM_carbonyl_index.npy') # path
-			group_indx['HOM_carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
-		
-			load_path = str(self.dir_path + '/NO3_index.npy') # path
-			group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
-		
-			load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
-			group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
-
-		except:
-			group_indx['RO2i'] = []
-			group_indx['ROi'] = []
-			group_indx['HOMRO2'] = []
-			group_indx['HOMs'] = []
-			group_indx['ROOR'] = []
-			group_indx['OOH']  = []
-			group_indx['HOM_OOH'] = []
-			group_indx['OH'] = []
-			group_indx['HOM_OH'] = []
-			group_indx['carbonyl'] = []
-			group_indx['HOM_carbonyl'] = []
-			group_indx['NO3'] = []
-			group_indx['HOM_NO3'] = []
+	siz_str = const['size_structure_0_for_moving_centre_1_for_full_moving']
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]
+		print(comp_time)
 	except:
 		comp_time = 0.
 
@@ -513,10 +367,8 @@ def retr_out(self):
 		output_by_sim_mv_ext = 0.
 	
 	yield (75.)
-	# withdraw index and names of components to plot the 
-	# gas-phase concentration temporal profile of
-	fname = str(self.dir_path + 
-		'/components_with_initial_gas_phase_concentrations_specified')
+	# withdraw index and names of components to plot the gas-phase concentration temporal profile of
+	fname = str(self.dir_path + '/components_with_initial_gas_phase_concentrations_specified')
 	# check file size (bytes) to see if file contains more than just the header
 	if (os.stat(fname).st_size > 123):
 		indx_plot = np.loadtxt(fname, delimiter=',', skiprows=1, dtype='str')
@@ -541,7 +393,7 @@ def retr_out(self):
 	
 	
 	try: # this output added on 23/02/2021
-		# withdraw environmental conditions (temperature in first column (K))
+		# withdraw chamber environmental conditions (s)
 		fname = str(self.dir_path + '/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:
@@ -559,20 +411,14 @@ def retr_out(self):
 	
 	yield (80.)
 
-	# withdraw concentrations (ppb in gas, 
-	# # molecules/cm3 in particle and wall)
-	fname = str(self.dir_path + 
-	'/concentrations_all_components_all_times_gas_particle_wall')
+	# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
+	fname = str(self.dir_path + '/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)
 	
-	# following will only load for certain simulation setups 
-	# (mostly whether particles included)
+	# following will only load for certain simulation setups (mostly whether particles included)
 	try:
-		# withdraw the wall concentration of components due to 
-		# particle deposition to wall
-		fname = str(self.dir_path + 
-			'/concentrations_all_components_all_times_on_wall_due_to_particle' +
-			'_deposition_to_wall')
+		# withdraw the wall concentration of components due to particle deposition to wall
+		fname = str(self.dir_path + '/concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall')
 		yrec_p2w = np.loadtxt(fname, delimiter = ',', skiprows = 2)
 	except:
 		yrec_p2w = []
@@ -598,10 +444,9 @@ def retr_out(self):
 		Nwet = np.zeros((0, 0))
 	
 	try:
-		# particle radii (um)
+		# particle sizes (um)
 		fname = str(self.dir_path + '/size_bin_radius')
-		# skiprows=1 omits header
-		x = np.loadtxt(fname, delimiter=',', skiprows=1)
+		x = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
 		x = []
 
@@ -625,21 +470,15 @@ def retr_out(self):
 		tot_in_res = []
 	
 	yield (95.)
-	
-	# convert vapour pressure at starting simulation temperature 
-	# from molecules/cm3 to Pa using ideal gas law
-	PsatPa0 = Psatmolecpercm3_0/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0])) 
+
 	# create a class to hold outputs
 	class ro_outputs:
 		
 		sp = output_by_sim_sch_ext # chemical scheme path
 		vp = output_by_sim_mv_ext # model variables path
 		gi = group_indx # indices of groups of components
-		# for each component, the generation number
-		gen_numbers = gen_num 
-		# hydrogen:carbon ratios for each component, this 
-		# output added on 31/05/2022
-		HyC = HC
+		gen_numbers = gen_num # for each component, the generation number
+		HyC = HC # hydrogen:carbon ratios for each component, this output added on 31/05/2022
 		nominal_mass = nom_mass 
 		nsb = num_sb
 		nc = num_comp
@@ -650,7 +489,7 @@ def retr_out(self):
 		cen_size = x
 		thr = timehr
 		rSMILES = rel_SMILES
-		comp_MW = y_MM
+		comp_MW = y_MW
 		Nrec_wet = Nwet
 		names_of_comp = comp_names
 		comp_MV = MV
@@ -661,7 +500,6 @@ def retr_out(self):
 		init_comp = comp0
 		part_to_wall = yrec_p2w
 		vpPa = PsatPa
-		vpPa0 = PsatPa0
 		O_to_C = OC
 		H2O_ind = H2Oi
 		seed_ind = seedi
@@ -691,15 +529,13 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 		col_title = 0
 		data_cnt = -1 # count on lines of data
 		
-		# prepare to create dictionary containing component names, 
-		# times and concentrations
+		# prepare to create dictionary containing component names, times and concentrations
 		data_dic = {}
 		for line in datafile.readlines():
 			
 			dlist = [] # prepare to convert to python list
 			
-			# identify whether tabs used to separate columns (if not then 
-			# spaces are)
+			# identify whether tabs used to separate columns (if not then spaces are)
 			if '\t' in line:
 				sep = '\t'
 			if ' ' in line:

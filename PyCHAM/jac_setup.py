@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''preparing the inputs for the ode solver Jacobian'''
 # called once the gas-phase and particle-phase equations have been interrogated
@@ -28,7 +28,7 @@ import numpy as np
 def jac_setup(comp_num, num_sb, num_asb, self):
 
 	# inputs ---------------------------------------------
-	# comp_num - number of components in chemical scheme
+	# comp_num - number of components
 	# num_sb - number of size bins (including any wall)
 	# self.eqn_num - number of chemical reactions
 	# gas-phase reactions
@@ -56,12 +56,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# self - reference to PyCHAM
 	# ----------------------------------------------------
 
-	# note that Jacobian will hold the partial derivative of a
-	# dependent component (given in rows of Jacobian) with respect 
-	# to a determining component (given in columns of Jacobian)
-
-	# rows in Jacobian affected by a given component in a given bin 
-	# (where bin includes gas, particle and wall)		 	
+	# rows in Jacobian affected by a process		 	
 	rowvals = np.empty((0))
 	# indices of rowvals representing each component being 
 	# differentiated by in Jacobian. Note, needs to start
@@ -84,14 +79,12 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		for i in range(self.nreac_g[eqni]):
 			# index of flattened Jacobian being affected in 
 			# this equation, note this doesn't need to 
-			# account for water and core component as below 
-			# (when unique elements found) all
+			# account for water and core component as below (when unique elements found) all
 			# full Jacobian matrix elements that aren't indexed are
-			# omitted to create the sparse Jacobian matrix (add one 
-			# to num_sb to account for gas-phase)
+			# omitted to create the sparse Jacobian matrix (add one to num_sb to account for gas-phase)
 			self.jac_indx_g[eqni, i*tot_comp:(i+1)*tot_comp] = self.rindx_g[eqni, i]*((comp_num)*(num_sb+1))+(totindx)
 			# check if rowvals already sufficiently long to contain this reactant  
-			if (self.rindx_g[eqni, i] <= (len(colptrs)-2)):
+			if self.rindx_g[eqni, i]<=(len(colptrs)-2):
 
 				# start index of rowvals where it is represented
 				r_st = int(colptrs[self.rindx_g[eqni, i]])
@@ -149,86 +142,53 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# include all components, including water and seed material.
 	# Remember that any final element of colptrs should represent the final
 	# rowval index, so colptrs needs to have a length one greater than the
-	# number of components+number of components*number of size bins 
-	# (number of size bins includes wall)
-	col_shrt =  ((comp_num+self.H2O_in_cs)+(comp_num+self.H2O_in_cs)*num_sb+1)-len(colptrs)
+	# number of components+number of components*number of size bins (number of size bins includes wall)
+	col_shrt =  ((comp_num+2)+(comp_num+2)*num_sb+1)-len(colptrs)
 	# rowvals indices for final columns of Jacobian		
 	colptrs = np.append(colptrs, np.array((colptrs[-1])).repeat(col_shrt))
 	
 	if (self.eqn_num[1] > 0): # if aqueous-phase reactions present
 
-		# aqueous-phase reaction part -----------------------------------------------
+		# aqueous-phase reaction part -----------------------------------------------------
 		# container for Jacobian index affected by aqueous-phase reactions	
-		self.jac_indx_aq = np.zeros((self.eqn_num[1],
-			max(self.nreac_aq*(self.nreac_aq+self.nprod_aq))))
-
-		# index of unique rows affected per reactant, note this
-		# covers all particle size bins
-		col_tracker = np.unique(self.rindx_aq[self.rstoi_aq != 0.])
-
-		# get total number of unique aqueous-phase 
-		# reactants per size bin
-		n_uni_aq_reac = int(len(col_tracker)/num_asb)
-
-		# maximum number of reactants and products 
-		# affected by an aqueous-phase reaction
-		max_affected_n = max(self.nreac_aq+self.nprod_aq)
-		# maximum number of reactants involved in aqueous 
-		# phase reaction
-		max_affected_r = max(self.nreac_aq)
+		self.jac_indx_aq = np.zeros((self.eqn_num[1], max(self.nreac_aq*(self.nreac_aq+self.nprod_aq))))
+		# index of unique rows affected per reactant, if zero acts as a filler this omitted below
+		col_tracker = np.unique(self.rindx_aq)
 		# track rows affected per column
-		row_tracker = np.ones((max_affected_n, len(col_tracker)))*-1.
-		
-		# note that size bins are dealt with below these 
-		# equation and reaction loops
+		row_tracker = np.ones((max(self.nreac_aq+self.nprod_aq), len(col_tracker)))*-1.
+		# note that size bins are dealt with below loops
 		for eqni in range(self.eqn_num[1]): # loop through reactions
 			# total number of components affected per reactant
 			tot_affcomp = self.nreac_aq[eqni]+self.nprod_aq[eqni]
 			# combined index of reactants and products in this equation
 			totindx = np.append(self.rindx_aq[eqni, 0:self.nreac_aq[eqni]], self.pindx_aq[eqni, 0:self.nprod_aq[eqni]])
-			# loop through reactants (would be columns in 2D Jacobian)
-			for ir in range(self.nreac_aq[eqni]):
-				# number of full Jacobian elements passed before reaching 
-				# this reactant, accounting for water and core and gas-phase
-				st_indx = ((comp_num+self.H2O_in_cs)*(num_sb+1)*
-					self.rindx_aq[eqni, ir])
-				# flat Jacobian index affected by this equation, this then 
-				# reduced to sparse matrix index below
-				self.jac_indx_aq[eqni, ir*tot_affcomp:
-					(ir+1)*tot_affcomp] = st_indx+totindx
+			for ir in range(self.nreac_aq[eqni]):# loop through reactants (would be columns in 2D Jacobian)
+				# number of full Jacobian elements passed before reaching this reactant, 
+				# accounting for water and core
+				st_indx = (comp_num+2)*(num_sb+1)*self.rindx_aq[eqni, ir]
+				# flat Jacobian index affected by this equation, this then reduced to sparse 
+				# matrix index below
+				self.jac_indx_aq[eqni, ir*tot_affcomp:(ir+1)*tot_affcomp] = st_indx+totindx
 			
 				# the column number affected
 				coli = np.where(col_tracker == self.rindx_aq[eqni, ir])[0]
 				# unique rows affected per reactant
-				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, 
-					coli]!=-1], totindx))
+				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, coli]!=-1], totindx))
 				row_tracker[0:len(unirow), coli] = unirow.reshape(-1, 1)
-					
+		
+		# account for the the gas-phase Jacobian indices
+		row_tracker[row_tracker != -1] += comp_num+2
 		# flatten ready for appendage
 		row_trackerf = row_tracker.flatten(order='F')
 		# append to rowvals
 		rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
-		
 		# sum number of unique rows affected per component
 		col_num = (row_tracker != -1).sum(axis = 0)
-
-		# spread col_num for this first size bin over
-		# all components in this size bin
-		col_num_all = np.zeros((comp_num+self.H2O_in_cs))
-		# insert number of affected components per
-		# aqeuous-phase reactant
-		col_num_all[col_tracker[0:n_uni_aq_reac]-
-		(comp_num+self.H2O_in_cs)] = col_num[0:n_uni_aq_reac]
-
-		# account for new rows in first size bin, add 1 to 
-		# index for the colptrs index since affecting 
-		# components are represented by their index
-		# to their index+1 in colptrs
-		colptrs[(comp_num+self.H2O_in_cs+1):
-		((comp_num+self.H2O_in_cs)*2+1)] += np.cumsum(col_num_all)
-		
-		# ensure latter inidices are updated 
-		colptrs[(comp_num+self.H2O_in_cs)*2::] = max(colptrs)
+		# account for new rows in first size bin, add 1 to index because this represents the
+		# number of elements per component
+		colptrs[col_tracker+(comp_num+2)+1] += np.cumsum(col_num)
+		# ensure latter inidices are consistent 
+		colptrs[max(col_tracker+(comp_num+2)+1)::] = colptrs[max(col_tracker+(comp_num+2)+1)] 
 		
 		# because above jac_indx_aq contains the indices of data assuming
 		# a full, rather than sparse matrix, now correct to affect
@@ -246,35 +206,27 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		
 		# now account for omission of full Jacobian elements between the gas-phase 
 		# reaction part and the aqueous-phase reaction part
-		self.jac_indx_aq[self.jac_indx_aq != 0.
-			] -= np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.]
-			)-np.amax(self.jac_indx_g)-1
+		self.jac_indx_aq[self.jac_indx_aq != 0.] -= np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])-np.amax(self.jac_indx_g)-1
 		# range of aqueous-phase sparse jacobian indices
-		ran_aq = (np.amax(self.jac_indx_aq[self.jac_indx_aq != 0.])- 
-			np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])+1)
+		ran_aq = np.amax(self.jac_indx_aq[self.jac_indx_aq != 0.])-np.amin(self.jac_indx_aq[self.jac_indx_aq != 0.])+1
 		# shape of index matrix for just one size bin
 		jsh = self.jac_indx_aq.shape
 
 		# now repeat over particle size bins
 		for sbi in range(1, num_asb):
-			self.jac_indx_aq = np.concatenate((self.jac_indx_aq, 
-				self.jac_indx_aq[0:jsh[0], 0:jsh[1]] + ran_aq*(sbi)), axis = 0)
+			self.jac_indx_aq = np.concatenate((self.jac_indx_aq, self.jac_indx_aq[0:jsh[0], 0:jsh[1]]+self.ran_aq*(sbi)), axis = 0)
 			
 			# account for the the gas-phase Jacobian indices
-			row_tracker[row_tracker != -1] += (comp_num+self.H2O_in_cs)
+			row_tracker[row_tracker != -1] += (comp_num+2)
 			# flatten ready for appendage
 			row_trackerf = row_tracker.flatten(order='F')
 			# append to rowvals
 			rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
-			# account for new rows in first size bin, add 1 to 
-			# index for the colptrs index since affecting 
-			# components are represented by their index
-			# to their index+1 in colptrs
-			
-			colptrs[(comp_num+self.H2O_in_cs)*(sbi+1)+1:
-			(comp_num+self.H2O_in_cs)*(sbi+2)+1] += np.cumsum(col_num_all)
-			# ensure latter inidices are updated 
-			colptrs[(comp_num+self.H2O_in_cs)*(sbi+2)+1::] = max(colptrs)
+			# account for new rows in latter size bin, add 1 to index because this represents the
+			# number of elements per component
+			colptrs[col_tracker+(comp_num+2)*(sbi+1)+1] += np.cumsum(col_num)
+			# ensure latter inidices are consistent 
+			colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)::] = colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)]
 	
 	if (self.eqn_num[1] == 0):
 		self.jac_indx_aq = np.zeros((1)) # filler
@@ -282,15 +234,15 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 
 	if (self.eqn_num[2] > 0): # if surface (e.g. wall) reactions present
 
-		# surface (e.g. wall) reaction part -----------------------------
+		# surface (e.g. wall) reaction part -----------------------------------------------------
 		# container for Jacobian index affected by surface (e.g. wall) reactions	
 		jac_indx_su = np.zeros((self.eqn_num[2], max(self.nreac_su*(self.nreac_su+self.nprod_su))))
 		# index of unique rows affected per reactant, if zero acts as a filler this omitted below
 		col_tracker = np.unique(self.rindx_su)
 		# track rows affected per column
 		row_tracker = np.ones((max(self.nreac_su+self.nprod_su), len(col_tracker)))*-1.
-		# note that surfaces are dealt with below loops
-		for eqni in range(self.eqn_num[2]): # loop through surface reactions
+		# note that size bins are dealt with below loops
+		for eqni in range(self.eqn_num[2]): # loop through reactions
 			# total number of components affected per reactant
 			tot_affcomp = self.nreac_su[eqni]+self.nprod_su[eqni]
 			# combined index of reactants and products in this equation
@@ -300,7 +252,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				# number of full Jacobian (i.e. not sparse Jacobian matrix) elements passed 
 				# before reaching this reactant, 
 				# accounting for water and core
-				st_indx = (comp_num+self.H2O_in_cs)*(num_sb+1)*self.rindx_su[eqni, ir]
+				st_indx = (comp_num+2)*(num_sb+1)*self.rindx_su[eqni, ir]
 				# flat Jacobian index affected by this equation, this then reduced to sparse 
 				# matrix index below
 				self.jac_indx_su[eqni, ir*tot_affcomp:(ir+1)*tot_affcomp] = st_indx+totindx
@@ -310,22 +262,19 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				unirow = np.unique(np.append(row_tracker[:, coli][row_tracker[:, coli]!=-1], totindx))
 				row_tracker[0:len(unirow), coli] = unirow.reshape(-1, 1)
 
-		# account for the any particle Jacobian indices (note that gas-phase 
-		# Jacobian already accounted for in self.rindx_su and self.pindx_su)
-		row_tracker[row_tracker != -1] += (comp_num+self.H2O_in_cs)*num_asb
+		# account for the the gas-phase and particle Jacobian indices
+		row_tracker[row_tracker != -1] += (comp_num+2) + (comp_num+2)*num_asb
 		# flatten ready for appendage
 		row_trackerf = row_tracker.flatten(order='F')
 		# append to rowvals
 		rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
-		
 		# sum number of unique rows affected per component
 		col_num = (row_tracker != -1).sum(axis = 0)
-		# account for new rows in first surface, add 1 to index because this represents the
+		# account for new rows in first size bin, add 1 to index because this represents the
 		# number of elements per component
-		colptrs[col_tracker+((comp_num+self.H2O_in_cs) + (comp_num+self.H2O_in_cs)*(num_asb-1))+1] += np.cumsum(col_num)
-		
+		colptrs[col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1] += np.cumsum(col_num)
 		# ensure latter inidices are consistent 
-		colptrs[max(col_tracker+((comp_num+self.H2O_in_cs) + (comp_num+self.H2O_in_cs)*(num_asb-1))+1)::] = colptrs[max(col_tracker+((comp_num+self.H2O_in_cs) + (comp_num+self.H2O_in_cs)*(num_asb-1))+1)] 
+		colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1)::] = colptrs[max(col_tracker+((comp_num+2) + (comp_num+2)*num_asb)+1)] 
 
 		# because above jac_indx_su contains the indices of data assuming
 		# a full, rather than sparse matrix, now correct to affect
@@ -357,20 +306,19 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			self.jac_indx_su = np.concatenate((self.jac_indx_su, self.jac_indx_su[0:jsh[0], 0:jsh[1]]+ran_su*(sbi)), axis = 0)
 			
 			# account for the the gas-phase and particle-phase Jacobian indices
-			row_tracker[row_tracker != -1] += (comp_num+self.H2O_in_cs)+((comp_num+self.H2O_in_cs)*num_asb)
+			row_tracker[row_tracker != -1] += (comp_num+2)+((comp_num+2)*num_asb)
 			# flatten ready for appendage
 			row_trackerf = row_tracker.flatten(order='F')
 			# append to rowvals
 			rowvals = np.append(rowvals, row_trackerf[row_trackerf != -1])
 			# account for new rows in latter size bin, add 1 to index because this represents the
 			# number of elements per component
-			colptrs[col_tracker+(comp_num+self.H2O_in_cs)*(num_asb+sbi+1)+1] += np.cumsum(col_num)
+			colptrs[col_tracker+(comp_num+2)*(num_asb+sbi+1)+1] += np.cumsum(col_num)
 			# ensure latter indices are consistent 
-			colptrs[max(col_tracker+(comp_num+self.H2O_in_cs)*(sbi+1)+1)::] = colptrs[max(col_tracker+(comp_num+self.H2O_in_cs)*(sbi+1)+1)]
+			colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)::] = colptrs[max(col_tracker+(comp_num+2)*(sbi+1)+1)]
 	
 	if (self.eqn_num[2] == 0):
 		self.jac_indx_su = np.zeros((1)) # filler
-	
 	
 	# particle partitioning influence on Jacobian part -------------------------------------------------
 	# loop through jacobian index to check whether the centre 
@@ -381,7 +329,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# and particle on particle effect
 
 	# Jacobian index for particle effects
-	self.jac_part_indx = np.zeros((comp_num+self.H2O_in_cs)*(num_asb+1)+((comp_num+self.H2O_in_cs)*(num_asb*2)))
+	jac_part_indx = np.zeros((comp_num+2)*(num_asb+1)+((comp_num+2)*(num_asb*2)))
 	
 	part_cnt = 0 # count on jac_part_indx inputs
 	
@@ -389,7 +337,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 
 		# loop through components in the gas-phase (add two 
 		# to account for water and seed material)
-		for compi in range(comp_num+self.H2O_in_cs):
+		for compi in range(comp_num+2):
 			# gas effect on gas part ---------------------------------------------
 			# relevant starting and finishing index in rowvals
 			st_indx = int(colptrs[compi])
@@ -402,13 +350,13 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx] == compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					self.jac_part_indx[part_cnt] = exist_indx
+					jac_part_indx[part_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then include
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					self.jac_part_indx[part_cnt] = new_indx # gas-particle partitioning
+					jac_part_indx[part_cnt] = new_indx # gas-particle partitioning
 					self.jac_indx_g[self.jac_indx_g>=new_indx] += 1 # gas-phase reactions
 					self.jac_indx_aq[self.jac_indx_aq>=new_indx] += 1 # aqueous-phase reactions
 					self.jac_indx_su[self.jac_indx_su>=new_indx] += 1 # surface (e.g. wall) reactions
@@ -423,7 +371,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				self.jac_part_indx[part_cnt] = st_indx # gas-particle partitioning
+				jac_part_indx[part_cnt] = st_indx # gas-particle partitioning
 				self.jac_indx_g[self.jac_indx_g>=st_indx] += 1 # gas-phase reactions
 				self.jac_indx_aq[self.jac_indx_aq>=st_indx] += 1 # aqueous-phase reactions
 				self.jac_indx_su[self.jac_indx_su>=st_indx] += 1 # surface (e.g. wall) reactions
@@ -440,11 +388,11 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# already know that the gas-phase reactions will not
 			# have affected this part of the Jacobian, so just need to
 			# modify sparse Jacobian inputs accordingly
-			self.jac_part_indx[part_cnt:part_cnt+num_asb] = range(en_indx, en_indx+num_asb)
+			jac_part_indx[part_cnt:part_cnt+num_asb] = range(en_indx, en_indx+num_asb)
 			self.jac_indx_g[self.jac_indx_g>=en_indx] += num_asb # gas-phase reaction
 			self.jac_indx_aq[self.jac_indx_aq>=en_indx] += num_asb # aqueous-phase reactions
 			self.jac_indx_su[self.jac_indx_su>=en_indx] += num_asb # surface (e.g. wall) reactions
-			new_el = (np.array(range(comp_num+self.H2O_in_cs+compi, (comp_num+self.H2O_in_cs)*(num_asb+1)+compi, (comp_num+self.H2O_in_cs)))).reshape(-1)
+			new_el = (np.array(range(comp_num+2+compi, (comp_num+2)*(num_asb+1)+compi, (comp_num+2)))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += num_asb
 			part_cnt += num_asb # keep count on particle index		
@@ -454,33 +402,33 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		# gas phase and on particle components for the Jacobian, note if no wall this 
 		# will include the final row in the final column of the Jacobian
 		for sbi in range(num_asb): # size bin loop
-			for compi in range(comp_num+self.H2O_in_cs): # component loop
+			for compi in range(comp_num+2): # component loop
 				# particle component effect on gas-phase
 				
 				# the flattened Jacobian index relating to this
 				# relevant start index for colptrs
-				stc_indx = int((comp_num+self.H2O_in_cs)*(sbi+1)+(compi))
+				stc_indx = int((comp_num+2)*(sbi+1)+(compi))
 				st_indx = int(colptrs[stc_indx]) # start index for rowvals		
-				self.jac_part_indx[part_cnt] = st_indx
+				jac_part_indx[part_cnt] = st_indx
 				new_el = np.array((compi)).reshape(-1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
-				colptrs[(comp_num+self.H2O_in_cs)*(sbi+1)+(compi+1)::] += 1
+				colptrs[(comp_num+2)*(sbi+1)+(compi+1)::] += 1
 				self.jac_indx_aq[self.jac_indx_aq>=st_indx] += 1 # aqueous-phase reactions
 				self.jac_indx_su[self.jac_indx_su>=st_indx] += 1 # surface (e.g. wall) reactions
 				part_cnt += 1
 				
 				# particle component effect on particle
-				new_el = np.array(((comp_num+self.H2O_in_cs)*(sbi+1)+compi)).reshape(-1)
+				new_el = np.array(((comp_num+2)*(sbi+1)+compi)).reshape(-1)
 				# account for any aqueous-phase or surface (e.g. wall) reactions
 				st_indx = (st_indx) + sum(rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])] < new_el)
-				self.jac_part_indx[part_cnt] = st_indx
+				jac_part_indx[part_cnt] = st_indx
 				# check if diagonal already in use by aqueous-phase reactions
 				if any(rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])] == new_el):
 					part_cnt += 1
 					continue # continue to next component if it is
 				else:
 					rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
-					colptrs[(comp_num+self.H2O_in_cs)*(sbi+1)+compi+1::] += 1
+					colptrs[(comp_num+2)*(sbi+1)+compi+1::] += 1
 					self.jac_indx_aq[self.jac_indx_aq>=st_indx] += 1 # aqueous-phase reactions
 					self.jac_indx_su[self.jac_indx_su>=st_indx] += 1 # surface (e.g. wall) reactions
 					part_cnt += 1
@@ -495,13 +443,13 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# and wall-on-wall affect
 	
 	# empty results array, 1st term is gas-on-gas, 2nd is gas-on-wall, 3rd is wall-on-gas, 4th is wall-on-wall
-	self.jac_wall_indx = np.zeros(((comp_num+self.H2O_in_cs)+(self.wall_on*(comp_num+self.H2O_in_cs))+(self.wall_on*(comp_num+self.H2O_in_cs))+(self.wall_on*(comp_num+self.H2O_in_cs))))
+	jac_wall_indx = np.zeros(((comp_num+2)+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))+(self.wall_on*(comp_num+2))))
 	wall_cnt = 0 # count on jac_wall_indx inputs
 	
 	if (self.wall_on > 0): # if surface present
 		# loop through components in the gas-phase (add two 
 		# to account for water and core component)
-		for compi in range(comp_num+self.H2O_in_cs):
+		for compi in range(comp_num+2):
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
@@ -517,13 +465,13 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					self.jac_wall_indx[wall_cnt] = exist_indx
+					jac_wall_indx[wall_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then add
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					self.jac_wall_indx[wall_cnt] = new_indx
+					jac_wall_indx[wall_cnt] = new_indx
 					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
 					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
 					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
@@ -537,7 +485,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				self.jac_wall_indx[wall_cnt] = st_indx
+				jac_wall_indx[wall_cnt] = st_indx
 				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
 				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
 				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
@@ -554,7 +502,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# already know that the gas-phase photochemistry will not
 			# have affected this part of the Jacobian, so just need to
 			# modify sparse Jacobian inputs accordingly
-			self.jac_wall_indx[wall_cnt:wall_cnt+self.wall_on] = range(en_indx, en_indx+self.wall_on)
+			jac_wall_indx[wall_cnt:wall_cnt+self.wall_on] = range(en_indx, en_indx+self.wall_on)
 			# increase gas, aqueous and particle (if present) effect indices up by number of surface bins to 
 			# account for addition to Jacobian
 			self.jac_indx_g[self.jac_indx_g >= en_indx] += self.wall_on
@@ -562,32 +510,26 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			self.jac_indx_su[self.jac_indx_su >= en_indx] += self.wall_on
 			
 			if (num_asb > 0):
-				self.jac_part_indx[self.jac_part_indx >= en_indx] += self.wall_on
-			
-			# the new rows to consider for gas effect on wall,
-			# note that the indexing for the count on
-			# components in this loop (compi) begins at 0 for
-			# the first component, and so there is no need to
-			# -1 from the count on preceding phases 
-			# ((comp_num+self.H2O_in_cs)*number of preceding phases)
-			new_el = (np.array(range((comp_num+self.H2O_in_cs)*(num_asb+1)+compi, (comp_num+self.H2O_in_cs)*(num_asb+1)+(comp_num+self.H2O_in_cs)*self.wall_on+compi, comp_num+self.H2O_in_cs))).reshape(-1)
+				jac_part_indx[jac_part_indx >= en_indx] += self.wall_on
+				
+			new_el = (np.array(range((comp_num+2)*(num_asb+1)+compi, (comp_num+2)*(num_asb+1)+(comp_num+2)*self.wall_on+compi, comp_num+2))).reshape(-1)
 			rowvals = np.concatenate([rowvals[0:en_indx], new_el, rowvals[en_indx::]])
 			colptrs[compi+1::] += self.wall_on
 			wall_cnt += self.wall_on # keep count on wall index
-			
+
 		# wall effect on gas phase and on wall components for the Jacobian, note this will include the
 		# final row in the final column of the Jacobian
 		for wbi in range(self.wall_on): # wall bin loop
-			for compi in range(comp_num+self.H2O_in_cs): # component loop
+			for compi in range(comp_num+2): # component loop
 				# wall component effect on itself in gas-phase is a location in the 
 				# Jacobian that cannot be taken by surface reactions
 				
 				# the flattened Jacobian index relating to this
 				# relevant start index for colptrs
-				stc_indx = int((comp_num+self.H2O_in_cs)*(wbi+num_asb+1)+(compi))
+				stc_indx = int((comp_num+2)*(wbi+num_asb+1)+(compi))
 				st_indx = colptrs[stc_indx]
 
-				self.jac_wall_indx[wall_cnt] = st_indx # include in wall index for Jacobian
+				jac_wall_indx[wall_cnt] = st_indx # include in wall index for Jacobian
 				# include in rowvals
 				rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx])], [compi], rowvals[int(colptrs[stc_indx])::]])
 				# include in colptrs
@@ -602,7 +544,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 				# just above in this loop
 				if ((colptrs[stc_indx]+1) == (colptrs[stc_indx+1])): # surface reaction is not present
 					
-					self.jac_wall_indx[wall_cnt] = st_indx+1 # include in wall index for Jacobian
+					jac_wall_indx[wall_cnt] = st_indx+1 # include in wall index for Jacobian
 					# include in rowvals, note that using stc_indx as the value means that 
 					# we use the index for component on wall effect on itself on wall - see 
 					# the stc_indx definition further up in this loop
@@ -619,9 +561,9 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					rows_reac = rowvals[int(colptrs[stc_indx]):int(colptrs[stc_indx+1])][1::]	
 					
 					# sum Jacobian indices between the wall on gas effect and this wall on wall effect
-					wall_indx_add = sum(rows_reac < comp_num+self.H2O_in_cs)
+					wall_indx_add = sum(rows_reac < comp_num+2)
 					# get the wall index
-					self.jac_wall_indx[wall_cnt] = st_indx+1+wall_indx_add # include in wall index for Jacobian
+					jac_wall_indx[wall_cnt] = st_indx+1+wall_indx_add # include in wall index for Jacobian
 
 					if (sum(rows_reac == stc_indx) == 0.): # if reaction does not cover wall effect on wall
 						
@@ -629,16 +571,15 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 						rowvals = np.concatenate([rowvals[0:int(colptrs[stc_indx]+1)], [stc_indx], rowvals[int(colptrs[stc_indx]+1)::]])
 						# include in colptrs
 						colptrs[stc_indx+1::] += 1
-						# adjust surface (e.g. wall) reactions
-						self.jac_indx_su[self.jac_indx_su > self.jac_wall_indx[wall_cnt]] += 1 
+						self.jac_indx_su[self.jac_indx_su > jac_wall_indx[wall_cnt]] += 1 # adjust surface (e.g. wall) reactions
 										
 
 				wall_cnt += 1 # move up index for wall index for Jacobian
-			
+				
 	# end of wall influence on Jacobian part ---------------------------------------------------
 
 	# index of the Jacobian affected by air extraction
-	self.jac_extr_indx = np.zeros(((comp_num+self.H2O_in_cs)*(num_asb+1)))
+	jac_extr_indx = np.zeros(((comp_num+2)*(num_sb+1)))
 	
 	# extraction effect on Jacobian part -----------------------
 	if (len(self.dil_fac) > 0): # if chamber air continuously being extracted, e.g. in flow-reactor
@@ -646,7 +587,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		extr_cnt = 0 # count on jac_extr_indx inputs
 		
 		# loop through all gas- and particle-phase components
-		for compi in range((comp_num+self.H2O_in_cs)*(num_asb+1)):
+		for compi in range((comp_num+2)*(num_asb)):
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
@@ -657,6 +598,7 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			# relevant starting and finishing index in rowvals
 			st_indx = int(colptrs[compi])
 			en_indx = int(colptrs[compi+1])
+			
 			# check if any rows already attributed to this column
 			if ((st_indx < en_indx) == True):
 			
@@ -668,20 +610,20 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-					self.jac_extr_indx[extr_cnt] = exist_indx
+					jac_extr_indx[extr_cnt] = exist_indx
 					
 				else: # if diagonal not already affected, then add
 				
 					# get index
 					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-					self.jac_extr_indx[extr_cnt] = new_indx
+					jac_extr_indx[extr_cnt] = new_indx
 					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
 					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
 					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
 					if (num_asb > 0):
-						self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
-					self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
+						jac_part_indx[jac_part_indx >= new_indx] += 1
+					jac_wall_indx[jac_wall_indx >= new_indx] += 1
 					
 					new_el = np.array((compi)).reshape(1)
 					rowvals = np.concatenate([rowvals[0:new_indx], 
@@ -691,14 +633,14 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-				self.jac_extr_indx[extr_cnt] = st_indx
+				jac_extr_indx[extr_cnt] = st_indx
 				# adjust other indices
 				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
 				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
 				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
 				if (num_asb > 0):
-					self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
-				self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
+					jac_part_indx[jac_part_indx >= st_indx] += 1
+				jac_wall_indx[jac_wall_indx >= st_indx] += 1
 				
 				new_el = np.array((compi)).reshape(1)
 				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
@@ -709,80 +651,79 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	# end of extraction effect on Jacobian part -------------
 
 
-	# index of the Jacobian affected by continuous influx - note this commented out 
-	# since influx rate is not a function concentration inside box in any phase
-	#self.jac_cont_infl_indx = np.zeros((len(self.con_infl_indx)))
+	# index of the Jacobian affected by continuous influx
+	self.jac_cont_infl_indx = np.zeros((len(self.con_infl_indx)))
 	
 	# continuous influx effect on Jacobian part -----------------------
-	#if (len(self.con_infl_indx) > 0): # if component continuously injected
+	if (len(self.con_infl_indx) > 0): # if component continuously injected
 	
-		#extr_cnt = 0 # count on jac_cont_infl_indx inputs
+		extr_cnt = 0 # count on jac_cont_infl_indx inputs
 		
 		# loop through gas-phase components with continuous influx, note that
 		# self.con_infl_indx and associated arrays are ordered ascending in
 		# eqn_pars.py
-		#for compi in self.con_infl_indx:
+		for compi in self.con_infl_indx:
 		
 			# gas effect on gas part --------------------------------------------
 			# relevant starting and finishing index in rowvals
-			#st_indx = int(colptrs[compi])
-			#en_indx = int(colptrs[compi+1])
+			st_indx = int(colptrs[compi])
+			en_indx = int(colptrs[compi+1])
 			
 			# check whether the diagonal of Jacobian for this component is already affected
 			# relevant starting and finishing index in rowvals
-			#st_indx = int(colptrs[compi])
-			#en_indx = int(colptrs[compi+1])
+			st_indx = int(colptrs[compi])
+			en_indx = int(colptrs[compi+1])
 			
 			# check if any rows already attributed to this column
-			#if ((st_indx < en_indx) == True):
+			if ((st_indx < en_indx) == True):
 			
 				# if rows are already attributed, check 
 				# whether the diagonal is already affected
-			#	if ((sum(rowvals[st_indx:en_indx]==compi)) > 0):
+				if ((sum(rowvals[st_indx:en_indx]==compi)) > 0):
 				
 					# get index
-			#		exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
+					exist_indx = st_indx+(np.where(rowvals[st_indx:en_indx]==compi)[0][0])
 					# if diagonal already affected then just copy relevant
 					# data index to the indexing for wall
-			#		self.jac_cont_infl_indx[extr_cnt] = exist_indx
+					self.jac_cont_infl_indx[extr_cnt] = exist_indx
 					
-			#	else: # if diagonal not already affected, then add
+				else: # if diagonal not already affected, then add
 				
 					# get index
-			#		new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
+					new_indx = st_indx+(sum(rowvals[st_indx:en_indx]<compi))+1
 					# modify indices for sparse Jacobian matrix
-			#		self.jac_cont_infl_indx[extr_cnt] = new_indx
-			#		self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
-			#		self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
-			#		self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
-			#		if (num_asb > 0):
-			#			self.jac_part_indx[self.jac_part_indx >= new_indx] += 1
-			#		self.jac_wall_indx[self.jac_wall_indx >= new_indx] += 1
+					self.jac_cont_infl_indx[extr_cnt] = new_indx
+					self.jac_indx_g[self.jac_indx_g >= new_indx] += 1
+					self.jac_indx_aq[self.jac_indx_aq >= new_indx] += 1
+					self.jac_indx_su[self.jac_indx_su >= new_indx] += 1
+					if (num_asb > 0):
+						jac_part_indx[jac_part_indx >= new_indx] += 1
+					jac_wall_indx[jac_wall_indx >= new_indx] += 1
 					
-			#		new_el = np.array((compi)).reshape(1)
-			#		rowvals = np.concatenate([rowvals[0:new_indx], 
-			#			new_el, rowvals[new_indx::]])
-			#		colptrs[compi+1::] += 1
+					new_el = np.array((compi)).reshape(1)
+					rowvals = np.concatenate([rowvals[0:new_indx], 
+						new_el, rowvals[new_indx::]])
+					colptrs[compi+1::] += 1
 					
-			#else: # no rows yet attributed to this column, so need to include
+			else: # no rows yet attributed to this column, so need to include
 
 				# modify indices for sparse Jacobian matrix
-			#	self.jac_cont_infl_indx[extr_cnt] = st_indx
+				self.jac_cont_infl_indx[extr_cnt] = st_indx
 				# adjust other indices
-			#	self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
-			#	self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
-			#	self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
-			#	if (num_asb > 0):
-			#		self.jac_part_indx[self.jac_part_indx >= st_indx] += 1
-			#	self.jac_wall_indx[self.jac_wall_indx >= st_indx] += 1
-			#	
-			#	new_el = np.array((compi)).reshape(1)
-			#	rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
-			#	colptrs[compi+1::] += 1
+				self.jac_indx_g[self.jac_indx_g >= st_indx] += 1
+				self.jac_indx_aq[self.jac_indx_aq >= st_indx] += 1
+				self.jac_indx_su[self.jac_indx_su >= st_indx] += 1
+				if (num_asb > 0):
+					jac_part_indx[jac_part_indx >= st_indx] += 1
+				jac_wall_indx[jac_wall_indx >= st_indx] += 1
 				
-			#extr_cnt += 1 # keep count on continous influx for jacobian index
+				new_el = np.array((compi)).reshape(1)
+				rowvals = np.concatenate([rowvals[0:st_indx], new_el, rowvals[st_indx::]])
+				colptrs[compi+1::] += 1
+				
+			extr_cnt += 1 # keep count on continous influx for jacobian index
 
-		#self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
+		self.jac_cont_infl_indx = self.jac_cont_infl_indx.astype('int') # ensure integer type
 	
 	# end of continuous influx effect on Jacobian part -------------
 	
@@ -793,11 +734,11 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 		# input a filler on this row;
 		# add two to the number of unique components counted here to
 		# account for water and seed material
-		if (max(rowvals) <= (comp_num+self.H2O_in_cs)-1):
+		if (max(rowvals) <= (comp_num+2)-1):
 			# index for final row of Jacobian
-			rowvals = np.append(rowvals, (comp_num+self.H2O_in_cs)-1)
+			rowvals = np.append(rowvals, (comp_num+2)-1)
 			# number of columns currently short of final column
-			col_shrt =  comp_num+self.H2O_in_cs-len(colptrs)
+			col_shrt =  comp_num+2-len(colptrs)
 			# rowval index for final column of Jacobian		
 			colptrs[-1] += 1
 
@@ -805,10 +746,10 @@ def jac_setup(comp_num, num_sb, num_asb, self):
 	self.jac_indx_g = self.jac_indx_g.astype(int)
 	self.jac_indx_aq = self.jac_indx_aq.astype(int)
 	self.jac_indx_su = self.jac_indx_su.astype(int)
-	self.jac_part_indx = self.jac_part_indx.astype(int)
-	self.jac_wall_indx = self.jac_wall_indx.astype(int)	
-	self.jac_extr_indx = self.jac_extr_indx.astype(int)
+	jac_part_indx = jac_part_indx.astype(int)
+	jac_wall_indx = jac_wall_indx.astype(int)	
+	jac_extr_indx = jac_extr_indx.astype(int)
 	rowvals = rowvals.astype(int)	
 	colptrs = colptrs.astype(int)
 	
-	return(rowvals, colptrs, self)
+	return(rowvals, colptrs, jac_part_indx, jac_wall_indx, jac_extr_indx, self)

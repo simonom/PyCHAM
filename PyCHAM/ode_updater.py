@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''updates integration constants and calls ODE solver'''
 # constants for the integration of the relevant ODEs are updated
 # at intervals and passed to the ODE solver to obtain solutions
@@ -44,6 +43,7 @@ except: # in case of a bad function
 	if os.path.exists('ode_solv'): # remove any bad functions
 		os.remove(ode_solv)
 import ode_solv_wat
+import dydt_rec
 import importlib
 import save
 import time
@@ -55,18 +55,20 @@ import ode_brk_err_mess
 
 def ode_updater(y, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
-	siz_str, num_sb, num_comp, 
+	siz_str, num_sb, num_comp, seed_name, seedx, 
 	core_diss, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
-	x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou,
-	N_perbin, Vol0, rad0, np_sum, new_partr, 
-	nuci, coag_on, inflectDp, pwl_xpre, 
+	x, Varr, act_coeff, Cfactor, rowvals, 
+	colptrs, jac_wall_indx, jac_part_indx, jac_extr_indx, Vbou,
+	N_perbin, Vol0, rad0, np_sum, new_partr, nucv1, nucv2, 
+	nucv3, nuci, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, 
 	pwl_xpro, inflectk, chamR, McMurry_flag, p_char, e_field, 
-	injectt, inj_indx, Ct, lowsize, 
+	injectt, inj_indx, Ct, pmode, pconc, pconct, mean_rad, lowsize, 
 	uppsize, std, rbou, MV, 
-	diff_vol, DStar_org, corei, ser_H2O, 
-	rbou00, ub_rad_amp, indx_plot,
-	wat_hist, NOi, 
+	partit_cutoff, diff_vol, DStar_org, corei, ser_H2O, 
+	sav_nam, space_mode, 
+	rbou00, ub_rad_amp, indx_plot, comp0, rel_SMILES,
+	wat_hist, Pybel_objects, pcont, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
 	Compti, tot_in_res_indx, chamSA, 
 	chamV, tempt_cnt, self, vol_Comp, volP):
@@ -82,13 +84,10 @@ def ode_updater(y, H2Oi,
 	# self.nreac_g - number of reactants per equation
 	# self.nprod_g - number of products per equation
 	# self.jac_stoi_g - stoichiometries relevant to Jacobian
-	# self.njac_g - number of elements of Jacobian affected per 
-	# equation
-	# self.jac_den_indx_g - index of denominator components for 
-	# Jacobian
+	# self.njac_g - number of elements of Jacobian affected per equation
+	# self.jac_den_indx_g - index of denominator components for Jacobian
 	# self.jac_indx_g - index of Jacobian affected per equation
-	# self.RO2_indx - index of components in alkyl peroxy radical 
-	# list
+	# self.RO2_indx - index of components in alkyl peroxy radical list
 	# self.RO_indx - index of components in alkoxy radical list
 	# H2Oi - index of water
 	# self.TEMP - temperature in chamber (K)
@@ -100,22 +99,20 @@ def ode_updater(y, H2Oi,
 	# self.lat - latitude of experiment (degrees)
 	# self.lon - longitude of experiment (degrees)
 	# self.af_path - path to actinic flux values
-	# self.dayOfYear - number of days since 31st December 
-	#	experiment held on
+	# self.dayOfYear - number of days since 31st December experiment held on
 	# self.photo_path - path to file with absorption cross-sections
 	# 		and quantum yields
 	# Jlen - number of photochemical reactions
-	# self.con_infl_C - influx of components with continuous 
-	#	influx (# molecules/cm3/s)
+	# self.con_infl_C - influx of components with continuous influx (# molecules/cm3/s)
 	# nrec_step - number of recording steps
-	# self.dydt_vst - dictionary for holding change tendencies of 
-	#	specified components
+	# self.dydt_vst - dictionary for holding change tendencies of specified
+	#		components
 	# siz_str - the size structure
 	# num_sb - number of particle size bins
 	# num_comp - number of components
 	# self.seedi - index of components comprising seed material
-	# self.seed_name - names of components comprising seed particles
-	# self.seedx - mole ratio of components comprising seed material
+	# seed_name - names of components comprising seed particles
+	# seedx - mole ratio of components comprising seed material
 	# core_diss - dissociation constant of seed
 	# self.Psat - pure component saturation vapour pressure 
 	# 	(# molecules/cm3 (air))
@@ -130,16 +127,14 @@ def ode_updater(y, H2Oi,
 	# Varr - particle volume (um3)
 	# therm_sp - thermal speed (m/s)
 	# act_coeff - activity coefficient
-	# self.Cw - effective absorbing mass of wall (# molecules/cm3 
-	#	(air))
+	# self.Cw - effective absorbing mass of wall (# molecules/cm3 (air))
 	# self.kw - gas-wall mass transfer coefficient (/s)
-	# Cfactor - conversion factor for concentrations (ppb/# 
-	#	molecules/cm3)
+	# Cfactor - conversion factor for concentrations (ppb/# molecules/cm3)
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
-	# self.y_arr_g - index for arranging concentrations into matrix 
-	# that allows reaction rate coefficient calculation
+	# self.y_arr_g - index for arranging concentrations into matrix that 
+	# 	allows reaction rate coefficient calculation
 	# self.y_rind_g - index for the concentration array  that 
 	# 	allows reaction rate coefficient calculation
 	# self.uni_y_rind_g - unique index of reactants
@@ -148,8 +143,8 @@ def ode_updater(y, H2Oi,
 	# self.uni_y_pind_g - unique index of products
 	# self.reac_co_gl - column indices for sparse matrix of reaction 
 	#		losses
-	# self.prod_col_g - column indices for sparse matrix of 
-	# production gains
+	# self.prod_col_g - column indices for sparse matrix of production
+	#		gains
 	# self.rstoi_flat_g - 1D array of reactant stoichiometries per 
 	#	equation
 	# self.pstoi_flat_g - 1D array of product stoichiometries per
@@ -162,12 +157,12 @@ def ode_updater(y, H2Oi,
 	# colptrs - indices of  rowvals corresponding to each column of
 	# 	the Jacobian
 	# self.wall_on - marker for whether wall partitioning turned on
-	# self.jac_wall_indx - index of inputs to Jacobian from wall 
+	# jac_wall_indx - index of inputs to Jacobian from wall 
 	# 	partitioning
-	# self.jac_part_indx - index of inputs to Jacobian from particle
+	# jac_part_indx - index of inputs to Jacobian from particle
 	#	partitioning
-	# self.jac_extr_indx - index of inputs to Jacobian from 
-	#	extraction of chamber air
+	# jac_extr_indx - index of inputs to Jacobian from extraction
+	#	of chamber air
 	# Vbou - volume boundary of size bins (um3)
 	# N_perbin - number concentration of particles per size bin 
 	#	(# particles/cm3 (air))
@@ -176,35 +171,31 @@ def ode_updater(y, H2Oi,
 	# np_sum - number concentration of newly nucleated particles 
 	#		(#/cc (air))
 	# new_partr - radius of newly nucleated particles (cm)
-	# self.nucv1, v2, v3 - nucleation parameters
+	# nucv1, v2, v3 - nucleation parameters
 	# nuci - index of nucleating component
-	# self.nuc_comp - the nucleating component
-	# self.nuc_ad - marker for whether to reduce time step to allow 
+	# nuc_comp - the nucleating component
+	# nuc_ad - marker for whether to reduce time step to allow 
 	#	for accurate capture of nucleation
 	# self.RH - relative humidities (fraction 0-1)
-	# self.RHt - times through experiment at which relative 
-	#	humidities reached (s)
+	# self.RHt - times through experiment at which relative humidities reached (s)
 	# coag_on - whether coagulation to be modelled
-	# inflectDp - particle diameter at which wall loss inflection 
-	#	occurs (m)
+	# inflectDp - particle diameter at which wall loss inflection occurs (m)
 	# pwl_xpre - x value preceding inflection point
 	# pwl_xpro - x value proceeding inflection point
 	# inflectk - deposition rate at inflection (/s)
 	# chamR - spherical-equivalent radius of chamber (m2)
-	# McMurry_flag - marker for treament of particle deposition to 
-	#	walls
+	# McMurry_flag - marker for treament of particle deposition to walls
 	# p_char - average number of charges per particle (/particle)
 	# e_field - average electric field inside chamber (g.m/A.s3)
 	# injectt - time of injection of components (s)
-	# inj_indx - index of components being instantaneously injected 
-	# after experiment start
+	# inj_indx - index of components being instantaneously injected after 
+	#	experiment start
 	# Ct - concentration(s) (ppb) of component(s) injected 
 	#	instantaneously after experiment start
-	# self.pmode - whether number size distributions expressed as modes
-	# 	or explicitly
-	# self.pconc - concentration of injected particles (#/cm3 (air))
-	# self.pconct - times of particle injection (s)
-	# self.mean_rad - mean radius for particle number size 
+	# pmode - whether number size distributions expressed as modes or explicitly
+	# pconc - concentration of injected particles (#/cc (air))
+	# pconct - times of particle injection (s)
+	# mean_rad - mean radius for particle number size 
 	#	distribution (um)
 	# lowsize - lower size bin boundary (um)
 	# uppsize - upper size bin boundary (um)
@@ -219,10 +210,8 @@ def ode_updater(y, H2Oi,
 	# self.pstoi_aq - stoichiometry of products for aqueous-phase
 	# self.nreac_aq - number of reactants per aqueous-phase reaction
 	# self.nprod_aq - number of products per aqueous-phase reaction
-	# self.jac_stoi_aq - stoichiometry for Jacobian for 
-	#	aqueous-phase
-	# self.njac_aq - number of Jacobian elements per 
-	#	aqueous-phase reaction 
+	# self.jac_stoi_aq - stoichiometry for Jacobian for aqueous-phase
+	# self.njac_aq - number of Jacobian elements per aqueous-phase reaction 
 	# self.jac_den_indx_aq - index of Jacobian denominators 
 	# self.jac_indx_aq - index of  Jacobian for aqueous-phase
 	# self.y_arr_aq - y indices for aqueous-phase
@@ -239,68 +228,51 @@ def ode_updater(y, H2Oi,
 	# self.rr_arr_aq - aqueous-phase reaction rate indices
 	# self.rr_arr_p_aq - aqueous-phase reaction rate indices
 	# self.eqn_num - number of reactions in gas- and aqueous-phase
-	# self.partit_cutoff - the product of saturation vapour pressure
+	# partit_cutoff - the product of saturation vapour pressure
 	#	and activity coefficient above which gas-particle
-	#	partitioning assumed negligible (Pa)
+	#	partitioning assumed negligible
 	# diff_vol - diffusion volumes of components according to 
 	#		Fuller et al. (1969)
-	# DStar_org - diffusion coefficient of components at initial 
-	#	temperature (cm2/s)
+	# DStar_org - diffusion coefficient of components at initial temperature (cm2/s)
 	# corei - index of core component
-	# ser_H2O - whether to serialise the gas-particle partitioning 
-	#	of water
-	# self.C_p2w - concentration of components on the wall due to 
-	#	particle deposition to wall (# molecules/cm3)
+	# ser_H2O - whether to serialise the gas-particle partitioning of water
+	# self.C_p2w - concentration of components on the wall due to particle
+	# deposition to wall (# molecules/cm3)
 	# the following inputs are used only for the saving module:
 	# self.sch_name - path to chemical scheme
-	# self.sav_nam - name of folder to save in
+	# sav_nam - name of folder to save in
 	# self.comp_namelist - chemical scheme name of components
 	# self.dydt_trak - name of components to track change tendencies
+	# space_mode - type of spacing used in particle size distribution
 	# rbou00 - original particle size bin bounds
 	# ub_rad_amp - amplificatin factor for upper bin size bound
-	# indx_plot - indices of components to plot the gas-phase 
-	#	temporal profile of
-	# self.comp0 - names of components to plot the gas-phase temporal 
-	#	profile of
+	# indx_plot - indices of components to plot the gas-phase temporal profile of
+	# comp0 - names of components to plot the gas-phase temporal profile of
 	# self.inname - path to model variables file
-	# self.rel_SMILES - SMILES strings of components in chemical 
-	#	scheme
-	# self.Psat_Pa_rec - pure component saturation vapour pressures 
-	#	(Pa) at 298.15 K
-	# self.Psat_Pa - pure component saturation vapour pressures (Pa) 
-	#	at starting temperature in chamber
+	# rel_SMILES - SMILES strings of components in chemical scheme
+	# self.Psat_Pa_rec - pure component saturation vapour pressures (Pa) at 298.15 K
+	# self.Psat_Pa - pure component saturation vapour pressures (Pa) at starting temperature in chamber
 	# self.OC - oxygen to carbon ratio of components
-	# wat_hist - flag for history of particle-phase with respect to 
-	#	water partitioning,
-	# 	where 0 is dry (therefore on the deliquescence curve) 
-	#	and 1 is wet 
+	# wat_hist - flag for history of particle-phase with respect to water partitioning,
+	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
 	#	(therefore on the efflorescence curve)
-	# self.Pybel_objects - the pybel objects for components
-	# self.pcont - flag for whether particle injection continuous or 
-	#	instantaneous
+	# Pybel_objects - the pybel objects for components
+	# pcont - flag for whether particle injection continuous or instantaneous
 	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
 	# NOi - NO index
 	# HO2i - HO2 index
 	# NO3i - NO3 index
-	# z_prt_coeff - fraction of total gas-particle partitioning 
-	#	coefficient 
-	#	below which partitioning to a particle size bin is 
-	#	treated as zero,
+	# z_prt_coeff - fraction of total gas-particle partitioning coefficient 
+	#	below which partitioning to a particle size bin is treated as zero,
 	#	e.g. because surface area of that size bin is tiny 
 	# self.con_C_indx - index of components with constant 
 	# 	gas-phase concentration
-	# self.seed_eq_wat - whether seed particles to be equilibrated 
-	#	with water prior to ODE solver
-	# self.Vwat_inc - whether suppled seed particle volume contains 
-	#	equilibrated water
-	# tot_in_res - record of total input of injected components 
-	#	(ug/m3)
-	# Compti - index for total injection record for instantaneously 
-	#	injected components
-	# self.cont_inf_reci - index of components with continuous 
-	#	influx in record
-	# self.con_infl_indx - index of components with continuous 
-	#	influx in concentration array
+	# self.seed_eq_wat - whether seed particles to be equilibrated with water prior to ODE solver
+	# self.Vwat_inc - whether suppled seed particle volume contains equilibrated water
+	# tot_in_res - record of total input of injected components (ug/m3)
+	# Compti - index for total injection record for instantaneously injected components
+	# self.cont_inf_reci - index of components with continuous influx in record
+	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
 	# chamSA - chamber surface area (m2)
 	# chamV - chamber volume (m3)
@@ -309,8 +281,7 @@ def ode_updater(y, H2Oi,
 	# ------------------------------------------------------------
 	
 	# start timer
-	if (self.spin_up == 0): # if no spin-up
-		self.st_time = time.time()
+	st_time = time.time()
 	
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)
@@ -318,22 +289,18 @@ def ode_updater(y, H2Oi,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
-	if (self.pconct[0, 0] == 0. and len(self.pconct[0, :]) > 1 and 
-	self.pcont[0, 0] == 0):
-		# count on injection times of particles
-		seedt_cnt = 1
-		self.seedx_tcnt = 1 
+	if (pconct[0, 0] == 0. and len(pconct[0, :]) > 1 and pcont[0, 0] == 0): 
+		seedt_cnt = 1 # count on injection times of particles
 	else:
 		seedt_cnt = 0
-		self.seedx_tcnt = 0
 	
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
-	
-	# current status of whether injection of particles instantaneous 
-	# or continuous, if not stated assume instantaneous
+
+	# current status of whether injection of particles instantaneous or continuous,
+	# if not stated assume instantaneous
 	pcontf = 0
-	if (self.pconct[0, 0] == 0 and self.pcont[0, 0] == 1):
+	if (pconct[0, 0] == 0 and pcont[0, 0] == 1):
 		pcontf = 1
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	infx_cnt0 = 0 # remember count at start of integration step
@@ -342,44 +309,32 @@ def ode_updater(y, H2Oi,
 	RHt_cnt0 = 0 # remember count at start of integration step
 	conPin_cnt = 0 # count on continuous influx of seed particles
 	conPin_cnt0 = 0 # remember count at start of integration step
-	# count on recording results, note starting on two because 
-	# results at t=0 already stored
+	# count on recording results, note starting on two because results at t=0 already stored
 	save_cnt = 2
-	# keep count on recording change tendencies, start on 1 because first row
-	# of dydt is reaction numbers
-	dydt_cnt = 1
-		
+	
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
 	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
-	y0[:] = y[:]
-	# remember initial particle number concentrations (# particles/cm3)
-	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))
-	N_perbin0[:, :] = N_perbin[:, :]
+	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1])) # remember initial particle number concentrations (# particles/cm3)
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
-	x0[:] = x[:]
 	t0 = self.update_stp # remember initial integration step (s)
 	# flag for changing integration time step due to changing initial values	
 	ic_red = 0
 	tnew = self.update_stp # the time to integrate over (s)
 	# fraction of newly injected seed particles
 	pconcn_frac = 0.
-	# numpy array version of chemical scheme names
-	self.comp_namelist_np = np.array(self.comp_namelist)
+	self.comp_namelist_np = np.array(self.comp_namelist) # numpy array version of chemical scheme names
 	# turn off flag for ongoing injection of particles
 	self.pcont_ongoing = 0
-
-	# find out what to do with the gas-wall partitioning 
-	# coefficient,
-	# note that self.kw and self.Cw are spread over wall bins in 
-	# rows and components 
+	
+	# find out what to do with the gas-wall partitioning coefficient,
+	# note that self.kw and self.Cw are spread over wall bins in rows and components 
 	# in columns (the latter spread is done in partit_var_prep.py)
 	if (self.wall_on > 0):
 		if (sum(sum(self.kw == -1)) > 0 ):
 			self.kwf = -1 # Huang et al. 2018 treatment
 		else:
-			# standard PyCHAM (GMD paper) treatment with 
-			# same gas-wall 
+			# standard PyCHAM (GMD paper) treatment with same gas-wall 
 			# partitioning coefficient for all components
 			self.kwf = 0
 	else:
@@ -397,34 +352,29 @@ def ode_updater(y, H2Oi,
 	x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
 	Jlen, Cfactor, 
-	Vbou, tnew, 
+	Vbou, tnew, nuc_ad, nucv1, nucv2, nucv3, 
 	np_sum, update_count, injectt, gasinj_cnt, 
-	inj_indx, Ct, seedt_cnt, corei, 
-	lowsize, uppsize, x, std, rbou, 
-	infx_cnt, MV, diff_vol, DStar_org, 
-	tempt_cnt, RHt_cnt, nuci, 
-	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	inj_indx, Ct, pmode, pconc, pconct, seedt_cnt, mean_rad, corei, 
+	seed_name, seedx, lowsize, uppsize, rad0, x, std, rbou, 
+	infx_cnt, MV, partit_cutoff, diff_vol, DStar_org, 
+	tempt_cnt, RHt_cnt, Pybel_objects, nuci, 
+	nuc_comp, t0, pcont, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
 	
 	import ode_solv
-	import dydt_rec
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
-	
+
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
 		
-		# remembering variables at the start of the 
-		# integration step -----------------------------------
-		# remember initial concentrations (# molecules/cm3 (air))
-		y0[:] = y[:]
-		# remember initial particle number concentration (# particles/cm3)
-		N_perbin0[:] = N_perbin[:]
+		# remembering variables at the start of the integration step ------------------------------------------
+		y0[:] = y[:] # remember initial concentrations (# molecules/cm3 (air))
+		N_perbin0[:] = N_perbin[:] # remember initial particle number concentration (# particles/cm3)
 		x0[:] = x[:] # remember initial particle sizes (um)
 		temp_now0 = temp_now # remember temperature (K)
-		# remember water history flag at start of integration step
-		wat_hist0 = wat_hist
+		wat_hist0 = wat_hist # remember water history flag at start of integration step
 		RH0 = RHn # relative humidity at start of integration step
 		Pnow0 = Pnow # pressure (Pa)
 
@@ -437,48 +387,71 @@ def ode_updater(y, H2Oi,
 		light_time_cnt0 = light_time_cnt
 		conPin_cnt0 = conPin_cnt
 		
-		# ------------------------------------------------------------
+		# --------------------------------------------------------------------------------------------------------------------
 		
-		# flag for stability in gas-particle partitioning for solver while loop
-		gpp_stab = 0
-		# flag for stability in gas-particle partitioning for time interval reset
-		stab_red = 0
+		
+		gpp_stab = 0 # flag for stability in gas-particle partitioning for solver while loop
+		stab_red = 0 # flag for stability in gas-particle partitioning for time interval reset
 		lin_int = 0 # flag to linearly interpolate changes to chamber
 		t00 = tnew # remember the initial integration step for this integration step (s)
 		save_cntf = 0 # flag for updating count on number of recordings
 		
 		while (gpp_stab != 1): # whilst ode solver flagged as unstable
 
-			# if integration interval decreased, reset 
-			# concentrations to those at start of interval
+			# if integration interval decreased, reset concentrations to those at start of interval
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
+			
+			# for change tendencies, t=0 recording done inside rec_prep
+			# record any change tendencies of specified components after t=0
+			if (len(self.dydt_vst) > 0 and save_cntf == 0):
+				if ((sumt-(self.save_step*(save_cnt-1)) > -1.e-10)):
+					
+					if (sumt-(self.save_step*(save_cnt-1)) > -1.e-10):
+						dydt_cnt = save_cnt-1
+
+					# before solving ODEs for chemistry, gas-particle partitioning and gas-wall partitioning, 
+					# estimate and record any change tendencies (# molecules/cm3/s) resulting from these processes
+					if (self.testf != 5):
+						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, num_comp, core_diss, 								kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, pconc, self)
 						
 			# record output if on the first attempt at solving this time interval, 
 			# note that recording here in this way means we include any
 			# instantaneous changes at this time step without interpolation to
 			# smaller instantaneous changes (when interpolation forced due to 
 			# instability)
-			# note also that recording before calling cham_up means that 
-			# any instantaneous 
-			# changes occurring during this upcoming time step are not 
-			# recorded at the very start 
+			# note also that recording before calling cham_up means that any instantaneous 
+			# changes occurring during this upcoming time step are not recorded at the very start 
 			# of the time step
-			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > 
-				-1.e-10) and self.testf != 5):
+			if (save_cntf == 0 and (sumt-(self.save_step*(save_cnt-1)) > -1.e-10) and self.testf != 5):
 				
 				[trec, yrec, Cfactor_vst, save_cntf, Nres_dry, Nres_wet, 
-				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, 
-				yrec, Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, 
-				core_diss, kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
+				x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, trec, yrec, 
+				Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, core_diss, 
+				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
 				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
-
-			# aligning time interval with pre-requisites --		
-			# ensure end of time interval does not surpass 
-			# recording time
+			
+			# update chamber variables
+			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
+			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
+			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
+			pconcn_frac,  pcontf, tot_in_res, 
+			self] = cham_up.cham_up(sumt, 
+			Pnow0, light_time_cnt0, 
+			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
+			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
+			infx_cnt0, Cfactor, diff_vol, 
+			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
+			
+			# aligning time interval with pre-requisites -------------------------
+			# ensure end of time interval does not surpass recording time
 			if ((sumt+tnew) > self.save_step*(save_cnt-1)):
 				tnew = (self.save_step*(save_cnt-1))-sumt
 				# temporarily set the update step for operator-split processes
@@ -487,51 +460,27 @@ def ode_updater(y, H2Oi,
 				self.update_stp = tnew
 				update_count = 0.
 				ic_red = 1
-				
+
 			# ensure update to operator-split processes interval not surpassed
 			if (update_count+tnew > self.update_stp):
 				tnew = (self.update_stp-update_count)
 				ic_red = 1
-				
+			
 			# ensure simulation end time not surpassed
 			if (sumt+tnew > self.tot_time):
 				tnew = (self.tot_time-sumt)
 				ic_red = 1
-
-			# update chamber variables, note this has to come after
-			# updates to tnew, so that things with influx can
-			# have the correct time integration applied
-			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
-			update_count, Cinfl_now, seedt_cnt, Cfactor, 
-			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
-			RHt_cnt, N_perbin, x,
-			pconcn_frac,  pcontf, tot_in_res, 
-			self] = cham_up.cham_up(sumt, 
-			Pnow0, light_time_cnt0, 
-			tnew, np_sum, update_count, 
-			injectt, gasinj_cnt0, inj_indx, Ct,
-			seedt_cnt0, num_comp, y0, y, N_perbin0, 
-			corei, 
-			lowsize, uppsize, num_sb, MV, x0, std, 
-			H2Oi, rbou, 
-			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
-			y_mw, temp_now0, gpp_stab, t00, x0,
- 			pcontf, Cinfl_now, surfT,
-			act_coeff, tot_in_res, Compti, self, vol_Comp, 
-			volP, ic_red)
-
-			# ------------------------------------------------------------
-			# if particles and/or wall present		
-			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
+			
+			# ------------------------------------------------------------------		
+			
+			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0): # if particles and/or wall present
 				
 				# update partitioning variables
-				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, 
-				num_comp, 
-				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
-				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1,
+				[kimt, kelv_fac] = partit_var.kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, 
+				y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
+				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1, partit_cutoff, 
 				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
-				
+			
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
 				# the cham_up module prior to this call
@@ -541,123 +490,53 @@ def ode_updater(y, H2Oi,
 				
 			else: # fillers
 			
-				kimt = np.zeros((num_sb+self.wall_on, 
-					num_comp))
-				kelv_fac = np.zeros((
-					num_sb-self.wall_on, 1))
+				kimt = np.zeros((num_sb+self.wall_on, num_comp))
+				kelv_fac = np.zeros((num_sb-self.wall_on, 1))
 				dydt_erh_flag = 0
 			
-			# reaction rate coefficient going into this 
-			# time step
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(
-				y[H2Oi], temp_now, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
-				sumt, self)
+			# reaction rate coefficient going into this time step
+			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
+				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
 			
-			# if error message from reaction rate 
-			# calculation
-			if (erf == 1): 
+			if (erf == 1): # if error message from reaction rate calculation
 				yield(err_mess)
-
-
-			# for change tendencies, t=0 recording done
-			# inside rec_prep
-			# record any change tendencies of specified 
-			# components after t=0, note this is done after
-			# the call to get reaction rate coefficients
-			# so that the change tendency given at a 
-			# particular time represents the tendency from
-			# that time onwards
-			if (len(self.dydt_vst) > 0):
-				if ((sumt-(self.save_step*(dydt_cnt-1))
-					 > -1.e-10)):
-					
-					# before solving ODEs for 
-					# chemistry, dilution, 
-					# gas-particle partitioning and
-					# gas-wall partitioning, 
-					# estimate and record any 
-					# change tendencies (# 
-					# molecules/cm3/s) resulting 
-					# from 
-					# these processes
-					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
-							num_sb, 
-							num_comp, core_diss, kelv_fac, kimt, 
-							act_coeff, dydt_erh_flag, H2Oi, 
-							wat_hist, self)
-
-					# keep count on recording change tendencies
-					dydt_cnt += 1
 			
-			# update Jacobian inputs based on 
-			# particle-phase fractions of components
-			[rowvalsn, colptrsn, jac_mod_len, 
-			jac_part_hmf_indx, rw_indx, 
-				jac_part_H2O_indx] = jac_up.jac_up(
-				y[num_comp:num_comp*
-				((num_sb-self.wall_on+1))], rowvals, 
-				colptrs, (num_sb-self.wall_on), num_comp, 
-				H2Oi, y[H2Oi], ser_H2O, self)
+			# update Jacobian inputs based on particle-phase fractions of components
+			[rowvalsn, colptrsn, jac_part_indxn, jac_mod_len, jac_part_hmf_indx, rw_indx, jac_wall_indxn, 
+			jac_part_H2O_indx] = jac_up.jac_up(y[num_comp:num_comp*((num_sb-self.wall_on+1))], rowvals, 
+			colptrs, (num_sb-self.wall_on), num_comp, jac_part_indx, H2Oi, y[H2Oi], jac_wall_indx, ser_H2O)
 			
-			
-			# if water gas-particle partitioning serialised
-			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
-				 and (sum(N_perbin) > 0)): 
-				
-				# if on the deliquescence curve rather 										# than the 
-				# efflorescence curve in terms of water 									# gas-particle partitioning
+			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0 and (sum(N_perbin) > 0)): # if water gas-particle partitioning serialised
+
+				# if on the deliquescence curve rather than the 
+				# efflorescence curve in terms of water gas-particle partitioning
 				if (wat_hist == 1):
-					# flag that water gas-particle 
-					# partitioning solved separately
-					self.odsw_flag = 1
-		
+					
 					# call on ode solver for water
-					[y, res_t] = ode_solv_wat.ode_solv(y, 
-					tnew,
-					Cinfl_now, rowvalsn, colptrsn, 
-					num_comp, 
-					num_sb, act_coeff, core_diss, 
-					kelv_fac, kimt, 
-					(num_sb-self.wall_on), 
-					jac_mod_len, jac_part_hmf_indx,
- 					rw_indx, N_perbin, 
-					jac_part_H2O_indx, H2Oi, self)
-					
-
-					
-					
-					# check on stability of water 
-					# partitioning	
-					if (any(y[H2Oi::num_comp] < 0.)): 
-
-						# identify components with negative 
-						# concentrations
+					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
+					Cinfl_now, rowvalsn, colptrsn, num_comp, 
+					num_sb, act_coeff, jac_wall_indxn,
+					core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
+					jac_part_indxn, jac_mod_len, 
+					jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, H2Oi, self)
+				
+					if (any(y[H2Oi::num_comp] < 0.)): # check on stability of water partitioning
+						
+						# identify components with negative concentrations
 						neg_comp_indx = y < 0.
-						# transform into components in columns, 
-						# locations in rows
-						neg_comp_indx = neg_comp_indx.reshape(
-						num_sb+1, num_comp)
-						# get component indices with negative 
-						# concentration
-						neg_comp_indx = np.unique((
-						np.where(neg_comp_indx == 1))[1])
-						# get chemical scheme names of components 
-						# with negative concentration
+						# transform into components in columns, locations in rows
+						neg_comp_indx = neg_comp_indx.reshape(num_sb+1, num_comp)
+						# get component indices with negative concentration
+						neg_comp_indx = np.unique((np.where(neg_comp_indx == 1))[1])
+						# get chemical scheme names of components with negative concentration
 						neg_names = self.comp_namelist_np[neg_comp_indx]
 
-						# isolate just water concentrations 
-						# (molecules/cm3)
-						y_H2O = y[H2Oi::num_comp]
-						# sum the negative concentrations and 
-						# convert to absolute value (molecules/cm3)
+						y_H2O = y[H2Oi::num_comp] # isolate just water concentrations (molecules/cm3)
+						# sum the negative concentrations and convert to absolute value (molecules/cm3)
 						neg_H2O = np.abs(sum(y_H2O[y_H2O<0.]))
 						
-						# allow a given fraction of water 
-						# concentrations to be negative
-						if (neg_H2O/sum(
-						np.abs(y[H2Oi::num_comp])) > 0. ):
+						# allow a given fraction of water concentrations to be negative
+						if (neg_H2O/sum(np.abs(y[H2Oi::num_comp])) > 0. ):
 				
 							gpp_stab = -1 # maintain unstable flag
 							# tell user what's happening
@@ -669,67 +548,39 @@ def ode_updater(y, H2Oi,
 									N_perbin, core_diss, kelv_fac, kimt, 0, H2Oi, y, self)
 
 								yield (str('Error: negative concentrations generated following call to ode_solv_wat module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
-							# half the update and 
-							# integration time step (s) 
-							# if necessary
+							# half the update and integration time step (s) if necessary
 							tnew = tnew/2.
-							# remember that time step temporarily
-							# reduced due to instability
-							stab_red = 1
+							stab_red = 1 # remember that time step temporarily reduced due to instability
 							continue
 
 						else: # if acceptable
 							gpp_stab = 1 # change to stable flag
-					# if solution stable, change stability flag to 
-					# represent this	
-					else:
+						
+					else: # if solution stable, change stability flag to represent this
 						gpp_stab = 1 # change to stable flag
-				else:
-					# water gas-particle partitioning not solved separately
-					self.odsw_flag = 0
-				# zero partitioning of water to particles 
-				# for integration without 
+					
+				# zero partitioning of water to particles for integration without 
 				# water gas-particle partitioning
-				# if particles present
-				if (num_sb > self.wall_on):
-					kimt[0:num_sb-self.wall_on, 
-						H2Oi] = 0.
+				if (num_sb > self.wall_on): # if particles present
+					kimt[0:num_sb-self.wall_on, H2Oi] = 0.
 			
-			else:
-				# water gas-particle partitioning not 
-				# solved separately
-				self.odsw_flag = 0
-
-			
-
-			# model component concentration changes to 
-			# get new concentrations molecules/cm3 (air))
-			try:
-				[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
+			# model component concentration changes to get new concentrations
+			# (# molecules/cm3 (air))
+			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
-				num_sb, act_coeff,
-				core_diss, kelv_fac, kimt, 
-				(num_sb-self.wall_on),
-				jac_mod_len, jac_part_hmf_indx, rw_indx, 
-				N_perbin, 
-				jac_part_H2O_indx, H2Oi, self)
-			except:
-				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
-			# if any components set to have constant 
-			# gas-phase concentration
-			# get index of time for constant components
-			if any(self.const_compt):
-				const_comp_tindx = sum(self.const_compt<=sumt)-1
-				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
-				conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
-				y[conCindxn] = y0[conCindxn] # (# molecules/cm3)
+				num_sb, act_coeff, jac_wall_indxn,
+				core_diss, kelv_fac, kimt, (num_sb-self.wall_on), 
+				jac_part_indxn, jac_extr_indx,
+				jac_mod_len, jac_part_hmf_indx, rw_indx, N_perbin, jac_part_H2O_indx, 
+				H2Oi, self)
+		
+			# if any components set to have constant gas-phase 
+			# concentration
+			if (any(self.con_C_indx)): # then keep constant
+				y[self.con_C_indx] = y0[self.con_C_indx] # (# molecules/cm3)
 			
-			# if negative, suggests ODE solver instability, 
-			# but could also be numerical 
-			# limits, especially if concentrations are
-			# relatively 
-			# close to zero, so allow 
-			# some leeway
+			# if negative, suggests ODE solver instability, but could also be numerical limits, 
+			# especially if concentrations are relatively close to zero, so allow some leeway
 			if (any(y/np.sum(np.abs(y))<-1.e-30)):
 			
 				# identify components with negative concentrations
@@ -738,8 +589,7 @@ def ode_updater(y, H2Oi,
 				neg_comp_indx = neg_comp_indx.reshape(num_sb+1, num_comp)
 				# get component indices with negative concentration
 				neg_comp_indx = np.unique((np.where(neg_comp_indx == 1))[1])
-				# get chemical scheme names of components with 
-				# negative concentration
+				# get chemical scheme names of components with negative concentration
 				neg_names = self.comp_namelist_np[neg_comp_indx]				
 
 				# loop through components with negative concentrations
@@ -754,14 +604,10 @@ def ode_updater(y, H2Oi,
 				# tell user what's happening
 				yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
 				
-				# if time step has decreased to unreasonably 
-				# low and solver still unstable then break
-				if (tnew < 1.e-20):
-					# estimate gas-phase reaction fluxes 
-					# for all reactions and partitioning 
-					# fluxes for troublesome components
+				if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
+					# estimate gas-phase reaction fluxes for all reactions and partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, 
-						num_comp, (num_sb-self.wall_on), act_coeff, 
+						num_comp, (num_sb-self.wall_on), Cw, act_coeff, kw, 
 						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
 						kimt, 1, H2Oi, y, self)
 
@@ -769,191 +615,95 @@ def ode_updater(y, H2Oi,
 						
 				# half the update and integration time step (s) if necessary	
 				tnew = tnew/2.
-				# remember that time step temporarily 
-				# reduced due to instability
-				stab_red = 1 
+				stab_red = 1 # remember that time step temporarily reduced due to instability
 				
 			else: # if solution stable, change stability flag to represent this
 				
-				# account for any partial addition of 
-				# newly injected seed particles
-				self.pconc[:, seedt_cnt] -= self.pconc[:, seedt_cnt]*pconcn_frac
+				# account for any partial addition of newly injected seed particles
+				pconc[:, seedt_cnt] -= pconc[:, seedt_cnt]*pconcn_frac
 				# reset fraction of newly injected seed particles
 				pconcn_frac = 0.
 				gpp_stab = 1 # change to stable flag
 		
 		
-		# end of integration stability condition section ------
+		# end of integration stability condition section ----------------------------
 		step_no += 1 # track number of steps
 		sumt += tnew # total time through simulation (s)
 		self.sumt += tnew
-
-		# if any gas-phase components constrained 
-		# to observations
-		if (any(self.obs_comp_i)):
+		
+		
+		if (any(self.obs_comp_i)): # if any components constrained to observations
 				# get observed concentrations now
-				# loop through components
-				for ci in range(len(self.obs_comp_i)):
-					y[self.obs_comp_i[ci]] = np.interp(
-					sumt, self.obs[:, 0], self.obs[:, ci+1])
-				
-		# dilute particle number following an integration 
-		# time step, e.g. for flow-reactor -----
-		# note that concentrations of components inside 
-		# particles (and in the gas-phase) will have been
+				for ci in range(len(self.obs_comp_i)): # loop through components
+					y[self.obs_comp_i[ci]] = np.interp(sumt, self.obs[:, 0], self.obs[:, ci+1])
+			
+		# dilute chamber particle number following an integration time step, e.g. for flow-reactor -----
+		# note that concentrations of components inside particles (and in the gas-phase) will have been
 		# reduced due to dilution inside the ODE solver
-		# note self.pp_dil set in def_mod_var and obs_file_open
-		if (self.dil_fac_now > 0 and self.pp_dil == 1):
+		if (self.dil_fac_now > 0):
 			N_perbin -= N_perbin*(self.dil_fac_now*tnew)
 		
-		# if particle size bins present, rebin
-		if ((num_sb-self.wall_on) > 0):
-
+		if ((num_sb-self.wall_on) > 0): # if particle size bins present
 			# update particle sizes
-			# if multiple particle size bins present 
-			# containing particles
-			if (((num_sb-self.wall_on) > 1) and 
-			(any(N_perbin > 1.e-10))):
-
+			if ((num_sb-self.wall_on) > 1) and (any(N_perbin > 1.e-10)): # if multiple particle size bins present containing particles
+				
 				if (siz_str == 0): # moving centre
-					(N_perbin, Varr, y, x, redt, t, 
-					bc_red) = mov_cen.mov_cen_main(N_perbin, 
+					(N_perbin, Varr, y, x, redt, t, bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					y0, MV, ic_red, y, res_t, self)
 					
 				if (siz_str == 1): # full-moving
-					(Varr, x, y[num_comp:(num_comp*(
-					num_sb-self.wall_on+1))], 
-					N_perbin, Vbou, rbou) = fullmov.fullmov((
-					num_sb-self.wall_on), N_perbin,
- 					num_comp, y[num_comp:(num_comp)*(
-					num_sb-self.wall_on+1)], MV*1.e12, 
+					(Varr, x, y[num_comp:(num_comp*(num_sb-self.wall_on+1))], 
+					N_perbin, Vbou, rbou) = fullmov.fullmov((num_sb-self.wall_on), N_perbin,
+ 					num_comp, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
 			
-			# time since operator-split processes 
-			# last called (s)
-			update_count += tnew
+			update_count += tnew # time since operator-split processes last called (s)
 			
-			# if time met to implement operator-split 
-			# processes
-			if (update_count >= (
-			self.update_stp*9.999999e-1)):
-
+			
+			# if time met to implement operator-split processes
+			if (update_count >= (self.update_stp*9.999999e-1)):
 				if (any(N_perbin > 1.e-10)):
 				
-					# particle-phase 
-					# concentration(s) 
-					# (# molecules/cm3)
-					Cp = np.transpose(y[num_comp:(num_comp)*(
-					num_sb-self.wall_on+1)].reshape(
-					num_sb-self.wall_on, num_comp))
+					# particle-phase concentration(s) (# molecules/cm3 (air))
+					Cp = np.transpose(y[num_comp:(num_comp)*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp))
 					
 					# coagulation
-					[N_perbin, y[num_comp:(num_comp)*(
-					num_sb-self.wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt],
-						 temp_now, x*1.e-6, 
+					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
+						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt], temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
 						num_comp, 0, Vol0, rad0, Pnow, 0,
-						Cp, (N_perbin).reshape(1, -1),
-						(Varr*1.e-18).reshape(1, -1),
+						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
-
-					# if particle loss to walls turned on, 
-					# account for this now
+					
+					# if particle loss to walls turned on, account for this now
 					if ((McMurry_flag > -1) and (self.wall_on > 0)):
-						[N_perbin, y[num_comp:(num_comp)*(
-						num_sb-self.wall_on+1)]] = wallloss.wallloss(
+						[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)]] = wallloss.wallloss(
 							N_perbin.reshape(-1, 1), 
-							y[num_comp:(num_comp)*(
-							num_sb-self.wall_on+1)], Gi, eta_ai,
+							y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], Gi, eta_ai,
  							x*2.e-6, y_mw, 
-							Varr*1.e-18, (num_sb-self.wall_on),
-							num_comp, temp_now, update_count, 
-							inflectDp, pwl_xpre, pwl_xpro, inflectk,
-							chamR, McMurry_flag, 
-							0, p_char, e_field, 
-							(num_sb-self.wall_on), self)
-
-					# if equilibrium gas-particle partitioning turned on
-					if (self.equi_gtop_partit == 1):
-
-						# note that Cstar is set in cham_up
-
-						# concentrations in gas and particle phase 
-						# (molecules/cm3) of components
-						Cpg = (y[0:(num_comp)*(
-						num_sb-self.wall_on+1)].reshape(
-						(num_sb-self.wall_on+1), num_comp))
-
-						# total molecular concentration of each
-						# component (gas+particle) (molecules/cm3),
-						# note that sum is over size bins
-						tmc_comp =  np.sum(Cpg, axis=0).reshape(1, -1)
-						# get total molecular concentration of each 
-						# component in ug/m3
-						tmc_comp_mc = ((tmc_comp/NA)*
-							y_mw.reshape(1, -1)*1.e12)
-
-						# starting estimate of condensable fraction of 
-						# each component
-						fi_est = np.zeros((num_comp))
-						
-						# set condensable fractions of non-volatile
-						# components to 1
-						fi_est[np.squeeze(self.Psat_Pa)==0.] = 1.
-						
-						# second estimate of condensable fraction of 
-						# each component at equilibrium (0-1)
-						se_est = np.squeeze((1+self.Cstar/
-							np.sum(fi_est*tmc_comp_mc, axis=1))**-1)
-				
-						while (np.abs(sum(fi_est)-sum(se_est))/
-							sum(se_est) > 1.e-5):
-				
-							# new first estimate (0-1)
-							fi_est[:] = se_est[:]
-
-							# new second estimate (0-1)
-							se_est = np.squeeze((1+self.Cstar/
-								np.sum(fi_est*tmc_comp_mc, axis=1))**-1)
-
-						# equilibrium concentrations in gas-phase
-						# (molecules/cm3) 	
-						Cpg[0, :] = (1.-se_est)*tmc_comp
-						# equilibrium concentrations in particle-phase
-						# (molecules/cm3), note this assumes just one
-						# particle size bin, so future work needs
-						# to distribute over size bins 	
-						Cpg[1, :] = (se_est)*tmc_comp
-						# allocate to y array
-						y[0:((num_comp)*(
-						num_sb-self.wall_on+1))] = Cpg.flatten()
+							Varr*1.e-18, (num_sb-self.wall_on), num_comp, temp_now, update_count, 
+							inflectDp, pwl_xpre, pwl_xpro, inflectk, chamR, McMurry_flag, 
+							0, p_char, e_field, (num_sb-self.wall_on), self)
 			
 
-				if (self.nucv1 > 0.): # nucleation
+				if (nucv1 > 0.): # nucleation
 					
-					[N_perbin, y, x, Varr, np_sum, 
-					rbou, Vbou] = nuc.nuc(sumt,
-					np_sum, N_perbin, y, 
-					y_mw.reshape(-1, 1),  
-					num_comp, Varr, x, new_partr, 
-					MV, siz_str, rbou, Vbou, 
-					(num_sb-self.wall_on), self)
+					[N_perbin, y, x, Varr, np_sum, rbou, Vbou] = nuc.nuc(sumt, np_sum, 
+						N_perbin, y, y_mw.reshape(-1, 1),  
+						num_comp, Varr, x, new_partr, MV, nucv1, nucv2, 
+						nucv3, nuc_comp[0], siz_str, rbou, Vbou, (num_sb-self.wall_on), self)
 				
-				# reset count that tracks when next 
-				# operator-split should be 
-				# called (s)
+				# reset count that tracks when next operator-split should be called (s)
 				update_count = 0.
 		
-		# update the percentage time through simulation 
-		# in the GUI progress bar
+		# update the percentage time in the GUI progress bar
 		yield (sumt/self.tot_time*100.)
 		
-
+		
 		# if ozone isopleth being made, then store ozone result
 		if (self.testf == 5):
 			
@@ -1001,74 +751,36 @@ def ode_updater(y, H2Oi,
 				
 				
 			else: # if O3 close enough to equilibrium
-				# remember new ozone concentration 
-				# for next set of [NOx] and 
-				# [VOC] values
+				# remember new ozone concentration for next set of [NOx] and [VOC] values
 				self.O3equil = y[self.O3i]
 				
 				return() # end this call to simulation
 
-		# record output at experiment end
-		if (sumt >= (self.tot_time-self.tot_time/1.e10) and self.testf != 5):
+		if (sumt >= (self.tot_time-self.tot_time/1.e10) and self.testf != 5): # record output at experiment end
 
-			# update chamber variables, note this 
-			# ensures that any changes made
-			# coincidentally with the experiment end 
-			# are captured
+			# update chamber variables, note this ensures that any changes made
+			# coincidentally with the experiment end are captured
 			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 			gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
 			Pnow0, light_time_cnt0, 
-			tnew, np_sum, 
-			update_count, 
-			injectt, gasinj_cnt0, inj_indx, Ct,
-			seedt_cnt0, num_comp, y0, y, N_perbin0, 
-			corei, 
-			lowsize, uppsize, num_sb, MV, x0, std, 
-			H2Oi, rbou, 
+			tnew, nuc_ad, nucv1, nucv2, nucv3, np_sum, update_count, 
+			injectt, gasinj_cnt0, inj_indx, Ct, pmode, pconc, pconct, 
+			seedt_cnt0, num_comp, y0, y, N_perbin0, mean_rad, corei, seedx, seed_name, 
+			lowsize, uppsize, num_sb, MV, rad0, x0, std, H2Oi, rbou, 
 			infx_cnt0, Cfactor, diff_vol, 
-			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
-			y_mw, temp_now0, gpp_stab, t00, x0,  
-			pcontf, Cinfl_now, surfT,
-			act_coeff, tot_in_res, Compti, self, vol_Comp, 
-			volP, ic_red)
+			DStar_org, tempt_cnt0, RHt_cnt0, Pybel_objects, nuci, nuc_comp,
+			y_mw, temp_now0, gpp_stab, t00, x0, pcont,  pcontf, Cinfl_now, surfT,
+			act_coeff, tot_in_res, Compti, self, vol_Comp, volP)
 			
-			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, 
-			Nres_wet,
+			[trec, yrec, Cfactor_vst, save_cnt, Nres_dry, Nres_wet,
 			x2, rbou_rec, cham_env] = rec.rec(save_cnt-1, 
-			trec, yrec, Cfactor_vst, y, sumt, num_sb, 
-			num_comp, N_perbin, core_diss, 
+			trec, yrec, Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, core_diss, 
 			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
-			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, 
-			rbou_rec, cham_env, temp_now, Pnow, 
-			tot_in_res, self)
-
-			# record final change tendency
-			# for change tendencies, t=0 recording done
-			# inside rec_prep
-			# record any change tendencies of specified 
-			# components after t=0
-			
-			if (len(self.dydt_vst) > 0):
-				dydt_cnt = len(trec)-1
-				
-				# before solving ODEs for 
-				# chemistry, dilution, 
-				# gas-particle partitioning and
-				# gas-wall partitioning, 
-				# estimate and record any 
-				# change tendencies (# 
-				# molecules/cm3/s) resulting 
-				# from 
-				# these processes
-				if (self.testf != 5):
-					self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
-						num_sb, 
-						num_comp, core_diss, kelv_fac, kimt, 
-						act_coeff, dydt_erh_flag, H2Oi, 
-						wat_hist, self)
+			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
+			cham_env, temp_now, Pnow, tot_in_res, self)
 		
 		# if time step was temporarily reduced, then reset
 		if (ic_red == 1 or stab_red == 1):
@@ -1077,14 +789,14 @@ def ode_updater(y, H2Oi,
 			ic_red = 0 # reset flag
 			stab_red = 0 # reset flag
 		
-		# remember the gas-phase water concentration from 
-		# previous integration step (# molecules/cm3)
+		# remember the gas-phase water concentration from previous 
+		# integration step (# molecules/cm3)
 		y_H2O0 = y[H2Oi]
-			
-	time_taken = time.time()-self.st_time
+		
+	time_taken = time.time()-st_time
 	
-	# re-merge continuous influx of water with that of other 
-	# components, this will allow further commands from the GUI
+	# re-merge continuous influx of water with that of other components, 
+	# this will allow further commands from the GUI
 	if (self.H2Oin == 1):
 
 		# index
@@ -1093,9 +805,9 @@ def ode_updater(y, H2Oi,
 		self.con_infl_C = np.concatenate((self.con_infl_C, self.con_infl_H2O), axis=0)
 	
 	# save results
-	save.saving(yrec, Nres_dry, Nres_wet, trec, 
+	save.saving(yrec, Nres_dry, Nres_wet, trec, sav_nam, 
 		num_comp, Cfactor_vst, 0, num_sb, y_mw, MV, time_taken, 
-		x2, rbou_rec, rbou00, ub_rad_amp, 
-		indx_plot, H2Oi, siz_str, cham_env, self)
+		seed_name, x2, rbou_rec, space_mode, rbou00, ub_rad_amp, indx_plot, 
+		comp0, rel_SMILES, H2Oi, siz_str, cham_env, self)
 	
 	return() # end of function

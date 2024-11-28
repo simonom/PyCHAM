@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''estimating consumption of a component over simulation'''
 # a module to calculate the consumed mass concentration of a 
@@ -25,6 +25,7 @@
 # by means other than through injection
 
 import scipy.constants as si # scientific constants
+import retr_out # retrieving information
 import numpy as np # for arithmetic
 
 def cons(self, caller):
@@ -115,6 +116,7 @@ def cons(self, caller):
 		# integrate chemical losses over time intervals within the period of interest (ug/m3) for total consumed
 		cons[:] += crl[indxt][0:-1][:, 0]*(np.diff(timehr[indxt])*3.6e3)
 		
+		
 		# in case we just want change in concentration
 		#cons = yrec[:, comp_names.index(self.comp_names_to_plot[compi].strip())]
 		#cons = (((cons[0, :]-cons[-1, :])*Cfac[0])/si.N_A)*y_MW[comp_names.index(self.comp_names_to_plot[compi].strip())]*1.e12
@@ -160,14 +162,6 @@ def cons(self, caller):
 		# sum for total (ug/m3)
 		SOAst = np.sum(SOA)
 
-		# get model variables file name
-		try:
-			inname = inname[::-1][0:inname[::-1].index('/')][::-1]
-		except:
-			inname = inname[::-1][0:inname[::-1].index('\\')][::-1]
-		
-		inname = str(self.dir_path + '/inputs/' + inname)	
-		
 		inputs = open(inname, mode= 'r' ) # open model variables file
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
@@ -196,10 +190,8 @@ def cons(self, caller):
 			dil_facst = dil_fac[sum(dil_fact<=min(timehr[indxt]))]
 			dil_fac = np.mean(dil_fac[dil_facst:dil_facfi+1])
 		except:
-			try:
-				dil_fac = dil_fac			
-			except:
-				dil_fac = 0.
+			dil_fac = dil_fac			
+
 
 
 		# integrate loss of SOA due to dilution over time interval

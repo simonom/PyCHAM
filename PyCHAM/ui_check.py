@@ -1,29 +1,26 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
-'''checking that user inputs are valid and providing appropriate 
-	modification to the PyCHAM GUI'''
-# once model variables are validated, this module also allows options 
-# in the GUI for continuing with simulations
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
+'''checking that user inputs are valid and providing appropriate modification to the PyCHAM GUI'''
+# once model variables are validated, this module also allows options in the GUI for continuing with simulations
 
 import os
 import sys
@@ -36,157 +33,90 @@ from PyQt5.QtCore import *
 import write_hyst_eq
 import hyst_eq
 import importlib
-import math
 
 def ui_check(self):
 	
-	# inputs: ------------------------------------------------------
+	# inputs: ----------------------------------------------------------------------
 	# self - reference to GUI
-	# --------------------------------------------------------------
+	# --------------------------------------------------------------------------------
 	
 	# path to store for variables
-	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
+	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[y0, Press,
-		siz_stru, num_sb, lowsize, 
-		uppsize, std, 
-		Compt, injectt, Ct,
-		seed_mw, seed_diss, seed_dens,
+		[sav_nam, comp0, y0, Press,
+		siz_stru, num_sb, pmode, pconc, pconct, lowsize, uppsize, space_mode, std, mean_rad, 
+		Compt, injectt, Ct, seed_name,
+		seed_mw, seed_diss, seed_dens, seedx,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
-		accom_comp, accom_val, uman_up, int_tol, new_partr, 
-		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, 		
-		ser_H2O, wat_hist, drh_str, erh_str, z_prt_coeff, 		
+		accom_comp, accom_val, uman_up, int_tol, new_partr, nucv1, 
+		nucv2, nucv3, nuc_comp, nuc_ad, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+		inflectk, chamSA, Rader, p_char, e_field, partit_cutoff, ser_H2O, 
+		wat_hist, drh_str, erh_str, pcont, z_prt_coeff, 
 		chamV] = pickle.load(pk)
 		pk.close()	
 
-	# loaded variables: --------------------------------------------
-	# self.sav_nam - name of folder to save results to
+	# loaded variables: ------------------------------------------------------------
+	# sav_nam - name of folder to save results to
 	# self.sch_name - name of chemical scheme file
 	# self.wall_on - marker for whether wall on or off
 	# siz_stru - the size structure
 	# num_sb - number of particle size bins
-	# self.pmode - whether particle number concentrations expressed 
-	#	by mode or explicitly
-	# self.pconc - number concentration of particles
-	# self.pconct - times of particle injection (s)
+	# pmode - whether particle number concentrations expressed by mode or explicitly
+	# pconc - number concentration of particles
+	# pconct - times of particle injection (s)
 	# lowsize - lower bound of particle sizes (um)
 	# uppsize - upper bound of particle sizes (um)
 	# std - standard deviation for particle sizes
-	# self.mean_rad - mean radius of particle size distributions (um)
+	# mean_rad - mean radius of particle size distributions (um)
 	# new_partr - radius of newly nucleated particles (cm)
 	# chamSA - chamber surface area (m2)
 	# self.chem_sch_mark - markers in chemical scheme
 	# self.af_path - actinic flux path
 	# int_tol - integration tolerances
-	# self.update_stp - time step for updating ODE initial 
-	# conditions (s)
+	# self.update_stp - time step for updating ODE initial conditions (s)
 	# self.tot_time - total experiment time (s)
 	# self.RH - relative humidity (0-1)
 	# uman_up - marker for whether to update UManSysProp folder
 	# self.light_stat - marker for whether lights on or off
 	# self.light_time - time that lights attain status
-	# injectt - times of instantaneous injections of gas-phase 
-	# components (s)
-	# Ct - concentrations of components instantaneously injected 
-	# (ppb)
+	# injectt - times of instantaneous injections of gas-phase components (s)
+	# Ct - concentrations of components instantaneously injected (ppb)
 	# dens_comp - chemical scheme names of components with density 
 	# manually assigned
 	# dens - manually assigned densities (g/cc)
-	# self.seed_name - name of component(s) comprising seed particles
-	# self.seedx - mole fraction of dry seed components
-	# seed_diss - dissociation constant for seed particle 
-	# 	component(s)
-	# self.partit_cutoff - product of vapour pressure and activity 
-	# 	coefficient above which gas-particle partitioning 
-	# 	assumed zero
-	# wat_hist - flag for particle-phase history with respect to 
-	# 	water (0 on the deliquescence curve, 1 on the 
-	#	efflorescence curve)
+	# seed_name - name of component(s) comprising seed particles
+	# seedx - mole fraction of dry seed components
+	# seed_diss - dissociation constant for seed particle component(s)
+	# partit_cutoff - product of vapour pressure and activity coefficient
+	# 	above which gas-particle partitioning assumed zero
+	# wat_hist - flag for particle-phase history with respect to water 
+	#	(0 on the deliquescence curve, 1 on the efflorescence curve)
 	# self.con_infl_t - times of continuous influx of components
-	# self.con_infl_nam - chemical scheme names of components with 
-	#	continuous influx
-	# self.con_infl_C - influx rate of components with continuous 
-	#	influx (ppb/s)
-	# self.Vwat_inc - flag for whether (1) or not (0) the number 
-	#	size distribution of seed particles includes the volume
-	# 	of water
-	# seed_eq_wat - whether (1) or not (0) to allow water to 
-	#	equilibrate with seeds before experiment starts
-	# z_prt_coeff - fraction of total gas-particle partitioning 
-	#	coefficient below which partitioning treated as 
-	# 	negligible, e.g. because a size bin has relatively 
-	#	very small surface area
+	# self.con_infl_nam - chemical scheme names of components with continuous influx
+	# self.con_infl_C - influx rate of components with continuous influx (ppb/s)
+	# self.Vwat_inc - flag for whether (1) or not (0) the number size 
+	# distribution of seed particles includes the volume of water
+	# seed_eq_wat - whether (1) or not (0) to allow water to equilibrate with
+	# seeds before experiment starts
+	# z_prt_coeff - fraction of total gas-particle partitioning coefficient
+	#	below which partitioning treated as negligible, e.g. because a 
+	#	size bin has relatively very small surface area
 	# self.testf - flag for testing and plotting checks of inputs
-	# -------------------------------------------------------------
+	# --------------------------------------------------------------------
+	
 	# to begin assume no errors, so message is that simulation ready
 	err_mess = 'Model variables fine - simulation ready'
 	em_flag = 0 # flag that no problematic errors detected
 	
+	# saving path (copied from saving module) ------------
 	dir_path = os.getcwd() # current working directory
 	output_root = 'PyCHAM/output'
 	filename = os.path.basename(self.sch_name)
 	filename = os.path.splitext(filename)[0]
-	# if path and folder name already stated for saving to
-	if (('/' in self.sav_nam) or ('\\' in self.sav_nam)): 
-		# one folder for one simulation
-		output_by_sim = os.path.join(self.sav_nam)
-	else: # if no path given for saving to
-		# one folder for one simulation
-		output_by_sim = os.path.join(dir_path, output_root, filename, self.sav_nam)
+	# one folder for one simulation
+	output_by_sim = os.path.join(dir_path, output_root, filename, sav_nam)
+	# -------------------------------------------------------------------
 	
-	# ensure that if user wants simulation preparation mode, spin-up
-	# is turned on
-	if (self.sim_ci_file != []):
-		from obs_file_open import obs_file_open
-		self.spin_up = 1 
-		# also ensure that components to track change tendencies
-		# of are established
-		obs_file_open(self)  
-	
-	# --------------------------------------------------------------
-	# check on chemical scheme markers. In older PyCHAM versions 
-	# only 12 markers were needed, but at least as of v4.4.0, 13 
-	# are needed. But if only 12 are provided then assume the final
-	#  marker (relating to start of reaction lines for surfaces) is 
-	# empty
-	if (len(self.chem_sch_mrk) == 12):
-		self.chem_sch_mrk.append('')
-	else:
-		if (len(self.chem_sch_mrk) != 13):
-			err_mess = str('Error - the number chemical of \
-				scheme markers (' + str(len(\
-				self.chem_sch_mrk)) + ') is not 13,\
-				and it must be; please check the \
-				guidelines in README')
-
-	# --------------------------------------------------------------
-	# check on nucleation parameters
-	# below taken from nuc
-	# Gompertz function (for asymmetric sigmoid curve): 
-	# https://en.wikipedia.org/wiki/Gompertz_function
-	if (self.nucv3 > 0):
-		nsum1 = self.nucv1*np.exp(self.nucv2*(np.exp(
-			-self.update_stp/self.nucv3)))
-		if (math.isinf(nsum1)):
-			err_mess = str('Error - the provided '
-				'nucleation '
-				'parameters generate an invalid '
-				'function, please modify, using the '
-				'nucleation function checker in the '
-				'\'Check Values\' button of the '
-				'\'Simulate\' tab, and the '
-				'corresponding drop-down selection')
-	# --------------------------------------------------------------
-	# check on skipping parsing
-	if (self.pars_skip == 1):
-		
-		try:
-			rowvals = self.rowvals
-		except:
-			self.pars_skip = 0
-		
-
 	# check on gas-wall partitioning inputs ---------------------------------
 	# check that number of effective absorbing masses for walls matches number of walls
 	if len(self.Cw)!=self.wall_on and self.wall_on > 0:
@@ -198,7 +128,6 @@ def ui_check(self):
 		err_mess = str('Error - the number of mass transfer coefficients for gas-wall partitioning (' + str(self.kw.shape[0]) + ') does not match the number of walls (' + str(self.wall_on) + '), and it must; please check the guidelines in README (message generated by ui_check.py module)')
 		em_flag = 2
 	
-
 	# check on seed molecular weight ------------------------------------------
 	# incorrect seed molecular weight
 	if seed_mw[0] == 'fail':
@@ -206,20 +135,17 @@ def ui_check(self):
 			err_mess = str('Error - the molecular weight of seed particle component (seed_mw in model variables input file) could not be interpreted, please check it adheres to the guidelines in README')
 		em_flag = 2
 	
-	# in case proposed results folder already saved
-	if (os.path.isdir(output_by_sim) == True and em_flag < 2):
-		err_mess = str('Error - results folder (' + output_by_sim + ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+	if (os.path.isdir(output_by_sim) == True and em_flag < 2): # in case proposed results folder already proposed
+		err_mess = str('Error - results folder (' +output_by_sim+ ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
-	# in case proposed results folder already proposed by another
-	# simulation in batch
-	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num > 1):
+	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num == 1): # in case proposed results folder already on computer hard drive
 		err_mess = str('Error - the proposed path for the results folder (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
 	# default name used for folder to save to
-	if (self.sav_nam == 'default_res_name' and em_flag < 2):
+	if (sav_nam == 'default_res_name' and em_flag < 2):
 		err_mess_n = str('Results will not be saved since the default name for folder to save to is chosen as the \'res_file_name\' variable in the model variables input\n')
 		if (em_flag == 0):
 			err_mess = err_mess_n
@@ -234,87 +160,66 @@ def ui_check(self):
 		err_mess = str('Error - the size structure must be either 0 for moving-centre or 1 for full-moving, see the notes on the size_structure model variable in README')
 		em_flag = 2
 	
-	# consistency between number of times given for 
-	# particle number concentration and number of
-	# times given for seed component mole fraction
-	if (self.seedx.shape[2] > 1):
-		if (self.seedx.shape[2] != self.pconc.shape[1]):
-			err_mess = str('''Error - the number of times given for seed component mole fractions ''' + str(self.seedx.shape[2]) + ''' does not match the number of times given for particle concentrations ''' + str(self.pconc.shape[1]) + ''', and they must be consistent. Please see seedx and pconc model variables in the README''')
-			em_flag = 2 # error message flag for error
-
-	if (self.seedx.shape[2] == 1 and self.pconc.shape[1] > 1):
-		# if just one time given for self.seedx, then
-		# tile over pconc times
-		self.seedx = np.tile(self.seedx, (1, 1, self.pconc.shape[1]))
-
 	# consistency between number of particle size bins and particle number concentration
-	if (num_sb == 0 and (sum(sum(self.pconc != 0)) > 0) and em_flag < 2):
+	if (num_sb == 0 and (sum(sum(pconc != 0)) > 0) and em_flag < 2):
 		err_mess = str('Error - zero particle size bins registered (number_size_bins in model variables input file), however total particle number concentration (pconc in model variables input file) contains a non-zero value, therefore please reconcile')
 		em_flag = 2 # error message flag for error
 	
 	# consistency between length of total particle concentration, 
 	# mean particle radius and standard deviation
 	if (num_sb > 0 and em_flag < 2):
-		if (self.pmode == 0): # particle number concentrations expressed as modes
-			if (self.mean_rad.shape != self.pconc.shape and em_flag < 2):
+		if (pmode == 0): # particle number concentrations expressed as modes
+			if (mean_rad.shape != pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the mean radius per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and mean_rad model variables in README.')
 				em_flag = 2 # error message flag for error
-			if (std.shape != self.pconc.shape and em_flag < 2):
+			if (std.shape != pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
 				em_flag = 2 # error message flag for error
 		
-	# ensure that the mean radius of modes (mean_rad) is consistent 
-	# with the particle size range
+	# ensure that the mean radius of modes (mean_rad) is consistent with the particle size range
 	if (num_sb > 0 and em_flag < 2):
 		
-		if (self.pmode == 0): # particle number concentrations expressed as modes
-			if (sum(sum(self.mean_rad < lowsize)) > 0 and sum(sum(self.mean_rad == -1.e6)) == 0):
+		if (pmode == 0): # particle number concentrations expressed as modes
+			if (sum(sum(mean_rad < lowsize)) > 0 and sum(sum(mean_rad == -1.e6)) == 0):
 				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is smaller than the particle size range (determined by the lower_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
 				em_flag = 2 # error message flag for error
-			if (sum(sum(self.mean_rad > uppsize)) > 0):
+			if (sum(sum(mean_rad > uppsize)) > 0):
 				err_mess = str('Error - A value for the mean radius (um) (determined by the mean_rad model variable) of particles is greater than the particle size range (determined by the upper_part_size model variable).  The mean radius must be within bounds set by the lower_part_size and upper_part_size model variables.  Please see README for more guidance.')
 				em_flag = 2 # error message flag for error
 				
 		# if particle concentration per size bin supplied explicitly
 		# check that number of time consistent across relevant variables
-		if (self.pmode == 1):
-
-			if (self.pconc.shape[1] != self.pconct.shape[1] or self.pconc.shape[1] != self.pcont.shape[1] or self.pconct.shape[1] != self.pcont.shape[1]):
-
-				if (self.pcont.shape[1] == 1 and self.pconc.shape[1] > 1):
-					self.pcont = np.ones((1, 
-					self.pconc.shape[1]))*self.pcont[0, 0]
-
-				else:
-					err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(self.pconc.shape[1])+'), pconct ('+str(self.pconct.shape[1])+') and/or pcont ('+str(self.pcont.shape[1])+').  Please see README for guidance.')
-					em_flag = 2 # error message flag for error
+		if (pmode == 1):
+			if (pconc.shape[1] != pconct.shape[1] or pconc.shape[1] != pcont.shape[1] or pconct.shape[1] != pcont.shape[1]):
+				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+') and/or pcont ('+str(pcont.shape[1])+').  Please see README for guidance.')
+				em_flag = 2 # error message flag for error
 			
 			# in this mode ensure fillers for mean_rad and std match the same
 			# length of first dimension (which represents times)
-			if (self.mean_rad.shape == (1, 1)):
-				if (self.mean_rad[0,0] == -1.e-6):
-					self.mean_rad = np.ones((1, self.pconct.shape[1]))*-1.e6
+			if (mean_rad.shape == (1, 1)):
+				if (mean_rad[0,0] == -1.e-6):
+					mean_rad = np.ones((1, pconct.shape[1]))*-1.e6
 			else: # if insufficient mean_rad values provided then error
-				if self.mean_rad.shape[1] != self.pconc.shape[1]:
-					err_mess = str('Error: the mean radius (mean_rad) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(self.pconc.shape[1])+'), mean_rad ('+str(self.mean_rad.shape[1])+').  Please see README for guidance.')
+				if mean_rad.shape[1] != pconc.shape[1]:
+					err_mess = str('Error: the mean radius (mean_rad) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+').  Please see README for guidance.')
 					em_flag = 2 # error message flag for error
 			if (std.shape == (1, 1)):
 				if (std[0,0] == 1.2):
-					std = np.ones((1, self.pconct.shape[1]))*1.2
+					std = np.ones((1, pconct.shape[1]))*1.2
 			else: # if insufficient std values provided then error
-				if std.shape[1] != self.pconc.shape[1]:
-					err_mess = str('Error: the standard deviation (std) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(self.pconc.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
+				if std.shape[1] != pconc.shape[1]:
+					err_mess = str('Error: the standard deviation (std) input does not cover the same number of times as the particle number concentration (pconc) input (number of times given in brackets): pconc ('+str(pconc.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
 					em_flag = 2 # error message flag for error
 				
 		# if particle concentration per size bin supplied by modes
 		# check that number of time consistent across relevant variables
-		if (self.pmode == 0):
-			if (self.pconct.shape[1] != std.shape[1] or self.pconct.shape[1] != self.mean_rad.shape[1] or self.pconct.shape[1] != self.pcont.shape[1] or self.pconct.shape[1] != self.pconc.shape[1]):
-				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(self.pconc.shape[1])+'), pconct ('+str(self.pconct.shape[1])+'), pcont ('+str(self.pcont.shape[1])+'), mean_rad ('+str(self.mean_rad.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
+		if (pmode == 0):
+			if (pconct.shape[1] != std.shape[1] or pconct.shape[1] != mean_rad.shape[1] or pconct.shape[1] != pcont.shape[1] or pconct.shape[1] != pconc.shape[1]):
+				err_mess = str('Error: inconsistent number of times for injection of particles as represented by the following model variable inputs (number of times represented in brackets) for: pconc ('+str(pconc.shape[1])+'), pconct ('+str(pconct.shape[1])+'), pcont ('+str(pcont.shape[1])+'), mean_rad ('+str(mean_rad.shape[1])+'), std ('+str(std.shape[1])+').  Please see README for guidance.')
 				em_flag = 2 # error message flag for error
 
 	# ensure only one particle concentration given at start of experiment
-	if (sum(sum(self.pconct == 0.)) > 1):
+	if (sum(sum(pconct == 0.)) > 1):
 		if (em_flag < 2):
 			err_mess = str('Error: only one initial (pconct = 0.0 s) number size distribution is allowed, but for the input pconct variable, time = 0.0 s has been detected more than once.  If you wish to have injection of particles after experiment start but close to time = 0 s please use a pconct value that is greater than 0.0 s but small compared to the recording time step.')
 			em_flag = 2 # error message flag for error
@@ -323,16 +228,6 @@ def ui_check(self):
 	if (em_flag < 2 and sum(sum(std <= 1.0)) > 0):
 		err_mess = str('Error: a standard deviation for particle number size distribution modes (std model variable) less than or equal to 1.0 has been detected, but values must exceed 1.0.  See sdt in the model variables section of README for more details.')
 		em_flag = 2 # error message flag for error
-
-	# if manual setting of size bin bounds, then ensure that mean radius per
-	# size bin is also supplied
-	if self.space_mode == 'man' and (sum(sum(self.mean_rad == -1.e6)) > 0):
-		if (em_flag < 2):
-			err_mess = str('Error: when setting the spacing of ' +
-			'particle size bins manually, the mean_rad variable ' +
-			'must also be defined by the user in the model ' +
-			'variables file, see README for more details.')
-			em_flag = 2 # error message flag for error
 
 	# check on temperature inputs ----------------------------------------------
 	
@@ -389,18 +284,14 @@ def ui_check(self):
 	
 	# check on UManSysProp ---------------------------------------------------
 
-	# note that whilst conditionally setting uman_up below is 
-	# required for this section to work, it does not
-	# change the input to the model, rather this is done, if 
-	# needed (and it's needed when umansysprop 
-	# needs downloading even when the user hasn't specified this), 
-	# by mod_var_read
+	# note that whilst conditionally setting uman_up below is required for this section to work, it does not
+	# change the input to the model, rather this is done, if needed (and it's needed when umansysprop 
+	# needs downloading even when the user hasn't specified this), by mod_var_read
 
 	# for UManSysProp if no update requested, check that there 
 	# is an existing UManSysProp folder
 	if (uman_up == 0): # check for existing umansysprop folder
-		# if no existing folder then force update
-		if not os.path.isdir(self.PyCHAM_path + '/umansysprop'):
+		if not os.path.isdir(os.getcwd() + '/umansysprop'): # if no existing folder then force update
 			uman_up = 1
 	
 	if (uman_up == 1): # test whether UManSysProp can be updated
@@ -417,7 +308,7 @@ def ui_check(self):
 			err_mess = str('Error - either user has requested cloning of UManSysProp via the model variables input file or no existing UManSysProp folder has been found, but connection to the page failed, possibly due to no internet connection (UManSysProp repository site: https://github.com/loftytopping/UManSysProp_public.git)')
 			em_flag = 2
 	# ----------------------------------------------------------------------------
-	
+
 	if (len(self.light_stat) != len(self.light_time) and em_flag < 2):
 		err_mess = str('Error - length of input model variables light_status and light_time have different lengths and they should be the same, please see README for guidance.')
 		em_flag = 2
@@ -438,63 +329,38 @@ def ui_check(self):
 		err_mess = str('Error: the number of chemical scheme names provided in the dens_Comp model variables input does not match the number of densities provided in the dens model variables input, please see README for details')
 		em_flag = 2
 	
-	# check on consistency of names of seed components, number 
-	# of size bins and the mole fraction of dry seed components, 
-	# note components in rows and size bins in columns
-	if (len(self.seed_name) != self.seedx.shape[0] and em_flag < 2):
+	# check on consistency of names of seed components, number of size bins and the mole fraction of dry seed components, note components in rows and size bins in columns
+	if (len(seed_name) != seedx.shape[0] and em_flag < 2):
 		
-		# if self.seedx is equal to the default 
-		# value, then assume equal mole fractions 
-		# of dry seed components
-		if ((len(self.seed_name) > 1) and (self.seedx.shape[0] == 1) 
-			and (self.seedx[0, 0] == 1)):
-			self.seedx = np.ones((len(self.seed_name), 1))
-			self.seedx[:, 0] = 1./len(self.seed_name)
+		# if seedx is equal to the default value, then assume equal mole fractions of dry seed components
+		if ((len(seed_name) > 1) and (seedx.shape[0] == 1) and (seedx[0, 0] == 1)):
+			seedx = np.ones((len(seed_name), 1))
+			seedx[:, 0] = 1./len(seed_name)
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) is inconsistent with the number of mole fractions of dry (excluding water) seed particle components (seedx in model variables input file), please see README for guidance')
 			em_flag = 2
 	
-	# check on consistency of dry seed component 
-	# mole fractions and number of size bins
+	# check on consistency of dry seed component mole fractions and number of size bins
 	# note that mole fraction size bins vary with columns
-	if (self.seedx.shape[1] > 1): # if size bins stated explicitly
-		if (self.seedx.shape[1] != num_sb): # if inconsistent
+	if (seedx.shape[1] > 1): # if size bins stated explicitly
+		if (seedx.shape[1] != num_sb): # if inconsistent
 			err_mess = str('Error - the number of size bins for which the dry (excluding water) seed particle component mole fractions (given by seedx in the model variables input file) is inconsistent with the number of size bins (number_size_bins in model variables input file), please see README for guidance.')
 			em_flag = 2
 
-	# if seedx not given per size bin 
-	# then tile over size bins, i.e. assume same
-	# mole fraction applies to all size bins
-	
-	else:
-		# ensure seedx has three dimensions before tiling
-		if (self.seedx.ndim < 3):
-			self.seedx = self.seedx.reshape(self.seedx.shape[0], 
-				self.seedx.shape[1], 1)
-		self.seedx = np.tile(self.seedx, (1, num_sb, 1))
-
-	# check consistency between names of initial components and
-	# their concentrations ------------------
-	if (len(self.comp0) != len(y0) and em_flag < 2):
-		err_mess = str('''Error - the number of gas-phase 
-		components present at simulation start (''' + 
-		str(len(self.comp0)) + ''') (the Comp0 model variable) is 
-		different to the number of initial concentrations of 
-		these components (''' + str(len(y0)) + ''') (the C0 
-		model variable), and they must be the same length.
-		Please see README for guidance''')
+	# check consistency between names of initial components and their concentrations ------------------
+	if (len(comp0) != len(y0) and em_flag < 2):
+		err_mess = str('Error - the number of gas-phase components present at simulation start (the Comp0 model variable) is different to the number of initial concentrations of these components (the C0 model variable), and they must be the same length.  Please see README for guidance')
 		em_flag = 2	
 
-	# check on consistency of names of seed component(s) and 
-	# their dissociation constant --------------
-	if (len(self.seed_name) != len(seed_diss) and em_flag < 2):
-		if (len(self.seed_name) > 1) and (len(seed_diss) == 1):
-			seed_diss = np.ones((len(self.seed_name)))
+	# check on consistency of names of seed component(s) and their dissociation constant --------------
+	if (len(seed_name) != len(seed_diss) and em_flag < 2):
+		if (len(seed_name) > 1) and (len(seed_diss) == 1):
+			seed_diss = np.ones((len(seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
 			em_flag = 2
 
-	if (len(self.partit_cutoff) > 1 and em_flag < 2):
+	if (len(partit_cutoff) > 1 and em_flag < 2):
 		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
 		em_flag = 2
 	
@@ -516,54 +382,33 @@ def ui_check(self):
 
 	# ----------------------------------------------------------
 	# check on presence of actinic flux file for photolysis - note this has to 
-	# be before chemical scheme check to stop that check crashing when 
-	# actinic flux file has a problem
+	# be before chemical scheme check to stop that check crashing when actinic flux file has a problem
 	if hasattr(self, 'af_path') and self.af_path != [] and self.af_path != 'no' and self.af_path != 'nat_act_flux': # if file provided
 		try: # try opening as in lamp_photo module
 			f = open(self.af_path, 'r') # open file
 			f.close() # close file
 		except:
-			# if they just gave the name of the file 
-			# try prefixing with the path to the photofiles folder
-			try:
-				# open file
-				f = open(str(os.getcwd()+'/PyCHAM/photofiles/' + 
-				self.af_path), 'r') 
+			try: # if they just gave the name of the file try prefixing with the path to the photofiles folder
+				f = open(str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path), 'r') # open file
 				# update variable
 				self.af_path = str(os.getcwd()+'/PyCHAM/photofiles/' + self.af_path)
 				f.close() # close file
-
 			except:
-
-				# if not in the photofiles folder, try looking inside
-				# the folder containing model variables file
-				try:
-					pd_indx = self.inname[::-1].index('/')
-					pd = self.inname[0:-pd_indx]
-					self.af_path = str(pd + self.af_path)
-					f = open(self.af_path , 'r') 
-				except:
-					
-					err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
-					em_flag = 2
+				err_mess = str('Error: actinic flux file ' + self.af_path + ' could not be found, please check file and/or the act_flux_path model variable in the model variable file.')
+				em_flag = 2
 	
 	
 
 	
 	# chemical scheme check-------------------------------------
-	# if a chemical scheme has been identified
-	if (em_flag < 2 and self.sch_name != 'Not found'):
+	if (em_flag < 2 and self.sch_name != 'Not found'): # if a chemical scheme has been identified
 	
-		# get chemical scheme names and SMILE strings 
-		# of components present in chemical scheme file
-		[comp_namelist, _, err_mess_new, 
-		H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
+		# get chemical scheme names and SMILE strings of components present in chemical scheme file
+		[comp_namelist, _, err_mess_new, H2Oi] = chem_sch_SMILES.chem_scheme_SMILES_extr(self)
 		
 		if (err_mess_new == '' and em_flag < 2):
 			
-			# check for water presence in components 
-			# instantaneously injected, note need to 
-			# call function above to get H2Oi
+			# check for water presence in components instantaneously injected, note need to call function above to get H2Oi
 			if (comp_namelist[H2Oi] in Compt):
 				err_mess = str('Error - water is included in the components being instantaneously injected via the model variables Ct, Compt and injectt, however changes to water vapour content should be made using the rh and rht model variables.  Please see README for further guidance.')
 				em_flag = 2
@@ -607,7 +452,7 @@ def ui_check(self):
 	if (em_flag < 2):
 		# write the module for hysteresis
 		importlib.reload(write_hyst_eq)
-		write_hyst_eq.write_hyst_eq(drh_str, erh_str, self)
+		write_hyst_eq.write_hyst_eq(drh_str, erh_str)
 		# test the module for hysteresis works
 		importlib.reload(hyst_eq)
 		try:
@@ -624,96 +469,46 @@ def ui_check(self):
 	# ------------------------------------
 	# check on manually assigned vapour pressure of seed component
 
-	if (self.seed_name.count('core') < len(self.seed_name)):
-		for seedi in self.seed_name: # loop through seed components
+	if (seed_name.count('core') < len(seed_name)):
+		for seedi in seed_name: # loop through seed components
 			# check whether this seed component is not core 
 			# and it has not been allocated a vapour pressure manually
 			if (seedi != 'core' and vol_comp.count(seedi) == 0 and em_flag < 2):
-				# note that the commands commented out below were 
-				# stopped because it prevented users from 
-				# having seed components that could have their
-				# vaopur pressure estimated in prop_calc and in
-				# volat_calc
-				## add component to manually assigned vapour pressures
-				#vol_comp.append(seedi)
-				## assume low volatility for this seed component (Pa)
-				#volP.append(1.e-20)
-				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver. If you wish to specify the vapour pressure of the seed components, use the vol_Comp and volP model variables.  Please see README for more guidance.')
+				# add component to manually assigned vapour pressures
+				vol_comp.append(seedi)
+				# assume low volatility for this seed component (Pa)
+				volP.append(1.e-20)
+				err_mess = str('Note - a seed component was identified without a manually specified vapour pressure.  This risks evaporation of seed particles and instability for the ODE solver, therefore a vapour pressure of 1.e-20 Pa has been assumed.  To change this setting, specify the vapour pressure of the seed components using the vol_Comp and volP model variables.  Please see README for more guidance.')
 				em_flag = 1
 		
 	# ------------------------------------
-	# check on presence of observation file for setting abundances
-	# of specific components
-	if hasattr(self, 'obs_file') and self.obs_file != []:
+	# check on presence of observation file for tracking specific components
+	if hasattr(self, 'obs_file') and self.obs_file != []: # if observation file provided for constraint
 		try: # try opening as in eqn_pars module
 			import openpyxl # require module
-			# path to file
-			self.obs_file = str(self.obs_file)								# open file	
-			wb = openpyxl.load_workbook(filename = 
-				self.obs_file) 
+			self.obs_file = str(os.getcwd() + self.obs_file) # path to file
+			wb = openpyxl.load_workbook(filename = self.obs_file) # open file
 			wb.close() # close excel file
 		except:
-			try:
-				# see if present inside same folder as 
-				# model variables
-				# strip path to model variables file 
-				# back to home directory
-				try:
-					path_start = (-1*
-					self.inname[::-1].index('/'))
-				except:
-					path_start = (-1*
-					self.inname[::-1].index('\\'))
-				# path to file
-				self.obs_file = str(self.inname[0:						path_start] + self.obs_file)
-				import openpyxl # require module
-				# open file
-				wb = openpyxl.load_workbook(filename = 
-					self.obs_file) 
-				wb.close() # close excel file
-			except:
-
-				err_mess = str('Error - observation ' +
-				'file ' +
-				self.obs_file + ' could not be ' +
-				'found, please check observation file ' +
-				'and/or the obs_file model variable in ' +
-				'the model variable file.')
-				em_flag = 2
-	# ------------------------------------
-
-	# check on gas-particle partitioning inputs --------------
-	# check that number of accommodation coefficient 
-	# values matches number of components
-	if len(accom_comp) != len(accom_val):
-		# allow this scenario where no components are specified 
-		# but accommodation values are, since all components can 
-		# be assigned the accommodation coefficient
-		if len(accom_val) == 1 and len(accom_comp) == 0:
-			accom_val = accom_val
-		else:
-			err_mess = str('Error - the number of accommodation coefficient values (' + str(len(accom_val)) + ')(accom_val user input) does not match the number of components that accommodation coefficient values must be assigned to (' + str(len(accom_comp)) + ')(accom_comp user input), and these values must align. Please see README for more guidance.')
+			err_mess = str('Error- observation file ' + self.obs_file + ' could not be found, please check observation file and/or the obs_file model variable in the model variable file.')
 			em_flag = 2
-	# --------------------------------------------------------
+	# ------------------------------------
 	
 	# store in pickle file
-	list_vars = [y0, Press, 
-			siz_stru, num_sb, lowsize, 
-			uppsize, std, 
-			Compt, injectt, Ct, seed_mw, 
-			seed_diss, seed_dens, 
-			dens_comp, dens, vol_comp, 
-			volP, act_comp, act_user, accom_comp, 
-			accom_val, uman_up, 	
-			int_tol, new_partr,
-			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, 
-			Rader, p_char, e_field, ser_H2O, 
-			wat_hist, drh_str, erh_str, 
+	list_vars = [sav_nam, comp0, y0, Press, 
+			siz_stru, num_sb, pmode, pconc, pconct, lowsize, 
+			uppsize, space_mode, std, mean_rad, 
+			Compt, injectt, Ct, seed_name, seed_mw, seed_diss, seed_dens, 
+			seedx, dens_comp, dens, vol_comp, 
+			volP, act_comp, act_user, accom_comp, accom_val, uman_up, 	
+			int_tol, new_partr, nucv1, nucv2, nucv3, nuc_comp, nuc_ad, 
+			coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, 
+			Rader, p_char, e_field, partit_cutoff, ser_H2O, 
+			wat_hist, drh_str, erh_str, pcont, 
 			z_prt_coeff, chamV]
 
-	# the file to be used for pickling
-	with open(input_by_sim, 'wb') as pk: 
+	input_by_sim = str(os.getcwd() + '/PyCHAM/pickle.pkl')
+	with open(input_by_sim, 'wb') as pk: # the file to be used for pickling
 		pickle.dump(list_vars, pk) # pickle
 		pk.close() # close
 	
@@ -725,7 +520,7 @@ def ui_check(self):
 		self.l80.setStyleSheet(0., '0px', 0., 0.) # remove any borders
 		self.bd_st = 3 # change border status to ready for change
 		
-		# remember path to output, in case it needs adding to list for batch
+		# remember path to output, in it needs adding to list for batch
 		self.output_by_sim = output_by_sim
 		
 		# if not (yet) in batch mode
@@ -744,7 +539,6 @@ def ui_check(self):
 			self.l81 = QLabel(self)
 			self.l81.setText('or')
 			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
-			self.l81.setAlignment(Qt.AlignCenter)
 		
 			# allow adding to batch list
 			self.b82 = QPushButton('Add to Batch', self)
@@ -791,8 +585,8 @@ def ui_check(self):
 		if (self.atb == 1): # if showing remove add to batch button
 			self.b82.deleteLater()
 			self.atb = 0 # remember that add to batch button not showing
-	
+		
 	import mod_var_up # update displayed model variables in case checking has modified any
 	mod_var_up.mod_var_up(self)
-	
+
 	return()

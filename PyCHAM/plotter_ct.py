@@ -1,34 +1,31 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
-'''plots results for the change tendency temporal profiles of specified 
-components'''
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
+'''plots results for the change tendency temporal profiles of specified components'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-# for customised colormap
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap # for customised colormap
 import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
 import numpy as np
@@ -72,19 +69,18 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	wall_on = self.ro_obj.wf
 	PsatPa = self.ro_obj.vpPa
 	OC = self.ro_obj.O_to_C
+	
+	# no record of change tendency for final experiment time point
+	timehr = timehr[0:-1]
 
 	# loop through components to plot to check they are available
 	for comp_name in (comp_names_to_plot):
 		
-		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
+		fname = str(dir_path+ '/' +comp_name +'_rate_of_change')
 		try: # try to open
-			# skiprows = 1 omits header	
-			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1)
+			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1) # skiprows = 1 omits header	
 		except:
-			mess = str('Please note, a change tendency record for the component ' + 
-			str(comp_name) + ' was not found, note that it must specified in the ' +
-			'tracked_comp input of the model variables file. Please ' + 
-			'see README for more information.')
+			mess = str('Please note, a change tendency record for the component ' + str(comp_name) + ' was not found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
 			self.l203a.setText(mess)
 			
 			# set border around error message
@@ -103,9 +99,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# if all files are available, then proceed without error message
 	mess = str('')
-	# if no priority message, e.g. from gui.py prior to plotter_ct call
-	if (self.pre_mess == 0):
-		self.l203a.setText(mess)
+	self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
@@ -142,54 +136,40 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
 			ci = len(y_mw)-1
 		
-		# note that column -3 in dydt is gas-particle 
-		# partitioning and column -2 is gas-wall partitioning
-		# and column -1 is dilution, whilst
+		# note that penultimate column in dydt is gas-particle 
+		# partitioning and final column is gas-wall partitioning, whilst
 		# the first row contains chemical reaction numbers
 		# extract the change tendency due to gas-particle partitioning
-		gpp = dydt[1::, -3]
+		gpp = dydt[1::, -2]
 		# extract the change tendency due to gas-wall partitioning
-		gwp = dydt[1::, -2]
-		# extract the change tendency due to dilution
-		dil = dydt[1::, -1]
+		gwp = dydt[1::, -1]
 		# sum chemical reaction gains
 		crg = np.zeros((dydt.shape[0]-1, 1))
 		# sum chemical reaction losses
 		crl = np.zeros((dydt.shape[0]-1, 1))
 		for ti in range(dydt.shape[0]-1): # loop through times
-			# indices of reactions that produce component
-			indx = dydt[ti+1, 0:-2] > 0
+			indx = dydt[ti+1, 0:-2] > 0 # indices of reactions that produce component
 			crg[ti] = dydt[ti+1, 0:-2][indx].sum()
-			# indices of reactions that lose component
-			indx = dydt[ti+1, 0:-2] < 0
+			indx = dydt[ti+1, 0:-2] < 0 # indices of reactions that lose component
 			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
 			 
 		# convert change tendencies from molecules/cm3/s to ug/m3/s
 		gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
 		gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
-		dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
 		crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
 		crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 			 
 		# plot temporal profiles of change tendencies due to chemical 
-		# reaction production and loss, gas-particle
-		# partitioning and gas-wall partitioning
-		
-		ax0.plot(timehr, gpp, 
-			label = str('gas-particle partitioning '+ comp_name))
+		# reaction production and loss, gas-particle partitioning and gas-wall partitioning
+		ax0.plot(timehr, gpp, label = str('gas-particle partitioning '+ comp_name))
 		ax0.plot(timehr, gwp, label = str('gas-wall partitioning '+ comp_name))
-		ax0.plot(timehr, dil, label = str('dilution '+ comp_name))
-		ax0.plot(timehr, crg, 
-			label = str('chemical reaction gain '+ comp_name))
-		ax0.plot(timehr, crl, 
-			label = str('chemical reaction loss '+ comp_name))
+		ax0.plot(timehr, crg, label = str('chemical reaction gain '+ comp_name))
+		ax0.plot(timehr, crl, label = str('chemical reaction loss '+ comp_name))
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
-		ax0.set_title('Change tendencies, where a tendency ' + 
-		'to decrease \ngas-phase concentrations is negative')
+		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is treated as negative')
 		ax0.set_xlabel('Time through experiment (hours)')
-		ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
-		ax0.set_ylabel(str('Change tendency ' + ct_units))
+		ax0.set_ylabel('Change tendency ($\mathrm{\mu g\, m^{-3}\, s^{-1}}$)')
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		ax0.xaxis.set_tick_params(direction = 'in')
@@ -264,9 +244,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	
 	# if all files are available, then proceed without error message
 	mess = str('')
-	# if no priority message, e.g. from gui.py prior to plotter_ct call
-	if (self.pre_mess == 0):
-		self.l203a.setText(mess)
+	self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
@@ -302,22 +280,20 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
 			ci = len(y_mw)-1
 		
-		# prepare to store results of change tendency due to chemical reactions
-		# note that final three 
-		# columns on the end are for 
-		# gas-particle-partitioning, gas-wall-partitioning and 
-		# dilution, whilst
+		# note that penultimate column in dydt is gas-particle 
+		# partitioning and final column is gas-wall partitioning, whilst
 		# the first row contains chemical reaction numbers
-		res = np.zeros((dydt.shape[0], dydt.shape[1]-3))
-		res[:, :] = dydt[:, 0:-3] # get chemical reaction numbers and change tendencies
+		
+		# prepare to store results of change tendency due to chemical reactions
+		res = np.zeros((dydt.shape[0], dydt.shape[1]-2))
+		res[:, :] = dydt[:, 0:-2] # get chemical reaction numbers and change tendencies
 		
 		import scipy.constants as si
 
 		if (uc == 0):
-			# convert to numpy array from list
-			Cfaca = (np.array(Cfac)).reshape(-1, 1)
+			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 			# convert change tendencies from # molecules/cm3/s to ppb
-			res[1::, :] = (res[1::, :]/Cfaca)
+			res[1::, :] = (res[1::, :]/Cfaca[1::])
 			ct_units = str('(ppb/s)')
 		if (uc == 1):			
 			# convert change tendencies from # molecules/cm3/s to ug/m3/s
@@ -335,61 +311,33 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		# sort in ascending order
 		res_sort = np.sort(res_sum)
 		
-		if (len(res_sort) < top_num[0] and self.pre_mess == 0):
+		if (len(res_sort) < top_num[0]):
 
 			# if less reactions are present than the number requested inform user
 			mess = str('Please note that ' + str(len(res_sort)) + ' relevant reactions were found, although a maximum of ' + str(top_num[0]) + ' were requested by the user.')
 			self.l203a.setText(mess)
 		
-		# get all reactions out of the used chemical scheme -------------
+		# get all reactions out of the used chemical scheme --------------------------------------------------------------------
 		import sch_interr # for interpeting chemical scheme
 		import re # for parsing chemical scheme
 		import scipy.constants as si
-		
-		try:
-			sch_name = self.ro_obj.sp
-			inname = self.ro_obj.vp
-			f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
-			inputs = open(inname, mode= 'r' ) # open model variables file
-		except:
-			# get index of slashes in path to scheme
-			try:
-				slashi = (sch_name[::-1]).index('/') # in case saved on UNIX
-			except:
-				slashi = (sch_name[::-1]).index('\\') # in case saved on windows
-			# get scheme name
-			sch_name = sch_name[-slashi::]
-			sch_name = str(dir_path + '/inputs/' + sch_name)
-			
-			f_open_eqn = open(sch_name, mode= 'r' ) # open chemical scheme file
 
-			# get index of slashes in path to model variables
-			try:
-				slashi = (inname[::-1]).index('/') # in case saved on UNIX
-			except:
-				slashi = (inname[::-1]).index('\\') # in case saved on windows
-			# get scheme name
-			inname = inname[-slashi::]
-			inname = str(dir_path + '/inputs/' + inname)
-			
-			inputs = open(inname, mode= 'r' ) # open model variables file
+		sch_name = self.ro_obj.sp
 		inname = self.ro_obj.vp
 		
-		
+		f_open_eqn = open(sch_name, mode= 'r' ) # open model variables file
 		# read the file and store everything into a list
 		total_list_eqn = f_open_eqn.readlines()
 		f_open_eqn.close() # close file
 		
-		# read file and store everything into a list
-		in_list = inputs.readlines()
+		inputs = open(inname, mode= 'r' ) # open model variables file
+		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
 
 		# start by assuming default chemical scheme markers
-		self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')',
-		'' , '&', '' , '', ':', '>', ';', '']
+		self.chem_sch_mrk = ['{', 'RO2', '+', 'C(ind_', ')','' , '&', '' , '', ':', '}', ';', '']
 
-		# loop through supplied model variables to interpret
-		for i in range(len(in_list)):
+		for i in range(len(in_list)): # loop through supplied model variables to interpret
 
 			# ----------------------------------------------------
 			# if commented out continue to next line
@@ -397,46 +345,31 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 				continue
 			try:
 				key, value = in_list[i].split('=') # split values from keys
-				# model variable name - a string with 
-				# bounding white space removed
+				# model variable name - a string with bounding white space removed
 				key = key.strip()
 				# ----------------------------------------------------
 
-				# formatting for chemical scheme
-				if key == 'chem_scheme_markers' and (value.strip()):
-					self.chem_sch_mrk = [
-					str(i).strip() for i in (value.split(','))]
+				if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+					self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 			except:
 				continue
-
-		# interpret scheme to list equations
+		# interrogate scheme to list equations
 		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	
-		# keep just the unique chemical reaction rates, as duplicates 
-		# will mean that the same group of reactions (of identical 
-		# reaction rates) will be repeatdely displayed
-		res_sort = np.unique(res_sort)
-
-		# loop through chemical reactions
-		for cnum in range(np.min([top_num[0], len(res_sort)])):
+		for cnum in range(np.min([top_num[0], len(res_sort)])): # loop through chemical reactions
 			
 			# identify this chemical reaction
 			cindx = np.where((res_sort[-(cnum+1)] ==  res_sum) == 1)[0]
-		
+			
 			for indx_two in (cindx):
 				
-				# get equation text
-				reac_txt = str(self.eqn_list[int(res[0, indx_two])])
-				# plot, and note the +1 in the label to 
-				# bring label into MCM index
-				ax0.plot(timehr, res[1::, indx_two], 
-				label = str(' Eq. # ' + str(int(res[0, indx_two])+1) + 
-				':  ' + reac_txt))
-				
+				reac_txt = str(self.eqn_list[int(res[0, indx_two])]) # get equation text
+				# plot, note the +1 in the label to bring label into MCM index
+				ax0.plot(timehr[0:-1], res[1::, indx_two], label = str(' Eq. # ' + str(int(res[0, indx_two])+1) + ':  ' + reac_txt))
+		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
-		ax0.set_title(str('Change tendencies, where a ' + 
-		'tendency to decrease \ngas-phase concentrations is negative'))
+		ax0.set_title('Change tendencies, where a tendency to decrease \ngas-phase concentrations is negative')
 		ax0.set_xlabel('Time through experiment (hours)')
 		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
@@ -513,9 +446,7 @@ def plotter_prod(caller, dir_path, comp_names_to_plot, tp, uc, self):
 
 	# if all files are available, then proceed without error message
 	mess = str('')
-	# if no priority message, e.g. from gui.py prior to plotter_ct call
-	if (self.pre_mess == 0):
-		self.l203a.setText(mess)
+	self.l203a.setText(mess)
 			
 	if (self.bd_pl < 3):
 		self.l203a.setStyleSheet(0., '0px solid red', 0., 0.)
@@ -785,7 +716,7 @@ def plotter_carb_res(self):
 			self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
 
 	# get carbon reservoir at start of simulation
-	if (init_flag == 1):
+	if init_flag == 1:
 		# molar mass of carbon in each component present at start (g/mol)
 		mm_C = np.zeros((len(comp0), 1))
 
@@ -793,7 +724,7 @@ def plotter_carb_res(self):
 			compi = comp_names.index(comp0[i])
 			mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
 		# now convert influxes to # molecules/cm3 from ppb
-		y0 = y0*np.array((Cfac[0]))
+		y0 = y0*Cfac[0]
 		# now divide by Avogadro's constant to convert # molecules/cm3 to mol/cm3
 		y0 = y0/si.N_A
 		# now multiply by molar mass of carbon and g/cm3 to ug/m3 conversion factor to get ug/m3
@@ -811,7 +742,6 @@ def plotter_carb_res(self):
 	for i in range(len(self.con_infl_nam)): # loop through influxed components
 		compi = comp_names.index(self.con_infl_nam[i])
 		mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
-	
 	
 	# now convert influxes to # molecules/cm3/s from ppb/s
 	self.con_infl_C = self.con_infl_C*Cfac[0]
@@ -896,7 +826,7 @@ def plotter_carb_res(self):
 	# by air exchange (ug/m3)
 	ax_removed = np.cumsum(dil_fac_align*yrecg)
 
-	# calculation of carbon lost through particle loss through air flushout --------
+	# calculation of carbon lost through particle loss during air exchange --------
 	if (num_sb-wall_on > 0):
 		# concentration of all components in the particle phase (# molecules/cm3)
 		yrecp = yrec[:, num_comp:num_comp*(num_sb-wall_on+1)]
@@ -1007,7 +937,7 @@ def plotter_carb_res(self):
 
 
 	ax0.plot((self.con_infl_t/3.6e3), user_influx_C[0, :], 'k', label = 'total in')
-	ax0.stackplot(timehr, ax_removed, ax_part_removed, yrec_p2w, yrec_w, yrec_g, yrec_p, labels = ['gas flushout', 'particle flushout', 'particle on wall', 'vapour on wall', 'gas phase', 'particle phase'])
+	ax0.stackplot(timehr, ax_removed, ax_part_removed, yrec_p2w, yrec_w, yrec_g, yrec_p, labels = ['exchange of gas', 'exchange of particle', 'particle on wall', 'vapour on wall', 'gas phase', 'particle phase'])
 	ax0.set_xlabel('Time through experiment (hours)')
 	ax0.set_ylabel(str('Cumulative Concentration (' + u'\u03BC' + 'g/m' +u'\u00B3' + ')'))
 		
@@ -1055,79 +985,5 @@ def const_infl_open(self): # define function to read in values relevant to const
 		
 	wb.close() # close excel file
 
-
-	return(self)
-
-# display properties of individual components
-def plotter_individ_prop(self):
-	
-	# inputs: ------------------------------------------------------------------
-	# self - reference to PyCHAM
-	# --------------------------------------------------------------------------
-
-	# get required variables from self
-	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
-	yrec[:, :] = self.ro_obj.yrec[:, :]
-	num_comp = self.ro_obj.nc
-	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
-	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
-	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
-	timehr = self.ro_obj.thr
-	comp_names = self.ro_obj.names_of_comp
-	rel_SMILES = self.ro_obj.rSMILES
-	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
-	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
-	H2Oi = self.ro_obj.H2O_ind
-	seedi = self.ro_obj.seed_ind
-	indx_plot = self.ro_obj.plot_indx
-	comp0 = self.ro_obj.init_comp
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
-	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-	x = self.ro_obj.cen_size
-	space_mode = self.ro_obj.spacing
-	Cfac = self.ro_obj.cfac
-	wall_on = self.ro_obj.wf
-	PsatPa = self.ro_obj.vpPa
-	PsatPa0 = self.ro_obj.vpPa0
-	OC = self.ro_obj.O_to_C
-	mv_path = self.ro_obj.vp
-	yrec_p2w = self.ro_obj.part_to_wall
-
-	if ('Molar Mass' in self.single_comp_prop):
-
-		try:
-			# get molar mass of component of interest
-			mm_interest = y_mw[0, comp_names.index(self.mm_comp_name)]
-		except:
-			self.l203a.setText(str('Error: component ' + self.mm_comp_name + 
-			' not identified in chemical scheme'))
-			return(self)
-		# display in text area of GUI
-		self.l203a.setText(str('Molar mass of ' + str(self.mm_comp_name) + ': ' + 
-			str(mm_interest) + ' g/mol'))
-
-	if ('saturation vapour pressure at starting temperature' in self.single_comp_prop):
-
-		PsatPa0 = np.squeeze(PsatPa0) # ensure minimum number of dimensions
-
-		if (PsatPa0.ndim == 1):
-			# get saturation vapour pressure at starting temperature of simulation
-			vp0_interest = PsatPa0[comp_names.index(self.mm_comp_name)]
-		else:
-			vp0_interest = PsatPa0[0, comp_names.index(self.mm_comp_name)]
-	
-		# display in text area of GUI
-		self.l203a.setText(str('Vapour pressure at starting temperature for ' + str(self.mm_comp_name) + ': ' + str(vp0_interest) + ' Pa'))
-
-	if ('saturation vapour pressure at 298.15 K' in self.single_comp_prop):
-
-		# get saturation vapour pressure at 298.15 K
-		vp_interest = PsatPa[comp_names.index(self.mm_comp_name)]
-	
-		# display in text area of GUI
-		self.l203a.setText(str('Vapour pressure at 298.15 K for ' + str(self.mm_comp_name) + ': ' + str(vp_interest) + ' Pa'))
 
 	return(self)

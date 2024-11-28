@@ -1,5 +1,6 @@
 name: PyCHAM
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - git
@@ -8,6 +9,7 @@ dependencies:
   - matplotlib
   - netcdf4
   - numpy
+  - openbabel
   - openpyxl
   - python
   - pyqt

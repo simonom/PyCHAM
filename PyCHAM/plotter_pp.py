@@ -1,28 +1,27 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''plots results for the particle-phase stuff'''
 # simulation results are represented graphically:
-# plots results for the total particle-phase concentration temporal profiles of 
-# specified components
+# plots results for the total particle-phase concentration temporal profiles of specified components
 # also the temporal profile or non-seed and non-water particle-phase
 
 import matplotlib.pyplot as plt
@@ -64,19 +63,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	y_MW = self.ro_obj.comp_MW
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-	group_indx = self.ro_obj.gi
-	y_MV = np.array((self.ro_obj.comp_MV)) # cm3/mol
 	
 	# number of actual particle size bins
 	num_asb = (self.ro_obj.nsb-self.ro_obj.wf)
-
-	# prepare to store summed results
-	if hasattr(self, 'sum_ornot_flag'):
-		if (self.sum_ornot_flag == 1):
-			sum_conc = np.zeros((len(timehr)))
-			sum_comp_names_to_plot = comp_names_to_plot[0]
 
 	if (caller == 0 or caller >= 3):
 		plt.ion() # show results to screen and turn on interactive mode
@@ -86,158 +77,21 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 	if (comp_names_to_plot): # if component names specified
 	
-		ip_fail = 0 # start by assuming all requested components available
-		group_flag = 0 # start by assuming single components wanted
-
 		# concentration plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
-
-			# begin array containing indices of components to consider
-			indx_plot = (np.arange(num_comp)).astype('int')
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
-				indx_plot = [H2Oi]
+				indx_plot = [self.ro_obj.H2O_ind]
 				indx_plot = np.array((indx_plot))
-
 			if (comp_names_to_plot[i].strip() == 'RO2'):
-				indx_plot = (np.array((group_indx['RO2i'])))
-				group_flag = 1
-
+				indx_plot = (np.array((self.ro_obj.indx_for_groups['RO2i'])))
 			if (comp_names_to_plot[i].strip() == 'RO'):
-				indx_plot = (np.array((group_indx['ROi'])))
-				group_flag = 1		
+				indx_plot = (np.array((self.ro_obj.indx_for_groups['ROi'])))
 				
-			if ('-OOH' in comp_names_to_plot[i].strip()):
-				indx_plot = (np.array((group_indx['OOH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-				
-			if ('-OH' in comp_names_to_plot[i].strip()):
-				indx_plot = (np.array((group_indx['OH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1			
-			
-			if ('-carbonyl' in comp_names_to_plot[i].strip()):	
-				indx_plot = (np.array((group_indx['carbonyl'])))			
-					
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			
-			if ('-NO3' in comp_names_to_plot[i].strip()):
-				indx_plot = (np.array((group_indx['NO3'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			
-			if ('ROOR' in comp_names_to_plot[i].strip()):
-				indx_plot = (np.array((group_indx['ROOR'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-
-			# check on whether this could be an individual component
-			try: # will work if provided components were in simulation chemical scheme
-				# get index of this specified component, removing any white space
-				indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
-				indx_plot = np.array((indx_plot))
-				group_flag = -1
-			except:
-				group_flag = 1
-			if (group_flag != -1):
-				if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
-					try:
-						cindx = comp_names_to_plot[i].strip().index('C') # index of C letter
-					except:
-						cindx = comp_names_to_plot[i].strip().index('c') # index of c letter
-				
-					# if a number given after carbon atom
-					if comp_names_to_plot[i].strip()[cindx+1].isnumeric():
-						numb_indx = cindx+1 # number index finishes
-						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
-							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
-								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
-									numb_indx += 1
-					
-						# get carbon number
-						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
-					
-						# get all components with this many carbons
-						indx_plot_nw = np.zeros((len(indx_plot)))
-						indx_plot_nw[:] = indx_plot[:]
-						for indxi in indx_plot:
-							# get the relevant SMILES
-							SMIi = rel_SMILES[indxi]
-							if ((SMIi.count('C') + SMIi.count('c')) != Cn):
-								indx_to_remove = np.where(indx_plot_nw == indxi)[0][0]
-								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
-						indx_plot = (np.array((indx_plot_nw))).astype('int')
-							
-						group_flag = 1
-						if (indx_plot.shape[0] == 0):
-							ip_fail = 1
-
-				if ('O' in comp_names_to_plot[i].strip() or 'o' in comp_names_to_plot[i].strip()):
-					try:
-						cindx = comp_names_to_plot[i].strip().index('O') # index of O letter
-					except:
-						cindx = comp_names_to_plot[i].strip().index('o') # index of o letter
-				
-					# if a number given after the atom letter
-					if (comp_names_to_plot[i].strip()[cindx+1].isnumeric()):
-						numb_indx = cindx+1 # number index finishes
-						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
-							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
-								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
-									numb_indx += 1
-					
-						# get number of atoms of interest
-						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
-					
-						# get all components with this many atoms of interest
-						indx_plot_nw = np.zeros((len(indx_plot)))
-						indx_plot_nw[:] = indx_plot[:]
-						for indxi in indx_plot:
-							# get the relevant SMILES
-							SMIi = rel_SMILES[indxi]
-							if ((SMIi.count('O') + SMIi.count('o')) != Cn):
-								indx_to_remove = np.where(indx_plot_nw == indxi)[0][0]
-								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
-						indx_plot = (np.array((indx_plot_nw))).astype('int')
-							
-						group_flag = 1
-						if (indx_plot.shape[0] == 0):
-							ip_fail = 1
-
-			
-				if (ip_fail == 1):	
-					# in case code thought this was a group but couldn't make the group work
-					try: # will work if provided components were in simulation chemical scheme
-						# get index of this specified component, removing any white space
-						indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
-						indx_plot = np.array((indx_plot))
-						group_flag = 0
-					except:
-
-						self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
-						# set border around error message
-						if (self.bd_pl == 1):
-							self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-							self.bd_pl = 2
-						else:
-							self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-							self.bd_pl = 1
-					
-						plt.ioff() # turn off interactive mode
-						plt.close() # close figure window
-						return()
-			
-			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
+			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
-					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+					indx_plot = [self.ro_obj.names_of_comp.index(comp_names_to_plot[i].strip())]
 					indx_plot = np.array((indx_plot))
 				except:
 					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -248,11 +102,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					else:
 						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 						self.bd_pl = 1
-
+					
 					plt.ioff() # turn off interactive mode
 					plt.close() # close figure window
 					return()
-
+			
 			import scipy.constants as si # for scientific constants
 			
 			yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
@@ -264,40 +118,30 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (self.ro_obj.wf == 0): # wall off
 				ppc = yrec[:, self.ro_obj.nc::]
 			
-			# particle-phase concentration of this component over all 
-			# size bins (# molecules/cm3)
+			# particle-phase concentration of this component over all size bins (# molecules/cm3)
 			conc = np.zeros((ppc.shape[0], self.ro_obj.nsb-self.ro_obj.wf))
 			for indxn in indx_plot: # loop through the indices
 				concf = ppc[:, indxn::self.ro_obj.nc]
 				# particle-phase concentration (ug/m3)
 				conc[:, :] += ((concf/si.N_A)*self.ro_obj.comp_MW[indxn])*1.e12
 			
-			# if summing values
-			if (self.sum_ornot_flag == 1):
-				sum_conc += conc.sum(axis = 1)
-				if (i > 0):
-					sum_comp_names_to_plot = str(sum_comp_names_to_plot + ', ' + comp_names_to_plot[i].strip())
-				if (i == len(comp_names_to_plot)-1):
-					ax0.plot(timehr, sum_conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + sum_comp_names_to_plot + ' (particle-phase)'))
-
-			# if showing inidividual values
-			if (self.sum_ornot_flag == 0):
-				if (group_flag != 1): # if not a sum over a group of components
-					# plot this component
-					ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
+			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO'): # if not a sum
+				# plot this component
+				ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
 			
-				else: # if a sum over a group of components
-					ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (particle-phase)'))
+			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
+				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (particle-phase)'))
 			
-			
-
+			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
+				ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$RO (particle-phase)'))
+				
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 
-		# end of particle-phase concentration sub-plot ----------------------------
+		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 	# if called by button to plot temporal profile of total particle-phase concentration 
 	# excluding water and seed
@@ -315,8 +159,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			ppc[:, i::num_comp] = 0.
 		
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
-			(1, self.ro_obj.nsb-self.ro_obj.wf))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, self.ro_obj.nsb-self.ro_obj.wf))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 		# convert from # molecules/cm3 to ug/m3
 		ppc = (ppc/si.N_A)*y_mwt*1.e12
@@ -325,8 +168,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc = np.sum(ppc, axis=1)
 		
 		# plot
-		ax0.plot(self.ro_obj.thr, ppc, '+', linewidth = 4., 
-			label = 'total particle-phase excluding seed and water')
+		ax0.plot(self.ro_obj.thr, ppc, '+', linewidth = 4., label = 'total particle-phase excluding seed and water')
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -343,8 +185,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			ppc = yrec[:, self.ro_obj.nc::]
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
-			(1, (self.ro_obj.nsb-self.ro_obj.wf)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -355,8 +196,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		# sum particle-phase concentrations over size bins (ug/m3), 
 		# but keeping components separate
-		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, 
-			self.ro_obj.nc), axis=0)
+		ppc_t = np.sum(ppc_t.reshape(self.ro_obj.nsb-self.ro_obj.wf, self.ro_obj.nc), axis=0)
 		
 		# convert to mass contributions
 		ppc_t = ((ppc_t/np.sum(ppc_t))*100.).reshape(-1, 1)
@@ -382,18 +222,15 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., 
-				label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
 	
-		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', 
-			fontsize = 14)
+		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 	
-	# if called by button to plot top contributors to particle-phase excluding 
-	# seed and water
+	# if called by button to plot top contributors to particle-phase excluding seed and water
 	if (caller == 7):
 
 		import scipy.constants as si		
@@ -410,8 +247,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppc[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0. # zero water
 
 		# tile molar weights over size bins and times
-		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), 
-			(1, (self.ro_obj.nsb-self.ro_obj.wf)))
+		y_mwt = np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, (self.ro_obj.nsb-self.ro_obj.wf)))
 		y_mwt = np.tile(y_mwt, (ppc.shape[0], 1))
 
 		# convert to ug/m3 from # molecules/cm3
@@ -448,8 +284,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# get contribution (%)
 			ppci = (ppci[ppc_sbc>0.]/ppc_sbc[ppc_sbc>0.])*100.
 
-			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', 
-				linewidth = 4., label = namei)
+			ax0.plot(self.ro_obj.thr[ppc_sbc>0.], ppci, '-+', linewidth = 4., label = namei)
 	
 		ax0.set_ylabel(r'Contribution to particle-phase mass concentration (%)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -470,8 +305,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		asp = np.sum(asp, axis=1)
 		# plot
 		ax0.plot(self.ro_obj.thr, asp, '-+', linewidth = 4.)
-		ax0.set_ylabel(str(r'Total particle-phase surface area concentration ' +
-		r'($\rm{m^{2}\,m^{-3}}$)'), fontsize = 14)
+		ax0.set_ylabel(r'Total particle-phase surface area concentration ($\rm{m^{2}\,m^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -491,10 +325,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ppcs = np.zeros((ppc.shape[0], (num_sb-wall_on)))
 
 		for i in seedi: # loop through seed indices
-
 			# get just seed component particle-phase volume concentration 
 			# (cm3/cm3)
-			ppcs[:, :] += (ppc[:, i::num_comp]/si.N_A)*y_MV[i]
+			ppcs[:, :] += (ppc[:, i::num_comp]/si.N_A)*(np.array((y_MV))[i])
 		
 		# convert total volume to volume per particle (cm3)
 		ppcs[Nwet>0] = ppcs[Nwet>0]/Nwet[Nwet>0]
@@ -700,24 +533,19 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 	return()
 
-# function for when calling from button for plotting size-segregated mass
-# concentration without water
 def part_mass_vs_time_sizeseg(self):
 
 	import scipy.constants as si
 	
 	# get required variables from self
 	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
-		self.ro_obj.yrec.shape[1]))
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
 	yrec[:, :] = self.ro_obj.yrec[:, :]
 	num_comp = self.ro_obj.nc
 	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
-		self.ro_obj.Nrec_wet.shape[1]))
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
 	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
-		self.ro_obj.Nrec_dry.shape[1]))
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
 	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
@@ -725,8 +553,7 @@ def part_mass_vs_time_sizeseg(self):
 	y_MW = self.ro_obj.comp_MW
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
-		self.ro_obj.rad.shape[1]))
+	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 
 	# number of actual particle size bins
@@ -738,8 +565,7 @@ def part_mass_vs_time_sizeseg(self):
 	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 	
 	try: # in case user-supplied values given:
-		psb_dub = [float(i) for i in 
-			self.e303p.text().split(',')]
+		psb_dub = [float(i) for i in self.e303p.text().split(',')]
 	except:
 		# default
 		# particle size bins (upper bounds) diameter (um), 
@@ -758,9 +584,8 @@ def part_mass_vs_time_sizeseg(self):
 
 	# get the index of particle size bins
 	for psb_dubi in psb_dub:
-		
 		psb_ind += dbou_rec[:, 1::]<psb_dubi
-		
+
 	# then use this index to find the mass concentrations 
 	# inside each size bound
 
@@ -988,415 +813,5 @@ def part_area_vs_time_sizeseg(self):
 	
 	# include legend
 	ax0.legend(fontsize=14)
-
-	return()
-
-# function for plotting contribution per user-supplied component by mass
-# against time
-def comp_part_mass_vs_time(self):
-
-	import scipy.constants as si
-
-	# inputs: ----
-	# self - PyCHAM object
-	# ------------
-
-	# get required variables from self
-	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
-		self.ro_obj.yrec.shape[1]))
-	yrec[:, :] = self.ro_obj.yrec[:, :]
-	num_comp = self.ro_obj.nc
-	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
-		self.ro_obj.Nrec_wet.shape[1]))
-	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
-		self.ro_obj.Nrec_dry.shape[1]))
-	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
-	timehr = self.ro_obj.thr
-	comp_names = self.ro_obj.names_of_comp
-	rel_SMILES = self.ro_obj.rSMILES
-	y_MW = self.ro_obj.comp_MW
-	H2Oi = self.ro_obj.H2O_ind
-	seedi = self.ro_obj.seed_ind
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
-		self.ro_obj.rad.shape[1]))
-	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-
-	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
-
-	plt.ion() # show results to screen and turn on interactive mode
-		
-	# prepare plot
-	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
-
-	# components to consider
-	cn = self.comp_names_part_mass_vs_time
-
-	# prepare results matrix
-	res = np.zeros((len(cn), len(timehr)))	
-
-	# particle-phase concentrations of all 
-	# components (# molecules/cm3)
-	if (wall_on > 0): # wall on
-		ppc = yrec[:, num_comp:-num_comp*wall_on]
-	if (wall_on == 0): # wall off
-		ppc = yrec[:, num_comp::]
-	
-	# tile molar masses over size bins and times
-	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
-	y_mwt = np.tile(y_mwt, (len(timehr), 1))
-	# convert from # molecules/cm3 to ug/m3
-	ppc = (ppc/si.N_A)*y_mwt*1.e12
-
-	# loop through components to plot
-	for i in range(len(cn)):	
-
-		# get chemical scheme index
-		try:
-			ci = comp_names.index(cn[i])
-			# sum over size bins
-			res[i, :] = np.sum(ppc[:, ci::num_comp], axis=1)
-						
-		except:
-			if (cn[i] == 'SOA'):
-				
-				y_SOA = np.zeros((ppc.shape[0], 
-					ppc.shape[1]))
-
-				y_SOA[:, :] = ppc[:, :]
-
-				# zero water and seed
-				y_SOA[:, H2Oi::num_comp] = 0.
-				# loop through seed components
-				for si in seedi: 
-					y_SOA[:, si::num_comp] = 0.
-				
-				# sum over components and size bins
-				res[i, :] = np.sum(y_SOA, axis=1)
-	
-	ax0.stackplot(timehr[1:-1], res[:, 1:-1], labels = cn)
-	plt.yscale('log')
-	ax0.set_ylabel(r'Particle Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
-	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
-	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.legend(fontsize = 14, loc='upper left')
-
-	return()	
-
-# function for plotting contribution per user-supplied component by
-# risk (as a function of mass) against time
-def comp_part_risk_vs_time(self):
-
-	import scipy.constants as si
-
-	# inputs: ----
-	# self - PyCHAM object
-	# ------------
-
-	# get required variables from self
-	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
-		self.ro_obj.yrec.shape[1]))
-	yrec[:, :] = self.ro_obj.yrec[:, :]
-	num_comp = self.ro_obj.nc
-	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
-		self.ro_obj.Nrec_wet.shape[1]))
-	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
-		self.ro_obj.Nrec_dry.shape[1]))
-	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
-	timehr = self.ro_obj.thr
-	comp_names = self.ro_obj.names_of_comp
-	rel_SMILES = self.ro_obj.rSMILES
-	y_MW = self.ro_obj.comp_MW
-	H2Oi = self.ro_obj.H2O_ind
-	seedi = self.ro_obj.seed_ind
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
-		self.ro_obj.rad.shape[1]))
-	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-
-	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
-
-	plt.ion() # show results to screen and turn on interactive mode
-		
-	# prepare plot
-	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
-
-	# components to consider
-	cn = self.comp_names_part_mass_vs_time
-
-	# prepare results matrix
-	res = np.zeros((len(cn), len(timehr)))	
-
-	# particle-phase concentrations of all 
-	# components (# molecules/cm3)
-	if (wall_on > 0): # wall on
-		ppc = yrec[:, num_comp:-num_comp*wall_on]
-	if (wall_on == 0): # wall off
-		ppc = yrec[:, num_comp::]
-	
-	# tile molar masses over size bins and times
-	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
-	y_mwt = np.tile(y_mwt, (len(timehr), 1))
-	# convert from # molecules/cm3 to ug/m3
-	ppc = (ppc/si.N_A)*y_mwt*1.e12
-
-	# concentration-response function from 
-	# https://assets.publishing.service.gov.uk/
-	# media/623302158fa8f504aa780865/
-	# COMEAP_Statement_on_PM2.5_mortality_quantification.pdf
-	risk_coeff = 1.08
-
-	# loop through components to plot
-	for i in range(len(cn)):	
-
-		# get chemical scheme index
-		try:
-			ci = comp_names.index(cn[i])
-			# sum over size bins
-			res[i, :] = risk_coeff**((
-			np.sum(ppc[:, ci::num_comp], axis=1))/10.)-1.
-						
-		except:
-			if (cn[i] == 'SOA'):
-				
-				y_SOA = np.zeros((ppc.shape[0], 
-					ppc.shape[1]))
-
-				y_SOA[:, :] = ppc[:, :]
-
-				# zero water and seed
-				y_SOA[:, H2Oi::num_comp] = 0.
-				# loop through seed components
-				for si in seedi: 
-					y_SOA[:, si::num_comp] = 0.
-				
-				# sum over components and size bins
-				res[i, :] = risk_coeff**((np.sum(
-				y_SOA, axis=1))/10.)-1.
-	
-	ax0.stackplot(timehr[1:-1], res[:, 1:-1], labels = cn)
-
-	ax0.set_ylabel(r'factor change in all-cause mortality', 
-	fontsize = 14)
-	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
-	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.legend(fontsize = 14)
-
-	return()
-
-
-# function for plotting contribution per user-supplied component by
-# carbon oxidation state against time
-def comp_part_cos_vs_time(self):
-
-	import scipy.constants as si
-
-	# inputs: ----
-	# self - PyCHAM object
-	# ------------
-
-	# get required variables from self
-	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], 
-		self.ro_obj.yrec.shape[1]))
-	yrec[:, :] = self.ro_obj.yrec[:, :]
-	num_comp = self.ro_obj.nc
-	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], 
-		self.ro_obj.Nrec_wet.shape[1]))
-	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], 
-		self.ro_obj.Nrec_dry.shape[1]))
-	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
-	timehr = self.ro_obj.thr
-	comp_names = self.ro_obj.names_of_comp
-	rel_SMILES = self.ro_obj.rSMILES
-	y_MW = self.ro_obj.comp_MW
-	HC = np.array((self.ro_obj.HyC))
-	
-	H2Oi = self.ro_obj.H2O_ind
-	seedi = self.ro_obj.seed_ind
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], 
-		self.ro_obj.rad.shape[1]))
-	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-
-	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)
-
-	plt.ion() # show results to screen and turn on interactive mode
-		
-	# prepare plot
-	fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
-
-	# components to consider
-	cn = self.comp_names_part_mass_vs_time
-	
-	# remember to include total carbon oxidation state
-	#cn.append('total')
-	
-	# prepare results matrix
-	res = np.zeros((len(cn), len(timehr)))	
-	ros = np.zeros((len(cn), len(timehr)))	
-
-	# particle-phase concentrations of all 
-	# components (# molecules/cm3)
-	if (wall_on > 0): # wall on
-		ppc = yrec[:, num_comp:-num_comp*wall_on]
-	if (wall_on == 0): # wall off
-		ppc = yrec[:, num_comp::]
-	
-	# tile molar masses over size bins and times
-	y_mwt = np.tile(np.array((y_MW)).reshape(1, -1), (1, num_asb))
-	y_mwt = np.tile(y_mwt, (len(timehr), 1))
-	# convert from # molecules/cm3 to ug/m3
-	ppc = (ppc/si.N_A)*y_mwt*1.e12
-
-	# now transform ppc matrix so that times in rows,
-	# components in columns and size bins in third dimension
-	ppc = ppc.reshape(len(timehr), num_comp, num_asb, order='F')
-
-	# now sum over size bins
-	ppc = np.sum(ppc, axis=2)
-
-	# carbon oxidation state per component 
-	cos = np.zeros((len(rel_SMILES)))
-	for ci in range(len(rel_SMILES)): # loop through components
-		# get carbon number
-		Cn = (rel_SMILES[ci].count('c')+
-			rel_SMILES[ci].count('C'))
-		if (Cn == 0):
-			cos[ci] = 0.
-		else:
-			
-			cos[ci] = (((HC[0, ci]*Cn)*-1+
-			rel_SMILES[ci].count('o')*2+
-			rel_SMILES[ci].count('O')*2.+
-			rel_SMILES[ci].count('oo')*-2+
-			rel_SMILES[ci].count('oO')*-2+
-			rel_SMILES[ci].count('Oo')*-2+
-			rel_SMILES[ci].count('OO')*-2+
-			rel_SMILES[ci].count('O[O]')*-3+
-			rel_SMILES[ci].count('ON(=O)=O')*-5)/Cn)
-			
-	# tile carbon oxidation states over times
-	cos = np.tile(cos.reshape(1, -1), (len(timehr), 1))	
-	# get the ROS
-	ros0 = cos*1.1+1.51
-	# can't have negative reactive oxidation spaces	
-	ros0[ros0<0.] = 0. 
-
-	# estimate mass fractions
-	# zero mass of water
-	ppc[:, H2Oi] = 0.
-	#ppc[:, comp_names.index('core')] = 0.
-	#ppc[:, comp_names.index('core_ind')] = 0.
-	
-	# mass fraction of each component at each time
-	mf = (ppc/(np.sum(ppc, axis=1).reshape(-1, 1)))
-
-	# multiply by mass concentration fraction
-	cos_frac = cos*mf
-	ros_frac = ros0*mf
-
-	# loop through components of known 
-	# oxidative potential
-	op_res = np.zeros((6, len(timehr)))
-	# ammonium sulphate (outdoor core)
-	op_res[0, :] = 180.*mf[:, comp_names.index('AMM_SUL')]
-	
-	
-	# outdoor primary (pri_org)
-	op_res[1, :] = 9.*mf[:, comp_names.index('pri_org')]
-	# outdoor secondary (sec_org), e.g. Figure 6 of Zhang et al. 2022:
-	# https://doi.org/10.5194/acp-22-1793-2022
-	op_res[2, :] = 60.*(
-	mf[:, comp_names.index('sec_org1')]+
-	mf[:, comp_names.index('sec_org0')]+
-	mf[:, comp_names.index('sec_org-1')]+
-	mf[:, comp_names.index('sec_org-2')])
-
-	# indoor elemental carbon (bcin)
-	op_res[3, :] = 2.*mf[:, comp_names.index('bcin')]
-	# indoor primary organic
-	op_res[4, :] = 9.*mf[:, comp_names.index('pri_orgin')]
-
-	# SOA using the factor from e.g. Figure 6 of Zhang et al. 2022:
-	# https://doi.org/10.5194/acp-22-1793-2022, but note that a factor
-	# 67 was used here previously but I can't remember the
-	# reference
-	# zero mass fractions of seed components
-	mf[:, seedi] = 0.
-	mf[:, H2Oi] = 0.
-	op_res[5, :] = 60.*np.sum(mf, axis=1)
-
-	# multiply by total dry mass of PM
-	op_res = op_res*(np.sum(ppc, axis=1).reshape(1, -1))
-
-	# loop through components to plot
-	#for i in range(len(cn)):	
-		
-		# get chemical scheme index
-		#try:
-			#ci = comp_names.index(cn[i])
-			# sum over size bins
-			#res[i, :] = cos_frac[:, ci]
-			#ros[i, :] = ros_frac[:, ci]
-		#except:	
-			#if (cn[i] == 'SOA'):
-				
-				#y_SOA = np.zeros((cos_frac.shape[0], 
-				#	cos_frac.shape[1]))
-				#yr_SOA = np.zeros((ros_frac.shape[0], 
-				#	ros_frac.shape[1]))	
-
-				#y_SOA[:, :] = cos_frac[:, :]
-				#yr_SOA[:, :] = ros_frac[:, :]
-				# zero water and seed
-				#y_SOA[:, H2Oi] = 0.
-				#yr_SOA[:, H2Oi] = 0.
-				
-				# loop through seed components
-				#for si in seedi: 
-				#	y_SOA[:, si] = 0.
-				#	yr_SOA[:, si] = 0.
-					
-				# sum over components
-				#res[i, :] = np.sum(y_SOA, axis=1)
-				#ros[i, :] = np.sum(yr_SOA, axis=1)
-	
-			#if (cn[i] == 'total'):
-				#res[i, :] = np.sum(cos_frac, axis=1)
-				#ros[i, :] = np.sum((ros[0:i, :]),
-				#	 axis=0)
-		#ax0.plot(timehr[1:-1]+16., res[i, 1:-1], label=cn[i])
-
-	# now that we have ROS results for all components, we can
-	# compare the ROS with and without each component, and 
-	# therefore estimate its factor change in ROS	
-	# loop through components contributing to ROS
-	#for i in range(len(cn)-1):	
-		#ros[i, :] = (ros[i, :]/ros[-1, :])
-		#ax1.plot(timehr[1:-1]+16., ros[i, 1:-1], label=cn[i])
-	print(cn)
-	ax0.stackplot(timehr[1:-1], op_res[:, 1:-1]*1.e-3, labels=['AMM_SUL', 'pri_org', 'SOAout', 'bcin', 'pri_orgin', 'SOAin'])
-	#ax0.set_ylabel(str('''Carbon oxidation state weighted by ''' +
-	#'''mass'''), fontsize = 14)
-	ax0.set_ylabel(str('''$\mathrm{OP_{DTT}}$ $\mathrm{(nmol\, min^{-1})}$ weighted by ''' +
-	'''mass'''), fontsize = 14)
-	#ax1.set_ylabel('''ROS''')
-	ax0.set_xlabel(r'Time through day (hours)', fontsize = 14)
-	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	#ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
-	#ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in')
-	ax0.legend(fontsize = 14)
 
 	return()

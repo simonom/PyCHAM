@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''isolate sections of chemical scheme'''
 # using the chemical scheme markers, sections of the 
@@ -46,11 +46,6 @@ def sch_interr(total_list_eqn, self):
 	eqn_flag = 0 # don't collate reaction equations until seen
 	pr_flag = 0 # don't collate peroxy radicals until seen
 	RO2_count = 0 # count on number of lines considered in peroxy radical list
-	# if thirtheenth marker missing, assume this is due to old inputs
-	# when only 12 markers were needed
-	if (len(self.chem_sch_mrk) == 12):
-		self.chem_sch_mrk.append('')
-
 	# -------------------------------------------------------------------------
 	
 	# obtain lists for reaction rate coefficients, peroxy radicals 
@@ -224,7 +219,7 @@ def sch_interr(total_list_eqn, self):
 		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
 		# and second \ ensures recognition of marker
 		# first, check if a marker given, if not bypass
-		if (self.chem_sch_mrk[12] == ''):
+		if self.chem_sch_mrk[12] == '':
 			continue
 		else:
 			

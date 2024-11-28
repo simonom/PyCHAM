@@ -1,27 +1,25 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
-'''plots a replication of mass spectrum as reported by a chemical 
-ionisation mass spectrometer (CIMS)'''
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
+'''plots a replication of mass spectrum as reported by a chemical ionisation mass spectrometer (CIMS)'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
@@ -33,15 +31,13 @@ import retr_out
 import numpy as np
 import scipy.constants as si
 import importlib
-import openpyxl # for opening excel file
 
 def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	
 	# inputs: -----------------
 	# self - reference to PyCHAM class
 	# res_in - inputs for resolution of molar mass to charge ratio (g/mol/charge)
-	# tn - time through experiment to plot at, set to 'all times' for 
-	# integration over time (s)
+	# tn - time through experiment to plot at (s)
 	# iont - type of ionisation
 	# sens_func - sensitivity to molar mass function
 	# ---------------------------
@@ -57,7 +53,7 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
 	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
 	timehr = self.ro_obj.thr
-	comp_names = np.array((self.ro_obj.names_of_comp))
+	comp_names = self.ro_obj.names_of_comp
 	rel_SMILES = self.ro_obj.rSMILES
 	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
 	H2Oi = self.ro_obj.H2O_ind
@@ -67,7 +63,7 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
-	Cfac = np.squeeze(np.array((self.ro_obj.cfac)))
+	Cfac = self.ro_obj.cfac
 	group_indx = self.ro_obj.gi
 	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
 	yrec_p2w = self.ro_obj.part_to_wall
@@ -77,59 +73,30 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	
 	# convert to 2D numpy array
 	y_MW = np.array((y_MW)).reshape(-1, 1)
-
-	# get carbon number of all components
-	Cn = np.zeros((num_comp))
-	for rsi in range(len(rel_SMILES)):
-		Cn[rsi] = (rel_SMILES[rsi].count('C')+rel_SMILES[rsi].count('c'))
 	
-	# get index of time wanted if a single time wanted
-	if (isinstance(tn, float)):
-		ti = (np.where(np.abs(timehr-tn/3600.) == 
-			np.min(np.abs(timehr-tn/3600.))))[0][0]
+	# get index of time wanted
+	ti = (np.where(np.abs(timehr-tn/3600.) == np.min(np.abs(timehr-tn/3600.))))[0][0]
 	
-		# convert yrec from 1D to 2D with times in rows and components in columns
-		yrec = yrec.reshape(len(timehr), num_comp*(num_sb+1))
-		
-		# select time wanted and keep components in rows
-		yrec = yrec[ti, :].reshape(1, -1)
+	# convert yrec from 1D to 2D with times in rows, then select time wanted
+	yrec = (yrec.reshape(len(timehr), num_comp*(num_sb+1)))[ti, :]
 	
-		# convert gas-phase abundances from ppb to molecules/cm3
-		yrec[0, 0:num_comp] = yrec[0, 0:num_comp]*Cfac[ti]
-
-		time_str = str(str(timehr[ti]) + 'hours through experiment')
-
-	if isinstance(tn, str): # check whether tn is string
-		if 'all times' in tn: # check whether all times wanted
-
-			# convert yrec from 1D to 2D with times in rows and 
-			#components in columns
-			yrec = yrec.reshape(len(timehr), num_comp*(num_sb+1))
-
-			# convert gas-phase abundances from ppb to molecules/cm3
-			Cfac_now = np.tile(Cfac.reshape(-1, 1), (1, num_comp))
-			yrec[:, 0:num_comp] = yrec[:, 0:num_comp]*Cfac_now
-	
-			# sum over times, keeping components in columns
-			yrec = (np.sum(yrec, axis=0)).reshape(1, -1)
-
-			time_str = 'all times through experiment'
-
-	
-	# get gas-phase concentrations (molecules/cm3)
-	gp = yrec[0, 0:num_comp]
+	# get gas-phase concentrations (ppt, note starting concentration is ppb)
+	gp = yrec[0:num_comp]*1.e3  # conversion to ug/m3 (if wanted): /Cfac[ti]/si.N_A*y_MW[:, 0]*1.e12
 	
 	# get particle-phase concentrations (molecules/cm3)
-	partp = yrec[0, num_comp:num_comp*(num_sb+1-wall_on)]
+	pp = yrec[num_comp:num_comp*(num_sb+1-wall_on)]
 	
 	# sum each component over size bins (molecules/cm3)
-	partp = np.sum(partp.reshape(num_sb-wall_on, num_comp), axis=0)
+	pp = np.sum(pp.reshape(num_sb-wall_on, num_comp), axis=0)
+	
+	# convert to ppt
+	pp = (pp/si.N_A)*Cfac[ti]*1.e6 # or convert to ug/m3: *y_MW[:, 0]*1.e12
 	
 	# correct for sensitivity to molar mass
-	fac_per_comp = write_sens2mm(0, sens_func, np.squeeze(y_MW), Cn)
+	fac_per_comp = write_sens2mm(0, sens_func, y_MW)
 	
 	gp = gp*fac_per_comp[:]
-	partp = partp*fac_per_comp[:]
+	pp = pp*fac_per_comp[:]
 
 	# if ionisation source molar mass to be added 
 	# (e.g. because not corrected for in measurment software), then add
@@ -141,139 +108,33 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	
 	# remove water
 	gp = np.append(gp[0:H2Oi], gp[H2Oi+1::])
-	partp = np.append(partp[0:H2Oi], partp[H2Oi+1::])
+	pp = np.append(pp[0:H2Oi], pp[H2Oi+1::])
 	y_MW = np.append(y_MW[0:H2Oi, 0], y_MW[H2Oi+1::, 0])
-	comp_names = np.append(comp_names[0:H2Oi], comp_names[H2Oi+1::])
 
 	# account for mass to charge resolution
 	[pdf, comp_indx, comp_prob, mm_all] = write_mzres(1, res_in, y_MW)
 	gpres = np.zeros((len(comp_indx)))
 	ppres = np.zeros((len(comp_indx)))
 	
-	# prepare to hold component with greatest contribution to each
-	# m/z peak
-	top_contr_per_mz = np.zeros((len(comp_indx))).astype('str')
-
 	for pdfi in range(len(comp_indx)): # loop through resolution intervals
 		gpres[pdfi] = np.sum(gp[comp_indx[pdfi]]*comp_prob[pdfi])
-		ppres[pdfi] = np.sum(partp[comp_indx[pdfi]]*comp_prob[pdfi])
-
-		if (ppres[pdfi] > 0.): # if this m/z interval has a signal
-			# the components affecting this m/z interval
-			comp_names_here = comp_names[comp_indx[pdfi]]
-			top_contr_here = comp_names_here[(partp[comp_indx[pdfi]]*
-				comp_prob[pdfi]) == np.max(partp[comp_indx[pdfi]]*
-				comp_prob[pdfi])]
-			top_contr_per_mz[pdfi] = top_contr_here[0]
+		ppres[pdfi] = np.sum(pp[comp_indx[pdfi]]*comp_prob[pdfi])
 		
-
-	# check if we need to normalise abundance
-	if ('normalised' in self.b290_abb.currentText()):
-		
-		gpres = gpres/np.sum(gpres)
-		ppres = ppres/np.sum(ppres)
-		ylabel = 'abundance normalised'
-	else:
-		ylabel = str(r'Concentration (molecules cm$\mathrm{-3}$)')
-
 	plt.ion() # disply plot in interactive mode
 
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
-	# check whether observations also need plotting
-	if hasattr(self, 'oandm'):
-		if (self.oandm == 10):
-			obs_CIMS_plot(self, ax0) # call function to also plot observations
-
-			# show simulated results in a mirror, using the x axis as
-			# the reflection point
-			gpres = -1*gpres
-			ppres = -1*ppres
-
-	if ('Particle' in self.b290_abc.currentText()):
-
-		# loop through molar masses with signals above 1 and print out the main
-		# contributor (simulated) to that molar mass signal
-		for mi in range(len(mm_all)):
-			if (mm_all[mi] > 0):
-				print(mm_all[mi], ppres[mi], top_contr_per_mz[mi])
-
-
-	if ('Stem' in self.b290_abb.currentText()):	 
-		if ('Gas' in self.b290_abc.currentText()):
-			stem = ax0.stem(mm_all, gpres, 'k', 
-				linefmt='grey', markerfmt='',  
-				label = str('simulated gas-phase'))
-			stem[2].set_linewidth(0)
-		if ('Particle' in self.b290_abc.currentText()):
-			stem = ax0.stem(mm_all, ppres, 'k',
-				markerfmt='', label = str('simulated particle-phase'))
-			stem[2].set_linewidth(0)
-			
-		if (self.b290_ab.currentText()[0:3] == 'Log'):	
-			ax0.set_yscale('log')
+	ax0.semilogy(mm_all, gpres, '+m', markersize = 14, markeredgewidth = 5,  label = str('gas-phase'))
+	ax0.semilogy(mm_all, ppres, 'xb', markersize = 14, markeredgewidth = 5, label = str('particle-phase'))
 	
-	if (self.b290_abb.currentText()[0:7] == 'Markers'):
-
-		if (self.b290_ab.currentText()[0:3] == 'Lin'):
-			if ('Gas' in self.b290_abc.currentText()):
-				ax0.plot(mm_all, gpres, '+m', markersize = 10, 
-				markeredgewidth = 3,  label = str('simulated gas-phase'))
-
-			if ('Particle' in self.b290_abc.currentText()):
-				ax0.plot(mm_all, ppres, 'xb', markersize = 10, 
-				markeredgewidth = 3, label = str('simulated particle-phase'))
-
-		if (self.b290_ab.currentText()[0:3] == 'Log'):
-			if ('Gas' in self.b290_abc.currentText()):
-				ax0.semilogy(mm_all, gpres, '+m', markersize = 10, 
-				markeredgewidth = 3,  label = str('simulated gas-phase'))
-			if ('Particle' in self.b290_abc.currentText()):
-				ax0.semilogy(mm_all, ppres, 'xb', markersize = 10, 
-				markeredgewidth = 3, label = str('simulated particle-phase'))	
+	ax0.set_title(str('Mass spectrum at ' + str(timehr[ti]) + ' hours'), fontsize = 14)
+	ax0.set_xlabel(r'Mass/charge (Th)', fontsize = 14)
+	ax0.set_ylabel(r'Concentration (ppt)', fontsize = 14)
+	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	ax0.legend(fontsize = 14)
 	
-	if hasattr(self, 'oandm'):
-		if (self.oandm == 10):
-			# set negative values to positive
-			yt_loc = ax0.get_yticks()
-			yt_lab = ax0.get_yticklabels(which='both')
-			yt_newloc = [] # prepare to hold tick locations
-			yt_newlab = [] # prepare to hold tick labels
-			
-			for i in range(len(yt_lab)):
-				
-				text_now = (yt_lab[i].get_text())
-				
-				if ('\N{MINUS SIGN}' in text_now):
-					yt_newlab.append(text_now[1::])
-				else:
-					yt_newlab.append(text_now)
-				yt_newloc.append(yt_lab[i].get_position()[1])
-
-			ax0.set_yticks(np.array(yt_newloc), yt_newlab)
-	else:
-		ax0.set_ylabel(ylabel, fontsize = 14)
-
-	#ax0.set_title(str('Mass spectrum at ' + time_str), fontsize = 14)
-	ax0.set_xlabel(r'm/z', fontsize = 18)
-	
-	ax0.xaxis.set_tick_params(labelsize = 18, direction = 'in', which = 'both')
-	ax0.yaxis.set_tick_params(labelsize = 18, direction = 'in', which = 'both')
-
-	if hasattr(self, 'oandm'):
-		if (self.oandm == 10):
-			
-			ax0.text(np.min(mm_all[ppres!=0.])-45., np.min(ppres)/2., 
-				'Simulated\nsignal\n(normalised)', 
-				fontsize = 18, rotation = 'vertical')
-			ax0.text(np.min(mm_all[ppres!=0.])-45., 0., 
-				'Observed\nsignal\n(normalised)', 
-				fontsize = 18, rotation = 'vertical')
-			ax0.set_xlim(left = np.min(mm_all[ppres!=0.])-5., right = 400.)
-	else:
-		ax0.legend(fontsize = 14)
-
 	return()
 
 # function for transforming and saving output in CIMS format
@@ -309,7 +170,7 @@ def write_CIMS_output(self):
 	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
-	Cfac = np.array((self.ro_obj.cfac))
+	Cfac = self.ro_obj.cfac
 	group_indx = self.ro_obj.gi
 	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
 	yrec_p2w = self.ro_obj.part_to_wall
@@ -355,8 +216,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -374,8 +234,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -393,8 +252,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -412,8 +270,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -431,8 +288,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -450,8 +306,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -469,8 +324,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -488,8 +342,7 @@ def write_CIMS_output(self):
 				try:
 					numC = float(Pybel_object.formula[numiC+1])
 					try:
-						numC = float(
-						Pybel_object.formula[numiC+1:numiC+3])
+						numC = float(Pybel_object.formula[numiC+1:numiC+3])
 					except:
 						numC = float(Pybel_object.formula[numiC+1])
 				except:
@@ -500,6 +353,7 @@ def write_CIMS_output(self):
 			if numiC != 'str':
 				CHON_res[icomp, 3] += numC
 				
+	
 		# concentration of this component at penultimate time step (# molecules/cm3)
 		conc_res[icomp, 0] = yrec[-1, icomp]*Cfac[-1]
 		# rate of change of this component at penultimate time step (# molecules/cm3/s)
@@ -515,10 +369,8 @@ def write_CIMS_output(self):
 	
 	# save
 	np.savetxt(os.path.join(self.dir_path, 'CHON.txt'), CHON_res, delimiter=' ') 		
-	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), 
-		conc_res, delimiter=' ')
-	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'),
-		concs_res, delimiter=' ') 
+	np.savetxt(os.path.join(self.dir_path, 'Cin1stcol_dCDtin2ndcol.txt'), conc_res, delimiter=' ')
+	np.savetxt(os.path.join(self.dir_path, 'CNO1strow_CHO22ndrow_CRO23rdrow.txt'), concs_res, delimiter=' ') 
 
 	if self.iont[1] == 1: # if we need to add ioniser molar mass onto molar mass
 		if self.iont[0] == 'I': # if iodide
@@ -571,16 +423,11 @@ def write_CIMS_output(self):
 
 	# save CIMS-style output to csv file
 	# saving both gas, particle and wall concentrations of components
-	np.savetxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), 
-	CIMS_res, delimiter=',', 
-	header=str('time changes with rows which correspond to the time output file, ' +
-		'm:z ratios is columns, first row is m:z values')) 		
+	np.savetxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), CIMS_res, delimiter=',', header=str('time changes with rows which correspond to the time output file, m:z ratios is columns, first row is m:z values')) 		
 	 
 	# uncomment below to run check ----------------------------------------------------
-	# check correct results saved (by comparing with output from the 
-	# 'CIMS observations' button 
-	#check_plot = np.loadtxt(os.path.join(self.dir_path, 
-	#'simulat_res_conv_to_CIMS_output'), delimiter=',', skiprows=1, dtype='str')
+	# check correct results saved (by comparing with output from the 'CIMS observations' button 
+	#check_plot = np.loadtxt(os.path.join(self.dir_path, 'simulat_res_conv_to_CIMS_output'), delimiter=',', skiprows=1, dtype='str')
 	#import matplotlib.pyplot as plt
 	#plt.ion() # disply plot in interactive mode
 	#fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7)) # prepare plot
@@ -593,84 +440,39 @@ def write_CIMS_output(self):
 
 	return()
 
-# function to plot observed CIMS in addition to simulated CIMS
-def obs_CIMS_plot(self, ax0):
-
-	# inputs: ------------------------------------------------
-	# self - the PyCHAM object (containing variables)
-	# ax0 - the CIMS plot
-	# --------------------------------------------------------
-
-	# open xls file
-	wb = openpyxl.load_workbook(filename = self.xls_path)
-	obs = wb.worksheets[0] # get first sheet
-
-	obs_mm = [] # prepare to hold molar masses of observations
-
-	obs_sig = [] # prepare to hold observed signal
-
-	# loop through columns to get information required for 
-	# handling observational data
-	# count on columns
-	ci = 0
-	for co in obs.iter_cols(values_only=True):
-
-		if (ci == 0): # molar masses
-			obs_mm = co[1::]
-		if (ci == 1): # signal
-			obs_sig = co[1::]
-
-		# count on columns
-		ci += 1
-		if ci == 2: # finish after two columns read in
-			break
-
-	# plot observed mass spectrum
-	stem = ax0.stem(obs_mm, obs_sig, 'k',
-		markerfmt='', label = str('observed particle-phase'))
-	stem[2].set_linewidth(0)
-
-	# end of CIMS plotting function
-	return()
-
 # function for plotting sensitivity to components
-def write_sens2mm(caller, sens_func, y_MM, Cn):
+def write_sens2mm(caller, sens_func, y_MW):
 
 	import datetime
 
 	# inputs: --------------------------
 	# caller - flag for the calling function
 	# sens_func - the sensitivity (Hz/ppt) function to molar mass (g/mol)
-	# y_MM - molar mass of components (g/mol)
-	# Cn - carbon number of components
+	# y_MW - molar mass of components (g/mol)
 	# ------------------------------------
-
-	# split sensitivity function string by commas
-	sens_func = sens_func.split(',')
 
 	# create new  file
 	f = open('PyCHAM/sens2mm.py', mode='w')
-
-	f.write('####################################################################\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    All Rights Reserved.                                                                #\n')
-	f.write('#    This file is part of PyCHAM                                                         #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under             #\n')
-	f.write('#    the terms of the GNU General Public License as published by the Free Software       #\n')
-	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          #\n')
-	f.write('#    version.                                                                            #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #\n')
-	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #\n')
-	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #\n')
-	f.write('#    details.                                                                            #\n')
-	f.write('#                                                                                        #\n')
-	f.write('#    You should have received a copy of the GNU General Public License along with        #\n')
-	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #\n')
-	f.write('#                                                                                        #\n')
+	f.write('##########################################################################################\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    Copyright (C) 2018-2022 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#                                                                                       											 #\n')
+	f.write('#    All Rights Reserved.                                                                									 #\n')
+	f.write('#    This file is part of PyCHAM                                                         									 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #\n')
+	f.write('#    the terms of the GNU General Public License as published by the Free Software       					 #\n')
+	f.write('#    Foundation, either version 3 of the License, or (at your option) any later          						 #\n')
+	f.write('#    version.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #\n')
+	f.write('#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #\n')
+	f.write('#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #\n')
+	f.write('#    details.                                                                            										 #\n')
+	f.write('#                                                                                        											 #\n')
+	f.write('#    You should have received a copy of the GNU General Public License along with        					 #\n')
+	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #\n')
+	f.write('#                                                                                        											 #\n')
 	f.write('##########################################################################################\n')
 	f.write('\'\'\'solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)\'\'\'\n')
 	f.write('# module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer\n')
@@ -679,33 +481,23 @@ def write_sens2mm(caller, sens_func, y_MM, Cn):
 	f.write('import numpy as np\n')
 	f.write('\n')
 	f.write('# function for sensitivity\n')
-	f.write('def sens2mm(caller, y_MM, Cn):\n')
+	f.write('def sens2mm(caller, y_MW):\n')
 	f.write('	\n')
 	f.write('	# inputs: -----------------\n')
 	f.write('	# caller - flag for the calling function\n')
-	f.write('	# y_MM - molar mass (g/mol) of components in question\n')
-	f.write('	# Cn - carbon number\n')
+	f.write('	# y_MW - molar mass (g/mol) of components in question\n')
 	f.write('	# ---------------------------\n')
 	f.write('	\n')
-	if '<' not in sens_func[0] and '>' not in sens_func[0]:
-		f.write('	fac_per_comp = %s # sensitivity (Hz/ppt) per molar mass (g/mol) \n' %(sens_func[0]))
-	else:
-		f.write('	fac_per_comp = np.ones((len(y_MM))) # sensitivity (Hz/ppt) per molar mass (g/mol) \n')
-		f.write('	fac_per_comp[y_MM%s] = 0. # sensitivity (Hz/ppt) per molar mass (g/mol) \n' %(sens_func[0]))
+	f.write('	fac_per_comp = %s # sensitivity (Hz/ppt) per molar mass (g/mol) \n' %(sens_func))
 	f.write('	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape \n')
 	f.write('	if (len(fac_per_comp) == 1): # if just a single value then tile across components \n')
-	f.write('		fac_per_comp = np.tile(fac_per_comp, len(y_MM)) # if just a single value then tile across components \n')
+	f.write('		fac_per_comp = np.tile(fac_per_comp, len(y_MW)) # if just a single value then tile across components \n')
 	f.write('	\n')
-	if (len(sens_func)>1): # if further information contained in sens_func
-		if 'organics only' in sens_func[1]: # if only keeping organic components
-			f.write('	inorganic_indx = (Cn == 0.) # get index of inorganics \n')
-			f.write('	fac_per_comp[inorganic_indx] = 0. # zero inorganics \n')
-
 	f.write('	if (caller == 3): # called on to plot sensitivity to molar mass\n')
 	f.write('		import matplotlib.pyplot as plt \n')
 	f.write('		plt.ion()\n')
 	f.write('		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))\n')
-	f.write('		ax0.plot(y_MM, fac_per_comp)\n')
+	f.write('		ax0.plot(y_MW, fac_per_comp)\n')
 	f.write('		ax0.set_title(\'Sensitivity of instrument to molar mass\')\n')
 	f.write('		ax0.set_ylabel(\'Sensitivity (fraction (0-1))\', size = 14)\n')
 	f.write('		ax0.yaxis.set_tick_params(labelsize = 14, direction = \'in\', which = \'both\')\n')
@@ -718,7 +510,7 @@ def write_sens2mm(caller, sens_func, y_MM, Cn):
 	# get sensitivity for each component
 	import sens2mm
 	importlib.reload(sens2mm)
-	fac_per_mass = sens2mm.sens2mm(caller, y_MM, Cn)
+	fac_per_mass = sens2mm.sens2mm(caller, y_MW)
 
 	return(fac_per_mass)
 

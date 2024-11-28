@@ -1,3 +1,2 @@
 exclude __pycache__
-exclude umansysprop
 include README.md

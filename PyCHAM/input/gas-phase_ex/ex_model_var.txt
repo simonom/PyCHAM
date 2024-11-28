@@ -1,4 +1,4 @@
-res_file_name = example_run_output2
+res_file_name = Example_Run_Output2
 total_model_time = 3600.
 update_step = 60.
 recording_time_step = 60.
@@ -34,4 +34,3 @@ light_time = 0., 7200.
 light_status = 1, 0
 umansysprop_update = 0
 tracked_comp = ELVOC_O3
-chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,

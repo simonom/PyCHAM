@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''module for calculating photolysis rates''' 
 # photolysis rates calculated for specified absorption cross-section 
 # and quantum yield files using actinic flux file'''
@@ -34,81 +33,53 @@ def lamp_photo(J, TEMP, self):
 	# self - reference to program
 	# --------------------------------------------------------------
 	
-	# if using actinic fluxes from file
-	if (self.af_path != 'nat_act_flux'): 
-		# open wavelengths (nm) we have total actinic flux 
-		# for (photon/cm2/nm/s)
+	if (self.af_path != 'nat_act_flux'): # if using actinic fluxes from file
+		# open wavelengths (nm) we have total actinic flux for (photon/cm2/nm/s)
 		# from chamber
 		f = open(self.af_path, 'r')
 		wl_chm = np.empty(0) # wavelengths (nm)
 		act_chm = np.empty(0) # actinic flux
 	
 		for line in f: # loop through line
-			
+		
 			try: # omit any headers
 				wl = float((line.strip()).split(',')[0])
-				act = float((line.strip()).split(
-					',')[1])
-				wl_chm = np.append(wl_chm, 
-				(np.array(wl)).reshape(1), axis=0)
-				act_chm = np.append(act_chm, 
-				(np.array(act)).reshape(1), axis=0)
+				act = float((line.strip()).split(',')[1])
+				wl_chm = np.append(wl_chm, (np.array(wl)).reshape(1), axis=0)
+				act_chm = np.append(act_chm, (np.array(act)).reshape(1), axis=0)
 				
 			except:
 				continue
 		f.close() # close file
-	
-		# ensure that wavelengths and actinic flux have a 
-		# resolution of 1 nm wavelength
-		# to ensure correct integration of photolysis rate 
-		# over full spectrum
+		
+		# ensure that wavelengths and actinic flux have a resolution of 1 nm wavelength
+		# to ensure correct integration of photolysis rate over full spectrum
 		wl_chm_ref = np.arange(np.min(wl_chm), np.max(wl_chm)+1)
-		# unit-resolution wavelength actinic flux 
-		# (photon/cm2/nm/s)
+		# unit-resolution wavelength actinic flux (photon/cm2/nm/s)
 		act_chm = np.interp(wl_chm_ref, wl_chm, act_chm)
 		# unit-resolution wavelength wavelength (nm)
 		wl_chm = wl_chm_ref
 		
 		# apply any wavelength-dependent transmission factor
-		# if wavelength-dependent transmission factor supplied
-		if (self.tf_range == 1): 
+		if (self.tf_range == 1): # if wavelength-dependent transmission factor supplied
 			for wl_cond in self.tf:
-				# index where underscore separates 
-				# wavelength from transmission factor
+				# index where underscore separates wavelength from transmission factor
 				us_indx = wl_cond.index('_')
-				# dissociate the wavelength from the 
-				# transmission factor
+				# dissociate the wavelength from the transmission factor
 				wln = float(wl_cond[0:us_indx])
 				tfn = float(wl_cond[us_indx+1::])
 				
-				# if there's an old range
-				if ('wlo' in locals()): 
-					# the greater than index
-					gt_indx = wl_chm > wln 
-					# the lesser than index
-					lt_indx = wl_chm <= wlo 
-					act_chm[gt_indx*
-					lt_indx] = act_chm[gt_indx*
-					lt_indx]*tfn
-
+				if 'wlo' in locals(): # if there's an old range
+					gt_indx = wl_chm > wln # the greater than index
+					lt_indx = wl_chm <= wlo # the lesser than index
+					act_chm[gt_indx*lt_indx] = act_chm[gt_indx*lt_indx]*tfn
 				else: # if first range
-					act_chm[wl_chm > 
-					wln] = act_chm[wl_chm>wln]*tfn
+					act_chm[wl_chm > wln] = act_chm[wl_chm>wln]*tfn
 					
 				# remember old range
 				wlo = wln
 		
-		# apply constant transmission factor
-		if (self.tf_range == 0):
-			if (self.tf[sum(self.tft<=self.sumt)-1] < 1.):
-				
-				self.tfn = self.tf[sum(self.tft <= 
-					self.sumt)-1]
-				
-				act_chm[:] = act_chm[:]*self.tfn
-
-		# if using a sinusoidal diurnal variation in actinic 
-		# flux
+		# if using a sinusoidal diurnal variation in actinic flux
 		if (self.light_stat_now == 2):
 			# fraction through day
 			ftd = self.sumt/(24.*3600.)
@@ -118,14 +89,12 @@ def lamp_photo(J, TEMP, self):
 			dist -= np.pi/2.
 			# find the sinusoidal function
 			act_fact = np.sin(dist)
-			# adjust so that peak has value 1, minimum has 
-			# value 0
+			# adjust so that peak has value 1, minimum has value 0
 			act_fact = (act_fact+1.)/2.
 			# apply factor to actinic flux	
 			act_chm = act_chm*act_fact
 
-	# if using modelled solar actinic flux
-	if (self.af_path == 'nat_act_flux'): 
+	if (self.af_path == 'nat_act_flux'): # if using modelled solar actinic flux
 		
 		import nat_act_flux
 		import zenith
@@ -135,24 +104,18 @@ def lamp_photo(J, TEMP, self):
 		
 		naff = 4 # flag for calling module
 		
-		# cosine of the solar zenith angle (radians), note 
-		# that solar declination angle 
-		# (self.dec), latitude (in radians) (self.lat_rad) and 
-		# local hour angle (lha) are 
+		# cosine of the solar zenith angle (radians), note that solar declination angle 
+		# (self.dec), latitude (in radians) (self.lat_rad) and local hour angle (lha) are 
 		# from zenith.py
-		self.mu0 = (np.sin(self.dec)*np.sin(self.lat_rad)
-			+ np.cos(self.dec)*np.cos(self.lat_rad)*
-			np.cos(self.lha))
+		self.mu0 = np.sin(self.dec)*np.sin(self.lat_rad)+np.cos(self.dec)*np.cos(self.lat_rad)*np.cos(self.lha)
 		
-		# get wavelengths (nm) and their associated actinic 
-		# fluxes (photon/cm2/nm/s)
+		# get wavelengths (nm) and their associated actinic fluxes (photon/cm2/nm/s)
 		
-		# loop through top-of-the-atmosphere downward actinic 
-		# flux (photon/cm2/nm/s) per wavelength (nm)
+		# loop through top-of-the-atmosphere downward actinic flux 
+		# (photon/cm2/nm/s) per wavelength (nm)
 		
 		for F0 in F_dep_wl:
-			[act_chm] = nat_act_flux.nat_act_flux(A, a, 
-				F0, theta, tau, naff, mu0, NL)
+			[act_chm] = nat_act_flux.nat_act_flux(A, a, F0, theta, tau, naff, mu0, NL)
 		
 	
 	# get UV-C transmission factor now
@@ -165,61 +128,45 @@ def lamp_photo(J, TEMP, self):
 		UVCindx[wl_chm<280.] += 1
 		UVCindx = UVCindx == 2
 		act_chm[UVCindx] = act_chm[UVCindx]*tf_UVCn
-	
+
 	# --------------------------------------------------------------
-	# in the below sections photolysis rates are calculated using 
-	# either the
-	# user-supplied file of absorption cross-sections and quantum 
-	# yields
+	# in the below sections photolysis rates are calculated using either the
+	# user-supplied file of absorption cross-sections and quantum yields
 	# or using those files recommended by MCM 
 	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	
 	cwd = os.getcwd() # address of current working directory
 	
 	
-	# determine whether to use MCM-recommended 
-	# wavelength-dependent absorption 
-	# cross-sections (cm2/molecule) and quantum yields (fraction) 
-	# or other
-	# using user-supplied estimates
-	if (self.photo_path[-26::] != '/PyCHAM/photofiles/MCMv3.2'): 
+	# determine whether to use MCM-recommended wavelength-dependent absorption 
+	# cross-sections (cm2/molecule) and quantum yields (fraction) or other
+	if self.photo_path != str(cwd+'/PyCHAM/photofiles/MCMv3.2'): # using user-supplied estimates
 		 
 		# open file to read
 		f = open(self.photo_path, 'r')
 		
-		# keep count on photolysis reactions, note Fortran 
-		# indexing to be consistent with 
+		# keep count on photolysis reactions, note Fortran indexing to be consistent with 
 		# MCM photochemical reaction numbers
 		Ji = 1
-	
-		# will contain wavelengths for cross-sections (nm)	
-		wlxs = np.empty(0) 
-		# will contain absorption cross-sections (cm2/molecule)
-		all_xs = np.empty(0)
-		# will contain wavelengths for quantum yields (nm) 
-		wlqy = np.empty(0) 
-		# will contain quantum yields (fraction)
-		all_qy = np.empty(0) 
 		
-		# flags for when to record absorption cross section 
-		# and quantum yields
+		wlxs = np.empty(0) # will contain wavelengths for cross-sections (nm)
+		all_xs = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
+		wlqy = np.empty(0) # will contain wavelengths for quantum yields (nm)
+		all_qy = np.empty(0) # will contain quantum yields (fraction)
+		
+		# flags for when to record absorption cross section and quantum yields
 		xs_rec = 0
 		qy_rec = 0
 		
-		# loop through lines of file containing absorption 
-		# cross-sections and quantum yields
+		# loop through lines of file containing absorption cross-sections 
+		# and quantum yields
 		for line in f:
 
-			# know when end reached - see below this 
-			# section for the arranging
-			# of absorption cross-sections and quantum 
-			# yields
-			if (line.strip() == str('J_'+str(Ji+1) + '_axs') 
-				or line.strip() == str('J_'+str(Ji+1) + '_qy') 
-				or line.strip() =='J_end'):
+			# know when end reached - see below this section for the arranging
+			# of absorption cross-sections and quantum yields
+			if line.strip() == str('J_'+str(Ji+1) + '_axs') or line.strip() == str('J_'+str(Ji+1) + '_qy') or line.strip() =='J_end':
 
-				# absorption cross section (cm2/molecule) 
-				# interpolation to wavelengths
+				# absorption cross section (cm2/molecule) interpolation to wavelengths
 				# given in actinic flux file
 				all_xs = np.interp(wl_chm, wlxs, all_xs)
 				# quantum yield (fraction) interpolation to wavelengths
@@ -263,51 +210,36 @@ def lamp_photo(J, TEMP, self):
 			
 			if qy_rec == 1: # when looking for quantum yields
 				wl = float(line.split(',')[0]) # get the wavelength part
-				# get the quantum yield at this wavelength
-				qy = float(line.split(',')[1])
+				qy = float(line.split(',')[1]) # get the quantum yield at this wavelength
 				wlqy = np.append(wlqy, (np.array(wl)).reshape(1), axis=0)
 				all_qy = np.append(all_qy, (np.array(xs)).reshape(1), axis=0)
+			
+			
+				
 				
 		f.close() # close file
 	
 	
 	# Using MCM recommended component absorption cross-sections 
-	# and quantum yields 
-	# (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
+	# and quantum yields (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 	# in combination with the actinic flux found above
-	else:
+	if (self.photo_path == str(cwd+'/PyCHAM/photofiles/MCMv3.2')):
 	
-		# ------------------------------------------------------		
+		# --------------------------------------------------------------
 		# J<1> and J<2> for O3 (ozone) photolysis
 		# cross-section file
-		f = open(str(self.photo_path + 
-			'/O3/o3_molina86_cs.txt'), 'r')
-		# will contain wavelengths for cross-sections (nm)
-		wlO3xs = np.empty(0)
-		# will contain absorption cross-sections (cm2/molecule) 
-		xsO3 = np.empty(0) 
+		f = open(str(self.photo_path+'/O3/o3_molina86_cs.txt'), 'r')
+		wlO3xs = np.empty(0) # will contain wavelengths for cross-sections (nm)
+		xsO3 = np.empty(0) # will contain absorption cross-sections (cm2/molecule)
 	
 		for line in f: # loop through line
 			
 			try: # omit headers
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
-				
-				# for absorption cross-sections of 
-				# wavelength 290 nm and above, following
-				# the Table 3 of 
-				# doi.org/10.1029/JD091iD13p14501, valid
-				# values of B are given, however, below
-				# 290 nm, values are taken from Table 1
-				# of the same publication
-				
-				xs = (float(line.split('	')[1])*
-				np.exp(float(line.split('	')[2])/
-				TEMP))
-				wlO3xs = np.append(wlO3xs, 
-				(np.array(wl)).reshape(1), axis=0)
-				xsO3 = np.append(xsO3, 
-				(np.array(xs)).reshape(1), axis=0)
+				xs = float(line.split('	')[1])*np.exp(float(line.split('	')[2])/TEMP)
+				wlO3xs = np.append(wlO3xs, (np.array(wl)).reshape(1), axis=0)
+				xsO3 = np.append(xsO3, (np.array(xs)).reshape(1), axis=0)
 				
 			except:
 				continue
@@ -316,12 +248,9 @@ def lamp_photo(J, TEMP, self):
 		xsO3 = np.interp(wl_chm, wlO3xs, xsO3)
 		
 		# same for J<1> quantum yield O3=O(1D)
-		f = open(str(self.photo_path+'/O3/'
-			'o3_o1d_matsumi02_qy_298.txt'), 'r')
-		# will contain wavelengths for qy (nm)
-		wlO3qy = np.empty(0)
-		# will contain qy (dimensionless fraction (0-1)) 
-		qyO3 = np.empty(0) 
+		f = open(str(self.photo_path+'/O3/o3_o1d_matsumi02_qy_298.txt'), 'r')
+		wlO3qy = np.empty(0) # will contain wavelengths for qy (nm)
+		qyO3 = np.empty(0) # will contain qy (dimensionless fraction (0-1))
 		
 		for line in f: # loop through line
 			
@@ -329,10 +258,8 @@ def lamp_photo(J, TEMP, self):
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
 				qy = float(line.split('	')[1])
-				wlO3qy = np.append(wlO3qy, 
-				(np.array(wl)).reshape(1), axis=0)
-				qyO3 = np.append(qyO3, 
-				(np.array(qy)).reshape(1), axis=0)
+				wlO3qy = np.append(wlO3qy, (np.array(wl)).reshape(1), axis=0)
+				qyO3 = np.append(qyO3, (np.array(qy)).reshape(1), axis=0)
 				
 			except:
 				continue
@@ -342,12 +269,9 @@ def lamp_photo(J, TEMP, self):
 		
 		
 		# same for J<2> quantum yield O3=O
-		f = open(str(self.photo_path+
-			'/O3/o3_o3p_matsumi02_qy_298.txt'), 'r')
-		# will contain wavelengths for qy (nm)
-		wlO3Pqy = np.empty(0)
-		# will contain qy (dimensionless fraction (0-1)) 
-		qyO3P = np.empty(0) 
+		f = open(str(self.photo_path+'/O3/o3_o3p_matsumi02_qy_298.txt'), 'r')
+		wlO3Pqy = np.empty(0) # will contain wavelengths for qy (nm)
+		qyO3P = np.empty(0) # will contain qy (dimensionless fraction (0-1))
 		
 		for line in f: # loop through line
 			
@@ -355,10 +279,8 @@ def lamp_photo(J, TEMP, self):
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
 				qy = float(line.split('	')[1])
-				wlO3Pqy = np.append(wlO3Pqy, 
-				(np.array(wl)).reshape(1), axis=0)
-				qyO3P = np.append(qyO3P, 
-				(np.array(qy)).reshape(1), axis=0)
+				wlO3Pqy = np.append(wlO3Pqy, (np.array(wl)).reshape(1), axis=0)
+				qyO3P = np.append(qyO3P, (np.array(qy)).reshape(1), axis=0)
 				
 			except:
 				continue
@@ -369,9 +291,10 @@ def lamp_photo(J, TEMP, self):
 		
 		# photolysis rate for J<1> and J<2> (/s)
 		J[1] = sum(xsO3*qyO3*act_chm)
-		J[2] = sum(xsO3*qyO3P*act_chm)	
+		J[2] = sum(xsO3*qyO3P*act_chm)
+		indx = wl_chm<264.
 
-		# ------------------------------------------------------
+		# --------------------------------------------------------------
 		# J<3> for H2O2 (hydrogen peroxide) photolysis: H2O2 = OH + OH
 		# cross-section file
 		f = open(str(self.photo_path+'/H2O2/h2o2_iupac2003_cs_298.txt'), 'r')
@@ -527,8 +450,7 @@ def lamp_photo(J, TEMP, self):
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
 				xs = float(line.split('	')[1])
-				wlHONOxs = np.append(wlHONOxs, 
-				(np.array(wl)).reshape(1), axis=0)
+				wlHONOxs = np.append(wlHONOxs, (np.array(wl)).reshape(1), axis=0)
 				xsHONO = np.append(xsHONO, (np.array(xs)).reshape(1), axis=0)
 				
 			except:
@@ -538,8 +460,7 @@ def lamp_photo(J, TEMP, self):
 		xsHONO = np.interp(wl_chm, wlHONOxs, xsHONO)
 		
 		# J<7> quantum yield: HONO = OH + NO
-		# assume quantum yield of 1.0 for J<7> following 
-		# recommendation of MCM website on
+		# assume quantum yield of 1.0 for J<7> following recommendation of MCM website on
 		# 4/12/2019
 		
 		# photolysis rate for J<7>
@@ -557,8 +478,8 @@ def lamp_photo(J, TEMP, self):
 			try: # omit headers
 				float(line.split('	')[0])
 				wl = float(line.split('	')[0])
-				xsA = float(line.split('	')[1])*1.e-20
-				xsB = float(line.split('	')[2])*1.e-3
+				xsA = float(line.split('	')[1])*1.0e-20
+				xsB = float(line.split('	')[2])
 				xss = xsA*np.exp(xsB*(TEMP-298.0))
 				wl_xs = np.append(wl_xs, (np.array(wl)).reshape(1), axis=0)
 				xs = np.append(xs, (np.array(xss)).reshape(1), axis=0)
@@ -566,7 +487,6 @@ def lamp_photo(J, TEMP, self):
 			except:
 				continue
 		f.close() # close file
-		
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl_xs, xs)
 		
@@ -575,6 +495,7 @@ def lamp_photo(J, TEMP, self):
 		
 		# photolysis rate
 		J[8] = sum(xs*1.0*act_chm)
+		
 		# --------------------------------------------------------------
 		# J<11> for HCHO (formaldehyde) photolysis: HCHO = CO + HO2 + HO2;
 		# cross-section file
@@ -1260,12 +1181,9 @@ def lamp_photo(J, TEMP, self):
 	
 		# --------------------------------------------------------------
 		# J<55> for → t-C4H9O + NO2
-		# comparing the link given in the MCM site: 
-		# http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/
-		# t_C4H9ONO2/t_c4h9ono2_Roberts&Fajar89_cs_298.txt
+		# comparing the link given in the MCM site: http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis/t_C4H9ONO2/t_c4h9ono2_Roberts&Fajar89_cs_298.txt
 		# for tert-butyl nitrate to the download folder of photolysis rates,
-		# this process does not seem to be included in the download, 
-		# so manual input provided
+		# this process does not seem to be included in the download, so manual input provided
 		wl = np.array(([270.0, 275.0, 280.0, 285.0, 290.0, 295.0, 300.0, 305.0, 310.0, 315.0, 320.0, 325.0, 330.0]))
 		xs = np.array(([4.3e-20, 4.0e-20, 3.7e-20, 3.1e-20, 2.6e-20, 2.0e-20, 1.5e-20, 1.0e-20, 7.0e-21, 4.5e-21, 2.7e-21, 1.50e-21, 8.60e-22]))
 		
@@ -1300,8 +1218,7 @@ def lamp_photo(J, TEMP, self):
 		# absorption cross section (cm2/molecule) interpolation
 		xs = np.interp(wl_chm, wl, xs)
 		
-		# quantum yield uses value given in MCM website 
-		# table (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
+		# quantum yield uses value given in MCM website table (http://mcm.leeds.ac.uk/MCMv3.3.1/parameters/photolysis.htt)
 		# (true on 4/12/2019)
 		qy=0.9
 		

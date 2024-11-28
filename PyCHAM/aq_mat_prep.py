@@ -1,23 +1,23 @@
 ##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
 ##########################################################################################
 '''preparing the matrices for aqueous-phase reactions'''
 # mostly just adjusting indices to account for number of size bins
@@ -74,15 +74,14 @@ def aq_mat_prep(num_sb, comp_num, self):
 		# tile where possible (ahead of vectorised operation)
 		self.rstoi_aq = np.tile(self.rstoi_aq, (num_asb, 1))
 		self.pstoi_aq = np.tile(self.pstoi_aq, (num_asb, 1))
-		self.rstoi_flat_aq = np.tile(self.rstoi_flat_aq, (num_asb))
-		self.pstoi_flat_aq = np.tile(self.pstoi_flat_aq, (num_asb))
+		self.rstoi_flat_aq = np.tile(self.rstoi_flat_aq, (1, num_asb))
+		self.pstoi_flat_aq = np.tile(self.pstoi_flat_aq, (1, num_asb))
 	
 		# count number of empty elements in rindx (due to not all reactions containing
 		# the maximum number of unique reactants present in a reaction)
 		empty_num = sum(sum(self.rindx_aq == -2))
 	
-		# now change fillers to zero, and note that although this suggests the 
-		# first component
+		# now change fillers to zero, and note that although this suggests the first component
 		# it makes no difference as the corresponding stoichiometry is 0
 		self.rindx_aq[self.rindx_aq == -2] = 0
 	
@@ -102,19 +101,19 @@ def aq_mat_prep(num_sb, comp_num, self):
 			if (sbi > 0): # larger size bin
 				self.rindx_aq = np.append(self.rindx_aq, self.rindx_aq[0:rindxs[0], 0:rindxs[1]]+(sbi)*(comp_num+2), axis=0)
 				self.pindx_aq = np.append(self.pindx_aq, self.pindx_aq[0:pindxs[0], 0:pindxs[1]]+(sbi)*(comp_num+2), axis=0)
-				self.y_arr_aq = np.append(self.y_arr_aq, self.y_arr_aq[0:y_arrl]+(sbi)*(max(self.y_arr_aq[0:y_arrl])+1)+en_cum, axis=0)
+				self.y_arr_aq = np.append(self.y_arr_aq, self.y_arr_aq[0:y_arrl]+(sbi)*(max(y_arr[0:y_arrl])+1)+en_cum, axis=0)
 				self.y_rind_aq = np.append(self.y_rind_aq, self.y_rind_aq[0:y_rindl]+(sbi)*(comp_num+2))
 				self.y_pind_aq = np.append(self.y_pind_aq, self.y_pind_aq[0:y_pindl]+(sbi)*(comp_num+2))
-				self.rr_arr_aq = np.append(self.rr_arr_aq, self.rr_arr_aq[0:rr_arrl]+(sbi)*(max(self.rr_arr_aq[0:rr_arrl])+1), axis=0)
-				self.rr_arr_p_aq = np.append(self.rr_arr_p_aq, self.rr_arr_p_aq[0:rr_arr_pl]+(sbi)*(max(self.rr_arr_p_aq[0:rr_arr_pl])+1), axis=0)
-				self.reac_col_aq = np.append(self.reac_col_aq, self.reac_col_aq[reac_coll-1]+self.reac_col_aq[-reac_coll+1::])
-				self.prod_col_aq = np.append(self.prod_col_aq, self.prod_col_aq[prod_coll-1]+self.prod_col_aq[-prod_coll+1::])
+				self.rr_arr_aq = np.append(self.rr_arr_aq, self.rr_arr_aq[0:rr_arrl]+(sbi)*(max(rr_arr[0:rr_arrl])+1), axis=0)
+				self.rr_arr_p_aq = np.append(self.rr_arr_p_aq, self.rr_arr_p_aq[0:rr_arr_pl]+(sbi)*(max(rr_arr_p[0:rr_arr_pl])+1), axis=0)
+				self.reac_col_aq = np.append(self.reac_col_aq, self.reac_col_aq[reac_coll-1]+reac_col[-reac_coll+1::])
+				self.prod_col_aq = np.append(self.prod_col_aq, self.prod_col_aq[prod_coll-1]+prod_col[-prod_coll+1::])
 				self.uni_y_rind_aq = np.append(self.uni_y_rind_aq, self.uni_y_rind_aq[0:uni_y_rindl]+(sbi)*(comp_num+2), axis=0)
 				self.uni_y_pind_aq = np.append(self.uni_y_pind_aq, self.uni_y_pind_aq[0:uni_y_pindl]+(sbi)*(comp_num+2), axis=0)
 				self.jac_stoi_aq = np.append(self.jac_stoi_aq, np.zeros((self.jac_stoi_aq.shape[0], int(max(self.njac_aq)))), axis=1)
 				self.jac_den_indx_aq = np.append(self.jac_den_indx_aq, np.zeros((self.jac_den_indx_aq.shape[0], int(max(self.njac_aq)))), axis=1)
 				for eqi in range(self.njac_aq.shape[0]): # equation loop
-					self.jac_stoi_aq[eqi, int(sbi*self.njac_aq[eqi]):int((sbi+1)*self.njac_aq[eqi])] = self.jac_stoi_aq[eqi, 0:int(self.njac_aq[eqi])]
+					self.jac_stoi_aq[eqi, int(sbi*self.njac_Aq[eqi]):int((sbi+1)*self.njac_aq[eqi])] = self.jac_stoi_aq[eqi, 0:int(self.njac_aq[eqi])]
 					self.jac_den_indx_aq[eqi, int(sbi*self.njac_aq[eqi]):int((sbi+1)*self.njac_aq[eqi])] = self.jac_den_indx_aq[eqi, 0:int(self.njac_aq[eqi])]+(sbi)*(comp_num+2)
 	
 		# account for size bins

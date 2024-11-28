@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''module to record required results'''
 # keeps track of model variables
 
@@ -33,13 +32,13 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	cham_env, temp_now, Pnow, tot_in_res, self):
 	
-	# inputs: ------------------------------------------------------
+	# inputs: ------------------------------------------------------------
 	# save_cnt - count on saving steps
 	# trec - the time through simulation record (s)
 	# yrec - concentration record (# molecules/cm3 (air))
 	# Cfactor_vst - record of the conversion factor for # molecules/cm3 
 	# to ppb
-	# y - concentrations (molecules/cm3 (air))
+	# y - concentrations (molecules/cc (air))
 	# sumt - cumulative time through simulation (s)
 	# num_sb - number of size bins
 	# num_comp - number of components
@@ -67,7 +66,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	#	particle-wall deposition, stacked by component first then by
 	#	size bin (# molecules/cm3)
 	# cham_env - chamber environmental conditions (temperature (K), 
-	# pressure (Pa), relative humdity, transmission factor
+	# pressure (Pa) and relative humdity
 	# temp_now - chamber temperature (K)
 	# Pnow - chamber pressure (Pa)
 	# tot_in_res - cumulative influx of injected components (ug/m3)
@@ -110,16 +109,14 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 			Nres_dry[save_cnt, Ni] = pconc[ish, 0].sum()
 		Nres_wet[save_cnt, :] = pconc[:, 0] # record with water
 	
-	# end of number size distribution part ------------------------------
-
+	# end of number size distribution part ----------------------------------------
+	
 	# chamber environmental conditions ----------------------------------
 	
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
 	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
-	# relative humidity (fraction (0-1))	
-	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] 	
-	cham_env[save_cnt, 3] = self.tf[sum(self.tft<=sumt)-1]
-	# -------------------------------------------------------------------
+	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] # relative humidity (fraction (0-1))
+	# --------------------------------------------------------------------------------
 
 	# cumulative influx of injected components (ug/m3)
 	self.tot_in_res_ft[save_cnt+1, :] += tot_in_res

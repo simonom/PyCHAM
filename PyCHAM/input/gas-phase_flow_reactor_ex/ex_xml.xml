@@ -4062,9 +4062,7 @@
 <species species_number="s1355" species_name="CHCLOO">
 <smiles>[O-][O+]=CCl</smiles>
 </species>
-<species species_number="s1356" species_name="HCL">
-<smiles>Cl</smiles>
-</species>
+<species species_number="s1356" species_name="HCL"/>
 <species species_number="s1357" species_name="CCLOHCOOH">
 <smiles>OOCC(O)Cl</smiles>
 </species>
@@ -7383,9 +7381,7 @@
 <species species_number="s2462" species_name="BOXPRONBOH">
 <smiles>CCCCOC(O)C(=O)C</smiles>
 </species>
-<species species_number="s2463" species_name="BR">
-<smiles>Br</smiles>
-</species>
+<species species_number="s2463" species_name="BR"/>
 <species species_number="s2464" species_name="BRETO3">
 <smiles>[O]OC(=O)CBr</smiles>
 </species>

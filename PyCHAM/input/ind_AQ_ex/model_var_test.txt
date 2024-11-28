@@ -37,7 +37,7 @@ volP = 1.e20, 0., 1.e20, 0.
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
 # and that cleaning emissions (8pm each day) are from:
 # https://onlinelibrary.wiley.com/doi/full/10.1111/ina.12906
-const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/cont_infl.xlsx
+const_infl = /Users/Simon_OMeara/Desktop/PyCHAM/PyCHAM/input/ind_AQ_ex/const_infl.xlsx
 # starting concentrations (ppb)
 Comp0 = CO, CH4, APINENE, O3, NO, NO2, HONO, SO2, BENZENE, MXYL, OXYL, PXYL, TM124B, TM135B, C2H6, C3H8, NC4H10, NC5H12, NC6H14, NC7H16, NC8H18, NC9H20, NC10H22, NC11H24, NC12H26, CHEX, CH3CCL3, CH2CL2, CHCL3, HCHO, MEMOXYCHO, BENZAL, CH3COCH3, MEK, CH3OH, C2H5OH, IPROPOL, IPROPOL, TOLUENE, EBENZ, PHENOL, IPBENZ, C2H4, C3H6, TBUT2ENE, CBUT2ENE, MEPROPENE, C4H6, ME2BUT2ENE, C5H8, LIMONENE, STYRENE, BUOX2ETOH, CYHEXONE, MIBK, MPRK, TRICLETH, TCE, TM123B, C5H11CHO, NPROPOL, PEAOH, NBUTOL, TBUTOL
 C0 = 4.e2, 1.9e3, 0.5, 2.,    5.,  2.,   5., 1.,       5.,   2.,   3.,   2.,     2.,                   1.,       2.5,  1.5,     4.,     2.,    0.7,    0.3,    0.9,    1.2,     0.8,     0.8,             0.8,      1.4,     10.,    0.4,   0.8,  30.,        5.,    1.6,      10., 9.2,  10.0, 100.0,     2.27,    0.2,      10.,   2.0,    2.3,   0.18,  1.5,  0.5,     0.3,       0.3, 0.5,       0.3,        0.4,    2.,       0.,     0.28,       1.3,      0.24,  0.13, 0.16, 3.8e-2,  0.28,   0.32,      4.9,    0.13,  0.19,  0.73,    0.21

@@ -1,36 +1,32 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
-'''plots results for the gas-phase temporal profiles of specified 
-components'''
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
+'''plots results for the gas-phase temporal profiles of specified components'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-# for customised colormap
-from matplotlib.colors import LinearSegmentedColormap
-# set colormap tick labels to standard notation
-import matplotlib.ticker as ticker 
+from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
 import retr_out
 import numpy as np
@@ -41,8 +37,7 @@ import openbabel.pybel as pybel
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
-	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) 
-	# or tests (2) are the calling module
+	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
 	# self - reference to GUI
@@ -72,156 +67,29 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	Cfac = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
 	
 	# number of actual particle size bins
-	num_asb = (num_sb-wall_on)	
+	num_asb = (num_sb-wall_on)
 
 	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or caller == 5 or caller == 6):
-		# show results to screen and turn on interactive mode
-		plt.ion() 
-	
+		plt.ion() # show results to screen and turn on interactive mode
+		
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
 	if (comp_names_to_plot): # if component names specified
 	
-		# gas-phase concentration sub-plot --------------------	
-		ip_fail = 0 # start by assuming all requested components available
-
+		# gas-phase concentration sub-plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
-
-			group_flag = 0 # start by assuming single components wanted
 			
 			if (comp_names_to_plot[i].strip() == 'H2O'):
 				indx_plot = [H2Oi]
 				indx_plot = np.array((indx_plot))
 			if (comp_names_to_plot[i].strip() == 'RO2'):
 				indx_plot = (np.array((group_indx['RO2i'])))
-				group_flag = 1
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
-				group_flag = 1	
 			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
 				indx_plot = (np.array((group_indx['HOMRO2'])))
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'HOM'):
-				indx_plot = (np.array((group_indx['HOMs'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == '-OOH'):
-				indx_plot = (np.array((group_indx['OOH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-OOH'):
-				indx_plot = (np.array((group_indx['HOM_OOH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == '-OH'):
-				indx_plot = (np.array((group_indx['OH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1			
-			if (comp_names_to_plot[i].strip() == 'HOM-OH'):
-				indx_plot = (np.array((group_indx['HOM_OH'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == '-carbonyl'):	
-				indx_plot = (np.array((group_indx['carbonyl'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-carbonyl'):
-				indx_plot = (np.array((group_indx['HOM_carbonyl'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == '-NO3'):
-				indx_plot = (np.array((group_indx['NO3'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOM-NO3'):
-				indx_plot = (np.array((group_indx['HOM_NO3'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1	
-			if (comp_names_to_plot[i].strip() == 'ROOR'):
-				indx_plot = (np.array((group_indx['ROOR'])))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-			if (comp_names_to_plot[i].strip() == 'HOMMonBaker'):
-				load_path = str('HOMMonBaker_indx.npy') # path
-				indx_plot = (np.load(str(dir_path + '/' + load_path),
-					allow_pickle=True))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-
-			if (comp_names_to_plot[i].strip() == 'HOMFragBaker'):
-				load_path = str('HOMFragBaker_indx.npy') # path
-				indx_plot = (np.load(str(dir_path + '/' + load_path),
-					allow_pickle=True))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-
-			if (comp_names_to_plot[i].strip() == 'HOMRO2Baker'):
-				load_path = str('HOMRO2Baker_indx.npy') # path
-				indx_plot = (np.load(str(dir_path + '/' + load_path),
-					allow_pickle=True))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-
-			if (comp_names_to_plot[i].strip() == 'ROORBaker'):
-				load_path = str('ROORBaker_indx.npy') # path
-				indx_plot = (np.load(str(dir_path + '/' + load_path),
-					allow_pickle=True))			
-				group_flag = 1
-				if (indx_plot.shape[0] == 0):
-					ip_fail = 1
-
-			if ('C' in comp_names_to_plot[i].strip() or 'c' 
-				in comp_names_to_plot[i].strip()):
-				# if a number given after carbon atom
-				if comp_names_to_plot[i].strip()[1::].isnumeric():
-					# get carbon number
-					Cn = float(comp_names_to_plot[i].strip()[1::])
-					# get all components with this many carbons
-					# empty list
-					indx_plot = []
-					indx_cnt = 0 # keep count on species
-					for SMILESi in rel_SMILES:
-						if ((SMILESi.count('C') + SMILESi.count('c')) 
-							== Cn):
-							indx_plot.append(indx_cnt)
-						indx_cnt += 1 # keep count on species
-
-					indx_plot = (np.array((indx_plot)))			
-					group_flag = 1
-					if (indx_plot.shape[0] == 0):
-						ip_fail = 1
-			if (ip_fail == 1):
-				self.l203a.setText(str('Component ' + comp_names_to_plot[i] + 
-				' not found in chemical scheme used for this simulation'))
-				# set border around error message
-				if (self.bd_pl == 1):
-					self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-					self.bd_pl = 2
-				else:
-					self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-					self.bd_pl = 1
-
-				plt.ioff() # turn off interactive mode
-				plt.close() # close figure window
-				return()
-
-			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
+			if (comp_names_to_plot[i].strip() != 'H2O' and comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'):
 				try: # will work if provided components were in simulation chemical scheme
 					# get index of this specified component, removing any white space
 					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
@@ -262,37 +130,42 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = np.sum(conc, axis=1) # sum multiple components
 			
 			# plot this component
-			if (group_flag == 0): # if not a sum of components
+			if (comp_names_to_plot[i].strip() != 'RO2' and comp_names_to_plot[i].strip() != 'RO' and comp_names_to_plot[i].strip() != 'HOMRO2'): # if not the sum of organic peroxy radicals
 				if (caller == 4 or caller == 5 or caller == 6): # log10 y axis
 					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
 					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
-			
-			else: # if a sum over a group of components
-				if (caller == 4 or caller == 5 or 
-					caller == 6): # log y axis
-					ax0.semilogy(timehr, conc, '-+',
-					 linewidth = 4., label = 
-					str(r'$\Sigma$' + 
-					comp_names_to_plot[i].strip() + 
-					' (gas-phase)'))
+				
+			if (comp_names_to_plot[i].strip() == 'RO2'): # if is the sum of organic peroxy radicals
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
-
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO2 (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'RO'): # if is the sum of organic alkoxy radicals
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$RO (gas-phase)'))
+			if (comp_names_to_plot[i].strip() == 'HOMRO2'): # if is the sum of HOM organic peroxy radicals
+				if (caller == 4 or caller == 5 or caller == 6): 
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$HOMRO2 (gas-phase)'))
+					
 		if (caller == 0 or caller == 5): # ug/m3 plot
-			ax0.set_ylabel(str(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)'), fontsize = 14)
+			ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		if (caller == 1 or caller == 4): # ppb plot
-			ax0.set_ylabel(str(r'Mixing ratio (ppb)'), fontsize = 14)
+			ax0.set_ylabel(r'Mixing ratio (ppb)', fontsize = 14)
 		if (caller == 3 or caller == 6): # # molecules/cm3 plot
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
-			ax0.set_ylabel(str(r'Concentration ' + gpunit), fontsize = 14)
+			ax0.set_ylabel(r'Concentration ' + gpunit, fontsize = 14)
 
-		ax0.set_xlabel(str(r'Time through simulation (hours)'), fontsize = 14)
+		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 		
-		# end of gas-phase concentration sub-plot --------------
+		# end of gas-phase concentration sub-plot ---------------------------------------
 	
 
 	if (caller == 2): # display
@@ -304,7 +177,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 # for time series of the average organic peroxy radical molecule
 def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	
-	# inputs: ------------------------------------------------------
+	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
@@ -387,8 +260,8 @@ def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	ax0.plot(timehr, Oav_cnt, '-+', linewidth = 4., label = 'Oxygen number')
 	ax0.plot(timehr, Hav_cnt, '-+', linewidth = 4., label = 'Hydrogen number')
 	
-	ax0.set_ylabel(str(r'Average number of atoms per RO2 molecule'), fontsize = 14)
-	ax0.set_xlabel(str(r'Time through simulation (hours)'), fontsize = 14)
+	ax0.set_ylabel(r'Average number of atoms per RO2 molecule', fontsize = 14)
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.legend(fontsize = 14)
@@ -423,7 +296,7 @@ def plotter_noncsv(caller, dir_path, comp_names_to_plot, self):
 			ax0.plot(Etime_s/3600., (ECrec[:, Ei]/Cfac), '-x', linewidth = 2., label = str(comp_names_to_plot[i]))
 		
 	
-	ax0.set_ylabel(str(r'Concentration (ppb)'), fontsize = 14)
+	ax0.set_ylabel(r'Concentration (ppb)', fontsize = 14)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -528,20 +401,14 @@ def plotter_rad_pool(self):
 		p3, = par1.plot(timehr, y_rad[:, ord[-(i+1)]], '--', label = str(rad_names[ord[-(i+1)]] + ' conc.'))
 
 	# also plot sum of fractions shown in plot
-	ax0.plot(timehr, frac_sum, '-k', 
-		label = str(r'$\Sigma$(frac. shown here)'))
+	ax0.plot(timehr, frac_sum, '-k', label = str(r'$\Sigma$(frac. shown here)'))
 
 	# in case you want to check that sum of fractions=1
-	#ax0.plot(timehr, np.sum(y_radf, axis=1), 
-	#	label = 'sum of fractions (check)')
+	#ax0.plot(timehr, np.sum(y_radf, axis=1), label = 'sum of fractions (check)')
 
-	ax0.set_ylabel(str('Fraction of all concentrations'), 
-		fontsize = 14)
-	# right vertical axis label
-	par1.set_ylabel(str(r'Concentration ($\mathrm{ppb}$)'), 
-		fontsize = 14, rotation=270, labelpad=20) 
-	ax0.set_xlabel(str(r'Time through simulation (hours)'), 
-		fontsize = 14)
+	ax0.set_ylabel(str('Fraction of all concentrations'), fontsize = 14)
+	par1.set_ylabel('Concentration ($\mathrm{ppb}$)', fontsize = 14, rotation=270, labelpad=20) # right vertical axis label
+	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	par1.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -677,24 +544,16 @@ def plotter_rad_flux(self):
 	# loop through top contributors
 	for compi in range(self.rad_ord_num):
 		
-		# plot temporal profiles of fractional change 
-		# tendencies due to chemical 
+		# plot temporal profiles of fractional change tendencies due to chemical 
 		# reaction
-		ax0.plot(timehr, cr_dydt_frac[:, ord[-(compi+1)]], 
-			label = str(rad_names[ord[-(compi+1)]] + 
-				' frac.'))
+		ax0.plot(timehr, cr_dydt_frac[:, ord[-(compi+1)]], label = str(rad_names[ord[-(compi+1)]] + ' frac.'))
 		# plot right axis (absolute flux)
-		p3, = par1.plot(timehr, cr_dydt[:, ord[-(compi+1)]],
-			 '--', label = str(rad_names[ord[-(compi+1)]] +
-			 ' flux'))
+		p3, = par1.plot(timehr, cr_dydt[:, ord[-(compi+1)]], '--', label = str(rad_names[ord[-(compi+1)]] + ' flux'))
 
 
 	ax0.set_xlabel('Time through experiment (hours)', fontsize = 14)
-	ax0.set_ylabel('Fraction of all change tendencies', 
-		fontsize = 14)
-	par1.set_ylabel(str(r'''Change tendency ($\mathrm{molecules\,
-		cm^{-3}\, s^{-1}}$)'''), fontsize = 14, rotation=270,
-		 labelpad=20) # right vertical axis label
+	ax0.set_ylabel('Fraction of all change tendencies', fontsize = 14)
+	par1.set_ylabel('Change tendency ($\mathrm{molecules \, cm^{-3}\, s^{-1}}$)', fontsize = 14, rotation=270, labelpad=20) # right vertical axis label
 		
 
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
@@ -842,8 +701,8 @@ def O3_iso(self):
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 
 	# set axis titles
-	ax0.set_xlabel(str(r'NOx mixing ratio (ppb)'), fontsize=14)
-	ax0.set_ylabel(str(r'VOC mixing ratio (ppb)'), fontsize=14)
+	ax0.set_xlabel(r'NOx mixing ratio (ppb)', fontsize=14)
+	ax0.set_ylabel(r'VOC mixing ratio (ppb)', fontsize=14)
 
 	# colour bar
 	cb = plt.colorbar(p1, pad=0.25, ax=ax0)

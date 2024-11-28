@@ -1,65 +1,58 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''module for calculating photolysis rates'''
-# can use ambient sunlight expression or artificial chamber lights for 
-# calculating photolysis rates
+# can use ambient sunlight expression or artificial chamber lights for calculating
+# photolysis rates
 
 import scipy
 import os
 import numpy as np
+import requests, zipfile, io # for downloading
 import shutil
 from lamp_photo import lamp_photo
 import zenith
 
 def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	
-	# inputs:------------------------------------------------------
+	# inputs:-----------------------------------------------------------------------------
 	# self.daytime - time of day experiment starts (for natural light photolysis) (s)
 	# self.lat - latitude
 	# self.lon - longitude
 	# TEMP - temperature inside chamber (K)
-	# self.af_path - name of path to file containing known actinic flux 
-	#	(only used if lights on inside chamber)
+	# self.af_path - name of path to file containing known actinic flux (only used if 
+	#				lights on inside chamber)
 	# self.DayOfYear - number of days through the calendar year
 	# self.photo_path - name of file containing estimates for wavelength-dependent
-	# 	absorption cross-sections and quantum yields
+	# 					absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
-	# self.tf - the transmission factor (for light intensity)
+	# self.tf - the transmission factor (for natural light intensity)
 	# sumt - total time through experiment (s)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light (0-1)
-	# -----------------------------------------------------------
+	# ------------------------------------------------------------------------------------
 	
 	self.sumt = sumt
 	
-	if (sum(self.light_stat == 3) == 0):
-		J = np.zeros((Jlen)) # prepare output
-	else:
-		J = self.stored_J[:, sum(self.light_time<=sumt)-1]
-		# if a wavelength-independent transmission factor
-		if (self.tf_range == 0):
-			J = J*self.tf
-		return(J)  
-
+	J = np.zeros((Jlen)) # prepare output
+    
 	cwd = os.getcwd() # address of current working directory
 	
 	# if using MCM chemical scheme and natural light
@@ -117,34 +110,29 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		J[56] = 7.549E-06*cosx**(1.015)*np.exp(-1.0*0.324*secx)
 		J[57] = 3.363E-06*cosx**(1.296)*np.exp(-1.0*0.322*secx)
 		J[61] = 7.537E-04*cosx**(0.499)*np.exp(-1.0*0.266*secx)
-		
-		# if tranmission factor of light
-		# that is not wavelength dependent
-		if (self.tf_range == 0):
-			J = J*self.tf
-		# if tranmission factor of light
-		# is wavelength dependent, then assume the effect
-		# on J as calculated by Hayman (1997) is that of
-		# solar transmittance through a window (clear 
-		# glass in Figure 1b of 
-		# doi.org/10.1007/s44223-022-00009-6). Simon 
-		# O'Meara (11/06/2024) estimated this effect 
-		# by getting the ratio
-		# of J w/ and w/o transmittance impediment where
-		# w/ impedimenent is using the window 
-		# transmittance cited above and w/o is 
-		# transmission factor=1. The J was calculated using 
-		# the MAC_Actinic_Flux_Spectrum_wUVCx3p5.csv file
-		# from PyCHAM/photofiles, which is estimated in
-		# lamp_photo.py. Note that J[57] and J[61]
-		# are not estimated in lamp_photo, but nor are they 
-		# present in the full MCM chemical scheme, so their
-		# transmittance factor is assumed to be 0.
-		# The resulting ratio for every J 
-		# is: 
-		Hayman_wd_tf_clear_glass = [0, 0.173121721, 0.707269159, 0.826452633, 0.870432426, 0.838243408, 0.892998655, 0.858393338, 0.620252851, 0, 0, 0.442839373, 0.598900199, 0.258290129, 0.232623684, 0.446158007, 0.446158007, 0.416693792, 0.795799329, 0.795799329, 0.795799329, 0.170721083, 0.287727411, 0.559692167, 0.559692166, 0, 0, 0, 0, 0, 0, 0.413105058, 0.544067465, 0.773449079, 0.74310927, 0.894902116, 0, 0, 0, 0, 0, 0.813654941, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.808833912, 0.733110394, 0.801542645, 0.741646608, 0.829273355, 0.821086824, 0, 0, 0, 0, 0]
-		if (self.tf_range == 2):
-			J = J*self.tf*Hayman_wd_tf_clear_glass
+
+		J = J*self.tf
+
+	# from MAC spectral analysis and Mainz database (xsproc.py)
+# 	J[1] = 2.3706768705670786e-05
+# 	J[2] = 7.128976494635883e-05
+# 	J[3] = 1.26339378672e-05
+# 	J[4] = 0.0011216654096221574
+# 	J[5] = 0.0024080663555999995
+# 	J[6] = 0.02122656504799999
+# 	J[7] = 0.0002830012299999995
+# 	J[8] = 2.8579387129999973e-07
+# 	J[11] = 1.3984589959570004e-05
+# 	J[12] = 6.155370761783531e-06
+# 	J[15] = 3.657979548045003e-05
+# 	J[21] = 2.4121216268999992e-06
+# 	J[22] = 1.0067723552799998e-05
+# 	J[31] = 8.998612475770001e-07
+# 	J[32] = 3.710891288701262e-06
+# 	J[33] = 8.468352055021745e-06
+# 	J[34] = 1.039182783128049e-05
+# 	J[35] = 3.1229494794723276e-05
+# 	J[41] = 0.014555553853016991
 
 	# if a file path for user-supplied absorption cross-sections
 	# and quantum yields are supplied and actinic flux is

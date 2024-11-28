@@ -1,8 +1,8 @@
-res_file_name = example_run_output_inc_aq2
+res_file_name = Example_Run_Output_inc_aq2
 total_model_time = 3600.
 update_step = 60.
 recording_time_step = 60.
-number_size_bins = 2
+number_size_bins = 8
 lower_part_size = 0.
 upper_part_size = 5.e-1
 space_mode = log
@@ -31,4 +31,4 @@ core_diss = 3.
 vol_Comp = AMM_SUL, C3H7N2O, C6H8N2
 volP = 0., 1.e-10, 1.e-6
 umansysprop_update = 0
-chem_scheme_markers = %, RO2, +, , , ;, +, ;, $, %, :, ;, 
+chem_scheme_markers = %, RO2, +, , , ;, +, ;, $, %, :, ;

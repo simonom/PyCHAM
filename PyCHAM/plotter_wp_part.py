@@ -1,36 +1,32 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
-'''plots results for the wall-phase (from particle partitioning to wall) 
-temporal profiles of specified components'''
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
+'''plots results for the wall-phase (from particle partitioning to wall) temporal profiles of specified components'''
 # simulation results are represented graphically
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MaxNLocator
-# for customised colormap
-from matplotlib.colors import LinearSegmentedColormap
-# set colormap tick labels to standard notation
-import matplotlib.ticker as ticker
+from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 import os
 import numpy as np
 import scipy.constants as si
@@ -109,13 +105,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					return()
 			
 			if (wall_on > 0):
-				# total concentration on wall 
-				# (from particle deposition to wall) (molecules/cm3)
+				# total concentration on wall (from particle deposition to wall) (molecules/cm3)
 				conc = (yrec_p2w[:, indx_plot::num_comp]).sum(axis = 1)
 				
 			else:
-				self.l203a.setText(str('Wall not considered ' +
-					'in this simulation'))
+				self.l203a.setText(str('Wall not considered in this simulation'))
 				
 				# set border around error message
 				if (self.bd_pl == 1):

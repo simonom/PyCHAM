@@ -1,32 +1,30 @@
-########################################################################								  
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''module to estimate component volatilities and liquid densities'''
 
 # called/returned from/to the front.py and ode_gen.py modules, 
 # this module is responsible for
-# setting key properties of components, including liquid-phase 
-# saturation vapour pressures
-# and liquid-phase densities.  It does this using either 
-# UManSysProp (default), or with
+# setting key properties of components, including liquid-phase saturation vapour pressures
+# and liquid-phase densities.  It does this using either UManSysProp (default), or with
 # user settings
 
 import numpy as np
@@ -38,33 +36,29 @@ import scipy.constants as si
 import errno
 import stat
 
-def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
-		volP, testf, corei, 
-		umansysprop_update, core_dens, comp_namelist,
-		ode_gen_flag, nuci, self):
+def volat_calc(comp_list, Pybel_objects, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
+				volP, testf, corei, seed_name, pconc, umansysprop_update, core_dens, comp_namelist,
+				ode_gen_flag, nuci, nuc_comp, self):
 
-	# inputs: ------------------------------------------------------
+	# inputs: ------------------------------------------------------------
 	# comp_list - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# self.Pybel_objects - list of Pybel objects representing the 
-	#	species in comp_list
+	# Pybel_objects - list of Pybel objects representing the species in comp_list
 	# (omitting water and core, if present)
 	# TEMP - temperature (K) in chamber at time function called
-	# Psat_water - pure component saturation vapour pressure of 
-	#	water (log10(atm)) 
+	# Psat_water - pure component saturation vapour pressure of water (log10(atm)) 
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
 	# 			that have vapour pressures manually set in volP
 	# testf - flag for whether in normal mode (0) or testing mode (1)
 	# corei - index of seed particle component
-	# umansysprop_update - marker for cloning UManSysProp so that 
-	#	the latest version is used
-	# core_dens - density of core material (g/cm3 
-	#	(liquid/solid density))
-	# comp_namelist - list of components' names in chemical 
-	# 	equation file
+	# seed_name - name(s) of components(s) comprising seed particles
+	# pconc - initial number concentration of particles (#/cc (air))
+	# umansysprop_update - marker for cloning UManSysProp so that latest version used
+	# core_dens - density of core material (g/cc (liquid/solid density))
+	# comp_namelist - list of components' names in chemical equation file
 	# ode_gen_flag - whether or not called from front or ode_gen
 	# nuci - index of nucleating component
-	# self.nuc_comp - name of nucleating component
+	# nuc_comp - name of nucleating component
 	# self - reference to PyCHAM
 	# ------------------------------------------------------------
 	
@@ -109,75 +103,50 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 		
 		for i in range (num_comp):
 			
-			# density estimation ---------------------------
-			if (i == H2Oi):
-				# (kg/m3 (particle))
-				y_dens[i] = 1.0*1.e3 
+			# density estimation ---------------------------------------------------------
+			if i == H2Oi:
+				y_dens[i] = 1.0*1.e3 # (kg/m3 (particle))
 				continue
 			# core properties
 			if (i == corei[0]):
-				# core density (kg/m3 (particle)):
-				y_dens[i] = core_dens*1.e3 
+				y_dens[i] = core_dens*1.e3 # core density (kg/m3 (particle))
 				continue
-			# nucleating component density, if component 
-			# is core (kg/m3 (particle))
-			if (i == nuci and self.nuc_comp[0]) == 'core': 
+			# nucleating component density, if component is core (kg/m3 (particle))
+			if i == nuci and nuc_comp[0] == 'core': 
 				y_dens[i] = 1.*1.e3
 				continue
-			# omit H2 as unliked by liquid density code
-			if comp_list[i] == '[HH]': 
-				# liquid density code does not like H2,
-				#  so manually input kg/m3
+			if comp_list[i] == '[HH]': # omit H2 as unliked by liquid density code
+				# liquid density code does not like H2, so manually input kg/m3
 				y_dens[i] = 1.e3
 			else:
-				# density (convert from g/cm3 to kg/m3)
-				y_dens[i] = liquid_densities.girolami(
-					self.Pybel_objects[i])*1.e3
-			# ----------------------------------------------
+				# density (convert from g/cc to kg/m3)
+				y_dens[i] = liquid_densities.girolami(Pybel_objects[i])*1.e3
+			# ----------------------------------------------------------------------------
+	
 	# note that self.Psat already tiled over size bins and wall bins
 
 	# estimate vapour pressures (log10(atm))
 	for i in range (num_comp):
-
-		if (i == corei[0]): # if this core component
-			# core component not included in Pybel_objects
-			continue 
-		if (i == nuci and self.nuc_comp[0] == 'core'):
-			# core component not included in Pybel_objects
-			continue 
 		
-		# water vapour pressure already given by Psat_water 
-		# (log10(atm))
+		if (i == corei[0]): # if this core component
+			continue # core component not included in Pybel_objects
+		if (i == nuci and nuc_comp[0] == 'core'):
+			continue # core component not included in Pybel_objects
+		
+		# water vapour pressure already given by Psat_water (log10(atm))
 		if (i == H2Oi):
 			self.Psat[:, i] = Psat_water
 			continue # water not included in Pybel_objects
-
-		# water vapour pressure already given by Psat_water 
-		# (log10(atm))
-		if (self.comp_namelist[i] == 'AMM_NIT' or self.comp_namelist[i] == 'amm_nit' or self.comp_namelist[i] == 'NH4NO3' or self.comp_namelist[i] == 'HNO3' and 
-			self.inorg_part_flag == 1):
-			self.Psat[:, i] = np.log10(
-				(9.9e-07*TEMP-2.5e-4)*9.869e-6)
-			continue # onto next component
-		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 'NH3' and 
-			self.inorg_part_flag == 1):
-			self.Psat[:, i] = np.log10(
-				(4.5e-04*TEMP-1.2e-1)*9.869e-6)
-			continue # onto next component
 		
-		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et 
-		# al. (2008), with dB of 
+		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
-		self.Psat[:, i] = ((vapour_pressures.nannoolal(
-			self.Pybel_objects[i], TEMP, 
-			boiling_points.nannoolal(
-			self.Pybel_objects[i]))))
-		
-	ish = (self.Psat == 0.) # non-volatiles
-
-	# convert to Pa from atm	
-	self.Psat = (np.power(10.0, self.Psat)*101325.) 
+		self.Psat[:, i] = ((vapour_pressures.nannoolal(Pybel_objects[i], TEMP, 
+						boiling_points.nannoolal(Pybel_objects[i]))))
 	
+	ish = (self.Psat == 0.) # non-volatiles
+	
+	self.Psat = (np.power(10.0, self.Psat)*101325.) # convert to Pa from atm
+
 	# retain low volatility where wanted
 	self.Psat[ish] = 0.
 	
@@ -294,11 +263,10 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 	# --------------------------------
 
 	# ensure if nucleating component is core that it is involatile
-	if (self.nuc_comp[0] == 'core'):
+	if (nuc_comp[0] == 'core'):
 		self.Psat[:, nuci] = 0.
 	    
-	# convert saturation vapour pressures from Pa to 
-	# # molecules/cm3 (air) using ideal
+	# convert saturation vapour pressures from Pa to # molecules/cm3 (air) using ideal
 	# gas law, R has units cm3.Pa/K.mol
 	self.Psat = self.Psat*(NA/((si.R*1.e6)*TEMP))
 	

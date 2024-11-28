@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        											 #
+#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#                                                                                       											 #
+#    All Rights Reserved.                                                                									 #
+#    This file is part of PyCHAM                                                         									 #
+#                                                                                        											 #
+#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
+#    the terms of the GNU General Public License as published by the Free Software       					 #
+#    Foundation, either version 3 of the License, or (at your option) any later          						 #
+#    version.                                                                            										 #
+#                                                                                        											 #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
+#    details.                                                                            										 #
+#                                                                                        											 #
+#    You should have received a copy of the GNU General Public License along with        					 #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
+#                                                                                        											 #
+##########################################################################################
 '''function to initiate concentrations of components'''
 # based on inputs, initial concentrations and their holding arrays 
 # are set
@@ -29,51 +28,42 @@ import scipy.constants as si
 import math
 from water_calc import water_calc
 import write_dydt_rec
-import openbabel.pybel as pybel
 
 
-def init_conc(num_comp, init_conc, PInit,
-	testf, num_eqn, Compt, seed_mw,
-	core_diss, self):
+def init_conc(num_comp, Comp0, init_conc, PInit, Pybel_objects,
+	testf, pconc, num_eqn, Compt, seed_name, seed_mw,
+	core_diss, nuc_comp, comp_xmlname, comp_smil, rel_SMILES, self):
 		
 	# inputs:------------------------------------------------------
 	
 	# num_comp - number of unique components
-	# self.comp0 - chemical scheme names of components present at 
-	# 	start of experiment
+	# Comp0 - chemical scheme names of components present at start of experiment
 	# init_conc - initial concentrations of components (ppb)	
-	# self.TEMP[0] - temperature in chamber at start of 
-	# 	experiment (K)
-	# self.RH - relative humidity in chamber (dimensionless 
-	#	fraction 0-1)
+	# self.TEMP[0] - temperature in chamber at start of experiment (K)
+	# self.RH - relative humidity in chamber (dimensionless fraction 0-1)
 	# PInit - initial pressure (Pa)
-	# init_SMIL - SMILES of components present at start of 
-	#	experiment (whose concentrations are given in init_conc)
-	# testf - flag for whether in normal mode (0) or testing 
-	# mode (1/2)
-	# self.dydt_trak - chemical scheme name of components for 
-	#	which user wants the tendency to  change tracked
+	# init_SMIL - SMILES of components present at start of experiment (whose 
+	# concentrations are given in init_conc)
+	# testf - flag for whether in normal mode (0) or testing mode (1/2)
+	# pconc - initial concentration of particles (# particles/cc (air))
+	# self.dydt_trak - chemical scheme name of components for which user wants the tendency to  
+	#			change tracked
 	# self.tot_time - total simulation time (s)
 	# self.save_step - recording frequency (s)
 	# self.rindx_g - indices of reactants per equation
 	# self.pindx_g - indices of products per equation
 	# num_eqn - number of equations
-	# self.comp_namelist - list of names of components as 
-	#	presented in the chemical scheme file
-	# Compt - name of components injected instantaneously after 
-	#	start of experiment
-	# self.seed_name - name of core component (input by user)
+	# self.comp_namelist - list of names of components as presented in the chemical scheme file
+	# Compt - name of components injected instantaneously after start of experiment
+	# seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
 	# core_diss - dissociation constant of seed material
-	# self.nuc_comp - name of nucleating component (input by user, 
-	#	or defaults to 'core')
-	# self.comp_xmlname - component names in xml file
-	# self.comp_smil - all SMILES strings in xml file
-	# self.self.rel_SMILES - only the SMILES strings of 
-	# components present in the chemical scheme file
+	# nuc_comp - name of nucleating component (input by user, or defaults to 'core')
+	# comp_xmlname - component names in xml file
+	# comp_smil - all SMILES strings in xml file
+	# rel_SMILES - only the SMILES strings of components present in the chemical scheme file
 	# self.RO_indx - RO chemical scheme indices of alkoxy radicals
-	# self.RO2_indices - RO2 list indices and chemical 
-	# scheme indices of non-HOM-RO2 molecules
+	# self.RO2_indices - RO2 list indices and chemical scheme indices of non-HOM-RO2 molecules
 	# self.HOMRO2_indx - chemical scheme indices of HOM-RO2 molecules
 	# self.rstoi_g - stoichiometry of reactants per equation
 	# self.pstoi_g - stoichiometry of products per equation
@@ -86,7 +76,7 @@ def init_conc(num_comp, init_conc, PInit,
 	
 	if (testf == 1): # testing mode
 		# return dummies
-		return(0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	# empty array for storing component gas-phase concentrations, must be an array
@@ -100,45 +90,28 @@ def init_conc(num_comp, init_conc, PInit,
 	y_indx_plot = []
 	
 	# convert concentrations
-	# total number of molecules in 1 cm3 air using ideal gas law.  
-	# R has units m3.Pa/K.mol (changing to cm3.Pa/K.mol when 
-	# multiplied by 1e6)
+	# total number of molecules in 1 cm3 air using ideal gas law.  R has units cm3.Pa/K.mol
 	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 	self.Cfactor = Cfactor
-	Cfac_flag = 1 # flag to use Cfactor on initial concentrations
 	# prepare dictionary for tracking tendency to change of user-specified components
 	self.dydt_vst = {}
 
-	# if no initial concentrations given in model variables file,
-	# then check if the observed concentrations file has 
-	# concentrations at the starting time
-	if hasattr(self, 'obs'):
-		if (len(self.comp0) == 0 and sum(self.obs[:, 0] == 0)>0):
-			self.comp0 = (np.array((self.comp_namelist))[self.obs_comp_i]).tolist()
-			# molecules/cm3
-			init_conc = np.squeeze(self.obs[self.obs[:, 0] == 0, 1::])
-			# flag to not use Cfactor on initial concentrations
-			Cfac_flag = 0
-
-	
-
 	# insert initial concentrations where appropriate
-	for i in range(len(self.comp0)):
+	for i in range(len(Comp0)):
 
-		if ('_wall' in self.comp0[i]): # in case component concentration relates to wall
+		if ('_wall' in Comp0[i]): # in case component concentration relates to wall
 			wall_flag = 1
 			# get index of string where _wall stated
 			str_cnt = 0 # count way through string
-			for ii in self.comp0[i]:
+			for ii in Comp0[i]:
 				
 				if ii == '_':
-					if self.comp0[i][str_cnt:str_cnt+5] == '_wall':
-						# component name
-						comp_now = self.comp0[i][0:str_cnt]
+					if Comp0[i][str_cnt:str_cnt+5] == '_wall':
+						comp_now = Comp0[i][0:str_cnt] # component name
 						# wall numbers provided by user start from 1
-						wall_number = int(self.comp0[i][str_cnt+5])-1
+						wall_number = int(Comp0[i][str_cnt+5])-1
 					break
 				str_cnt += 1 # count way through string	
 			
@@ -147,42 +120,30 @@ def init_conc(num_comp, init_conc, PInit,
 
 		if (wall_flag == 0):
     			# index of where initial components occur in list of components
-			# in case components already listed via 
-			# interpretation of the chemical scheme
-			try:
-				y_indx = self.comp_namelist.index(self.comp0[i])
+			try: # in case components already listed via interpretation of the chemical scheme
+				y_indx = self.comp_namelist.index(Comp0[i])
 			
-			# if component not already listed via 
-			# interpretation of the chemical scheme
+			# if component not already listed via interpretation of the chemical scheme
 			# then send error message
 			except:
 				erf = 1
-				err_mess = str('Error: component called ' + str(self.comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				err_mess = str('Error: component called ' + str(Comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 				return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 			
-			# set initial concentration
-			if (Cfac_flag == 1): # gas-phase concentrations
-				# convert from ppb to # molecules/cm3
-				y[y_indx] = init_conc[i]*Cfactor
-			if (Cfac_flag == 0):
-				# # molecules/cm3
-				y[y_indx] = init_conc[i]
-
+		
+			y[y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
 			# remember index for plotting gas-phase concentrations later
 			y_indx_plot.append(y_indx)
 	
 		if (wall_flag == 1):
 
 			# index of where initial components occur in list of components
-			# in case components already listed via 
-			# interpretation of the chemical scheme
-			try:
+			try: # in case components already listed via interpretation of the chemical scheme
 				y_indx = self.comp_namelist.index(comp_now)
 				
-			# if component not already listed via interpretation 
-			# of the chemical scheme
+			# if component not already listed via interpretation of the chemical scheme
 			# then send error message
 			except:
 				erf = 1
@@ -192,10 +153,9 @@ def init_conc(num_comp, init_conc, PInit,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
 
 			# insert surface concentration into surface array 
-			# convert from ppb to # molecules/cm3
-			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor
+			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor # convert from ppb to # molecules/cm3
 			y_indx_plot.append(y_indx) # remember for plotting
-		
+			
 	# check on whether O3 isopleth due to be made
 	# if isopleth due to be made overide any 
 	# originally provided initial conditions
@@ -212,8 +172,7 @@ def init_conc(num_comp, init_conc, PInit,
 		y[self.O3i] = self.VOCequil+self.NOxequil
 
 		self.O3equil = y[self.O3i] # register first guess at O3
-		# note that for NOx, the NO:NO2 ratio is allowed to change during 
-		# integration steps,
+		# note that for NOx, the NO:NO2 ratio is allowed to change during integration steps,
 		# however, the total NO+NO2 concentration is held constant through commands
 		# contained in ode_updater, likewise inside ode solver the VOC concentration is 
 		# not allowed to change
@@ -222,209 +181,123 @@ def init_conc(num_comp, init_conc, PInit,
 	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
 	for i in range(num_comp): # loop through all components to get molar weights
-		y_mw[i] = self.Pybel_objects[i].molwt # molecular mass (g/mol)
-		
-	# --------------------------------------------------------------
+		y_mw[i] = Pybel_objects[i].molwt # molecular weight (g/mol)
+	
+	# ------------------------------------------------------------------------------------
 	# account for water's properties
 	
-	# get initial gas-phase concentration (# molecules/cm3 (air)) 
-	# and vapour pressure
+	# get initial gas-phase concentration (# molecules/cm3 (air)) and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], 
-		self.RH[0], si.N_A)
+	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], self.RH[0], si.N_A)
 	
-	# if skipping parsing and property estimation
-	if (self.pars_skip == 1):
-		H2Oi = self.H2Oi # index for water
-		y_mw = self.y_mw
-		num_comp = self.num_comp
-		if (y.shape[0] == self.y.shape[0]-2):
-			y = np.append(y, np.zeros((2)))
-			y[self.H2Oi] = self.y[self.H2Oi]
-			y[self.seedi] = self.y[self.seedi]
-
-	if (self.pars_skip == 0 or self.pars_skip == 2):
-		# holder for water index (will be used if not identified in chemical scheme)
-		H2Oi = num_comp # index for water
-		self.H2Oi = H2Oi # index for water
+	# holder for water index (will be used if not identified in chemical scheme)
+	H2Oi = num_comp # index for water
+	self.H2Oi = H2Oi # index for water
 	
-		# check for water presence in chemical scheme via its SMILE string
-		# count on components
-		indx = -1
-		for single_chem in self.rel_SMILES:
-			indx += 1
-			# ensure this is water rather than single 
-			# oxygen (e.g. due to ozone photolysis 
-			# (O is the MCM chemical scheme name for single oxygen))
+	# check for water presence in chemical scheme via its SMILE string
+	# count on components
+	indx = -1
+	for single_chem in rel_SMILES:
+		indx += 1
+		# ensure this is water rather than single oxygen (e.g. due to ozone photolysis 
+		# (O is the MCM chemical scheme name for single oxygen))
+		if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
+			H2Oi = indx
+			y[H2Oi] = C_H2O # include initial concentration of water (molecules/cm3)
+			y_mw[H2Oi] = H2O_mw # include molar weight of water (g/mol)
 			
-			if (single_chem == 'O' and self.comp_namelist[indx] != 'O'):
-				
-				H2Oi = indx
-				self.H2Oi = H2Oi # index for water
-				# include initial concentration of water
-				# (# molecules/cm3)
-				y[H2Oi] = C_H2O
-				
-				# include molar weight of water (g/mol)
-				y_mw[H2Oi] = H2O_mw
-			
-				# remove the addition of water in the 
-				# surface concentrations
-				# first rearrange matrix so that 
-				# components in rows, surface number in 
-				#columns
-				y_w = y_w.reshape(self.wall_on, 
-					num_comp+2)
-				# remove the excess water column
-				y_w = np.concatenate((y_w[:, 0:-2], 
-				y_w[:, -1].reshape(-1, 1)), axis=1)
-				# then flatten back to 1D array
-				y_w = y_w.flatten()
+			# remove the addition of water in the surface concentrations
+			# first rearrange matrix so that components in rows, surface number in columns
+			y_w = y_w.reshape(self.wall_on, num_comp+2)
+			# remove the excess water column
+			y_w = np.concatenate(y_w[:, 0:-2], y_w[:, -1], axis=1)
+			# then flatten back to 1D array
+			y_w = y_w.flatten()
 
-		
-		# if not included in chemical scheme file, then add 
-		# water to end of component list
-		if (H2Oi == num_comp):
+	# if not included in chemical scheme file, then add water to end of component list
+	if (H2Oi == num_comp):
 	
-			# update number of components to account for 
-			# water
-			num_comp += 1
-			# append empty element to y and y_mw to hold 
-			# water values
-			y = np.append(y, C_H2O)
-			# append molar weight of water (g/mol)
-			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-			# append water's name to component name list
-			self.comp_namelist.append('H2O')
-			# add to SMILES list
-			H2O_SMILES = 'HOH'
-			self.rel_SMILES.append(H2O_SMILES)
-			# generate pybel object
-			Pybel_object = pybel.readstring('smi', 'O')
-				
-			# append to Pybel object list
-			self.Pybel_objects.append(Pybel_object)
+		num_comp += 1 # update number of components to account for water
+		# append empty element to y and y_mw to hold water values
+		y = np.append(y, C_H2O)
+		# append molar weight of water (g/mol)
+		y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
+		self.comp_namelist.append('H2O') # append water's name to component name list
+		# add to SMILES list
+		rel_SMILES.append('HOH')
 
 	# ------------------------------------------------------------------------------------
-	# seed components
-
-	# if this information already gained in previous run then skip
-	if (self.pars_skip == 0 or self.pars_skip == 2): 
-
-		# empty array for index of core component
-		self.seedi = (np.zeros((len(self.seed_name)))).astype(int)
-
-		# append any seed names that are not seen in the 
-		# chemical scheme file to the list of components
-		for seed_cnt in range(len(self.seed_name)):
-			if self.seed_name[seed_cnt] == 'core':
-				self.seedi[seed_cnt] = num_comp
-			else:
-				self.seedi[seed_cnt] = self.comp_namelist.index(self.seed_name[seed_cnt])
-
-		# append name of core to component name list
-		self.comp_namelist.append('core')
-		
-		# increase number of components to account for 'core' component
-		num_comp += 1
-		# prepare for skipping of parsing in following simulations
-		self.num_comp = num_comp
-		# add to SMILES list
-		self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
-
-		# append core gas-phase concentration (molecules/cm3 (air)) and molar 
-		# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
-		# calculations)
-		y = np.append(y, 0.)
-		y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
-		# prepare for skipping of parsing in future simulations
-		self.y_mw = y_mw
-		self.y = y # prepare for skipping of parsing in following simulations 
-	
 	# account for seed properties - note that even if no seed particle, this code ensures
 	# that an index is provided for core material
-	corei = [num_comp-1] # index for core component
+	
+	# empty array for index of core component
+	self.seedi = (np.zeros((len(seed_name)))).astype(int)
+	
+	self.comp_namelist.append('core') # append name of core to component name list
+	corei = [num_comp] # index for core component
+	# increase number of components to account for 'core' component
+	num_comp += 1
+
+	# add to SMILES list
+	rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
+
+	# append core gas-phase concentration (molecules/cm3 (air)) and molar 
+	# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
+	# calculations)
+	y = np.append(y, 0.)
+	y_mw = (np.append(y_mw, seed_mw)).reshape(-1, 1)
 	
 	# finally append surface concentration array to gas-phase array
 	y = np.append(y, y_w)
 	
 	# tracked components (dydt)--------------------------------------
-	# check for tracking of all alkyl peroxy radicals
-	if ('RO2_ind' in self.dydt_trak):
-		# append existing list and list of RO2 radicals 
-		self.dydt_trak = self.dydt_trak + ((np.array((
-			self.comp_namelist)))[self.RO2_indices[:, 
-			1]]).tolist()
 	
-		# remove the RO2_ind item from the tracked component 
-		# list
+	# check for tracking of all alkyl peroxy radicals
+	if ('RO2_ind' in self.dydt_trak): # append existing list and list of RO2 radicals
+		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO2_indices[:, 1]]).tolist()
+	
+		# remove the RO2_ind item from the tracked component list
 		self.dydt_trak.remove('RO2_ind')
 
 	# check for tracking of all alkoxy radicals
-	if ('RO_ind' in self.dydt_trak):
-		# append existing list and list of RO radicals 
-		self.dydt_trak = self.dydt_trak + ((np.array((
-		self.comp_namelist)))[self.RO_indx]).tolist()
+	if ('RO_ind' in self.dydt_trak): # append existing list and list of RO radicals
+		self.dydt_trak = self.dydt_trak + ((np.array((self.comp_namelist)))[self.RO_indx]).tolist()
 	
 		# remove the RO_ind item from the tracked component list
 		self.dydt_trak.remove('RO_ind')
 
-	# get index of user-specified components for tracking their 
-	# change tendencies (dydt) due to modelled mechanisms
+	# get index of user-specified components for tracking their change tendencies (dydt) due to modelled
+	# mechanisms
 	if (len(self.dydt_trak) > 0):
 		
-		# empty list for indices of these components
-		dydt_traki = [] 	
-
+		dydt_traki = [] # empty list for indices of these components
+		
 		for i in range (len(self.dydt_trak)):
 
-			# indices of reactions involving this component
-			reac_index = [] 
-			# value for whether this component is reactant 
-			# or product in a reaction and stoichiometry
+			reac_index = [] # indices of reactions involving this component
+			# value for whether this component is reactant or product in a reaction and stoichiometry
 			reac_sign = []
 			
-			if (self.dydt_trak[i] != 'RO2' and 
-				self.dydt_trak[i] != 'HOMRO2'):
+			if (self.dydt_trak[i] != 'RO2' and self.dydt_trak[i] != 'HOMRO2'):
 			
 				# index of components in component list
 				try:
-					y_indx = self.comp_namelist.\
-					index(self.dydt_trak[i])
-				# if component not already listed via 
-				# interpretation of the chemical scheme
+					y_indx = self.comp_namelist.index(self.dydt_trak[i])
+				# if component not already listed via interpretation of the chemical scheme
 				# then send error message
 				except:
 					erf = 1
-					err_mess = str('Error: ' + 
-					'component called ' + 
-					str(self.dydt_trak[i]
-					) + ', which is specified to ' +
-					'be tracked in the model ' +
-					'variables input file has not ' +
-					'been found in the chemical ' +
-					'scheme.  Please check the scheme ' +
-					'and associated chemical scheme ' + 
-					'markers, which are stated in ' + 
-					'the model variables input ' + 
-					'file.')
+					err_mess = str('Error: component called ' + str(self.dydt_trak[i]) + ', which is specified to be tracked in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
 					return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
-				# remember index for plotting gas-phase
-				# concentrations later
+				# remember index for plotting gas-phase concentrations later
 				dydt_traki.append([int(y_indx)])
 			
-				# search through reactions to see 
-				# where this component is reactant or 
-				# product
+				# search through reactions to see where this component is reactant or product
 				for ri in range(num_eqn):
-					if sum(self.rindx_g[ri, 
-						0:self.nreac_g[ri]] == 
-						y_indx) > 0:
-						# append reaction index
-						reac_index.append(int(
-						ri)) 
+					if sum(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx) > 0:
+						reac_index.append(int(ri)) # append reaction index
 						reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
 						reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
 					if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
@@ -468,70 +341,45 @@ def init_conc(num_comp, init_conc, PInit,
 							reac_index.append(int(ri)) # append reaction index
 							reac_place = np.where(self.rindx_g[ri, 0:self.nreac_g[ri]] == y_indx)[0]
 							reac_sign.append(-1*self.rstoi_g[int(ri), reac_place])
-						if (sum(self.pindx_g[ri, 0:self.nprod_g[ri]] 
-							== y_indx) > 0):
-							# append reaction index
-							reac_index.append(int(ri))
-							reac_place = np.where(self.pindx_g[
-							ri, 0:self.nprod_g[ri]] == y_indx)[0]
-							reac_sign.append(1*self.pstoi_g[
-							int(ri), reac_place])
+						if sum(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx) > 0:
+							reac_index.append(int(ri)) # append reaction index
+							reac_place = np.where(self.pindx_g[ri, 0:self.nprod_g[ri]] == y_indx)[0]
+							reac_sign.append(1*self.pstoi_g[int(ri), reac_place])
 				y_indx = self.HOMRO2_indx[:] # ready for storing below
 				
-			# save reaction indices in dictionary value 
-			# for this component,
-			# when creating empty rec_array, add three 
-			# columns onto the end for 
-			# gas-particle-partitioning, gas-wall-partitioning and 
-			# dilution, and include a top row for reaction indices
-			rec_array = np.zeros((nrec_steps+1, 
-				len(reac_index)+3))
-			rec_array[0, 0:-3] = reac_index
+			# save reaction indices in dictionary value for this component,
+			# when creating empty rec_array, add two columns onto the end for particle- and 
+			# wall-partitioning, respectively
+			rec_array = np.zeros((nrec_steps, len(reac_index)+2))
+			rec_array[0, 0:-2] = reac_index
 
-			comp_indx_str = str(self.dydt_trak[i] + 
-				'_comp_indx')
+			comp_indx_str = str(self.dydt_trak[i] + '_comp_indx')
 			res_string = str(self.dydt_trak[i] + '_res')
-			reac_string = str(self.dydt_trak[i] + 
-				'_reac_sign')
-	
-			if hasattr(self, 'sim_ci_file'):
-				ci_string = str(self.dydt_trak[i] + 
-					'_ci')
-				ci_arrayi = np.zeros((nrec_steps-1, 1))
-			# dictionary entry to hold index of tracked 
-			# component	
-			self.dydt_vst[comp_indx_str] = y_indx
-			# dictionary entry to hold reaction indices 
-			# and results 
-			self.dydt_vst[res_string] = rec_array
-			# dictionary entry to hold sign (source or sink
-			# per reaction) 
-			self.dydt_vst[reac_string] = reac_sign 
-			if hasattr(self, 'sim_ci_file'):
-				# dictionary entry to hold continuous 
-				#influx rate
-				self.dydt_vst[ci_string] = ci_arrayi
+			reac_string = str(self.dydt_trak[i] + '_reac_sign')
+			
+			self.dydt_vst[comp_indx_str] = y_indx # dictionary entry to hold index of tracked component
+			self.dydt_vst[res_string] = rec_array # dictionary entry to hold reaction indices and results
+			self.dydt_vst[reac_string] = reac_sign # dictionary entry to hold results
 
-		# dictionary entry to hold component names of 
-		# components to track
+
+		# dictionary entry to hold component names of components to track
 		self.dydt_vst['comp_names'] = self.dydt_trak
 		
-		# call on write_dydt_rec to generate the module that 
-		# will process
+		# call on write_dydt_rec to generate the module that will process
 		# the tendency to change during the simulation
-		write_dydt_rec.write_dydt_rec(self)
+		write_dydt_rec.write_dydt_rec()
 	
 	# --------------------------------------
 	
 	# if nucleating component formed of core component
-	if (self.nuc_comp[0] == 'core'):
+	if (nuc_comp[0] == 'core'):
 		nuci = num_comp-1 # index of core component
 	else:
 		nuci = -1 # filler
 	
 	# get indices of seed particle component(s)
 	indx = 0 # count on seed component(s)
-	for sname in self.seed_name:
+	for sname in seed_name:
 		# index of core component
 		self.seedi[indx] = int(self.comp_namelist.index(sname))
 		indx += 1 # count on seed component(s)
@@ -548,7 +396,6 @@ def init_conc(num_comp, init_conc, PInit,
 
 	# ensure index arrays are integer type
 	inj_indx = inj_indx.astype('int')
-	
 	corei = np.array((corei)).astype('int')
 	
 	# get indices of NO, HO2 and NO3 (for reaction rate calculations)
@@ -572,10 +419,8 @@ def init_conc(num_comp, init_conc, PInit,
 		import matplotlib.pyplot as plt
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
-		# for customised colormap
-		from matplotlib.colors import LinearSegmentedColormap
-		# set colormap tick labels to standard notation
-		import matplotlib.ticker as ticker 
+		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
+		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
 
 		plt.ion() # show results to screen and turn on interactive mode
 		
@@ -613,4 +458,4 @@ def init_conc(num_comp, init_conc, PInit,
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, core_diss,
 			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
-			HO2i, NO3i, init_conc, self)
+			HO2i, NO3i, self, rel_SMILES)
