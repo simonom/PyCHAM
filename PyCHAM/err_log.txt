@@ -1,1 +1,0 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/sgr_3.2acr_1.0tf_1mops_1fry_1sho_0wst
