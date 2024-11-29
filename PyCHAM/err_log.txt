@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/method_ex_dynpart_1.e-8zpc_1e3inttol_RO2pool
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/full_chem_scheme/sgr_3.2acr_1.0tf_1mops_1fry_1sho_0wst

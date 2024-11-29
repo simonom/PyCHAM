@@ -1,0 +1,12 @@
+number_of_size_bins,2
+number_of_components,333
+factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[24051039402.86705], [24051039402.86705], [24051039402.86705], [24051039402.86705], [24051039402.86705], [24051039402.86705], [24051039402.86705]]
+simulation_computer_time(s),194.60806322097778
+seed_name,['AMMSUL', 'SA']
+wall_on_flag_0forNO_>0forYES,0
+space_mode,log
+index_of_water,13
+index_of_seed_components,[331, 21]
+size_structure_0_for_moving_centre_1_for_full_moving,0
+output_by_sim_sch_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/20Nov_0900_0959_Base/inputs/mcmAP_scheme.kpp
+output_by_sim_mv_ext,/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/mcmAP_scheme/20Nov_0900_0959_Base/inputs/modvar_20Nov_0900_0959_Base_SU_simple.txt
