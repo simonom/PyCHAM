@@ -618,8 +618,13 @@ def mod_var_read(self):
 
 					# if on first character
 					if (ic == 0):
-						const_comp = (value[
-							ic:value.index(',')])
+						try:
+							const_comp = (value[
+								ic:value.index(',')])
+						except: # if just one component given
+							const_comp = (value[:])
+							const_comp = const_comp.replace(
+								'\n', '')
 						# prepare to hold component names (rows) 
 						# at the required
 						# times (columns)
@@ -948,7 +953,11 @@ def mod_var_read(self):
 			if key == 'volP' and (value.strip()):
 				volP = [float(i) for i in (value.split(','))]
 
-			# names of components with specified activity coefficients
+			# vapour pressure estimation method for non-HOMs
+			if (key == 'nonHOMs_vp_method' and (value.strip())):
+				self.nonHOMs_vp =  str(value.strip())
+
+			# vapour pressure estimation method for HOMs
 			if (key == 'HOMs_vp_method' and (value.strip())):
 				self.HOMs_vp =  str(value.strip())
 

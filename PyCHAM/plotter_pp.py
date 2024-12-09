@@ -546,8 +546,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# model variable name - a string with bounding white space removed
 			key = key.strip()
 			# ----------------------------------------------------
-
-			if key == 'chem_scheme_markers' and (value.strip()): # formatting for chemical scheme
+			# formatting for chemical scheme
+			if key == 'chem_scheme_markers' and (value.strip()):
 				chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 		# interrogate scheme to list equations

@@ -162,9 +162,10 @@ def plotter(caller, dir_path, uc, self):
 			# get the location of ticks
 			locs = ax0.get_yticks()
 			maxloc = max(locs)
-			ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/9.5, y = ymax*1.05, s='a)', size=14)
+			ax0.text(x = timehr[0]-(timehr[-1]-timehr[0])/9.5, 
+				y = ymax*1.05, s='a)', size=14)
 
-		# end of gas-phase concentration sub-plot ---------------------------------------
+		# end of gas-phase concentration sub-plot -----------------------------------
 	
 	# particle properties sub-plot --------------------------------------------------
 	if (num_asb > 0): # if size bins present		

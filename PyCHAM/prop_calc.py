@@ -365,6 +365,20 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					# (log10(atm))
 					Psatnow = np.log10((Psatnow*8.2057e-5*
 					self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
+
+			if (self.HOMs_vp == 'EVAPORATION'):
+				if (self.pars_skip != 2):
+					# if EVAPORATION method wanted for HOMs
+					Psatnow = ((vapour_pressures.evaporation2(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt])))
+			
+			if (self.HOMs_vp == 'SIMPOL'):
+				if (self.pars_skip != 2):
+					# if SIMPOL method wanted for HOMs
+					Psatnow = ((vapour_pressures.simpol(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt])))
 					
 			
 		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
@@ -372,23 +386,26 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# that equation given by eq. 7 of same reference)
 		else: 
 			if (self.pars_skip != 2):
-				
-				Psatnow = ((vapour_pressures.nannoolal(
-				self.Pybel_objects[i],
-				self.TEMP[tempt_cnt], 
-				boiling_points.nannoolal(
-				self.Pybel_objects[i]))))
-				
-				#Psatnow = ((vapour_pressures.
-				#evaporation(self.Pybel_objects[i], 
-				#self.TEMP[tempt_cnt])))
-				#Psatnow += 2
-				# in case you want to ensure small
-				# molecules don't contribute to 
-				# particle mass
-				#if self.rel_SMILES[i].count('C')<=5:
-				# 	ensure no condensation of small molecules
-				#	Psatnow += 10
+
+				if (self.nonHOMs_vp == 'Nannoolal2008'):
+					# if Nannoolal method wanted for nonHOMs
+					Psatnow = ((vapour_pressures.nannoolal(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt], 
+						boiling_points.nannoolal(
+						self.Pybel_objects[i]))))
+			
+				if (self.nonHOMs_vp == 'EVAPORATION'):
+					# if EVAPORATION method wanted for nonHOMs
+					Psatnow = ((vapour_pressures.evaporation2(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt])))
+			
+				if (self.nonHOMs_vp == 'SIMPOL'):
+					# if SIMPOL method wanted for nonHOMs
+					Psatnow = ((vapour_pressures.simpol(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt])))
 
 
 		if (self.pars_skip != 2 and self.pars_skip != 3):

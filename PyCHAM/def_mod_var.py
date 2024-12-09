@@ -236,6 +236,8 @@ def def_mod_var(caller, self): # define function
 	vol_comp = []
 	# manually assigned vapour pressures (Pa)
 	volP = []
+	# method for estimating vapour pressure of non-HOMs
+	self.nonHOMs_vp = 'Nannoolal2008'
 	# method for estimating vapour pressures of HOMs
 	self.HOMs_vp = 'Nannoolal2008'
 	# names of components (corresponding to chemical scheme name) with 
