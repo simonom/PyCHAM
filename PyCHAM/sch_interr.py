@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2025					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''isolate sections of chemical scheme'''
 # using the chemical scheme markers, sections of the 
 # chemical scheme are separated
@@ -33,7 +34,8 @@ def sch_interr(total_list_eqn, self):
 	# inputs: ------------------------------------------------------------------
 	# total_list_eqn - all lines from the chemical scheme file
 	# self - reference to PyCHAM
-	# self.chem_sch_mrk - markers to denote different section of the chemical scheme
+	# self.chem_sch_mrk - markers to denote different section of the 
+	#	chemical scheme
 	# --------------------------------------------------------------------------
 	
 	# preparatory part ---------------------------------------------------------
@@ -48,20 +50,96 @@ def sch_interr(total_list_eqn, self):
 	eqn_flag = 0 # don't collate reaction equations until seen
 	pr_flag = 0 # don't collate peroxy radicals until seen
 	RO2_count = 0 # count on number of lines considered in peroxy radical list
-	# if thirtheenth marker missing, assume this is due to old inputs
+	# if thirteenth marker missing, assume this is due to old inputs
 	# when only 12 markers were needed
 	if (len(self.chem_sch_mrk) == 12):
 		self.chem_sch_mrk.append('')
+	# begin by not looking out for component atomic composition
+	ac_flag = 0
+	# the atom name register
+	atom_reg = ['H', 'C', 'N', 'O']
 
 	# -------------------------------------------------------------------------
 	
 	# obtain lists for reaction rate coefficients, peroxy radicals 
-	# and equation reactions using markers for separating chemical scheme elements
+	# and equation reactions using markers for separating chemical 
+	# scheme elements
 	for line in total_list_eqn:
 		
 		line1 = line.strip() # remove bounding white space
 		
-		# --------------------------------------------------------------------------------
+	
+		# ----------------------------------------------------------------
+		# atomic composition per component, only use if not using
+		# SMILES to define components
+		if ('#DEFVAR' in line1 and self.ac_by_cs == 1):
+			# invoke looking out for component atomic composition
+			ac_flag = 1
+			# prepare to hold (in the following order per column):
+			# component name, hydrogen number, carbon number, nitrogen
+			# number and oxygen number
+			ac_mat = np.zeros((0, 5))
+
+		# if this is a line containing atomic composition
+		# of component
+		if (ac_flag == 1 and '=' in line):
+
+			# extend matrix ready to hold information
+			ac_mat = np.concatenate((ac_mat, np.zeros((
+				1, ac_mat.shape[1]))), axis=0)
+
+			# get component name
+			ac_mat[-1, 0] = line.split('=')[0].replace(' ', '')
+			# get atom numbers
+			atomn = line.split('=')[1].replace(' ', '')
+			# attempt getting individual atom numbers
+			# starting index for considering
+			istart = 0
+			# work through string elements
+			for atomni in range(1, len(atomn)):
+
+				# if at end of string, then continue to next line
+				if (atomn[atomni] == ';'):
+					continue
+
+				# if not ready to look for a number, continue to
+				# next element of string
+				if (atomni <= istart):
+					continue
+				try:
+					anum = int(atomn[istart:atomni])
+				# if can't make into an integer, then register atom
+				# number
+				except:
+					# atom number
+					anum = int(atomn[istart:atomni-1])
+					# get index where atom name ends
+					try:
+						atomnend = atomni+atomn[
+							atomni::].index('+')
+					except:
+						atomnend = atomni+atomn[
+							atomni::].index(';')
+					at_name = str(atomn[atomni:atomend])
+					# reference index of this atom and +1 to
+					# allow for component name
+					at_indx = atom_reg.index(at_name)+1
+					ac_mat[-1, at_indx] = anum
+
+					# move index for starting to look for atom
+					# numbers up
+					istart = atomnend+1
+			import ipdb; ipdb.set_trace()	
+				
+			
+		
+
+		if (ac_flag == 1 and '#INLINE F90_RCONST' in line):
+			# stop looking for components and their atomic composition
+			ac_flag = 0
+			
+
+	# ------------------------------------------------------------------------
 		# generic reaction rate coefficients part
 		# marker at end of generic reaction rate coefficient lines
 		# the first \ allows python to interpret the second \ as a dash
@@ -111,7 +189,7 @@ def sch_interr(total_list_eqn, self):
 								# get just name of generic reaction rate coefficient
 								rrc_name.append((line2.split('=')[0]).strip())		
 			
-		# --------------------------------------------------------------------------------
+		# ---------------------------------------------------------------------------
 		# peroxy radical part
 		# start logging peroxy radicals
 		RO2_start_mark = str('^' + self.chem_sch_mrk[1])

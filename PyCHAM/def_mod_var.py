@@ -37,17 +37,21 @@ def def_mod_var(caller, self): # define function
 
 	# default input files ------------------------------
 	# default chemical scheme
-	self.sch_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt'
+	self.sch_name = str(self.PyCHAM_path + 
+		'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt')
 	# xml file path
 	self.xml_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_xml.xml'
 	self.inname = 'Default' # model variables file name
 	
-	# general -----------------------------------------------------------------------------
+	# general ----------------------------------------------
 	# name of folder to save results to
 	self.sav_nam = 'default_res_name'
 	# markers to isolate sections of chemical scheme based on MCM KPP format
 	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , 
 		'&', '' , '', ':', '>', ';', '']
+	# whether (1) or not (0) to define components by the atomic composition
+	# given in the chemical scheme file
+	self.ac_by_cs = 0 
 	# time interval between updates to integration inputs (s)
 	self.update_stp = 1.
 	self.tot_time = 1. # total time to integrate over (s)

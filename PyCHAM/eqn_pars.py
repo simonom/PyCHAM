@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -102,8 +102,11 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	
 	# interrogate scheme to list equations
 	[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)
-	# interrogate xml to list all component names and SMILES
-	[err_mess_new, self] = xml_interr.xml_interr(self)
+
+	# if atomic composition not gained from chemical scheme file
+	if (self.ac_by_cs == 0):
+		# interrogate xml to list all component names and SMILES
+		[err_mess_new, self] = xml_interr.xml_interr(self)
 	
 	# get equation information for chemical reactions
 	[comp_list, Pybel_objects, comp_num, erf, err_mess, self] = eqn_interr.eqn_interr(

@@ -1,4 +1,4 @@
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp3_MYnonHOM_MYHOM
+res_file_name = /Users/Psymo/OneDrive - The University of Manchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp3_NANNOOLALnonHOM_NANNOOLALHOM
 chem_sch_name = mcmAP_PRAMAP_scheme.kpp
 xml_name = MCM_PRAM_xml.xml
 total_model_time = 8.64e4
@@ -64,9 +64,9 @@ volP = 0., 0.
 eff_abs_wall_massC = 1.e-3
 chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
 # set the vapour pressure estimation method for nonHOMs
-nonHOMs_vp_method = MY
+nonHOMs_vp_method = NANNOOLAL
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = MY
+HOMs_vp_method = NANNOOLAL
 # only need to use the below variables for the seeded case
 number_size_bins = 6
 seed_name = core

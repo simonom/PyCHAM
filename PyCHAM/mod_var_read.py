@@ -140,9 +140,15 @@ def mod_var_read(self):
 				key, value = in_list[i].split('=')
 				
 			except:
-				err_mess = '''Did not see an \'=\' symbol in a line in the 				model variables file, please check model variables file and 				ensure that any lines supposed to be comments begin with #, 				and see README for guidance'''
+				err_mess = str('Did not see an \'=\' symbol in ' +
+					'a line in the model variables file, ' +
+					'please check model variables file and ' +
+					'ensure that any lines supposed to be ' +
+					'comments begin with #, ' +
+					'and see README for guidance')
 				continue
-			# model variable name - a string with bounding white space removed
+			# model variable name - a string with bounding white 
+			# space removed
 			key = key.strip()
 			
 			# ----------------------------------
@@ -155,11 +161,18 @@ def mod_var_read(self):
 				self.chem_sch_mrk = [str(i).strip() for i 
 				in (value.split(','))]
 
+			# whether to define components by atomic composition
+			# given in the chemical scheme file, rather than by
+			# SMILES
+			if (key == 'ac_by_cs' and (value.strip())):
+				self.ac_by_cs = int(value.strip())
+
 			# path to chemical scheme
 			if (key == 'chem_sch_name' and (value.strip())): 
 				self.sch_name = str(value.strip())
 
-			if (key == 'xml_name' and (value.strip())): # path to xml file
+			# path to xml file
+			if (key == 'xml_name' and (value.strip())):
 				self.xml_name = str(value.strip())
 			
 			# time step (s) for updating ODE initial 

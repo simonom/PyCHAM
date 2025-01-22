@@ -23,7 +23,7 @@
 # residence time was 63 minutes:
 # Particle loss rate (fraction of total particles/s) = 1/τ  =1/k_wall +1/k_(flush out)  
 # so 1/(54*60) = 1/kwall+1/(63*60) so 1/kwall = 1/(54*60)-1/(63*60) = 4.41e-5 /s
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp2p1_NANNOOLALnonHOM_NANNOOLALHOM
+res_file_name = /Users/Psymo/OneDrive - The University of Manchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp2p1_NANNOOLALnonHOM_MOHRHOM
 chem_sch_name = mcmAP_PRAMAP_scheme.kpp
 xml_name = MCM_PRAM_xml.xml
 total_model_time = 8.64e4
@@ -95,7 +95,7 @@ chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
 # set the vapour pressure estimation method for nonHOMs
 nonHOMs_vp_method = NANNOOLAL
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = NANNOOLAL
+HOMs_vp_method = MOHR
 # only need to use the below variables for the seeded case
 number_size_bins = 6
 seed_name = core
