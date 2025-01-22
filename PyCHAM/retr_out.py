@@ -84,7 +84,10 @@ def retr_out(self):
 	group_indx['carbonyl'] = [] # filler	
 	group_indx['HOM_carbonyl'] = [] # filler
 	group_indx['NO3'] = [] # filler
-	group_indx['HOM_NO3'] = [] # filler	
+	group_indx['HOM_NO3'] = [] # filler
+	group_indx['PRAMpr_indx'] = [] # filler
+	group_indx['PRAMcsmon_indx'] = [] # filler
+	group_indx['PRAMcsacc_indx'] = [] # filler	
 	
 	for line in const_in.readlines():
 		
@@ -243,7 +246,8 @@ def retr_out(self):
 			if (st_indx == len(line)+fi_indx): # if empty list
 				continue
 			else: # if list has contents
-				group_indx['RO2i'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
+				group_indx['RO2i'] = list(np.array((
+				line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))			
 			yield (22.)
 
 		if (str(line.split(',')[0]) == 'organic_alkoxy_radical_index'):
@@ -407,6 +411,7 @@ def retr_out(self):
 	
 	if (v4_flag == 1): # if results in question saved in version 4 or later
 
+		# load component molar masses (g/mol)
 		load_path = str(self.dir_path + '/y_mw.npy') # path
 		y_MM = np.load(load_path, allow_pickle=True)
 
@@ -442,6 +447,8 @@ def retr_out(self):
 		try: # this output added after others in version 4 of PyCHAM
 
 			# path
+			# note this definition of organic peroxy radicals is based
+			# on SMILES strings, so not limited to the list of RO2 in the RO2 pool
 			load_path = str(self.dir_path + '/organic_peroxy_radical_index.npy')
 			group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
 
@@ -472,16 +479,31 @@ def retr_out(self):
 			group_indx['HOM_OH'] = (np.load(load_path, allow_pickle=True)).tolist()	
 		
 			load_path = str(self.dir_path + '/carbonyl_index.npy') # path
-			group_indx['carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+			group_indx['carbonyl'] = (np.load(load_path, 
+				allow_pickle=True)).tolist()	
 		
 			load_path = str(self.dir_path + '/HOM_carbonyl_index.npy') # path
-			group_indx['HOM_carbonyl'] = (np.load(load_path, allow_pickle=True)).tolist()	
+			group_indx['HOM_carbonyl'] = (np.load(load_path, 
+				allow_pickle=True)).tolist()	
 		
 			load_path = str(self.dir_path + '/NO3_index.npy') # path
 			group_indx['NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
 			load_path = str(self.dir_path + '/HOM_NO3_index.npy') # path
 			group_indx['HOM_NO3'] = (np.load(load_path, allow_pickle=True)).tolist()
+
+			load_path = str(self.dir_path + '/PRAMpr_indx.npy') # path
+			group_indx['PRAMpr_indx'] = (np.load(load_path, 
+				allow_pickle=True)).tolist()	
+		
+			load_path = str(self.dir_path + '/PRAMcsmon_indx.npy') # path
+			group_indx['PRAMcsmon_indx'] = (np.load(load_path, 
+				allow_pickle=True)).tolist()
+		
+			load_path = str(self.dir_path + '/PRAMcsacc_indx.npy') # path
+			group_indx['PRAMcsacc_indx'] = (np.load(load_path,
+				allow_pickle=True)).tolist()
+
 
 		except:
 			group_indx['RO2i'] = []
@@ -497,6 +519,9 @@ def retr_out(self):
 			group_indx['HOM_carbonyl'] = []
 			group_indx['NO3'] = []
 			group_indx['HOM_NO3'] = []
+			group_indx['PRAMpr_indx'] = []
+			group_indx['PRAMcsmon_indx'] = []
+			group_indx['PRAMcsacc_indx'] = []
 	
 	try:
 		comp_time = (const["simulation_computer_time(s)"])[0]
@@ -628,7 +653,8 @@ def retr_out(self):
 	
 	# convert vapour pressure at starting simulation temperature 
 	# from molecules/cm3 to Pa using ideal gas law
-	PsatPa0 = Psatmolecpercm3_0/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0])) 
+	PsatPa0 = Psatmolecpercm3_0/(si.Avogadro/((si.R*1.e6)*cham_env[0, 0]))
+	
 	# create a class to hold outputs
 	class ro_outputs:
 		

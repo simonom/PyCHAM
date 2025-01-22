@@ -63,7 +63,7 @@ def plotter(caller, dir_path, uc, self):
 	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
-
+	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
@@ -73,24 +73,30 @@ def plotter(caller, dir_path, uc, self):
 	# prepare sub-plots depending on whether particles present
 	if (num_asb == 0): # no particle size bins
 		if not (indx_plot): # check whether there are any gaseous components to plot
-			mess = str('Please note, no initial gas-phase concentrations were received and no particle size bins were present, therefore there is nothing for the standard plot to show')
+			mess = str('Please note, no initial gas-phase concentrations ' +
+			'were received and no particle size bins were present, ' +
+			'therefore there is nothing for the standard plot to show')
 			self.l203a.setText(mess)
 			return()
 
 		# if there are gaseous components to plot, then prepare figure
 		fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-		mess = str('Please note, no particle size bins were present, therefore the particle-phase standard plot will not be shown')
+		mess = str('Please note, no particle size bins were present, therefore '+
+		'the particle-phase standard plot will not be shown')
 		self.l203a.setText(mess)
 
 	if (num_asb > 0): 
 		
 		if not (indx_plot): # no gaseous components
-			mess = str('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot is not shown')
+			mess = str('Please note, no initial gas-phase concentrations ' +
+			'were registered, therefore the gas-phase standard plot is not shown')
 			self.l203a.setText(mess)
 
 			
 		if not (indx_plot): # no gaseous components, only particle-phase
-			mess = str('Please note, no initial gas-phase concentrations were registered, therefore the gas-phase standard plot will not be shown')
+			mess = str('Please note, no initial gas-phase concentrations '+
+			'were registered, therefore the gas-phase standard plot will ' +
+			'not be shown')
 			self.l203a.setText(mess)
 			# if there are no gaseous components then prepare figure
 			fig, (ax1) = plt.subplots(1, 1, figsize=(14, 7))
@@ -125,9 +131,10 @@ def plotter(caller, dir_path, uc, self):
 			gp_conc = yrec[:, 0:num_comp] # ppb is original units
 			gpunit = '(ppb)'
 		if (uc == 1 or uc == 2): # ug/m3 or # molecules/cm3
-
-			y_MW = (np.array(y_MW)).reshape(1, -1) # convert to numpy array from list
-			Cfaca = (np.array(Cfac)).reshape(-1, 1) # convert to numpy array from list
+			# convert to numpy array from list
+			y_MW = (np.array(y_MW)).reshape(1, -1)
+			# convert to numpy array from list
+			Cfaca = (np.array(Cfac)).reshape(-1, 1)
 			
 			gp_conc = yrec[:, 0:num_comp] 
 
@@ -178,20 +185,26 @@ def plotter(caller, dir_path, uc, self):
 
 		# plotting number size distribution --------------------------------------
 	
-		# don't use the first boundary as it could be zero, which will error when log10 taken
+		# don't use the first boundary as it could be zero, which will error 
+		# when log10 taken
 		log10D = np.log10(rbou_rec[:, 1::]*2.)
 		
 		if (num_asb > 1) :
-			# note, can't append zero to start of log10D to cover first size bin as the log10 of the
-			# non-zero boundaries give negative results due to the value being below 1, so instead
+			# note, can't append zero to start of log10D to cover first 
+			# size bin as the log10 of the
+			# non-zero boundaries give negative results due to the value 
+			# being below 1, so instead
 			# assume same log10 distance as the next pair
-			log10D = np.append((log10D[:, 0]-(log10D[:, 1]-log10D[:, 0])).reshape(-1, 1), log10D, axis=1)
+			log10D = np.append((log10D[:, 0]-(log10D[:, 1]-log10D[:, 
+				0])).reshape(-1, 1), log10D, axis=1)
 			# radius distance covered by each size bin (log10(um))
-			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], log10D.shape[1]-1)
+			dlog10D = (log10D[:, 1::]-log10D[:, 0:-1]).reshape(log10D.shape[0], 
+				log10D.shape[1]-1)
 		
 		if (num_asb == 1): # single particle size bin
 			# assume lower radius bound is ten times smaller than upper
-			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/10.)*2.)).reshape(log10D.shape[0], 1)
+			dlog10D = (log10D[:, 0]-np.log10((rbou_rec[:, 1]/
+				10.)*2.)).reshape(log10D.shape[0], 1)
 				
 		# number size distribution contours (# particles/cm3 (air))
 		dNdlog10D = np.zeros((Nwet.shape[0], Nwet.shape[1]))
@@ -203,7 +216,8 @@ def plotter(caller, dir_path, uc, self):
 		z = np.ma.masked_where(np.isnan(dNdlog10D), dNdlog10D)
 	
 		# customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
-		colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), (1., 1., 0.), (1., 0., 0.)]  # R -> G -> B
+		colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), 
+			(1., 1., 0.), (1., 0., 0.)]  # R -> G -> B
 		n_bin = 100  # discretizes the colormap interpolation into bins
 		cmap_name = 'my_list'
 		# create the colormap
@@ -218,20 +232,26 @@ def plotter(caller, dir_path, uc, self):
 			levels = np.zeros((1))
 			
 		else:	
-			# make a first contour plot (which will be covered by plot p1 below) to get 
+			# make a first contour plot (which will be covered by plot p1 below)
+			# to get 
 			# the contour labels of actual concentration (not log10(concentration))
 			# set contour levels
 			if (z_min > 0.5): # if rounding gives a number greater than 0 
-				levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+				levels = np.arange(np.log10(round(z_min)), 
+				np.log10(np.max(z[~np.isnan(z)])), 
+				(np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
 			else: # i rounding would give a number below zero, then don't round		
-				levels = np.arange(np.log10((z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
+				levels = np.arange(np.log10((z_min)), 
+				np.log10(np.max(z[~np.isnan(z)])), 
+				(np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
 			# associate colours and contour levels
 			norm1 = BoundaryNorm(10.**levels, ncolors=cm.N, clip=True)
-		
+	
 			# contour plot with times (hours) along x axis and 
 			# particle diameters (nm) along y axis
 			for ti in range(len(timehr)-1): # loop through times
-				p0 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+				p0 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), 
+				(z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
 		
 		# ----------------------------
 		
@@ -244,16 +264,22 @@ def plotter(caller, dir_path, uc, self):
 			# contour plot with times (hours) along x axis and 
 			# particle diameters (nm) along y axis
 			for ti in range(len(timehr)-1): # loop through times
-				p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+				p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3),
+				 (z[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
 
-			cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
+			cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25,
+				 ax=ax1)
 			
 		else:
 			if (z_min > 0.5): # if rounding would give zero
 				# set contour levels
-				levels = np.arange(np.log10(round(z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
+				levels = np.arange(np.log10(round(z_min)), 
+				np.log10(np.max(z[~np.isnan(z)])), 
+				(np.log10(np.max(z[~np.isnan(z)]))-np.log10(round(z_min)))/1.e2)
 			else: # don't round if minimum close to zero
-				levels = np.arange(np.log10((z_min)), np.log10(np.max(z[~np.isnan(z)])), (np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
+				levels = np.arange(np.log10((z_min)), 
+				np.log10(np.max(z[~np.isnan(z)])), 
+				(np.log10(np.max(z[~np.isnan(z)]))-np.log10((z_min)))/1.e2)
 			
 			# associate colours and contour levels
 			norm1 = BoundaryNorm(levels, ncolors=cm.N, clip=True)
@@ -270,9 +296,12 @@ def plotter(caller, dir_path, uc, self):
 			# contour plot with times (hours) along x axis and 
 			# particle diameters (nm) along y axis
 			for ti in range(len(timehr)-1): # loop through times
-				p1 = ax1.pcolormesh(timehr[ti:ti+2], (rbou_rec[ti, :]*2*1e3), (z_log10[:, ti]).reshape(-1, 1), cmap=cm, norm=norm1)
+				p1 = ax1.pcolormesh(timehr[ti:ti+2], 
+				(rbou_rec[ti, :]*2*1e3), (z_log10[:, ti]).reshape(-1, 1), 
+				cmap=cm, norm=norm1)
 	
-			cb = plt.colorbar(p0, format=ticker.FuncFormatter(fmt), pad=0.25, ax=ax1)
+			cb = plt.colorbar(p0, format=ticker.FuncFormatter(fmt), pad=0.25,
+				ax=ax1)
 	
 		# if logarithmic or manual spacing of size bins specified, plot vertical axis 
 		# logarithmically
@@ -287,7 +316,8 @@ def plotter(caller, dir_path, uc, self):
 
 		# label according to whether gas-phase plot also displayed		
 		if (indx_plot):
-			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
+			ax1.text(x=timehr[0]-(timehr[-1]-timehr[0])/11., 
+				y = np.amax(rbou_rec*2*1e3)*1.05, s='b)', size=14)
 		ax1.set_xlabel(r'Time through simulation (hours)', fontsize=14)
 		
 		cb.ax.tick_params(labelsize=14)   

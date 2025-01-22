@@ -20,9 +20,11 @@
 #                                                                                        #
 ##########################################################################################
 '''generates an array of component indices for the components that constitute a particular component type'''
-# for peroxy radicals makes a two column array, with the first column giving the index of components
+# for peroxy radicals makes a two column array, with the first column giving the 
+# index of components
 # included in the peroxy radical list and the
-# second column containing the index based on where the RO2 occurs in comp_namelist (i.e., relative
+# second column containing the index based on where the RO2 occurs in comp_namelist 
+# (i.e., relative
 # to all other components from the chemical scheme)
 
 import numpy as np
@@ -40,13 +42,32 @@ def group_indices(Hcount, SMILES, i, self):
 	Cn = SMILES.count('C') + SMILES.count('c')
 	On = SMILES.count('O') + SMILES.count('o')
 
-	# check for peroxy radical
+	# if name string of this component matches a string section in the list of
+	# reactive RO2 names
+	if (self.comp_namelist[i] in self.RO2_names):
+		
+		# check that this name exactly matches (so not just a string subsection)
+		# one of those in the list of reactive RO2 names. Note that 
+		# self.reac_RO2_indx is initiated in sch_interr.py
+		for RO2_namei in self.RO2_names:
+			if (RO2_namei == self.comp_namelist[i]):
+				self.reac_RO2_indx = np.concatenate((self.reac_RO2_indx, 
+					np.array((i)).reshape(1)), axis=0)
+				self.reac_RO2_indx = self.reac_RO2_indx.astype('int')
+	
+
+
+	# check for peroxy radical, note that this list of peroxy radicals
+	# is based on the SMILES string, and so may be differenet to the list of
+	# reactive peroxy radicals in self.reac_RO2_indx
 	if ('O[O]' in SMILES or '[O]O' in SMILES):
 		if (Cn > 0):
 			if (self.RO2_indices.shape[0] == 0): # if first installment
 				self.RO2_indices = np.array((1, i)).reshape(1, 2)
 			else:
-				self.RO2_indices = np.concatenate((self.RO2_indices, np.array((self.RO2_indices[-1, 0]+1, i)).reshape(1, 2)), axis = 0)
+				self.RO2_indices = np.concatenate((self.RO2_indices, 
+					np.array((self.RO2_indices[-1, 0]+1, i)).reshape(
+					1, 2)), axis = 0)
 			if (On >= 6):
 				# HOMs peroxy radicals
 				self.HOM_RO2_indx.append(i) 
@@ -54,51 +75,97 @@ def group_indices(Hcount, SMILES, i, self):
 	# check if alkoxy radical present in this component and that component is organic
 	if ('[O]' in SMILES):
 		if (Cn > 0):
-			# if it is an alkoxy radical (rather than alkyl peroxy radical) add its index to list
-			if ('O[O]' not in SMILES and '[O]O' not in SMILES): # ensure it's not alkyl peroxy radical
+			# if it is an alkoxy radical (rather than alkyl peroxy radical) add 
+			# its index to list
+			# ensure it's not alkyl peroxy radical
+			if ('O[O]' not in SMILES and '[O]O' not in SMILES):
 				self.RO_indx.append(i)					
 
 	# check for HOMs and accretion products
 	if (On >= 6):
-		# HOMs radicals
+		# highly oxidised molecules
 		self.HOMs_indx.append(i)
 		if (Cn > 10):
 			# HOMs accretion products
 			self.ROOR_indx.append(i)
 
+	# check for HOMs present in PRAM, first find the index of the
+	# first PRAM species
+
+	# fillers
+	C10H15O2O2_indx = 1.e10
+	BZo_RO2_O7_indx = 1.e10
+		
+	if 'C10H15O2O2' in self.comp_namelist:
+		C10H15O2O2_indx = self.comp_namelist.index('C10H15O2O2')
+		mon_Cnum = 10
+	if 'BZo_RO2_O7' in self.comp_namelist:
+		BZo_RO2_O7_indx = self.comp_namelist.index('BZo_RO2_O7')
+		mon_Cnum = 6
+
+	PRAM_start_indx = min([C10H15O2O2_indx, BZo_RO2_O7_indx])
+	
+	if (i >= PRAM_start_indx): # if a PRAM component
+		self.PRAM_indx.append(i)
+
+		# if a closed-shell HOM PRAM species
+		if ('[O]' not in SMILES and On >= 6):
+			if (Cn == mon_Cnum):
+				# index of closed-shell PRAM monomer
+				self.PRAMcsmon_indx.append(i)
+			if (Cn < mon_Cnum):
+				# index of closed-shell PRAM fragmentation, but
+				# note that in 'Methods/The PRAM section' of
+				# Roldin et al. 2019 (doi.org/10.1038/s41467-019-12338-8)
+				# they explain, that no matter how oxidised an alkoxy radical
+				# is, they assume that it fragments (decomposes) to 
+				# the MCM species C717O2 and CH3COCH3
+				self.PRAMcsfrag_indx.append(i)
+				
+			if (Cn > mon_Cnum):
+				# index of closed-shell PRAM accretion product
+				self.PRAMcsacc_indx.append(i)
+
+		# if a peroxy radical HOM PRAM species
+		if (On >= 6):
+			if ('O[O]' in SMILES or '[O]O' in SMILES ):
+				self.PRAMpr_indx.append(i)
+
 	# Ademipo start------------------------------------------------------
 	# check for product classes of  HOMs as defined by Baker et al. 2024
 	# doi.org/10.5194/acp-24-4789-2024
 	if (Cn > 10):
-		if (On >= 4):
-			# HOMs accretion products as defined by Baker et al. 2024
-			# i is component index
-			# append is a python command
-			# ROORBaker__index is the list containing the indices
-			# of components that fit the HOM accretion product 
-			# definition
-			# self is a place to store the ROORBaker_indx variable
-			# and self.ROORBaker_indx is defined in 
-			self.ROORBaker_indx.append(i)
-
-        # check for fragment product HOMs as defined by Baker et al. 2024
+		if ('[O]' not in SMILES and '[o]' not in SMILES):
+			if (On >= 4):
+				# HOMs accretion products as defined by Baker et al. 2024
+				# i is component index
+				# append is a python command
+				# ROORBaker__index is the list containing the indices
+				# of components that fit the HOM accretion product 
+				# definition
+				# self is a place to store the ROORBaker_indx variable
+				# and self.ROORBaker_indx is defined in 
+				self.ROORBaker_indx.append(i)
+				
+        # check for closed-shell fragment product HOMs as defined by Baker et al. 2024
 	if (5 <= Cn < 10):
-		if (On >= 4):
-                        # HOMs fragment products as defined by Baker at al. 2024
-			# i is component index
-			# append is a python command
-			# HOMFragBaker__index is the list containing the indices
-			# of components that fit the HOM fragment product
-			# defintion
-			# self is a place to store the HOMFragBaker_indx variable
-			# and self.HOMFragBaker_indx is defined in 
-			self.HOMFragBaker_indx.append(i)
+		if ('[O]' not in SMILES and '[o]' not in SMILES):
+			if (On >= 4):
+                       	 # HOMs fragment products as defined by Baker at al. 2024
+				# i is component index
+				# append is a python command
+				# HOMFragBaker__index is the list containing the indices
+				# of components that fit the HOM fragment product
+				# defintion
+				# self is a place to store the HOMFragBaker_indx variable
+				# and self.HOMFragBaker_indx is defined in 
+				self.HOMFragBaker_indx.append(i)
 
-        # check for peroxyradical product HOMs as defined by Baker et al. 2024
+        # check for peroxy radical product HOMs as defined by Baker et al. 2024
 	if (Cn == 10 and On >=4):
 		if ('O[O]' in SMILES or '[O]O' in SMILES or 'o[o]' in SMILES or 
 		'[o]o' in SMILES):
-			# HOMs peroxyradical products  as defined  by Baker et al. 2024
+			# HOMs peroxy radical products  as defined  by Baker et al. 2024
 			# i is component index
 			# append is a python command
 			# HOMRO2Baker__index is the list containing the indices 
@@ -108,7 +175,7 @@ def group_indices(Hcount, SMILES, i, self):
 			# and self.HOMRO2Baker_indx is defined in 
 			self.HOMRO2Baker_indx.append(i)
 
-	# check for monomer product HOMs as defined by Baker et al. 2024
+	# check for closed-shell monomer product HOMs as defined by Baker et al. 2024
 	if (Cn == 10 and On >= 4):
 		if ('[O]' not in SMILES and '[o]' not in SMILES):
 			# HOMs monomer products as defined by Baker et al. 2024
@@ -138,7 +205,8 @@ def group_indices(Hcount, SMILES, i, self):
 		if self.HO2i != []:
 		
 			if (self.rindx_g.ndim == 2):
-				eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i, axis=1) == 1)  
+				eqn_of_inter = produci*(np.sum(self.rindx_g == 
+					self.HO2i, axis=1) == 1)  
 			if (self.rindx_g.ndim == 1):
 				eqn_of_inter = produci*(np.sum(self.rindx_g == self.HO2i) == 1)  
 
@@ -151,7 +219,8 @@ def group_indices(Hcount, SMILES, i, self):
 			for eqni in np.where(eqn_of_inter == 1)[0]:
 
 				# get the index of the precursor peroxy radical
-				pre_RO2i = self.rindx_g[eqni, :][self.rindx_g[eqni, :] != self.HO2i]
+				pre_RO2i = self.rindx_g[eqni, :][
+					self.rindx_g[eqni, :] != self.HO2i]
 				# get SMILE string of precursor RO2
 				
 				pre_RO2_SMILE = self.rel_SMILES[pre_RO2i[0]]
@@ -160,14 +229,17 @@ def group_indices(Hcount, SMILES, i, self):
 				# oxygen count
 				On_pre = pre_RO2_SMILE.count('O')+pre_RO2_SMILE.count('o')
 
-				# check on whether hydrogen number given in product component name
+				# check on whether hydrogen number given in product 
+				# component name
 				if 'H' in self.comp_namelist[i]:
 					try: # check if number comes after H letter
 						# get index of H character
 						Hindx = self.comp_namelist[i].index('H')	
 						Hcount = float(self.comp_namelist[i][Hindx+1])
-						try: # in case two digit number after H character
-							Hcount = float(self.comp_namelist[i][Hindx+1:Hindx+3])	
+						# in case two digit number after H character
+						try:
+							Hcount = float(self.comp_namelist[
+								i][Hindx+1:Hindx+3])	
 						except: # just one number
 							Hcount = Hcount
 					except:
@@ -209,7 +281,7 @@ def group_indices(Hcount, SMILES, i, self):
 						else: # if no hydrocarbons
 							Hn_pre = 0.
 								
-				# peroxy radical
+				# hydrogen peroxide molecule
 				if (Hcount-1 == Hn_pre and Cn == Cn_pre and On == On_pre):	
 					self.OOH.append(int(i))
 					if (On >= 6): # HOMs hydroperoxides
@@ -234,7 +306,8 @@ def group_indices(Hcount, SMILES, i, self):
 		# rate coefficient and no other reactants beside the precursor
 		eq_of_inter = (produci*eqi_single_reac*self.RO2_in_rrc)
 
-		# check if RO2 present in the reaction rate coefficient in any of these equations
+		# check if RO2 present in the reaction rate coefficient in 
+		# any of these equations
 		if (sum(eq_of_inter) > 0): 	
 			# get index of zeros
 			eoi_zindx = (eq_of_inter == 0)
@@ -251,17 +324,22 @@ def group_indices(Hcount, SMILES, i, self):
 				# get the precursor index
 				pre_RO2i = self.rindx_g[reac_now, 0]
 				# get the precursor carbon and oxygen count
-				pCn = self.rel_SMILES[pre_RO2i].count('C')+self.rel_SMILES[pre_RO2i].count('c')
-				pOn = self.rel_SMILES[pre_RO2i].count('O')+self.rel_SMILES[pre_RO2i].count('o')
+				pCn = (self.rel_SMILES[pre_RO2i].count('C')+
+					self.rel_SMILES[pre_RO2i].count('c'))
+				pOn = (self.rel_SMILES[pre_RO2i].count('O')+
+					self.rel_SMILES[pre_RO2i].count('o'))
 				
-				# check on whether hydrogen number given in product component name
+				# check on whether hydrogen number given in product 
+				# component name
 				if 'H' in self.comp_namelist[i]:
 					try: # check if number comes after H letter
 						# get index of H character
 						Hindx = self.comp_namelist[i].index('H')	
 						Hcount = float(self.comp_namelist[i][Hindx+1])
-						try: # in case two digit number after H character
-							Hcount = float(self.comp_namelist[i][Hindx+1:Hindx+3])	
+						# in case two digit number after H character
+						try:
+							Hcount = float(self.comp_namelist[
+								i][Hindx+1:Hindx+3])	
 						except: # just one number
 							Hcount = Hcount
 					except:
@@ -273,7 +351,8 @@ def group_indices(Hcount, SMILES, i, self):
 					Hindx = self.comp_namelist[pre_RO2i].index('H')	
 					Hn_pre = float(self.comp_namelist[pre_RO2i][Hindx+1])
 					try: # in case two digit number after H character
-						Hn_pre = float(self.comp_namelist[pre_RO2i][Hindx+1:Hindx+3])	
+						Hn_pre = float(self.comp_namelist[
+							pre_RO2i][Hindx+1:Hindx+3])	
 					except: # just one number
 						Hn_pre = Hn_pre
 				except:
@@ -313,6 +392,7 @@ def group_indices(Hcount, SMILES, i, self):
 					if (On >= 6): # HOMs carbonyls
 						self.HOM_carbonyl.append(int(i))
 					break # don't loop through anymore reactions
+
 	# nitrates
 	if (self.comp_namelist[i][-3::] == 'NO3'): # MCM and PRAM carbonyl
 		if (Cn >= 1):

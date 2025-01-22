@@ -40,10 +40,10 @@ from water_calc import water_calc
 import group_indices
 
 def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp, 
-			volP, testf, corei, umansysprop_update, 
-			core_dens,
-			ode_gen_flag, nuci, dens_comp, dens,
-			y_mw, tempt_cnt, self):
+		volP, testf, corei, umansysprop_update, 
+		core_dens,
+		ode_gen_flag, nuci, dens_comp, dens,
+		y_mw, tempt_cnt, self):
 
 	# inputs: ------------------------------------------------------
 	# self.rel_SMILES - array of SMILE strings for components 
@@ -155,6 +155,14 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	self.HOMRO2Baker_indx = [] # HOM peroxyradical products as defined in Baker 2024
 	self.HOMMonBaker_indx = [] # HOM monomer products as defined in Baker 2024
 	# Ademipo finish -------------------------------
+	# PRAM start (https://doi.org/10.1038/s41467-019-12338-8) -----------
+	self.PRAM_indx = [] # all PRAM components
+	self.PRAMpr_indx = [] # PRAM HOM peroxy radicals
+	self.PRAMcsmon_indx = [] # PRAM HOM closed-shell monomers
+	self.PRAMcsfrag_indx = [] # PRAM HOM closed-shell fragments
+	self.PRAMcsacc_indx = [] # PRAM HOM closed-shell accretion products
+	# PRAM finish ----------------------------------
+
 	# index for HO2, used in identifying components with 
 	# functional groups in group_indices.py
 	try:
@@ -321,19 +329,15 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# possibly use different method for vapour pressure 
 		# (log10(atm)) of HOMs
 		
-		# if HOMs
-		if (((self.rel_SMILES[i].count('C') + 
-			self.rel_SMILES[i].count('c') >= 10) and 
-			(self.rel_SMILES[i].count('O') + 
-			self.rel_SMILES[i].count('o') >= 6) and 
-			'PAN' not in self.comp_namelist[i]) and
-			'Mesotrione' not in self.comp_namelist[i]):
+		# if HOMs component
+		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6):
 
 			# tell recording section we are dealing 
 			# with a HOM		
 			rec_now_flag = 1
 			
-			if (self.HOMs_vp == 'Nannoolal2008'):
+			if ('Nannoolal' in self.HOMs_vp or 'nannoolal' in self.HOMs_vp or
+				'NANNOOLAL' in self.HOMs_vp):
 				# if Nannoolal method wanted for HOMs
 				Psatnow = ((vapour_pressures.nannoolal(
 					self.Pybel_objects[i],
@@ -342,7 +346,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.Pybel_objects[i]))))
 
 			# if Mohr et al. 2019 method wanted for HOMs
-			if (self.HOMs_vp == 'Mohr2019'):
+			if ('Mohr' in self.HOMs_vp or 'mohr' in self.HOMs_vp or 
+				'MOHR' in self.HOMs_vp):
 			
 				# log(C* (ug/m3)) (natural logarithm of effective 
 				# saturation concentration) of component 
@@ -372,6 +377,15 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					Psatnow = ((vapour_pressures.evaporation2(
 						self.Pybel_objects[i],
 						self.TEMP[tempt_cnt])))
+
+			if (self.HOMs_vp == 'MY'):
+				if (self.pars_skip != 2):
+					# if Myrdal and Yalkowsky method wanted for HOMs
+					Psatnow = ((vapour_pressures.myrdal_and_yalkowsky(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt], 
+						boiling_points.nannoolal(
+						self.Pybel_objects[i]))))
 			
 			if (self.HOMs_vp == 'SIMPOL'):
 				if (self.pars_skip != 2):
@@ -380,14 +394,17 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 						self.Pybel_objects[i],
 						self.TEMP[tempt_cnt])))
 					
+					
 			
 		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
 		# et al. (2008), with dB of 
 		# that equation given by eq. 7 of same reference)
-		else: 
+		else: # if not HOMs component
 			if (self.pars_skip != 2):
 
-				if (self.nonHOMs_vp == 'Nannoolal2008'):
+				if ('Nannoolal' in self.nonHOMs_vp or 
+					'nannoolal' in self.nonHOMs_vp or
+					'NANNOOLAL' in self.nonHOMs_vp):
 					# if Nannoolal method wanted for nonHOMs
 					Psatnow = ((vapour_pressures.nannoolal(
 						self.Pybel_objects[i],
@@ -400,6 +417,22 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					Psatnow = ((vapour_pressures.evaporation2(
 						self.Pybel_objects[i],
 						self.TEMP[tempt_cnt])))
+
+				# if Myrdal and Yalkowsky method wanted for nonHOMs
+				if (self.nonHOMs_vp == 'MY'):
+					# Myrdal and Yalkowsky method in UManSysProp
+					# cannot deal with bimolecular hydrogen as it
+					# gives a 0 mass, so assign an arbitrarilly high
+					# vapour pressure here
+					if (self.comp_namelist[i] == 'H2'):
+						Psatnow = 10. # log10(atm)
+					else:
+						Psatnow = ((
+						vapour_pressures.myrdal_and_yalkowsky(
+						self.Pybel_objects[i],
+						self.TEMP[tempt_cnt], 
+						boiling_points.nannoolal(
+						self.Pybel_objects[i]))))
 			
 				if (self.nonHOMs_vp == 'SIMPOL'):
 					# if SIMPOL method wanted for nonHOMs
@@ -424,14 +457,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			else: 
 			
 				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
-					298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
-				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], 
-				#	self.TEMP[tempt_cnt])))	
-				#Psatnow += 2
-				# in case you want to ensure small molecules don't contribute to 
-				# particle mass
-				#if self.rel_SMILES[i].count('C')<=5:
-				#	Psatnow += 10 # ensure no condensation of small molecules
+					298.15,  
+					boiling_points.nannoolal(self.Pybel_objects[i]))))
 
 				try: # in case array
 					self.Psat_Pa_rec[i]  = Psatnow[0]
@@ -451,15 +478,19 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			Hindx_end = Hindx_start
 			for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
 				try:
-					float(Hnum_test) # only continue if this character is a number
+					# only continue if this character is a number
+					float(Hnum_test)
 					Hindx_end += 1
 					if (Hindx_end == len(self.Pybel_objects[i].formula)):
-						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
+						Hcount = float(self.Pybel_objects[i].formula[
+							Hindx_start:Hindx_end])
 				except:
 					if (Hindx_end != Hindx_start):
-						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
+						Hcount = float(self.Pybel_objects[i].formula[
+						Hindx_start:Hindx_end])
 					else:
-						Hcount = 1. # if no number then Hydrogen must be alone
+						# if no number then Hydrogen must be alone
+						Hcount = 1.
 					break
 
 		else: # if no hydrocarbons
@@ -469,7 +500,9 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# list hydrgogen numbers per component
 		self.Hn_list.append(Hcount)	
 
-		self.nom_mass[0, i] = Hcount*1.+self.rel_SMILES[i].count('O')*16.+self.rel_SMILES[i].count('C')*12.+self.rel_SMILES[i].count('N')*14.+self.rel_SMILES[i].count('S')*32.
+		self.nom_mass[0, i] = (Hcount*1.+self.rel_SMILES[i].count('O')*16.+
+			self.rel_SMILES[i].count('C')*12.+self.rel_SMILES[i].count('N')*14.+
+			self.rel_SMILES[i].count('S')*32.)
 
 		# carbon and oxygen numbers in this component
 		self.Cnum[i, 0] = self.rel_SMILES[i].count('C')+self.rel_SMILES[i].count('c')
@@ -506,6 +539,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		ish = (self.Psat == 0.) # non-volatiles
 		# convert to Pa from atm
 		self.Psat = (10.**self.Psat)*101325.
+
 		# retain low volatility where wanted following unit 
 		# conversion
 		self.Psat[ish] = 0.
@@ -574,26 +608,74 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 
 							# get index of components in this group
 							if '<' in inequal:
-								if '=' in inequal: # less than or equal to
-									# get index of all components in this group
-									vol_indx = self.Psat[0, :] <= float(inequal[2::])
+								# less than or equal to
+								if '=' in inequal:
+									# get index of all 
+									# components in this 
+									# group
+									vol_indx = self.Psat[
+									0, :] <= float(
+									inequal[2::])
 								else: # just less than
-									# get index of all components in this group
-									vol_indx = self.Psat[0, :] < float(inequal[1::])
+									# get index of all 
+									# components in this 
+									# group
+									vol_indx = self.Psat[
+									0, :] < float(
+									inequal[1::])
+									
 							if '>' in inequal:
-								if '=' in inequal: # greater than or equal to
-									# get index of all components in this group
-									vol_indx = self.Psat[0, :] >= float(inequal[2::])
+								# greater than or equal to
+								if '=' in inequal:
+									# get index of all 
+									# components in this 
+									#group
+									vol_indx = self.Psat[
+										0, :] >= float(
+										inequal[2::])
 								else: # just greater than
-									# get index of all components in this group
-									vol_indx = self.Psat[0, :] > float(inequal[1::])
+									# get index of all 
+									# components in this 
+									# group
+									vol_indx = self.Psat[
+									0, :] > float(
+									inequal[1::])
 							if '==' in inequal:
-								# get index of all components in this group
-								vol_indx = self.Psat[0, :] == float(inequal[2::])
-
-						if 'RO2' in group_name: # if RO2, as categorised by the chemical scheme
+								# get index of all components 
+								# in this group
+								vol_indx = self.Psat[
+									0, :] == float(
+									inequal[2::])
+						
+						# if RO2, as categorised by the SMILES string in
+						# group_indices.py
+						if ('RO2' in group_name):
 							vol_indx = self.RO2_indices[:, 1]
+						# if HOMs
+						if ('HOM' in group_name):
+							vol_indx = self.HOMs_indx
+						# if the HOM subset of RO2
+						if ('HOMRO2' in group_name or 
+							'HOM_RO2' in group_name):
+							vol_indx = self.HOM_RO2_indx
+						# if all PRAM components
+						if (group_name == 'PRAM'):
+							vol_indx = self.PRAM_indx
+
+						# if PRAM closed-shell monomers components
+						if (group_name == 'PRAMcsmon'):
+							vol_indx = self.PRAMcsmon_indx
 					
+						# if PRAM closed-shell accretion products
+						if (group_name == 'PRAMcsacc'):
+							vol_indx = self.PRAMcsacc_indx
+
+						# if PRAM peroxy radicals
+						if (group_name == 'PRAMpr'):
+							vol_indx = self.PRAMpr_indx
+
+			
+
 					# assign user-defined vapour pressure for this wall (Pa)
 					self.Psat[(self.num_asb-1)+wn, vol_indx] = volP[i]
 
@@ -641,15 +723,25 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 									# get index of all components in this group
 									vol_indx = self.Psat[0, :] >= float(inequal[2::])
 								else: # just greater than
-									# get index of all components in this group
-									vol_indx = self.Psat[0, :] > float(inequal[1::])
+									# get index of all 
+									# components in this 
+									# group
+									vol_indx = self.Psat[
+									0, :] > float(
+									inequal[1::])
 							if '==' in inequal:
 								# get index of all components 
 								# in this group
-								vol_indx = self.Psat[0, :] == float(inequal[2::])
+								vol_indx = self.Psat[
+								0, :] == float(inequal[2::])
 						# if RO2, as categorised by the chemical scheme
-						if 'RO2' in group_name:
-							vol_indx = self.RO2_indices
+						if ('RO2' in group_name):
+							vol_indx = self.RO2_indices[:, 1]
+						if ('HOMRO2' in group_name or 
+							'HOM_RO2' in group_name):
+							vol_indx = self.HOM_RO2_indx
+						if ('HOM' in group_name):
+							vol_indx = self.HOMs_indx
 
 					# assign user-defined vapour pressure (Pa)
 					self.Psat[:, vol_indx] = volP[i]
@@ -668,9 +760,8 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# convert saturation vapour pressures from Pa to 
 		# # molecules/cm3 (air) using ideal
 		# gas law, R has units cm3.Pa/K.mol
-		self.Psat = self.Psat*(NA/((si.R*1.e6)*
-			self.TEMP[tempt_cnt]))
-
+		self.Psat = self.Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
+		
 		# remember Psat (# molecules/cm3) in case it is altered 
 		# by user-defined inputs in partit_var.py
 		self.Psat_num_rec = np.zeros((self.Psat.shape))

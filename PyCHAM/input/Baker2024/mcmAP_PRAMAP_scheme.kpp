@@ -786,7 +786,7 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {246 } H1CO23CHO + OH = CO + CO + HOCH2CO3 : 1.44E-11 ;
  {247 } H1CO23CHO + hv = CO + CO + HO2 + HOCH2CO3 : J(17)+J(18) ;
 # note that branching ratios here are reduced to allow space
-# for the branching ration of APINENE+OH in the PRAM scheme
+# for the branching ratio of APINENE+OH in the PRAM scheme
  {248 } APINENE + OH = APINAO2 : 1.2E-11*EXP(440./TEMP)*0.5577 ;
  {249 } APINENE + OH = APINBO2 : 1.2E-11*EXP(440./TEMP)*0.344 ;
  {250 } APINENE + OH = APINCO2 : 1.2E-11*EXP(440./TEMP)*0.073125 ;
@@ -1138,8 +1138,10 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {593 } C717O = CO235C6CHO + HO2 : KROSEC*O2 ;
  {594 } C107O2 + NO3 = C107O + NO2 : KRO2NO3 ;
  {595 } C107O2 + HO2 = C107OOH : KRO2HO2*0.914 ;
- {596 } C107O2 = C107O : 9.20E-14*0.7*RO2 ;
- {597 } C107O2 = C107OH : 9.20E-14*0.3*RO2 ;
+# note that branching ratios here are *0.9
+# to account for the PRAM reaction of C107O2
+ {596 } C107O2 = C107O : 9.20E-14*0.7*RO2*0.9 ;
+ {597 } C107O2 = C107OH : 9.20E-14*0.3*RO2*0.9 ;
  {598 } C108O2 + NO3 = C108O + NO2 : KRO2NO3 ;
  {599 } C108O2 + HO2 = C108OOH : KRO2HO2*0.914 ;
  {600 } C108O2 = C108O : 6.70E-15*0.7*RO2 ;
@@ -1426,7 +1428,7 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {881 } HCOCO = HCOCO3 : 5.00E-12*O2*3.2*EXP(-550./TEMP) ;
  {882 } HCOCO = CO + OH : 5.00E-12*O2*3.2*(1.-EXP(-550./TEMP)) ;
  {883 } HMVKANO3 + hv = HMVKAO + NO2 : J(24)*0.91 ;
-# background reactivity used for OH in supplemntary material of Baker et al. 2024 
+# background reactivity used for OH in supplementary material of Baker et al. 2024 
 # (10.5194/acp-24-4789-2024-supplement
  {884 } OH = : 5. ;
 
@@ -2661,8 +2663,10 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
 {1151.}     C10H15O12O2 = C10H16O13   :               1E-11*0.5*RO2 ;
 
 {1152.}     C107O2 = C10H15O2O :                      9.20D-14*RO2*0.1 ;
-{1153.}     C107O2 = C107O : 	                      9.20D-14*0.7*RO2*0.9 ;
-{1154.}     C107O2 = C107OH : 	                      9.20D-14*0.3*RO2*0.9 ;
+# note that these adjustments to MCM reaction of C107O2 are contained in
+# the MCM section of this file
+#{1153.}     C107O2 = C107O : 	                      9.20D-14*0.7*RO2*0.9 ;
+#{1154.}     C107O2 = C107OH : 	                      9.20D-14*0.3*RO2*0.9 ;
 
 # MT+OH autoxidation
 {1155.}     C10H17O3O2 = C10H17O5O2 :                 2D17*exp(-1.2077D4/TEMP);

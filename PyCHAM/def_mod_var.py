@@ -102,8 +102,14 @@ def def_mod_var(caller, self): # define function
 	self.pcont = np.zeros((1, 1), dtype=int) 
 	# molecular weight of seed material (g/mol)
 	seed_mw = (np.array((132.14))).reshape(1) 
-	seed_diss = [1.] # dissociation constant of seed material
-	seed_dens = np.ones((1)) # density of seed material (g/cc)
+	self.core_diss = [1.] # dissociation constant of seed material
+	# dissociation constant of seed material with respect to water
+	self.core_diss_wrtw = [1.]
+	# dissociation constant of non-seed material with respect to water
+	self.noncore_diss_wrtw = [1.]
+	# dissociation constant of water with respect to organics
+	self.H2O_diss_const_org = [1.]
+	seed_dens = np.ones((1)) # density of seed material (g/cm3)
 	self.seed_name = ['core'] # name of component forming seed material
 	# mole fraction of dry seed components
 	self.seedx = np.ones((1, 1, 1)) 
@@ -179,7 +185,9 @@ def def_mod_var(caller, self): # define function
 	# experiment start
 	Ct = np.zeros((0, 0))
 	# the gas-particle partitioning cutoff (Pa)
-	self.partit_cutoff = []
+	self.ppartit_cutoff = []
+	# the gas-wall partitioning cutoff (Pa)
+	self.wpartit_cutoff = []
 
 	# lights -------------------------------------------------------------------------------
 	self.light_stat = np.zeros((1), dtype='int') # light status
@@ -210,10 +218,14 @@ def def_mod_var(caller, self): # define function
 		delattr(self, 'cosx')	
 
 
-	# deposition of particles and vapours to wall ------------------------------------------
+	# deposition of particles and vapours to surface(s) ---------------------------------
 	self.wall_on = 1 # marker for whether to consider wall (0 for no, 1 for yes)
 	self.Cw = np.zeros((1)) # effective absorbing mass of wall (g/m3 (air))
 	self.kw = np.zeros((1, 1)) # gas-wall mass transfer coefficient (/s)
+	# tell partit_var_prep and cham_up that
+	# mass transfer coefficients are not provided
+	# in equation form by default
+	self.mtc_calc_flag = 0
 
 	inflectDp = 1.e-6 # diameter of deposition function inflection
 	pwl_xpre = 0. # gradient before inflection
@@ -221,7 +233,9 @@ def def_mod_var(caller, self): # define function
 	inflectk = 0. # rate at inflection
 	chamSA = 42. # chamber surface area (m2)
 	chamV = 18. # chamber volume (m3, set to MAC value)
-	Rader = -1 # flag for deposition to wall treatment (0 for customised, 1 for Rader and McMurry (1985))
+	# flag for deposition to wall treatment (0 for customised, 1 for Rader and 
+	# McMurry (1985))
+	Rader = -1
 	p_char = 0. # average number of charges per particle (/particle)
 	e_field = 0. # average electric field inside chamber (g.m/A.s3)
 
@@ -265,7 +279,7 @@ def def_mod_var(caller, self): # define function
 			lowsize, 
 			uppsize, std, 
 			Compt, injectt, Ct, seed_mw, 
-			seed_diss, seed_dens, 
+			seed_dens, 
 			dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, 
@@ -288,7 +302,7 @@ def def_mod_var(caller, self): # define function
 	return(y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, 
 		std, Compt, 
-		injectt, Ct, seed_mw, seed_diss, seed_dens,  
+		injectt, Ct, seed_mw, seed_dens,  
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, 

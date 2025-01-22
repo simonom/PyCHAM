@@ -34,7 +34,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	# n0 - particle concentration per size bin now (# particles/cm3 (air))
 	# ---------------------------------------------------------------------------
 
-	y_dens = self.y_dens*1.e3 # convert density from kg/m3 to g/cm3
+	y_dens = self.y_dens*1.e-3 # convert density from kg/m3 to g/cm3
 
 	y_asmat = (y.reshape(num_asb, num_comp))
 	y_asmat = y_asmat.transpose() # species in rows and size bins in columns
@@ -50,9 +50,11 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	
 	# mass fractions of each species including core
 	mass_fracs[:, ish] = y_mass_array[:, ish]/((np.sum(y_mass_array, 0))[ish])
-	# total density of particles per size bin (g/cm3)
+	# total density of particles per size bin (g/cm3), by calculating the
+	# mass-weighted average density
 	tot_rho = np.zeros((num_asb))
-	tot_rho[ish] = 1.e-3/((np.sum(mass_fracs/y_dens, 0))[ish])
+	tot_rho[ish] = ((np.sum(mass_fracs*y_dens, 0))[ish])
+	
 	# average molecular weight of particles (g/mol)
 	avMW = (mass_fracs*y_mw).sum(0)
 	

@@ -105,7 +105,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 			if (comp_names_to_plot[i].strip() == 'RO'):
 				indx_plot = (np.array((group_indx['ROi'])))
-				group_flag = 1		
+				group_flag = 1	
+
+			if (comp_names_to_plot[i].strip() == 'HOM'):
+				indx_plot = (np.array((group_indx['HOMs'])))			
+				group_flag = 1	
 				
 			if ('-OOH' in comp_names_to_plot[i].strip()):
 				indx_plot = (np.array((group_indx['OOH'])))			
@@ -138,31 +142,53 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
 
-			# check on whether this could be an individual component
-			try: # will work if provided components were in simulation chemical scheme
-				# get index of this specified component, removing any white space
-				indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
-				indx_plot = np.array((indx_plot))
-				group_flag = -1
-			except:
+			if ('seed' in comp_names_to_plot[i].strip()):
+				indx_plot = seedi
 				group_flag = 1
-			if (group_flag != -1):
-				if ('C' in comp_names_to_plot[i].strip() or 'c' in comp_names_to_plot[i].strip()):
+
+			# if not a group
+			# check on whether this could be an individual component
+			# will work if provided components were in simulation chemical scheme
+			if (group_flag == 0):
+				try:
+					# get index of this specified component, removing any 
+					# white space
+					indx_plot = [comp_names.index(
+						comp_names_to_plot[i].strip())]
+					indx_plot = np.array((indx_plot))
+					group_flag = -1
+				except:
+					# if not a chemical scheme component, then mark for
+					# failure to find component, which will be 
+					# changed if the carbon or oxygen number tests
+					# below succeed
+					ip_fail = 1
+
+			if (group_flag == 0):
+				if ('C' in comp_names_to_plot[i].strip() or 
+					'c' in comp_names_to_plot[i].strip()):
 					try:
-						cindx = comp_names_to_plot[i].strip().index('C') # index of C letter
+						# index of C letter
+						cindx = comp_names_to_plot[i].strip().index('C') 
 					except:
-						cindx = comp_names_to_plot[i].strip().index('c') # index of c letter
+						# index of c letter
+						cindx = comp_names_to_plot[i].strip().index('c') 
 				
 					# if a number given after carbon atom
 					if comp_names_to_plot[i].strip()[cindx+1].isnumeric():
 						numb_indx = cindx+1 # number index finishes
-						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
-							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
-								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
+						if (len(comp_names_to_plot[i].strip()) >= 
+							cindx+2):
+							for str_i in range(cindx+2, 
+							len(comp_names_to_plot[i].strip())):
+								if (comp_names_to_plot[
+									i].strip()[cindx+2
+									:str_i+1].isnumeric()):
 									numb_indx += 1
 					
 						# get carbon number
-						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
+						Cn = float(comp_names_to_plot[
+							i].strip()[cindx+1:numb_indx+1])
 					
 						# get all components with this many carbons
 						indx_plot_nw = np.zeros((len(indx_plot)))
@@ -170,33 +196,51 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 						for indxi in indx_plot:
 							# get the relevant SMILES
 							SMIi = rel_SMILES[indxi]
-							if ((SMIi.count('C') + SMIi.count('c')) != Cn):
-								indx_to_remove = np.where(indx_plot_nw == indxi)[0][0]
-								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
-						indx_plot = (np.array((indx_plot_nw))).astype('int')
+							if ((SMIi.count('C') + 
+								SMIi.count('c')) != Cn):
+								indx_to_remove = np.where(
+								indx_plot_nw == indxi)[0][0]
+								indx_plot_nw = np.concatenate((
+								indx_plot_nw[0:indx_to_remove],
+								indx_plot_nw[
+								indx_to_remove+1::]))
+						indx_plot = (np.array((
+							indx_plot_nw))).astype('int')
 							
 						group_flag = 1
+						ip_fail = 0
 						if (indx_plot.shape[0] == 0):
 							ip_fail = 1
 
-				if ('O' in comp_names_to_plot[i].strip() or 'o' in comp_names_to_plot[i].strip()):
+				if ('O' in comp_names_to_plot[i].strip() or 
+					'o' in comp_names_to_plot[i].strip()):
 					try:
-						cindx = comp_names_to_plot[i].strip().index('O') # index of O letter
+						# index of O letter
+						cindx = comp_names_to_plot[i].strip().index('O') 
 					except:
-						cindx = comp_names_to_plot[i].strip().index('o') # index of o letter
+						# index of o letter
+						cindx = comp_names_to_plot[i].strip().index('o') 
 				
 					# if a number given after the atom letter
 					if (comp_names_to_plot[i].strip()[cindx+1].isnumeric()):
 						numb_indx = cindx+1 # number index finishes
-						if (len(comp_names_to_plot[i].strip()) >= cindx+2):
-							for str_i in range(cindx+2, len(comp_names_to_plot[i].strip())):
-								if (comp_names_to_plot[i].strip()[cindx+2:str_i+1].isnumeric()):
+						if (len(comp_names_to_plot[i].strip()) >= 
+							cindx+2):
+							for str_i in range(cindx+2, 
+								len(comp_names_to_plot[
+								i].strip())):
+								if (comp_names_to_plot[
+									i].strip()[
+									cindx+2:str_i+1
+									].isnumeric()):
 									numb_indx += 1
 					
 						# get number of atoms of interest
-						Cn = float(comp_names_to_plot[i].strip()[cindx+1:numb_indx+1])
+						Cn = float(comp_names_to_plot[i].strip()[
+							cindx+1:numb_indx+1])
 					
-						# get all components with this many atoms of interest
+						# get all components with this many atoms 
+						# of interest
 						indx_plot_nw = np.zeros((len(indx_plot)))
 						indx_plot_nw[:] = indx_plot[:]
 						for indxi in indx_plot:
@@ -207,21 +251,30 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 								indx_plot_nw = np.concatenate((indx_plot_nw[0:indx_to_remove], indx_plot_nw[indx_to_remove+1::]))
 						indx_plot = (np.array((indx_plot_nw))).astype('int')
 							
+						ip_fail = 0
 						group_flag = 1
 						if (indx_plot.shape[0] == 0):
 							ip_fail = 1
 
 			
 				if (ip_fail == 1):	
-					# in case code thought this was a group but couldn't make the group work
-					try: # will work if provided components were in simulation chemical scheme
-						# get index of this specified component, removing any white space
-						indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+					# in case code thought this was a group but 
+					# couldn't make the group work
+					# will work if provided components were in 
+					# simulation chemical scheme
+					try:
+						# get index of this specified component, 
+						#removing any white space
+						indx_plot = [comp_names.index(
+							comp_names_to_plot[i].strip())]
 						indx_plot = np.array((indx_plot))
 						group_flag = 0
 					except:
 
-						self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+						self.l203a.setText(str('Component ' + 
+						comp_names_to_plot[i] + 
+						' not found in chemical scheme used ' +	
+						'for this simulation'))
 						# set border around error message
 						if (self.bd_pl == 1):
 							self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -235,9 +288,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 						return()
 			
 			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
-				try: # will work if provided components were in simulation chemical scheme
-					# get index of this specified component, removing any white space
-					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+				# will work if provided components were in simulation 
+				# chemical scheme
+				try:
+					# get index of this specified component, 
+					#removing any white space
+					indx_plot = [comp_names.index(comp_names_to_plot[
+						i].strip())]
 					indx_plot = np.array((indx_plot))
 				except:
 					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
@@ -252,7 +309,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.ioff() # turn off interactive mode
 					plt.close() # close figure window
 					return()
-
+			
 			import scipy.constants as si # for scientific constants
 			
 			yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))

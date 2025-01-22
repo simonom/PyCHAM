@@ -21,7 +21,8 @@
 #                                                                      #
 ########################################################################
 '''solution of ODEs for water gas-particle partitioning'''
-# module to solve system of ordinary differential equations (ODEs) using solve_ivp of Scipy 
+# module to solve system of ordinary differential equations (ODEs) 
+# using solve_ivp of Scipy 
 
 import numpy as np
 import scipy.sparse as SP
@@ -30,7 +31,7 @@ from scipy.integrate import solve_ivp
 # define function
 def ode_solv(y, integ_step, Cinfl_now,
 	rowvals, colptrs, num_comp, num_sb,
-	act_coeff, core_diss, kelv_fac, kimt, num_asb,
+	act_coeff, kelv_fac, kimt, num_asb,
 	jac_mod_len, jac_part_hmf_indx, rw_indx, 
 	N_perbin, jac_part_H2O_indx, H2Oi, self):
 
@@ -49,7 +50,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# self.Psat - pure component saturation vapour pressures (# molecules/cm3)
 	# act_coeff - activity coefficient of components
 	# self.seedi - index of seed material
-	# core_diss - dissociation constant of seed material
+	# self.diss_wrtw - dissociation constant of components with respect to water
 	# kelv_fac - kelvin factor for particles
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
 	# num_asb - number of actual size bins (excluding wall)
@@ -86,37 +87,48 @@ def ode_solv(y, integ_step, Cinfl_now,
 		if (self.H2Oin == 1):
 			dd[0, 0] += self.Cinfl_H2O_now
 		# check for continuous dilution
-		if (self.dil_fac_H2O_now > 0):
-			dd[0:num_sb+1, 0] -= y[0:num_sb+1, 0]*self.dil_fac_H2O_now
+		if (self.dil_fac_H2Og_now > 0):
+			# gas-phase water
+			dd[0, 0] -= y[0, 0]*self.dil_fac_H2Og_now
+
+		if (self.dil_fac_now > 0):
+			# particle-phase water
+			dd[1:num_sb+1, 0] -= y[1:num_sb+1, 0]*self.dil_fac_now
 				
 		# gas-particle partitioning-----------------
 		
-		# update the water particle-phase concentrations in the matrix of particle-phase 
-		# concentrations for all components
+		# update the water particle-phase concentrations in the matrix 
+		# of particle-phase concentrations for all components
 		ymat[:, H2Oi] = y[1::, 0]
 		
 		# total particle-phase concentration per size bin (# molecules/cm3 (air))
-		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((
-		ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
+		csum = ((ymat*self.diss_wrtw).sum(axis=1)).reshape(-1, 1)
+		
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 
 		
 		if (any(isb)): # if particle-phase components present
 
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
-			# gas-phase concentration of water at particle surface (# molecules/cm3 (air), core_diss)
-			Csit = Csit*self.Psat[0:num_sb-self.wall_on, :][isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[0:num_sb-self.wall_on, :][isb, H2Oi]
+			# gas-phase concentration of water at particle surface
+			# (# molecules/cm3 (air))
+			Csit = Csit*self.Psat[0:num_sb-self.wall_on, :][
+				isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[
+				0:num_sb-self.wall_on, :][isb, H2Oi]
+
 			# partitioning rate (# molecules/cm3/s)
 			dd_all = (kimt[0:num_asb, :][isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
 			dd[0, 0] -= sum(dd_all) # gas-phase change
 			
 			dd[1::, 0][isb] += (dd_all.flatten()) # particle change
 			
+			
 		
 		# force all components in size bins with no particle to zero
 		if (num_asb > 0):
 			dd[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
-		# return to array, note that consistent with the solve_ivp manual, this ensures dd is
+		# return to array, note that consistent with the solve_ivp manual, 
+		# this ensures dd is
 		# a vector rather than matrix, since y00 is a vector
 		dd = dd.flatten()
 	
@@ -125,7 +137,8 @@ def ode_solv(y, integ_step, Cinfl_now,
 	def jac(t, y): # define the Jacobian
 		
 		# inputs: ----------------
-		# y - concentrations (molecules/cc), note when using scipy integrator solve_ivp, this should have shape (number of elements, 1)
+		# y - concentrations (molecules/cm3), note when using scipy integrator 
+		#	solve_ivp, this should have shape (number of elements, 1)
 		# t - time interval to integrate over (s)
 		# ---------------------------------------------
 		
@@ -155,10 +168,12 @@ def ode_solv(y, integ_step, Cinfl_now,
 		
 		y[1::][N_perbin[:, 0] == 0] = 0 # ensure zero water where zero particles
 		
-		# update the particle-phase concentrations of water (molecules/cc (air))
+		# update the particle-phase concentrations of water (molecules/cm3 (air))
 		ymat[:, H2Oi] = y[1::, 0]
-		# total particle-phase concentration per size bin (molecules/cc (air))
-		csum = ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1)+(ymat[:, self.seedi]*core_diss).sum(axis=1)
+
+		# total particle-phase concentration per size bin (# molecules/cm3 (air))
+		csum = ((ymat*self.diss_wrtw).sum(axis=1))
+		
 		
 		# effect of particle-on-gas and particle-on-particle
 		for isb in range(int(num_asb)): # size bin loop
@@ -166,7 +181,9 @@ def ode_solv(y, integ_step, Cinfl_now,
 				# effect of gas on particle
 				data[1+isb] += kimt[isb, H2Oi]
 				# prepare for diagonal (component effect on itself)
-				diag = kimt[isb, H2Oi]*self.Psat[0, H2Oi]*act_coeff[0, H2Oi]*kelv_fac[isb, 0]*(-(csum[isb]-y[1+isb, :])/(csum[isb]**2.)) 
+				diag = kimt[isb, H2Oi]*self.Psat[0, H2Oi]*act_coeff[
+					0, H2Oi]*kelv_fac[isb, 0]*(-(csum[isb]-y[
+					1+isb, :])/(csum[isb]**2.)) 
 				# implement to part_eff
 				data[(num_asb+1)+isb*2] -= diag
 				data[(num_asb+1)+isb*2+1] += diag

@@ -27,11 +27,11 @@
 import numpy as np
 import scipy.constants as si
 
-def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas, 
+def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas, 
 		TEMP, surfT, act_coeff, Vperbin, x, num_comp, self):
 	
 	# inputs: ---------------------------------------------------------
-	# y - concentrations of all components (moelcules/cm3)
+	# H2Ogc - concentration of water in gas-phase (molecules/cm3)
 	# yp - container for concentration of particle-phase component
 	# concentrations (molecules/cm3)
 	# seedx_now - mole fraction of particle-phase components (may or 
@@ -126,7 +126,7 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 				
 				# average density of seed components 
 				# and water (g/cm3)
-				av_dens = sum(seedx_now*dens_seed)
+				av_dens = np.sum(seedx_now*dens_seed, axis=0)
 
 				# calculate Kelvin effect factor for the 
 				# provided number size distribution
@@ -138,16 +138,16 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 				# multiplied by 
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 
-				# 1e-4 to give cm from um and 
+				# 1e-4 to give cm from um and
 				kelv = (np.exp((2.e0*avMM*surfT)/
-				(R_gas*1.e7*TEMP*(x*1.e-4)*av_dens)))
+					(R_gas*1.e7*TEMP*(x*1.e-4)*av_dens)))
 				
 				# equilibrium mole fraction of water per 
 				# size bin
 				# from the ode solver equation for 
 				# vapour-particle partitioning of 
 				# water
-				xwat = y[self.H2Oi]/(self.Psat[0:(num_asb), 
+				xwat = H2Ogc/(self.Psat[0:(num_asb), 
 					self.H2Oi]*kelv*act_coeff[0:(num_asb),
 				 	self.H2Oi])
 
@@ -284,7 +284,7 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 			# equilibrium mole fraction of water from the ode solver 
 			# equation for vapour-particle partitioning per size bin, note that
 			# self.Psat has particle size bins and walls in rows
-			xwat = y[self.H2Oi]/(
+			xwat = H2Ogc/(
 			self.Psat[0:num_asb, self.H2Oi]*kelv*act_coeff[0:num_asb, self.H2Oi])
 				
 			# total molecular concentration of dry (no water) seed 
@@ -341,32 +341,42 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 		seedi_here = np.zeros((len(self.seedi))).astype('int')
 		seedi_here[:] = self.seedi[:].astype('int')
 
-		# ensure seedx sums to 1 per size bin
+		# ensure where no mole fractions are present (e.g. because a size bin
+		# has no new particles, seedx_now is 0 rather than nan)
+		seedx_zeros_indx = np.sum(seedx_now, axis=0) == 0.
+
+		# ensure seedx sums to 1 per size bin (columns) across
+		# components (rows)
 		seedx_now = seedx_now/np.sum(seedx_now, axis=0)
+		
+		# zero any nan values
+		seedx_now[:, seedx_zeros_indx] = 0.
 
 		# molar mass of seed 
-		# components (g/mol) spread across 
-		# size bins
+		# components (g/mol) (rows)
 		seed_mm = y_mm[seedi_here] 
 			
-		# density of seed components, including water,
+		# density of seed components (rows), including water,
 		# * by 1.e-3 to convert from kg/m3
 		# to g/cm3
 		dens_seed = self.y_dens[seedi_here, 0].reshape(-1, 1)*1.e-3
 	
 		# average molar mass of 
-		# dry (no water) seed components 
-		# (cm3/mol) per size bin
-		av_MM = np.sum(seedx_now*seed_mm, axis=0)
+		# dry (no water) seed components (rows)
+		# (cm3/mol) per size bin (columns)
+		av_MM = (np.sum(seedx_now*seed_mm, axis=0)).reshape(1, num_asb)
 
 		# average liquid-phase density of seed particles
 		# including water (g/cm3) per size bin
-		av_dens = np.sum(seedx_now*dens_seed, axis=0)
+		av_dens = (np.sum(seedx_now*dens_seed, axis=0)).reshape(1, num_asb)
 
 		# molar volume averaged over seed 
 		# components (including water) (cm3/mol) 
-		# per size bin
+		# per size bin (columns)
 		avMV = np.sum(av_MM/av_dens, axis=0)
+
+		# convert any nans to 0
+		avMV[seedx_zeros_indx] = 0.
 
 		# total molecular concentration of seed 
 		# components 
@@ -375,6 +385,9 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 		# from um3 to cm3, multiply by NA to convert
 		# moles/cm3 to molecules/cm3
 		tmc = ((Vperbin*1.e-12)/avMV)*NA
+
+		# convert any nans to 0
+		tmc[seedx_zeros_indx] = 0.
 		
 		seed_cnt = 0 # count on seed components
 
@@ -389,5 +402,5 @@ def pp_water_equil(y, yn, seedx_now, num_asb, y_mm, R_gas,
 			num_comp] = tmc*(seedx_now[seed_cnt, :])
 
 			seed_cnt += 1 # count on seed components
-
+	
 	return(yn)

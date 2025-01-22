@@ -1,0 +1,82 @@
+# model variable file for reproducing the JPAC alpha-pinene SOA observations given in 
+# Ehn et al. 2014 (https://doi.org/10.1038/nature13032) (fig 2b), Roldin et al. 2019 (https://doi.org/10.1038/s41467-019-12338-8) (fig 2a). Inputs are derived from 
+# several sources: Rate of movement to/from wall 
+#(the gas-wall mass transfer coefficient) is given by Eq. 1 of Methods section of Roldin et al. #2019 (https://doi.org/10.1038/s41467-019-12338-8), as is the effective absorbing mass #concentration of wall (5umol/m3 = 5 umol/m3*200g/mol = 1e3ug/m3 = 1e-3g/m3), noting that PyCHAM #assumes a molar mass of the wall of 200 g/mol
+# Fig 2as of Roldin et al. 2019 shows the measured ammonium sulphate (note a mistake has been
+# made in their legend, meaning that measured ammonium sulphate is the red cross), which was 
+# used to tune pconc and pconct here. Ehn et al. 2014 (doi.org/10.1038/s41467-019-12338-8) 
+# say in their main text that the experiment is steady-state ozonolysis and that seed particles 
+# have 100 nm diameter (mean_rad below). In the 'Online Methods' of Ehn et al. 2014, they say
+# residence time in JPAC is 45 minutes (dil_fac below), they also give T and RH. Extended 
+# Data Figure 6 of Ehn et al. 2014 says that steady-state concentration of alpha-pinene was 
+# 19 ppb and for ozone was 83 ppb. Values for NO, NO2, SO2 and CO were assumed to be the same
+# as the values used in Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) 
+# (supplementery material ST5). Online Methods section of Ehn et al. 2014 implies that the
+# discharge lamps and UV lamps were used, with the potential for shielding the UV lamps.
+# They don't say what the shielding on the UV lamps is, but in extended data fig 6 they say that 
+# 9/15 of alpha-pinene reacts with O3 and 6/15 of alpha-pinene reacts with OH, so
+# they can be used (by tracking the alpha-pinene change tendency) to tune the UV transmission
+# factor. Note that the SMILES for PRAM species that are present in the xml file were made
+# using PRAM_SMILES_generator.py, which uses the functional group information from 
+# Supplementary Table 2, which can be downloaded from 
+# https://doi.pangaea.de/10.1594/PANGAEA.905102?format=html#download, and additionally, an [O]O
+# functional group for PRAM peroxy radicals
+# note that in section Methods/Smog chamber simulations of Roldin et al. 2019, they say that HOM
+# peroxy radicals were assumed to deposit irreversibly on the JPAC chamber walls. But when MCM
+# RO2 are allowed to reversibly partition with the walls, PyCHAM-estimated SOA comes out higher
+# than Roldin estimated SOA (when both use SIMPOL for nonHOMs and HOMs components). Later on
+# in the same paragraph Roldin et al. 2019 say 'the release of semi-volatile non-reactive VOC 
+# back to the gas-phase from the walls ...', implying that MCM RO2 are lost to chamber wall
+# irreversibly, and when PyCHAM sets vapour pressures of all RO2 (as well as all HOMs) on the
+# chamber wall to zero, then agreement is gained with ADCHAM
+# 'Roldin2019paper/Methods/ADCHAM and ADCHEM model setup and description' says only 
+# components with vapour pressures less than 10^-2 Pa were allowed to condense onto 
+# particles, so this used to set partit_cutoff below
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Ehn2014/JPAC_apinene_gponly_HOMPRAMspecwl
+chem_sch_name = MCM_PRAMAP_scheme.kpp
+xml_name = MCM_PRAM_xml.xml
+total_model_time = 4.8e4
+update_step = 3.6e2
+recording_time_step = 1.8e3
+temperature = 289.15
+tempt = 0.
+p_init = 101325.0
+rh = 0.63
+rht = 0
+light_status = 1
+light_time = 0
+act_flux_path = JPAC_Actinic_Flux_Spectrum.csv
+tf_UVC = 0.00
+tf_UVCt = 0
+# initial concentrations of components (ppb)
+Comp0 = APINENE, O3, NO, NO2, SO2, CO
+C0 = 10., 42., 1.e-4, 1.e-3, 1.e-2, 1.
+# Table D in extended data figure 6 of Ehn et al. 2014
+# says there was a constant influx of 34 ppb of 
+# alpha-pinene, which is converted to ppb/s here by
+# dividing by the residence time (45*60 s) and then
+# tuning upwards to account for chemical loss, likewise
+# for O3
+cont_infl = H2O, APINENE, O3, NO, NO2, SO2, CO
+cont_infl_t = 0., 1.2e4, 2.4e4, 3.6e4
+Cinfl = 4181.0, 4181.0, 4181.0, 4181.0; 0.0030, 0.0065, 0.0065, 0.0065; 0.004, 0.008, 0.017, 0.030; 3.7e-07, 3.7e-07, 3.7e-07, 3.7e-07; 3.7e-07, 3.7e-07, 3.7e-07, 3.7e-07; 3.7e-06, 3.7e-06, 3.7e-06, 3.7e-06; 3.7e-04, 3.7e-04, 3.7e-04, 3.7e-04
+# residence time of 45 minutes
+dil_fac = 0.000370
+wall_on = 1
+# gas-wall partitioning
+# 1.1e-2 /s for all species from Ehn et al. 2013
+# (1./75.)*(D_ig/D_C10H16O8iso1) from Roldin et al. 2019 (Eq. 1 of Methods 
+# (https://doi.org/10.1038/s41467-019-12338-8))
+mass_trans_coeff = (1./75.)*(D_ig/D_C10H16O8iso1)
+# once these components go to wall do not allow evaporation from wall
+vol_Comp = PRAMcsmon_wall1, PRAMcsacc_wall1, PRAMpr_wall1
+volP = 0., 0., 0.
+eff_abs_wall_massC = 1.e-3
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;, 
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = SIMPOL
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = SIMPOL
+# only need to use the below variables for the seeded case
+number_size_bins = 0
+tracked_comp = APINENE, C10H15O6O2, APINAO2

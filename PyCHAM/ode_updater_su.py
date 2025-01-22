@@ -58,7 +58,7 @@ import os
 def ode_updater_su(y, H2Oi, 
 	Pnow, Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, 
-	core_diss, mfp, therm_sp,
+	mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou,
 	N_perbin, Vol0, rad0, np_sum, new_partr, 
@@ -113,7 +113,6 @@ def ode_updater_su(y, H2Oi,
 	# self.seedi - index of components comprising seed material
 	# self.seed_name - names of components comprising seed particles
 	# self.seedx - mole ratio of components comprising seed material
-	# core_diss - dissociation constant of seed
 	# self.Psat - pure component saturation vapour pressure 
 	# 	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
@@ -336,7 +335,7 @@ def ode_updater_su(y, H2Oi,
 	seedt_cnt, _, Cfactor, infx_cnt, 
 	temp_now, cham_env, Pnow, 
 	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, 
-	num_sb, num_comp, N_perbin, core_diss, mfp,
+	num_sb, num_comp, N_perbin, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	x, therm_sp, H2Oi, act_coeff,
 	sumt, Pnow, light_time_cnt, 
@@ -489,7 +488,7 @@ def ode_updater_su(y, H2Oi,
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
 					Cinfl_now, rowvalsn, colptrsn, num_comp, 
-					num_sb, act_coeff, core_diss, kelv_fac, kimt, 
+					num_sb, act_coeff, kelv_fac, kimt, 
 					(num_sb-self.wall_on), 
 					jac_mod_len, jac_part_hmf_indx, rw_indx, 
 					N_perbin, jac_part_H2O_indx, H2Oi, self)
@@ -523,7 +522,7 @@ def ode_updater_su(y, H2Oi,
 							if (tnew < 1.e-20): # if time step has decreased to unreasonably low and solver still unstable then break
 								ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, num_comp, 
 									(num_sb-self.wall_on), act_coeff, neg_comp_indx, 
-									N_perbin, core_diss, kelv_fac, kimt, 0, H2Oi, y, self)
+									N_perbin, kelv_fac, kimt, 0, H2Oi, y, self)
 
 								print(str('Error: negative concentrations generated following call to ode_solv_wat module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
 							# half the update and integration time step (s) if necessary
@@ -557,7 +556,7 @@ def ode_updater_su(y, H2Oi,
 			[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
-				core_diss, kelv_fac, kimt, (num_sb-self.wall_on),
+				kelv_fac, kimt, (num_sb-self.wall_on),
 				jac_mod_len, jac_part_hmf_indx, 
 				rw_indx, N_perbin, jac_part_H2O_indx, 
 				H2Oi, self)
@@ -611,7 +610,7 @@ def ode_updater_su(y, H2Oi,
 					# partitioning fluxes for troublesome components
 					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, 
 						num_comp, (num_sb-self.wall_on), act_coeff, 
-						neg_comp_indx, N_perbin, core_diss, kelv_fac, 
+						neg_comp_indx, N_perbin, kelv_fac, 
 						kimt, 1, H2Oi, y, self)
 
 					print(str('Error: negative concentrations generated following call to ode_solv module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))

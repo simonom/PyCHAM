@@ -74,7 +74,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)	
 
-	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or caller == 5 or caller == 6):
+	if (caller == 0 or caller == 1 or caller == 3 or caller == 4 or 
+		caller == 5 or caller == 6):
 		# show results to screen and turn on interactive mode
 		plt.ion() 
 	
@@ -186,6 +187,30 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				if (indx_plot.shape[0] == 0):
 					ip_fail = 1
 
+			if (comp_names_to_plot[i].strip() == 'PRAMpr'):
+				load_path = str('PRAMpr_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
+			if (comp_names_to_plot[i].strip() == 'PRAMcsmon'):
+				load_path = str('PRAMcsmon_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
+			if (comp_names_to_plot[i].strip() == 'PRAMcsacc'):
+				load_path = str('PRAMcsacc_indx.npy') # path
+				indx_plot = (np.load(str(dir_path + '/' + load_path),
+					allow_pickle=True))			
+				group_flag = 1
+				if (indx_plot.shape[0] == 0):
+					ip_fail = 1
+
 			if ('C' in comp_names_to_plot[i].strip() or 'c' 
 				in comp_names_to_plot[i].strip()):
 				# if a number given after carbon atom
@@ -222,18 +247,26 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				return()
 
 			if (comp_names_to_plot[i].strip() != 'H2O' and group_flag != 1):
-				try: # will work if provided components were in simulation chemical scheme
-					# get index of this specified component, removing any white space
-					indx_plot = [comp_names.index(comp_names_to_plot[i].strip())]
+				# will work if provided components were in simulation 
+				#chemical scheme
+				try:
+					# get index of this specified component, 
+					# removing any white space
+					indx_plot = [comp_names.index(
+						comp_names_to_plot[i].strip())]
 					indx_plot = np.array((indx_plot))
 				except:
-					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+					self.l203a.setText(str('Component ' + 
+					comp_names_to_plot[i] + ' not found in chemical ' +
+					'scheme used for this simulation'))
 					# set border around error message
 					if (self.bd_pl == 1):
-						self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+						self.l203a.setStyleSheet(0., '2px dashed red', 
+							0., 0.)
 						self.bd_pl = 2
 					else:
-						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+						self.l203a.setStyleSheet(0., '2px solid red', 
+							0., 0.)
 						self.bd_pl = 1
 
 					plt.ioff() # turn off interactive mode
@@ -243,20 +276,23 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (caller == 0  or caller == 5): # ug/m3 plot
 			
 				# gas-phase concentration (# molecules/cm3)
-				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
+				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
+					(indx_plot).shape[0])*Cfac
 
 				# gas-phase concentration (ug/m3)
-				conc = ((conc/si.N_A)*y_MW[indx_plot])*1.e12
+				conc = (((conc/si.N_A)*(y_MW[indx_plot].reshape(1, -1)))*1.e12)
 			
 			if (caller == 1 or caller == 4): # ppb plot
 			
 				# gas-phase concentration (ppb)
-				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])
+				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
+					(indx_plot).shape[0])
 
 			if (caller == 3  or caller == 6): # # molecules/cm3 plot
 			
 				# gas-phase concentration (# molecules/cm3)
-				conc = yrec[:, indx_plot].reshape(yrec.shape[0], (indx_plot).shape[0])*Cfac
+				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
+					(indx_plot).shape[0])*Cfac
 			
 			if (len(indx_plot) > 1): # e.g. for sum of RO2 or RO
 				conc = np.sum(conc, axis=1) # sum multiple components
@@ -264,9 +300,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# plot this component
 			if (group_flag == 0): # if not a sum of components
 				if (caller == 4 or caller == 5 or caller == 6): # log10 y axis
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+					ax0.semilogy(timehr, conc, '-+', linewidth = 4., 
+						label = str(str(comp_names[int(indx_plot)]+
+							' (gas-phase)')))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(str(comp_names[int(indx_plot)]+' (gas-phase)')))
+					ax0.plot(timehr, conc, '-+', linewidth = 4., 
+					label = str(str(comp_names[int(indx_plot)]+
+						' (gas-phase)')))
 			
 			else: # if a sum over a group of components
 				if (caller == 4 or caller == 5 or 
@@ -277,7 +317,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					comp_names_to_plot[i].strip() + 
 					' (gas-phase)'))
 				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (gas-phase)'))
+					ax0.plot(timehr, conc, '-+', linewidth = 4., 
+					label = str(r'$\Sigma$' + comp_names_to_plot[
+					i].strip() + ' (gas-phase)'))
 
 		if (caller == 0 or caller == 5): # ug/m3 plot
 			ax0.set_ylabel(str(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)'), fontsize = 14)

@@ -51,7 +51,7 @@ def ui_check(self):
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, 
 		Compt, injectt, Ct,
-		seed_mw, seed_diss, seed_dens,
+		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -95,9 +95,7 @@ def ui_check(self):
 	# dens - manually assigned densities (g/cc)
 	# self.seed_name - name of component(s) comprising seed particles
 	# self.seedx - mole fraction of dry seed components
-	# seed_diss - dissociation constant for seed particle 
-	# 	component(s)
-	# self.partit_cutoff - product of vapour pressure and activity 
+	# self.ppartit_cutoff - product of vapour pressure and activity 
 	# 	coefficient above which gas-particle partitioning 
 	# 	assumed zero
 	# wat_hist - flag for particle-phase history with respect to 
@@ -213,8 +211,12 @@ def ui_check(self):
 	
 	# in case proposed results folder already proposed by another
 	# simulation in batch
-	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num > 1):
-		err_mess = str('Error - the proposed path for the results folder (' +output_by_sim+ ') has been taken by another simulation in the batch, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
+	if (output_by_sim in self.output_list and em_flag < 2 and self.chck_num == 1):
+		err_mess = str('Error - the proposed path for the results ' + 
+			'folder (' +output_by_sim+ ') has been taken by another ' +
+			'simulation in the batch, please use an alternative.  ' +
+			'This can be changed by the res_file_name variable in the ' +
+			'model variables file, as explained in README.')
 		em_flag = 2
 	
 	# let user know that results will be automatically deleted when 
@@ -487,18 +489,20 @@ def ui_check(self):
 
 	# check on consistency of names of seed component(s) and 
 	# their dissociation constant --------------
-	if (len(self.seed_name) != len(seed_diss) and em_flag < 2):
-		if (len(self.seed_name) > 1) and (len(seed_diss) == 1):
-			seed_diss = np.ones((len(self.seed_name)))
+	if (len(self.seed_name) != len(self.core_diss) and em_flag < 2):
+		if (len(self.seed_name) > 1) and (len(self.core_diss) == 1):
+			self.core_diss = np.ones((len(self.seed_name)))
 		else:
 			err_mess = str('Error - the number of seed particle component names (seed_name in model variables input file) and the number of seed particle component dissociation constants (seed_diss in model variables input file) are inconsistent, please see README for guidance')
 			em_flag = 2
 
-	if (len(self.partit_cutoff) > 1 and em_flag < 2):
-		err_mess = str('Error - length of the model variables input partit_cutoff should have a maximum length of one, but is greater, please see README for guidance')
+	if (len(self.ppartit_cutoff) > 1 and em_flag < 2):
+		err_mess = str('Error - length of the model variables input ' +
+			'ppartit_cutoff should have a maximum length of one, ' +
+			'but is greater, please see README for guidance')
 		em_flag = 2
 	
-	# check on continuous injection of components inputs -----------------------------------------------
+	# check on continuous injection of components inputs -------------------------------
 	if (em_flag < 2): # if no other errors
 		try: # note, won't work on the empty con_infl_C default variable
 			if (self.con_infl_C.shape[0] != len(self.con_infl_nam)):
@@ -577,8 +581,8 @@ def ui_check(self):
 		if (err_mess_new[0:5] == 'Error' and em_flag < 2):
 			err_mess = err_mess_new
 			em_flag = 2
-	
-	if (em_flag < 2 and self.sch_name == 'Not found'): # if a chemical scheme has not been identified
+	# if a chemical scheme has not been identified
+	if (em_flag < 2 and self.sch_name == 'Not found'):
 	
 		err_mess_n = str('Error - a new chemical scheme has not been identified automatically.  For PyCHAM to identify automatically the chemical scheme file must be inside the selected folder and its file name must contain the string \'chem\'.  Alternatively use the relevant button to select the chemical scheme individually.\n')
 		if (em_flag == 0):
@@ -692,7 +696,13 @@ def ui_check(self):
 		if len(accom_val) == 1 and len(accom_comp) == 0:
 			accom_val = accom_val
 		else:
-			err_mess = str('Error - the number of accommodation coefficient values (' + str(len(accom_val)) + ')(accom_val user input) does not match the number of components that accommodation coefficient values must be assigned to (' + str(len(accom_comp)) + ')(accom_comp user input), and these values must align. Please see README for more guidance.')
+			err_mess = str('Error - the number of accommodation ' +
+			'coefficient values (' + str(len(accom_val)) + 
+			')(accom_val user input) does not match the number of ' +
+			'components that accommodation coefficient values must ' +
+			'be assigned to (' + str(len(accom_comp)) + 
+			')(accom_comp user input), and these values must align. ' + 
+			'Please see README for more guidance.')
 			em_flag = 2
 	# --------------------------------------------------------
 	
@@ -701,7 +711,7 @@ def ui_check(self):
 			siz_stru, num_sb, lowsize, 
 			uppsize, std, 
 			Compt, injectt, Ct, seed_mw, 
-			seed_diss, seed_dens, 
+			seed_dens, 
 			dens_comp, dens, vol_comp, 
 			volP, act_comp, act_user, accom_comp, 
 			accom_val, uman_up, 	

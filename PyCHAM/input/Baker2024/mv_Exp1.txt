@@ -1,6 +1,31 @@
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp1_defit
+# the main article of Baker et al. 2024 (https://doi.org/10.5194/acp-24-4789-2024), Table1,
+# they say that surface area of seed particles was 8.7e-4 m2/m3 in this experiment, 
+# which is used to set pconc below
+# and checked with the Seed Only option on the Particle surface area button on the 
+# PyCHAM/Plot/Particle GUI
+# although some notes on wall interaction are included, below, I strongly believe that the SOA
+# results reported in Figure S3 of Baker supplementary material are corrected for gas and 
+# particle loss to wall, because the main Baker article says these were corrected for when
+# estimating the SOA yield. And they report a yield of 10 % for low HO2/RO2 in exp2.1, for
+# which 3.4 ug/m3 of SOA is reported in Figure S3. And Table 1 of the main paper indicates that
+# around 6 ppb of alpha-pinene is consumed in this experiment, which has a conversion factor of
+# 5.7 ug/m3/ppb under the T and P of the experiment. 6ppb*5.7 ug/m3/ppb gives 34.2 ug/m3 of
+# consumed alpha-pinene, which is set as the denominator in the yield calculation, whilst
+# 3.4 ug/m3 of SOA is set as the numerator, to give a wall-corrected yield of 10 %. Hence,
+# the reported SOA is consistent with the SOA that must have been used in the reported
+# wall-corrected SOA yield calculation.
+# mass transfer coefficients of components to wall are from section S3 of Baker's supplementary
+# material (https://doi.org/10.5194/acp-24-4789-2024-supplement), note that the reference
+# value of 0.0058 is from 1./171., as 171 s is the lifetime due to wall loss observed for C10
+# components in S3 of Baker's supplementary material
+# the rate of particle loss to wall is from section S2 of Baker's supplementary material
+# followed by: Need to calculate knowing that lifetime of particles is 54 minutes when 
+# residence time was 63 minutes:
+# Particle loss rate (fraction of total particles/s) = 1/τ  =1/k_wall +1/k_(flush out)  
+# so 1/(54*60) = 1/kwall+1/(63*60) so 1/kwall = 1/(54*60)-1/(63*60) = 4.41e-5 /s
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp1_unseeded_EVAPORATIONnonHOM_EVAPORATIONHOM
 chem_sch_name = mcmAP_PRAMAP_scheme.kpp
-xml_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_input/MCM_PRAM_xml.xml
+xml_name = MCM_PRAM_xml.xml
 total_model_time = 8.64e4
 update_step = 3.6e2
 recording_time_step = 3.6e3
@@ -9,15 +34,25 @@ tempt = 0.
 p_init = 101325.0
 rh = 0.52
 rht = 0
-# UVC lights on
-light_status = J_values.xlsx
+# UVC lights on, note that in Yare's MCM model run, they
+# set the J(O1D) directly (the analogous approach in PyCHAM is
+# to set light_status = J_values.xlsx), but in reality UVC affects
+# multiple photolysis routes, so to capture this the act_flux_file model variable
+# and tf_UVC and tf_UVCt can be set
+#light_status = J_values.xlsx
+light_status = 1
 # note that the photon intensity for 254 nm in this file
 # has been tuned to give a photolysis rate of J(O1D) 
 # i.e. O3 + hv = O1D of 
 # 8x10-4 /s when the exposed light is at a minimum of 35 %,
 # which Baker et al. 2024 section 3.1 says is the minimum
-# J(O1D) rate. 
-#act_flux_file = SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+# J(O1D) rate. Yare told me by email that J(O1D) in the low HO2/RO2
+# was 8.2e-4 /s and in the high HO2/RO2 was 1.68e-3 /s, and so
+# the tf_UVC below has been tuned to give these J(O1D) values
+act_flux_file = SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+# with HO2 and RO2 0vol
+tf_UVC = 0.21, 0.45
+tf_UVCt = 0., 4.32e4
 const_comp = H2O
 # initial concentrations of components (ppb)
 Comp0 = O3, CO, APINENE, OH
@@ -25,22 +60,15 @@ C0 = 29., 0., 7.5, 3.4e-5
 # continuously influxed components
 cont_infl = O3, APINENE, CO
 cont_infl_t = 0., 4.32e4
-# based on Figure 2 of Baker et al. 2024,
-# we need to tune the Cinfl values so that
-# in both the with and without CO stages of
-# experiment O3 has a mixing ratio of 25 ppb,
-# alpha-pinene has a mixing ratio of 5 ppb and
-# CO has a mixing ratio of 0 ppm in the first
-# stage and a mixing ratio of 2.5 ppm
-# these give correct results for APINENE, O3 and CO
-# when light intensity
-# in photofile set to 2.3e14 photons/cm2/s, but
-# OH comes out around a factor of two higher than Figure 2
-# observations
-# lights tuned down for O3 and OH agreement
-#Cinfl = 0.0076, 0.0089; 0.0028, 0.0028; 0., 0.69
-# lights set to give same J(O1D) as in Baker paper 
-Cinfl = 0.0083, 0.011; 0.0033, 0.0033; 0., 0.67
+# O3 influx rate tuned to give value comparable with 
+# Figure 2 of Baker et al. 2024, whilst also giving the
+# OH turnover at low HO2/RO2 in Table 1 of the same paper
+# alpha-pinene and CO influx are fixed at the values
+# given in Table 1 of Baker et al. 2024, where
+# influx in ppbv/s = influx concentration in 
+# Table 1*dilution factor, e.g. 
+# 10 ppbv alpha-pinene*0.000265 = 0.00265 ppb/s
+Cinfl = 0.008, 0.010; 0.00265, 0.00265; 0., 0.6625
 # residence time of 63 minutes
 dil_fac = 0.000265
 wall_on = 1
@@ -50,22 +78,20 @@ wall_on = 1
 # 5.88e-3 /s for RO2, OH loss rate
 # (5 /s) is actually due to a 'background reactivity', so
 # it is stated in the chemical scheme
-# and HO2 wall loss rate of 
-mass_trans_coeff = RO2_wall1_5.88e-3; HO2_wall1_2e-2
-# once these components go to wall do not allow evaporation from wall
+# and HO2 wall loss rate given in supplement too. Loss
+# to walls of closed-shell organics is not included as SOA results in Baker
+# supplement are corrected for wall loss of SOA
+# components
+mass_trans_coeff = (1./171.)*((D_ig/D_C10H16O8iso1)**2.)
+# once components below go to wall do not allow evaporation from wall
 vol_Comp = RO2_wall1, HO2_wall1
 volP = 0., 0.
-eff_abs_wall_massC = 1.e0
-number_size_bins = 0
+eff_abs_wall_massC = 1.e-3
 chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = EVAPORATION
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = Mohr2019
+HOMs_vp_method = EVAPORATION
 # only need to use the below variables for the seeded case
-#pconc = 4.e1
-#pconct = 0.
-#pcont = 1 
-#mean_rad = 3.e-2
-#std = 1.5
-# 125 nm radius
-#upper_part_size = 1.25e-1
-tracked_comp = O3, OH, HO2, APINENE
+number_size_bins = 0
+tracked_comp = APINENE, O3

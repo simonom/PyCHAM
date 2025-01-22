@@ -29,7 +29,7 @@ import scipy.constants as si
 
 def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci, 
 		accom_coeff, y_mw, surfT, R_gas, TEMP, NA, y_dens, 
-		N_perbin, RH, core_diss, Varr, Vbou, rbou, Vol0, MV,
+		N_perbin, RH, Varr, Vbou, rbou, Vol0, MV,
 		therm_sp, Cw, kgwt, act_coeff, wall_on, 
 		partit_cutoff, Press, coll_dia, seedi):
 
@@ -69,10 +69,11 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
 				H2Oi, act_coeff, wall_on, 0, partit_cutoff, Press, coll_dia)
 
-			# get seed particle properties: concentration (molecules/cc (air))
+			# get seed particle properties: concentration (molecules/cm3 (air))
 			ycore = 0.			
 			for ci in range(len(seedi)):
-				ycore += y[num_speci*(sbstep+1)+seedi[ci]]*core_diss[ci]
+				ycore += y[
+					num_speci*(sbstep+1)+seedi[ci]]*self.core_diss_wrtw[ci]
 			
 			# first guess of particle-phase water concentration based on RH = mole 
 			# fraction (molecules/cc (air))
@@ -91,7 +92,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 			# account for seed dissociation constant
 			for ci in range(len(seedi)):
 				conc_sum = (conc_sum-y[num_speci*(sbstep+1)+seedi[ci]]+
-					(y[num_speci*(sbstep+1)+seedi[ci]]*core_diss[ci]))
+					(y[num_speci*(sbstep+1)+seedi[
+					ci]]*self.core_diss_wrtw[ci]))
 			
 			# partitioning coefficient and kelvin factor
 			[kimt, kelv_fac] = kimt_calc(y, mfp, num_sb, num_speci, accom_coeff, y_mw,   
@@ -138,7 +140,8 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				# account for seed dissociation constant
 				for ci in range(len(seedi)):
 					conc_sum = (conc_sum-y[num_speci*(sbstep+1)+seedi[ci]]+
-						(y[num_speci*(sbstep+1)+seedi[ci]]*core_diss[ci]))
+						(y[num_speci*(sbstep+1)+seedi[
+						ci]]*self.core_diss_wrtw[ci]))
 					
 				Csit = (Wc_surf/conc_sum)*Psat[0, H2Oi]*kelv_fac[sbstep, 0]*act_coeff[0, H2Oi]
 		

@@ -58,7 +58,7 @@ def chem_scheme_SMILES_extr(self):
 	f_open_eqn.close() # close file
 
 	# interrogate scheme to list equations
-	[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)
+	[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, self] = xml_interr.xml_interr(self)

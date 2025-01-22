@@ -34,6 +34,8 @@ import os
 import numpy as np
 import scipy.constants as si
 
+# plot change tendency due to all processes (e.g. gas-wall partitioning and the sum
+# of chemical reaction loss and the sum of chemical reaction gain)
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
@@ -144,8 +146,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		
 		# note that column -3 in dydt is gas-particle 
 		# partitioning and column -2 is gas-wall partitioning
-		# and column -1 is dilution, whilst
-		# the first row contains chemical reaction numbers
+		# and column -1 is dilution, whilst columns 0 up to, but
+		# not including -3 are chemical reactions, with the first
+		# row of these columns containing chemical reaction numbers
+		
 		# extract the change tendency due to gas-particle partitioning
 		gpp = dydt[1::, -3]
 		# extract the change tendency due to gas-wall partitioning
@@ -158,11 +162,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		crl = np.zeros((dydt.shape[0]-1, 1))
 		for ti in range(dydt.shape[0]-1): # loop through times
 			# indices of reactions that produce component
-			indx = dydt[ti+1, 0:-2] > 0
-			crg[ti] = dydt[ti+1, 0:-2][indx].sum()
+			indx = dydt[ti+1, 0:-3] > 0
+			crg[ti] = dydt[ti+1, 0:-3][indx].sum()
 			# indices of reactions that lose component
-			indx = dydt[ti+1, 0:-2] < 0
-			crl[ti] = dydt[ti+1, 0:-2][indx].sum()
+			indx = dydt[ti+1, 0:-3] < 0
+			crl[ti] = dydt[ti+1, 0:-3][indx].sum()
 			 
 		# convert change tendencies from molecules/cm3/s to ug/m3/s
 		gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
@@ -244,9 +248,13 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		
 		fname = str(dir_path+ '/' +comp_name +'_rate_of_change')
 		try: # try to open
-			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 0) # skiprows = 0 skips first header	
+			# skiprows = 0 skips first header
+			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 0)	
 		except:
-			mess = str('Please note, a change tendency record for the component ' + str(comp_name) + ' was not found, was it specified in the tracked_comp input of the model variables file?  Please see README for more information.')
+			mess = str('Please note, a change tendency record for the component ' +
+			 str(comp_name) + ' was not found, was it specified in the ' +
+			'tracked_comp input of the model variables file?  Please see ' +
+			'README for more information.')
 			self.l203a.setText(mess)
 			
 			# set border around error message
@@ -321,7 +329,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 			ct_units = str('(ppb/s)')
 		if (uc == 1):			
 			# convert change tendencies from # molecules/cm3/s to ug/m3/s
-			res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[ci])*1.e12
+			res[1::, :] = ((res[1::, :]/si.N_A)*y_mw[0, ci])*1.e12
 			ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
 		if (uc == 2):
 			# keep change tendencies as # molecules/cm3/s
@@ -410,7 +418,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 				continue
 
 		# interpret scheme to list equations
-		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
+		[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)	
 	
 		# keep just the unique chemical reaction rates, as duplicates 
 		# will mean that the same group of reactions (of identical 
@@ -948,7 +956,8 @@ def plotter_carb_res(self):
 		# wall concentrations (# molecules/cm3)
 		yrec_w = yrec[:, -num_comp*wall_on::]
 
-		# convert concentrations of components on wall due to particle deposition to wall
+		# convert concentrations of components on wall due to particle 
+		# deposition to wall
 		# from # molecules/cm3 to mol/cm3
 		yrec_w = yrec_w/si.N_A
 

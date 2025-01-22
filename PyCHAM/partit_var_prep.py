@@ -29,6 +29,7 @@
 import numpy as np
 import scipy.constants as si
 import diff_vol_est
+import importlib
 
 def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp, 
 	accom_coeff_user, num_sb, num_asb, Pnow, 
@@ -158,12 +159,14 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 		# plot gas-phase diffusion coefficients (cm2/s)
 		ax0.plot(np.arange(len(self.comp_namelist)), Dstar_org, '+')
-		ax0.set_ylabel(r'Gas-phase diffusion coefficient (cm$\rm{^{2}}\,$s$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_ylabel(str('Gas-phase diffusion coefficient ' + 
+			r'(cm$\rm{^{2}}\,$s$\rm{^{-1}}$)'), fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
 		ax0.set_xticks(np.arange(len(self.comp_namelist)))
 		ax0.set_xticklabels(self.comp_namelist, rotation = 90)
-		ax0.set_title(str('Gas-phase diffusion coeffiecients at ' + str(TEMP) + ' K and ' + str(Pnow) + ' Pa'), fontsize = 14)
+		ax0.set_title(str('Gas-phase diffusion coeffiecients at ' + str(TEMP) + 
+			' K and ' + str(Pnow) + ' Pa'), fontsize = 14)
 		err_mess = 'Stop'
 
 	if (self.testf == 3):
@@ -171,18 +174,21 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		from matplotlib.colors import BoundaryNorm
 		from matplotlib.ticker import MaxNLocator
 		from matplotlib.colors import LinearSegmentedColormap # for customised colormap
-		import matplotlib.ticker as ticker # set colormap tick labels to standard notation
+		# set colormap tick labels to standard notation
+		import matplotlib.ticker as ticker
 		plt.ion() # allow plotting
 		# prepare plot
 		fig, (ax0) = plt.subplots(1, 1, figsize = (14, 7))
 		# plot gas-phase diffusion coefficients (cm2/s)
 		ax0.plot(np.arange(len(self.comp_namelist)), therm_sp, '+')
-		ax0.set_ylabel(r'Gas-phase mean thermal speed (m$\,$s$\rm{^{-1}}$)', fontsize = 14)
+		ax0.set_ylabel(r'Gas-phase mean thermal speed (m$\,$s$\rm{^{-1}}$)', 
+			fontsize = 14)
 		ax0.set_xlabel(r'Component name', fontsize = 14)
 		# set location of x ticks
 		ax0.set_xticks(np.arange(len(self.comp_namelist)))
 		ax0.set_xticklabels(self.comp_namelist, rotation = 90)
-		ax0.set_title(str('Gas-phase mean thermal speeds at ' + str(TEMP) + ' K'), fontsize = 14)
+		ax0.set_title(str('Gas-phase mean thermal speeds at ' + 
+			str(TEMP) + ' K'), fontsize = 14)
 		err_mess = 'Stop'
 	
 	# accommodation coefficient of components in each particle size bin
@@ -190,41 +196,55 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	
 	# list containing accommodation coefficients that are functions
 	accom_coeff_func = []
-	
+
+	# prepape to hold indices of individual components for accommodation 
+	# coefficient setting
 	ac_indx = []
+
 	for i in range(len(acc_comp)): # user-defined accommodation coefficients
-		# get index of component stated
-		ac_indx.append(self.comp_namelist.index(acc_comp[i].strip()))
-
-	# check for any accommodation coefficients set by user
-	if len(ac_indx)>0:
-		for i in range(len(ac_indx)):
-
+	
+		if (acc_comp[i] == 'all'):
+			# set accommodation coefficient index to all components
+			ac_indx = np.arange(num_comp).tolist()
 			# if it is a constant (not a function, which would be a string)
 			if isinstance(accom_coeff_user[i], str) == False:
-				accom_coeff[ac_indx] = accom_coeff_user[i]
-			# if it is a function, it will be a string and needs making available to the 
-			# kimt_calc module
+				accom_coeff = accom_coeff*float(accom_coeff_user[i])
+
+			# if it is a function, it will be a string and needs making 
+			# available to the partit_var module
 			if isinstance(accom_coeff_user[i], str) == True:
-				accom_coeff_func.append(str('accom_coeff[' + str(ac_indx[i]) + ', 0:self.num_asb]' + ' = ' + accom_coeff_user[i]))
-	
-	else: # if no components specified
-		# but one accommodation coefficient is specified, then apply to all
-		# components
-		if (len(accom_coeff_user) == 1):
-			accom_coeff = accom_coeff*float(accom_coeff_user[0])
+				accom_coeff_func.append(str('accom_coeff[:, 0:self.num_asb]' 
+					+ ' = ' + accom_coeff_user[i]))
+
+			skip_acu = 1 # skip setting accommodation coef
+		else:
+			# get index of component stated
+			ac_indx = self.comp_namelist.index(acc_comp[i].strip())
+
+			for i in range(len(ac_indx)):
+		
+				# if it is a constant (not a function, which would be a string)
+				if isinstance(accom_coeff_user[i], str) == False:
+					accom_coeff[ac_indx] = accom_coeff_user[i]
+				# if it is a function, it will be a string and needs making 
+				# available to the partit_var module
+				if isinstance(accom_coeff_user[i], str) == True:
+					accom_coeff_func.append(str('accom_coeff[' + 
+						str(ac_indx[i]) + ', 0:self.num_asb]' + ' = ' + 
+						accom_coeff_user[i]))
 
 	# generate module that contains any accommodation coefficient functions, note, do 
 	# this even if no functions supplied so that the accomm_coeff_calc is updated and
 	# accurate for this simulation
 	f = open(self.PyCHAM_path + '/PyCHAM/accom_coeff_calc.py', mode='w')
-	f.write('##########################################################################################\n')
-	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
-	f.write('#                                                                                       											 #\n')
-	f.write('#    All Rights Reserved.                                                                 #\n')
-	f.write('#    This file is part of PyCHAM                                                          #\n')
-	f.write('#                                                                                        											 #\n')
+	f.write('#################################################################\n')
+	f.write('#                                                               #\n')
+	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : 			 #\n')
+	f.write('#    simon.omeara@manchester.ac.uk              		 #\n')
+	f.write('#                                                               #\n')
+	f.write('#    All Rights Reserved.                                       #\n')
+	f.write('#    This file is part of PyCHAM                                #\n')
+	f.write('#                                                               #\n')
 	f.write('#    PyCHAM is free software: you can redistribute it and/or modify it under              #\n')
 	f.write('#    the terms of the GNU General Public License as published by the Free Software        #\n')
 	f.write('#    Foundation, either version 3 of the License, or (at your option) any later           #\n')
@@ -238,8 +258,9 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	f.write('#    You should have received a copy of the GNU General Public License along with         #\n')
 	f.write('#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 #\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('##########################################################################################\n')
-	f.write('\'\'\'module for calculating accommodation coefficients, automatically generated by\n')
+	f.write('###################################################################################\n')
+	f.write('\'\'\'module for calculating accommodation coefficients,\n')
+	f.write(' automatically generated by\n')
 	f.write(' partit_var_prep\'\'\'\n')
 	f.write('\n')
 	f.write('# code that expresses and performs the functions for accommodation \n')
@@ -250,15 +271,16 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 
 	# following part is the function (there should be an indent at the start of each line
 	# following the def line - suggest using 1 tab)
-	f.write('def accom_coeff_func(accom_coeff, radius, self):\n')
+	f.write('def accom_coeff_func(accom_coeff, Rp, self):\n')
 	f.write('\n')
-	f.write('	# ------------------------------------------------------------------ \n')
+	f.write('	# -------------------------------------------------------------- \n')
 	f.write('	# inputs:\n')
 	f.write('	# accom_coeff - array containing accommodation coefficients for all \n')
 	f.write('	# components (rows) and size bins (columns) (including walls)\n')
-	f.write('	# radius - radii of size bins (m)\n')
-	f.write('	# ------------------------------------------------------------------ \n')
+	f.write('	# Rp - radii of size bins (m)\n')
+	f.write('	# --------------------------------------------------------------- \n')
 	f.write('\n')
+	f.write('	import numpy as np\n')
 	f.write('	# calculate accommodation coefficients \n')
 	# code to calculate accommodation coefficients as given by user 
 	for line in accom_coeff_func:
@@ -278,10 +300,12 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# particle and wall bins
 	act_coeff = np.tile(act_coeff, (num_sb, 1))
 	# convert Cw (effective absorbing mass of wall) from g/m3 (air) to 
-	# # molecules/cm3 (air), assuming a molecular weight of 200 g/mol (*1.e-6 to convert from
+	# # molecules/cm3 (air), assuming a molecular weight of 
+	# 200 g/mol (*1.e-6 to convert from
 	# /m3 (air) to /cm3 (air))
 	self.Cw = ((self.Cw*1.e-6)/200.)*si.N_A
-	# ensure effective absorbing mass of walls represents walls in rows and components in columns
+	# ensure effective absorbing mass of walls represents walls in rows and 
+	# components in columns
 	self.Cw = np.tile((self.Cw.reshape(-1, 1)), (1, num_comp))
 	# in case user has not given a Cw value for every wall
 	if (self.Cw.shape[0] == 1 and self.wall_on > 1):
@@ -296,12 +320,22 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	mask = mask == 0.
 	
 	if (self.wall_on > 0): # if wall present
+
+
+		# if mass trasfer coefficient of components to surfaces was provided
+		# in equation form by user, then estimate coefficients now (/s)
+		if (self.mtc_calc_flag == 1):
+			import mass_trans_coeff_eq
+			importlib.reload(mass_trans_coeff_eq) # ensure latest version uploaded
+			kwn = mass_trans_coeff_eq.mtc(Dstar_org, TEMP, num_comp, kwn, self)
+			
 		# loop through user-defined inputs
 		for wi in range(self.kw.shape[0]): # loop through walls
+			
 			# loop through number of components partitioning with this wall
 			for ci in range(sum(self.kw[wi, :]==-1.e-7)): 	
 				
-				if self.wmtc_names[pre_count]== 'all_other_components':
+				if (self.wmtc_names[pre_count] == 'all_other_components'):
 					# coefficient specified for all components of this wall
 					kwn[wi, mask[wi, :]] = self.wmtc[pre_count]
 					pre_count += 1 # count on components
@@ -358,15 +392,21 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 							mask[wi, comp_indx] = False
 					except:
 						# give error message
-						err_mess = str('Error: component ' + str(self.wmtc_names[pre_count]) + ' has a gas-wall mass transfer coefficient but has not been identified in the chemical scheme')
+						err_mess = str('Error: component ' + 
+						str(self.wmtc_names[pre_count]) + 
+						' has a gas-wall mass transfer coefficient '+
+						'but has not been identified in the '+
+						'chemical scheme')
 						break
 
 				pre_count += 1 # count on prescribed components	
 	
+	
 	# finally convert kw to kwn
 	self.kw = np.zeros((((self.wall_on, num_comp))))
 	self.kw[:, :] = kwn[:, :]
-
+	
+	
 	# end of mass transfer rate coefficient to wall -------------------
 
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)

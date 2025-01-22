@@ -85,13 +85,23 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	erf = 0
 	err_mess = ''
 	
-	f_open_eqn = open(self.sch_name, mode='r') # open the chemical scheme file
+	# open the chemical scheme file
+	try:
+		# open the chemical scheme file
+		f_open_eqn = open(self.sch_name, mode='r')
+	# in case in same folder as model variables file
+	except:
+		pd_indx = self.inname[::-1].index('/')
+		pd = self.inname[0:-pd_indx]
+		self.sch_name = str(pd + self.sch_name)
+		f_open_eqn = open(self.sch_name, mode='r')
+
 	# read the file and store everything into a list
 	total_list_eqn = f_open_eqn.readlines()
 	f_open_eqn.close() # close file
 	
 	# interrogate scheme to list equations
-	[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)
+	[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, self] = xml_interr.xml_interr(self)
 	

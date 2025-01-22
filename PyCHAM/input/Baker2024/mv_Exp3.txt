@@ -1,0 +1,89 @@
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp3_MYnonHOM_MYHOM
+chem_sch_name = mcmAP_PRAMAP_scheme.kpp
+xml_name = MCM_PRAM_xml.xml
+total_model_time = 8.64e4
+update_step = 3.6e2
+recording_time_step = 3.6e3
+temperature = 293.15
+tempt = 0.
+p_init = 101325.0
+rh = 0.52
+rht = 0
+# UVC lights on, note that in Yare's MCM model run, they
+# set the J(O1D) directly (the analogous approach in PyCHAM is
+# to set light_status = J_values.xlsx), but in reality UVC affects
+# multiple photolysis routes, so to capture this the act_flux_file model variable
+# and tf_UVC and tf_UVCt can be set
+#light_status = J_values.xlsx
+light_status = 1
+# note that the photon intensity for 254 nm in this file
+# has been tuned to give a photolysis rate of J(O1D) 
+# i.e. O3 + hv = O1D of 
+# 8x10-4 /s when the exposed light is at a minimum of 35 %,
+# which Baker et al. 2024 section 3.1 says is the minimum
+# J(O1D) rate. Yare told me by email that J(O1D) in the low HO2/RO2
+# was 8.2e-4 /s and in the high HO2/RO2 was 1.68e-3 /s, and so
+# the tf_UVC below has been tuned to give these J(O1D) values
+act_flux_file = SAPHIR_STAR_UVC_Actinic_Flux_Spectrum.csv
+tf_UVC = 0.35, 0.90
+tf_UVCt = 0., 4.32e4
+const_comp = H2O
+# initial concentrations of components (ppb)
+Comp0 = O3, CO, APINENE, OH
+C0 = 29., 0., 7.5, 3.4e-5
+# continuously influxed components
+cont_infl = O3, APINENE, CO
+cont_infl_t = 0., 4.32e4
+# O3 influx rate tuned to give value comparable with 
+# Figure 2 of Baker et al. 2024, whilst also giving the
+# OH turnover at low HO2/RO2 in Table 1 of the same paper
+# alpha-pinene and CO influx are fixed at the values
+# given in Table 1 of Baker et al. 2024, where
+# influx in ppbv/s = influx concentration in 
+# Table 1*dilution factor, e.g. 
+# 10 ppbv alpha-pinene*0.000265 = 0.00265 ppb/s
+Cinfl = 0.0113, 0.015; 0.00265, 0.00265; 0., 0.6625
+# residence time of 63 minutes
+dil_fac = 0.000265
+wall_on = 1
+# deposition of particles to wall
+inflectDp = 0.
+Rate_at_inflect = 4.41e-5
+# gas-wall partitioning
+# 1.1e-2 /s for all species from Ehn et al. 2013, 
+# from S3 of supplement of Baker et al. 2024:
+# 5.88e-3 /s for RO2, OH loss rate
+# (5 /s) is actually due to a 'background reactivity', so
+# it is stated in the chemical scheme
+# and HO2 wall loss rate of 
+mass_trans_coeff = (1./171.)*(D_ig/D_C10H16O8iso1)
+# ; RO2_wall1_5.88e-3; HO2_wall1_2e-2
+# once these components go to wall do not allow evaporation from wall
+vol_Comp = RO2_wall1, HO2_wall1
+volP = 0., 0.
+eff_abs_wall_massC = 1.e-3
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = MY
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = MY
+# only need to use the below variables for the seeded case
+number_size_bins = 6
+seed_name = core
+pconc = 0., 6.26, 0., 0., 0., 0.
+pconct = 0.
+pcont = 1
+std = 1.2: 1.2: 1.2: 1.2: 1.2: 1.2
+Vwat_inc = 0
+seed_eq_wat = 0
+seed_diss = 3.e-6
+nonseed_diss_wrtw = 0.
+seed_diss_wrtw = 3.
+H2O_diss_wrtorg = 0.
+ppartit_cutoff = 1.e0
+accom_coeff_comp = all
+accom_coeff_user = 1.
+mean_rad = 4.e-2: 5.0e-2: 6.0e-2: 7.0e-2: 1.0e-1: 1.0e0
+lower_part_size = 3.5e-2, 4.5e-2, 5.5e-2, 6.5e-2, 7.5e-2, 2.5e0, 1.e1
+space_mode = man
+tracked_comp = APINENE

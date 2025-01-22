@@ -40,7 +40,7 @@ def mod_var_up(self):
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, 
 		Compt, injectt, Ct,
-		seed_mw, seed_diss, seed_dens,
+		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -71,7 +71,7 @@ def mod_var_up(self):
 	self.l20a.setText((str(self.pconc)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l21a.setText((str(self.pconct)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l22a.setText((str(seed_mw)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l23a.setText((str(seed_diss)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l23a.setText((str(self.core_diss)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l24a.setText((str(seed_dens)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l25a.setText((str(self.seed_name)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l26a.setText((str(self.seedx)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

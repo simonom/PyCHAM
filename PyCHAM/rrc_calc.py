@@ -45,7 +45,7 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 
 	# ---------------------------------------------
 	# inputs:
-	# self.RO2_indices - indices of RO2 components
+	# self.reac_RO2_indx - indices of reactive RO2 components listed in chemical scheme
 	# H2O - concentrations of water (# molecules/cm3)
 	# TEMP - temperature (K)
 	# self.light_status_now - whether lights off (0) or on (1)
@@ -74,10 +74,10 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	err_mess = ''
 	
 	# calculate total RO2 concentration
-	if (self.RO2_indices.size == 0):
+	if (self.reac_RO2_indx.size == 0):
 		RO2 = 0
 	else:
-		RO2 = np.sum(y[self.RO2_indices[:, 1]])
+		RO2 = np.sum(y[self.reac_RO2_indx])
 		
 	# calculate concentrations of third body (M), nitrogen and 
 	# oxygen

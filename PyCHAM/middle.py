@@ -47,8 +47,7 @@ def middle(self): # define function
 	[y0, Pnow,
 		siz_str, num_sb,
 		lowsize, uppsize, std,
-		Compt, injectt, Ct, seed_mw, 
-		core_diss, seed_dens, 
+		Compt, injectt, Ct, seed_mw, seed_dens, 
 		dens_comp, dens, vol_comp, 
 		volP, act_comp, act_user, accom_comp, 
 		accom_coeff_user, uman_up, 
@@ -88,11 +87,11 @@ def middle(self): # define function
 	
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
-	inj_indx, core_diss, Psat_water, 
+	inj_indx, Psat_water, 
 	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, y0,
 	self] = init_conc.init_conc(comp_num, 
 	y0, Pnow, 0, self.eqn_num[0], Compt,
-	seed_mw, core_diss, self)
+	seed_mw, self)
 
 	# if error raised, then tell GUI to display it and to stop 
 	# programme
@@ -131,7 +130,7 @@ def middle(self): # define function
 	rbou00, ub_rad_amp, np_sum] = pp_intro.pp_intro(y, num_comp, 
 	self.TEMP[0], H2Oi, mfp, accom_coeff, y_mw, surfT, siz_str, 
 	num_sb, lowsize, uppsize, 0, std, 
-	therm_sp, core_diss, act_coeff, Pnow, 
+	therm_sp, act_coeff, Pnow, 
 	seed_mw, R_gas, self)
 	
 	# estimate total inputs of emitted components (ug/m3)
@@ -146,7 +145,7 @@ def middle(self): # define function
 		Vbou] = ode_updater_su.ode_updater_su(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
 		siz_str, num_sb, num_comp, 
-		core_diss, mfp, therm_sp,  
+		mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, 
@@ -165,8 +164,7 @@ def middle(self): # define function
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 
 		Pnow, Jlen, nrec_steps, 
-		siz_str, num_sb, num_comp, 
-		core_diss, mfp, therm_sp,  
+		siz_str, num_sb, num_comp, mfp, therm_sp,  
 		accom_coeff, y_mw, surfT, R_gas, NA, 
 		x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou, 
 		N_perbin, Vol0, rad0, np_sum, new_partr, 

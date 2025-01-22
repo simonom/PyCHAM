@@ -51,7 +51,8 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pconcn, testf, self
 		
 		if (any(mrn == -1.e6 for mrn in mean_radn)):
 			if (lowersize > 0.):
-				mean_radn[mean_radn == -1.e6] = [10**((np.log10(lowersize)+np.log10(uppersize))/2.)]
+				mean_radn[mean_radn == -1.e6] = [10**((np.log10(lowersize)
+					+np.log10(uppersize))/2.)]
 			if (lowersize == 0.):
 				mean_radn[mean_radn == -1.e6] = [10**(np.log10(uppersize)-1)]
 

@@ -24,11 +24,11 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2024-12-09 10:43:56.389556
+# File Created at 2025-01-22 12:02:23.680933
 
 import numpy as np 
 
-def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss,
+def dydt_rec(y, reac_coef, step, num_sb, num_comp,
 kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
 	
 	# number of particle size bins excluding wall
@@ -79,7 +79,7 @@ kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
 				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]
 				conc_sum = np.zeros((1)) 
 				if (sum(sum(self.pconc > 0.)) > 0): # if seed particles present 
-					conc_sum[0] = ((Csit.sum()-sum(Csit[self.seedi]))+sum(Csit[self.seedi]*core_diss))
+					conc_sum[0] = ((Csit.sum()-sum(Csit[self.seedi]))+sum(Csit[self.seedi]*self.core_diss))
 				else: 
 					conc_sum[0] = Csit.sum() 
 				# prevent numerical error due to division by zero 

@@ -1,0 +1,77 @@
+# model variable file for reproducing the JPAC Benzene SOA observations given in figure 6 of 
+# Garmash et al. 2020 (https://doi.org/10.5194/acp-20-515-2020). Inputs are derived from 
+# several sources: Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) supplementary material  #Table ST5 gives total simulation time, RH, T, mixing ratios of benzene, O3, NO, NO2, SO2, CO, #seed addition time, diameter of seed, standard deviation of seed, and caption of this table #gives mean residence time, whilst fig S18 shows very clearly that the measured SOA is 2.75 ug/#m3 at its peak. Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) main article (section #2.6.2) says to assume that components with vapour pressures <1e-7 Pa cannot evaporate from wall #and section 3.2 says that experiments was under UV radiation 
+# (backed up by section 3.1.2 of Garmash et al. 2020 (https://doi.org/10.5194/acp-20-515-2020)). 
+# Rate of movement to/from wall (the gas-wall mass transfer coefficient) is given by Eq. 1 of
+# Methods section of Roldin et al. #2019 (https://doi.org/10.1038/s41467-019-12338-8), as is the effective absorbing mass #concentration of wall (5umol/m3 = 5 umol/m3*200g/mol = 1e3ug/m3 = 1e-3g/m3), noting that PyCHAM #assumes a molar mass of the wall of 200 g/mol. At the bottom of Table 1 of Garmash et al. 2020 (https://doi.org/10.5194/acp-20-515-2020) is the aerosol seed experiment description, showing the J(O1D) value, which was used to tune the tf_UVC value here, the OH concentration, which was used to tune the OH background reactivity in the chemical scheme file, Fig 6 of Garmash shows the mass concentration of ammonium sulphate (seed particle), which was used to tune pconc here
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Garmash2020/JPAC_benzene_seed_MYnonHOM_MYHOM
+chem_sch_name = AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat
+xml_name = MCM_PRAM_xml.xml
+total_model_time = 7.2e4
+update_step = 3.6e2
+recording_time_step = 3.6e3
+temperature = 287.35
+tempt = 0.
+p_init = 101325.0
+rh = 0.65
+rht = 0
+light_status = 1
+light_time = 0
+tf_UVC = 0.05
+act_flux_path = JPAC_Actinic_Flux_Spectrum_UVConly.csv
+# initial concentrations of components (ppb)
+Comp0 = BENZENE, O3, NO, NO2, SO2, CO
+C0 = 15.7, 42., 1.e-4, 1.e-3, 1.e-2, 1. 
+const_comp = H2O, BENZENE, O3, NO, NO2, SO2, CO
+cont_infl = H2O, BENZENE, O3, NO, NO2, SO2, CO
+cont_infl_t = 0.
+Cinfl = 3840.6; 5.8053e-3; 1.554e-2; 3.7e-07; 3.7e-07; 3.7e-06; 3.7e-04
+# residence time of 45 minutes
+dil_fac = 0.000370
+wall_on = 1
+# particle deposition to wall
+Grad_pre_inflect = 1.
+Grad_post_inflect = 1.
+Rate_at_inflect = 1.e-5
+McMurry_flag = 0
+# gas-wall partitioning
+# (1./75.)*(D_ig/D_C10H16O8iso1) from Roldin et al. 2019 (Eq. 1 of Methods 
+# (https://doi.org/10.1038/s41467-019-12338-8))
+mass_trans_coeff = (1./75.)*(D_ig/D_C10H16O8iso1)
+# once these components go to wall do not allow evaporation from wall
+vol_Comp = all_<1.e-7_wall1
+volP = 0.
+eff_abs_wall_massC = 1.e-3
+chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;, 
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = MY
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = MY
+# particle section
+number_size_bins = 6
+seed_name = core
+pconc = 0., 0., 0., 0., 0., 0.; 0., 11.1, 3.7, 0., 0., 0.; 0., 0., 0., 0., 0., 0.
+pconct = 0.; 4.4640e4; 57960.0
+pcont = 1
+mean_rad = 3.7e-2: 5.e-2: 6.3e-2: 7.6e-2: 10.e-2: 100.e-2; 3.7e-2: 5.e-2: 6.3e-2: 7.6e-2: 10.e-2: 100.e-2; 3.7e-2: 5.e-2: 6.3e-2: 7.6e-2: 10.e-2: 100.e-2
+std = 1.2: 1.2: 1.2: 1.2: 1.2: 1.2; 1.2: 1.2: 1.2: 1.2: 1.2: 1.2; 1.2: 1.2: 1.2: 1.2: 1.2: 1.2
+Vwat_inc = 0
+seed_eq_wat = 0
+seed_diss = 3.e-6
+nonseed_diss_wrtw = 0.
+seed_diss_wrtw = 3.
+H2O_diss_wrtorg = 0.
+partit_cutoff = 1.e0
+accom_coeff_comp = all
+accom_coeff_user = 1./(1.+np.exp(-((Rp-5.e-9)*1.e8)*100.))
+# 25 % of particles are double charged according to ST5 of Pichelstorfer et al. 2024,
+# which means 25 % of the particle number consists of particles with double the volume
+# of the median size, i.e. there are two modes of injected particle. The median size is 50 nm,
+# and the equation for calculating the resulting size of the smaller mode (which has double 
+# the volume is: v0 = (4./3.)*np.pi*5.0e-2**3 for the volume of the smaller mode, followed
+# by: (((v0*2)*3.)/(4.*np.pi))**(1./3.), which gives the results 63 nm, so the lower and 
+# upper part sizes provided here, using a linear spacing allows these radii to be at the centre
+# of the two smallest size bins, followed by an empty size bin
+lower_part_size = 30.5e-3, 43.5e-3, 56.5e-3, 69.5e-3, 82.5e-3, 82.5e-2, 1.
+space_mode = man
+tracked_comp = O3, BENZENE

@@ -98,6 +98,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	
 		# update accommodation coefficients
 		import accom_coeff_calc
+		import importlib
 		# import most recent version
 		importlib.reload(accom_coeff_calc)
 		accom_coeff_now = accom_coeff_calc.accom_coeff_func(
@@ -132,7 +133,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		kelv[ish, 0] = np.exp((2.e0*avMW[ish]*surfT)/
 			(R_gas*1.e7*TEMP*radius[0, ish]*
 			1.e2*tot_rho[ish]))
-	
+		
 		# ------------------------------------------------
 		# gas-phase diffusion coefficient*Fuch-Sutugin 
 		# correction (cm2/s)
@@ -194,19 +195,39 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		
 		# zero partitioning to particles for any components with low condensability
 		# if a value provided (default is empty list)
-		if (self.partit_cutoff):
+		if (self.ppartit_cutoff):
 
 			# convert partit_cutoff from Pa to molecules/cm3
 			# (air), note README states
 			# that just one value accepted for partit_cutoff 
 			# input
-			partit_cutoff_molcm = (self.partit_cutoff[0]*(
+			ppartit_cutoff_molcm = (self.ppartit_cutoff[0]*(
 			NA/((R_gas*1.e6)*TEMP)))
+			# indices of components above the cutoff threshold
 			highVPi = ((self.Psat*act_coeff) > 
-			partit_cutoff_molcm)
+			ppartit_cutoff_molcm)
 			# mask water to allow its partitioning
 			highVPi[:, H2Oi] = 0
 			kimt[highVPi[0:(num_sb-self.wall_on), :]] = 0.
+
+		# zero partitioning to walls for any components with low condensability
+		# if a value provided (default is empty list)
+		if (self.wpartit_cutoff):
+
+			# convert wpartit_cutoff from Pa to molecules/cm3
+			# (air), note README states
+			# that just one value accepted for wpartit_cutoff 
+			# input
+			wpartit_cutoff_molcm = (self.wpartit_cutoff[0]*(
+			NA/((R_gas*1.e6)*TEMP)))
+			# indices of components above the cutoff threshold
+			highVPi = ((self.Psat*act_coeff) > 
+			wpartit_cutoff_molcm)
+			# mask water to allow its partitioning
+			highVPi[:, H2Oi] = 0
+			# loop through walls
+			for iw in range(self.kw.shape[0]):
+				self.kw[iw, highVPi[0, :]] = 0.
 
 		# if equilibrium gas-particle partitioning turned on, then partitioning
 		# is solved in operator-split process
@@ -245,23 +266,6 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# spread over wall bins
 		self.kw = np.tile(self.kw.reshape(1, num_comp), 
 			(self.wall_on, 1))
-		
-	
-	# zero partitioning to walls for any components with low 
-	# condensability
-	# if a value provided (default is empty list)
-	if (self.partit_cutoff):
-
-		# convert partit_cutoff from Pa to molecules/cm3 (air), 
-		# note README states
-		# that just one value accepted for partit_cutoff input
-		partit_cutoff_molcm = self.partit_cutoff[0]*(
-		NA/((R_gas*1.e6)*TEMP))
-		highVPi = (self.Psat*act_coeff) > partit_cutoff_molcm
-		# mask water to allow its partitioning
-		highVPi[:, H2Oi] = 0 
-		self.kw[:, highVPi[-1, :]] = 0.
-
 
 	# make any necessary adjustments for vapour pressure of 
 	# components as a function of

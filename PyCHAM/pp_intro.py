@@ -32,8 +32,7 @@ from pp_water_equil import pp_water_equil
 def pp_intro(y, num_comp, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, 
-		testf, std, therm_sp,
-		core_diss, act_coeff, Press,
+		testf, std, therm_sp, act_coeff, Press,
 		seed_mw, R_gas, self):
 	
 	# inputs -----------------------------------
@@ -66,7 +65,6 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	#	(num_comp, 1)
 	# self.Psat - saturation vapour pressure of components 
 	# 	(# molecules/cm3 (air))
-	# core_diss - core dissociation constant
 	# self.seedx - mole ratio of non-water components comprising seed 
 	# particles
 	# self.comp_namelist - names of components noted in chemical 
@@ -162,7 +160,8 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# particle deposition to wall (# molecules/cm3)
 		self.C_p2w  = 0.
 
-	else: # if size bins present, get the particle number size distribution from inputs
+	# if size bins present, get the particle number size distribution from inputs
+	else:
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pconcn, testf, self)
@@ -234,9 +233,9 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# (# molecules/cm3 (air))
 		yn = np.zeros((num_comp*(num_aasb)))
 		
-		yn = pp_water_equil(y, yn, seedx_now, num_aasb, y_mw, 
+		yn = pp_water_equil(y[self.H2Oi], yn, seedx_now, num_aasb, y_mw, 
 			R_gas, TEMP, surfT, act_coeff, Vperbin, x, num_comp, self)
-
+		
 		# include particle-phase concentations in y 
 		# (molecules/cm3)
 		y[num_comp:(num_comp*(num_aasb+1))] = yn[:]
@@ -283,6 +282,13 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		N_perbin = self.N_perbin0_prev_sim
 		x = self.x0_prev_sim
 		Varr = self.Varr0_prev_sim
+
+	# prepare matrix to hold dissociation constants of components (columns)
+	# with respect to water over all size bins (rows)
+	self.diss_wrtw = np.zeros((num_asb, num_comp))
+	self.diss_wrtw[:, :] = self.noncore_diss_wrtw
+	self.diss_wrtw[:, self.seedi] = self.core_diss_wrtw
+	self.diss_wrtw[:, H2Oi] = 1. # water with respect to itself
 	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb,
 		 rbou00, upper_bin_rad_amp, np_sum)

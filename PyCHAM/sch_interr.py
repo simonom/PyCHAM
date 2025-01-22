@@ -40,7 +40,9 @@ def sch_interr(total_list_eqn, self):
 	self.eqn_list = [] # empty list for gas-phase reaction equation
 	self.aqeqn_list = [] # empty list for particle-phase reaction equation
 	self.sueqn_list = [] # empty list for surface (e.g. wall) reaction equation
-	RO2_names = [] # empty list for peroxy radicals
+	self.RO2_names = [] # empty list for peroxy radicals
+	# initiate array of indices of reactive RO2 components
+	self.reac_RO2_indx = np.zeros((0)) # initiate with empty array
 	rrc = [] # empty list for reaction rate coefficients
 	rrc_name = [] # empty list for reaction rate coefficient labels
 	eqn_flag = 0 # don't collate reaction equations until seen
@@ -168,7 +170,7 @@ def sch_interr(total_list_eqn, self):
 					if line3[-len(self.chem_sch_mrk[4])::] == self.chem_sch_mrk[4]:
 						line3 = line3[0:-len(self.chem_sch_mrk[4])]
 					
-					RO2_names.append(line3)
+					self.RO2_names.append(line3)
 			# check for end of RO2 list - given either by marker for end or absence of
 			# marker for continuation onto next line of RO2
 			# check for marker for end of RO2 list
@@ -231,14 +233,17 @@ def sch_interr(total_list_eqn, self):
 			marker = str('^\\' +  self.chem_sch_mrk[12])
 		
 			if (re.match(marker, line1) != None):
-				# second check is whether markers for starting reaction rate coefficients
+				# second check is whether markers for starting reaction 
+				# rate coefficients
 				# part, and markers for end of equation lines, are present
-				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
+				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), 
+					str('.*\\' +  self.chem_sch_mrk[11])]
 				if (re.match(eqn_markers[0], line1) != None and 
 					re.match(eqn_markers[1], line1) != None):
 					self.sueqn_list.append(line1) # store reaction equations
 
 	# number of equations
-	self.eqn_num = np.array((len(self.eqn_list), len(self.aqeqn_list), len(self.sueqn_list)))
+	self.eqn_num = np.array((len(self.eqn_list), len(self.aqeqn_list), 
+		len(self.sueqn_list)))
 
-	return(rrc, rrc_name, RO2_names, self)
+	return(rrc, rrc_name, self)

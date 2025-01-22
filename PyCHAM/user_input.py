@@ -46,11 +46,6 @@ def share(self):
 	else: # if no path given for saving to
 		# one folder for one simulation
 		self.output_by_sim = os.path.join(dir_path, output_root, filename, self.sav_nam)
-	
-	# create results directory now
-	# to stop parallel (in time) simulations duplicating
-	# one another
-	os.makedirs(self.output_by_sim, exist_ok=False)
 
 	# remember this path in self, in case plotting scripts need it
 	self.dir_path = self.output_by_sim
@@ -61,7 +56,7 @@ def share(self):
 		[y0, Press,
 		siz_stru, num_sb, lowsize, 
 		uppsize, std, Compt, injectt, Ct,
-		seed_mw, seed_diss, seed_dens,
+		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -102,7 +97,8 @@ def share(self):
 		self.Ct_orig = Ct
 		self.seed_name_orig = self.seed_name
 		self.seed_mw_orig = seed_mw
-		self.seed_diss_orig = seed_diss
+		self.core_diss_orig = self.core_diss
+		self.core_diss_wrtw_orig = self.core_diss_wrtw
 		self.seed_dens_orig = seed_dens
 		self.seedx_orig = self.seedx
 		self.con_infl_t_orig = self.con_infl_t
@@ -131,7 +127,8 @@ def share(self):
 		self.Rader_orig = Rader
 		self.p_char_orig = p_char
 		self.e_field_orig = e_field
-		self.partit_cutoff_orig = self.partit_cutoff
+		self.ppartit_cutoff_orig = self.ppartit_cutoff
+		self.wpartit_cutoff_orig = self.wpartit_cutoff
 		self.ser_H2O_orig = ser_H2O
 		self.wat_hist_orig = wat_hist
 		self.drh_str_orig = drh_str
@@ -164,7 +161,7 @@ def share(self):
 	return(y0, Press,
 		siz_stru, num_sb, lowsize, uppsize, 
 		std, Compt, injectt, Ct,
-		seed_mw, seed_diss, seed_dens,
+		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 

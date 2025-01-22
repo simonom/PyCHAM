@@ -30,6 +30,7 @@ import numpy as np
 import csv
 from shutil import copyfile
 import pickle
+import scipy.constants as si
 
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
@@ -100,6 +101,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
 	
+	
+
 	# correct for changes to size bin radius bounds
 	if ((numsb-self.wall_on) > 0):
 		rbou_rec[:, 0] = rbou00
@@ -108,8 +111,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	if (testf == 1):
 		return(0) # return dummy
 
-	# note that the directory to save results to (self.output_by_sim) 
-	# is created in user_input.py
+	# create results directory now
+	os.makedirs(self.output_by_sim, exist_ok=False)
 
 	# create folder to store copies of inputs
 	os.makedirs(str(self.output_by_sim+'/inputs'))
@@ -183,10 +186,12 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	save_path = str(self.output_by_sim + '/rel_SMILES') # path
 	np.save(save_path, self.rel_SMILES, allow_pickle=True)
 
-	save_path = str(self.output_by_sim + '/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
+	save_path = str(self.output_by_sim + 
+	'/pure_component_saturation_vapour_pressures_at_298p15K_Pa') # path
 	np.save(save_path, self.Psat_Pa_rec, allow_pickle=True)
 
-	save_path = str(self.output_by_sim + '/pure_component_saturation_vp_at_startT_molec_percm3') # path
+	save_path = str(self.output_by_sim + 
+	'/pure_component_saturation_vp_at_startT_molec_percm3') # path
 	np.save(save_path, self.Psat_rec0, allow_pickle=True)
 
 	save_path = str(self.output_by_sim + '/oxygen_to_carbon_ratios_of_components') # path
@@ -219,6 +224,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	save_path = str(self.output_by_sim + '/HOM_NO3_index') # path
 	np.save(save_path, self.HOM_NO3, allow_pickle=True)
 
+	# save index of all organic peroxy radical components, note this is based
+	# on SMILES strings, so not limited to the list of RO2 in the RO2 pool
 	save_path = str(self.output_by_sim + '/organic_peroxy_radical_index') # path
 	np.save(save_path, self.RO2_indices[:, -1], allow_pickle=True)	
 	
@@ -236,10 +243,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 
 	# saving Ademipo's group indices for Baker et al. 2024 (
 	# doi.org/10.5194/acp-24-4789-2024) product classes start --------
-	save_path = str(self.output_by_sim + '/ROORBaker_indx') # path
-	np.save(save_path, self.HOMFragBaker_indx, allow_pickle=True)
-
 	save_path = str(self.output_by_sim + '/HOMFragBaker_indx') # path
+	np.save(save_path, self.HOMFragBaker_indx, allow_pickle=True)
+	
+
+	save_path = str(self.output_by_sim + '/ROORBaker_indx') # path
 	np.save(save_path, self.ROORBaker_indx, allow_pickle=True)
 
 	save_path = str(self.output_by_sim + '/HOMRO2Baker_indx') # path
@@ -249,6 +257,17 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	np.save(save_path, self.HOMMonBaker_indx, allow_pickle=True)
 
 	# Baker et al. 2024 product classes end --------------------------
+	# PRAM product classes start -------------------------------------
+	save_path = str(self.output_by_sim + '/PRAMpr_indx') # path
+	np.save(save_path, self.PRAMpr_indx, allow_pickle=True)
+
+	save_path = str(self.output_by_sim + '/PRAMcsmon_indx') # path
+	np.save(save_path, self.PRAMcsmon_indx, allow_pickle=True)
+
+	save_path = str(self.output_by_sim + '/PRAMcsacc_indx') # path
+	np.save(save_path, self.PRAMcsacc_indx, allow_pickle=True)
+
+	# PRAM product classes end ---------------------------------------
 
 	# convert gas-phase concentrations from # molecules/cm3 (air) into ppb
 	# leaving any particle or wall concentrations as # molecules/cm3 (air)
@@ -444,6 +463,10 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		Nresult_dry = (np.array((Nresult_dry)))
 		rbou_rec = (np.array((rbou_rec)))	
 	
+	# convert vapour pressure at starting simulation temperature 
+	# from molecules/cm3 to Pa using ideal gas law
+	self.Psat_rec0 = self.Psat_rec0/(si.Avogadro/((si.R*1.e6)*float(cham_env[0, 0])))	
+
 	# to ensure quick use of output, store results in an object in an identical 
 	# way to retr_out
 	# create a class to hold outputs

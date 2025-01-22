@@ -196,10 +196,10 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		self.seedx.shape[0], self.seedx.shape[1])
 	
 	# consider water equilibrium between gas and particles
-	yn = pp_water_equil(y, yn, seedx_now, num_sb, y_mm, 
+	yn = pp_water_equil(H2Ogc, yn, seedx_now, num_sb, y_mm, 
 		R_gas, TEMP, surfT, act_coeff, Vperbin, radn, 
 		num_comp, self)
-
+	
 	# if instantaneous injection of particles
 	# factor concentrations of components comprising 
 	# new seed particles into existing concentration (# molecules/cm3)

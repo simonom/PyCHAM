@@ -192,7 +192,7 @@ class PyCHAM(QWidget):
 		# variables -------------------------
 		[y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
-		Compt, injectt, Ct, seed_mw, seed_diss, seed_dens, 
+		Compt, injectt, Ct, seed_mw, seed_dens, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
@@ -440,7 +440,7 @@ class PyCHAM(QWidget):
 		l23.setText('Dissociation constant(s) of seed \ncomponent(s): ')
 		self.varbox.addWidget(l23, par_row+6, 0)
 		self.l23a = QLabel(self)
-		self.l23a.setText((str(seed_diss)).replace('\'', '').replace(
+		self.l23a.setText((str(self.core_diss)).replace('\'', '').replace(
 			' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l23a, par_row+6, 1)
 		
@@ -2141,7 +2141,7 @@ class PyCHAM(QWidget):
 		[y0, Press, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
 		Compt, 
-		injectt, Ct, seed_mw, seed_diss, seed_dens, 
+		injectt, Ct, seed_mw, seed_dens, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, 
@@ -2161,7 +2161,7 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, 
 			lowsize, uppsize, std, 
 			Compt, injectt, Ct,
-			seed_mw, seed_diss, seed_dens,
+			seed_mw, seed_dens,
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, 
 			accom_comp, accom_val, uman_up, int_tol, 
@@ -2375,7 +2375,7 @@ class PyCHAM(QWidget):
 			siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, 
-			Ct, seed_mw, seed_diss, seed_dens,  
+			Ct, seed_mw, seed_dens,  
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, 
@@ -2424,10 +2424,11 @@ class PyCHAM(QWidget):
 				siz_stru, num_sb,
 				lowsize, uppsize, std,
 				Compt, injectt, Ct,
-				seed_mw, seed_diss, seed_dens,
+				seed_mw, seed_dens,
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, 
-				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, chamSA, Rader, 
+				accom_comp, accom_val, uman_up, int_tol, 							new_partr, coag_on, inflectDp, pwl_xpre, 
+				pwl_xpro, inflectk, chamSA, Rader, 
 				p_char, e_field, 
 				ser_H2O, wat_hist, drh_str, erh_str, 
 				z_prt_coeff, 
@@ -2909,7 +2910,8 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded' + 
+				' using the Load Outputs button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -4660,10 +4662,11 @@ class PyCHAM(QWidget):
 				siz_stru, num_sb,
 				 lowsize, uppsize, 
 				std, Compt, injectt, Ct,
-				seed_mw, seed_diss, seed_dens,
+				seed_mw, seed_dens,
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, 
-				accom_comp, accom_val, uman_up, int_tol, 				new_partr, coag_on, inflectDp, pwl_xpre,
+				accom_comp, accom_val, uman_up, int_tol, 
+				new_partr, coag_on, inflectDp, pwl_xpre,
 				 pwl_xpro, 
 				inflectk, chamSA, Rader, p_char, 
 				e_field, ser_H2O, 

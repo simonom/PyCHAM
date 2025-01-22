@@ -28,7 +28,7 @@ import scipy.constants as si
 import importlib
 
 def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
-	num_sb, num_comp, pconc, core_diss, kelv_fac, 
+	num_sb, num_comp, pconc, kelv_fac, 
 	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
 	cham_env, temp_now, Pnow, tot_in_res, self):
@@ -44,7 +44,6 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# num_sb - number of size bins
 	# num_comp - number of components
 	# pconc - particle concentrations now (# particles/cm3 (air))
-	# core_diss - dissociation constant of seed
 	# self.Psat - pure component saturation vapour pressure 
 	#	(# molecules/cm3 (air))
 	# kelv_fac - Kelvin factor

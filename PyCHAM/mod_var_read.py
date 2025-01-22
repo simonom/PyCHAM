@@ -45,7 +45,7 @@ def mod_var_read(self):
 			siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, Ct,
-			seed_mw, seed_diss, seed_dens,
+			seed_mw, seed_dens,
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, coag_on, 
@@ -307,21 +307,21 @@ def mod_var_read(self):
 			# https://doi.org/10.1021/acs.est.7b05575
 			if (key == 'mass_trans_coeff' and 
 				(value.strip())):
-				
+
 				# check if this is a path to a file 
-				# containing continuous 
-				# influxes, if not treat as a list of
+				# containing values, if not treat as a list of
 				# component names
 				# treat as path to file containing mass 
 				# transfer coefficients
-				if '/' in value or '\\' in value: 
-					self.mtc_path = str(
-					value.strip())
-					value = mass_trans_coeff_open(
-					self)
-					err_mess = self.err_mess
-					if err_mess[0:5] == 'Error':
-						break
+				if '/' in value or '\\' in value:
+					if 'D_ig' not in value:
+						self.mtc_path = str(
+						value.strip())
+						value = mass_trans_coeff_open(
+						self)
+						err_mess = self.err_mess
+						if err_mess[0:5] == 'Error':
+							break
 					
 				max_comp = 1
 				max_of_all = []
@@ -386,28 +386,54 @@ def mod_var_read(self):
 				# number of entries for each wall
 				ind_wall_cnt = 1
 				for prei in prescribes:
-	
+
 					# if this gives the coefficient 
 					# for a specific component
-					if prei.count('_') == 2:
+					if prei.count('_') == 2 and 'D_ig' not in prei:
 						
 						# get component name
 						self.wmtc_names.append(prei[0:prei.index('_')])
-						# get wall number (note spreadsheet values start at 1 for first wall (not zero))
-						self.wmtc_wn.append(int(prei[prei.index('_')+5:prei.index('_')+5+prei[prei.index('_')+5::].index('_')])-1)
+						# get wall number (note spreadsheet values 
+						# start at 1 for first wall (not zero))
+						self.wmtc_wn.append(int(prei[prei.index(
+						'_')+5:prei.index('_')+5+prei[prei.index(
+						'_')+5::].index('_')])-1)
 						# get mass transfer coefficient
-						self.wmtc.append(float(prei[prei.index('_')+1 + prei[prei.index('_')+1::].index('_')+1::]))
-						self.kw[int(self.wmtc_wn[-1]), ind_wall_cnt-1] = -1.e-7
-					else: # if just a generic mass transfer coefficient for this wall
-						self.wmtc_names.append('all_other_components')
-						self.wmtc.append(float(prei))
-						self.kw[wall_num, ind_wall_cnt-1] = -1.e-7
+						self.wmtc.append(float(prei[prei.index('_')+1 
+						+ prei[prei.index('_')+1::].index('_')+1::]))
+						self.kw[int(self.wmtc_wn[-1]), 
+							ind_wall_cnt-1] = -1.e-7
+					# if just a generic mass transfer coefficient for 
+					# this wall
+					else:
+						if 'D_ig' not in prei:
+							self.wmtc_names.append(
+								'all_other_components')
+							self.wmtc.append(float(prei))
+							self.kw[wall_num, 
+								ind_wall_cnt-1] = -1.e-7
+
+					# if this is an equation, e.g. eq. 1 of Methods 
+					# section in Roldin et al. 2019
+					# (https://doi.org/10.1038/s41467-019-12338-8)
+					if 'D_ig' in prei:
+						import write_mass_trans_coeff
+						write_mass_trans_coeff.write(str(
+						prei), self)
+						# tell partit_var_prep and cham_up that
+						# mass transfer coefficients are provided
+						# in equation form
+						self.mtc_calc_flag = 1
 					
-					pre_cnt += 1 # count on number of prescribed mass transfer coefficients
+					# count on number of prescribed mass transfer 
+					# coefficients
+					pre_cnt += 1
 					ind_wall_cnt += 1 # number of entries for each wall
-					if pre_cnt == sum(max_of_all[0:wall_num+1]): # if moving up a wall
+					# if moving up a wall
+					if pre_cnt == sum(max_of_all[0:wall_num+1]):
 						wall_num += 1
-						ind_wall_cnt = 1 # number of entries for each wall
+						# number of entries for each wall
+						ind_wall_cnt = 1
 			
 			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
 				chamSA = float(value.strip())
@@ -459,12 +485,14 @@ def mod_var_read(self):
 				if (self.pmode == 1):
 					self.pconc = np.zeros((sb_cnt, time_cnt))
 					for i in range(time_cnt):
-						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(','))]
+						self.pconc[:, i] = [float(ii.strip()) for ii 
+						in ((value.split(';')[i]).split(','))]
 				else: # mode quantities provided
 					self.pconc = np.zeros((self.pmode_cnt, time_cnt))
 					for i in range(time_cnt):
-						self.pconc[:, i] = [float(ii.strip()) for ii in ((value.split(';')[i]).split(':'))]
-			
+						self.pconc[:, i] = [float(ii.strip()) for ii 
+						in ((value.split(';')[i]).split(':'))]
+
 			# seed particle input times (s)
 			if (key == 'pconct' and (value.strip())):
 				time_cnt = 1 # track number of times
@@ -501,7 +529,8 @@ def mod_var_read(self):
 				# if a list, representing manually 
 				# set radius (um) bounds
 				if ',' in lowsize:
-					self.manual_rbounds = [float(i) for i in ((value.strip()).split(','))]
+					self.manual_rbounds = [float(i) for i in 
+						((value.strip()).split(','))]
 					lowsize = self.manual_rbounds[0]
 				else:
 					lowsize = float(value.strip())
@@ -632,7 +661,7 @@ def mod_var_read(self):
 						self.const_comp[0, 0] = const_comp
 						
 					ic += 1 # keep count on character in value
-
+				
 			# times that constant components are for
 			if (key == 'const_compt' and (value.strip())):
 				self.const_compt = np.array(([str(i).strip() for i in 
@@ -691,9 +720,26 @@ def mod_var_read(self):
 				except:
 					seed_mw = ['fail']
 		
-			# dissociation constant of seed material
+			# dissociation constant(s) of seed component(s)
 			if (key == 'seed_diss' and value.strip()):
-				seed_diss = [float(i) for i in 
+				self.core_diss = [float(i) for i in 
+				(value.split(','))]
+
+			# dissociation constant(s) of seed component(s) with
+			# respect to water
+			if (key == 'seed_diss_wrtw' and value.strip()):
+				self.core_diss_wrtw = [float(i) for i in 
+				(value.split(','))]
+
+			# dissociation constant(s) of nonseed component(s) with
+			# respect to water
+			if (key == 'nonseed_diss_wrtw' and value.strip()):
+				self.noncore_diss_wrtw = [float(i) for i in 
+				(value.split(','))]
+
+			# dissociation constant of water with respect to organics
+			if (key == 'H2O_diss_wrtorg' and value.strip()):
+				self.H2O_diss_const_org = [float(i) for i in 
 				(value.split(','))]
 
 			if (key == 'seed_dens' and value.strip()):
@@ -977,17 +1023,23 @@ def mod_var_read(self):
 
 			# names of componenets with specified 
 			# accommodation coefficients
-			if key == 'accom_coeff_comp' and (value.strip()):
+			if (key == 'accom_coeff_comp' and (value.strip())):
 				accom_comp = [i for i in (((value.strip()).split(',')))]
 
 			# value(s) of accommodation coefficient set by user
-			if key == 'accom_coeff_user' and (value.strip()):
+			if (key == 'accom_coeff_user' and (value.strip())):
 				accom_val = [i for i in (((value.strip()).split(',')))]
 
-			# value(s) of the gas-particle and gas-wall 
-			# partitioning cutoff
-			if (key == 'partit_cutoff' and (value.strip())):
-				self.partit_cutoff = [float(i) for 
+			# value(s) of the gas-particle
+			# partitioning cutoff (Pa)
+			if (key == 'ppartit_cutoff' and (value.strip())):
+				self.ppartit_cutoff = [float(i) for 
+				i in (((value.strip()).split(',')))]
+
+			# value(s) of the gas-wall
+			# partitioning cutoff (Pa)
+			if (key == 'wpartit_cutoff' and (value.strip())):
+				self.wpartit_cutoff = [float(i) for 
 				i in (((value.strip()).split(',')))]
 			
 			# marker for whether to clone latest version 
@@ -1131,7 +1183,7 @@ def mod_var_read(self):
 				siz_stru, num_sb, lowsize, 
 				uppsize, std, 
 				Compt, injectt, Ct, seed_mw, 
-				seed_diss, seed_dens, 
+				seed_dens, 
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, accom_comp, 
 				accom_val, uman_up, int_tol, 

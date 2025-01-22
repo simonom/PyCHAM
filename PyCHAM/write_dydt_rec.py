@@ -69,7 +69,7 @@ def write_dydt_rec(self): # define function
 	f.write('\n')
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest 1 Tab
-	f.write('def dydt_rec(y, reac_coef, step, num_sb, num_comp, core_diss,\nkelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):\n')
+	f.write('def dydt_rec(y, reac_coef, step, num_sb, num_comp,\nkelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):\n')
 	f.write('	\n')
 	f.write('	# number of particle size bins excluding wall\n')
 	f.write('	num_asb = num_sb-self.wall_on\n')
@@ -116,7 +116,7 @@ def write_dydt_rec(self): # define function
 	f.write('				Csit = y[num_comp*(ibin+1):num_comp*(ibin+2)]\n')
 	f.write('				conc_sum = np.zeros((1)) \n')
 	f.write('				if (sum(sum(self.pconc > 0.)) > 0): # if seed particles present \n')
-	f.write('					conc_sum[0] = ((Csit.sum()-sum(Csit[self.seedi]))+sum(Csit[self.seedi]*core_diss))\n')
+	f.write('					conc_sum[0] = ((Csit.sum()-sum(Csit[self.seedi]))+sum(Csit[self.seedi]*self.core_diss))\n')
 	f.write('				else: \n')
 	f.write('					conc_sum[0] = Csit.sum() \n')
 	f.write('				# prevent numerical error due to division by zero \n')

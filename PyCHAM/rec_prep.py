@@ -32,7 +32,7 @@ import act_coeff_update
 
 # define function
 def rec_prep(nrec_step, y, y0, 
-	num_sb, num_comp, N_perbin, core_diss, mfp,
+	num_sb, num_comp, N_perbin, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, therm_sp, H2Oi, act_coeff, 
 	sumt, Pnow, light_time_cnt, 
@@ -60,7 +60,6 @@ def rec_prep(nrec_step, y, y0,
 	# num_sb - number of size bins
 	# num_comp - number of components
 	# N_perbin - particle concentration per size bin (#/cm3 (air))
-	# core_diss - dissociation constant of seed
 	# self.Psat - pure component saturation vapour pressure 
 	#	(# molecules/cm3 (air))
 	# mfp - mean free path (m)
@@ -316,7 +315,7 @@ def rec_prep(nrec_step, y, y0,
 		importlib.reload(dydt_rec) # import most recent version
 		dydt_cnt = 0 # index for row to record on
 		self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, num_sb, 
-			num_comp, core_diss, kelv_fac, 
+			num_comp, kelv_fac, 
 			kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist,
 			self)
 						

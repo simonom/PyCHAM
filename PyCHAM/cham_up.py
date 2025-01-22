@@ -174,15 +174,15 @@ def cham_up(sumt, Pnow,
 	# update dilution factor
 	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
 	# for water vapour
-	# if water previously set to 0, e.g. below because of
+	# if gas-phase water previously set to 0, e.g. below because of
 	# fixing to observation, then keep at 0.
-	if hasattr(self, 'dil_fac_H2O_now'):
-		if (self.dil_fac_H2O_now == 0.):
-			self.dil_fac_H2O_now = 0
+	if hasattr(self, 'dil_fac_H2Og_now'):
+		if (self.dil_fac_H2Og_now == 0.):
+			self.dil_fac_H2Og_now = 0
 		else:
-			self.dil_fac_H2O_now = self.dil_fac[self.dil_fac_cnt]
+			self.dil_fac_H2Og_now = self.dil_fac[self.dil_fac_cnt]
 	else:
-		self.dil_fac_H2O_now = self.dil_fac[self.dil_fac_cnt]
+		self.dil_fac_H2Og_now = self.dil_fac[self.dil_fac_cnt]
 		
 	# check on change of light setting ------------------------------
 
@@ -330,12 +330,21 @@ def cham_up(sumt, Pnow,
 			# the Taylor (1993) textbook 
 			# Multicomponent Mass Transfer, ISBN: 0-471-57417-1, note diffusion 
 			# volume for air (19.7) taken from Table 4.1 of Taylor (1993) and mw of 
-			# air converted to g/mol from kg/mol.  This is a replication of the original method 			
+			# air converted to g/mol from kg/mol.  This is a replication of 
+			# the original method 			
 			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
-			DStar_org = 1.013e-2*temp_nown**1.75*(((y_mw+ma*1.e3)/(y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+			DStar_org = 1.013e-2*temp_nown**1.75*(((y_mw+ma*1.e3)/(
+			y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
 			
+			# if mass trasfer coefficient of components to surfaces was provided
+			# in equation form by user, then estimate coefficients now (/s)
+			if (self.mtc_calc_flag == 1):
+				import mass_trans_coeff_eq
+				self = mass_trans_coeff_eq.mtc(DStar_org, temp_nown, 
+					num_comp, self)
+
 			temp_now = temp_nown # update current temperature (K)
 		
 		# check whether temperature changes during proposed integration time step
@@ -410,14 +419,14 @@ def cham_up(sumt, Pnow,
 						
 						# assume we don't want dilution of 
 						# water vapour
-						self.dil_fac_H2O_now = 0.
+						self.dil_fac_H2Og_now = 0.
 					RHt_cnt += 1 # update count on RH
 					
 				else:
 					RHt_cnt = -1 # reached end
 					# assume no dilution of water
 					# vapour
-					self.dil_fac_H2O_now = 0.
+					self.dil_fac_H2Og_now = 0.
  
 				# reset flag for time step reduction due 
 				# to boundary conditions
@@ -430,7 +439,7 @@ def cham_up(sumt, Pnow,
 					
 					# assume we don't want dilution of 
 					# water vapour
-					self.dil_fac_H2O_now = 0.
+					self.dil_fac_H2Og_now = 0.
 				# reset flag for time step reduction due to boundary conditions
 				bc_red = 1
 		
@@ -667,14 +676,14 @@ def cham_up(sumt, Pnow,
 		# prepare to hold particle-phase concentrations (molecules/cm3)
 		yp0 = np.zeros((num_comp*num_asb))
 		yp0[:] = y0[num_comp:num_comp*(num_asb+1)]
-
+		
 		[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 		_] = pp_dursim.pp_dursim(yp0, 
 		N_perbin0, mean_radn, pconcn, lowsize, 
 		uppsize, num_comp, num_asb, MV, 
 		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], x, self)
-	
+			
 	# --------------------------------------------------------------------------
 	
 	# check on continuous influx of gas-phase components -------------
@@ -794,8 +803,10 @@ def cham_up(sumt, Pnow,
 	# check on nucleation ------------------------------------------
 	# if automatic time step adaption to nucleation requested, 
 	# check whether number of new particles
-	# exceeds 10 % of total number formed during nucleation event.  	# Second part of condition is that
-	# the specified nucleation event has not yet reached its defined 	# finishing particle number
+	# exceeds 10 % of total number formed during nucleation event.  	
+	# Second part of condition is that
+	# the specified nucleation event has not yet reached its defined 	
+	# finishing particle number
 	# concentration (# particles/cm3 (air))
 	if ((self.nuc_ad == 1) and (new_part_sum1 < self.nucv1*0.9) 
 		and ((num_sb-self.wall_on) > 0)):

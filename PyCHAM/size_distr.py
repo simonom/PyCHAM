@@ -57,12 +57,12 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 	
 	# constant volume ratio method --------------
 	# constant volume ratio (13.3 Jacobson 2005)
-# 		Vrat = (vNb/v1)**(1/(num_bins-1))
+	# 	Vrat = (vNb/v1)**(1/(num_bins-1))
 	# volume at centre of each size bin (um3) (13.2 Jacobson 2005)
-# 		Varr = v1*(Vrat**np.arange(0, num_bins))
-# 		Varr = np.append(Varr, ((4.0*np.pi)/3.0)*(1.0**3.0)) # wall volume (um3)
-# 		# radius at centre of each size bin (um)
-# 		x_output = ((3.0/(4.0*np.pi))*Varr[0:-1])**(1.0/3.0)
+ 	#	Varr = v1*(Vrat**np.arange(0, num_bins))
+ 	#	Varr = np.append(Varr, ((4.0*np.pi)/3.0)*(1.0**3.0)) # wall volume (um3)
+ 	#	# radius at centre of each size bin (um)
+ 	#	x_output = ((3.0/(4.0*np.pi))*Varr[0:-1])**(1.0/3.0)
 	# ---------------------------------------
 	# logarithmic method
 	if (self.space_mode == 'log'):

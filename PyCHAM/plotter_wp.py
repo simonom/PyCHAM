@@ -59,13 +59,14 @@ def plotter(caller, comp_names_to_plot, self):
 	comp0 = self.ro_obj.init_comp
 	rbou_rec = self.ro_obj.rad
 	space_mode = self.ro_obj.spacing
+	group_indx = self.ro_obj.gi
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
 	if (caller == 0):
 		plt.ion() # show results to screen and turn on interactive mode
-		
+
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 
@@ -74,20 +75,35 @@ def plotter(caller, comp_names_to_plot, self):
 		# concentration plot ---------------------------------------------	
 		for i in range(len(comp_names_to_plot)):
 			
+			# start by assuming it's not a group to be plotted
+			group_flag = 0
+
 			if comp_names_to_plot[i].strip() == 'H2O':
 				indx_plot = H2Oi
-			else:
-				try: # will work if provided components were in simulation chemical scheme
-					# get index of this specified component, removing any white space
-					indx_plot = comp_names.index(comp_names_to_plot[i].strip())
+				group_flag = 1
+			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
+				indx_plot = (np.array((group_indx['HOMRO2'])))
+				group_flag = 1
+			if (group_flag == 0):
+				# will work if provided components were in simulation 
+				# chemical scheme
+				try:
+					# get index of this specified component, removing 
+					# any white space
+					indx_plot = np.array((comp_names.index(
+						comp_names_to_plot[i].strip()))).reshape(1)
 				except:
-					self.l203a.setText(str('Component ' + comp_names_to_plot[i] + ' not found in chemical scheme used for this simulation'))
+					self.l203a.setText(str('Component ' + 	
+					comp_names_to_plot[i] + ' not found in chemical ' +
+					'scheme used for this simulation'))
 					# set border around error message
 					if (self.bd_pl == 1):
-						self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+						self.l203a.setStyleSheet(0., 
+							'2px dashed red', 0., 0.)
 						self.bd_pl = 2
 					else:
-						self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+						self.l203a.setStyleSheet(0., 
+							'2px solid red', 0., 0.)
 						self.bd_pl = 1
 					
 					plt.ioff() # turn off interactive mode
@@ -95,12 +111,23 @@ def plotter(caller, comp_names_to_plot, self):
 					return()
 			
 			if (wall_on > 0):
-				# wall-phase concentration (from gas-wall partitioning and production on wall) (# molecules/cm3)
+				# wall-phase concentration (from gas-wall partitioning 
+				# and production on wall) (# molecules/cm3)
 				# (summed over walls)
-				conc = np.sum(yrec[:, ((num_asb+1)*num_comp)+indx_plot::num_comp], axis = 1)
+				# prepare to hold abundance
+				conc = np.zeros((len(timehr)))
+				# loop over components in this group (or just one loop if a 
+				# single component)
+				for ip in range(len(indx_plot)):
+					conc_ip = np.sum(yrec[:, ((num_asb+1)*num_comp)
+					+indx_plot[ip]::num_comp], axis = 1)
+
+					# convert abundance from molecules/cm3 to ug/m3
+					conc += ((conc_ip/si.N_A)*y_MW[0, indx_plot[ip]])*1.e12
 			
 			else:
-				self.l203a.setText(str('Wall not considered in this simulation'))
+				self.l203a.setText(str('Wall not considered in ' +
+					 'this simulation'))
 				
 				# set border around error message
 				if (self.bd_pl == 1):
@@ -114,10 +141,10 @@ def plotter(caller, comp_names_to_plot, self):
 				plt.close() # close figure window
 				return()
 				
-			# concentration in units of ug/m3
-			conc = ((conc/si.N_A)*y_MW[0, indx_plot])*1.e12
 			# plot this component
-			ax0.plot(timehr, conc, '+', linewidth = 4., label = str(str(comp_names[indx_plot ]+' (wall (from gas-wall partitioning))')))
+			ax0.plot(timehr, conc, '+', linewidth = 4., 
+				label = str(str(comp_names_to_plot[i]+
+				' (wall (from gas-wall partitioning))')))
 
 		ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
@@ -125,7 +152,7 @@ def plotter(caller, comp_names_to_plot, self):
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.legend(fontsize = 14)
 
-		# end of gas-phase concentration sub-plot ---------------------------------------
+		# end of wall-phase concentration ----------------------------
 	
 
 	# display

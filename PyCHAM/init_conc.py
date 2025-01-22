@@ -34,7 +34,7 @@ import openbabel.pybel as pybel
 
 def init_conc(num_comp, init_conc, PInit,
 	testf, num_eqn, Compt, seed_mw,
-	core_diss, self):
+	self):
 		
 	# inputs:------------------------------------------------------
 	
@@ -64,7 +64,6 @@ def init_conc(num_comp, init_conc, PInit,
 	#	start of experiment
 	# self.seed_name - name of core component (input by user)
 	# seed_mw - molecular weight of seed material (g/mol)
-	# core_diss - dissociation constant of seed material
 	# self.nuc_comp - name of nucleating component (input by user, 
 	#	or defaults to 'core')
 	# self.comp_xmlname - component names in xml file
@@ -221,8 +220,8 @@ def init_conc(num_comp, init_conc, PInit,
 	# number of recording steps
 	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
-	for i in range(num_comp): # loop through all components to get molar weights
-		y_mw[i] = self.Pybel_objects[i].molwt # molecular mass (g/mol)
+	for i in range(num_comp): # loop through all components to get molar mass (g/mol)
+		y_mw[i] = self.Pybel_objects[i].molwt
 		
 	# --------------------------------------------------------------
 	# account for water's properties
@@ -281,7 +280,6 @@ def init_conc(num_comp, init_conc, PInit,
 				# then flatten back to 1D array
 				y_w = y_w.flatten()
 
-		
 		# if not included in chemical scheme file, then add 
 		# water to end of component list
 		if (H2Oi == num_comp):
@@ -611,6 +609,5 @@ def init_conc(num_comp, init_conc, PInit,
 		y[:] = y[:]
 
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
-			inj_indx, core_diss,
-			Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
+			inj_indx, Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
 			HO2i, NO3i, init_conc, self)

@@ -30,7 +30,7 @@ import datetime # for dealing with times
 	
 def ode_brk_err_mess(y0, neg_names, rrc, num_comp, 
 			num_asb, act_coeff, neg_comp_indx,
-			N_perbin, core_diss, kelv_fac, kimt, 
+			N_perbin, kelv_fac, kimt, 
 			call, H2Oi, y, self):
 	
 	# inputs: ------------------------------------------------------------------
@@ -57,7 +57,6 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 	# neg_comp_indx - indices of components with negative concentrations
 	# N_perbin - number concentration of particles per size bin (#/cm3)
 	# self.seedi - index of seed components
-	# core_diss - dissociation of seed components
 	# kelv_fac - kelvin factor for particle
 	# kimt - mass transfer coefficient for gas-particle partitioning (s)
 	# self.eqn_num - number of gas- and particle-phase reactions
@@ -200,7 +199,7 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 		# force all components in size bins with no particle to zero
 		ymat[N_perbin[:, 0] == 0, :] = 0.
 		# total particle-phase concentration per size bin (molecules/cc (air))		
-		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
+		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*self.core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
 		# tile over components
 		csum = np.tile(csum, [1, len(neg_comp_indx)])
 		ymat = ymat[:, neg_comp_indx] # keep just the components with negative values output by ODE solver

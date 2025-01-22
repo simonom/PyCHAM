@@ -1,1 +1,1 @@
-/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp3_zpc1e-4_it1e-3_SIMPOL_MohrHOMs
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp2p1_NANNOOLALnonHOM_NANNOOLALHOM
