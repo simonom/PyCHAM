@@ -156,6 +156,10 @@ def def_mod_var(caller, self): # define function
 	# partitioning coefficient is set to zero, e.g. because surface area of a size bin
 	# is relatively very small
 	z_prt_coeff = 1.e-9
+	# fraction of total gas- and particle-phase concentrations (excluding seed 
+	# and water) below which partitioning to particles and walls is set to
+	# zero
+	self.z_prt_coeff_loC = 0.
 	# whether (1) or not (0) to set the effective vapour pressure of
 	# inorganic components (like HNO3 and ammonium nitrate) that are 
 	# known to partition inside 

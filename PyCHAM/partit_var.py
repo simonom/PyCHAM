@@ -158,12 +158,13 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 			kimt[:, np.sum(kimt, axis = 0)/
 				np.sum(np.sum(kimt)) < z_prt_coeff] = 0.
 		
-		# zero partitioning coefficient for any components 
+		# zero partitioning coefficient to particle and wall 
+		# for any components 
 		# with relatively tiny abundance 
-		# in the gas and particle phase
+		# in the gas- and particle-phase
 		# when compared against non-water and non-seed 
 		# components
-		if (z_prt_coeff > 0. and num_sb-self.wall_on > 0):
+		if (self.z_prt_coeff_loC > 0. and num_sb > 0):
 			
 			# get gas and particle phase concentrations
 			if (self.wall_on > 0): # if wall present
@@ -182,12 +183,17 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 			y_gp[H2Oi, :] = 0.
 			# zero seed
 			y_gp[self.seedi, :] = 0.
-			# sum over gas/size bins for each component
+			# sum over gas and particle size bins for each component
 			y_gp = np.sum(y_gp, axis=1)
 			y_gp_frac = y_gp/np.sum(y_gp)
 			# if any components in tiny abundance but are present
-			if (sum((y_gp_frac < z_prt_coeff)*(y_gp > 0)) >  0): 
-				kimt[((y_gp_frac < z_prt_coeff)*(y_gp > 0)), :] = 0.
+			if (sum((y_gp_frac < self.z_prt_coeff_loC)*(y_gp > 0)) >  0):
+				# index of components to be zeroed 
+				zindx = ((y_gp_frac < self.z_prt_coeff_loC)*(y_gp > 0))
+				kimt[zindx, :] = 0.
+				# loop through walls
+				for iw in range(self.kw.shape[0]):
+					self.kw[iw, zindx] = 0.
 		
 		# transpose kimt ready for multiplication inside ode solver, so size bins
 		# in rows and components in columns

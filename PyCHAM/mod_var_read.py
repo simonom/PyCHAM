@@ -816,11 +816,19 @@ def mod_var_read(self):
 			if (key == 'seed_eq_wat' and value.strip()):
 				self.seed_eq_wat = int(value.strip())
 
-			# fraction below which gas-particle partitioning 
-			# coefficient treated as zero,
-			# e.g. because size bin has relatively very small surface area
-			if (key == 'z_prt_coeff'  and value.strip()):
-				z_prt_coeff = float(value.strip())			
+			# fraction of total partitioning coefficient
+			# below which gas-particle partitioning rate
+			# is set to zero, e.g. because of tiny
+			# surface area in a particle size bin
+			if (key == 'z_prt_coeff' and value.strip()):
+				z_prt_coeff = float(value.strip())
+
+			# fraction of total (excluding water and seed)
+			# gas- and particle-phase molecular concentration
+			# below which partitioning to particles and wall
+			# is set to 0
+			if (key == 'z_prt_coeff_loC' and value.strip()):
+				self.z_prt_coeff_loC = float(value.strip())			
 
 			# status of lights (on or off)
 			if (key == 'light_status' and value.strip()):
@@ -944,10 +952,12 @@ def mod_var_read(self):
 						
 					# treat as list of components
 					except:
-						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))
+						self.con_infl_nam = np.array((
+						[str(i).strip() for i in (value.split(','))]))
 
 					if ('not in a file' in self.con_infl_nam):
-						self.con_infl_nam = np.array(([str(i).strip() for i in (value.split(','))]))	
+						self.con_infl_nam = np.array((
+						[str(i).strip() for i in (value.split(','))]))	
 
 
 			if (key == 'const_infl_t' or key == 'cont_infl_t'):
@@ -980,10 +990,14 @@ def mod_var_read(self):
 						time_count += 1 # record number of times
 				self.con_infl_C = np.zeros((comp_count, time_count))
 				
-				try:	
-					for i in range(comp_count): # loop through components
-						for ii in range(time_count): # loop through times
-							self.con_infl_C[i, ii] = float((((value.split(';')[i]).split(',')))[ii].strip())
+				try:
+					# loop through components
+					for i in range(comp_count):
+						# loop through times
+						for ii in range(time_count):
+							self.con_infl_C[i, ii] = float(
+							(((value.split(';')[i]).split(
+							',')))[ii].strip())
 							
 				# in case semicolons and commas messed 
 				# up on input, note this will invoke an 
@@ -1085,26 +1099,32 @@ def mod_var_read(self):
 
 			# chemical scheme name of nucleating component
 			if (key == 'nuc_comp' and (value.strip())): 
-				self.nuc_comp = [str(i).strip() for i in 					(value.split(','))]
+				self.nuc_comp = [str(i).strip() for i in
+ 					(value.split(','))]
 
 			# marker for whether to adapt time interval to 
 			# nucleation
 			if (key == 'nuc_adapt' and (value.strip())): 
 				self.nuc_ad = int(value.strip())
 
-			if key == 'coag_on' and (value.strip()): # marker for whether to model coagulation
+			# marker for whether to model coagulation
+			if key == 'coag_on' and (value.strip()):
 				coag_on = int(value.strip())
 
-			if key == 'inflectDp' and (value.strip()): # diameter at which wall deposition of particles inflection occurs
+			# diameter at which wall deposition of particles inflection occurs
+			if key == 'inflectDp' and (value.strip()):
 				inflectDp = float(value.strip())
 
-			if key == 'Grad_pre_inflect' and (value.strip()): # gradient of wall deposition of particles before inflection
+			# gradient of wall deposition of particles before inflection
+			if key == 'Grad_pre_inflect' and (value.strip()):
 				pwl_xpre = float(value.strip())
 
-			if key == 'Grad_post_inflect' and (value.strip()): # gradient of particle deposition to wall after inflection
+			# gradient of particle deposition to wall after inflection
+			if key == 'Grad_post_inflect' and (value.strip()):
 				pwl_xpro = float(value.strip())
 
-			if key == 'Rate_at_inflect' and (value.strip()): # particle deposition to wall rate at inflection
+			# particle deposition to wall rate at inflection
+			if key == 'Rate_at_inflect' and (value.strip()):
 				inflectk = float(value.strip())
 
 			# chamber surface area (m2) used for particle loss to walls
