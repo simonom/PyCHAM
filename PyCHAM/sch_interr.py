@@ -27,6 +27,7 @@
 import re
 import numpy as np
 import formatting
+import openbabel.pybel as pybel
 
 # define function
 def sch_interr(total_list_eqn, self):
@@ -45,8 +46,8 @@ def sch_interr(total_list_eqn, self):
 	self.RO2_names = [] # empty list for peroxy radicals
 	# initiate array of indices of reactive RO2 components
 	self.reac_RO2_indx = np.zeros((0)) # initiate with empty array
-	rrc = [] # empty list for reaction rate coefficients
-	rrc_name = [] # empty list for reaction rate coefficient labels
+	self.rrc = [] # empty list for reaction rate coefficients
+	self.rrc_name = [] # empty list for reaction rate coefficient labels
 	eqn_flag = 0 # don't collate reaction equations until seen
 	pr_flag = 0 # don't collate peroxy radicals until seen
 	RO2_count = 0 # count on number of lines considered in peroxy radical list
@@ -57,7 +58,97 @@ def sch_interr(total_list_eqn, self):
 	# begin by not looking out for component atomic composition
 	ac_flag = 0
 	# the atom name register
-	atom_reg = ['H', 'C', 'N', 'O']
+	atom_reg = ['H', 'C', 'N', 'O', 'S', 'Cl']
+	# get the molar masses of these components according to pybel (g/mol)
+	self.atom_reg_mm = np.zeros((len(atom_reg)))
+
+	# get the molar mass of a single hydrogen atom according to pybel
+	Hnum = (pybel.readstring('smi', 'F'))
+
+	# difference between molwt, exactmass functions in pybel given 
+	# here (24/01/2025): 
+	# https://openbabel.org/api/3.0/
+	# classOpenBabel_1_1OBMol.shtml#a7cac960f30506aa53d083983845032df,
+	# and I chose molwt (for molecules), which is equivalent to atomic mass
+	# for atoms, because this represents the average isotopic abundance,
+	# whereas exactmass should only be used when the isotopic abundance
+	# has been purposefully set in an experiment
+
+	# molar mass (g/mol) of whole FH molecule
+	MM = Hnum.molwt
+	for atom in Hnum:
+		# subtract the mass of fluorine get the mass
+		# of a single hydrogen atom
+		MM -= atom.atomicmass
+
+	for atomi in range(len(atom_reg)):
+		
+		if atom_reg[atomi] == 'H':
+			self.atom_reg_mm[atomi] = MM
+		else:
+			for atom in (pybel.readstring('smi', atom_reg[atomi])):
+				self.atom_reg_mm[atomi] = atom.atomicmass
+
+	# if a generic rate constant file provided, 
+	# then read in the lines from this
+	if (self.rate_cons_name != []):
+
+		# prepare to hold codes and numbers of photolysis rates
+		jcode_list = []
+		jnum_list = []
+
+		# open the rate constants file
+		try:
+			f_open_eqn = open(self.rate_cons_name, mode='r')
+		# in case in same folder as model variables file
+		except:
+			pd_indx = self.inname[::-1].index('/')
+			pd = self.inname[0:-pd_indx]
+			self.rate_cons_path = str(pd + self.rate_cons_name)
+			f_open_grc = open(self.rate_cons_path, mode='r')
+		
+		# read the file and store everything into a list
+		total_list_grc = f_open_grc.readlines()
+		f_open_grc.close()
+
+		for line in total_list_grc:
+
+			# based on the constants_mcm.f90 file from
+			# the mcm website when kpp formatting for chemical scheme
+			# file selected
+			if (line.count('=') == 0): # if no rate constant
+				continue
+
+			# remove white space
+			line = line.replace(' ', '')
+
+			# if a photolysis rate constant
+			if (line.count('=') == 2 and line.count('::') == 1):
+				# get the code for this rate constant
+				jcode_now = line[line.index('::')+2:line.index('=')]
+			
+				# get the photolysis rate number
+				try: # in case two digits
+					jnum_now = int(line[line.index('!MCM')+6:
+						line.index('!MCM')+8])
+				except: # in case one digit
+					jnum_now = int(line[line.index('!MCM')+6:
+						line.index('!MCM')+7])
+
+				jcode_list.append(jcode_now)
+				jnum_list.append(jnum_now)
+
+			# if a generic rate constant
+			if (line.count('=') == 1 and line.count('!') == 0):
+
+				# convert fortran-type 
+				# scientific notation to 
+				# python type
+				line = formatting.SN_conversion(line)
+				# ensure rate coefficient 
+				# is python readable
+				line = formatting.convert_rate_mcm(line)
+				self.rrc.append(line)
 
 	# -------------------------------------------------------------------------
 	
@@ -75,32 +166,43 @@ def sch_interr(total_list_eqn, self):
 		if ('#DEFVAR' in line1 and self.ac_by_cs == 1):
 			# invoke looking out for component atomic composition
 			ac_flag = 1
-			# prepare to hold (in the following order per column):
-			# component name, hydrogen number, carbon number, nitrogen
-			# number and oxygen number
-			ac_mat = np.zeros((0, 5))
+			# prepare to hold (in the following order per component):
+			# hydrogen number, carbon number, nitrogen
+			# number, oxygen number, sulphur number, chlorine number
+			self.ac_dic = {}
 
 		# if this is a line containing atomic composition
 		# of component
 		if (ac_flag == 1 and '=' in line):
 
-			# extend matrix ready to hold information
-			ac_mat = np.concatenate((ac_mat, np.zeros((
-				1, ac_mat.shape[1]))), axis=0)
-
 			# get component name
-			ac_mat[-1, 0] = line.split('=')[0].replace(' ', '')
+			comp_name = str(line.split('=')[0].replace(' ', ''))
+			
+			# create new dictionary key-value pair
+			self.ac_dic[comp_name] = [0]*len(atom_reg)
+
 			# get atom numbers
 			atomn = line.split('=')[1].replace(' ', '')
+
+			# these components currently (23/01/2025) not
+			# assigned atomic numbers in MCM kpp v3.3.1 file
+			if ('IGNORE' in atomn):
+				if (comp_name == 'NA'):
+					self.ac_dic[comp_name][atom_reg.index('H')] = 1 
+					self.ac_dic[comp_name][atom_reg.index('N')] = 1
+					self.ac_dic[comp_name][atom_reg.index('O')] = 3
+					continue
+				if (comp_name == 'SA'):
+					self.ac_dic[comp_name][atom_reg.index('H')] = 2 
+					self.ac_dic[comp_name][atom_reg.index('S')] = 1
+					self.ac_dic[comp_name][atom_reg.index('O')] = 4
+					continue
+			
 			# attempt getting individual atom numbers
 			# starting index for considering
 			istart = 0
 			# work through string elements
 			for atomni in range(1, len(atomn)):
-
-				# if at end of string, then continue to next line
-				if (atomn[atomni] == ';'):
-					continue
 
 				# if not ready to look for a number, continue to
 				# next element of string
@@ -111,8 +213,11 @@ def sch_interr(total_list_eqn, self):
 				# if can't make into an integer, then register atom
 				# number
 				except:
-					# atom number
-					anum = int(atomn[istart:atomni-1])
+					try:
+						# atom number
+						anum = int(atomn[istart:atomni-1])
+					except:
+						anum = 1
 					# get index where atom name ends
 					try:
 						atomnend = atomni+atomn[
@@ -120,26 +225,22 @@ def sch_interr(total_list_eqn, self):
 					except:
 						atomnend = atomni+atomn[
 							atomni::].index(';')
-					at_name = str(atomn[atomni:atomend])
-					# reference index of this atom and +1 to
-					# allow for component name
-					at_indx = atom_reg.index(at_name)+1
-					ac_mat[-1, at_indx] = anum
+					at_name = str(atomn[atomni-1:atomnend])
+					# reference index of this atom
+					at_indx = atom_reg.index(at_name)
+						
+					self.ac_dic[comp_name][at_indx] = anum
 
 					# move index for starting to look for atom
 					# numbers up
 					istart = atomnend+1
-			import ipdb; ipdb.set_trace()	
-				
-			
-		
 
 		if (ac_flag == 1 and '#INLINE F90_RCONST' in line):
 			# stop looking for components and their atomic composition
 			ac_flag = 0
 			
 
-	# ------------------------------------------------------------------------
+		# ----------------------------------------------------------
 		# generic reaction rate coefficients part
 		# marker at end of generic reaction rate coefficient lines
 		# the first \ allows python to interpret the second \ as a dash
@@ -150,9 +251,10 @@ def sch_interr(total_list_eqn, self):
 		# look out for start of generic reaction rate coefficients
 		# could be generic reaction coefficient if just one = in line
 		
-		if (len(line1.split('=')) == 2):
+		if (len(line1.split('=')) == 2 and ac_flag == 0):
 			rrc_flag = 1
-			# don't record if nothing preceding '=' (can occur in KPP files, e.g.
+			# don't record if nothing preceding '=' 
+			# (can occur in KPP files, e.g.
 			# =IGNORE)
 			if (len((line1.split('=')[0]).strip()) == 0):
 				rrc_flag = 0
@@ -160,34 +262,55 @@ def sch_interr(total_list_eqn, self):
 			if len((line1.split('=')[1]).strip()) >= 6:
 				if (line1.split('=')[1]).strip()[0:6] == 'IGNORE':
 					rrc_flag = 0
-			# don't record if marker (if one present) for end of generic reaction rate
+			# don't record if marker (if one present) 
+			# for end of generic reaction rate
 			# coefficient lines not present
 			if (len(self.chem_sch_mrk[7]) > 0):
 				if re.search(end_mark, line1.strip()) == None:
 					rrc_flag = 0
-			
+
+			# don't record if a separate file path is provided for 
+			# rate constants
+			if (self.rate_cons_name != []):
+				rrc_flag = 0			
+
 			if (rrc_flag == 1): 
 				
 				# dont consider if start of peroxy radical list
 				if (line1.split('=')[0]).strip() != self.chem_sch_mrk[1]:
 					# don't consider if a gas-phase chemical scheme reaction
-					if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[0]:
-						# don't consider if an aqueous-phase chemical scheme reaction
-						if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[8]:
-							# don't consider if a surface (e.g. wall) chemical scheme reaction
-							if ((line1.split('=')[0]).strip())[0] != self.chem_sch_mrk[12]:
+					if (((line1.split('=')[0]).strip())[0] != 
+						self.chem_sch_mrk[0]):
+						# don't consider if an aqueous-phase 
+						# chemical scheme reaction
+						if (((line1.split('=')[0]).strip())[0] != 
+							self.chem_sch_mrk[8]):
+							# don't consider if a surface 
+							# (e.g. wall) chemical scheme 
+							# reaction
+							if (((line1.split('=')[0]).strip())[0] 
+								!= self.chem_sch_mrk[12]):
 							
 								# remove end characters
-								line2 = line1.replace(str(self.chem_sch_mrk[7]), '')
+								line2 = line1.replace(str(
+								self.chem_sch_mrk[7]), '')
 								# remove all white space
 								line2 = line2.replace(' ', '')
-								# convert fortran-type scientific notation to python type
-								line2 = formatting.SN_conversion(line2)
-								# ensure rate coefficient is python readable
-								line2 = formatting.convert_rate_mcm(line2)
-								rrc.append(line2.strip())
-								# get just name of generic reaction rate coefficient
-								rrc_name.append((line2.split('=')[0]).strip())		
+								# convert fortran-type 
+								# scientific notation to 
+								# python type
+								line2 = \
+								formatting.SN_conversion(line2)
+								# ensure rate coefficient 
+								# is python readable
+								line2 = \
+								formatting.convert_rate_mcm(
+								line2)
+								self.rrc.append(line2.strip())
+								# get just name of generic
+								# reaction rate coefficient
+								self.rrc_name.append((
+								line2.split('=')[0]).strip())		
 			
 		# ---------------------------------------------------------------------------
 		# peroxy radical part
@@ -203,13 +326,15 @@ def sch_interr(total_list_eqn, self):
 			# first check whether the RO2 list comprises just one line, as this will
 			# mean its end marker is present
 			if (len(self.chem_sch_mrk[5].strip()) > 0):
-				# .* allows search across all elements of line, \\ ensures marker is
+				# .* allows search across all elements of 
+				# line, \\ ensures marker is
 				# recognised as string
 				mark = str('.*\\' + self.chem_sch_mrk[5])
 				if (re.match(mark, line1) != None):
 					pr_flag = 1
 			
-			# look for presence of marker for RO2 list continuing onto next line, which
+			# look for presence of marker for RO2 list 
+			# continuing onto next line, which
 			# confirms this is the RO2 list when it covers more than one line
 			# .* allows search across all elements of line, \\ ensures marker is
 			# recognised as string
@@ -217,9 +342,11 @@ def sch_interr(total_list_eqn, self):
 			if (re.match(mark, line1) != None):
 				pr_flag = 1
 			
-			# if line end or continuation marker not supplied then assume the RO2 start
+			# if line end or continuation marker not supplied then 
+			# assume the RO2 start
 			# marker is unique
-			if (len(self.chem_sch_mrk[5].strip()) == 0 and len(self.chem_sch_mrk[6].strip()) == 0):
+			if (len(self.chem_sch_mrk[5].strip()) == 0 and 
+				len(self.chem_sch_mrk[6].strip()) == 0):
 				pr_flag = 1
 					
 		if (pr_flag == 1):
@@ -266,20 +393,57 @@ def sch_interr(total_list_eqn, self):
 				if (re.match(mark, line1) == None):
 					pr_flag = 0
 		
-		# --------------------------------------------------------------------------------
+		# -------------------------------------------------
 		# gas-phase reaction equation part
-		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
+		# ^ means occurs at start of line and, first \ means 
+		# second \ can be interpreted 
 		# and second \ ensures recognition of marker
 		marker = str('^\\' +  self.chem_sch_mrk[0])
 		
 		# first check is whether equation start marker is present
 		if (re.match(marker, line1) != None):
 			
-			# second check is whether markers for starting reaction rate coefficients
+			# second check is whether markers for 
+			# starting reaction rate coefficients
 			# part, and markers for end of equation lines, are present
-			eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
+			eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), 
+				str('.*\\' +  self.chem_sch_mrk[11])]
 			if (re.match(eqn_markers[0], line1) != None and 
 				re.match(eqn_markers[1], line1) != None):
+
+				# if generic rate constant file provided
+				if (self.rate_cons_name != []):
+				
+					# if photolysis rate constant present
+					if 'J(' in line1:
+
+						# prepare to hold updated line
+						line2 = str(line1[:])
+
+						# loop through line characters
+						for si in range(len(line1)):
+
+							if (line2[si:si+2] == 'J('):
+								
+								# get end index
+								ei = si+line2[si::].index(')')	
+
+								# the photolysis rate code
+								jcode_now = line2[si+2:ei]
+								# get the photolysis rate number 
+								# associated with
+								# this code
+								prn_now = jnum_list[
+									jcode_list.index(
+									jcode_now)]
+								line2 = line2.replace(
+									jcode_now, 
+									str(prn_now))
+
+						# updated photolysis rate constants
+						line1 = str(line2[:])
+						
+							
 				self.eqn_list.append(line1) # store reaction equations
 
 		# aqueous-phase reaction equation part
@@ -293,15 +457,19 @@ def sch_interr(total_list_eqn, self):
 			marker = str('^\\' +  self.chem_sch_mrk[8])
 		
 			if (re.match(marker, line1) != None):
-				# second check is whether markers for starting reaction rate coefficients
-				# part, and markers for end of equation lines, are present
-				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), str('.*\\' +  self.chem_sch_mrk[11])]
+				# second check is whether markers for 
+				# starting reaction rate coefficients
+				# part, and markers for end of equation lines, 
+				# are present
+				eqn_markers = [str('.*\\' +  self.chem_sch_mrk[9]), 
+					str('.*\\' +  self.chem_sch_mrk[11])]
 				if (re.match(eqn_markers[0], line1) != None and 
 					re.match(eqn_markers[1], line1) != None):
 					self.aqeqn_list.append(line1) # store reaction equations
 
 		# surface (e.g. wall) reaction equation part
-		# ^ means occurs at start of line and, first \ means second \ can be interpreted 
+		# ^ means occurs at start of line and, first \ means 
+		# second \ can be interpreted 
 		# and second \ ensures recognition of marker
 		# first, check if a marker given, if not bypass
 		if (self.chem_sch_mrk[12] == ''):
@@ -318,10 +486,12 @@ def sch_interr(total_list_eqn, self):
 					str('.*\\' +  self.chem_sch_mrk[11])]
 				if (re.match(eqn_markers[0], line1) != None and 
 					re.match(eqn_markers[1], line1) != None):
-					self.sueqn_list.append(line1) # store reaction equations
+					# store reaction equations
+					self.sueqn_list.append(line1)
 
 	# number of equations
 	self.eqn_num = np.array((len(self.eqn_list), len(self.aqeqn_list), 
 		len(self.sueqn_list)))
 
-	return(rrc, rrc_name, self)
+
+	return(self)

@@ -346,7 +346,9 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		if (len(res_sort) < top_num[0] and self.pre_mess == 0):
 
 			# if less reactions are present than the number requested inform user
-			mess = str('Please note that ' + str(len(res_sort)) + ' relevant reactions were found, although a maximum of ' + str(top_num[0]) + ' were requested by the user.')
+			mess = str('Please note that ' + str(len(res_sort)) + 
+				' relevant reactions were found, although a maximum of ' + 
+				str(top_num[0]) + ' were requested by the user.')
 			self.l203a.setText(mess)
 		
 		# get all reactions out of the used chemical scheme -------------
@@ -799,12 +801,14 @@ def plotter_carb_res(self):
 
 		for i in range(len(comp0)): # loop through starting components
 			compi = comp_names.index(comp0[i])
-			mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
+			mm_C[i, 0] = (rel_SMILES[compi].count('C')
+				+rel_SMILES[compi].count('c'))*12.0107
 		# now convert influxes to # molecules/cm3 from ppb
 		y0 = y0*np.array((Cfac[0]))
 		# now divide by Avogadro's constant to convert # molecules/cm3 to mol/cm3
 		y0 = y0/si.N_A
-		# now multiply by molar mass of carbon and g/cm3 to ug/m3 conversion factor to get ug/m3
+		# now multiply by molar mass of carbon and g/cm3 to 
+		# ug/m3 conversion factor to get ug/m3
 		y0 = y0*mm_C*1.e12
 
 		# sum over components (ug/m3)
@@ -818,7 +822,8 @@ def plotter_carb_res(self):
 	mm_C = np.zeros((len(self.con_infl_nam), 1))
 	for i in range(len(self.con_infl_nam)): # loop through influxed components
 		compi = comp_names.index(self.con_infl_nam[i])
-		mm_C[i, 0] = (rel_SMILES[compi].count('C')+rel_SMILES[compi].count('c'))*12.0107
+		mm_C[i, 0] = (rel_SMILES[compi].count('C')+
+			rel_SMILES[compi].count('c'))*12.0107
 	
 	
 	# now convert influxes to # molecules/cm3/s from ppb/s

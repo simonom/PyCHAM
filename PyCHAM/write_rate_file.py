@@ -24,16 +24,17 @@
 
 import datetime
 
-def write_rate_file(rrc, rrc_name, testf, self): # define function
+def write_rate_file(testf, self): # define function
 	
 	# inputs: ----------------------------------------------------------------------------
-	# self.reac_coef_g - gas-phase reaction rate coefficient expression from the equation file
+	# self.reac_coef_g - gas-phase reaction rate coefficient expression 
+	#	from the equation file
 	# self.reac_coef_aq - aqueous-phase reaction rate coefficient expression from the 
 	# equation file
 	# self.reac_coef_su - surface (e.g. wall) reaction rate coefficient expression from 
 	# the equation file
-	# rrc - expression for generic reaction rate coefficients
-	# rrc_name - name given to generic reaction rate coefficients	
+	# self.rrc - expression for generic reaction rate coefficients
+	# self.rrc_name - name given to generic reaction rate coefficients	
 	# testf - flag for mode: 0 in gas-phase equation mode, 2 for test mode, 3 for
 	#			aqueous-phase equation mode
 	# ------------------------------------------------------------------------------------
@@ -101,14 +102,17 @@ def write_rate_file(rrc, rrc_name, testf, self): # define function
 	if (len(self.reac_coef_g)+len(self.reac_coef_aq)+len(self.reac_coef_su) > 0):
 		
 		f.write('\n')
-		f.write('	# calculate any generic reaction rate coefficients given by chemical scheme\n')
+		f.write('	# calculate any generic reaction rate \n')
+		f.write('	# coefficients given by chemical scheme \n')
 		f.write('\n')
-		if rrc:
+		if self.rrc:
 			f.write('	try:\n')
 			f.write('		gprn=0\n')
-			# code to calculate any generic rate coefficients given by chemical scheme file
-			for line in rrc:
-				f.write('		gprn += 1 # keep count on reaction number\n')
+			# code to calculate any generic rate coefficients 
+			# given by chemical scheme file
+			for line in self.rrc:
+				f.write('		# keep count on reaction number \n')
+				f.write('		gprn += 1 \n')
 				f.write('		%s \n' %line)
 			f.write('\n')
 			f.write('	except:\n')

@@ -54,7 +54,7 @@ def xml_interr(self):
 			err_mess_new = str(
 			'Error: xml file could not be ' + 
 			'interpreted, please check file')
-			return(err_mess_new, [], [])
+			return(err_mess_new, [])
 
 	a = doc['mechanism']['species_defs']['species']
 	

@@ -84,8 +84,11 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# we multiply by 1e-3
 	therm_sp = ((8.*si.k*TEMP)/(np.pi*(y_mw/si.N_A)*1.e-3))**0.5
 	
-	# get diffusion volumes
-	diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
+	if (self.ac_by_cs == 0): # if SMILES being used
+		# get diffusion volumes
+		diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
+	else:
+		diff_vol = np.zeros((len(self.comp_namelist)-1))
 
 	# do water and core (water from Table 4.1 of the 
 	# Taylor (1993) textbook 

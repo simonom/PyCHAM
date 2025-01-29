@@ -416,7 +416,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 	
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		
+		print('time through ode_updater: ', sumt)
 		# remembering variables at the start of the 
 		# integration step -----------------------------------
 		# remember initial concentrations (# molecules/cm3 (air))
@@ -671,7 +671,7 @@ def ode_updater(y, H2Oi,
 							neg_comp_indx, N_perbin, 
 							kelv_fac, kimt, 0, H2Oi, y, self)
 
-								yield (str('Error: negative concentrations generated following call to ode_solv_wat module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
+								yield (str('Error: negative ' + neg_names[0] +  ' concentrations generated following call to ode_solv_wat module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
 							# half the update and 
 							# integration time step (s) 
 							# if necessary
@@ -764,7 +764,7 @@ def ode_updater(y, H2Oi,
 					
 				gpp_stab = -1 # maintain unstable flag
 				# tell user what's happening
-				yield (str('Note: negative concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
+				yield (str('Note: negative ' + neg_names[0] +  ' concentrations generated following call to ode_solv module, the program assumes this is because of a change in chamber condition (e.g. injection of components), and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current integration time interval is ' + str(tnew) + ' seconds'))
 				
 				# if time step has decreased to unreasonably 
 				# low and solver still unstable then break

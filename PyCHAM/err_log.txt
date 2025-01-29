@@ -1,1 +1,1 @@
-/Users/Psymo/OneDrive - The University of Manchester/Man_Teach/research_experience/SAPHIR-STAR/PyCHAM_output/mcmAP_PRAMAP_scheme/Baker_2024_Exp3_NANNOOLALnonHOM_NANNOOLALHOM
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/INGENIOUS/Papers/simulated_PM_mass_versus_observation/PyCHAM_out/sgu_1.0acr_0.5tf_1mops_2fry_1sho_1pcp_0wst

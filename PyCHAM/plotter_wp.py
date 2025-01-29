@@ -79,7 +79,7 @@ def plotter(caller, comp_names_to_plot, self):
 			group_flag = 0
 
 			if comp_names_to_plot[i].strip() == 'H2O':
-				indx_plot = H2Oi
+				indx_plot = np.array((H2Oi)).reshape(1)
 				group_flag = 1
 			if (comp_names_to_plot[i].strip() == 'HOMRO2'):
 				indx_plot = (np.array((group_indx['HOMRO2'])))
@@ -118,6 +118,7 @@ def plotter(caller, comp_names_to_plot, self):
 				conc = np.zeros((len(timehr)))
 				# loop over components in this group (or just one loop if a 
 				# single component)
+
 				for ip in range(len(indx_plot)):
 					conc_ip = np.sum(yrec[:, ((num_asb+1)*num_comp)
 					+indx_plot[ip]::num_comp], axis = 1)

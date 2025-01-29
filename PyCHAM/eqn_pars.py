@@ -101,7 +101,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	f_open_eqn.close() # close file
 	
 	# interrogate scheme to list equations
-	[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)
+	self = sch_interr.sch_interr(total_list_eqn, self)
 
 	# if atomic composition not gained from chemical scheme file
 	if (self.ac_by_cs == 0):
@@ -264,7 +264,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 		(num_sb-self.wall_on), 0, self)
 
 	# call function to generate reaction rate calculation module
-	write_rate_file.write_rate_file(rrc, rrc_name, 0, self)
+	write_rate_file.write_rate_file(0, self)
 
 	# call function to generate module that tracks change tendencies
 	# of certain components

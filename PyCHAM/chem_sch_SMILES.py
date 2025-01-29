@@ -58,7 +58,7 @@ def chem_scheme_SMILES_extr(self):
 	f_open_eqn.close() # close file
 
 	# interrogate scheme to list equations
-	[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)
+	self = sch_interr.sch_interr(total_list_eqn, self)
 	
 	# interrogate xml to list all component names and SMILES
 	[err_mess_new, self] = xml_interr.xml_interr(self)
@@ -244,17 +244,22 @@ def chem_scheme_SMILES_extr(self):
 		# (O is the MCM chemical scheme name for single oxygen))
 		if (single_chem == 'O' and comp_namelist[indx] != 'O'):
 			H2Oi = indx
-				
-	if (H2Oi == len(comp_list)): # if not in chemical scheme, water would be the next component appended to component list
+	# if not in chemical scheme, water would be the next 
+	# component appended to component list
+	if (H2Oi == len(comp_list)):
 		comp_namelist.append('H2O')
 	
 	# if no error message but no equations identified then tell user
 	if (err_mess == '' and self.eqn_num[0] == 0):
-		err_mess = 'Note: no gas-phase reactions seen, this could be due to the chemical scheme marker input (chem_scheme_markers in the model variables input) not corresponding to the chemical scheme file, please see README for more guidance.'
+		err_mess = str('Note: no gas-phase reactions seen, ' +
+		'this could be due to the chemical scheme marker ' +
+		'input (chem_scheme_markers in the model variables ' +
+		'input) not corresponding to the chemical scheme ' +
+		'file, please see README for more guidance.')
 	
 	# check on whether all rate coefficients can be calculated
 	# call function to generate reaction rate calculation module
-	write_rate_file.write_rate_file(rrc, rrc_name, 0, self)
+	write_rate_file.write_rate_file(0, self)
 
 	# get number of photolysis equations
 	Jlen = photo_num.photo_num(self.photo_path)
@@ -263,7 +268,8 @@ def chem_scheme_SMILES_extr(self):
 	try:
 		import rate_coeffs
 		importlib.reload(rate_coeffs) # ensure latest version uploaded
-		[rate_values, erf, err_mess] = rate_coeffs.evaluate_rates(0., 0., 298.15, 0., 1., 1., 1., Jlen, 1., 1., 1., 0., self)
+		[rate_values, erf, err_mess] = rate_coeffs.evaluate_rates(
+			0., 0., 298.15, 0., 1., 1., 1., Jlen, 1., 1., 1., 0., self)
 		
 	except: # in case import fails or rate coefficient calculation fails
 		err_mess = err_mess

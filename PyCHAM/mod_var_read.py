@@ -171,6 +171,10 @@ def mod_var_read(self):
 			if (key == 'chem_sch_name' and (value.strip())): 
 				self.sch_name = str(value.strip())
 
+			# path to chemical scheme rate constants
+			if (key == 'rate_constant_file' and (value.strip())): 
+				self.rate_cons_name = str(value.strip())
+
 			# path to xml file
 			if (key == 'xml_name' and (value.strip())):
 				self.xml_name = str(value.strip())

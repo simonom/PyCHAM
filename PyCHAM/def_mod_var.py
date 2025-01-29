@@ -39,6 +39,8 @@ def def_mod_var(caller, self): # define function
 	# default chemical scheme
 	self.sch_name = str(self.PyCHAM_path + 
 		'/PyCHAM/input/gas-phase_ex/ex_chem_scheme.txt')
+	# rate constant file
+	self.rate_cons_name = []
 	# xml file path
 	self.xml_name = self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_xml.xml'
 	self.inname = 'Default' # model variables file name

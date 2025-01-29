@@ -112,17 +112,16 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 			hires = 10**(np.linspace(np.log10(x_output[0]-rwid[0]/2.1),
 				np.log10(uppersize), int(num_bins*1.e2)))
 			# probability distribution function
-			try: # if std is an array
-				if (len(std) > 1): # get this mode
-					stdi = std[i]
-			except: # if std is single number
-				 stdi = std
+			if (len(std) > 1): # get this mode
+				stdi = std[i]
+			else:
+				stdi = std
 			try: # if scale is an array
 				if (len(scale) > 1): # extract array from list
 					scalei = scale[i] # get this mode
 			except: # if scale is single number
 				 scalei = scale
-			import ipdb; ipdb.set_trace()
+			
 			pdf_output = stats.lognorm.pdf(hires, stdi, loc, scalei)
 			# remove any excess dimensions
 			pdf_output = np.squeeze(pdf_output)

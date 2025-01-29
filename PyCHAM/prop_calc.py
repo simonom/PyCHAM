@@ -258,18 +258,22 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
 			continue
-	
-		if self.rel_SMILES[i] == '[HH]': # omit H2 as unliked by liquid density code
-			# liquid density code does not like H2, so manually input kg/m3
-			self.y_dens[i] = 1.e3
+		
+		if  (self.ac_by_cs == 0): # if SMILES considered
+			# omit H2 as unliked by liquid density code
+			if (self.rel_SMILES[i] == '[HH]'):
+				# liquid density code does not like H2, 
+				# so manually input kg/m3
+				self.y_dens[i] = 1.e3
 
-		if (i != corei[0] and i != H2Oi and self.rel_SMILES[i] != '[HH]'):
-			# density (convert from g/cm3 to kg/m3)
-			self.y_dens[i] = liquid_densities.girolami(
-					self.Pybel_objects[i])*1.e3
+			if (i != corei[0] and i != H2Oi and 
+				self.rel_SMILES[i] != '[HH]'):
+				# density (convert from g/cm3 to kg/m3)
+				self.y_dens[i] = liquid_densities.girolami(
+						self.Pybel_objects[i])*1.e3
 			
 		if (self.comp_namelist[i] == 'O3'):
-			if (self.pars_skip != 2):
+			if (self.pars_skip != 2 and self.ac_by_cs == 0):
 				# vapour pressure of ozone from 
 				# https://doi.org/10.1063/1.1700683
 				self.Psat[0, i] =  np.log10((8.25313-
@@ -291,7 +295,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			self.comp_namelist[i] == 'HNO3' and 
 			self.inorg_part_flag == 1):
 			
-			if (self.pars_skip != 2):
+			if (self.pars_skip != 2 and self.ac_by_cs == 0):
 				# effective vapour pressure of ammonium nitrate from 
 				# diurnal_est.py on Simon O'Meara OneDrive
 				# (Pa converted to log10(atm))
@@ -310,7 +314,7 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		if (self.comp_namelist[i] == 'NH4' or self.comp_namelist[i] == 
 			'NH3' and self.inorg_part_flag == 1):
 			
-			if (self.pars_skip != 2):
+			if (self.pars_skip != 2 and self.ac_by_cs == 0):
 				# effective vapour pressure of ammonia from 
 				# diurnal_est.py on Simon O'Meara OneDrive
 				self.Psat[0, i] =  np.log10(
@@ -330,118 +334,122 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# (log10(atm)) of HOMs
 		
 		# if HOMs component
-		if (self.rel_SMILES[i].count('O') + self.rel_SMILES[i].count('o') >= 6):
+		if (self.ac_by_cs == 0): # if using SMILES
+			if (self.rel_SMILES[i].count('O') + 
+			self.rel_SMILES[i].count('o') >= 6):
 
-			# tell recording section we are dealing 
-			# with a HOM		
-			rec_now_flag = 1
+				# tell recording section we are dealing 
+				# with a HOM		
+				rec_now_flag = 1
 			
-			if ('Nannoolal' in self.HOMs_vp or 'nannoolal' in self.HOMs_vp or
+				if ('Nannoolal' in self.HOMs_vp or 
+				'nannoolal' in self.HOMs_vp or
 				'NANNOOLAL' in self.HOMs_vp):
-				# if Nannoolal method wanted for HOMs
-				Psatnow = ((vapour_pressures.nannoolal(
-					self.Pybel_objects[i],
-					self.TEMP[tempt_cnt], 
-					boiling_points.nannoolal(
-					self.Pybel_objects[i]))))
-
-			# if Mohr et al. 2019 method wanted for HOMs
-			if ('Mohr' in self.HOMs_vp or 'mohr' in self.HOMs_vp or 
-				'MOHR' in self.HOMs_vp):
-			
-				# log(C* (ug/m3)) (natural logarithm of effective 
-				# saturation concentration) of component 
-				# (Eq. 1 Mohr et al. 2019)
-				nC = (self.rel_SMILES[i].count('C') + 
-				self.rel_SMILES[i].count('c'))
-				nO = (self.rel_SMILES[i].count('O') + 
-				self.rel_SMILES[i].count('o'))
-				nN = (self.rel_SMILES[i].count('N') + 
-					self.rel_SMILES[i].count('n'))
-				if (self.pars_skip != 2):
-					Psatnow = ((25.-nC)*0.475-
-					(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
-					(nC+nO-3.*nN))*0.9-nN*2.5)
-					# convert to vapour pressure (log10(atm))
-					# (eq. 1 O'Meara et al. 2014)
-					# first raise to the natural logarithm
-					Psatnow = np.exp(Psatnow) # ug/m3
-					# now convert ug/m3 to atm and take log10
-					# (log10(atm))
-					Psatnow = np.log10((Psatnow*8.2057e-5*
-					self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
-
-			if (self.HOMs_vp == 'EVAPORATION'):
-				if (self.pars_skip != 2):
-					# if EVAPORATION method wanted for HOMs
-					Psatnow = ((vapour_pressures.evaporation2(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt])))
-
-			if (self.HOMs_vp == 'MY'):
-				if (self.pars_skip != 2):
-					# if Myrdal and Yalkowsky method wanted for HOMs
-					Psatnow = ((vapour_pressures.myrdal_and_yalkowsky(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt], 
-						boiling_points.nannoolal(
-						self.Pybel_objects[i]))))
-			
-			if (self.HOMs_vp == 'SIMPOL'):
-				if (self.pars_skip != 2):
-					# if SIMPOL method wanted for HOMs
-					Psatnow = ((vapour_pressures.simpol(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt])))
-					
-					
-			
-		# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
-		# et al. (2008), with dB of 
-		# that equation given by eq. 7 of same reference)
-		else: # if not HOMs component
-			if (self.pars_skip != 2):
-
-				if ('Nannoolal' in self.nonHOMs_vp or 
-					'nannoolal' in self.nonHOMs_vp or
-					'NANNOOLAL' in self.nonHOMs_vp):
-					# if Nannoolal method wanted for nonHOMs
+					# if Nannoolal method wanted for HOMs
 					Psatnow = ((vapour_pressures.nannoolal(
 						self.Pybel_objects[i],
 						self.TEMP[tempt_cnt], 
 						boiling_points.nannoolal(
 						self.Pybel_objects[i]))))
-			
-				if (self.nonHOMs_vp == 'EVAPORATION'):
-					# if EVAPORATION method wanted for nonHOMs
-					Psatnow = ((vapour_pressures.evaporation2(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt])))
 
-				# if Myrdal and Yalkowsky method wanted for nonHOMs
-				if (self.nonHOMs_vp == 'MY'):
-					# Myrdal and Yalkowsky method in UManSysProp
-					# cannot deal with bimolecular hydrogen as it
-					# gives a 0 mass, so assign an arbitrarilly high
-					# vapour pressure here
-					if (self.comp_namelist[i] == 'H2'):
-						Psatnow = 10. # log10(atm)
-					else:
+				# if Mohr et al. 2019 method wanted for HOMs
+				if ('Mohr' in self.HOMs_vp or 'mohr' in self.HOMs_vp or 
+				'MOHR' in self.HOMs_vp):
+			
+					# log(C* (ug/m3)) (natural logarithm of effective 
+					# saturation concentration) of component 
+					# (Eq. 1 Mohr et al. 2019)
+					nC = (self.rel_SMILES[i].count('C') + 
+					self.rel_SMILES[i].count('c'))
+					nO = (self.rel_SMILES[i].count('O') + 
+					self.rel_SMILES[i].count('o'))
+					nN = (self.rel_SMILES[i].count('N') + 
+						self.rel_SMILES[i].count('n'))
+					if (self.pars_skip != 2):
+						Psatnow = ((25.-nC)*0.475-
+						(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
+						(nC+nO-3.*nN))*0.9-nN*2.5)
+						# convert to vapour pressure (log10(atm))
+						# (eq. 1 O'Meara et al. 2014)
+						# first raise to the natural logarithm
+						Psatnow = np.exp(Psatnow) # ug/m3
+						# now convert ug/m3 to atm and take log10
+						# (log10(atm))
+						Psatnow = np.log10((Psatnow*8.2057e-5*
+						self.TEMP[tempt_cnt])/(1.e6*y_mw[i]))
+
+				if (self.HOMs_vp == 'EVAPORATION'):
+					if (self.pars_skip != 2):
+						# if EVAPORATION method wanted for HOMs
+						Psatnow = ((vapour_pressures.evaporation2(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt])))
+
+				if (self.HOMs_vp == 'MY'):
+					if (self.pars_skip != 2):
+						# if Myrdal and Yalkowsky method wanted for HOMs
 						Psatnow = ((
-						vapour_pressures.myrdal_and_yalkowsky(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt], 
-						boiling_points.nannoolal(
-						self.Pybel_objects[i]))))
+							vapour_pressures.myrdal_and_yalkowsky(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt], 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
 			
-				if (self.nonHOMs_vp == 'SIMPOL'):
-					# if SIMPOL method wanted for nonHOMs
-					Psatnow = ((vapour_pressures.simpol(
-						self.Pybel_objects[i],
-						self.TEMP[tempt_cnt])))
+				if (self.HOMs_vp == 'SIMPOL'):
+					if (self.pars_skip != 2):
+						# if SIMPOL method wanted for HOMs
+						Psatnow = ((vapour_pressures.simpol(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt])))
+					
+					
+			
+			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
+			# et al. (2008), with dB of 
+			# that equation given by eq. 7 of same reference)
+			else: # if not HOMs component
+				if (self.pars_skip != 2):
+
+					if ('Nannoolal' in self.nonHOMs_vp or 
+						'nannoolal' in self.nonHOMs_vp or
+						'NANNOOLAL' in self.nonHOMs_vp):
+						# if Nannoolal method wanted for nonHOMs
+						Psatnow = ((vapour_pressures.nannoolal(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt], 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
+			
+					if (self.nonHOMs_vp == 'EVAPORATION'):
+						# if EVAPORATION method wanted for nonHOMs
+						Psatnow = ((vapour_pressures.evaporation2(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt])))
+
+					# if Myrdal and Yalkowsky method wanted for nonHOMs
+					if (self.nonHOMs_vp == 'MY'):
+						# Myrdal and Yalkowsky method in UManSysProp
+						# cannot deal with bimolecular hydrogen as it
+						# gives a 0 mass, so assign an arbitrarilly high
+						# vapour pressure here
+						if (self.comp_namelist[i] == 'H2'):
+							Psatnow = 10. # log10(atm)
+						else:
+							Psatnow = ((
+							vapour_pressures.myrdal_and_yalkowsky(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt], 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
+			
+					if (self.nonHOMs_vp == 'SIMPOL'):
+						# if SIMPOL method wanted for nonHOMs
+						Psatnow = ((vapour_pressures.simpol(
+							self.Pybel_objects[i],
+							self.TEMP[tempt_cnt])))
 
 
-		if (self.pars_skip != 2 and self.pars_skip != 3):
+		if (self.pars_skip != 2 and self.pars_skip != 3 and self.ac_by_cs == 0):
 			try: # in case array
 				self.Psat[0, i] = Psatnow[0]
 			except: # in case float
@@ -455,10 +463,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					# note transfer to Pa is below
 					self.Psat_Pa_rec[i] = Psatnow
 			else: 
-			
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
-					298.15,  
-					boiling_points.nannoolal(self.Pybel_objects[i]))))
+				if  (self.ac_by_cs == 0):
+					Psatnow = ((vapour_pressures.nannoolal(
+						self.Pybel_objects[i], 298.15,  
+						boiling_points.nannoolal(
+						self.Pybel_objects[i]))))
 
 				try: # in case array
 					self.Psat_Pa_rec[i]  = Psatnow[0]
@@ -466,68 +475,75 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.Psat_Pa_rec[i] = Psatnow
 			
 		# if component is chlorine, then H:C is 0 and can continue
-		if (self.rel_SMILES[i] == 'ClCl'):
-			self.HC[0, i] = 0.
-			self.nom_mass[0, i] = 70.
-			continue
+		if (self.ac_by_cs == 0):
+			if (self.rel_SMILES[i] == 'ClCl'):
+				self.HC[0, i] = 0.
+				self.nom_mass[0, i] = 70.
+				continue
 		
-		# if hydrogen is present in this molecule
-		if ('H' in self.Pybel_objects[i].formula):
+			# if hydrogen is present in this molecule
+			if ('H' in self.Pybel_objects[i].formula):
 
-			Hindx_start = self.Pybel_objects[i].formula.index('H')+1
-			Hindx_end = Hindx_start
-			for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
-				try:
-					# only continue if this character is a number
-					float(Hnum_test)
-					Hindx_end += 1
-					if (Hindx_end == len(self.Pybel_objects[i].formula)):
-						Hcount = float(self.Pybel_objects[i].formula[
+				Hindx_start = self.Pybel_objects[i].formula.index('H')+1
+				Hindx_end = Hindx_start
+				for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
+					try:
+						# only continue if this character is a number
+						float(Hnum_test)
+						Hindx_end += 1
+						if (Hindx_end == len(
+							self.Pybel_objects[i].formula)):
+							Hcount = float(
+								self.Pybel_objects[i].formula[
+								Hindx_start:Hindx_end])
+					except:
+						if (Hindx_end != Hindx_start):
+							Hcount = float(
+								self.Pybel_objects[i].formula[
 							Hindx_start:Hindx_end])
-				except:
-					if (Hindx_end != Hindx_start):
-						Hcount = float(self.Pybel_objects[i].formula[
-						Hindx_start:Hindx_end])
-					else:
-						# if no number then Hydrogen must be alone
-						Hcount = 1.
-					break
+						else:
+							# if no number then Hydrogen 
+							# must be alone
+							Hcount = 1.
+						break
 
-		else: # if no hydrocarbons
-			Hcount = 0.
-			self.HC[0, i] = 0.
+			else: # if no hydrocarbons
+				Hcount = 0.
+				self.HC[0, i] = 0.
 		
-		# list hydrgogen numbers per component
-		self.Hn_list.append(Hcount)	
+			# list hydrgogen numbers per component
+			self.Hn_list.append(Hcount)	
 
-		self.nom_mass[0, i] = (Hcount*1.+self.rel_SMILES[i].count('O')*16.+
+			self.nom_mass[0, i] = (Hcount*1.+self.rel_SMILES[i].count('O')*16.+
 			self.rel_SMILES[i].count('C')*12.+self.rel_SMILES[i].count('N')*14.+
 			self.rel_SMILES[i].count('S')*32.)
 
-		# carbon and oxygen numbers in this component
-		self.Cnum[i, 0] = self.rel_SMILES[i].count('C')+self.rel_SMILES[i].count('c')
-		self.Onum[i, 0] = self.rel_SMILES[i].count('O')+self.rel_SMILES[i].count('o')
+			# carbon and oxygen numbers in this component
+			self.Cnum[i, 0] = (self.rel_SMILES[i].count('C')
+				+self.rel_SMILES[i].count('c'))
+			self.Onum[i, 0] = (self.rel_SMILES[i].count('O')
+				+self.rel_SMILES[i].count('o'))
 
-		# O:C ratio determined from SMILES string
-		if (self.Cnum[i, 0] > 0):
+			# O:C ratio determined from SMILES string
+			if (self.Cnum[i, 0] > 0):
 			 
-			self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
-			self.HC[0, i] = Hcount/self.Cnum[i, 0] 
-			# get indices of components with particular 
-			# functional groups
-			group_indices.group_indices(Hcount, 
-			self.rel_SMILES[i], i, self)
+				self.OC[0, i] = self.Onum[i, 0]/self.Cnum[i, 0] 
+				self.HC[0, i] = Hcount/self.Cnum[i, 0] 
+				# get indices of components with particular 
+				# functional groups
+				group_indices.group_indices(Hcount, 
+				self.rel_SMILES[i], i, self)
 		
-		else: # if no carbons in this component
-			self.OC[0, i] = 0.
+			else: # if no carbons in this component
+				self.OC[0, i] = 0.
 		
-	# account for any manually assigned component densities (kg/m3)
-	if (len(dens_comp) > 0  and ode_gen_flag == 0):
-		for i in range (len(dens_comp)):
-			# index of component in list of components
-			dens_indx = self.comp_namelist.index(
-			dens_comp[i])
-			self.y_dens[dens_indx] = dens[i]
+		# account for any manually assigned component densities (kg/m3)
+		if (len(dens_comp) > 0  and ode_gen_flag == 0):
+			for i in range (len(dens_comp)):
+				# index of component in list of components
+				dens_indx = self.comp_namelist.index(
+				dens_comp[i])
+				self.y_dens[dens_indx] = dens[i]
 
 	# in case not parsing
 	if (self.pars_skip != 2):
@@ -544,18 +560,20 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		# conversion
 		self.Psat[ish] = 0.
 
-	# get group indices in correct format
-	self.RO2_indices = np.asarray(self.RO2_indices, dtype=int)
-	self.HOM_RO2_indx = np.asarray(self.HOM_RO2_indx, dtype=int)
-	self.RO_indx = np.asarray(self.RO_indx, dtype=int)	
-	self.OOH = np.asarray(self.OOH, dtype=int)
-	self.HOM_OOH = np.asarray(self.HOM_OOH, dtype=int)
-	self.OH = np.asarray(self.OH, dtype=int)
-	self.HOM_OH = np.asarray(self.HOM_OH, dtype=int)
-	self.carbonyl = np.asarray(self.carbonyl, dtype=int)
-	self.HOM_carbonyl = np.asarray(self.HOM_carbonyl, dtype=int)
-	self.NO3 = np.asarray(self.NO3, dtype=int)
-	self.HOM_NO3 = np.asarray(self.HOM_NO3, dtype=int)	
+	if (self.ac_by_cs == 0):
+		# get group indices in correct format
+		self.RO2_indices = np.asarray(self.RO2_indices, dtype=int)
+		self.HOM_RO2_indx = np.asarray(self.HOM_RO2_indx, dtype=int)
+		self.RO_indx = np.asarray(self.RO_indx, dtype=int)	
+		self.OOH = np.asarray(self.OOH, dtype=int)
+		self.HOM_OOH = np.asarray(self.HOM_OOH, dtype=int)
+		self.OH = np.asarray(self.OH, dtype=int)
+		self.HOM_OH = np.asarray(self.HOM_OH, dtype=int)
+		self.carbonyl = np.asarray(self.carbonyl, dtype=int)
+		self.HOM_carbonyl = np.asarray(self.HOM_carbonyl, dtype=int)
+		self.NO3 = np.asarray(self.NO3, dtype=int)
+		self.HOM_NO3 = np.asarray(self.HOM_NO3, dtype=int)
+	
 	if (self.pars_skip != 2):
 		# in preparation for ode solver, tile over size and 
 		# wall bins if present

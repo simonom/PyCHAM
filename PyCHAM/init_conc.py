@@ -185,7 +185,12 @@ def init_conc(num_comp, init_conc, PInit,
 			# then send error message
 			except:
 				erf = 1
-				err_mess = str('Error: component called ' + str(comp_now) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				err_mess = str('Error: component called ' + str(comp_now) + 
+				', which has an initial concentration specified in ' +
+				'the model variables input file has not been found ' +
+				'in the chemical scheme.  Please check the scheme ' +
+				'and associated chemical scheme markers, which are ' +
+				'stated in the model variables input file.')
 				return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
@@ -220,9 +225,24 @@ def init_conc(num_comp, init_conc, PInit,
 	# number of recording steps
 	nrec_steps = int(math.ceil(self.tot_time/self.save_step)+1)
 	
-	for i in range(num_comp): # loop through all components to get molar mass (g/mol)
-		y_mw[i] = self.Pybel_objects[i].molwt
-		
+	if (self.ac_by_cs == 0):
+		# loop through all components to get molar mass (g/mol)
+		# from pybel objects that are from SMILES strings
+		for i in range(num_comp):
+			y_mw[i] = self.Pybel_objects[i].molwt
+	else:
+		# loop through all components to get molar mass (g/mol) from atomic
+		# composition in chemical scheme file
+		for i in range(num_comp):
+	
+			# a filler chemical component in MCM v3.3.1
+			if (self.comp_namelist[i] == 'PROD'):
+				continue
+			# get index of this component in atomic composition
+			# dictionary
+			y_mw[i] = sum(self.atom_reg_mm*np.array((
+					self.ac_dic[self.comp_namelist[i]])))
+	
 	# --------------------------------------------------------------
 	# account for water's properties
 	

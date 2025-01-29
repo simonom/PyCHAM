@@ -55,6 +55,15 @@ def group_indices(Hcount, SMILES, i, self):
 					np.array((i)).reshape(1)), axis=0)
 				self.reac_RO2_indx = self.reac_RO2_indx.astype('int')
 	
+	# check if alkoxy radical present in this component 
+	# and that component is organic
+	if ('[O]' in SMILES):
+		if ('C' in SMILES or 'c' in SMILES):
+			# if it is an alkoxy radical (rather than alkyl peroxy radical) 
+			# add its index to list
+			# ensure it's not alkyl peroxy radical
+			if ('O[O]' not in SMILES and '[O]O' not in SMILES):
+				self.RO_indx.append(i)
 
 
 	# check for peroxy radical, note that this list of peroxy radicals
