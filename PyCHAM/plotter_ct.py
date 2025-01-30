@@ -420,7 +420,7 @@ def plotter_ind(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 				continue
 
 		# interpret scheme to list equations
-		[rrc, rrc_name, self] = sch_interr.sch_interr(total_list_eqn, self)	
+		self = sch_interr.sch_interr(total_list_eqn, self)	
 	
 		# keep just the unique chemical reaction rates, as duplicates 
 		# will mean that the same group of reactions (of identical 

@@ -98,5 +98,5 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, 
 		TEMP, time, M_val, N2_val, O2_val, Jlen, NO, HO2, NO3, 
 		sumt, self)
-	
+
 	return(rrc, erf, err_mess)

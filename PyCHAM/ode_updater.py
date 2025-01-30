@@ -416,7 +416,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(dydt_rec) # import most recent version
 	
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
-		print('time through ode_updater: ', sumt)
+		
 		# remembering variables at the start of the 
 		# integration step -----------------------------------
 		# remember initial concentrations (# molecules/cm3 (air))

@@ -63,7 +63,8 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	cwd = os.getcwd() # address of current working directory
 	
 	# if using MCM chemical scheme and natural light
-	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') and self.af_path == 'no'):
+	if (self.photo_path == str(cwd + '/PyCHAM/photofiles/MCMv3.2') 
+		and self.af_path == 'no'):
 	
 		# get solar zenith angle following the equations of 
 		# Chapter 1 ("The Atmosphere and UV-B Radiation at 
@@ -142,8 +143,18 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 		# transmittance factor is assumed to be 0.
 		# The resulting ratio for every J 
 		# is: 
-		Hayman_wd_tf_clear_glass = [0, 0.173121721, 0.707269159, 0.826452633, 0.870432426, 0.838243408, 0.892998655, 0.858393338, 0.620252851, 0, 0, 0.442839373, 0.598900199, 0.258290129, 0.232623684, 0.446158007, 0.446158007, 0.416693792, 0.795799329, 0.795799329, 0.795799329, 0.170721083, 0.287727411, 0.559692167, 0.559692166, 0, 0, 0, 0, 0, 0, 0.413105058, 0.544067465, 0.773449079, 0.74310927, 0.894902116, 0, 0, 0, 0, 0, 0.813654941, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.808833912, 0.733110394, 0.801542645, 0.741646608, 0.829273355, 0.821086824, 0, 0, 0, 0, 0]
 		if (self.tf_range == 2):
+			Hayman_wd_tf_clear_glass = [0, 0.173121721, 0.707269159, 
+			0.826452633, 0.870432426, 0.838243408, 0.892998655, 
+			0.858393338, 0.620252851, 0, 0, 0.442839373, 
+			0.598900199, 0.258290129, 0.232623684, 0.446158007, 
+			0.446158007, 0.416693792, 0.795799329, 0.795799329, 
+			0.795799329, 0.170721083, 0.287727411, 0.559692167, 
+			0.559692166, 0, 0, 0, 0, 0, 0, 0.413105058, 0.544067465, 
+			0.773449079, 0.74310927, 0.894902116, 0, 0, 0, 0, 0, 
+			0.813654941, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.808833912, 
+			0.733110394, 0.801542645, 0.741646608, 0.829273355, 
+			0.821086824, 0, 0, 0, 0, 0]
 			J = J*self.tf*Hayman_wd_tf_clear_glass
 
 	# if a file path for user-supplied absorption cross-sections
