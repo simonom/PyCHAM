@@ -127,7 +127,7 @@ def mod_var_read(self):
 		# default value for number of modes represented by 
 		# particle number concentration
 		self.pmode_cnt = 0
-
+		
 		# loop through supplied model variables to interpret
 		for i in range(len(in_list)):
 			
@@ -1146,26 +1146,32 @@ def mod_var_read(self):
 			
 			# dilution factor rate
 			if key == 'dil_fac' and (value.strip()):
-				self.dil_fac = np.array(([float(i) for i in (((value.strip()).split(',')))]))
+				self.dil_fac = np.array(([float(i) for i in 
+				(((value.strip()).split(',')))]))
 			
 			# dilution factor rate times through experiment (s)
 			if key == 'dil_fact' and (value.strip()):
-				self.dil_fact = np.array(([float(i) for i in (((value.strip()).split(',')))]))
-				
-			if key == 'ser_H2O' and (value.strip()): # whether to serialise water gas-particle partitioning
+				self.dil_fact = np.array(([float(i) for i in 
+				(((value.strip()).split(',')))]))
+			
+			# whether to serialise water gas-particle partitioning
+			if key == 'ser_H2O' and (value.strip()):
 				ser_H2O = int(value)
-				
-			if (key == 'H2O_hist' and (value.strip())): # history of particle-phase with respect to particle-phase water
+			
+			# history of particle-phase with respect to particle-phase water
+			if (key == 'H2O_hist' and (value.strip())):
 				try:
 					wat_hist = int(value)
 				except:
 					wat_hist = -1 # will cause error message
-			if (key == 'drh_ft' and (value.strip())): # deliquescence RH dependence on temperature
+			# deliquescence RH dependence on temperature
+			if (key == 'drh_ft' and (value.strip())):
 				try:
 					drh_str = str(value)
 				except:
 					drh_str = -1 # will cause error message
-			if (key == 'erh_ft' and (value.strip())): # efflorescence RH dependence on temperature
+			# efflorescence RH dependence on temperature
+			if (key == 'erh_ft' and (value.strip())):
 				try:
 					erh_str = str(value)
 				except:
@@ -1175,6 +1181,16 @@ def mod_var_read(self):
 			# chemical scheme
 			if (key == 'remove_influx_not_in_scheme' and (value.strip())):
 				self.remove_influx_not_in_scheme = int(value)
+
+			# name of component who's abundance needs to be nudged to give
+			# the prescribed RO2 pool abundance, followed by the prescribed
+			# RO2 abundance (molecules/cm3)
+			if (key == 'comp_nudge_RO2' and (value.strip())):
+				self.comp_nudge_RO2 = [str(i).strip() for i in
+ 					(value.split(','))][0]
+				self.RO2_nudge_target = float([str(i).strip() for i in
+ 					(value.split(','))][1])
+			
 		
 		
 		

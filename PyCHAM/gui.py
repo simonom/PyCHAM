@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -38,6 +38,8 @@ import numpy as np
 import re
 import vol_contr_analys
 import importlib
+import mod_var_read
+import time
 		
 class PyCHAM(QWidget):
 	
@@ -2084,7 +2086,7 @@ class PyCHAM(QWidget):
 		self.EXPlayout = QGridLayout() 
 		EXPTab.setLayout(self.EXPlayout)
 
-		# select observations file --------------------------------------------------------------
+		# select observations file --------------------------------------
 		b500 = QPushButton('Output', self)
 		b500.setToolTip('Estimates the outputs typically useful for experiment preparation and save in excel file inside same folder as selected results stored in')
 		b500.clicked.connect(self.on_click500)
@@ -2213,7 +2215,6 @@ class PyCHAM(QWidget):
 		# chemical 
 		# scheme files specified in the model variables overide
 		# any found by automatic search
-		import mod_var_read
 		mod_var_read.mod_var_read(self)
 		
 		# end this function if an error thrown by reading of 
@@ -2367,7 +2368,7 @@ class PyCHAM(QWidget):
 				return(err_mess)
 			
 			# --------------------------------------------
-		
+			
 			# reset to default variables to allow any new 
 			# variables to arise
 			# from the current model variables file only
@@ -2387,6 +2388,7 @@ class PyCHAM(QWidget):
 			
 			# get text from batch list label
 			btch_list = self.btch_str
+			
 			if ((sim_num+1) < (self.btch_no-1)): # if prior to final item in list
 				# get location of text relevant to this simulation
 				txt_st = (btch_list.find(str(str(sim_num+1) + '.' + 
@@ -2401,7 +2403,7 @@ class PyCHAM(QWidget):
 					
 			# split into separate file paths
 			txtn = txtn.split('\n')
-				
+			
 			# update file names
 			self.sch_name = txtn[0]
 			self.xml_name = txtn[1]
@@ -2462,10 +2464,14 @@ class PyCHAM(QWidget):
 			# display the progress label, including the name of the saving path
 			if (self.btch_no == 1): # single run mode
 				self.l81b.setText('')
-				self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
+				self.l81b.setText(str('Progress through simulation '+
+				'that will save to: \n' + str(output_by_sim) + '\n' + 
+				str(sim_num+1) + ' of ' + str(self.btch_no)))
 			if (self.btch_no > 1): # batch run mode
 				self.l81b.setText('')
-				self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
+				self.l81b.setText(str('Progress through simulation '+
+				'that will save to: \n' + str(output_by_sim) + '\n' + 
+				str(sim_num+1) + ' of ' + str(self.btch_no-1)))
 			
 			# if showing, disable then remove start simulation button
 			if (self.fab == 1):
@@ -2514,12 +2520,20 @@ class PyCHAM(QWidget):
 			if (err_mess != ''): # state error message if any generated
 				self.l81b.setText('') # remove old progress message
 				if (self.btch_no > 1): # in batch mode
-					self.l81b.setText(str('See error message below generated during simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1) + '\n' + err_mess))
+					self.l81b.setText(str('See error message '+
+					'below generated during simulation saving '+
+					'to: \n' + str(output_by_sim) + '\n' + 
+					str(sim_num+1) + ' of ' + str(self.btch_no-1) + 
+					'\n' + err_mess))
 				if (self.btch_no == 1): # in single simulation mode
-					self.l81b.setText(str('See error message below generated during simulation saving to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(1) + '\n' + err_mess))
+					self.l81b.setText(str('See error message below '+
+					'generated during simulation saving to: \n' +
+					str(output_by_sim) + '\n' + str(sim_num+1) + 
+					' of ' + str(1) + '\n' + err_mess))
 				self.l81b.setStyleSheet(0., '2px dashed red', 0., 0.)
 				self.output_list = [] # reset list of output paths
-				self.btch_no = 1 # reset to single simulation run mode (rather than batch) 
+				# reset to single simulation run mode (rather than batch)
+				self.btch_no = 1
 				return(err_mess)
 		
 		# if no error message then return with no error message
@@ -2529,8 +2543,9 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	# start the simulation
 	def act_81(self, output_by_sim, sim_num):
-		
-		from middle import middle # prepare to communicate with main program
+
+		# prepare to communicate with main program
+		from middle import middle
 		
 		note_messf = 0 # cancel note message flag
 		
@@ -2561,14 +2576,21 @@ class PyCHAM(QWidget):
 				
 					if (self.btch_no == 1): # single run mode
 						self.l81b.setText('')
-						self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no)))
+						self.l81b.setText(str('Progress through '+
+						'simulation that will save to: \n' +
+						str(output_by_sim) + '\n' + str(sim_num+1) + 
+						' of ' + str(self.btch_no)))
 					if (self.btch_no > 1): # batch run mode
 						self.l81b.setText('')
-						self.l81b.setText(str('Progress through simulation that will save to: \n' + str(output_by_sim) + '\n' + str(sim_num+1) + ' of ' + str(self.btch_no-1)))
+						self.l81b.setText(str('Progress through ' +
+						'simulation that will save to: \n' +
+						str(output_by_sim) + '\n' + str(sim_num+1) +
+						' of ' + str(self.btch_no-1)))
 			
 				self.progress.setValue(int(prog)) # get progress
-				
-			QApplication.processEvents() # allow progress bar/message panel to update
+			
+			# allow progress bar/message panel to update
+			QApplication.processEvents()
 		
 
 		# remove the progress bar after each simulation
@@ -2589,14 +2611,18 @@ class PyCHAM(QWidget):
 	@pyqtSlot()
 	def on_click81sing(self): # when single simulation button pressed
 		
-		# note it can be useful to process events now, in case PyCHAM working in automatic mode
+		# note it can be useful to process events now, in 
+		# case PyCHAM working in automatic mode
 		QApplication.processEvents() # allow progress bar/message panel to update
 
 		cs_file = self.l3.text()
 		xml_file = self.l5.text()
 		mv_file = self.l7.text()
-		self.btch_no = 1 # ensure just one simulation when single simulation button pressed
-		self.btch_str = (str(str(self.btch_no)+'.\n' + cs_file + '\n' + xml_file + '\n' + mv_file + '\n'))
+		
+		# ensure just one simulation when single simulation button pressed
+		self.btch_no = 1
+		self.btch_str = (str(str(self.btch_no)+'.\n' + cs_file + 
+			'\n' + xml_file + '\n' + mv_file + '\n'))
 		
 		# if called from autorun function and if later simulations 
 		# being conducted (i.e. not the first)  
@@ -2624,7 +2650,7 @@ class PyCHAM(QWidget):
 			self.ssb = 0 # remember this button removed
 		
 		self.l81b.setText('') # clear progress message
-			
+		
 		# action to simulate a single simulation
 		err_mess = self.on_click81b()
 			
@@ -2633,7 +2659,8 @@ class PyCHAM(QWidget):
 		self.output_list = [] # reset list of output paths
 		# return to single simulation mode
 		self.btch_no = 1
-		self.btch_str = 'File combinations included in batch: chemical scheme, xml, model variables\n'
+		self.btch_str = str('File combinations included in batch: ' +
+			'chemical scheme, xml, model variables\n')
 		
 		# show checking inputs buttons
 		self.b80.show()
@@ -2696,7 +2723,8 @@ class PyCHAM(QWidget):
 		xml_file = self.l5.text()
 		mv_file = self.l7.text()
 		
-		self.btch_str = (str(self.btch_str + str(self.btch_no)+'.\n' + cs_file + '\n' + xml_file + '\n' + mv_file + '\n'))
+		self.btch_str = (str(self.btch_str + str(self.btch_no)+'.\n' 
+		+ cs_file + '\n' + xml_file + '\n' + mv_file + '\n'))
 		self.l81b.setText(self.btch_str)
 		
 		self.btch_no += 1 # increase number in batch
@@ -4970,567 +4998,74 @@ class PyCHAM(QWidget):
 		# note that default model variables are already set 
 		# before autorun function called
 
-		# choose variable values
-		param_range = self.param_const['param_ranges']		
+		# get the string for checking on change in chemistry
+		wo_str = self.param_const['wo_str']
 
-		# filler for original starter simulation name
-		starter_name0 = 'fill'
-		
-		if ((self.param_const['sim_num'] == 'set') and 
-		(self.param_const['sim_type'] == 'finisher')):
-	
-			# tells mod_var_read that model variables not contained in a file
-			self.inname = 'Not found'
-		
-			# loop through starter simulations
-			for starteri in range(len(param_range['starter_paths'])):
+		ri = 0 # count on simulations
 
-				# get file name of starter	
-				starter_name = param_range['starter_paths'][starteri]
-
-				# set initial concentrations (ppb)
-				# note that param_range['ys'] set in automated_setup_and_call.py
-				# set starting concentration of components now (# molecules/cm3)
-				self.param_const['ynow'] = param_range['ys'][starteri]
-
-				# set temperature (K)
-				self.param_const['temperature'] = param_range['temps'][starteri]
-				# set relative humidity (0-1)
-				self.param_const['rh'] = param_range['rhs'][starteri]
-				# set pressure (Pa)
-				self.param_const['p_init'] = param_range['pressures'][starteri]
-				# set transmission factor for light (0-1)
-				self.param_const['trans_fac'] = param_range['js'][starteri]
-
-				if sys.platform == 'win32':
-					save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\'
-				if sys.platform == 'darwin':
-					save_path_start = '/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/'
-				
-				if ('loJ' in starter_name):
-					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_loJ')
-				if ('meJ' in starter_name):
-					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_meJ')
-				if ('hiJ' in starter_name):
-					self.param_const['res_file_name'] = str(save_path_start + starter_name + '_hiJ')
-		
-				if ('loT' in starter_name):
-					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loT')
-					if ('loT' not in starter_name0):
-						# if temperature changes, need to renew property estimation 
-						self.param_const['pars_skip'] = 0
-				if ('meT' in starter_name):
-					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meT')
-					if ('meT' not in starter_name0):
-						# if temperature changes, need to renew property estimation 
-						self.param_const['pars_skip'] = 0
-				if ('hiT' in starter_name):
-					self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiT')
-					if ('hiT' not in starter_name0):
-						# if temperature changes, need to renew property estimation 
-						self.param_const['pars_skip'] = 0
-
-				# remember original starter simulation name
-				starter_name0 = starter_name
-
-				# remember original starting string in results save name
-				res_file_name0 = self.param_const['res_file_name']
-
-				# get names of influxing components in a useful list form (from string)
-				const_influxers = self.param_const['const_infl'].split(',')
-
-				# set influx rate for methane and carbon monoxide (ppb/s)
-				Cinfl_0 = np.zeros((len(const_influxers)))
-
-				if 'loCH4' in starter_name:
-					# get index for methane
-					CH4indx = const_influxers.index('CH4')
-					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][0]	
-					# get index for carbon monoxide
-					COindx = const_influxers.index('CO')
-					Cinfl_0[COindx] = param_range['Cinfl'][COindx][0]
-
-				if 'meCH4' in starter_name:
-					# get index for methane
-					CH4indx = const_influxers.index('CH4')
-					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][1]	
-					# get index for carbon monoxide
-					COindx = const_influxers.index('CO')
-					Cinfl_0[COindx] = param_range['Cinfl'][COindx][1]
-
-				if 'hiCH4' in starter_name:
-					# get index for methane
-					CH4indx = const_influxers.index('CH4')
-					Cinfl_0[CH4indx] = param_range['Cinfl'][CH4indx][2]
-					# get index for carbon monoxide
-					COindx = const_influxers.index('CO')
-					Cinfl_0[COindx] = param_range['Cinfl'][COindx][2]
-		
-				# get alpha-pinene index
-				APindx = const_influxers.index('APINENE')
-
-				# get benzene, NO and NO2 indices
-				BZindx = const_influxers.index('BENZENE')
-				NOindx = const_influxers.index('NO')
-				NO2indx = const_influxers.index('NO2')
-	
-				# now loop through alpha-pinene influxes in combination with 
-				# influxes of benzene, nitrogen oxide and nitrogen dioxide
-				for iap in range(len(param_range['Cinfl'][APindx])):
-					Cinfl_0[APindx] = param_range['Cinfl'][APindx][iap]
-					if (iap == 0):
-						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loAP')
-					if (iap == 1):
-						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meAP')
-					if (iap == 2):
-						self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiAP')
-					
-					# loop through benzene influxes
-					for ibz in range(len(param_range['Cinfl'][BZindx])):
-						Cinfl_0[BZindx] = param_range['Cinfl'][BZindx][ibz]
-						Cinfl_0[NOindx] = param_range['Cinfl'][NOindx][ibz]
-						Cinfl_0[NO2indx] = param_range['Cinfl'][NO2indx][ibz]	
-						if (ibz == 0):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_loBZ')
-						if (ibz == 1):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_meBZ')
-						if (ibz == 2):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_hiBZ')	
-						# finally, either add (no interaction) or exclude (interaction) 
-						# nint label from results save name
-						if ('nint' in self.param_const['sch_name']):
-							self.param_const['res_file_name'] = str(self.param_const['res_file_name'] + '_nint')
-						
-						# ensure correct format
-						self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
-						# loop through characters, white spaces with ; (components)
-						cci = 1
-						cc_all = -1
-						for ccn in self.param_const['Cinfl']: # loop through characters
-							cc_all += 1
-							if (ccn == ' ' and cci % 2. > 0.):
-								
-								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
-								cci += 1
-								continue
-							if (ccn == ' ' and cci % 2. < 1.):
-								self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
-								cci += 1
-								continue		
-						print(self.param_const['res_file_name'])
-						print(self.param_const['Cinfl'])
-						print(self.param_const['const_infl'])
-						print(self.param_const['temperature'])									
-						print(self.param_const['rh'])
-						print(self.param_const['p_init'])
-						print(self.param_const['trans_fac'])
-
-						if os.path.exists(self.param_const['res_file_name']):
-							self.param_const['pars_skip'] = 0
-							print('already exists!, so skipping')
-							
-						else:
-							# establish parameters provided by user by calling mod_var_read
-							import mod_var_read
-							mod_var_read.mod_var_read(self)
-							
-							self.on_click2() # assign chemical scheme
-							self.on_click3() # assign xml file
-							self.on_click4() # provide model variables label
-							
-							self.on_click81sing() # run simulation
-							# ensure that after the first call parsing and property estimation is skipped 
-							self.param_const['pars_skip'] = 1
-
-						# remove benzene tag, ready for new one
-						if 'nint' in self.param_const['res_file_name']:
-							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-10]
-						else:
-							self.param_const['res_file_name'] = self.param_const['res_file_name'][0:-5]
-						
-					# reset saving name to original
-					self.param_const['res_file_name'] = res_file_name0
-		
-		if (self.param_const['sim_num'] == 'set') and (self.param_const['sim_type'] == 'starter'):
-
-			# tells mod_var_read that model variables not in a model variables file 
-			self.inname = 'Not found'
-
-			# loop through light flux
-			for Ji in range(len(param_range['trans_fac'])):
-				
-				# reset results save name
-				res_name = '' 
-				self.param_const['trans_fac'] = param_range['trans_fac'][Ji]
-
-				if (Ji == 0):
-					res_name = 'loJ' 
-				if (Ji == 1):
-					res_name = 'meJ'
-				if (Ji == 2):
-					res_name = 'hiJ' 
-
-				# prepare for starting concentrations
-				C0_0 = np.zeros((len(self.param_const['Comp0'].split(','))))
-				
-				# index for NO3 starting concentration in supplied 
-				# values (constant between scenarios)
-				#NO3i = (self.param_const['Comp0'].split(',').index('NO3'))
-				# NO3 starting concentration (ppb)
-				#C0_0[NO3i] = param_range['C0'][NO3i][0]
-
-				# index for HNO3 starting concentration in supplied 
-				# values (constant between scenarios)
-				#HNO3i = (self.param_const['Comp0'].split(',').index('HNO3'))
-				# HNO3 starting concentration (ppb)
-				#C0_0[HNO3i] = param_range['C0'][HNO3i][0]
-
-				# index for O3 starting concentration in supplied 
-				# values (constant between scenarios)
-				#O3i = (self.param_const['Comp0'].split(',').index('O3'))
-				# O3 starting concentration (ppb)
-				#C0_0[O3i] = param_range['C0'][O3i][0]
-
-				# prepare for influxes
-				Cinfl_0 = np.zeros((len(self.param_const['const_infl'].split(','))))
-				# setup constant continuous influxes 
-				# (not changing between scenarios)
-				for const_infl_i in self.param_const['Cinfl_const_indx']:
-					Cinfl_0[const_infl_i] = param_range['Cinfl'][const_infl_i][0]
-				
-				# loop through NOx emission
-				for Ni in range(len(param_range['Cinfl'][0])):
-				
-					# reset results name to just the lighting part
-					res_name = res_name[0:3]
-
-					# index for NO starting concentration in supplied values
-					NOi = self.param_const['Comp0'].split(',').index('NO')
-					# NO starting concentration (ppb)
-					C0_0[NOi] = param_range['C0'][NOi][Ni]
-
-					# index for NO influx in supplied values
-					NOi = self.param_const['const_infl'].split(',').index('NO')
-					# NO emission rate (ppb/s)
-					Cinfl_0[NOi] = param_range['Cinfl'][NOi][Ni]
-
-					# index for NO2 starting concentration in supplied values
-					NO2i = self.param_const['Comp0'].split(',').index('NO2')
-					# NO2 starting concentration (ppb)
-					C0_0[NO2i] = param_range['C0'][NO2i][Ni]
-
-					# index for NO2 in supplied values
-					NO2i = self.param_const['const_infl'].split(',').index('NO2')
-					# NO2 emission rate (ppb/s)
-					Cinfl_0[NO2i] = param_range['Cinfl'][NO2i][Ni]
-
-					# index for O3 in supplied values
-					O3i = self.param_const['const_infl'].split(',').index('O3')
-
-					if (Ni == 0):
-						res_name = str(res_name  + '_loNOx')
-						# O3 transport rate (ppb/s)
-						Cinfl_0[O3i] = param_range['Cinfl'][O3i][0]
-					if (Ni == 1):
-						res_name = str(res_name  + '_meNOx')
-						# O3 transport rate (ppb/s)
-						Cinfl_0[O3i] = param_range['Cinfl'][O3i][1]
-					if (Ni == 2):
-						res_name = str(res_name  + '_hiNOx')
-						# O3 transport rate (ppb/s)
-						Cinfl_0[O3i] = param_range['Cinfl'][O3i][2]
-
-					# loop through CH4 and CO emission
-					for Ci in range(len(param_range['Cinfl'][0])):
-						
-						# reset results name to the lighting and NOx part
-						res_name = res_name[0:9]
-						
-						# index for CH4 starting concentration in supplied values
-						CH4i = self.param_const['Comp0'].split(',').index('CH4')
-						# CH4 starting concentration (ppb)
-						C0_0[CH4i] = param_range['C0'][CH4i][Ci]
-
-						# index for CH4 in supplied values
-						CH4i = self.param_const['const_infl'].split(',').index('CH4')
-						# CH4 emission rate (ppb/s)
-						Cinfl_0[CH4i] = param_range['Cinfl'][CH4i][Ci]
-
-						# index for CO starting concentration in supplied values
-						COi = self.param_const['Comp0'].split(',').index('CO')
-						# CO starting concentration (ppb)
-						C0_0[COi] = param_range['C0'][COi][Ci]
-
-						# index for CO in supplied values
-						COi = self.param_const['const_infl'].split(',').index('CO')
-						# CO emission rate (ppb/s)
-						Cinfl_0[COi] = param_range['Cinfl'][COi][Ci]
-										
-						if (Ci == 0):
-							res_name = str(res_name  + '_loCH4') 
-						if (Ci == 1):
-							res_name = str(res_name  + '_meCH4')
-						if (Ci == 2):
-							res_name = str(res_name  + '_hiCH4')
-						
-						for ti in range(len(param_range['temperature'])):
-
-							# reset results name to the lighting, NOx and CH4 part
-							res_name = res_name[0:15]
-
-							self.param_const['temperature'] = param_range['temperature'][ti]
-							if (ti == 0):
-								res_name = str(res_name + '_loT') 
-							if (ti == 1):
-								res_name = str(res_name + '_meT')
-							if (ti == 2):
-								res_name = str(res_name + '_hiT')
-							if (sys.platform == 'win32'):
-								save_path_start = 'C:\\Users\\Psymo\\OneDrive - The University of Manchester\\PyCHAM\\outputs\\interact\\AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme\\'
-							if (sys.platform == 'darwin'):
-								save_path_start = '/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/PyCHAM/outputs/interact/AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme/'
-							# check if this result already present
-							print(str(save_path_start + res_name))
-							
-							# set results path
-							self.param_const['res_file_name'] = str(save_path_start + res_name)
-
-							if os.path.exists(self.param_const['res_file_name']):
-								print('already exists!')
-								continue
-							
-							# ensure correct format for mod_var_read
-							self.param_const['C0'] = ''
-						
-							for i in C0_0:
-								if i == '[' or i == ']':
-									continue
-								if i == ' ':
-									continue
-								self.param_const['C0'] = str(self.param_const['C0'] + str(i) + ', ')
-							if self.param_const['C0'][-2::] == ', ':
-								self.param_const['C0'] = self.param_const['C0'][0:-2] 	
-							
-							# ensure correct format
-							self.param_const['Cinfl'] = (str(Cinfl_0)).strip('[').strip(']')
-							# loop through characters, replacing odd white spaces with , 
-							# (times) and even white spaces with ; (components)
-							cci = 1
-							cc_all = -1
-							for ccn in self.param_const['Cinfl']: # loop through characters
-								cc_all += 1
-								if (ccn == ' ' and cci % 2. > 0.):
-									
-									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
-									cci += 1
-									continue
-								if (ccn == ' ' and cci % 2. < 1.):
-									self.param_const['Cinfl'] = str(self.param_const['Cinfl'][0:cc_all]+';'+self.param_const['Cinfl'][cc_all+1::])
-									cci += 1
-									continue
-							
-							# establish parameters provided by user by calling mod_var_read
-							import mod_var_read
-							mod_var_read.mod_var_read(self)
-							
-							self.on_click2() # assign chemical scheme
-							self.on_click3() # assign xml file
-							self.on_click4() # provide model variables label
-							
-							self.on_click81sing() # run simulation
-						
-							# ensure that after first simulation equation parsing is skipped
-							self.param_const['pars_skip'] = 1
-							
-		if (type(self.param_const['sim_num']) == float or 
-		type(self.param_const['sim_num']) == int and 
-		self.param_const['sim_type'] != 'standard_call'):
-	
-			# prepare for randomness
-			from numpy.random import default_rng
-			rng = default_rng()
-
-			# tells mod_var_read that model variables are 
-			# not in a model variables file 
-			self.inname = 'Not found'
-
-
-			# loop through simulations
-			for simi in range(self.param_const['sim_num']):
-				
-				# reset component concentrations
-				self.param_const['Cinfl'] = ''
-
-				# linear distribution in transmission factor of light (based on common sense, where 
-				# 0=dark and 1=midday sunshine in Meditteranean in summer) 
-				self.param_const['trans_fac'] = str('0_' + str((rng.integers(low=param_range['trans_fac'][0]*100., high=param_range['trans_fac'][1]*100., size=1))[0]/100.))
-				
-				# linear distribution in temperature (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
-				self.param_const['temperature'] = (rng.integers(low=param_range['temperature'][0], high=param_range['temperature'][1], size=1))[0]
-				# linear distribution in relative humidity (fig 11. of doi.org/10.1021/acsearthspacechem.1c00090) 
-				self.param_const['rh'] = (rng.integers(low=param_range['rh'][0]*100., high=param_range['rh'][1]*100., size=1))[0]/100.
+		# loop through simulations
+		for inname in self.param_const['mod_var_name']:
 			
-				# log-normal distribution for emission rate of gas phase: benzene, alpha-pinene, NOx, CO, SO2, CH4 (fig 10. of doi.org/10.1021/acsearthspacechem.1c00090)
-				comp_cnt = 0 # count on components
-				for compi in range(len(param_range['Cinfl'])):
+			# default variables for all required input model 
+			# variables -------------------------
+			[y0, Press, siz_stru, num_sb, 
+			lowsize, uppsize, std, 
+			Compt, injectt, Ct, seed_mw, seed_dens, 
+			dens_comp, dens, vol_comp, volP, act_comp, 
+			act_user, accom_comp, accom_val, uman_up, int_tol, 
+			new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
+			inflectk, chamSA, Rader, 
+			p_char, e_field, ser_H2O, wat_hist, 
+			drh_str, erh_str, 
+			z_prt_coeff, chamV, 
+			self] = def_mod_var.def_mod_var(0, self)
 
-					# create log-normal distribution for concentration range of this component
-					minCi = param_range['Cinfl'][compi][0] # minimum concentration (ppb)
-					maxCi = param_range['Cinfl'][compi][1] # maximum concentration (ppb)
-
-					# linear distribution along log10 of range extremes
-					lin_dis = np.linspace(np.log10(minCi), np.log10(maxCi), num=100)
-
-					# randomly select concentration and raise to power 10
-					conc_rand = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
-
-					if (comp_cnt == 0):
-						self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + str(conc_rand))
-					else:
-						self.param_const['Cinfl'] = str(self.param_const['Cinfl'] + ', ' + str(conc_rand))
+			# store model variable name
+			self.inname = inname
 			
-					comp_cnt += 1 # count on components
-				
-				new_Cinfl = ''
-				# now ensure continuous influx of components ends after 1 hour
-				for ci in self.param_const['Cinfl'].split(','):
+			# get index of final /
+			file_name_indx = -1*self.inname[::-1].index('/')
+			# get just file name
+			file_name = self.inname[file_name_indx::]
 
-					new_Cinfl = str(new_Cinfl + str(ci) + ', 0. ;')
-				# remove final ;			
-				self.param_const['Cinfl'] = new_Cinfl[0:-1]	
-
-				
-				# log-normal distribution of seed particle concentration
-				# create log-normal distribution for concentration range of this component
-				minC = param_range['pconc'][0] # minimum concentration (# particles/cm3)
-				maxC = param_range['pconc'][1] # maximum concentration (# particles/cm3)
-
-				# linear distribution along log10 of range extremes
-				lin_dis = np.linspace(np.log10(minC), np.log10(maxC), num=100)
-
-				# randomly select total particle concentration influx rate and raise to power 10
-				ptotal = 10**(lin_dis[(rng.integers(0, 99, size=1))[0]])
-
-				# randomly select numbers between 0-1 to represent fraction in each size bin
-				p0rnd = (rng.integers(0, 99, size=1))[0]
-				p1rnd = (rng.integers(0, 99, size=1))[0]
-				p2rnd = (rng.integers(0, 99, size=1))[0]
-				ptotrnd = p0rnd+p1rnd+p2rnd
-				self.param_const['pconc'] = str(str((p0rnd/ptotrnd)*ptotal) + ',' + str((p1rnd/ptotrnd)*ptotal) + ',' + str((p2rnd/ptotrnd)*ptotal) + '; 0,0,0')
-				
-				if (self.param_const['sim_type'] == 'finisher'):
-					#import ast # for converting imported strings to list
-
-					param_range['starter_paths'] = [] # prepare to list starter folders
-					starter_names = [] # just the folder name
-
-					# loop through starter simulations
-					for starteri in range(len(param_range['starter_paths'])):
-
-						self.param_const['res_file_name'] = str(starter_names[starteri] + '_' + str(simi))
-						
-						# withdraw concentrations (ppb in gas, # molecules/cm3 in particle and wall)
-						#fname = str(param_range['starter_paths'][starteri] + '/concentrations_all_components_all_times_gas_particle_wall')
-						#ystarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
-
-						#fname = str(param_range['starter_paths'][starteri] + '/model_and_component_constants')
-						#const_in = open(fname)
-						#for line in const_in.readlines():
-
-							#if str(line.split(',')[0]) == 'factor_for_multiplying_ppb_to_get_molec/cm3_with_time':
-
-								# find index of first [ and index of last ]
-								#icnt = 0 # count on characters
-								#for i in line:
-								#	if i == '[':
-								#		st_indx = icnt
-								#		break
-								#	icnt += 1 # count on characters
-								#for cnt in range(10):
-								#	if line[-cnt] == ']':
-								#		fi_indx = -cnt+1
-								#		break
-
-								# conversion factor to change gas-phase concentrations from # molecules/cm3 
-								# (air) into ppb
-								#Cfactor = (ast.literal_eval(line[st_indx:fi_indx]))[-1]
-						
-							#for i in line.split(',')[1::]:
-							#	if str(line.split(',')[0]) == 'number_of_components':
-							#		num_comp = int(i)
-
-						# convert ppb to # molecules/cm3
-						#ystarter[0:num_comp] = ystarter[0:num_comp]*Cfactor
-						
-						# note that param_range['ys'] set in automated_setup_and_call.py
-						# set starting concentration of components now (# molecules/cm3)
-						self.param_const['ynow'] = param_range['ys'][starteri]
-
-						# withdraw number-size distributions (# particles/cm3 (air))
-						#fname = str(param_range['starter_paths'][starteri] +  '/particle_number_concentration_wet')
-						#Nstarter = (np.loadtxt(fname, delimiter=',', skiprows=1))[-1, :]
-
-						# note that param_range['Ns'] set in automated_setup_and_call.py
-						# set starting concentration of particles now (# particles/cm3)
-						self.param_const['Nnow'] = param_range['Ns'][starteri]
-
-						# establish parameters provided by user by calling mod_var_read
-						import mod_var_read
-						mod_var_read.mod_var_read(self)
-				
-						self.on_click2() # assign chemical scheme
-						self.on_click3() # assign xml file
-						self.on_click4() # provide model variables label
-				
-						self.on_click81sing() # run simulation
-
-			if (self.param_const['sim_type'] == 'starter'):
-
-				# tells mod_var_read that model variables are 
-				# not in a model variables file
-				self.inname = 'Not found'
-
-				# establish parameters provided by user by calling mod_var_read
-				import mod_var_read
-				mod_var_read.mod_var_read(self)
-			
-				param_const['sch_name']
-				param_const['xml_name']
-
-				self.on_click2() # assign chemical scheme
-				self.on_click3() # assign xml file
-				self.on_click4() # provide model variables label
-			
-				self.on_click81sing() # run simulation
-
-		if (self.param_const['sim_type'] == 'standard_call'):
-
-			self.inname = self.param_const['mod_var_name']
 			# establish parameters provided by user by calling mod_var_read
-			import mod_var_read
 			mod_var_read.mod_var_read(self)
+
+			# set labels for chemical scheme file, xml file 
+			# and model variable file
+			self.l3.setText(self.sch_name)
+			self.l5.setText(self.xml_name)
+			self.l7.setText(self.inname)
+
+			self.btch_str = (str(str(1.)+'.\n' + self.sch_name + 
+			'\n' + self.xml_name + '\n' + self.inname + '\n'))
 			
-			# in case chemical scheme and xml 
-			# file names contained in model variables file
-			try:
-				self.param_const['sch_name'] = self.sch_name
-				self.param_const['xml_name'] = self.xml_name
-			# in case chemical scheme and xml file names contained
-			# in provided self.param_const variable
-			except:
-				self.sch_name = self.param_const['sch_name']
-				self.xml_name = self.param_const['xml_name']
-				self.inname = self.param_const['mod_var_name']
-	
-			self.on_click2() # assign chemical scheme
-			self.on_click3() # assign xml file
-			self.on_click4() # provide model variables label
+			# if past the first simulation
+			if (inname != self.param_const['mod_var_name'][0]):
+				
+				# check whether chemistry has changed and therefore
+				# can't skip parsing the reactions
+				if (wo_str in sim_name0 and 
+					wo_str not in file_name):
+					print('new chemistry')
+					self.pars_skip = 0
+				if (wo_str not in sim_name0 
+					and wo_str in file_name):
+					print('new chemistry')
+					self.pars_skip = 0
 			
+
+			# run simulation
 			self.on_click81sing() # run simulation
+			print('completed ', file_name, ri)
+			# remember this name
+			sim_name0 = file_name
+			# pause
+			time.sleep(0.5)
+			ri += 1 # count on simulations
 
-		QWidget.close(self) # quit and close gui window
 
-		return()
+		return() # end of autorun function
 
 # class for scrollable label 
 class ScrollLabel(QScrollArea): 

@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -27,19 +27,25 @@ def eqn_pars_skipper(self): # define function
 	import numpy as np # matrix functions
 	import scipy.constants as si
 	from water_calc import water_calc
+	from constant_conc_setup import constant_conc_setup
+
 	# imports: ---------------------------------
 	# self - reference to PyCHAM class
 	# ------------------------------------------
+
+	# starting error flag and message (assumes no errors)
+	erf = 0
+	err_mess = ''
+
 	# if observation file provided for constraint
 	if hasattr(self, 'obs_file') and self.obs_file != []:
-
 		from obs_file_open import obs_file_open
 		self = obs_file_open(self)
 
 	# get index of components with continuous influx/concentration -----------
 	# empty array for storing index of components with continuous influx
 	self.con_infl_indx = np.zeros((len(self.con_infl_nam)))
-	self.con_C_indx = np.zeros((len(self.const_comp))).astype('int')
+	
 	delete_row_list = [] # prepare for removing rows of unrecognised components
 
 	icon = 0 # count on constant influxes
@@ -90,7 +96,11 @@ def eqn_pars_skipper(self): # define function
 			except:
 				erf = 1 # raise error
 
-				err_mess = str('Error: continuous influx component with name ' +str(self.con_infl_nam[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+				err_mess = str('Error: continuous influx ' +
+				'component with name ' + str(self.con_infl_nam[i]) + 
+				' has not been identified in the chemical ' +
+				'scheme, please check it is present and the ' +
+				'chemical scheme markers are correct')
 	
 		icon += 1 # count on continuous influxes
 
@@ -124,20 +134,8 @@ def eqn_pars_skipper(self): # define function
 	else:
 		self.H2Oin = 0 # flag for no water influx
 
-	# components with constant concentration
-	for i in range (len(self.const_comp)):
-		try:
-			# index of where constant concentration components occur in list 
-			# of components
-			self.con_C_indx[i] = self.comp_namelist.index(self.const_comp[i])
-		except:
-			# if water then we know it will be the next component to 
-			# be appended to the component list
-			if (self.const_comp[i] == 'H2O'):
-				self.con_C_indx[i] = len(self.comp_namelist)
-			else: # if not water
-				erf = 1 # raise error
-				err_mess = str('Error: constant concentration component with name ' + str(self.const_comp[i]) + ' has not been identified in the chemical scheme, please check it is present and the chemical scheme markers are correct')
+	# set up constant concentration arrays	
+	[erf, err_mess, self] = constant_conc_setup(erf, err_mess, self)
 
 	# use eqn_pars output from previous simulation
 	rowvals = self.rowvals; colptrs = self.colptrs 
@@ -149,12 +147,13 @@ def eqn_pars_skipper(self): # define function
 	self.Psat = self.Psat_rec0
 
 	# get saturation vapour pressure of water (log10(atm))
-	[_, Psat_water, _] = water_calc(self.TEMP[0], self.RH[0], si.N_A)	
+	[_, _, self] = water_calc(self.TEMP[0], self.RH[0], si.N_A, self)	
 
 	# convert to Pa
-	Psat_water = (10**Psat_water)*101325.
+	Psat_water = (10**self.Psat_water)*101325.
 	# convert to # molecules/cm3
-	self.Psat[0, self.comp_namelist.index('H2O')] = Psat_water*(si.N_A/((si.R*1.e6)*self.TEMP[0]))
+	self.Psat[0, self.comp_namelist.index('H2O')] = Psat_water*(
+		si.N_A/((si.R*1.e6)*self.TEMP[0]))
 
 	return(rowvals, colptrs, comp_num, 
 		Jlen, erf, err_mess)

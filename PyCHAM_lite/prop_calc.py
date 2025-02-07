@@ -409,15 +409,18 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 					self.Psat_Pa_rec[i] = Psatnow
 			else: 
 			
-				Psatnow = ((vapour_pressures.nannoolal(self.Pybel_objects[i], 
-					298.15,  boiling_points.nannoolal(self.Pybel_objects[i]))))
+				Psatnow = ((vapour_pressures.nannoolal(
+					self.Pybel_objects[i], 
+					298.15,  boiling_points.nannoolal(
+					self.Pybel_objects[i]))))
 				#Psatnow = ((vapour_pressures.evaporation(self.Pybel_objects[i], 
 				#	self.TEMP[tempt_cnt])))	
 				#Psatnow += 2
 				# in case you want to ensure small molecules don't contribute to 
 				# particle mass
 				#if self.rel_SMILES[i].count('C')<=5:
-				#	Psatnow += 10 # ensure no condensation of small molecules
+				## ensure no condensation of small molecules
+				#	Psatnow += 10
 
 				try: # in case array
 					self.Psat_Pa_rec[i]  = Psatnow[0]
@@ -437,15 +440,19 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			Hindx_end = Hindx_start
 			for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
 				try:
-					float(Hnum_test) # only continue if this character is a number
+					# only continue if this character is a number
+					float(Hnum_test)
 					Hindx_end += 1
 					if (Hindx_end == len(self.Pybel_objects[i].formula)):
-						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
+						Hcount = float(self.Pybel_objects[
+						i].formula[Hindx_start:Hindx_end])
 				except:
 					if (Hindx_end != Hindx_start):
-						Hcount = float(self.Pybel_objects[i].formula[Hindx_start:Hindx_end])
+						Hcount = float(self.Pybel_objects[
+						i].formula[Hindx_start:Hindx_end])
 					else:
-						Hcount = 1. # if no number then Hydrogen must be alone
+						# if no number then Hydrogen must be alone
+						Hcount = 1.
 					break
 
 		else: # if no hydrocarbons

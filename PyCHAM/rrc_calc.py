@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -34,7 +34,6 @@ except:
 	import os
 	if os.path.exists('rate_coeffs'): # remove any bad functions
 		os.remove(rate_coeffs)
-
 
 
 def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
@@ -78,6 +77,18 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 		RO2 = 0
 	else:
 		RO2 = np.sum(y[self.reac_RO2_indx])
+
+	# check whether a component needs abundance nudging
+	# to give a required RO2 abundance
+	if (self.comp_nudge_RO2 != '' and self.RO2_nudge_target != -1):
+		# get factor away from target RO2 abundance
+		RO2_fac = self.RO2_nudge_target/RO2
+
+		if (RO2_fac > 1.e6): # reasonable limits
+			RO2_fac = 1.1
+		y[self.comp_namelist.index(
+			self.comp_nudge_RO2)] = y[
+			self.comp_namelist.index(self.comp_nudge_RO2)]*RO2_fac
 		
 	# calculate concentrations of third body (M), nitrogen and 
 	# oxygen
@@ -99,4 +110,4 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 		TEMP, time, M_val, N2_val, O2_val, Jlen, NO, HO2, NO3, 
 		sumt, self)
 
-	return(rrc, erf, err_mess)
+	return(rrc, erf, y, err_mess)

@@ -409,6 +409,10 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# a vector rather than matrix, since y0 is a vector\n')
 	f.write('		dd = dd.flatten()\n')
 	f.write('		nzindx = dd != 0.\n')
+	f.write('		# zero rates of change for components\n')	
+	f.write('		# with constant gas-phase concentration\n')
+	f.write('		for rowi in self.conCindxn:\n')
+	f.write('			dd[rowi] = 0.\n')
 	f.write('		return (dd)\n')
 	f.write('\n')
 	
@@ -560,7 +564,11 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	#ordinary differential equation is expressed
 	#if (len(self.con_infl_indx) > 0.): # include continuous influx of gases
 		#f.write('		Cinfl_gr_zero = Cinfl_now[:, 0] > 0. # influxes over zero\n')
-		#f.write('		data[self.jac_cont_infl_indx][Cinfl_gr_zero] += Cinfl_now[Cinfl_gr_zero, 0]/(y[self.con_infl_indx, 0][Cinfl_gr_zero])\n')	
+		#f.write('		data[self.jac_cont_infl_indx][Cinfl_gr_zero] += Cinfl_now[Cinfl_gr_zero, 0]/(y[self.con_infl_indx, 0][Cinfl_gr_zero])\n')
+	f.write('		# zero partial derivative rates of change for components\n')	
+	f.write('		# with constant gas-phase concentration\n')
+	f.write('		for rowi in self.conCindxn:\n')
+	f.write('			data[rowvals == rowi] = 0.\n')
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')
 	f.write('		\n')

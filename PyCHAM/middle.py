@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -68,9 +68,9 @@ def middle(self): # define function
 			(num_sb+self.wall_on), 
 			drh_str, erh_str, self)
 	
-
+	
 	# if skipping parsing of chemical scheme
-	if (self.pars_skip == 1):
+	if (self.pars_skip == 1 or self.pars_skip == 3):
 		[rowvals, colptrs, comp_num, Jlen, 
 		erf, err_mess] = eqn_pars_skipper.eqn_pars_skipper(self)
 
@@ -87,8 +87,7 @@ def middle(self): # define function
 	
 	# set initial concentrations (# molecules/cm3)
 	[y, H2Oi, y_mw, num_comp, Cfactor, indx_plot, corei, 
-	inj_indx, Psat_water, 
-	nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, y0,
+	inj_indx, nuci, nrec_steps, erf, err_mess, NOi, HO2i, NO3i, y0,
 	self] = init_conc.init_conc(comp_num, 
 	y0, Pnow, 0, self.eqn_num[0], Compt,
 	seed_mw, self)
@@ -101,11 +100,10 @@ def middle(self): # define function
 	tempt_cnt = 0 # count on chamber temperatures
 	
 	# if not skipping component properties
-	if (self.pars_skip == 0 or self.pars_skip == 2): 
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3): 
 		# get component properties
 		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
-			num_comp, Psat_water, vol_comp, volP, 0, 
-			corei,
+			num_comp, vol_comp, volP, 0, corei,
 			uman_up, seed_dens, 0, nuci, dens_comp, dens,
 			y_mw, tempt_cnt, self)
 	
@@ -159,7 +157,6 @@ def middle(self): # define function
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
 		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self,
 		vol_comp, volP)
-
 
 	# solve problem
 	for prog in ode_updater.ode_updater(y, H2Oi, 

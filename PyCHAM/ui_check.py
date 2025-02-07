@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -177,7 +177,7 @@ def ui_check(self):
 				'corresponding drop-down selection')
 	# --------------------------------------------------------------
 	# check on skipping parsing
-	if (self.pars_skip == 1):
+	if (self.pars_skip == 1 or self.pars_skip == 3):
 		
 		try:
 			rowvals = self.rowvals
@@ -556,7 +556,8 @@ def ui_check(self):
 	
 	# chemical scheme check-------------------------------------
 	# if a chemical scheme has been identified
-	if (em_flag < 2 and self.sch_name != 'Not found' and self.ac_by_cs == 0):
+	if (em_flag < 2 and self.sch_name != 'Not found' and 
+		self.ac_by_cs == 0 and self.pars_skip != 3):
 	
 		# get chemical scheme names and SMILE strings 
 		# of components present in chemical scheme file

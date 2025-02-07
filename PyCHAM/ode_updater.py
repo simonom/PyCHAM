@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -50,7 +50,7 @@ import time
 import act_coeff_update
 # providing error message if ODE solver produces 
 # negative results below minimum integration time
-import ode_brk_err_mess
+from ode_brk_err_mess import ode_brk_err_mess
 
 
 def ode_updater(y, H2Oi, 
@@ -551,7 +551,7 @@ def ode_updater(y, H2Oi,
 			
 			# reaction rate coefficient going into this 
 			# time step
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(
+			[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(
 				y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
 				sumt, self)
@@ -604,8 +604,8 @@ def ode_updater(y, H2Oi,
 			
 			# if water gas-particle partitioning serialised
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
-				 and (sum(N_perbin) > 0)): 
-				
+				 and (sum(N_perbin) > 0)):
+
 				# if on the deliquescence curve rather 								# than the 
 				# efflorescence curve in terms of water 							# gas-particle partitioning and therefore
 				# water able to gas-particle partition
@@ -665,7 +665,7 @@ def ode_updater(y, H2Oi,
 							# unreasonably low and solver still 
 							#unstable then break
 							if (tnew < 1.e-20):
-								ode_brk_err_mess.ode_brk_err_mess(
+								ode_brk_err_mess(
 							y0, neg_names, rrc, num_comp, 
 							(num_sb-self.wall_on), act_coeff, 
 							neg_comp_indx, N_perbin, 
@@ -713,6 +713,13 @@ def ode_updater(y, H2Oi,
 				# solved separately
 				self.odsw_flag = 0
 
+			# get indices of any components with constant concentration
+			# now
+			if (self.con_C_indx.shape[0]>0):
+				const_comp_tindx = sum(self.const_compt<=sumt)-1
+				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
+				self.conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
+
 			# model component concentration changes to 
 			# get new concentrations molecules/cm3 (air))
 			try:
@@ -727,14 +734,14 @@ def ode_updater(y, H2Oi,
 				
 			except:
 				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
-			# if any components set to have constant 
-			# gas-phase concentration
-			# get index of time for constant components
-			if (self.con_C_indx.shape[0]>0):
-				const_comp_tindx = sum(self.const_compt<=sumt)-1
-				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
-				conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
-				y[conCindxn] = y0[conCindxn] # (# molecules/cm3)
+			## if any components set to have constant 
+			## gas-phase concentration
+			## get index of time for constant components
+			#if (self.con_C_indx.shape[0]>0):
+				#const_comp_tindx = sum(self.const_compt<=sumt)-1
+				#conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
+				#conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
+				#y[conCindxn] = y0[conCindxn] # (# molecules/cm3)
 				
 			# if negative, suggests ODE solver instability, 
 			# but could also be numerical 
@@ -772,7 +779,7 @@ def ode_updater(y, H2Oi,
 					# estimate gas-phase reaction fluxes 
 					# for all reactions and partitioning 
 					# fluxes for troublesome components
-					ode_brk_err_mess.ode_brk_err_mess(y0, neg_names, rrc, 
+					ode_brk_err_mess(y0, neg_names, rrc, 
 						num_comp, (num_sb-self.wall_on), act_coeff, 
 						neg_comp_indx, N_perbin, kelv_fac, 
 						kimt, 1, H2Oi, y, self)

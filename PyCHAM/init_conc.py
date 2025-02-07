@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -156,7 +156,14 @@ def init_conc(num_comp, init_conc, PInit,
 			# then send error message
 			except:
 				erf = 1
-				err_mess = str('Error: component called ' + str(self.comp0[i]) + ', which has an initial concentration specified in the model variables input file has not been found in the chemical scheme.  Please check the scheme and associated chemical scheme markers, which are stated in the model variables input file.')
+				err_mess = str('Error: component called ' + 
+				str(self.comp0[i]) + ', which has an initial ' +
+				'concentration specified in the model ' +
+				'variables input file has not been found in ' +
+				'the chemical scheme.  Please check the ' +
+				'scheme and associated chemical scheme ' +
+				'markers, which are stated in the model ' +
+				'variables input file.')
 				return (0, 0, 0, 0, 0, 0, 0, 
 					0, 0, 0,
 					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
@@ -249,11 +256,10 @@ def init_conc(num_comp, init_conc, PInit,
 	# get initial gas-phase concentration (# molecules/cm3 (air)) 
 	# and vapour pressure
 	# of water (log10(atm))
-	[C_H2O, Psat_water, H2O_mw] = water_calc(self.TEMP[0], 
-		self.RH[0], si.N_A)
+	[C_H2O, H2O_mw, self] = water_calc(self.TEMP[0], self.RH[0], si.N_A, self)
 	
 	# if skipping parsing and property estimation
-	if (self.pars_skip == 1):
+	if (self.pars_skip == 1 or self.pars_skip == 3):
 		H2Oi = self.H2Oi # index for water
 		y_mw = self.y_mw
 		num_comp = self.num_comp
@@ -262,6 +268,7 @@ def init_conc(num_comp, init_conc, PInit,
 			y[self.H2Oi] = self.y[self.H2Oi]
 			y[self.seedi] = self.y[self.seedi]
 
+	# if not skipping parsing and property estimation
 	if (self.pars_skip == 0 or self.pars_skip == 2):
 		# holder for water index (will be used if not identified in chemical scheme)
 		H2Oi = num_comp # index for water
@@ -315,10 +322,10 @@ def init_conc(num_comp, init_conc, PInit,
 			# append water's name to component name list
 			self.comp_namelist.append('H2O')
 			# add to SMILES list
-			H2O_SMILES = 'HOH'
+			H2O_SMILES = 'O'
 			self.rel_SMILES.append(H2O_SMILES)
 			# generate pybel object
-			Pybel_object = pybel.readstring('smi', 'O')
+			Pybel_object = pybel.readstring('smi', H2O_SMILES)
 				
 			# append to Pybel object list
 			self.Pybel_objects.append(Pybel_object)
@@ -629,5 +636,5 @@ def init_conc(num_comp, init_conc, PInit,
 		y[:] = y[:]
 
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
-			inj_indx, Psat_water, nuci, nrec_steps, erf, err_mess, NOi, 
+			inj_indx, nuci, nrec_steps, erf, err_mess, NOi, 
 			HO2i, NO3i, init_conc, self)

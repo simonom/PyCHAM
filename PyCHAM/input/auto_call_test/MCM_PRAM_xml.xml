@@ -27536,631 +27536,631 @@
 <smiles>O=C([O])C(OO)C(O)C(O)C(OO)=O</smiles>
 </species>
 <species species_name="C10H15O2O2" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>[O]OC1CC1CCCC(C(=O))C(=O)C</smiles>
 </species>
 <species species_name="C10H17O3O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>[O]OCCCCCCCCC(O)C(OO)</smiles>
 </species>
 <species species_name="CARENE" species_number="n">
 <smiles>CC1=CCC2CC1C2(C)C</smiles>
 </species>
 <species species_name="C10H15O3O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>[O]OCCCCC(C(=O))C(=O)CC(=O)C</smiles>
 </species>
 <species species_name="C10H15O5O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>[O]OCCCC(C(=O))C(=O)CC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H15O4O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>[O]OC1CC1CCC(C(=O))C(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H15O6O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCCC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O7O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>[O]OCCCCC(=O)CC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O8O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O9O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>[O]OCCCC(=O)CC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O10O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O11O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>[O]OCCC(=O)CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O12O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCC(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O2O" species_number="n">
-<smiles>CCCCCCCCCCOOO</smiles>
+<smiles>CCCCCCC(C(=O))C(=O)C</smiles>
 </species>
 <species species_name="C10H15O3O" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCCCC(C(=O))C(=O)CC(=O)C</smiles>
 </species>
 <species species_name="C10H15O4O" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCC(C(=O))C(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H15O5O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>CCCC(C(=O))C(=O)CC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H15O6O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>CCCCCCC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O7O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>CCCCC(=O)CC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O8O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>CCCCCC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O9O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>CCCC(=O)CC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O10O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>CCCCC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O11O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>CCC(=O)CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O12O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCC(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O3" species_number="n">
-<smiles>CCCCCCCCCCOOO</smiles>
+<smiles>C1CC1CCC(C(=O))(C(=O))C(=O)C</smiles>
 </species>
 <species species_name="C10H14O4" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCC(C(=O))C(=O)CC(=O)CC(=O)C</smiles>
 </species>
 <species species_name="C10H14O5" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>C1CC1C(C(=O))C(=O)CC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H14O6" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>CC(C(=O))C(=O)CC(=O)CC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H14O7" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CC(=O)CC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O8" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>CCC(=O)CC(=O)CC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O9" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1C(=O)CC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O10" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>CC(=O)CC(=O)CC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O11" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1(=O)CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O12" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C(=O)CC(=O)CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H14O13" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1C(=O)CC(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O2NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOON</smiles>
+<smiles>CCCCCC(C(=O))C(=O)CC(ON(=O)O)</smiles>
 </species>
 <species species_name="C10H15O3NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOON</smiles>
+<smiles>C1CC1C(C(=O))C(=O)CC(=O)CC(ON(=O)O)</smiles>
 </species>
 <species species_name="C10H15O4NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOON</smiles>
+<smiles>C1CC1CC(C(=O))C(=O)CC(ON(=O)O)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O5NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOON</smiles>
+<smiles>C1CC1(C(=O))C(=O)CC(=O)CC(ON(=O)O)C(OO)</smiles>
 </species>
 <species species_name="C10H15O6NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCC(=O)CC(ON(=O)O)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O7NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>C1CC1C(=O)CC(=O)CC(ON(=O)O)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O8NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>CCCCC(=O)CC(ON(=O)O)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O9NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>C1CC1(=O)CC(=O)CC(ON(=O)O)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O10NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>CCCC(=O)CC(ON(=O)O)C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O11NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>C1C(=O)CC1(=O)CC(ON(=O)O)C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H15O12NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCC(ON(=O)O)C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O4iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCCCCCCC(O)C(=O)C</smiles>
 </species>
 <species species_name="C10H16O5iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H16O6iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CCC(=O)CC(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H16O7iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCC(O)C(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O8iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>CCCC(O)C(=O)CC(=O)CC(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O9iso1" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CC(O)C(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O10" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>CCC(O)C(=O)CC(=O)CC(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O11" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1C(O)C(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O12" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>CC(O)C(=O)CC(=O)CC(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O13" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CC(O)C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O14" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CC(OO)C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O5" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCCCCCCCCC(O)(C(=O))C(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C20H30O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(C(=O))(C(=O))C(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C20H30O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C20H31O4NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCCC(C(=O))C(=O)CC(ON(=O)O)C1OOC1</smiles>
 </species>
 <species species_name="C20H31O5NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(C(=O))C(=O)CC(=O)CC(ON(=O)O)C1OOC1</smiles>
 </species>
 <species species_name="C19H28O5" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCCCCCCCC(O)(C(=O))C(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C19H28O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(C(=O))(C(=O))C(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C19H28O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C19H28O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H29O5NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(C(=O))C(=O)CC(=O)CC(ON(=O)O)C1OOC1</smiles>
 </species>
 <species species_name="C18H26O5" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCCCCCCC(O)(C(=O))C(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C18H26O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(C(=O))(C(=O))C(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C18H26O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C18H26O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H26O4" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOO</smiles>
+<smiles>CCCCCCCCCCCCC(C(=O))C(=O)CC1OOC1</smiles>
 </species>
 <species species_name="C18H27O6NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H30O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(C(=O))C(=O)CC(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H31O6NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H28O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O6NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H26O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(O)(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H30O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(O)(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H28O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(O)(C(=O))C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H26O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O14" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O14" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O12NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O14" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O12NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O15" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O12NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O15" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O13NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O15" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCCCCC(O)(C(=O))C(=O)CC(=O)CC1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O13NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O16" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O13NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O16" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O14NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O16" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O14NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O17" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O14NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O17" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(O)(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O15NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H30O17" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)(C(=O))C(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C20H31O15NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H28O18" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCCCCCC(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C19H29O15NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H26O18" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOO</smiles>
+<smiles>CCCCCCCCC(=O)CC1OOC1C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C18H27O16NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCC(ON(=O)O)C1OOC1C(OO)C(OO)C(OO)C(OO)(C(=O)OO)(C(=O)OO)</smiles>
 </species>
 <species species_name="C10H16O3" species_number="n">
-<smiles>CCCCCCCCCCOOO</smiles>
+<smiles>C1CC1CCCC(O)(C(=O))C(=O)C</smiles>
 </species>
 <species species_name="C10H17O5O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCCC(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O4O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>[O]OCCCCCCCC(O)C(O)C(OO)</smiles>
 </species>
 <species species_name="C10H17O6O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCC(O)C(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O7O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CCC(O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H17O8O2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>[O]OC1CC1CC(O)C(O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H17O3O" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCCCCCCCC(O)C(OO)</smiles>
 </species>
 <species species_name="C10H17O4O" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCC(O)C(O)C(OO)</smiles>
 </species>
 <species species_name="C10H17O5O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>CCCCCCC(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O6O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>CCCCCC(O)C(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O7O" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>CCCCCC(O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H16O4iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCCCCCC(O)C(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H16O5iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCC(O)C(O)C(=O)CC(OO)</smiles>
 </species>
 <species species_name="C10H16O6iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CC(O)C(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H16O7iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1C(O)C(O)C(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H16O8iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1C(O)C(=O)CC1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H16O9iso2" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1(O)C(O)C(=O)CC1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H17O3NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOON</smiles>
+<smiles>CCCCCCCC(O)C(ON(=O)O)C(OO)</smiles>
 </species>
 <species species_name="C10H17O4NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOON</smiles>
+<smiles>CCCCCCC(O)C(O)C(ON(=O)O)C(OO)</smiles>
 </species>
 <species species_name="C10H17O5NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOON</smiles>
+<smiles>CCCCCC(O)C(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O6NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCC(O)C(O)C(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H17O7NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>CCCCC(O)C(ON(=O)O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H17O8NO3" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>CCCC(O)C(O)C(ON(=O)O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H18O5" species_number="n">
-<smiles>CCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCC(O)C(O)C(O)C(OO)</smiles>
 </species>
 <species species_name="C10H18O6" species_number="n">
-<smiles>CCCCCCCCCCOOOOOO</smiles>
+<smiles>C1CC1CCC(O)C(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H18O7" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CC(O)C(O)C(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C10H18O8" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CC(O)C(O)C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H18O9" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CC(O)C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H18O10" species_number="n">
-<smiles>CCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1C(O)C(O)C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H34O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>CCCCCCCCCCCCCCC(O)C(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H34O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCCC(O)C(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H34O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H35O5NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCCCC(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H35O6NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>CCCCCCCCCCCCCC(O)C(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H33O6NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOON</smiles>
+<smiles>CCCCCCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O6" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOO</smiles>
+<smiles>CCCCCCCCCCCCC(O)C(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O7" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC(=O)CC1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O8" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O5" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOO</smiles>
+<smiles>CCCCCCCCCCCCCCC(O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H31O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCC(O)C(=O)CC(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H34O9" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H35O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(=O)CC(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H33O7NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC(=O)CC(ON(=O)O)C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H31O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H34O10" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H35O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H33O8NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H31O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C20H34O11" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H35O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C19H32O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)C(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H33O9NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)</smiles>
 </species>
 <species species_name="C18H30O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(O)C(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H31O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H34O12" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H35O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H32O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H33O10NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H30O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H31O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H34O13" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C20H35O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H32O14" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCCC(O)C(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C19H33O11NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCCC(O)C(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H30O14" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOO</smiles>
+<smiles>C1CC1CCCC(O)C(O)C(O)C(=O)CC1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C18H31O12NO3" species_number="n">
-<smiles>CCCCCCCCCCCCCCCCCCOOOOOOOOOOOOOOON</smiles>
+<smiles>C1CC1CCCCC(O)C(=O)CC(ON(=O)O)C1OOC1C1OOC1C(OO)C(OO)C(OO)</smiles>
 </species>
 <species species_name="C10H18O4" species_number="n">
-<smiles>CCCCCCCCCCOOOO</smiles>
+<smiles>CCCCCCCC(O)C(O)C(OO)</smiles>
 </species>
 <species species_name="DUMMY" species_number="n">
 <smiles>C</smiles>

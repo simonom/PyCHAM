@@ -1,5 +1,5 @@
 ########################################################################								  
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -38,7 +38,7 @@ import scipy.constants as si
 import errno
 import stat
 
-def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp, 
+def volat_calc(comp_list, TEMP, H2Oi, num_comp, vol_Comp, 
 		volP, testf, corei, 
 		umansysprop_update, core_dens, comp_namelist,
 		ode_gen_flag, nuci, self):
@@ -50,7 +50,7 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 	#	species in comp_list
 	# (omitting water and core, if present)
 	# TEMP - temperature (K) in chamber at time function called
-	# Psat_water - pure component saturation vapour pressure of 
+	# self.Psat_water - pure component saturation vapour pressure of 
 	#	water (log10(atm)) 
 	# vol_Comp - names of components (corresponding to those in chemical scheme file)
 	# 			that have vapour pressures manually set in volP
@@ -149,7 +149,7 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, Psat_water, vol_Comp,
 		# water vapour pressure already given by Psat_water 
 		# (log10(atm))
 		if (i == H2Oi):
-			self.Psat[:, i] = Psat_water
+			self.Psat[:, i] = self.Psat_water
 			continue # water not included in Pybel_objects
 
 		# water vapour pressure already given by Psat_water 

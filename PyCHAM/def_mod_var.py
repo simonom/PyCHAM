@@ -282,6 +282,11 @@ def def_mod_var(caller, self): # define function
 	self.obs_comp_i = []
 	# name of file to save calculated continuous influx rates to
 	self.sim_ci_file = []
+	# name of component to nudge abundance of to attain target 
+	# RO2 abundance
+	self.comp_nudge_RO2 = ''
+	# target RO2 abundance (molecules/cm3)
+	self.RO2_nudge_target = -1
 	# -------------------------------------------------------------
 	# prepare for pickling
 	list_vars = [y0, Press, 

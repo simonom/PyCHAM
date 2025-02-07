@@ -282,12 +282,12 @@ def cham_up(sumt, Pnow,
 			# update vapour pressure of water (log10(atm)),
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
-			[_, Psat_water, _] = water_calc(temp_nown, self.RH[RHt_cnt], si.N_A)
+			[_, _, self] = water_calc(temp_nown, self.RH[RHt_cnt], si.N_A, self)
 
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
 			[self, _] = volat_calc.volat_calc(0, temp_nown,
-				 H2Oi, num_comp, Psat_water, vol_Comp, 
+				 H2Oi, num_comp, vol_Comp, 
 				volP, 0, corei, 
 				0, 0.0, [], 1, nuci, self)
 			
@@ -447,7 +447,7 @@ def cham_up(sumt, Pnow,
 			# update vapour pressure of water (log10(atm)), and change 
 			# gas-phase concentration of water vapour since 
 			# RH stays as stated in the RH and RHt model variables
-			[y[H2Oi], _, _] = water_calc(temp_now, RHn, si.N_A)
+			[y[H2Oi], _, self] = water_calc(temp_now, RHn, si.N_A, self)
 				
 		# check whether changes occur during next proposed integration time step
 		# and that time step has not been forced to reduce due to unstable ode solvers

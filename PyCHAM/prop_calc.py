@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -39,7 +39,7 @@ import stat
 from water_calc import water_calc
 import group_indices
 
-def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp, 
+def prop_calc(H2Oi, num_comp, vol_Comp, 
 		volP, testf, corei, umansysprop_update, 
 		core_dens,
 		ode_gen_flag, nuci, dens_comp, dens,
@@ -80,7 +80,86 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	# default values for error message and error flag
 	err_mess = ''
 	erf = 0
+	
+	# if using archived reference temperature
+	# vapour pressure (Pa), which has EVAPORATION
+	# vapour pressures for MCM species and EVAPORATION
+	# for HOMs, then get vapour pressures at the current
+	# temperature and then return to middle so that
+	# other variables (like y_dens and group_indices) 
+	# are carried over from previous simulation 
+	if (self.pars_skip == 3):
+
+		# import dependency
+		from scipy.interpolate import CubicSpline
+
+		# get reference vapour pressures at various 
+		# temperatures for these components
+
+		# start and finish index for chemical scheme name
+		sti = self.sch_name[::-1].index('/')
+		fii = self.sch_name.index('.')
 		
+		# path to reference vapour pressures for components with this
+		# chemical scheme
+		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/VPs_' +
+		self.sch_name[-sti:fii])
+
+		# get list of files in this directory and sort alphabetically
+		# (ensures ascending temperatures)
+		file_list = sorted(os.listdir(load_path))
+
+		# prepare to hold reference vapour pressures (molecules/cm3),
+		# temperatures in rows and components in columns
+		ref_vp_molecpcc = np.zeros((0, num_comp))
+
+		# prepare to hold reference temperatures (K)
+		temp_list = np.zeros((0))
+
+		fcnt = 0 # count on valid files
+
+		# loop through temperatures to get reference vapour pressures
+		for fi in range(len(file_list)):
+
+			if '.DS_Store' in file_list[fi]: # skip this file
+				continue
+
+			# prepare to hold values
+			ref_vp_molecpcc = np.concatenate((ref_vp_molecpcc, 
+				np.zeros((1, num_comp))), axis=0)
+			temp_list = np.concatenate((temp_list, 
+				np.zeros((1))), axis=0)
+
+			# get reference vapour pressures
+			ref_vp_molecpcc[fcnt, :] = np.load(str(load_path + '/' 
+				+ file_list[fi]), allow_pickle=True)
+
+			# remember temperature for this file (K)
+			Tstr = file_list[fi][file_list[fi].index('_T')+2:
+				file_list[fi].index('.npy')]
+			temp_list[fcnt] = float(Tstr.replace('p', '.'))
+
+			fcnt += 1 # count on valid files			
+
+		# create cubic spline functions for all vapour pressures
+		# (molecules/cm3) as a function of temperature
+		cs = CubicSpline(temp_list, ref_vp_molecpcc, axis = 0)
+		# get cubic spline interpolation at the current temperature
+		# (molecules/cm3)
+		self.Psat = cs(self.TEMP[tempt_cnt])
+
+		# ensure any component named core has zero vapour pressure
+		self.Psat[corei[0]] = 0.
+
+		# in preparation for ode solver, tile over size and 
+		# wall bins if present
+		if (self.num_asb+self.wall_on > 0):
+			self.Psat = np.tile(self.Psat, 
+			(self.num_asb+self.wall_on, 1))
+
+		return(self, err_mess, erf) # return to middle.py
+
+
 	cwd = os.getcwd() # address of current working directory
 	
 	# if update required, note this update flag is set when model variables are checked
@@ -125,7 +204,10 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	from umansysprop import liquid_densities
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
-	self.y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)
+
+	
+	# components' liquid density (kg/m3)
+	self.y_dens = np.zeros((num_comp, 1))
 	# vapour pressures of components, ensures any seed component called 
 	# core has zero vapour pressure
 	self.Psat = np.zeros((1, num_comp))
@@ -196,26 +278,6 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 		'/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		self.Psat_Pa_rec = (np.load(load_path, allow_pickle=True))
 
-	# if using archived reference temperature (298.15 K (Pa))
-	# vapour pressure (Pa), which has Nannoolal et al. (2008)
-	# vapour pressures for MCM species and Mohr et al. (2019)
-	# for HOMs
-	if (self.pars_skip == 3):
-		# get vapour pressures at 298.15 K (Pa)
-		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/' +
-		'pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
-		self.Psat_Pa_rec_ref = (np.load(load_path, allow_pickle=True))
-		self.Psat_Pa_rec = np.zeros((num_comp))
-		# loop through components to map reference vapour pressure onto
-		for comp_nami in range(len(self.comp_namelist)):
-			try:
-				# reference index
-				ref_indx = (self.Psat_Pa_rec_ref[0, :] == 
-				self.comp_namelist[comp_nami])
-				self.Psat_Pa_rec[comp_nami] = self.Psat_Pa_rec_ref[1, ref_indx]
-			except:
-				self.pars_skip = 1
-			
 	# estimate condensed-phase densitites (kg/m3) vapour pressures 
 	# (log10(atm)) and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
@@ -243,17 +305,18 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 			# different vapour pressure is specified it is accounted for below
 			continue
 		
-		# water vapour pressure already given by Psat_water (log10(atm))
+		# water vapour pressure already given by self.Psat_water (log10(atm))
 		# and water not included in self.Pybel_objects
 		if (i == H2Oi):
 			self.y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
 			if (self.pars_skip != 2):
-				self.Psat[0, i] = Psat_water
+				self.Psat[0, i] = self.Psat_water
 				if (self.TEMP[tempt_cnt] == 298.15):
 					self.Psat_Pa_rec[i] = self.Psat[0, i]
 				else:
-					[_, self.Psat_Pa_rec[i], _] = water_calc(
-					298.15, 0.5, si.N_A)
+					[_, _, self] = water_calc(
+					298.15, 0.5, si.N_A, self)
+					self.Psat_Pa_rec[i] = self.Psat_water
 			self.OC[0, i] = 0.
 			self.HC[0, i] = 0.
 			self.nom_mass[0, i] = 2.*1.+1.*16.
@@ -549,11 +612,11 @@ def prop_calc(H2Oi, num_comp, Psat_water, vol_Comp,
 	if (self.pars_skip != 2):
 		# in case not using archived vapour pressures
 		if (self.pars_skip != 3):
-			# convert to Pa from atm
+			# convert to Pa from log10(atm)
 			self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325.
 
 		ish = (self.Psat == 0.) # non-volatiles
-		# convert to Pa from atm
+		# convert to Pa from log10(atm)
 		self.Psat = (10.**self.Psat)*101325.
 
 		# retain low volatility where wanted following unit 

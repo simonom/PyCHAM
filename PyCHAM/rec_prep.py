@@ -273,14 +273,15 @@ def rec_prep(nrec_step, y, y0,
 		
 		# end of number size distribution part ----------------------------------------
 		
-		# concentration of components on the wall due to particle deposition to wall (# molecules/cm3)
+		# concentration of components on the wall due to 
+		# particle deposition to wall (# molecules/cm3)
 		self.yrec_p2w[0, :] = self.C_p2w
 
 	else: # fillers
 		kimt = kelv_fac = 0.
 	
 	# update reaction rate coefficients
-	[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
+	[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
 				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
 
 	# chamber environmental conditions ----------------------------------

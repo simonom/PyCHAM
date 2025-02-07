@@ -75,8 +75,8 @@ class PyCHAM_lite():
 		# automated_setup_and_call.py
 		if (type(param_const) == dict):
 			self.autorun() # call on automatic setup and run
-			
-		return()
+		
+		return
 	
 	def on_click81sing(self): # when single simulation button pressed
 			
