@@ -1934,12 +1934,12 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {98.} CH3O2 = CH3O : 2*KCH3O2*RO2*7.18*EXP(-885/TEMP) ;
 {99.} CH3O2 = CH3OH : 2*KCH3O2*RO2*0.5*(1-7.18*EXP(-885/TEMP)) ;
 {100.} CH3O2 = HCHO : 2*KCH3O2*RO2*0.5*(1-7.18*EXP(-885/TEMP)) ;
-# note rate coefficients for BZBIPERO2 are *0.658 to allow for 
-# PRAM reactions of BZBIPERO2
-{101.} BZBIPERO2 + HO2 = BZBIPEROOH : KRO2HO2*0.770*0.658 ;
-{102.} BZBIPERO2 + NO = BZBIPERNO3 : KRO2NO*0.082*0.658 ;
-{103.} BZBIPERO2 + NO = NO2 + BZBIPERO : KRO2NO*0.918*0.658 ;
-{104.} BZBIPERO2 + NO3 = NO2 + BZBIPERO : KRO2NO3*0.658 ;
+{101.} BZBIPERO2 + HO2 = BZBIPEROOH : KRO2HO2*0.770 ;
+{102.} BZBIPERO2 + NO = BZBIPERNO3 : KRO2NO*0.082 ;
+{103.} BZBIPERO2 + NO = NO2 + BZBIPERO : KRO2NO*0.918 ;
+{104.} BZBIPERO2 + NO3 = NO2 + BZBIPERO : KRO2NO3 ;
+# note branching ratios for BZBIPERO2 are *0.658 to allow for 
+# autoAPRAM-fw unimolecular reactions of BZBIPERO2
 {105.} BZBIPERO2 = BZBIPER2OH : 8.80D-13*RO2*0.2*0.658 ;
 {106.} BZBIPERO2 = BZBIPERO : 8.80D-13*RO2*0.6*0.658 ;
 {107.} BZBIPERO2 = BZOBIPEROH : 8.80D-13*RO2*0.2*0.658 ;
@@ -2022,8 +2022,8 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {182.} BZBIPEROOH = BZBIPERO + OH : J(41) ;
 {183.} BZBIPERNO3 + OH = BZOBIPEROH + NO2 : 7.30D-11 ;
 {184.} BZBIPERNO3 = BZBIPERO + NO2 : J(54) ;
-# Note rate coefficients for BZBIPERO decomposition are
-# *0.9 to allow for decomposition in PRAM
+# note branching ratios for BZBIPERO decomposition are
+# *0.9 to allow for decomposition in autoAPRAM-fw
 {185.} BZBIPERO = GLYOX + BZFUONE + HO2 : KDEC*0.50*0.9 ;
 {186.} BZBIPERO = GLYOX + MALDIAL + HO2 : KDEC*0.50*0.9 ;
 {187.} BZBIPER2OH + OH = BZOBIPEROH + HO2 : 1.21D-10 ;
@@ -2044,12 +2044,12 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {202.} GLYOOA = HCHO : KDEC*0.125 ;
 {203.} GLYOOA = HO2 + HO2 + CO : KDEC*0.125 ;
 {204.} GLYOOA = OH + HO2 + CO + CO : KDEC*0.57 ;
-# note  BZEMUCO2 rate coefficients are *0.68
-# to allow for PRAM reaction
-{205.} BZEMUCO2 + HO2 = BZEMUCOOH : KRO2HO2*0.77*0.68 ;
-{206.} BZEMUCO2 + NO = BZEMUCNO3 : KRO2NO*0.105*0.68 ;
-{207.} BZEMUCO2 + NO = BZEMUCO + NO2 : KRO2NO*0.895*0.68 ;
-{208.} BZEMUCO2 + NO3 = BZEMUCO + NO2 : KRO2NO3*0.68 ;
+{205.} BZEMUCO2 + HO2 = BZEMUCOOH : KRO2HO2*0.77 ;
+{206.} BZEMUCO2 + NO = BZEMUCNO3 : KRO2NO*0.105 ;
+{207.} BZEMUCO2 + NO = BZEMUCO + NO2 : KRO2NO*0.895 ;
+{208.} BZEMUCO2 + NO3 = BZEMUCO + NO2 : KRO2NO3 ;
+# note  unimolecular BZEMUCO2 branching ratios are adjusted
+# to allow for autoAPRAM-fw reaction
 {209.} BZEMUCO2 = BZEMUCCO : 8.80D-13*0.2*RO2*0.68 ;
 {210.} BZEMUCO2 = BZEMUCO : 8.80D-13*0.6*RO2*0.68 ;
 {211.} BZEMUCO2 = BZEMUCOH : 8.80D-13*0.2*RO2*0.68 ;
@@ -2075,11 +2075,11 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {231.} CATECHOL + NO3 = CATEC1O + HNO3 : 9.9D-11 ;
 {232.} CATECHOL + O3 = CATECOOA : 9.2D-18 ;
 {233.} CATECHOL + OH = CATEC1O : 1.0D-10 ;
-# note PHENO2 rate coefficients are *0.68 to
-# allow for PRAM reactions
-{234.} PHENO2 + HO2 = PHENOOH : KRO2HO2*0.770*0.68 ;
-{235.} PHENO2 + NO = PHENO + NO2 : KRO2NO*0.68 ;
-{236.} PHENO2 + NO3 = PHENO + NO2 : KRO2NO3*0.68 ;
+{234.} PHENO2 + HO2 = PHENOOH : KRO2HO2*0.770 ;
+{235.} PHENO2 + NO = PHENO + NO2 : KRO2NO ;
+{236.} PHENO2 + NO3 = PHENO + NO2 : KRO2NO3 ;
+# note PHENO2 unimolecular branching ratios *0.68 to
+# allow for autoAPRAM-fw reactions
 {237.} PHENO2 = PHENO : 8.00D-13*RO2*0.7*0.68 ;
 {238.} PHENO2 = PHENOH : 8.00D-13*RO2*0.3*0.68 ;
 {239.} PINAL + NO3 = C96CO3 + HNO3 : 2.0D-14 ;
@@ -3065,8 +3065,11 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {1219.} H1CO23CHO + OH = CO + CO + HOCH2CO3 : 1.44D-11 ;
 {1220.} H1CO23CHO = CO + CO + HOCH2CO3 + HO2 : J(34)+J(35) ;
 # MCM finished
-# PRAM (for alpha-pinene and benzene) starts
+# PRAM (for alpha-pinene) and autoAPRAM-fw (for benzene) starts
 # Benzene HOM CHEMISTRY 
+# note that unimolecular reactions of BZBIPERO2, BZBIPERO, 
+# BZEMUCO2 and PHENO2 are adjusted in MCM reactions above
+# to accomoodate the branching ratios in the reactions below
 {1.}      BZBIPERO2 = BZo_RO2_O7 :		0.32 ; 
 {2.}      BZBIPERO = BZeo_RO2_O6 :	 	0.1*KDEC ; 
 {3.}      BZBIPERO2 = C5_RO2_O6 + CO :	 	0.022 ; 

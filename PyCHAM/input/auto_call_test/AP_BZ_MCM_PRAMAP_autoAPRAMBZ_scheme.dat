@@ -1885,9 +1885,9 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {49.} APINENE + O3 = APINOOB : 8.05D-16*EXP(-640/TEMP)*0.4 ;
 # note that branching ratios are adjusted to allow for the
 # APINENE reaction(s) in PRAM
-{50.} APINENE + OH = APINAO2 : 1.2D-11*EXP(440/TEMP)*0.558 ;
-{51.} APINENE + OH = APINBO2 : 1.2D-11*EXP(440/TEMP)*0.344 ;
-{52.} APINENE + OH = APINCO2 : 1.2D-11*EXP(440/TEMP)*0.073 ;
+{50.} APINENE + OH = APINAO2 : 1.2D-11*EXP(440/TEMP)*0.572*0.975 ;
+{51.} APINENE + OH = APINBO2 : 1.2D-11*EXP(440/TEMP)*0.353*0.975 ;
+{52.} APINENE + OH = APINCO2 : 1.2D-11*EXP(440/TEMP)*0.075*0.975 ;
 {53.} CL + CH4 = CH3O2 : 6.6D-12*EXP(-1240/TEMP) ;
 {54.} OH + CH4 = CH3O2 : 1.85D-12*EXP(-1690/TEMP) ;
 {55.} BENZENE + OH = BZBIPERO2 : 2.3D-12*EXP(-190/TEMP)*0.352 ;
@@ -1938,9 +1938,11 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {102.} BZBIPERO2 + NO = BZBIPERNO3 : KRO2NO*0.082 ;
 {103.} BZBIPERO2 + NO = NO2 + BZBIPERO : KRO2NO*0.918 ;
 {104.} BZBIPERO2 + NO3 = NO2 + BZBIPERO : KRO2NO3 ;
-{105.} BZBIPERO2 = BZBIPER2OH : 8.80D-13*RO2*0.2 ;
-{106.} BZBIPERO2 = BZBIPERO : 8.80D-13*RO2*0.6 ;
-{107.} BZBIPERO2 = BZOBIPEROH : 8.80D-13*RO2*0.2 ;
+# note branching ratios for BZBIPERO2 are *0.658 to allow for 
+# autoAPRAM-fw unimolecular reactions of BZBIPERO2
+{105.} BZBIPERO2 = BZBIPER2OH : 8.80D-13*RO2*0.2*0.658 ;
+{106.} BZBIPERO2 = BZBIPERO : 8.80D-13*RO2*0.6*0.658 ;
+{107.} BZBIPERO2 = BZOBIPEROH : 8.80D-13*RO2*0.2*0.658 ;
 {108.} BZEPOXMUC + NO3 = BZEMUCCO3 + HNO3 : 2*KNO3AL*2.75 ;
 {109.} BZEPOXMUC + O3 = EPXC4DIAL + GLYOOA : 2.00D-18 ;
 {110.} BZEPOXMUC + OH = BZEMUCCO3 : 6.08D-11*0.31 ;
@@ -1967,8 +1969,10 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {131.} C107O2 + HO2 = C107OOH : KRO2HO2*0.914 ;
 {132.} C107O2 + NO = C107O + NO2 : KRO2NO ;
 {133.} C107O2 + NO3 = C107O + NO2 : KRO2NO3 ;
-{134.} C107O2 = C107O : 9.20D-14*0.7*RO2 ;
-{135.} C107O2 = C107OH : 9.20D-14*0.3*RO2 ;
+# the following two reactions have branching ratios
+# adjusted to allow for PRAM branch
+{134.} C107O2 = C107O : 9.20D-14*0.7*RO2*0.9 ;
+{135.} C107O2 = C107OH : 9.20D-14*0.3*RO2*0.9 ;
 {136.} C109O2 + HO2 = C109OOH : KRO2HO2*0.914 ;
 {137.} C109O2 + NO = C109O + NO2 : KRO2NO ;
 {138.} C109O2 + NO3 = C109O + NO2 : KRO2NO3 ;
@@ -2018,8 +2022,10 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {182.} BZBIPEROOH = BZBIPERO + OH : J(41) ;
 {183.} BZBIPERNO3 + OH = BZOBIPEROH + NO2 : 7.30D-11 ;
 {184.} BZBIPERNO3 = BZBIPERO + NO2 : J(54) ;
-{185.} BZBIPERO = GLYOX + BZFUONE + HO2 : KDEC*0.50 ;
-{186.} BZBIPERO = GLYOX + MALDIAL + HO2 : KDEC*0.50 ;
+# note branching ratios for BZBIPERO decomposition are
+# *0.9 to allow for decomposition in autoAPRAM-fw
+{185.} BZBIPERO = GLYOX + BZFUONE + HO2 : KDEC*0.50*0.9 ;
+{186.} BZBIPERO = GLYOX + MALDIAL + HO2 : KDEC*0.50*0.9 ;
 {187.} BZBIPER2OH + OH = BZOBIPEROH + HO2 : 1.21D-10 ;
 {188.} BZOBIPEROH + OH = MALDIALCO3 + GLYOX : 8.16D-11 ;
 {189.} BZOBIPEROH = MALDIALCO3 + GLYOX + HO2 : J(22) ;
@@ -2042,9 +2048,11 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {206.} BZEMUCO2 + NO = BZEMUCNO3 : KRO2NO*0.105 ;
 {207.} BZEMUCO2 + NO = BZEMUCO + NO2 : KRO2NO*0.895 ;
 {208.} BZEMUCO2 + NO3 = BZEMUCO + NO2 : KRO2NO3 ;
-{209.} BZEMUCO2 = BZEMUCCO : 8.80D-13*0.2*RO2 ;
-{210.} BZEMUCO2 = BZEMUCO : 8.80D-13*0.6*RO2 ;
-{211.} BZEMUCO2 = BZEMUCOH : 8.80D-13*0.2*RO2 ;
+# note  unimolecular BZEMUCO2 branching ratios are adjusted
+# to allow for autoAPRAM-fw reaction
+{209.} BZEMUCO2 = BZEMUCCO : 8.80D-13*0.2*RO2*0.68 ;
+{210.} BZEMUCO2 = BZEMUCO : 8.80D-13*0.6*RO2*0.68 ;
+{211.} BZEMUCO2 = BZEMUCOH : 8.80D-13*0.2*RO2*0.68 ;
 {212.} C5DIALO2 + HO2 = C5DIALOOH : KRO2HO2*0.706 ;
 {213.} C5DIALO2 + NO = C5DIALO + NO2 : KRO2NO ;
 {214.} C5DIALO2 + NO3 = C5DIALO + NO2 : KRO2NO3 ;
@@ -2070,8 +2078,10 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {234.} PHENO2 + HO2 = PHENOOH : KRO2HO2*0.770 ;
 {235.} PHENO2 + NO = PHENO + NO2 : KRO2NO ;
 {236.} PHENO2 + NO3 = PHENO + NO2 : KRO2NO3 ;
-{237.} PHENO2 = PHENO : 8.00D-13*RO2*0.7 ;
-{238.} PHENO2 = PHENOH : 8.00D-13*RO2*0.3 ;
+# note PHENO2 unimolecular branching ratios *0.68 to
+# allow for autoAPRAM-fw reactions
+{237.} PHENO2 = PHENO : 8.00D-13*RO2*0.7*0.68 ;
+{238.} PHENO2 = PHENOH : 8.00D-13*RO2*0.3*0.68 ;
 {239.} PINAL + NO3 = C96CO3 + HNO3 : 2.0D-14 ;
 {240.} PINAL + OH = C96CO3 : 5.2D-12*EXP(600/TEMP)*0.772 ;
 {241.} PINAL + OH = PINALO2 : 5.2D-12*EXP(600/TEMP)*0.228 ;
@@ -3055,8 +3065,12 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {1219.} H1CO23CHO + OH = CO + CO + HOCH2CO3 : 1.44D-11 ;
 {1220.} H1CO23CHO = CO + CO + HOCH2CO3 + HO2 : J(34)+J(35) ;
 # MCM finished
-# PRAM (for alpha-pinene and benzene) starts
-# Benzene HOM CHEMISTRY 
+# PRAM (for alpha-pinene) and autoAPRAM-fw (for benzene) starts
+# Benzene HOM CHEMISTRY, note that unimolecular reactions for
+# BZBIPERO2, BZBIPERO,  BZEMUCO2 and PHENO2 have
+# branching ratios
+# adjusted to accommodate the autoAPRAM-fw reactions
+# below 
 {1.}      BZBIPERO2 = BZo_RO2_O7 :		0.32 ; 
 {2.}      BZBIPERO = BZeo_RO2_O6 :	 	0.1*KDEC ; 
 {3.}      BZBIPERO2 = C5_RO2_O6 + CO :	 	0.022 ; 
@@ -5253,9 +5267,11 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {}	C10H15O12O2 = C10H15O12O  :               1E-11*0.0*RO2 ;		
 {}	C10H15O12O2 = C10H16O13   :               1E-11*0.5*RO2 ;		
 {}			
-{}	C107O2 = C10H15O2O :                      9.20D-14*RO2*0.1 ;		
-{}	C107O2 = C107O : 	                      9.20D-14*0.7*RO2*0.9 ;	
-{}	C107O2 = C107OH : 	                      9.20D-14*0.3*RO2*0.9 ;	
+{}	C107O2 = C10H15O2O :                      9.20D-14*RO2*0.1 ;
+# two reactions below contained in MCM section 
+# (with adjusted branching ratios)		
+#{}	C107O2 = C107O : 	                      9.20D-14*0.7*RO2*0.9 ;	
+#{}	C107O2 = C107OH : 	                      9.20D-14*0.3*RO2*0.9 ;	
 {}			
 {}	C10H17O3O2 = C10H17O5O2 :                 2D17*exp(-1.2077D4/TEMP);		
 {}	C10H17O4O2 = C10H17O6O2 :                 6D16*exp(-1.2077D4/TEMP);		
@@ -7824,3 +7840,10 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 
 
 # PRAM finished
+
+# first-order dry deposition to non-particle surfaces from Woodward-Massey et al. 
+# 2023 https://doi.org/10.5194/acp-23-14393-2023, page 14399, then using the equation
+# 1/lifetime=1/first-order loss rate to get first-order loss rate
+{4513.}      HNO3 = : 0.25 ; 
+{4514.}      H2O2 = : 0.1 ; 
+{4515.}      HCHO = : 0.0833 ; 

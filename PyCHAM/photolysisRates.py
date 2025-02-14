@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -51,9 +51,10 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	
 	self.sumt = sumt
 	
+	# if dark
 	if (sum(self.light_stat == 3) == 0):
 		J = np.zeros((Jlen)) # prepare output
-	else:
+	else: # if a stored array of photolysis rates
 		J = self.stored_J[:, sum(self.light_time<=sumt)-1]
 		# if a wavelength-independent transmission factor
 		if (self.tf_range == 0):
@@ -162,8 +163,8 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	# based on the Madronich equations for actinic flux from
 	# solar irradiation
 	
-	# if a file path for the chamber's actinic flux is supplied,
-	# this is done if chamber lamps are turned on
+	# if a file path for the actinic flux is supplied,
+	# (e.g. if chamber lamps are turned on)
 	# note this option is for user-supplied actinic flux and either a
 	# user-supplied absorption cross-section and quantum yield 
 	# file or MCM recommended absorption cross-section and 

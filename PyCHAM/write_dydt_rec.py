@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -39,7 +39,7 @@ def write_dydt_rec(self): # define function
 	f = open(self.PyCHAM_path + '/PyCHAM/dydt_rec.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
 	f.write('#                                                                                        #\n')
 	f.write('#    All Rights Reserved.                                                                #\n')
 	f.write('#    This file is part of PyCHAM                                                         #\n')
@@ -95,10 +95,11 @@ def write_dydt_rec(self): # define function
 	f.write('		reac_count = 0 \n')
 	f.write('		# loop through relevant reactions \n')
 	f.write('		# note that final three rows are for\n		# particle- and wall-partitioning and dilution \n')
-	f.write('		for i in dydt_rec[0, 0:-3]: \n')
-	f.write('			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) \n')
+	f.write('		reac_indx = np.zeros((len(dydt_rec[0, 0:-3]))).astype(\'int\') \n')
+	f.write('		reac_indx[:] = (dydt_rec[0, 0:-3]).astype(\'int\') \n')
+	f.write('		for indx in reac_indx: \n')
 	f.write('			# estimate gas-phase change tendency for each reaction involving this component \n')
-	f.write('			gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]]]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*reac_coef[i] \n')
+	f.write('			gprate = ((y[self.rindx_g[indx, 0:self.nreac_g[indx]]]**self.rstoi_g[indx, 0:self.nreac_g[indx]]).prod())*reac_coef[indx] \n')
 	f.write('			dydt_rec[step+1, reac_count] += reac_sign[reac_count]*((gprate))\n')
 	f.write('			reac_count += 1 # keep count on relevant reactions \n')
 	f.write('			\n')

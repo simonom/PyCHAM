@@ -456,12 +456,8 @@ def ode_updater(y, H2Oi,
 			if (gpp_stab == -1):
 				y[:] = y0[:] # (# molecules/cm3)
 						
-			# record output if on the first attempt at solving this time interval, 
-			# note that recording here in this way means we include any
-			# instantaneous changes at this time step without interpolation to
-			# smaller instantaneous changes (when interpolation forced due to 
-			# instability)
-			# note also that recording before calling cham_up means that 
+			# record output if on the first attempt at solving this time interval,
+			# note that recording before calling cham_up means that 
 			# any instantaneous 
 			# changes occurring during this upcoming time step are not 
 			# recorded at the very start 
@@ -477,6 +473,76 @@ def ode_updater(y, H2Oi,
 				cham_env, temp_now, Pnow, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
+
+			# for change tendencies, t=0 recording done
+			# inside rec_prep
+			# record any change tendencies of specified 
+			# components after t=0, note this is done after
+			# the call to get reaction rate coefficients
+			# so that the change tendency given at a 
+			# particular time represents the tendency from
+			# that time onwards
+			if (len(self.dydt_vst) > 0):
+				if ((sumt-(self.save_step*(dydt_cnt-1))
+					 > -1.e-10)):
+
+					# reaction rate coefficient prior to 
+					# calling cham_up, so that dydt function
+					# records in step with rec.rec function 
+					[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(
+						y[H2Oi], temp_now, y, 
+						Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
+						sumt, self)
+
+					# if error message from reaction rate 
+					# calculation
+					if (erf == 1): 
+						yield(err_mess)
+
+					# if particles and/or wall present		
+					if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
+				
+						# update partitioning variables
+						[kimt, kelv_fac] = partit_var.kimt_calc(y, 
+						mfp, num_sb, num_comp, 
+						accom_coeff, y_mw, surfT, R_gas, temp_now, 
+						NA, N_perbin, 
+						x.reshape(1, -1)*1.e-6, therm_sp, 
+						H2Oi, act_coeff, 1,
+						Pnow, DStar_org, z_prt_coeff, chamSA, 
+						chamV, self)
+				
+						# update particle-phase activity 
+						# coefficients, note the output,
+						# note that if ODE solver unstable, 
+						# then y resets to y0 via
+						# the cham_up module prior to this call
+						[act_coeff, wat_hist, RHn, y, 
+						dydt_erh_flag] = act_coeff_update.ac_up(y, 
+						H2Oi, RH0, temp_now, 
+						wat_hist0, act_coeff, num_comp, 
+						(num_sb-self.wall_on))
+				
+					else: # fillers
+			
+						kimt = np.zeros((num_sb+self.wall_on, 
+							num_comp))
+						kelv_fac = np.zeros((
+							num_sb-self.wall_on, 1))
+						dydt_erh_flag = 0
+					 
+					# estimate and record any 
+					# change tendencies 
+					# (molecules/cm3/s)
+					if (self.testf != 5):
+						
+						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt-1, 
+							num_sb, num_comp, kelv_fac, kimt, 
+							act_coeff, dydt_erh_flag, H2Oi, 
+							wat_hist, self)
+
+					# keep count on recording change tendencies
+					dydt_cnt += 1
 
 			# aligning time interval with pre-requisites --		
 			# ensure end of time interval does not surpass 
@@ -560,37 +626,6 @@ def ode_updater(y, H2Oi,
 			# calculation
 			if (erf == 1): 
 				yield(err_mess)
-
-
-			# for change tendencies, t=0 recording done
-			# inside rec_prep
-			# record any change tendencies of specified 
-			# components after t=0, note this is done after
-			# the call to get reaction rate coefficients
-			# so that the change tendency given at a 
-			# particular time represents the tendency from
-			# that time onwards
-			if (len(self.dydt_vst) > 0):
-				if ((sumt-(self.save_step*(dydt_cnt-1))
-					 > -1.e-10)):
-					
-					# before solving ODEs for 
-					# chemistry, dilution, 
-					# gas-particle partitioning and
-					# gas-wall partitioning, 
-					# estimate and record any 
-					# change tendencies (# 
-					# molecules/cm3/s) resulting 
-					# from 
-					# these processes
-					if (self.testf != 5):
-						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt, 
-							num_sb, num_comp, kelv_fac, kimt, 
-							act_coeff, dydt_erh_flag, H2Oi, 
-							wat_hist, self)
-
-					# keep count on recording change tendencies
-					dydt_cnt += 1
 			
 			# update Jacobian inputs based on 
 			# particle-phase fractions of components

@@ -4,12 +4,12 @@
 # (backed up by section 3.1.2 of Garmash et al. 2020 (https://doi.org/10.5194/acp-20-515-2020)). 
 # Rate of movement to/from wall (the gas-wall mass transfer coefficient) is given by Eq. 1 of
 # Methods section of Roldin et al. #2019 (https://doi.org/10.1038/s41467-019-12338-8), as is the effective absorbing mass #concentration of wall (5umol/m3 = 5 umol/m3*200g/mol = 1e3ug/m3 = 1e-3g/m3), noting that PyCHAM #assumes a molar mass of the wall of 200 g/mol. At the bottom of Table 1 of Garmash et al. 2020 (https://doi.org/10.5194/acp-20-515-2020) is the aerosol seed experiment description, showing the J(O1D) value, which was used to tune the tf_UVC value here, the OH concentration, which was used to tune the OH background reactivity in the chemical scheme file, Fig 6 of Garmash shows the mass concentration of ammonium sulphate (seed particle), which was used to tune pconc here
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Garmash2020/JPAC_benzene_seed_MYnonHOM_MYHOM
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Garmash2020/JPAC_benzene_seed_EVAPORATIONnonHOM_EVAPORATIONHOM
 chem_sch_name = AP_BZ_MCM_PRAMAP_autoAPRAMBZ_scheme.dat
 xml_name = MCM_PRAM_xml.xml
 total_model_time = 7.2e4
 update_step = 3.6e2
-recording_time_step = 3.6e3
+recording_time_step = 1.8e3
 temperature = 287.35
 tempt = 0.
 p_init = 101325.0
@@ -44,9 +44,9 @@ volP = 0.
 eff_abs_wall_massC = 1.e-3
 chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;, 
 # set the vapour pressure estimation method for nonHOMs
-nonHOMs_vp_method = MY
+nonHOMs_vp_method = EVAPORATION
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = MY
+HOMs_vp_method = EVAPORATION
 # particle section
 number_size_bins = 6
 seed_name = core
@@ -61,7 +61,7 @@ seed_diss = 3.e-6
 nonseed_diss_wrtw = 0.
 seed_diss_wrtw = 3.
 H2O_diss_wrtorg = 0.
-partit_cutoff = 1.e0
+ppartit_cutoff = 1.e0
 accom_coeff_comp = all
 accom_coeff_user = 1./(1.+np.exp(-((Rp-5.e-9)*1.e8)*100.))
 # 25 % of particles are double charged according to ST5 of Pichelstorfer et al. 2024,

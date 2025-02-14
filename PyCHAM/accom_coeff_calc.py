@@ -40,5 +40,6 @@ def accom_coeff_func(accom_coeff, Rp, self):
 
 	import numpy as np
 	# calculate accommodation coefficients 
+	accom_coeff[:, 0:self.num_asb] = 1./(1.+np.exp(-((Rp-5.e-9)*1.e8)*100.)) 
 
 	return(accom_coeff)

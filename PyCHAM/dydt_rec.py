@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -24,7 +24,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2025-02-07 17:04:25.376063
+# File Created at 2025-02-14 16:21:26.958697
 
 import numpy as np 
 
@@ -57,10 +57,11 @@ kelv_fac, kimt, act_coeff, dydt_erh_flag, H2Oi, wat_hist, self):
 		# loop through relevant reactions 
 		# note that final three rows are for
 		# particle- and wall-partitioning and dilution 
-		for i in dydt_rec[0, 0:-3]: 
-			i = int(i) # ensure reaction index is integer - this necessary because the dydt_rec array is float (the tendency to change records beneath its first row are float) 
+		reac_indx = np.zeros((len(dydt_rec[0, 0:-3]))).astype('int') 
+		reac_indx[:] = (dydt_rec[0, 0:-3]).astype('int') 
+		for indx in reac_indx: 
 			# estimate gas-phase change tendency for each reaction involving this component 
-			gprate = ((y[self.rindx_g[i, 0:self.nreac_g[i]]]**self.rstoi_g[i, 0:self.nreac_g[i]]).prod())*reac_coef[i] 
+			gprate = ((y[self.rindx_g[indx, 0:self.nreac_g[indx]]]**self.rstoi_g[indx, 0:self.nreac_g[indx]]).prod())*reac_coef[indx] 
 			dydt_rec[step+1, reac_count] += reac_sign[reac_count]*((gprate))
 			reac_count += 1 # keep count on relevant reactions 
 			

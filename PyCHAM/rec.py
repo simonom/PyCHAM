@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -97,8 +97,10 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	ish = (pconc[:, 0] > 1.e-10)
 	
 	if (ish.sum() > 0):
-		# rearrange particle concentrations into size bins in rows, components in columns
-		Cn = y[num_comp:num_comp*(num_sb-self.wall_on+1)].reshape(num_sb-self.wall_on, num_comp)
+		# rearrange particle concentrations into size bins in rows, 
+		# components in columns
+		Cn = y[num_comp:num_comp*(num_sb-self.wall_on+1)].reshape(
+			num_sb-self.wall_on, num_comp)
 		# new volume of single particle per size bin (um3) excluding volume of water	
 		Vnew[ish] = (np.sum((Cn[ish, :]/(si.N_A*pconc[ish]))*MV[:, 0]*1.e12, 1)-
 				((Cn[ish, H2Oi]/(si.N_A*pconc[ish, 0]))*MV[H2Oi, 0]*1.e12))

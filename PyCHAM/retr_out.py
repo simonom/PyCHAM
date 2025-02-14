@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -566,7 +566,10 @@ def retr_out(self):
 	
 	
 	try: # this output added on 23/02/2021
-		# withdraw environmental conditions (temperature in first column (K))
+		# withdraw environmental conditions (temperature in first column (K)),
+		# pressure in second column (Pa), relative humidity in third
+		# column (0-1 fraction), transmission factor of light in fourth
+		# column (fraction 0-1), times in rows
 		fname = str(self.dir_path + '/chamber_environmental_conditions')
 		cham_env = np.loadtxt(fname, delimiter=',', skiprows=1)
 	except:

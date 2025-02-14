@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -337,8 +337,10 @@ def plotter(caller, dir_path, uc, self):
 		
 		p3, = par1.plot(timehr, Nvs_time, '+k', label = 'N')
 	
-		par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
-		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
+		par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, 
+			rotation=270, labelpad=20) # vertical axis label
+		# set tick format for vertical axis
+		par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
 		par1.yaxis.set_tick_params(labelsize=14)
 
 		# mass concentration of particles --------------------------------------------
@@ -350,7 +352,8 @@ def plotter(caller, dir_path, uc, self):
 		yrp[:, :] = yrec[:, num_comp:num_comp*(num_asb+1)]
 		# loop through size bins to convert to ug/m3
 		for sbi in range(num_asb):
-			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, sbi*num_comp:(sbi+1)*num_comp]/si.N_A)*y_MW)*1.e12
+			yrp[:, sbi*num_comp:(sbi+1)*num_comp] = ((yrp[:, 
+				sbi*num_comp:(sbi+1)*num_comp]/si.N_A)*y_MW)*1.e12
 		
 		MCvst[0, :] = yrp.sum(axis=1)
 

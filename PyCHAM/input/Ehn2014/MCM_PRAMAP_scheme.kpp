@@ -1121,6 +1121,8 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {581 } C719OH + OH = C719O : 6.72E-11  ;
  {582 } APINENE + O3 = APINOOA : 8.05E-16*EXP(-640./TEMP)*0.6  ;
  {583 } APINENE + O3 = APINOOB : 8.05E-16*EXP(-640./TEMP)*0.4  ;
+# note that branching ratio reduced by 0.9 to allow for
+# PRAM branch for APINOOA
  {584 } APINOOA = C107O2 + OH : KDEC*0.55*0.90   ;
  {585 } APINOOA = C109O2 + OH : KDEC*0.45*0.90   ;
  {586 } C107O2 + NO = C107O + NO2 : KRO2NO  ;
@@ -1133,6 +1135,8 @@ J(24) = 4.365E-05*(cos(zenith)**1.089)*exp(-0.323*(1./cos(zenith))) {MCM J=56.}
  {593 } C717O = CO235C6CHO + HO2 : KROSEC*O2  ;
  {594 } C107O2 + NO3 = C107O + NO2 : KRO2NO3  ;
  {595 } C107O2 + HO2 = C107OOH : KRO2HO2*0.914  ;
+# the following two reactions have branching ratios
+# adjusted to allow for PRAM branch
  {596 } C107O2 = C107O : 9.20E-14*0.7*RO2*0.9  ;
  {597 } C107O2 = C107OH : 9.20E-14*0.3*RO2*0.9  ;
  {598 } C108O2 + NO3 = C108O + NO2 : KRO2NO3  ;
@@ -1799,7 +1803,9 @@ C107OH = IGNORE  ;
 {1.}      CARENE + NO3 = NAPINAO2 :                             9.10D-12*0.65 ;
 {1.}      CARENE + NO3 = NAPINBO2 :                             9.10D-12*0.35 ;
 
-#PRAM reactions. Numbered according to Supplementary Table S4 (Roldin et al., NCOMMS, 2019)  
+#PRAM reactions. Numbered according to Supplementary Table S4 (Roldin et al., NCOMMS, 2019) 
+# the two reactions below are contained in the MCM section
+# (with adjsuted branching ratios)
 #{1.}      APINOOA = C107O2 + OH :                      KDEC*0.55*0.90  ;
 #{2.}      APINOOA = C109O2 + OH :                      KDEC*0.45*0.90  ;
 {3.}      APINOOA = C10H15O2O2 + OH :                  KDEC*0.10  ;
@@ -3016,6 +3022,8 @@ C107OH = IGNORE  ;
 {1151.}     C10H15O12O2 = C10H16O13   :               1E-11*0.5*RO2  ;
 
 {1152.}     C107O2 = C10H15O2O :                      9.20D-14*RO2*0.1  ;
+# these two reactions below included in MCM scheme above
+# (with adjusted branching ratios)
 #{1153.}     C107O2 = C107O : 	                      9.20D-14*0.7*RO2*0.9  ;
 #{1154.}     C107O2 = C107OH : 	                      9.20D-14*0.3*RO2*0.9  ;
 
