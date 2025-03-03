@@ -104,7 +104,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		# chemical scheme
 		load_path = str(self.PyCHAM_path + '/PyCHAM/prop_store/VPs_' +
 		self.sch_name[-sti:fii])
-
+		
 		# get list of files in this directory and sort alphabetically
 		# (ensures ascending temperatures)
 		file_list = sorted(os.listdir(load_path))
@@ -129,7 +129,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 				np.zeros((1, num_comp))), axis=0)
 			temp_list = np.concatenate((temp_list, 
 				np.zeros((1))), axis=0)
-
+			
 			# get reference vapour pressures
 			ref_vp_molecpcc[fcnt, :] = np.load(str(load_path + '/' 
 				+ file_list[fi]), allow_pickle=True)
@@ -840,7 +840,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		
 		# convert saturation vapour pressures from Pa to 
 		# # molecules/cm3 (air) using ideal
-		# gas law, R has units cm3.Pa/K.mol
+		# gas law, R has units cm3.Pa/K.mol (after multiplying by 1.e6)
 		self.Psat = self.Psat*(NA/((si.R*1.e6)*self.TEMP[tempt_cnt]))
 		
 		# remember Psat (# molecules/cm3) in case it is altered 

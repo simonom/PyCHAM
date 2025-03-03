@@ -206,8 +206,11 @@ def ui_check(self):
 	
 	# in case proposed results folder already saved
 	if (os.path.isdir(output_by_sim) == True and em_flag < 2):
-		err_mess = str('Error - results folder (' + output_by_sim + ') already exists, please use an alternative.  This can be changed by the res_file_name variable in the model variables file, as explained in README.')
-		em_flag = 2
+		err_mess = str('Note - results folder (' + output_by_sim + 
+		') already exists, and will be overwritten.  This can be ' +
+		'changed by the res_file_name variable in the model ' +
+		'variables file, as explained in README.')
+		em_flag = 1
 	
 	# in case proposed results folder already proposed by another
 	# simulation in batch

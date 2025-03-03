@@ -2413,6 +2413,10 @@ class PyCHAM(QWidget):
 			# (as identified by self.inname) and store to pickle
 			import mod_var_read
 			mod_var_read.mod_var_read(self)
+
+			if (type(self.param_const) == dict):
+				if (self.pars_skip_forcetozero == 1):
+					self.pars_skip = 0
 			
 			# end this function if an error thrown by reading of model variables
 			if (self.bd_st == 1 or self.bd_st == 2):
@@ -3731,7 +3735,7 @@ class PyCHAM(QWidget):
 			
 			sdt = [5., 0.5]
 		
-		# -----------------------------------------------------------------------------------------
+		# -----------------------------------------------------------------------------
 		
 		# maximum particle size -------------------------------------------------------
 		try:
@@ -5040,6 +5044,10 @@ class PyCHAM(QWidget):
 			self.btch_str = (str(str(1.)+'.\n' + self.sch_name + 
 			'\n' + self.xml_name + '\n' + self.inname + '\n'))
 			
+			# start by assuming pars_skip does not need to be
+			# forced to zero
+			self.pars_skip_forcetozero = 0
+
 			# if past the first simulation
 			if (inname != self.param_const['mod_var_name'][0]):
 				
@@ -5048,13 +5056,12 @@ class PyCHAM(QWidget):
 				if (wo_str in sim_name0 and 
 					wo_str not in file_name):
 					print('new chemistry')
-					self.pars_skip = 0
+					self.pars_skip_forcetozero = 1
 				if (wo_str not in sim_name0 
 					and wo_str in file_name):
 					print('new chemistry')
-					self.pars_skip = 0
+					self.pars_skip_forcetozero = 1
 			
-
 			# run simulation
 			self.on_click81sing() # run simulation
 			print('completed ', file_name, ri)

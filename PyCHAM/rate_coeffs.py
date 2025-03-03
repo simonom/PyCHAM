@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2025-02-14 16:21:26.898973
+# created at 2025-02-28 11:01:41.149810
 
 import numpy
 import photolysisRates
@@ -503,10 +503,7 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		#{}	C107O2=C107OH:	9.20e-14*0.3*RO2*0.9; 
 		# keep count on reaction number 
 		gprn += 1 
-		#{884}HO2=:3000.; 
-		# keep count on reaction number 
-		gprn += 1 
-		#{885}OH=:30000.; 
+		#1/lifetime=1/first-orderlossratetogetfirst-orderlossrate 
 
 	except:
 		erf = 1 # flag error
@@ -517,7 +514,7 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 
 	if (self.light_stat_now == 0):
 		J = [0]*len(J)
-	rate_values = numpy.zeros((5797))
+	rate_values = numpy.zeros((5798))
 	
 	# if reactions have been found in the chemical scheme
 	# gas-phase reactions
@@ -721,16 +718,16 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		rate_values[48] = 8.05e-16*numpy.exp(-640/TEMP)*0.4
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.558' 
-		rate_values[49] = 1.2e-11*numpy.exp(440/TEMP)*0.558
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.572*0.975' 
+		rate_values[49] = 1.2e-11*numpy.exp(440/TEMP)*0.572*0.975
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.344' 
-		rate_values[50] = 1.2e-11*numpy.exp(440/TEMP)*0.344
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.353*0.975' 
+		rate_values[50] = 1.2e-11*numpy.exp(440/TEMP)*0.353*0.975
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.073' 
-		rate_values[51] = 1.2e-11*numpy.exp(440/TEMP)*0.073
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.075*0.975' 
+		rate_values[51] = 1.2e-11*numpy.exp(440/TEMP)*0.075*0.975
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
 		rc_eq_now = '6.6e-12*numpy.exp(-1240/TEMP)' 
@@ -933,16 +930,16 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		rate_values[101] = KRO2NO3
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*RO2*0.2*0.658' 
-		rate_values[102] = 8.80e-13*RO2*0.2*0.658
+		rc_eq_now = '8.80e-13*RO2*0.2' 
+		rate_values[102] = 8.80e-13*RO2*0.2
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*RO2*0.6*0.658' 
-		rate_values[103] = 8.80e-13*RO2*0.6*0.658
+		rc_eq_now = '8.80e-13*RO2*0.6' 
+		rate_values[103] = 8.80e-13*RO2*0.6
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*RO2*0.2*0.658' 
-		rate_values[104] = 8.80e-13*RO2*0.2*0.658
+		rc_eq_now = '8.80e-13*RO2*0.2' 
+		rate_values[104] = 8.80e-13*RO2*0.2
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
 		rc_eq_now = '2*KNO3AL*2.75' 
@@ -1349,16 +1346,16 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		rate_values[205] = KRO2NO3
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*0.2*RO2*0.68' 
-		rate_values[206] = 8.80e-13*0.2*RO2*0.68
+		rc_eq_now = '8.80e-13*0.2*RO2' 
+		rate_values[206] = 8.80e-13*0.2*RO2
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*0.6*RO2*0.68' 
-		rate_values[207] = 8.80e-13*0.6*RO2*0.68
+		rc_eq_now = '8.80e-13*0.6*RO2' 
+		rate_values[207] = 8.80e-13*0.6*RO2
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.80e-13*0.2*RO2*0.68' 
-		rate_values[208] = 8.80e-13*0.2*RO2*0.68
+		rc_eq_now = '8.80e-13*0.2*RO2' 
+		rate_values[208] = 8.80e-13*0.2*RO2
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
 		rc_eq_now = 'KRO2HO2*0.706' 
@@ -1461,12 +1458,12 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		rate_values[233] = KRO2NO3
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.00e-13*RO2*0.7*0.68' 
-		rate_values[234] = 8.00e-13*RO2*0.7*0.68
+		rc_eq_now = '8.00e-13*RO2*0.7' 
+		rate_values[234] = 8.00e-13*RO2*0.7
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '8.00e-13*RO2*0.3*0.68' 
-		rate_values[235] = 8.00e-13*RO2*0.3*0.68
+		rc_eq_now = '8.00e-13*RO2*0.3' 
+		rate_values[235] = 8.00e-13*RO2*0.3
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
 		rc_eq_now = '2.0e-14' 
@@ -23705,12 +23702,16 @@ def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, se
 		rate_values[5794] = 3.4641e-13
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '0.' 
-		rate_values[5795] = 0.
+		rc_eq_now = '0.25' 
+		rate_values[5795] = 0.25
 		gprn += 1 # keep count on reaction number
 		# remember equation in case needed for error reporting
-		rc_eq_now = '6.8' 
-		rate_values[5796] = 6.8
+		rc_eq_now = '0.1' 
+		rate_values[5796] = 0.1
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '0.0833' 
+		rate_values[5797] = 0.0833
 	except:
 		erf = 1 # flag error
 		err_mess = (str('Error: Could not calculate '+ 

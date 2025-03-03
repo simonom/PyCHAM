@@ -345,7 +345,8 @@ def init_conc(num_comp, init_conc, PInit,
 			if self.seed_name[seed_cnt] == 'core':
 				self.seedi[seed_cnt] = num_comp
 			else:
-				self.seedi[seed_cnt] = self.comp_namelist.index(self.seed_name[seed_cnt])
+				self.seedi[seed_cnt] = self.comp_namelist.index(
+					self.seed_name[seed_cnt])
 
 		# append name of core to component name list
 		self.comp_namelist.append('core')
@@ -634,6 +635,9 @@ def init_conc(num_comp, init_conc, PInit,
 			
 	except: # not called from finisher simulation
 		y[:] = y[:]
+
+	# remember number of components
+	self.nc = num_comp
 
 	return (y, H2Oi, y_mw, num_comp, Cfactor, y_indx_plot, corei, 
 			inj_indx, nuci, nrec_steps, erf, err_mess, NOi, 

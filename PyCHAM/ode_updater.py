@@ -310,9 +310,12 @@ def ode_updater(y, H2Oi,
 	# tempt_cnt # count on chamber temperatures
 	# ------------------------------------------------------------
 	
-	# start timer
+	# start timer, getting time in terms of seconds (UTC) since
+	# start of UNIX epoch (01/01/1970 00:00:00 UTC)
 	if (self.spin_up == 0): # if no spin-up
 		self.st_time = time.time()
+		# remember for saving in a time.struct_time object
+		self.sim_start_timestamp = time.gmtime(self.st_time)
 	
 	step_no = 0 # track number of time steps
 	sumt = 0. # track time through simulation (s)

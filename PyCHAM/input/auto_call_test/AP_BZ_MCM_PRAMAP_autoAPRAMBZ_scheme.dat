@@ -1938,11 +1938,9 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {102.} BZBIPERO2 + NO = BZBIPERNO3 : KRO2NO*0.082 ;
 {103.} BZBIPERO2 + NO = NO2 + BZBIPERO : KRO2NO*0.918 ;
 {104.} BZBIPERO2 + NO3 = NO2 + BZBIPERO : KRO2NO3 ;
-# note branching ratios for BZBIPERO2 are *0.658 to allow for 
-# autoAPRAM-fw unimolecular reactions of BZBIPERO2
-{105.} BZBIPERO2 = BZBIPER2OH : 8.80D-13*RO2*0.2*0.658 ;
-{106.} BZBIPERO2 = BZBIPERO : 8.80D-13*RO2*0.6*0.658 ;
-{107.} BZBIPERO2 = BZOBIPEROH : 8.80D-13*RO2*0.2*0.658 ;
+{105.} BZBIPERO2 = BZBIPER2OH : 8.80D-13*RO2*0.2 ;
+{106.} BZBIPERO2 = BZBIPERO : 8.80D-13*RO2*0.6 ;
+{107.} BZBIPERO2 = BZOBIPEROH : 8.80D-13*RO2*0.2 ;
 {108.} BZEPOXMUC + NO3 = BZEMUCCO3 + HNO3 : 2*KNO3AL*2.75 ;
 {109.} BZEPOXMUC + O3 = EPXC4DIAL + GLYOOA : 2.00D-18 ;
 {110.} BZEPOXMUC + OH = BZEMUCCO3 : 6.08D-11*0.31 ;
@@ -2048,11 +2046,9 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {206.} BZEMUCO2 + NO = BZEMUCNO3 : KRO2NO*0.105 ;
 {207.} BZEMUCO2 + NO = BZEMUCO + NO2 : KRO2NO*0.895 ;
 {208.} BZEMUCO2 + NO3 = BZEMUCO + NO2 : KRO2NO3 ;
-# note  unimolecular BZEMUCO2 branching ratios are adjusted
-# to allow for autoAPRAM-fw reaction
-{209.} BZEMUCO2 = BZEMUCCO : 8.80D-13*0.2*RO2*0.68 ;
-{210.} BZEMUCO2 = BZEMUCO : 8.80D-13*0.6*RO2*0.68 ;
-{211.} BZEMUCO2 = BZEMUCOH : 8.80D-13*0.2*RO2*0.68 ;
+{209.} BZEMUCO2 = BZEMUCCO : 8.80D-13*0.2*RO2;
+{210.} BZEMUCO2 = BZEMUCO : 8.80D-13*0.6*RO2 ;
+{211.} BZEMUCO2 = BZEMUCOH : 8.80D-13*0.2*RO2 ;
 {212.} C5DIALO2 + HO2 = C5DIALOOH : KRO2HO2*0.706 ;
 {213.} C5DIALO2 + NO = C5DIALO + NO2 : KRO2NO ;
 {214.} C5DIALO2 + NO3 = C5DIALO + NO2 : KRO2NO3 ;
@@ -2078,10 +2074,8 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {234.} PHENO2 + HO2 = PHENOOH : KRO2HO2*0.770 ;
 {235.} PHENO2 + NO = PHENO + NO2 : KRO2NO ;
 {236.} PHENO2 + NO3 = PHENO + NO2 : KRO2NO3 ;
-# note PHENO2 unimolecular branching ratios *0.68 to
-# allow for autoAPRAM-fw reactions
-{237.} PHENO2 = PHENO : 8.00D-13*RO2*0.7*0.68 ;
-{238.} PHENO2 = PHENOH : 8.00D-13*RO2*0.3*0.68 ;
+{237.} PHENO2 = PHENO : 8.00D-13*RO2*0.7 ;
+{238.} PHENO2 = PHENOH : 8.00D-13*RO2*0.3 ;
 {239.} PINAL + NO3 = C96CO3 + HNO3 : 2.0D-14 ;
 {240.} PINAL + OH = C96CO3 : 5.2D-12*EXP(600/TEMP)*0.772 ;
 {241.} PINAL + OH = PINALO2 : 5.2D-12*EXP(600/TEMP)*0.228 ;
@@ -3067,8 +3061,7 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 # MCM finished
 # PRAM (for alpha-pinene) and autoAPRAM-fw (for benzene) starts
 # Benzene HOM CHEMISTRY, note that unimolecular reactions for
-# BZBIPERO2, BZBIPERO,  BZEMUCO2 and PHENO2 have
-# branching ratios
+# BZBIPERO in MCM above have branching ratios
 # adjusted to accommodate the autoAPRAM-fw reactions
 # below 
 {1.}      BZBIPERO2 = BZo_RO2_O7 :		0.32 ; 

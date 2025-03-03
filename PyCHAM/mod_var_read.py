@@ -1191,8 +1191,14 @@ def mod_var_read(self):
 				self.RO2_nudge_target = float([str(i).strip() for i in
  					(value.split(','))][1])
 			
-		
-		
+			# user-defined outputs (molecules/cm3)
+			if (key == 'user_output' and (value.strip())):
+				# begin with the unconditional variables
+				self.user_output = ['unconditional_variables']
+				# append user-defined variables
+				user_output_list = [str(i).strip() for i in
+ 					(value.split(','))]
+				self.user_output += user_output_list
 		
 		# UManSysProp check ----------------------------------
 		# for UManSysProp if no update requested, check that there 

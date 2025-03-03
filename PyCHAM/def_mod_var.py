@@ -48,6 +48,8 @@ def def_mod_var(caller, self): # define function
 	# general ----------------------------------------------
 	# name of folder to save results to
 	self.sav_nam = 'default_res_name'
+	# variables to save
+	self.user_output = ['all']
 	# markers to isolate sections of chemical scheme based on MCM KPP format
 	self.chem_sch_mrk = ['<', 'RO2', '+', 'C(ind_', ')','' , 
 		'&', '' , '', ':', '>', ';', '']

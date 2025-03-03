@@ -39,7 +39,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	
 	# inputs: ----------------------------------------------------------------------------
 	
-	# y_mat - component (columns) concentrations with time (rows) (# molecules/cm3 (air))
+	# y_mat - component (columns) concentrations with time (rows) 
+	#	(# molecules/cm3 (air))
 	# Nresult_dry  - number concentration of dry particles 
 	# per size bin (# particles/cm3 (air))
 	# Nresult_wet  - number concentration of dry particles 
@@ -62,7 +63,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# time step
 	# time_taken - computer processing time for entire simulation 
 	#	(s)
-	# y_mw - molecular weights (g/mol)
+	# y_mw - molar masses weights (g/mol)
 	# self.nom_mass - nominal molar mass (g/mol)
 	# MV - molar volumes of all components (cm3/mol)
 	# time_taken - simulation computer time (s)
@@ -93,15 +94,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# self.seedi - index of seed components
 	# siz_str - the size structure
 	# cham_env - chamber environmental conditions (temperature (K), 
-	# pressure (Pa) and relative humidity
+	# pressure (Pa), relative humidity (0-1), transmission factor of light (0-1)
 	# self.RO2_indices[:, 1] - alkyl peroxy radical indices
 	# self.RO_indx - alkoxy radical indices
 	# self.tot_in_res_ft - record of cumulative inputs of injected components (ug/m3)
 	# self.tf - transmission factor of light, possibly segregated by wavelength
 	# self - reference to PyCHAM
 	# ---------------------------------------------------------------
-	
-	
+
 
 	# correct for changes to size bin radius bounds
 	if ((numsb-self.wall_on) > 0):
@@ -111,8 +111,50 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	if (testf == 1):
 		return(0) # return dummy
 
-	# create results directory now
-	os.makedirs(self.output_by_sim, exist_ok=False)
+	# create results directory now, note that setting exist_ok to
+	# true means any existing directories will be overwritten
+	os.makedirs(self.output_by_sim, exist_ok=True)
+
+	# if user has specified outputs
+	if (self.user_output[0] != 'all'):
+		
+		from save_bespoke import bespoke_saving
+		from netCDF4 import Dataset
+
+		# file name for results
+		y_pp_fname = os.path.join(self.output_by_sim, 'PyCHAM_results.nc')
+
+		# see https://unidata.github.io/
+		# netcdf4-python/#creatingopeningclosing-a-netcdf-file
+		# for tips on netCDF4 python package
+		# write the nc file, setting as an object called 
+		# root group
+		rootgrp = Dataset(y_pp_fname, 'w', format='NETCDF4')
+
+		# create the gas-phase concentration sub-group
+		cg = rootgrp.createGroup('concentrations_g')
+
+		# create the particle-phase concentration sub-group
+		cp = rootgrp.createGroup('concentrations_p')
+
+		# create the non-particle-surface-phase concentration sub-group
+		cs = rootgrp.createGroup('concentrations_s')
+
+		# get number of particle size bins
+		self.nasb = self.nsb-self.wall_on
+
+		# loop through outputs to save
+		for savei in range(len(self.user_output)):
+
+			# call on bespoke saving function, removing bounding 
+			# white space from variable name
+			rootgrp = bespoke_saving(savei, y_mat, y_mw, t_out, 
+				cham_env, rootgrp, self)	
+
+		# close netCDF file
+		rootgrp.close()
+
+		return() # end of saving function
 
 	# create folder to store copies of inputs
 	os.makedirs(str(self.output_by_sim+'/inputs'))
@@ -130,7 +172,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	
 	# if in automatic calling mode, then save the specified model variables
 	if (type(self.param_const) == dict):
-		output_by_sim_mv_ext = str(self.output_by_sim + '/inputs/specified_model_variables.txt')
+		output_by_sim_mv_ext = str(self.output_by_sim + 
+			'/inputs/specified_model_variables.txt')
 		with open(output_by_sim_mv_ext, 'w') as f:
 			for key, value in self.param_const.items():
 				f.write('%s = %s\n' % (key, value))
@@ -302,8 +345,8 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# saving time of outputs
 	np.savetxt(os.path.join(self.output_by_sim, 'time'), t_out, delimiter=',', header='time (s), these correspond to the rows in the concentrations_all_components_all_times_gas_particle_wall, particle_number_concentration and size_bin_radius output files')
 	
-	# saving environmental conditions (temperature, pressure, relative humidity, transmission factor)
-	# prepare to concatenate transmission factor of light (0-1)
+	# saving environmental conditions (temperature, pressure, 
+	# relative humidity, transmission factor)
 	cham_env = cham_env.astype('str')
 
 	np.savetxt(os.path.join(self.output_by_sim, 'chamber_environmental_conditions'), cham_env, fmt = '%s', delimiter=',', header='chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa), third is relative humidity (fraction (0-1), fourth is transmission factor of light (0-1))')

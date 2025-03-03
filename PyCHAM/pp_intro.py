@@ -202,6 +202,8 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	else:
 		num_sb = num_asb
 
+	self.nsb = num_sb # remember in self
+
 	# remember wall concentrations (set in init_conc)
 	y_w = y[num_comp::]
 
