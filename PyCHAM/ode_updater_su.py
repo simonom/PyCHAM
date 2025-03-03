@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -56,7 +56,7 @@ import ode_brk_err_mess
 import os
 
 def ode_updater_su(y, H2Oi, 
-	Pnow, Jlen, nrec_steps, 
+	Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, 
 	mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
@@ -92,7 +92,7 @@ def ode_updater_su(y, H2Oi,
 	# H2Oi - index of water
 	# self.TEMP - temperature in chamber (K)
 	# self.tempt - times that temperatures reached (s)
-	# Pnow - pressure inside chamber (Pa)
+	# self.Press - air pressure (Pa)
 	# self.light_stat - lights status
 	# self.light_time - time light status attained (s)
 	# self.daytime - time of day experiment starts (s)
@@ -333,13 +333,12 @@ def ode_updater_su(y, H2Oi,
 	# prepare
 	[_, _, _, _, _, _, 
 	seedt_cnt, _, Cfactor, infx_cnt, 
-	temp_now, cham_env, Pnow, 
+	temp_now, cham_env, 
 	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, 
 	num_sb, num_comp, N_perbin, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	x, therm_sp, H2Oi, act_coeff,
-	sumt, Pnow, light_time_cnt, 
-	Jlen, Cfactor, 
+	sumt, light_time_cnt, Jlen, Cfactor, 
 	Vbou, tnew, np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, seedt_cnt, corei, 
 	lowsize, uppsize, x, std, rbou, 
@@ -365,8 +364,7 @@ def ode_updater_su(y, H2Oi,
 		# step
 		wat_hist0 = wat_hist 
 		# relative humidity at start of integration step
-		RH0 = RHn 
-		Pnow0 = Pnow # pressure (Pa)
+		RH0 = RHn
 
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
@@ -414,13 +412,13 @@ def ode_updater_su(y, H2Oi,
 			# simulation time
 
 			# update chamber variables
-			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
+			[temp_now, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
 			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 			RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
-			Pnow0, light_time_cnt0, 
+			light_time_cnt0, 
 			tnew, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, 

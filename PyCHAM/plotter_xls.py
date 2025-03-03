@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -53,10 +53,12 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 		# open worksheet with observations
 		obs = wb[str(obs_setup[0])]
 	except:
-		mess = str('Error, could not find worksheet ' + str(obs_setup[0]) + ', available worksheets: ' + str(wb.sheetnames))
+		mess = str('Error, could not find worksheet ' + 
+		str(obs_setup[0]) + ', available worksheets: ' + 
+		str(wb.sheetnames))
 		self.l203a.setText(mess)
 		return()
-
+	
 	# starting row for x-axis
 	xrs = int(obs_setup[1].split(':')[0])-1
 	# finishing row for x-axis
@@ -123,7 +125,7 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	timehr = self.ro_obj.thr
 	comp_names = self.ro_obj.names_of_comp
 	rel_SMILES = self.ro_obj.rSMILES
-	y_MW = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
+	y_MM = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
 	H2Oi = self.ro_obj.H2O_ind
 	seedi = self.ro_obj.seed_ind
 	indx_plot = self.ro_obj.plot_indx
@@ -131,6 +133,7 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 	rbou_rec = self.ro_obj.rad
 	space_mode = self.ro_obj.spacing
 	group_indx = self.ro_obj.gi
+	Cfac = (np.array(self.ro_obj.cfac)).reshape(-1, 1)
 
 	# subtract any time before lights on
 	
@@ -143,7 +146,8 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 		try:
 			indx_plt = comp_names.index(self.gp_names[mci].strip())
 		except:
-			self.l203a.setText(str('Component ' + self.gp_names[mci].strip() + ' not found in chemical scheme used for this simulation'))
+			self.l203a.setText(str('Component ' + self.gp_names[mci].strip() + 
+			' not found in chemical scheme used for this simulation'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -155,11 +159,22 @@ def plotter_gp_mod_n_obs(self): # for gas-phase concentration temporal profiles
 			plt.ioff() # turn off interactive mode
 			plt.close() # close figure window
 			return()
+		
+		gp_units = self.b206b.currentText() # gas-phase concentration units
+		if (gp_units[0] == 'p'): # if ppb
+			conc = yrec[:, indx_plt].reshape(yrec.shape[0], 1)
+		if (gp_units[1] == 'g'): # if ug/m3
+			conc = yrec[:, indx_plt].reshape(yrec.shape[0], 1)*Cfac
+			conc = (((conc/si.N_A)*(y_MM[indx_plt].reshape(1, -1)))*1.e12)
+		if (gp_units[2] == 'm'): # if molecules/cm3
+			conc = yrec[:, indx_plt].reshape(yrec.shape[0], 1)*Cfac
 			
 		if (self.gp_units[-4::] == 'near'): # linear y-axis
-			ax0.plot(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))
+			ax0.plot(timehr, conc, '--', 
+				label = str(self.gp_names[mci] + ' sim.'))
 		if (self.gp_units[-4::] == 'log.'): # logarithmic y-axis
-			ax0.semilogy(timehr, yrec[:, indx_plt], '--', label = str(self.gp_names[mci] + ' sim.'))
+			ax0.semilogy(timehr, conc, '--', 
+				label = str(self.gp_names[mci] + ' sim.'))
 	
 	# x-axis title
 	ax0.set_xlabel(obs_setup[3], fontsize = 14)

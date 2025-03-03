@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2025					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to estimate coagulation kernel using p. 508 of Jacobson (2005), called on by ode_gen'''
 
 # number- but not mass-conserving coagulation code, called from ode_gen and operator-split
@@ -36,7 +37,7 @@ from mov_cen_water_eq import mov_cen_main as movcen # moving centre method for r
 import fullmov
 
 def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
-			num_comp, vdWon, V0, rad0, PInit, testf, num_molec_rint, num_part_rint, 
+			num_comp, vdWon, V0, rad0, testf, num_molec_rint, num_part_rint, 
 			sbVj, coag_on, siz_str, self):
 
 	# inputs:---------------------------------------------------------
@@ -85,8 +86,8 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	
 	# call on function to determine the Knudsen number and therefore flow 
 	# regime of each size bin
-	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr, PInit)
-	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint, PInit)
+	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr)
+	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint)
 
 	# Reynold number and terminal fall velocity for each size bin
 	[Rei, Vfi] = Reyn_num(sbr, eta_ai, rho_ai, kin_visc, 1.0e6, Kni)

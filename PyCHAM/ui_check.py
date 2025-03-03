@@ -47,8 +47,7 @@ def ui_check(self):
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[y0, Press,
-		siz_stru, num_sb, lowsize, 
+		[y0, siz_stru, num_sb, lowsize, 
 		uppsize, std, 
 		Compt, injectt, Ct,
 		seed_mw, seed_dens,
@@ -711,8 +710,7 @@ def ui_check(self):
 	# --------------------------------------------------------
 	
 	# store in pickle file
-	list_vars = [y0, Press, 
-			siz_stru, num_sb, lowsize, 
+	list_vars = [y0, siz_stru, num_sb, lowsize, 
 			uppsize, std, 
 			Compt, injectt, Ct, seed_mw, 
 			seed_dens, 

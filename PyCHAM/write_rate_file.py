@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -48,7 +48,7 @@ def write_rate_file(testf, self): # define function
 		f = open('rate_coeffs.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
 	f.write('#                                                                                        #\n')
 	f.write('#    All Rights Reserved.                                                                #\n')
 	f.write('#    This file is part of PyCHAM                                                         #\n')
@@ -77,14 +77,14 @@ def write_rate_file(testf, self): # define function
 
 	# following part is the function (there should be an indent at the start of each line)
 	# suggest using one tab
-	f.write('def evaluate_rates(RO2, H2O, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):\n')
+	f.write('def evaluate_rates(RO2, H2O, RH, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt, self):\n')
 	f.write('\n')
 	f.write('	# inputs: ------------------------------------------------------------------\n')
 	f.write('	# RO2 - total concentration of alkyl peroxy radicals (# molecules/cm3) \n')	
 	f.write('	# M - third body concentration (# molecules/cm3 (air))\n')
 	f.write('	# N2 - nitrogen concentration (# molecules/cm3 (air))\n')
 	f.write('	# O2 - oxygen concentration (# molecules/cm3 (air))\n')
-	f.write('	# H2O, TEMP: given by the user\n')
+	f.write('	# H2O, RH, TEMP: given by the user\n')
 	f.write('	# self.light_stat_now: given by the user and is 0 for lights off and >1 for on\n')
 	f.write('	# reaction rate coefficients and their names parsed in eqn_parser.py \n')
 	f.write('	# Jlen - number of photolysis reactions\n')
@@ -133,6 +133,8 @@ def write_rate_file(testf, self): # define function
 		f.write('	# if reactions have been found in the chemical scheme\n')
 		f.write('	# gas-phase reactions\n')
 		f.write('	gprn = 0 # keep count on reaction number\n')
+		# in case pause needed
+		#f.write('	import ipdb; ipdb.set_trace()\n')
 		f.write('	try:\n') # in case there are any issues with calculating a rate coefficient
 		for eqn_key in range (len(self.reac_coef_g)):
 			f.write('		gprn += 1 # keep count on reaction number\n')
@@ -145,8 +147,7 @@ def write_rate_file(testf, self): # define function
 		f.write('		\'rate coefficient for equation number \' \n')
 		f.write('		+ str(gprn) + \' \' + rc_eq_now + \n')
 		f.write('		\' (message from rate coeffs.py)\'))\n')
-		# in case pause needed
-		# f.write('	import ipdb; ipdb.set_trace()\n')
+		
 		f.write('	\n')
 		f.write('	# aqueous-phase reactions\n')
 		for eqn_key_aq in range (len(self.reac_coef_aq)):

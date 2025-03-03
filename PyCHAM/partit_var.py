@@ -32,7 +32,7 @@ import scipy.constants as si
 
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, 
 		R_gas, TEMP, NA, N_perbin, radius, therm_sp,
-		H2Oi, act_coeff, caller, Press, 
+		H2Oi, act_coeff, caller, 
 		DStar_org, z_prt_coeff, chamSA, chamV, self):
 	
 	# inputs:-----------------------------------------------------
@@ -58,7 +58,6 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	# caller - marker for the calling function
 	# self.partit_cutoff - the product of self.Psat and act_coeff above
 	#	 which gas-particle partitioning assumed zero (Pa)
-	# Press - air pressure (Pa)
 	# DStar_org - gas-phase diffusion coefficients of components 
 	#	(cm2/s)
 	# z_prt_coeff - fraction of total gas-particle partitioning 

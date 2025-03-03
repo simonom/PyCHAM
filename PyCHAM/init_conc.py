@@ -32,7 +32,7 @@ import write_dydt_rec
 import openbabel.pybel as pybel
 
 
-def init_conc(num_comp, init_conc, PInit,
+def init_conc(num_comp, init_conc,
 	testf, num_eqn, Compt, seed_mw,
 	self):
 		
@@ -46,7 +46,7 @@ def init_conc(num_comp, init_conc, PInit,
 	# 	experiment (K)
 	# self.RH - relative humidity in chamber (dimensionless 
 	#	fraction 0-1)
-	# PInit - initial pressure (Pa)
+	# self.Press - initial pressure (Pa)
 	# init_SMIL - SMILES of components present at start of 
 	#	experiment (whose concentrations are given in init_conc)
 	# testf - flag for whether in normal mode (0) or testing 
@@ -102,7 +102,7 @@ def init_conc(num_comp, init_conc, PInit,
 	# total number of molecules in 1 cm3 air using ideal gas law.  
 	# R has units m3.Pa/K.mol (changing to cm3.Pa/K.mol when 
 	# multiplied by 1e6)
-	ntot = PInit*(NA/((si.R*1.e6)*self.TEMP[0]))
+	ntot = self.Press[0]*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume
 	Cfactor = ntot*1.e-9 # ppb to # molecules/cm3 conversion factor
 	self.Cfactor = Cfactor

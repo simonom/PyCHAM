@@ -41,8 +41,7 @@ def mod_var_read(self):
 		input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[y0_gas, Press,
-			siz_stru, num_sb, 
+			[y0_gas, siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, Ct,
 			seed_mw, seed_dens,
@@ -274,7 +273,8 @@ def mod_var_read(self):
 
 			# pressure inside chamber
 			if (key == 'p_init' and (value.strip())):
-				Press = float(value.strip())
+				self.Press = np.array(([float(i) for i in
+					((value.strip()).split(','))]))
 
 			# time of day at experiment start (s)
 			if key == 'daytime_start' and (value.strip()):
@@ -833,7 +833,7 @@ def mod_var_read(self):
 			# status of lights (on or off)
 			if (key == 'light_status' and value.strip()):
 
-				# check if a path to file
+				# check if a path to file containing photolysis rates
 				try:
 					from J_value_file_open import J_value_file_open
 					self = J_value_file_open(str(value.strip()), self)
@@ -843,11 +843,11 @@ def mod_var_read(self):
 					light_stat = [int(i) for i in (value.split(','))]
 					self.light_stat = np.array((light_stat))
 					
-					# signal to use pre-calculated transmission
+					# checl for flag to use pre-calculated transmission
 					# factor for solar radiation (Hayman method)
-					# through clear glass (see photolysisRates)
-					# for more information
-					if sum(np.array((self.light_stat)) == 3) > 0:
+					# through clear glass (see photolysisRates
+					# for more information)
+					if (sum(np.array((self.light_stat)) == 3) > 0):
 						# ensure lights on
 						self.light_stat = np.ones((1)).astype('int')
 						# set a tf_range value that tells
@@ -857,14 +857,14 @@ def mod_var_read(self):
 					
 			
 			# times (s) corresponding to light status
-			if key == 'light_time' and value.strip():
+			if (key == 'light_time' and value.strip()):
 				light_time = [float(i) for i in (value.split(','))]
 				self.light_time = np.array((light_time))
 				
-			if key == 'lat': # latitude (degrees)
+			if (key == 'lat'): # latitude (degrees)
 				if (value.strip()): self.lat = float(value.strip())
 
-			if key == 'lon': # longitude (degrees)
+			if (key == 'lon'): # longitude (degrees)
 				if (value.strip()): self.lon = float(value.strip())
 
 			# for specified actinic flux, note 'act_flux_file' 
@@ -1238,7 +1238,7 @@ def mod_var_read(self):
 			self.pmode = 0 # modal particle concentrations
 		
 		# prepare for pickling
-		list_vars = [y0_gas, Press, 
+		list_vars = [y0_gas, 
 				siz_stru, num_sb, lowsize, 
 				uppsize, std, 
 				Compt, injectt, Ct, seed_mw, 

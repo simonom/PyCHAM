@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -47,10 +47,14 @@ def obs_file_open(self):
 	# time (seconds) is in first column, other 
 	# variables in later columns
 	ic = 0 # count on row iteration
-	# column indices for temperature and 
-	# relative humidity
+	# column indices for temperature,
+	# relative humidity, pressure
 	temper_indx = -2
 	rh_indx = -2
+	press_indx = -2
+	ls_indx = -2
+	Jref_indx = -2
+	
 	# track whether particulate matter mole fractions 
 	# seen in obs_file
 	seedx_flag = 0
@@ -103,6 +107,28 @@ def obs_file_open(self):
 					self.RH = []
 					self.RHt = []
 					continue
+				if (oc == 'Pressure (Pa)'):
+					press_indx = col_num
+					self.Press = []
+					self.Presst = []
+					continue
+				if (oc == 'light_status'):
+					ls_indx = col_num
+					self.light_stat = np.zeros((0))
+					self.light_time = np.zeros((0))
+					continue
+				# check whether a photolysis rate (to
+				# constrain all photolysis rates by)
+				# is provided
+				if (oc[0] == 'J' and '/s' in oc):
+					# get photolysis rate index
+					self.photo_rate_indx = int(oc[1:oc.index(' ')])
+					Jref_indx = col_num
+					self.Jref = []
+					self.Jref_time = []
+					continue
+									
+
 				# if an observed particulate 
 				# matter component
 				if 'PM' in oc or 'pm' in oc:
@@ -253,7 +279,8 @@ def obs_file_open(self):
 			# get times (s)
 			self.obs[ic-1, 0] = np.array((i))[0]
 			
-			# temperature and relative humidity observations
+			# temperature, relative humidity, pressure, light status 
+			# observations, reference photolysis rate observation
 			if (temper_indx != -2):
 				self.TEMP.append(
 				np.array((i))[temper_indx])
@@ -261,6 +288,20 @@ def obs_file_open(self):
 			if (rh_indx != -2):
 				self.RH.append(np.array((i))[rh_indx])
 				self.RHt.append(i[0])
+			if (press_indx != -2):
+				self.Press.append(np.array((i))[press_indx])
+				self.Presst.append(i[0])
+			if (ls_indx != -2):
+				self.light_stat = np.append(self.light_stat, 
+					np.array((i))[ls_indx])
+				self.light_time = np.append(self.light_time, 
+					np.array((i))[0])
+			if (Jref_indx != -2):
+				self.Jref.append(np.array((i))[Jref_indx])
+				self.Jref_time.append(i[0])
+				# tell photolysisRates that photolysis rates
+				# need constraining by this observation
+				self.tf_range = 3
 
 			# particulate matter observations at this time
 			if (seedx_flag == 1):
@@ -305,9 +346,13 @@ def obs_file_open(self):
 	except: # filler except command
 		self.seed_name = self.seed_name
 	
-	# ensure numpy array for rh arrays
+	# ensure numpy array for rh and pressure arrays
 	self.RH = np.array((self.RH)).astype('float')
 	self.RHt = np.array((self.RHt)).astype('float')
+
+	self.Press = np.array((self.Press)).astype('float')
+	self.Presst = np.array((self.Presst)).astype('float')
+
 	wb.close() # close excel file
 	
 	

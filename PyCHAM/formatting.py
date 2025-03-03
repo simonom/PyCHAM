@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -48,11 +48,17 @@ def remove_comments(total_list):
 def SN_conversion(RateExp):
 	SN_d_regex = r"\d+(D|d)(-?|\+?)\d+"
 	RegexList = re.findall(SN_d_regex, RateExp)
-	if (RegexList != []): # in case more than one 'D' type instances are in the rate expression
-		for i in range(len(RegexList)): # loop the checking until all 'D/d' instances are corrected
+	# in case more than one 'D' type instances are in the rate expression
+	if (RegexList != []):
+		# loop the checking until all 'D/d' instances are corrected
+		for i in range(len(RegexList)):
 			m = re.search(SN_d_regex, RateExp)
-			TempSlice = m.group(0) #  get the slice that RE engine has extracted from the rate coef. expression
-			SliceStart = m.start() # the position and length are used to replace a part of the expression
+			#  get the slice that RE engine has extracted 
+			# from the rate coef. expression
+			TempSlice = m.group(0)
+			# the position and length are used to 
+			# replace a part of the expression
+			SliceStart = m.start()
 			SliceEnd = m.end()
 			# replace the 'D/d' with 'e' in the SLICE
 			TempSlice = TempSlice.replace('d', 'e')
@@ -93,20 +99,57 @@ def convert_rate_mcm(rate_coef):
 	for func_step in range(len(math_func_list)):
 
 		if (new_rate.find(math_func_list[func_step][0]) != -1):
-			new_rate = new_rate.replace(math_func_list[func_step][0], math_func_list[func_step][1]) 
+			new_rate = new_rate.replace(math_func_list[func_step][0], 
+				math_func_list[func_step][1]) 
 		else:
 			continue
 
-	# see if the rate expression contains photolysis rate; convert 'J(n)' or 'J<n>' to 'J[n]'
-	photolysis_rate_str = re.findall(r"J\(|J\<", new_rate)
+	# see if the rate expression contains photolysis rate
+	# convert 'J(n)' or 'J<n>' to 'J[n]'
+	photolysis_rate_str = re.findall(r"J\(", new_rate)
 	if (photolysis_rate_str != []): 
 		new_j_rate = new_rate # redefine
+		scnt = new_j_rate.count('J(')
+		for iscnt in range(scnt):
+			sindx = new_j_rate.index('J(')
+			new_j_rate = str(
+			new_j_rate[0:sindx+1] + '[' + 
+			new_j_rate[sindx+2::])
 
-		new_j_rate = new_j_rate.replace('(', '[')
-		new_j_rate = new_j_rate.replace('<', '[')
-		new_j_rate = new_j_rate.replace(')', ']')
-		new_j_rate = new_j_rate.replace('>', ']')
+			# loop for corresponding close bracket
+			while sindx < len(new_j_rate):
+				sindx +=1 # move up an index
+				if new_j_rate[sindx] == ')':
+					new_j_rate = str(
+					new_j_rate[0:sindx] + ']' + 
+					new_j_rate[sindx+1::])
+					break # break while loop
+
+		new_rate = new_j_rate
+
+	photolysis_rate_str = re.findall(r"J\<", new_rate)
+	if (photolysis_rate_str != []):
+		new_j_rate = new_rate # redefine
+		scnt = new_j_rate.count('J<')
+		for iscnt in range(scnt):
 			
+			sindx = new_j_rate.index('J<')
+			new_j_rate = str(
+			new_j_rate[0:sindx+1] + '[' + 
+			new_j_rate[sindx+2::])
+			
+			# loop for corresponding close bracket
+			while sindx < len(new_j_rate):
+				sindx +=1 # move up an index
+				if (new_j_rate[sindx] == '>'):
+					new_j_rate = str(
+					new_j_rate[0:sindx] + ']' + 
+					new_j_rate[sindx+1::])
+					break # break while loop	
+		new_rate = new_j_rate
+
+	photolysis_rate_str = re.findall(r"J\[", new_rate)
+	if (photolysis_rate_str != []):
 		new_j_rate = new_j_rate.replace('J_O3_O1D', '1')
 		new_j_rate = new_j_rate.replace('J_O3_O3P', '2')
 		new_j_rate = new_j_rate.replace('J_H2O2', '3')
@@ -141,7 +184,6 @@ def convert_rate_mcm(rate_coef):
 		new_j_rate = new_j_rate.replace('J_IC3H7NO3', '54')
 		new_j_rate = new_j_rate.replace('J_TC4H9NO3', '55')
 		new_j_rate = new_j_rate.replace('J_NOA', '56')
-
 		new_rate = new_j_rate
 
 	# The output rate_coef has length equal to the number of

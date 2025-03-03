@@ -192,7 +192,7 @@ class PyCHAM(QWidget):
 		
 		# default variables for all required input model 
 		# variables -------------------------
-		[y0, Press, siz_stru, num_sb, 
+		[y0, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
 		Compt, injectt, Ct, seed_mw, seed_dens, 
 		dens_comp, dens, vol_comp, volP, act_comp, 
@@ -377,10 +377,10 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(self.l16c, env_row+4, 1)
 		
 		l17 = QLabel(self)
-		l17.setText('Chamber air pressure (Pa): ')
+		l17.setText('Air pressure (Pa): ')
 		self.varbox.addWidget(l17, env_row+5, 0)
 		self.l17a = QLabel(self)
-		self.l17a.setText((str(Press)).replace('\'', '').replace(' ', ''))
+		self.l17a.setText((str(self.Press)).replace('\'', '').replace(' ', ''))
 		self.varbox.addWidget(self.l17a, env_row+5, 1)
 		
 		l17_1 = QLabel(self)
@@ -1150,7 +1150,8 @@ class PyCHAM(QWidget):
 		
 		# button to plot temporal profile of gas-phase concentrations
 		self.b206 = QPushButton(str('Gas-phase concentrations'), self)
-		self.b206.setToolTip('Plot gas-phase concentration temporal profile for the specified components')
+		self.b206.setToolTip(str('Plot gas-phase concentration ' +
+			'temporal profile for the specified components'))
 		self.b206.clicked.connect(self.on_click206)
 		self.PRIMlayout.addWidget(self.b206, 3, 0)
 		
@@ -1220,7 +1221,8 @@ class PyCHAM(QWidget):
 		
 		# button to plot temporal profile of chamber environmental variables
 		self.b215_a = QPushButton('Physical Conditions (T, P, RH)', self)
-		self.b215_a.setToolTip('''Plot the temporal profile of chamber variables (temperature, pressure, relative humidity)''')
+		self.b215_a.setToolTip(str('Plot the temporal profile of chamber ' +
+			'variables (temperature, pressure, relative humidity)'))
 		self.b215_a.clicked.connect(self.on_click215_a)
 		self.PRIMlayout.addWidget(self.b215_a, 0, 2)
 		
@@ -2046,9 +2048,9 @@ class PyCHAM(QWidget):
 
 		# drop down button for what to plot
 		self.b402 = QComboBox(self)
-		self.b402.addItem('Gas-phase Concentrations (ppb)')
-		self.b402.addItem(str('Particle Concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' + ')  with Standard Results Plot'))
-		self.b402.addItem(str('Particle Concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' +') with Cumulative particle mass concentration without water plot'))
+		self.b402.addItem('Gas-phase concentrations (units set in Quick tab)')
+		self.b402.addItem(str('Particle concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' + ')  with Standard Results Plot'))
+		self.b402.addItem(str('Particle concentrations (' + u'\u03BC' + 'g/m' + u'\u00B3' +') with Cumulative particle mass concentration without water plot'))
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)')
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)')
 		self.b402.addItem('Van Krevelen (Time Profile, Averaged Over _ Extension Hydrocarbons)')
@@ -2140,7 +2142,7 @@ class PyCHAM(QWidget):
 		# prepare by enforcing default variables
 		# default variables for all required input model 
 		# variables -------------------------------------------- 
-		[y0, Press, siz_stru, num_sb, 
+		[y0, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
 		Compt, 
 		injectt, Ct, seed_mw, seed_dens, 
@@ -2159,8 +2161,7 @@ class PyCHAM(QWidget):
 			'/PyCHAM/pickle.pkl')
 		
 		with open(input_by_sim, 'rb') as pk:
-			[y0, Press,
-			siz_stru, num_sb, 
+			[y0, siz_stru, num_sb, 
 			lowsize, uppsize, std, 
 			Compt, injectt, Ct,
 			seed_mw, seed_dens,
@@ -2372,8 +2373,7 @@ class PyCHAM(QWidget):
 			# reset to default variables to allow any new 
 			# variables to arise
 			# from the current model variables file only
-			[y0, Press, 
-			siz_stru, num_sb, 
+			[y0, siz_stru, num_sb, 
 			lowsize, uppsize, 
 			std, Compt, injectt, 
 			Ct, seed_mw, seed_dens,  
@@ -2426,8 +2426,7 @@ class PyCHAM(QWidget):
 			input_by_sim = str(self.PyCHAM_path 
 				+ '/PyCHAM/pickle.pkl')
 			with open(input_by_sim, 'rb') as pk:
-				[y0, Press,
-				siz_stru, num_sb,
+				[y0, siz_stru, num_sb,
 				lowsize, uppsize, std,
 				Compt, injectt, Ct,
 				seed_mw, seed_dens,
@@ -4690,8 +4689,7 @@ class PyCHAM(QWidget):
 
 			# get the most recent model variables
 			with open(input_by_sim, 'rb') as pk:
-				[y0, Press,
-				siz_stru, num_sb,
+				[y0, siz_stru, num_sb,
 				 lowsize, uppsize, 
 				std, Compt, injectt, Ct,
 				seed_mw, seed_dens,
@@ -4887,7 +4885,7 @@ class PyCHAM(QWidget):
 		self.oandm = 0
 
 		# if gas-phase concentrations
-		if ('Gas-phase Concentrations' in om_choice):
+		if ('Gas-phase concentrations' in om_choice):
 			self.oandm = 1
 			# get names of gas-phase components to plot
 			self.gp_names = [str(i) for i in self.e205.text(). split(',')]
@@ -4896,7 +4894,7 @@ class PyCHAM(QWidget):
 
 		
 		# if total particle concenrations
-		if ('Particle Concentrations' in om_choice): 
+		if ('Particle concentrations' in om_choice): 
 			if ('Standard Results Plot' in om_choice):
 				self.oandm = 1.1
 			if ('Cumulative particle mass concentration without water' 
@@ -4906,7 +4904,8 @@ class PyCHAM(QWidget):
 		# if Van Krevelen
 		if ('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)' in om_choice):
 			self.oandm = 2
-		if ('Van Krevelen (All Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+		if (str('Van Krevelen (All Individual Hydrocarbons at The Time ' +
+			'Through Experiment (s) Provided Below)') in om_choice):
 			self.oandm = 3
 		if ('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)' in om_choice):
 			self.oandm = 4
@@ -5012,7 +5011,7 @@ class PyCHAM(QWidget):
 			
 			# default variables for all required input model 
 			# variables -------------------------
-			[y0, Press, siz_stru, num_sb, 
+			[y0, siz_stru, num_sb, 
 			lowsize, uppsize, std, 
 			Compt, injectt, Ct, seed_mw, seed_dens, 
 			dens_comp, dens, vol_comp, volP, act_comp, 

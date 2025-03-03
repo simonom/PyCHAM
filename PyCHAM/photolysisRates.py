@@ -158,6 +158,27 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 			0.821086824, 0, 0, 0, 0, 0]
 			J = J*self.tf*Hayman_wd_tf_clear_glass
 
+		
+		# if the natural light photolysis rates need multiplying by
+		# the factor needed to match a reference (e.g. observed) 
+		# photolysis rate
+		if (self.tf_range == 3):
+
+			# get the reference photolysis rate (/s)
+			Jref_now = np.interp(sumt, self.Jref_time, self.Jref)
+
+			# get the factor to multiply by
+			tf_now = Jref_now/J[self.photo_rate_indx]
+
+			# multiply all Hayman (natural light) photolysis
+			# rates by this factor
+			J = J*tf_now
+
+			# remember this factor for the chemical scheme rate
+			# coefficients
+			self.JFAC = tf_now
+
+
 	# if a file path for user-supplied absorption cross-sections
 	# and quantum yields are supplied and actinic flux is
 	# based on the Madronich equations for actinic flux from

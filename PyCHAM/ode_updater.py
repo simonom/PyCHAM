@@ -54,7 +54,7 @@ from ode_brk_err_mess import ode_brk_err_mess
 
 
 def ode_updater(y, H2Oi, 
-	Pnow, Jlen, nrec_steps, 
+	Jlen, nrec_steps, 
 	siz_str, num_sb, num_comp, mfp, therm_sp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, Varr, act_coeff, Cfactor, rowvals, colptrs, Vbou,
@@ -92,7 +92,7 @@ def ode_updater(y, H2Oi,
 	# H2Oi - index of water
 	# self.TEMP - temperature in chamber (K)
 	# self.tempt - times that temperatures reached (s)
-	# Pnow - pressure inside chamber (Pa)
+	# self.Press - air pressure (Pa)
 	# self.light_stat - lights status
 	# self.light_time - time light status attained (s)
 	# self.daytime - time of day experiment starts (s)
@@ -389,18 +389,23 @@ def ode_updater(y, H2Oi,
 			self.kwf = 0
 	else:
 		self.kwf = 0 # filler when no wall
+
+	# get air pressure (Pa) now
+	self.Pressn = np.interp(sumt, self.Presst, self.Press)
+	# get relative humidity now
+	self.RHn = self.RH[0]
 	
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are recorded below
 	[trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 	seedt_cnt, rbou_rec, Cfactor, infx_cnt, 
-	temp_now, cham_env, Pnow, 
+	temp_now, cham_env, 
 	RHn, Cinfl_now] = rec_prep.rec_prep(nrec_steps, y, y0, 
 	num_sb, num_comp, N_perbin, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA,
 	x, therm_sp, H2Oi, act_coeff,
-	sumt, Pnow, light_time_cnt, 
+	sumt, light_time_cnt, 
 	Jlen, Cfactor, 
 	Vbou, tnew, 
 	np_sum, update_count, injectt, gasinj_cnt, 
@@ -431,7 +436,7 @@ def ode_updater(y, H2Oi,
 		# remember water history flag at start of integration step
 		wat_hist0 = wat_hist
 		RH0 = RHn # relative humidity at start of integration step
-		Pnow0 = Pnow # pressure (Pa)
+		self.RHn = RHn
 
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
@@ -441,6 +446,9 @@ def ode_updater(y, H2Oi,
 		gasinj_cnt0 = gasinj_cnt
 		light_time_cnt0 = light_time_cnt
 		conPin_cnt0 = conPin_cnt
+		
+		# get air pressure (Pa) now
+		self.Pressn = np.interp(sumt, self.Presst, self.Press)
 		
 		# ------------------------------------------------------------
 		
@@ -473,7 +481,7 @@ def ode_updater(y, H2Oi,
 				yrec, Cfactor_vst, y, sumt, num_sb, num_comp, N_perbin, 
 				kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 				Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, rbou_rec, 
-				cham_env, temp_now, Pnow, tot_in_res, self)
+				cham_env, temp_now, tot_in_res, self)
 				# prepare for recording next point
 				save_cnt += 1
 
@@ -494,7 +502,7 @@ def ode_updater(y, H2Oi,
 					# records in step with rec.rec function 
 					[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(
 						y[H2Oi], temp_now, y, 
-						Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
+						Jlen, y[NOi], y[HO2i], y[NO3i], 
 						sumt, self)
 
 					# if error message from reaction rate 
@@ -512,7 +520,7 @@ def ode_updater(y, H2Oi,
 						NA, N_perbin, 
 						x.reshape(1, -1)*1.e-6, therm_sp, 
 						H2Oi, act_coeff, 1,
-						Pnow, DStar_org, z_prt_coeff, chamSA, 
+						DStar_org, z_prt_coeff, chamSA, 
 						chamV, self)
 				
 						# update particle-phase activity 
@@ -572,13 +580,13 @@ def ode_updater(y, H2Oi,
 			# update chamber variables, note this has to come after
 			# updates to tnew, so that things with influx can
 			# have the correct time integration applied
-			[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
+			[temp_now, light_time_cnt, tnew, ic_red, 
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
 			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 			RHt_cnt, N_perbin, x,
 			pconcn_frac,  pcontf, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
-			Pnow0, light_time_cnt0, 
+			light_time_cnt0, 
 			tnew, np_sum, update_count, 
 			injectt, gasinj_cnt0, inj_indx, Ct,
 			seedt_cnt0, num_comp, y0, y, N_perbin0, 
@@ -601,7 +609,7 @@ def ode_updater(y, H2Oi,
 				num_comp, 
 				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1,
-				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
+				DStar_org, z_prt_coeff, chamSA, chamV, self)
 				
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
@@ -622,7 +630,7 @@ def ode_updater(y, H2Oi,
 			# time step
 			[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(
 				y[H2Oi], temp_now, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 
+				Jlen, y[NOi], y[HO2i], y[NO3i], 
 				sumt, self)
 			
 			# if error message from reaction rate 
@@ -914,7 +922,7 @@ def ode_updater(y, H2Oi,
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
-						num_comp, 0, Vol0, rad0, Pnow, 0,
+						num_comp, 0, Vol0, rad0, 0,
 						Cp, (N_perbin).reshape(1, -1),
 						(Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
@@ -1082,7 +1090,7 @@ def ode_updater(y, H2Oi,
 			num_comp, N_perbin, 
 			kelv_fac, kimt, act_coeff, Cfactor, Nres_dry, 
 			Nres_wet, x2, x, MV, H2Oi, Vbou, rbou, 
-			rbou_rec, cham_env, temp_now, Pnow, 
+			rbou_rec, cham_env, temp_now, 
 			tot_in_res, self)
 
 			# record final change tendency

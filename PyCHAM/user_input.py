@@ -53,8 +53,7 @@ def share(self):
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:
-		[y0, Press,
-		siz_stru, num_sb, lowsize, 
+		[y0, siz_stru, num_sb, lowsize, 
 		uppsize, std, Compt, injectt, Ct,
 		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
@@ -79,7 +78,7 @@ def share(self):
 		self.y0_orig = y0
 		self.RH_orig = self.RH
 		self.RHt_orig = self.RHt
-		self.Press_orig = Press
+		self.Press_orig = self.Press
 		self.Cw_orig = self.Cw
 		self.kw_orig = self.kw
 		self.siz_stru_orig = siz_stru
@@ -158,8 +157,7 @@ def share(self):
 		self.tf_UVC_orig = self.tf_UVC
 		self.num_asb = num_sb
 
-	return(y0, Press,
-		siz_stru, num_sb, lowsize, uppsize, 
+	return(y0, siz_stru, num_sb, lowsize, uppsize, 
 		std, Compt, injectt, Ct,
 		seed_mw, seed_dens,
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 

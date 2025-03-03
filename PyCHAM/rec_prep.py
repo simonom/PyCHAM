@@ -1,5 +1,5 @@
 ########################################################################							
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -35,7 +35,7 @@ def rec_prep(nrec_step, y, y0,
 	num_sb, num_comp, N_perbin, mfp,
 	accom_coeff, y_mw, surfT, R_gas, NA, 
 	x, therm_sp, H2Oi, act_coeff, 
-	sumt, Pnow, light_time_cnt, 
+	sumt, light_time_cnt, 
 	Jlen, Cfactor, Vbou, tnew, 
 	np_sum, update_count, injectt, gasinj_cnt, 
 	inj_indx, Ct, seedt_cnt, corei, 
@@ -77,7 +77,7 @@ def rec_prep(nrec_step, y, y0,
 	# act_coeff - activity coefficient
 	# self.RO2_indices - index of alkyl peroxy radicals in second column
 	# sumt - cumulative time through simulation (s)
-	# Pnow - chamber pressure (Pa)
+	# self.Pressn - air pressure now (Pa)
 	# self.light_stat - light status
 	# self.light_time - times corresponding to light status
 	# light_time_cnt - count on light status array
@@ -189,12 +189,12 @@ def rec_prep(nrec_step, y, y0,
 	# due to air exchange
 	self.C_res_flux = np.zeros((nrec_step+1, 5))
 	
-	[temp_now, Pnow, light_time_cnt, tnew, ic_red, 
+	[temp_now, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
 		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, 
 		self] = cham_up.cham_up(sumt, 
-		Pnow, light_time_cnt, 0, 
+		light_time_cnt, 0, 
 		np_sum, update_count, 
 		injectt, gasinj_cnt, inj_indx, Ct, 
 		seedt_cnt, num_comp, y0, y, N_perbin, 
@@ -244,7 +244,7 @@ def rec_prep(nrec_step, y, y0,
 		num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, 
-		Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
+		DStar_org, z_prt_coeff, chamSA, chamV, self)
 		
 	if (num_sb-self.wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 
@@ -282,7 +282,7 @@ def rec_prep(nrec_step, y, y0,
 	
 	# update reaction rate coefficients
 	[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
+				Jlen, y[NOi], y[HO2i], y[NO3i], 0., self)
 
 	# chamber environmental conditions ----------------------------------
 	# initiate the array for recording chamber temperature (K), pressure (Pa) 
@@ -290,7 +290,7 @@ def rec_prep(nrec_step, y, y0,
 	cham_env = np.zeros((nrec_step, 4))
 	
 	cham_env[0, 0] = temp_now # temperature (K)
-	cham_env[0, 1] = Pnow # pressure (Pa)
+	cham_env[0, 1] = self.Pressn # pressure (Pa)
 	# relative humidity (fraction (0-1))
 	cham_env[0, 2] = y[H2Oi]/self.Psat[0, H2Oi] 
 	# transmission factor of light
@@ -322,4 +322,4 @@ def rec_prep(nrec_step, y, y0,
 						
 	return(trec, yrec, Cfactor_vst, Nres_dry, Nres_wet, x2, 
 		seedt_cnt, rbou_rec, Cfactor, infx_cnt, temp_now, 
-		cham_env, Pnow, cham_env[0, 2], Cinfl_now)
+		cham_env, cham_env[0, 2], Cinfl_now)

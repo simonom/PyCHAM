@@ -36,7 +36,7 @@ except:
 		os.remove(rate_coeffs)
 
 
-def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
+def rrc_calc(H2O, TEMP, y, Jlen, NO, HO2, NO3, sumt, self):
 
 	# in case failure to import previous version using import 
 	# command above
@@ -53,7 +53,7 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	# self.lon - longitude
 	# self.af_path - path to file stating actinic flux
 	# self.DayOfYear - day number of the year (1-365)
-	# PInit - chamber pressure (Pa)
+	# self.Press - air pressure (Pa)
 	# self.photo_file - name of file with estimates for photolysis 
 	#	absorption cross-sections and quantum yields
 	# Jlen - number of photolysis reactions
@@ -97,7 +97,7 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 	# 1.0e-6 is the 1 cm3 volume expressed as m3
 	# R and Avogadro's constant set the same as in 
 	#atmosphereFunctions.f90 of AtChem2
-	M_val = ((PInit*1.e-6)/(8.3144621*TEMP))*si.N_A
+	M_val = ((self.Pressn*1.e-6)/(8.3144621*TEMP))*si.N_A
 	
 	# N2 and O2 given the same multiplication as in 
 	# atmosphereFunctions.f90 of AtChem2
@@ -106,7 +106,7 @@ def rrc_calc(H2O, TEMP, y, PInit, Jlen, NO, HO2, NO3, sumt, self):
 
 	importlib.reload(rate_coeffs) # ensure latest version uploaded
 	# calculate the new rate coefficient array (/s) 
-	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, 
+	[rrc, erf, err_mess] = rate_coeffs.evaluate_rates(RO2, H2O, self.RHn,
 		TEMP, time, M_val, N2_val, O2_val, Jlen, NO, HO2, NO3, 
 		sumt, self)
 

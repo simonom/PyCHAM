@@ -32,7 +32,7 @@ from pp_water_equil import pp_water_equil
 def pp_intro(y, num_comp, TEMP, H2Oi,
 		mfp, accom_coeff, y_mw, surfT, 
 		siz_str, num_asb, lowersize, uppersize, 
-		testf, std, therm_sp, act_coeff, Press,
+		testf, std, therm_sp, act_coeff,
 		seed_mw, R_gas, self):
 	
 	# inputs -----------------------------------
@@ -71,7 +71,6 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	# scheme file
 	# act_coeff - activity coefficient of components
 	# self.wall_on - whether or not to consider wall
-	# Press - pressure inside chamber
 	# self.seedi - index of seed components
 	# self.pcont - whether particle injections are instantaneous 
 	#	or continuous (flag)

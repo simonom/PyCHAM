@@ -83,7 +83,7 @@ def def_mod_var(caller, self): # define function
 	self.RH = np.array(([0.65]))
 	# time through simulation (s) at which RH is reached
 	self.RHt = np.array(([0]))
-	Press = 9.8e4 # air pressure during experiment (Pa)
+	self.Press = 9.8e4 # air pressure during experiment (Pa)
 	# dilution factor (volume fraction per second)
 	self.dil_fac = np.zeros(1) 
 	# dilution factor times through experiment (s)
@@ -98,6 +98,7 @@ def def_mod_var(caller, self): # define function
 	# size structure (0 for moving-centre, 1 for full-moving)
 	siz_stru = 0
 	num_sb = 0 # number of particle size bins
+	self.num_asb = num_sb
 	# whether particle number concentrations expressed 
 	# by modes (0) or explicitly (1)
 	self.pmode = 0
@@ -291,8 +292,7 @@ def def_mod_var(caller, self): # define function
 	self.RO2_nudge_target = -1
 	# -------------------------------------------------------------
 	# prepare for pickling
-	list_vars = [y0, Press, 
-			siz_stru, num_sb, 
+	list_vars = [y0, siz_stru, num_sb, 
 			lowsize, 
 			uppsize, std, 
 			Compt, injectt, Ct, seed_mw, 
@@ -316,7 +316,7 @@ def def_mod_var(caller, self): # define function
 		f.close() # close
 
 
-	return(y0, Press, siz_stru, num_sb, 
+	return(y0, siz_stru, num_sb, 
 		lowsize, uppsize, 
 		std, Compt, 
 		injectt, Ct, seed_mw, seed_dens,  

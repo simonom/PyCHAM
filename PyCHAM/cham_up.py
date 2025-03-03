@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -34,7 +34,7 @@ import scipy.constants as si
 from water_calc import water_calc
 
 # define function
-def cham_up(sumt, Pnow, 
+def cham_up(sumt, 
 	light_time_cnt, tnew, 
 	new_part_sum1, update_count,
 	injectt, gasinj_cnt, inj_indx, 
@@ -50,7 +50,7 @@ def cham_up(sumt, Pnow,
 	# sumt - cumulative time through simulation (s)
 	# self.TEMP - temperature in chamber (K)
 	# self.tempt - times that temperatures reached (s)
-	# Pnow - pressure in chamber (Pa)
+	# self.Pressn - air pressure now (Pa)
 	# self.light_stat - status of lights
 	# self.light_time - times that light attain status (s)
 	# light_time_cnt - light status counter
@@ -291,15 +291,13 @@ def cham_up(sumt, Pnow,
 				volP, 0, corei, 
 				0, 0.0, [], 1, nuci, self)
 			
-			# according to the ideal gas law, air pressure (Pa) inside chamber
-			# is proportional to temperature, therefore pressure changes by 
-			# the same factor 
-			Pnow = Pnow*(temp_nown/temp_now)
-			
+			# note that air pressure does not respond to temperature in
+			# PyCHAM, it needs to be set by the user
+
 			# update ppb to molecules/cm3 conversion factor concentrations
 			# total number of molecules in 1 cm3 air using ideal gas law.  
 			# R has units cm3.Pa/K.mol
-			ntot = Pnow*(si.N_A/((si.R*1.e6)*temp_nown))
+			ntot = self.Pressn*(si.N_A/((si.R*1.e6)*temp_nown))
 			# one billionth of number of molecules in chamber unit volume
 			Cfactor = ntot*1.e-9 # ppb to molecules/cm3 conversion factor
 			
@@ -310,7 +308,7 @@ def cham_up(sumt, Pnow,
 			ma = 28.966e-3
 			
 			# air density (kg/m3 (air)), ideal gas law
-			rho_a =  (Pnow*ma)/((si.R)*temp_nown)
+			rho_a =  (self.Pressn*ma)/((si.R)*temp_nown)
 						
 			# update mean free path and thermal speed
 			# mean thermal speed of each molecule (m/s) (11.151 Jacobson 2005)
@@ -334,7 +332,7 @@ def cham_up(sumt, Pnow,
 			# the original method 			
 			# from Fuller et al. (1969): doi.org/10.1021/j100845a020
 			DStar_org = 1.013e-2*temp_nown**1.75*(((y_mw+ma*1.e3)/(
-			y_mw*ma*1.e3))**0.5)/(Pnow*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
+			y_mw*ma*1.e3))**0.5)/(self.Pressn*(diff_vol**(1./3.)+19.7**(1./3.))**2.)
 			# convert to cm2/s
 			DStar_org = DStar_org*1.e4
 			
@@ -828,44 +826,6 @@ def cham_up(sumt, Pnow,
 			
 	# nucleation check end -----------------------------------------
 	
-	# check on new vapour pressure of HOM-RO2+MCM-RO2 accretion 
-	# products -------------
-	
-	# convert y into components in rows and phases in columns
-	if ('RO2_POOL' in self.comp_namelist):
-	
-		y_mat = y.reshape(num_comp, num_sb+1, order='F')
-		if self.wall_on > 0:
-			y_mat = y_mat[:, 0:-self.wall_on]
-	
-		# get the average oxygen and carbon number of the gas- and particle-phase RO2
-		Cnumav = sum(sum((self.Cnum[
-			self.RO2_indices[:, 1], :])*
-			(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/
-			sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
-
-		Onumav = sum(sum((self.Onum[
-			self.RO2_indices[:, 1], :])*
-			(y_mat[self.RO2_indices[:, 1], :].sum(axis=1))/
-			sum(sum(y_mat[self.RO2_indices[:, 1], :]))))
-	
-		# estimate vapour pressure (Pa) effect of the RO2 pool based 
-		# on carbon and oxygen number
-		RO2pool_effect_Pa = 10**(-0.12*Onumav + Cnumav*-0.22)*101325.
-		
-		# take effect on the HOM-RO2-MCM-RO2 accretion product, note that 
-		# inside Psat_Pa_rec
-		# is the estimated vapour pressure of the HOM-RO2 (Pa)
-		self.Psat_Pa[:, self.RO2_POOL_APi] = (self.Psat_Pa_rec[self.RO2_POOL_APi] + 
-			RO2pool_effect_Pa)
-		# convert to # molecules/cm3 (air) using ideal
-		# gas law, R has units cm3.Pa/K.mol
-		self.Psat[:, self.RO2_POOL_APi] = (self.Psat_Pa[0, self.RO2_POOL_APi]*
-			(si.N_A/((si.R*1.e6)*self.TEMP[tempt_cnt])))
-		
-		
-	# end of check on new vapour pressure of HOM-RO2+MCM-RO2 accretion products ----------
-
 	# in case time step reduction was actioned prior to call to 
 	# cham_up, then keep the signal that this reduction occurred
 	if (ic_red == 1 and bc_red == 0):
@@ -881,6 +841,6 @@ def cham_up(sumt, Pnow,
 		self.Psat_Pa/
 		(8.314*temp_now))
 
-	return(temp_now, Pnow, light_time_cnt, tnew, bc_red, update_count, 
+	return(temp_now, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 		RHt_cnt, N_perbin, x, pconcn_frac, pcontf, tot_in_res, self)

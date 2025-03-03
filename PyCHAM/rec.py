@@ -31,7 +31,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	num_sb, num_comp, pconc, kelv_fac, 
 	kimt, act_coeff, Cfactor, Nres_dry, Nres_wet, x2, x,
 	MV, H2Oi, Vbou, rbou, rbou_rec, 
-	cham_env, temp_now, Pnow, tot_in_res, self):
+	cham_env, temp_now, tot_in_res, self):
 	
 	# inputs: ------------------------------------------------------
 	# save_cnt - count on saving steps
@@ -68,7 +68,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# cham_env - chamber environmental conditions (temperature (K), 
 	# pressure (Pa), relative humdity, transmission factor
 	# temp_now - chamber temperature (K)
-	# Pnow - chamber pressure (Pa)
+	# self.Press - air pressure (Pa)
 	# tot_in_res - cumulative influx of injected components (ug/m3)
 	# self.tot_in_res_ft - record of continuous influx of injected 
 	#	components (ug/m3)
@@ -116,7 +116,7 @@ def rec(save_cnt, trec, yrec, Cfactor_vst, y, sumt,
 	# chamber environmental conditions ----------------------------------
 	
 	cham_env[save_cnt, 0] = temp_now # temperature (K)
-	cham_env[save_cnt, 1] = Pnow # pressure (Pa)
+	cham_env[save_cnt, 1] = self.Pressn # pressure (Pa)
 	# relative humidity (fraction (0-1))	
 	cham_env[save_cnt, 2] = y[H2Oi]/self.Psat[0, H2Oi] 	
 	cham_env[save_cnt, 3] = self.tf[sum(self.tft<=sumt)-1]

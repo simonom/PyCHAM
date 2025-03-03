@@ -1,1 +1,1 @@
-/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/w_and_wo_RO2int/11111244_w2
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/guaiacol-MCM-model/guaiacol
