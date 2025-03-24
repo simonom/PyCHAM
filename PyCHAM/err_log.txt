@@ -1,1 +1,1 @@
-/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/guaiacol-MCM-model/guaiacol
+/Users/user/Documents/GitHub/PyCHAM/PyCHAM/output/guaiacol-MCM-model/guaiacol_all_constrained_wall_particle

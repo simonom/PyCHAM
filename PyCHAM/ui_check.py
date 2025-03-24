@@ -54,9 +54,8 @@ def ui_check(self):
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, 		
-		ser_H2O, wat_hist, drh_str, erh_str, z_prt_coeff, 		
-		chamV] = pickle.load(pk)
+		inflectk, Rader, p_char, e_field, 		
+		ser_H2O, wat_hist, drh_str, erh_str, z_prt_coeff] = pickle.load(pk)
 		pk.close()	
 
 	# loaded variables: --------------------------------------------
@@ -74,7 +73,7 @@ def ui_check(self):
 	# std - standard deviation for particle sizes
 	# self.mean_rad - mean radius of particle size distributions (um)
 	# new_partr - radius of newly nucleated particles (cm)
-	# chamSA - chamber surface area (m2)
+	# self.chamSA - chamber surface area (m^2)
 	# self.chem_sch_mark - markers in chemical scheme
 	# self.af_path - actinic flux path
 	# int_tol - integration tolerances
@@ -261,7 +260,7 @@ def ui_check(self):
 	if (num_sb > 0 and em_flag < 2):
 		if (self.pmode == 0): # particle number concentrations expressed as modes
 			if (self.mean_rad.shape != self.pconc.shape and em_flag < 2):
-				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the mean radius per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and mean_rad model variables in README.')
+				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form, however the length of the mean radius per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and mean_rad model variables in README.')
 				em_flag = 2 # error message flag for error
 			if (std.shape != self.pconc.shape and em_flag < 2):
 				err_mess = str('Error - particle number concentration of seed particles has been detected in modal form (as colons separate values), however the length of the standard deviation per mode does not match the length of the particle number concentration per mode, and it must, please see the pconc and std model variables in README.')
@@ -719,10 +718,10 @@ def ui_check(self):
 			accom_val, uman_up, 	
 			int_tol, new_partr,
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, 
+			inflectk, 
 			Rader, p_char, e_field, ser_H2O, 
 			wat_hist, drh_str, erh_str, 
-			z_prt_coeff, chamV]
+			z_prt_coeff]
 
 	# the file to be used for pickling
 	with open(input_by_sim, 'wb') as pk: 

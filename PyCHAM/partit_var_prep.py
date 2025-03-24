@@ -113,7 +113,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# doi.org/10.1021/j100845a020
 	Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
 		(y_mw*ma*1.e3))**0.5)/
-		(self.Press*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
+		(self.Press[0]*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
 	
 	# convert to cm^2/s
 	Dstar_org = Dstar_org*1.e4
@@ -139,7 +139,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	#dyn_visc = 1.8325e-5*((416.16/(TEMP+120.))*(TEMP/296.16)**1.5)
 
 	# air density (kg/m3 (air)), ideal gas law
-	#rho_a =  (self.Press*ma)/((si.R)*TEMP)
+	#rho_a =  (self.Press[0]*ma)/((si.R)*TEMP)
 
 	# mean free path (m) of air in air (15.24 of Jacobson 2005)
 	#mfp = (2.*dyn_visc/(rho_a*therm_sp)).reshape(-1, 1)
@@ -147,7 +147,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# end of mean free path of air in air --------------------------
 
 	# concentration of molecules (# molecules/m3)
-	nv = (self.Press/(si.R*TEMP))*si.N_A 
+	nv = (self.Press[0]/(si.R*TEMP))*si.N_A 
 
 	if (self.testf == 2):
 		import matplotlib.pyplot as plt
@@ -169,7 +169,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 		ax0.set_xticks(np.arange(len(self.comp_namelist)))
 		ax0.set_xticklabels(self.comp_namelist, rotation = 90)
 		ax0.set_title(str('Gas-phase diffusion coeffiecients at ' + str(TEMP) + 
-			' K and ' + str(self.Press) + ' Pa'), fontsize = 14)
+			' K and ' + str(self.Press[0]) + ' Pa'), fontsize = 14)
 		err_mess = 'Stop'
 
 	if (self.testf == 3):

@@ -54,8 +54,7 @@ def middle(self): # define function
 		inflectDp, pwl_xpre, pwl_xpro, inflectk, ChamR, 
 		Rader, p_char, 
 		e_field, ser_H2O, wat_hist, drh_str, 
-		erh_str, z_prt_coeff, 
-		chamSA, chamV] = ui.share(self)
+		erh_str, z_prt_coeff] = ui.share(self)
 	
 	# if not skipping parsing of chemical scheme	
 	if (self.pars_skip == 0 or self.pars_skip == 2): 
@@ -152,7 +151,7 @@ def middle(self): # define function
 		rbou00, ub_rad_amp, indx_plot,
 		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self,
+		Compti, tot_in_res_indx, tempt_cnt, self,
 		vol_comp, volP)
 
 	# solve problem
@@ -170,7 +169,7 @@ def middle(self): # define function
 		rbou00, ub_rad_amp, indx_plot,
 		wat_hist, NOi, 
 		HO2i, NO3i, z_prt_coeff, tot_in_res,
-		Compti, tot_in_res_indx, chamSA, chamV, tempt_cnt, self, 
+		Compti, tot_in_res_indx, tempt_cnt, self, 
 		vol_comp, volP):
 
 		yield prog # update progress bar	

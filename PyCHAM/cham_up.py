@@ -296,11 +296,11 @@ def cham_up(sumt,
 
 			# update ppb to molecules/cm3 conversion factor concentrations
 			# total number of molecules in 1 cm3 air using ideal gas law.  
-			# R has units cm3.Pa/K.mol
+			# R has units 8.314 cm3.Pa/K.mol (changing to cm3.Pa/K.mol 
+			# when multiplied by 1e6)
 			ntot = self.Pressn*(si.N_A/((si.R*1.e6)*temp_nown))
 			# one billionth of number of molecules in chamber unit volume
 			Cfactor = ntot*1.e-9 # ppb to molecules/cm3 conversion factor
-			
 			# dynamic viscosity of air (kg/m.s), eq. 4.54 of Jacobson 2005
 			dyn_visc = 1.8325e-5*((416.16/(temp_nown+120.))*(temp_nown/296.16)**1.5)
 	

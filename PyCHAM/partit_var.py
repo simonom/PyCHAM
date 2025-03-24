@@ -33,7 +33,7 @@ import scipy.constants as si
 def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT, 
 		R_gas, TEMP, NA, N_perbin, radius, therm_sp,
 		H2Oi, act_coeff, caller, 
-		DStar_org, z_prt_coeff, chamSA, chamV, self):
+		DStar_org, z_prt_coeff, self):
 	
 	# inputs:-----------------------------------------------------
 	
@@ -65,8 +65,8 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	#	below which partitioning to a particle size bin is 
 	#	treated as zero,
 	#	e.g. because surface area of that size bin is tiny
-	# chamSA - chamber surface area (m2)
-	# chamV - chamber volume (m3)
+	# self.chamSA - chamber surface area (m^2)
+	# self.chamV - chamber volume (m^3)
 	# self.kwf - gas-wall partitioning coefficient flag 
 	#	(-1 means treat with Huang et al. 2018)
 	# self - reference to program
@@ -251,22 +251,27 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# https://doi.org/10.1021/acs.est.7b05575
 		# mass transport coefficient across gas-phase boundary 
 		# layer, note the 
-		# assumption of ke = 1./40. derived from fitting decay 
-		# of ozone to observed
-		# decay from MAC
-		ve = ((2./np.pi)*((1./40.*DStar_org*1.e-4)**0.5))
-		vc = 1.*therm_sp/4.
+		# assumption of ke (the eddy diffusivity coefficient (/s)
+		# for mixing in the chamber, also described as the mxing 
+		# timescale in the chamber (page 2138 of Huang et al. 
+		# 2018)
+		ke = 1./(4.*60) # mixing time of 4 minutes in EUPHORE
+		ve = ((2./np.pi)*((ke*DStar_org*1.e-4)**0.5)).reshape(1, -1)
+		vc = (1.*therm_sp/4.).reshape(1, -1)
 
 		# for Dekati Oxidation Flow Reactor
 		# eddy diffusivity coefficient
-		ke = 4.e-3+10**-2.25*chamV**0.74
-		ve = ((2./np.pi)*((ke*DStar_org*1.e-4)**0.5))	
-		vc = 0. # because glass not teflon
+		#ke = 4.e-3+10**-2.25*self.chamV**0.74
+		#ve = ((2./np.pi)*((ke*DStar_org*1.e-4)**0.5))	
+		#vc = 0. # because glass not teflon
 
-		if (vc != 0.):
-			self.kw = (chamSA/chamV)*((1./ve + 1./vc)**-1)
-		if (vc == 0.):
-			self.kw = (chamSA/chamV)*((1./ve)**-1)
+		self.kw = np.zeros((1, vc.shape[1]))
+
+		self.kw[0, vc[0, :] != 0.] = (self.chamSA/self.chamV)*((
+			1./ve[0, vc[0, :] != 0.] + 1./vc[0, vc[0, :] != 0.])**-1)
+	
+		self.kw[0, vc[0, :] == 0.] = (self.chamSA/self.chamV)*((
+			1./ve[0, vc[0, :] == 0.])**-1)
 
 		# spread over wall bins
 		self.kw = np.tile(self.kw.reshape(1, num_comp), 

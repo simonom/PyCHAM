@@ -67,8 +67,7 @@ def ode_updater(y, H2Oi,
 	rbou00, ub_rad_amp, indx_plot,
 	wat_hist, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
-	Compti, tot_in_res_indx, chamSA, 
-	chamV, tempt_cnt, self, vol_Comp, volP):
+	Compti, tot_in_res_indx, tempt_cnt, self, vol_Comp, volP):
 	
 	# inputs: ----------------------------------------------------
 	# self.update_stp - interval at which to update integration 
@@ -304,8 +303,8 @@ def ode_updater(y, H2Oi,
 	# self.con_infl_indx - index of components with continuous 
 	#	influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
-	# chamSA - chamber surface area (m2)
-	# chamV - chamber volume (m3)
+	# self.chamSA - chamber surface area (m^2)
+	# self.chamV - chamber volume (m^3)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light
 	# tempt_cnt # count on chamber temperatures
 	# ------------------------------------------------------------
@@ -391,7 +390,10 @@ def ode_updater(y, H2Oi,
 		self.kwf = 0 # filler when no wall
 
 	# get air pressure (Pa) now
-	self.Pressn = np.interp(sumt, self.Presst, self.Press)
+	if (len(self.Press) > 1):
+		self.Pressn = np.interp(sumt, self.Presst, self.Press)	
+	else:
+		self.Pressn = self.Press
 	# get relative humidity now
 	self.RHn = self.RH[0]
 	
@@ -415,7 +417,7 @@ def ode_updater(y, H2Oi,
 	tempt_cnt, RHt_cnt, nuci, 
 	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
+	tot_in_res_indx, wat_hist, self, vol_Comp, volP)
 	
 	import ode_solv
 	import dydt_rec
@@ -448,7 +450,10 @@ def ode_updater(y, H2Oi,
 		conPin_cnt0 = conPin_cnt
 		
 		# get air pressure (Pa) now
-		self.Pressn = np.interp(sumt, self.Presst, self.Press)
+		if (len(self.Press) > 1):
+			self.Pressn = np.interp(sumt, self.Presst, self.Press)	
+		else:
+			self.Pressn = self.Press
 		
 		# ------------------------------------------------------------
 		
@@ -520,8 +525,7 @@ def ode_updater(y, H2Oi,
 						NA, N_perbin, 
 						x.reshape(1, -1)*1.e-6, therm_sp, 
 						H2Oi, act_coeff, 1,
-						DStar_org, z_prt_coeff, chamSA, 
-						chamV, self)
+						DStar_org, z_prt_coeff, self)
 				
 						# update particle-phase activity 
 						# coefficients, note the output,
@@ -609,7 +613,7 @@ def ode_updater(y, H2Oi,
 				num_comp, 
 				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1,
-				DStar_org, z_prt_coeff, chamSA, chamV, self)
+				DStar_org, z_prt_coeff, self)
 				
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via

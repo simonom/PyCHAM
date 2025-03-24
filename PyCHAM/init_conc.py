@@ -100,7 +100,7 @@ def init_conc(num_comp, init_conc,
 	
 	# convert concentrations
 	# total number of molecules in 1 cm3 air using ideal gas law.  
-	# R has units m3.Pa/K.mol (changing to cm3.Pa/K.mol when 
+	# R has units 8.314 m3.Pa/K.mol (changing to cm3.Pa/K.mol when 
 	# multiplied by 1e6)
 	ntot = self.Press[0]*(NA/((si.R*1.e6)*self.TEMP[0]))
 	# one billionth of number of # molecules in chamber unit volume

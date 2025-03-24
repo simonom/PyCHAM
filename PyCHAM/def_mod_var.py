@@ -84,6 +84,7 @@ def def_mod_var(caller, self): # define function
 	# time through simulation (s) at which RH is reached
 	self.RHt = np.array(([0]))
 	self.Press = 9.8e4 # air pressure during experiment (Pa)
+	self.Presst = 0. # time of (s) air pressure during experiment
 	# dilution factor (volume fraction per second)
 	self.dil_fac = np.zeros(1) 
 	# dilution factor times through experiment (s)
@@ -216,15 +217,19 @@ def def_mod_var(caller, self): # define function
 	photopath = str(photopath[0:-7] + '/PyCHAM')
 	self.photo_path = str(photopath + '/photofiles/' + 'MCMv3.2')
 	self.dayOfYear = 1 # number of days since 31st December that experiment conducted
-	self.tf = np.ones((1)).astype('float') # transmission factor for natural sunlight (0-1 fraction)
-	self.tft = np.zeros((1)).astype('float') # time (s) through simulation that self.tf applies to
+	# transmission factor for natural sunlight (0-1 fraction)
+	self.tf = np.ones((1)).astype('float')
+	# time (s) through simulation that self.tf applies to
+	self.tft = np.zeros((1)).astype('float')
 	self.tf_range = 0 # flag for no wavelength-dependency of transmission factor
 	# marker to say whether or not to adapt integration time interval 
 	# and initial condition update to changing natural light intensity
 	self.light_ad = 1
-	self.tf_UVC = np.ones((1, 1)) # transmission factor for 254 nm wavelength artificial light
-	self.tf_UVCt = np.zeros((1, 1)) # time (s) for transmission factor for 254 nm wavelength artificial light
-	# if natural sunlight paraemeters have been set in a previous run then delete
+	# transmission factor for 254 nm wavelength artificial light
+	self.tf_UVC = np.ones((1, 1))
+	# time (s) for transmission factor for 254 nm wavelength artificial light
+	self.tf_UVCt = np.zeros((1, 1))
+	# if natural sunlight parameters have been set in a previous run then delete
 	if hasattr(self, 'secx'):
 		delattr(self, 'secx')
 	if hasattr(self, 'cosx'):
@@ -244,8 +249,8 @@ def def_mod_var(caller, self): # define function
 	pwl_xpre = 0. # gradient before inflection
 	pwl_xpro = 0. # gradient after inflection
 	inflectk = 0. # rate at inflection
-	chamSA = 42. # chamber surface area (m2)
-	chamV = 18. # chamber volume (m3, set to MAC value)
+	self.chamSA = 42. # chamber surface area (m2)
+	self.chamV = 18. # chamber volume (m3, set to MAC value)
 	# flag for deposition to wall treatment (0 for customised, 1 for Rader and 
 	# McMurry (1985))
 	Rader = -1
@@ -302,10 +307,10 @@ def def_mod_var(caller, self): # define function
 			accom_val, uman_up, 
 			int_tol, new_partr, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, 
+			inflectk, 
 			Rader, p_char, e_field, ser_H2O, 
 			wat_hist, drh_str, erh_str, 
-			z_prt_coeff, chamV]
+			z_prt_coeff]
 
 	
 	# path to store for variables
@@ -323,6 +328,6 @@ def def_mod_var(caller, self): # define function
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, 
-		pwl_xpro, inflectk, chamSA, Rader, p_char, e_field, 
+		pwl_xpro, inflectk, Rader, p_char, e_field, 
 		ser_H2O, wat_hist, drh_str, erh_str, 
-		z_prt_coeff, chamV, self)
+		z_prt_coeff, self)

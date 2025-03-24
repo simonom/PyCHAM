@@ -43,9 +43,8 @@ def mod_var_up(self):
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, ser_H2O, 
-		wat_hist, drh_str, erh_str, z_prt_coeff, 
-		chamV] = pickle.load(pk)
+		inflectk, Rader, p_char, e_field, ser_H2O, 
+		wat_hist, drh_str, erh_str, z_prt_coeff] = pickle.load(pk)
 	pk.close()
 
 	
@@ -123,8 +122,8 @@ def mod_var_up(self):
 	self.l63a.setText((str(pwl_xpre)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l64a.setText((str(pwl_xpro)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l65a.setText((str(inflectk)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l66a.setText((str(chamSA)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
-	self.l66aaa.setText((str(chamV)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l66a.setText((str(self.chamSA)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+	self.l66aaa.setText((str(self.chamV)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l67a.setText((str(Rader)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l68a.setText((str(p_char)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
 	self.l69a.setText((str(e_field)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))

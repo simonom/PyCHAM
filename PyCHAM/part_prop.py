@@ -50,6 +50,7 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	
 	# mass fractions of each species including core
 	mass_fracs[:, ish] = y_mass_array[:, ish]/((np.sum(y_mass_array, 0))[ish])
+
 	# total density of particles per size bin (g/cm3), by calculating the
 	# mass-weighted average density
 	tot_rho = np.zeros((num_asb))

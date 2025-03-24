@@ -70,8 +70,7 @@ def ode_updater_su(y, H2Oi,
 	rbou00, ub_rad_amp, indx_plot,
 	wat_hist, NOi, 
 	HO2i, NO3i, z_prt_coeff, tot_in_res,
-	Compti, tot_in_res_indx, chamSA, 
-	chamV, tempt_cnt, self, vol_Comp, volP):
+	Compti, tot_in_res_indx, tempt_cnt, self, vol_Comp, volP):
 	
 	# inputs: ----------------------------------------------------
 	# self.update_stp - interval at which to update integration 
@@ -274,8 +273,8 @@ def ode_updater_su(y, H2Oi,
 	# self.cont_inf_reci - index of components with continuous influx in record
 	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
-	# chamSA - chamber surface area (m2)
-	# chamV - chamber volume (m3)
+	# self.chamSA - chamber surface area (m^2)
+	# self.chamV - chamber volume (m^3)
 	# self.tf_UVC - transmission factor for 254 nm wavelength light
 	# tempt_cnt # count on chamber temperatures
 	# ------------------------------------------------------------
@@ -346,7 +345,7 @@ def ode_updater_su(y, H2Oi,
 	tempt_cnt, RHt_cnt, nuci, 
 	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP)
+	tot_in_res_indx, wat_hist, self, vol_Comp, volP)
 
 	while (RO2_pool_diff) >= (1.e1):
 		print('Time through spin-up (s): ', sumt)	
@@ -441,7 +440,7 @@ def ode_updater_su(y, H2Oi,
 				num_comp, 
 				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1,
-				Pnow, DStar_org, z_prt_coeff, chamSA, chamV, self)
+				Pnow, DStar_org, z_prt_coeff, self)
 			
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via

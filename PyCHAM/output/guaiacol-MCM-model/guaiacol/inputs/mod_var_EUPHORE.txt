@@ -15,8 +15,8 @@ DayOfYear = 135
 # dilution rate (fraction of air removed per second)
 dil_fac = 1.63e-5
 # initial concentrations of components (ppb)
-Comp0 = HNO3, O3, GUAIACOL, GLYOX, NO, NO2, HCHO
-C0 = 0.00817, 17.3, 432.5, 2.5, 35.2, 42.1, 2.5
+Comp0 = HNO3, O3, GUAIACOL, GLYOX, NO, NO2, HCHO, HONO
+C0 = 0.00817, 17.300, 432.498, 2.51, 35.195, 42.059, 2.483, 40.076
 const_comp = H2O
 wall_on = 0
 # gas-wall partitioning
@@ -30,3 +30,4 @@ wall_on = 0
 nonHOMs_vp_method = SIMPOL
 # set the vapour pressure estimation method for HOMs
 HOMs_vp_method = SIMPOL
+tracked_comp = GUAIACOL

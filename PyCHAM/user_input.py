@@ -59,16 +59,15 @@ def share(self):
 		dens_comp, dens, vol_comp, volP, act_comp, act_user, 
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, p_char, e_field, 
+		inflectk, Rader, p_char, e_field, 
 		ser_H2O, 
-		wat_hist, drh_str, erh_str, z_prt_coeff, 
-		chamV] = pickle.load(pk)
+		wat_hist, drh_str, erh_str, z_prt_coeff] = pickle.load(pk)
 		pk.close()
 		
 		# convert chamber surface area (m2) to spherical 
 		# equivalent radius (m)
 		# (below eq. 2 in Charan et al. 2018, doi.org/10.1080/02786826.2018.1474167)
-		chamR = (chamSA/(4.*np.pi))**0.5
+		chamR = (self.chamSA/(4.*np.pi))**0.5
 
 		# in addition to other variables already saved to self, 
 		# ensure that every variable passed to middle is also available in self.
@@ -136,8 +135,8 @@ def share(self):
 		self.Vwat_inc_orig = self.Vwat_inc
 		self.seed_eq_wat_orig = self.seed_eq_wat
 		self.z_prt_coeff_orig = z_prt_coeff
-		self.chamSA_orig = chamSA
-		self.chamV_orig = chamV
+		self.chamSA_orig = self.chamSA
+		self.chamV_orig = self.chamV
 		self.light_stat_orig = self.light_stat
 		self.light_time_orig = self.light_time
 		self.daytime_orig = self.daytime
@@ -164,5 +163,4 @@ def share(self):
 		accom_comp, accom_val, uman_up, int_tol, new_partr,
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, 
 		inflectk, chamR, Rader, p_char, e_field, ser_H2O, 
-		wat_hist, drh_str, erh_str, z_prt_coeff, 
-		chamSA, chamV)
+		wat_hist, drh_str, erh_str, z_prt_coeff)

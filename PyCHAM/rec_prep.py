@@ -44,7 +44,7 @@ def rec_prep(nrec_step, y, y0,
 	DStar_org, tempt_cnt, RHt_cnt, 
 	nuci, t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
-	tot_in_res_indx, chamSA, chamV, wat_hist, self, vol_Comp, volP):
+	tot_in_res_indx, wat_hist, self, vol_Comp, volP):
 	
 	# inputs: ------------------------------------------------------
 	# nrec_step - number of steps to record on
@@ -168,8 +168,8 @@ def rec_prep(nrec_step, y, y0,
 	# self.tot_time - total experiment time (s)
 	# self.con_infl_indx - index of components with continuous influx in concentration array
 	# tot_in_res_indx - index of components with recorded influx
-	# chamSA - chamber surface area (m2)
-	# chamV - chamber volume (m3)
+	# self.chamSA - chamber surface area (m^2)
+	# self.chamV - chamber volume (m^3)
 	# tf_UVC - transmission factor for 254 nm wavelength light (0-1)
 	# wat_hist - flag for water history with respect to particles
 	# ----------------------------------------------------------------
@@ -244,7 +244,7 @@ def rec_prep(nrec_step, y, y0,
 		num_comp, accom_coeff, y_mw,   
 		surfT, R_gas, temp_now, NA, N_perbin, 
 		x.reshape(1, -1)*1.0e-6, therm_sp, H2Oi, act_coeff, 1, 
-		DStar_org, z_prt_coeff, chamSA, chamV, self)
+		DStar_org, z_prt_coeff, self)
 		
 	if (num_sb-self.wall_on) > 0: # if particles present
 		# single particle radius (um) at size bin centre 

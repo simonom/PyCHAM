@@ -49,10 +49,9 @@ def mod_var_read(self):
 			act_user, accom_comp, accom_val, uman_up, 
 			int_tol, new_partr, coag_on, 
 			inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, 
-			ser_H2O, 
-			wat_hist, drh_str, erh_str, z_prt_coeff, 
-			chamV] = pickle.load(pk)
+			inflectk, Rader, p_char, e_field, 
+			ser_H2O, wat_hist, drh_str,
+			erh_str, z_prt_coeff] = pickle.load(pk)
 		pk.close()
 		
 		# if not using defaults	
@@ -452,19 +451,24 @@ def mod_var_read(self):
 						# number of entries for each wall
 						ind_wall_cnt = 1
 			
-			if key == 'chamSA' and (value.strip()): # chamber surface area (m2)
-				chamSA = float(value.strip())
+			if (key == 'chamSA' and (value.strip())): # chamber surface area (m^2)
+				self.chamSA = float(value.strip())
 
-			if key == 'chamV' and (value.strip()): # chamber volume (m3)
-				chamV = float(value.strip())
+			if (key == 'chamV' and (value.strip())): # chamber volume (m^3)
+				self.chamV = float(value.strip())
 
-			if key == 'size_structure' and (value.strip()): # the size structure
+			if (key == 'size_structure' and (value.strip())): # the size structure
 				siz_stru = int(value.strip())
 
 			# number of particle size bins
 			if (key == 'number_size_bins' and (value.strip())):
 				num_sb = int(value.strip())
 				self.num_asb = int(value.strip())
+			
+				if (self.pconc.shape[0] == self.num_asb):
+					self.pmode = 1
+				else:
+					self.pmode = 0
 
 			# seed particle number concentrations (# particles/cm3)
 			if (key == 'pconc' and (value.strip())):
@@ -1127,10 +1131,6 @@ def mod_var_read(self):
 			if key == 'Rate_at_inflect' and (value.strip()):
 				inflectk = float(value.strip())
 
-			# chamber surface area (m2) used for particle loss to walls
-			if key == 'ChamSA' and (value.strip()):
-				ChamSA = float(value.strip())
-
 			# marker for whether to use the McMurry model 
 			# for particle deposition to wall
 			if key == 'McMurry_flag' and (value.strip()):
@@ -1248,10 +1248,10 @@ def mod_var_read(self):
 				accom_val, uman_up, int_tol, 
 				new_partr, coag_on, 
 				inflectDp, pwl_xpre, pwl_xpro, inflectk,
-				 chamSA, Rader, p_char, 
+				Rader, p_char, 
 				e_field, ser_H2O, 
 				wat_hist, drh_str, 
-				erh_str, z_prt_coeff, chamV]
+				erh_str, z_prt_coeff]
 
 		# the file to be used for pickling
 		with open(input_by_sim, 'wb') as pk: 

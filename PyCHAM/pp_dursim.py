@@ -98,10 +98,25 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
 
 	if (num_sb == 1):
-		
-		# (# particles/cm3 (air))
-		N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc))
-		pconc_new = pconc
+		# if this is the new overall particle number 
+		# concentration, e.g. from an observation 
+		# file, as interpretted by obs_file_open
+		if (self.pp_dil == 0):
+
+			# number concentration of new particles (particles/cm3)
+			pconc_new = (np.array((pconc)).reshape(-1, 1))-N_perbin[:, :]
+			# (# particles/cm3 (air))
+			N_perbin[:, :] = (np.array((
+			pconc)).reshape(-1, 1))
+
+		# if this new particle number represents
+		# injection of new particle in addition to
+		# the existing particles
+		else:		
+			# (# particles/cm3 (air))
+			N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc))
+			# number concentration of new particles (particles/cm3)
+			pconc_new = pconc
 
 	# number concentration stated per size bin in multi size bin 
 	# simulation

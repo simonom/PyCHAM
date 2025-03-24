@@ -86,12 +86,12 @@ def coag(RH, T, sbr, sbVi, M, rint, num_molec, num_part, tint, sbbound, rbou,
 	
 	# call on function to determine the Knudsen number and therefore flow 
 	# regime of each size bin
-	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr)
-	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint)
+	[Kni, eta_ai, rho_ai, kin_visc] = reg_determ(RH, T, sbr, self)
+	[Knj, eta_aj, rho_aj, kin_visc] = reg_determ(RH, T, rint, self)
 
 	# Reynold number and terminal fall velocity for each size bin
-	[Rei, Vfi] = Reyn_num(sbr, eta_ai, rho_ai, kin_visc, 1.0e6, Kni)
-	[Rej, Vfj] = Reyn_num(rint, eta_aj, rho_aj, kin_visc, 1.0e6, Knj)
+	[Rei, Vfi] = Reyn_num(sbr, eta_ai, rho_ai, kin_visc, 1.e6, Kni)
+	[Rej, Vfj] = Reyn_num(rint, eta_aj, rho_aj, kin_visc, 1.e6, Knj)
 	
 	# tile Knudsen number over number of size bins
 	Kni_m = np.tile(Kni, (sbn, 1))

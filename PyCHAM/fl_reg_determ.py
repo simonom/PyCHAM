@@ -28,14 +28,14 @@ import numpy as np
 import scipy.constants as si
 import pdb
 
-def reg_determ(RH, T, sbr):
+def reg_determ(RH, T, sbr, self):
 
 	# ------------------------------------------------
 	# inputs:
 	# RH - relative humidity at this time (fraction) 
 	# T - temperature (K)
 	# sbr - size bin radii (m)
-	# self.Press - air pressure (Pa)
+	# self.Pressn - air pressure now (Pa)
 	
 	# ------------------------------------------------
 	# outputs:
@@ -52,9 +52,9 @@ def reg_determ(RH, T, sbr):
 	
 	# vapour pressure (partial pressure) of water vapour 
 	# (Pa (kg/m.s2) (2.66)
-	Pv = (RH*self.Press*Pvs)/(RH*Pvs+self.Press-Pvs)
+	Pv = (RH*self.Pressn*Pvs)/(RH*Pvs+self.Pressn-Pvs)
 	# pressure of dry air (Pa) (2.22)
-	Pd = self.Press-Pv
+	Pd = self.Pressn-Pv
 	
 	# ratio of molecular weights of water and dry air (p. 30 for Mw air
 	# & CRC for Mw water vapour) (2.31)
@@ -69,7 +69,7 @@ def reg_determ(RH, T, sbr):
 	Rm = R_dash*((1.0+omega/epsilon)/(1.0+omega))	
 	# mass density of moist air (g/m3) (2.36 Jacobson 2005)
 	# (multiply by 1.0e3) to convert from kg/m3 to g/m3
-	rho_a = self.Press/(Rm*T)*1.0e3
+	rho_a = self.Pressn/(Rm*T)*1.0e3
 	
 	
 	# dynamic viscosity of air (g/m.s) (4.54) 
@@ -87,6 +87,6 @@ def reg_determ(RH, T, sbr):
 
 	# Knudsen number for particles in air (15.23) - determines flow regime
 	Kni = lamb/sbr	
-		
-	return Kni, eta_a, rho_a, kin_visc
+	
+	return(Kni, eta_a, rho_a, kin_visc)
 

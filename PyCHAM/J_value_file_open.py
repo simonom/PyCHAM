@@ -59,7 +59,7 @@ def J_value_file_open(path, self):
 
 		if (ir == 0):
 			# get times for lighting (s through expeirment)
-			self.light_time = np.array((i[0::]))
+			self.light_time = np.array((i[0::])).astype('float')
 			# prepare for variable names
 			self.stored_J = np.zeros((0, len(self.light_time)))
 			

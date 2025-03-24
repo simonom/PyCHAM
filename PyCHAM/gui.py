@@ -198,10 +198,10 @@ class PyCHAM(QWidget):
 		dens_comp, dens, vol_comp, volP, act_comp, 
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-		inflectk, chamSA, Rader, 
+		inflectk, Rader, 
 		p_char, e_field, ser_H2O, wat_hist, 
 		drh_str, erh_str, 
-		z_prt_coeff, chamV, 
+		z_prt_coeff, 
 		self] = def_mod_var.def_mod_var(0, self)
 		
 		# listing input files ----------------------------------
@@ -850,14 +850,16 @@ class PyCHAM(QWidget):
 		l66.setText('Chamber surface area (m2) : ')
 		self.varbox.addWidget(l66, wall_row+8, 0)
 		self.l66a = QLabel(self)
-		self.l66a.setText((str(chamSA)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l66a.setText((str(self.chamSA)).replace('\'', '').replace(
+		' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l66a, wall_row+8, 1)
 
 		l66aa = QLabel(self)
 		l66aa.setText('Chamber volume (m3) : ')
 		self.varbox.addWidget(l66aa, wall_row+9, 0)
 		self.l66aaa = QLabel(self)
-		self.l66aaa.setText((str(chamV)).replace('\'', '').replace(' ', '').replace('[', '').replace(']', ''))
+		self.l66aaa.setText((str(self.chamV)).replace('\'', '').replace(
+		' ', '').replace('[', '').replace(']', ''))
 		self.varbox.addWidget(self.l66aaa, wall_row+9, 1)
 		
 		l67 = QLabel(self)
@@ -2150,10 +2152,10 @@ class PyCHAM(QWidget):
 		act_user, accom_comp, accom_val, uman_up, int_tol, 
 		new_partr, 
 		coag_on, inflectDp, pwl_xpre, pwl_xpro, inflectk, 
-		chamSA, Rader, 
+		Rader, 
 		p_char, e_field, ser_H2O, wat_hist, 
 		drh_str, erh_str, 
-		z_prt_coeff, chamV, self] = def_mod_var.def_mod_var(0, 
+		z_prt_coeff, self] = def_mod_var.def_mod_var(0, 
 			self)
 		
 		# then open default variables, ready for modification
@@ -2170,10 +2172,9 @@ class PyCHAM(QWidget):
 			accom_comp, accom_val, uman_up, int_tol, 
 			new_partr, coag_on, inflectDp, pwl_xpre, 
 			pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, 
+			inflectk, Rader, p_char, e_field, 
 			ser_H2O, 
-			wat_hist, drh_str, erh_str, z_prt_coeff, 
-			chamV] = pickle.load(pk)
+			wat_hist, drh_str, erh_str, z_prt_coeff] = pickle.load(pk)
 			pk.close()
 		
 		# button to get path to folder/file containing 
@@ -2381,9 +2382,9 @@ class PyCHAM(QWidget):
 			act_user, accom_comp, 
 			accom_val, uman_up, int_tol, new_partr, 
 			coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, p_char, e_field, 
+			inflectk, Rader, p_char, e_field, 
 			ser_H2O, wat_hist, drh_str, erh_str, 
-			z_prt_coeff, chamV, 
+			z_prt_coeff, 
 			self] = def_mod_var.def_mod_var(0, self)
 			
 			# get text from batch list label
@@ -2433,11 +2434,10 @@ class PyCHAM(QWidget):
 				dens_comp, dens, vol_comp, volP, 
 				act_comp, act_user, 
 				accom_comp, accom_val, uman_up, int_tol, 							new_partr, coag_on, inflectDp, pwl_xpre, 
-				pwl_xpro, inflectk, chamSA, Rader, 
+				pwl_xpro, inflectk, Rader, 
 				p_char, e_field, 
 				ser_H2O, wat_hist, drh_str, erh_str, 
-				z_prt_coeff, 
-				chamV] = pickle.load(pk)
+				z_prt_coeff] = pickle.load(pk)
 				pk.close() # close pickle file
 			
 			# let check know this is a second call
@@ -2508,14 +2508,14 @@ class PyCHAM(QWidget):
 					el.close
 			
 			# tell numpy what to do if error observed
-			import err_log_code
-			log = err_log_code
-			saved_handler = np.seterrcall(log)
+			#import err_log_code
+			#log = err_log_code
+			#saved_handler = np.seterrcall(log)
 			# note that error messages saved to the log file are less verbose than 
 			# those printed to the command line, to get the command line version 
 			# (which outputs to the command line)
 			# change 'log' below to 'warn'
-			save_err = np.seterr(all='log')
+			#save_err = np.seterr(all='log')
 			
 			# call on function to simulate
 			err_mess = self.act_81(output_by_sim, sim_num)
@@ -4698,10 +4698,10 @@ class PyCHAM(QWidget):
 				accom_comp, accom_val, uman_up, int_tol, 
 				new_partr, coag_on, inflectDp, pwl_xpre,
 				 pwl_xpro, 
-				inflectk, chamSA, Rader, p_char, 
+				inflectk, Rader, p_char, 
 				e_field, ser_H2O, 
 				wat_hist, drh_str, erh_str, 
-				z_prt_coeff, chamV] = pickle.load(pk)
+				z_prt_coeff] = pickle.load(pk)
 				pk.close()
 		
 			# call on plotting script
@@ -5017,10 +5017,10 @@ class PyCHAM(QWidget):
 			dens_comp, dens, vol_comp, volP, act_comp, 
 			act_user, accom_comp, accom_val, uman_up, int_tol, 
 			new_partr, coag_on, inflectDp, pwl_xpre, pwl_xpro, 
-			inflectk, chamSA, Rader, 
+			inflectk, Rader, 
 			p_char, e_field, ser_H2O, wat_hist, 
 			drh_str, erh_str, 
-			z_prt_coeff, chamV, 
+			z_prt_coeff, 
 			self] = def_mod_var.def_mod_var(0, self)
 
 			# store model variable name
