@@ -61,7 +61,7 @@ def retr_out(self):
 	# loading of results, therefore check which version saved 
 	# the results in question and treat accordingly
 	try:
-		# if v4 of later this will work
+		# if v4 or later this will work
 		load_path = str(self.dir_path + '/nom_mass.npy') # path
 		nom_mass = np.load(load_path, allow_pickle=True)
 		v4_flag = 1

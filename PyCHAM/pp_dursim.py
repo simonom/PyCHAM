@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -113,9 +113,9 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		# injection of new particle in addition to
 		# the existing particles
 		else:		
-			# (# particles/cm3 (air))
+			# (# particles/cm^3 (air))
 			N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc))
-			# number concentration of new particles (particles/cm3)
+			# number concentration of new particles (particles/cm^3)
 			pconc_new = pconc
 
 	# number concentration stated per size bin in multi size bin 
@@ -229,7 +229,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		# the existing particles
 		else:
 			y += yn
-		
+
 	if (pcontf == 1): # if continuous injection of particles
 		y += yn # adding to y array here rather than in ode_solv
 	

@@ -3,7 +3,7 @@
 # need to constrain to everything possible w/ wall and w/ particle
 # and then inspect the 
 # gas-phase concentration of guaiacol products
-res_file_name = guaiacol_all_constrained_wall_particle
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_all_constrained_wall_particle
 chem_sch_name = guaiacol-MCM-model.fac
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;, .
 xml_name = MCM_PRAM_xml.xml
@@ -34,13 +34,14 @@ nonHOMs_vp_method = SIMPOL
 # set the vapour pressure estimation method for HOMs
 HOMs_vp_method = SIMPOL
 number_size_bins = 1
-coag_on = 0
+coag_on = 1
 #space_mode = log
 upper_part_size = 1.e2
 #nucv1 = 6.e6
 #nucv2 = -10.
 #nucv3 = 1.e2
 Rate_at_inflect = 4.1e-5
-#pconc = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#pconct = 0.
+pconct = 0; 60; 120; 180; 240; 300; 360; 420; 480; 540
+pconc = 23777.924; 1484008.929; 1484008.929; 1484008.929; 1484008.929; 127924.2474; 127924.2474; 127924.2474; 127924.2474; 127924.2474
+mean_rad = 0.09; 0.09; 0.09; 0.09; 0.09; 0.09; 0.09; 0.1; 0.1; 0.1
 tracked_comp = OMCATECHOL

@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -56,7 +56,9 @@ def zenith(self):
 	b5 = -0.002697
 	b6 =  0.001480
 
-	self.dec = b0 + b1*np.cos(theta) + b2*np.sin(theta) + b3*np.cos(2.*theta) + b4*np.sin(2.*theta) + b5*np.cos(3.*theta) + b6*np.sin(3.*theta)
+	self.dec = (b0 + b1*np.cos(theta) + b2*np.sin(theta) + 
+		b3*np.cos(2.*theta) + b4*np.sin(2.*theta) + 
+		b5*np.cos(3.*theta) + b6*np.sin(3.*theta))
 	
 	# equation of time accounts for the discrepancy between the apparent and the mean
 	# solar time at a given location
@@ -65,7 +67,8 @@ def zenith(self):
 	c2 = -0.032077
 	c3 = -0.014615
 	c4 = -0.040849
-	eqtime = c0 + c1*np.cos(theta)+c2*np.sin(theta)+c3*np.cos(2.0*theta)+c4*np.sin(2.0*theta)
+	eqtime = (c0 + c1*np.cos(theta) + c2*np.sin(theta) +
+		c3*np.cos(2.0*theta) + c4*np.sin(2.0*theta))
 
 	# get the fraction hour by dividing by seconds per hour, then remove any hours
 	# from previous days by using the remainder function and 24 hours
@@ -79,7 +82,7 @@ def zenith(self):
 	cosld = np.cos(self.lat_rad)*np.cos(self.dec)
    
 	cosx = (np.cos(self.lha)*cosld)+sinld
-	secx = 1.E+0/(cosx+1.E-30)
+	secx = 1.e+0/(cosx+1.e-30)
 	
 	# as in solarFunctions.f90 of AtChem2, set negative cosx to 0
 	if (cosx < 0.):
