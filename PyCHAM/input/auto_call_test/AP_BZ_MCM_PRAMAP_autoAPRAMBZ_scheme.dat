@@ -4095,7 +4095,7 @@ CALL mcm_constants(time, temp, M, N2, O2, RO2, H2O)
 {896.}      C5_RO2_O10 = C5euni_O9_O + HO2 : 0.01 ; 
 
 #These are the CARENE reaction rates used by Roldin et al, (NCOMMS 2019). 
-# Assumption: CARENE form the same MCM oxidation products as APINENE.  
+# Assumption: CARENE form the same MCM oxidation products as APINENE .  
 {}	APINOOA = C107O2 + OH :                      KDEC*0.55*0.90 ;		
 {}	APINOOA = C109O2 + OH :                      KDEC*0.45*0.90 ;		
 {}	APINOOA = C10H15O2O2 + OH :                  KDEC*0.10 ;		

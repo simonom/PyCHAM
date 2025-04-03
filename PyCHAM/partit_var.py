@@ -154,8 +154,13 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# such little number concentration or radius that 
 		# partitioning is relatively tiny
 		if (z_prt_coeff > 0.):
-			kimt[:, np.sum(kimt, axis = 0)/
-				np.sum(np.sum(kimt)) < z_prt_coeff] = 0.
+			# get the relevant fractions of kimt per size bin
+			kimt_frac = np.zeros((len(N_perbin)))
+			# index of size bins with particles
+			nz_indx = np.squeeze(radius*N_perbin.reshape(1, -1) > 0.)
+			kimt_frac[nz_indx] = np.sum(kimt[:, nz_indx], 
+				axis=0)/np.sum(np.sum(kimt))
+			kimt[:, kimt_frac < z_prt_coeff] = 0.
 		
 		# zero partitioning coefficient to particle and wall 
 		# for any components 

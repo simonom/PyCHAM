@@ -98,8 +98,8 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 		# set values for time variable (s)
 		timevar[:] = t_out
 
-		# create temperature variable
-		tempervar = rootgrp.createVariable('air_temperature', 'float32', ('time'))
+		# create time variable
+		timevar = rootgrp.createVariable('time', 'float32', ('time'))
 		# set units for temperature variable
 		tempervar.setncattr('units', 'K')
 		# set values for temperature variable (K)

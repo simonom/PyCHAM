@@ -21,7 +21,7 @@
 ##########################################################################################
 '''module for calculating reaction rate coefficients (automatically generated)'''
 # module to hold expressions for calculating rate coefficients # 
-# created at 2025-03-27 14:46:31.763886
+# created at 2025-04-03 14:34:29.910607
 
 import numpy
 import photolysisRates
@@ -45,5 +45,82 @@ def evaluate_rates(RO2, H2O, RH, TEMP, time, M, N2, O2, Jlen, NO, HO2, NO3, sumt
 	# ------------------------------------------------------------------------
 
 	erf = 0; err_mess = '' # begin assuming no errors
-	rate_values = numpy.zeros((0))
+
+	# calculate any generic reaction rate 
+	# coefficients given by chemical scheme 
+
+	# estimate and append photolysis rates
+	J = photolysisRates.PhotolysisCalculation(TEMP, Jlen, sumt, self)
+
+	if (self.light_stat_now == 0):
+		J = [0]*len(J)
+	rate_values = numpy.zeros((13))
+	
+	# if reactions have been found in the chemical scheme
+	# gas-phase reactions
+	gprn = 0 # keep count on reaction number
+	try:
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = 'J[1]' 
+		rate_values[0] = J[1]
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = 'J[2]' 
+		rate_values[1] = J[2]
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '6.3e-16*numpy.exp(-580/TEMP)*0.57' 
+		rate_values[2] = 6.3e-16*numpy.exp(-580/TEMP)*0.57
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '6.3e-16*numpy.exp(-580/TEMP)*0.37' 
+		rate_values[3] = 6.3e-16*numpy.exp(-580/TEMP)*0.37
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-12*numpy.exp(490/TEMP)*0.65' 
+		rate_values[4] = 1.2e-12*numpy.exp(490/TEMP)*0.65
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-12*numpy.exp(490/TEMP)*0.35' 
+		rate_values[5] = 1.2e-12*numpy.exp(490/TEMP)*0.35
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.482' 
+		rate_values[6] = 1.2e-11*numpy.exp(440/TEMP)*0.482
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.293' 
+		rate_values[7] = 1.2e-11*numpy.exp(440/TEMP)*0.293
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.065' 
+		rate_values[8] = 1.2e-11*numpy.exp(440/TEMP)*0.065
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '1.2e-11*numpy.exp(440/TEMP)*0.08' 
+		rate_values[9] = 1.2e-11*numpy.exp(440/TEMP)*0.08
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '6.3e-16*numpy.exp(-580/TEMP)*0.06' 
+		rate_values[10] = 6.3e-16*numpy.exp(-580/TEMP)*0.06
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '6.3e-16*numpy.exp(-580/TEMP)*0.06' 
+		rate_values[11] = 6.3e-16*numpy.exp(-580/TEMP)*0.06
+		gprn += 1 # keep count on reaction number
+		# remember equation in case needed for error reporting
+		rc_eq_now = '6.3e-16*numpy.exp(-580/TEMP)*0.06' 
+		rate_values[12] = 6.3e-16*numpy.exp(-580/TEMP)*0.06
+	except:
+		erf = 1 # flag error
+		err_mess = (str('Error: Could not calculate '+ 
+		'rate coefficient for equation number ' 
+		+ str(gprn) + ' ' + rc_eq_now + 
+		' (message from rate coeffs.py)'))
+	
+	# aqueous-phase reactions
+	
+	# surface (e.g. wall) reactions
+	
 	return(rate_values, erf, err_mess)

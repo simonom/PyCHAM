@@ -188,6 +188,8 @@ def def_mod_var(caller, self): # define function
 
 	# chemical scheme name of components with constant concentration	
 	self.const_comp = np.zeros((0, 0)).astype('str')
+	# chemical scheme index of components with constant gas-phase concentration
+	self.conCindxn = []
 	# times that constant concentration applies to
 	self.const_compt = np.zeros((1)).astype('float')
 	# chemical scheme names of components injected instantaneously after start of experiment

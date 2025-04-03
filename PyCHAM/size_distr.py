@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -119,6 +119,8 @@ def lognormal(num_bins, pconc, std, lowersize, uppersize, loc, scale, self):
 			try: # if scale is an array
 				if (len(scale) > 1): # extract array from list
 					scalei = scale[i] # get this mode
+				else:
+					scalei = scale[0]
 			except: # if scale is single number
 				 scalei = scale
 			
