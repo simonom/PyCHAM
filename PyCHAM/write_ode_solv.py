@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -50,7 +50,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f = open(self.PyCHAM_path + '/PyCHAM/ode_solv.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk              #\n')
 	f.write('#                                                                                        #\n')
 	f.write('#    All Rights Reserved.                                                                #\n')
 	f.write('#    This file is part of PyCHAM                                                         #\n')
@@ -209,20 +209,28 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))\n')
 		f.write('		rrc_y[self.y_arr_g] = y[self.y_rind_g, 0]\n')
 		f.write('		rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = \'C\')\n')
-		f.write('		# reaction rate (molecules/cm3/s) \n')
+		f.write('		# reaction rate (molecules/cm^3/s) \n')
 		f.write('		rr = rrc[0:self.rindx_g.shape[0]]*((rrc_y**self.rstoi_g).prod(axis=1))\n')
 		f.write('		# loss of reactants\n')
 		f.write('		data = rr[self.rr_arr_g]*self.rstoi_flat_g # prepare loss values\n')
 		f.write('		# convert to sparse matrix\n')
 		f.write('		loss = SP.csc_matrix((data, self.y_rind_g, self.reac_col_g))\n')
+		f.write('		# rate of loss of gas-phase reactants\n')
+		f.write('		gpr_lr = np.array((loss.sum(axis = 1))[self.uni_y_rind_g])[:, 0]\n')
 		f.write('		# register loss of reactants\n')
-		f.write('		dd[self.uni_y_rind_g, 0] -= np.array((loss.sum(axis = 1))[self.uni_y_rind_g])[:, 0]\n')
+		f.write('		dd[self.uni_y_rind_g, 0] -= gpr_lr\n')
+		# if OH reactivity nudging needed, then get the total OH reactivity now (/s)
+		if (self.comp_nudge_kOH != '' and self.kOH_nudge_target != -1):
+			f.write('		if (y[self.comp_namelist.index(\'OH\')][0]>0.):\n')
+			f.write('			self.kOH = gpr_lr[self.comp_namelist.index(\'OH\')]/y[self.comp_namelist.index(\'OH\')][0]\n')
 		f.write('		# gain of products\n')
 		f.write('		data = rr[self.rr_arr_p_g]*self.pstoi_flat_g # prepare loss values\n')
 		f.write('		# convert to sparse matrix\n')
 		f.write('		loss = SP.csc_matrix((data, self.y_pind_g, self.prod_col_g))\n')
 		f.write('		# register gain of products\n')
-		f.write('		dd[self.uni_y_pind_g, 0] += np.array((loss.sum(axis = 1))[self.uni_y_pind_g])[:, 0]\n')
+		f.write('		# rate of gain of gas-phase products\n')
+		f.write('		gpr_gr = np.array((loss.sum(axis = 1))[self.uni_y_pind_g])[:, 0]\n')
+		f.write('		dd[self.uni_y_pind_g, 0] += gpr_gr\n')
 		f.write('		\n')
 
 	if (self.eqn_num[1] > 0): # if particle-phase reactions present

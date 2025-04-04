@@ -50,7 +50,7 @@ def PhotolysisCalculation(TEMP, Jlen, sumt, self):
 	# -----------------------------------------------------------
 	
 	self.sumt = sumt
-	
+
 	# if not a stored array of photolysis rates
 	if (sum(self.light_stat == 3) == 0):
 		J = np.zeros((Jlen)) # prepare output
