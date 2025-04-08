@@ -300,8 +300,13 @@ def def_mod_var(caller, self): # define function
 	# name of component to nudge abundance of to attain target 
 	# OH reactivity
 	self.comp_nudge_kOH = ''
-	# target RO2 abundance (molecules/cm3)
+	# target OH reactivity (/s)
 	self.kOH_nudge_target = -1
+	# name of component to nudge abundance of to attain target 
+	# particulate matter mass concentration
+	self.comp_nudge_PM = ''
+	# target OH reactivity (/s)
+	self.PM_nudge_target = -1
 	# -------------------------------------------------------------
 	# prepare for pickling
 	list_vars = [y0, siz_stru, num_sb, 

@@ -47,6 +47,7 @@ import ode_solv_wat
 import importlib
 import save
 import time
+import scipy.constants as si
 import act_coeff_update
 # providing error message if ODE solver produces 
 # negative results below minimum integration time
@@ -784,14 +785,6 @@ def ode_updater(y, H2Oi,
 				
 			except:
 				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
-			## if any components set to have constant 
-			## gas-phase concentration
-			## get index of time for constant components
-			#if (self.con_C_indx.shape[0]>0):
-				#const_comp_tindx = sum(self.const_compt<=sumt)-1
-				#conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
-				#conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
-				#y[conCindxn] = y0[conCindxn] # (# molecules/cm3)
 				
 			# if negative, suggests ODE solver instability, 
 			# but could also be numerical 
@@ -1018,11 +1011,38 @@ def ode_updater(y, H2Oi,
 				# called (s)
 				update_count = 0.
 		
+		# check whether particle-phase concentration of nudge 
+		# component needs
+		# nudging to compensate for particle-phase concentration
+		# of other components so that total PM mass concentration is 
+		# kept constant
+		if (self.comp_nudge_PM != '' and self.PM_nudge_target != -1):
+			# molecules/cm^3 per particle size bin in particle-phase
+			# after ode solver
+			PM = y[num_comp:num_comp*(self.num_asb+1)].reshape(
+				self.num_asb, num_comp)
+			# sum across particle size bins (molecules/cm^3)
+			PM = (np.sum(PM, axis=0)).reshape(-1, 1)
+			# zero water
+			PM[self.H2Oi, 0] = 0.
+			# convert to ug/m^3 from molecules/cm^3
+			PM = (PM/si.N_A)*(y_mw*1.e6)*1.e6
+			# difference to target (ug/m3)
+			delta_PM = np.sum(PM)-self.PM_nudge_target
+			
+			# convert mass concentration difference to
+			# molar concentration difference (molecules/cm^3)
+			delta_PM = si.N_A*((delta_PM*1.e-12)/y_mw[
+				self.comp_namelist.index(self.comp_nudge_PM), 0])
+			# subtract difference in molar concentration from target
+			# component (molecules/cm^3)
+			y[num_comp+self.comp_namelist.index(
+				self.comp_nudge_PM)] -= delta_PM
+
 		# update the percentage time through simulation 
 		# in the GUI progress bar
 		yield (sumt/self.tot_time*100.)
 		
-
 		# if ozone isopleth being made, then store ozone result
 		if (self.testf == 5):
 			

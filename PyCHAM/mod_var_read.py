@@ -1190,6 +1190,29 @@ def mod_var_read(self):
  					(value.split(','))][0]
 				self.RO2_nudge_target = float([str(i).strip() for i in
  					(value.split(','))][1])
+
+			# name of component who's abundance needs to be nudged to give
+			# the prescribed OH reactivity, followed by the prescribed
+			# OH reactivity (molecules/cm3)
+			if (key == 'comp_nudge_kOH' and (value.strip())):
+				self.comp_nudge_kOH = [str(i).strip() for i in
+				(value.split(','))][0]
+				self.kOH_nudge_target = float([str(i).strip() for i in
+				(value.split(','))][1])
+				# begin by assuming kOH is on target (prior to the first
+				# call to ode_solv, which is when the real self.kOH is
+				# estimated
+				self.kOH = self.kOH_nudge_target
+
+			# name of component who's abundance needs to be nudged to give
+			# the prescribed particulate matter mass concentration, 
+			# followed by the prescribed
+			# particulate matter mass concentration (ug/m^3)
+			if (key == 'comp_nudge_PM' and (value.strip())):
+				self.comp_nudge_PM = [str(i).strip() for i in
+				(value.split(','))][0]
+				self.PM_nudge_target = float([str(i).strip() for i in
+				(value.split(','))][1])
 			
 			# user-defined outputs (molecules/cm3)
 			if (key == 'user_output' and (value.strip())):

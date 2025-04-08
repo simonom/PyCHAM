@@ -48,7 +48,7 @@ def rrc_calc(H2O, TEMP, y, Jlen, NO, HO2, NO3, sumt, self):
 	# H2O - concentrations of water (# molecules/cm3)
 	# TEMP - temperature (K)
 	# self.light_status_now - whether lights off (0) or on (1)
-	# y - component concentrations (# molecules/cm3 (air))
+	# y - component concentrations (# molecules/cm^3 (air))
 	# self.lat - latitude
 	# self.lon - longitude
 	# self.af_path - path to file stating actinic flux
@@ -89,7 +89,24 @@ def rrc_calc(H2O, TEMP, y, Jlen, NO, HO2, NO3, sumt, self):
 		y[self.comp_namelist.index(
 			self.comp_nudge_RO2)] = y[
 			self.comp_namelist.index(self.comp_nudge_RO2)]*RO2_fac
-		
+
+	# check whether a component needs abundance nudging
+	# to give a required OH reactivity, note that self.kOH
+	# (the current OH reactivity is given in ode_solv)
+	if (self.comp_nudge_kOH != '' and self.kOH_nudge_target != -1):
+                             
+		if (self.kOH == 0):
+			kOH_fac = 1.
+		else:
+			# get factor away from target OH reactivity abundance
+			kOH_fac = self.kOH_nudge_target/self.kOH
+			
+			if (kOH_fac > 1.e6): # if above reasonable limit
+				kOH_fac = 1.1
+			y[self.comp_namelist.index(
+ 				self.comp_nudge_kOH)] = y[
+				self.comp_namelist.index(self.comp_nudge_kOH)]*kOH_fac
+
 	# calculate concentrations of third body (M), nitrogen and 
 	# oxygen
 	# calculate gas-phase concentrations of M, N2 and O2 
