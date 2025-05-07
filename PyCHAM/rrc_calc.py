@@ -72,7 +72,7 @@ def rrc_calc(H2O, TEMP, y, Jlen, NO, HO2, NO3, sumt, self):
 	erf = 0
 	err_mess = ''
 	
-	# calculate total RO2 concentration
+	# calculate total RO2 pool concentration
 	if (self.reac_RO2_indx.size == 0):
 		RO2 = 0
 	else:

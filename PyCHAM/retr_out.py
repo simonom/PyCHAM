@@ -74,6 +74,7 @@ def retr_out(self):
 	# empty dictionary to contain indices of certain groups of components
 	group_indx = {}
 	group_indx['RO2i'] = [] # filler in case of no RO2i
+	group_indx['RO2pooli'] = [] # filler in case of no RO2pooli
 	group_indx['ROi'] = [] # filler in case of no ROi
 	group_indx['HOMRO2'] = [] # filler in case of no HOMRO2
 	group_indx['HOMs'] = [] # filler	
@@ -286,7 +287,8 @@ def retr_out(self):
 			if (st_indx == len(line)+fi_indx): # if empty list
 				continue
 			else: # if list has contents
-				group_indx['HOMRO2'] = list(np.array((line[st_indx:fi_indx].strip(' ').split(','))).astype('int'))
+				group_indx['HOMRO2'] = list(np.array((line[
+				st_indx:fi_indx].strip(' ').split(','))).astype('int'))
 			yield (32.)
 
 		if (str(line.split(',')[0]) == 'organic_HOMs_index'):
@@ -453,10 +455,18 @@ def retr_out(self):
 			group_indx['RO2i'] = (np.load(load_path, allow_pickle=True)).tolist()
 
 			# path
+			# note this definition of organic peroxy radicals is based
+			# on the RO2 pool, so is limited to the list of RO2 in the RO2 pool
+			load_path = str(self.dir_path + 
+				'/organic_peroxy_radical_pool_index.npy')
+			group_indx['RO2pooli'] = (np.load(load_path, 
+				allow_pickle=True)).tolist()
+
+			# path
 			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy')
 			group_indx['ROi'] = (np.load(load_path, allow_pickle=True)).tolist()
 		
-			 # path
+			# path
 			load_path = str(self.dir_path + '/organic_HOM_peroxy_radical_index.npy')
 			group_indx['HOMRO2'] = (np.load(load_path, allow_pickle=True)).tolist()
 
@@ -507,6 +517,7 @@ def retr_out(self):
 
 		except:
 			group_indx['RO2i'] = []
+			group_indx['RO2pooli'] = []
 			group_indx['ROi'] = []
 			group_indx['HOMRO2'] = []
 			group_indx['HOMs'] = []

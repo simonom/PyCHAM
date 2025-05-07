@@ -186,25 +186,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	const = {}
 	const["number_of_size_bins"] = numsb
 	const["number_of_components"] = num_comp
-	#const["molecular_weights_g/mol_corresponding_to_component_names"] = (np.squeeze(
-	#	y_mw[:, 0]).tolist())
-	#const["nominal_molar_mass_g/mol"] = self.nom_mass.tolist()
-	#const["molar_volumes_cm3/mol"] = (MV[:, 0].tolist())
-	#const["organic_peroxy_radical_index"] = (self.RO2_indices[:, 1].tolist())
-	#const["organic_alkoxy_radical_index"] = self.RO_indx
-	#const["organic_HOM_peroxy_radical_index"] = self.HOMRO2_indx
-	#const["organic_HOMs_index"] = self.HOMs_indx	
-	#const["chem_scheme_names"] = self.comp_namelist
-	#const["SMILES"] = self.rel_SMILES
 	const["factor_for_multiplying_ppb_to_get_molec/cm3_with_time"] = (Cfactor_vst.tolist())
 	const["simulation_computer_time(s)"] = time_taken
 	const["seed_name"] = self.seed_name
 	const["wall_on_flag_0forNO_>0forYES"] = self.wall_on
 	const["space_mode"] = self.space_mode
-	#const["pure_component_saturation_vapour_pressures_at_298.15K_Pa"
-	#	] = self.Psat_Pa_rec.tolist()
-	#const["oxygen_to_carbon_ratios_of_components"] = self.OC.tolist()
-	#const["hydrogen_to_carbon_ratios_of_components"] = self.HC.tolist()
 	const["index_of_water"] = H2Oi
 	const["index_of_seed_components"] = self.seedi.tolist()
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
@@ -272,7 +258,13 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# save index of all organic peroxy radical components, note this is based
 	# on SMILES strings, so not limited to the list of RO2 in the RO2 pool
 	save_path = str(self.output_by_sim + '/organic_peroxy_radical_index') # path
-	np.save(save_path, self.RO2_indices[:, -1], allow_pickle=True)	
+	np.save(save_path, self.RO2_indices[:, -1], allow_pickle=True)
+
+	# save index of organic peroxy radical components in the RO2 pool, note this is based
+	# on the RO2 pool, so is limited to the list of RO2 in the RO2 pool
+	save_path = str(self.output_by_sim + '/organic_peroxy_radical_pool_index') # path
+	np.save(save_path, self.reac_RO2_indx, allow_pickle=True)
+		
 	
 	save_path = str(self.output_by_sim + '/organic_alkoxy_radical_index') # path
 	np.save(save_path, self.RO_indx, allow_pickle=True)

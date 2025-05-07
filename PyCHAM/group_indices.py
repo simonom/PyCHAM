@@ -43,7 +43,7 @@ def group_indices(Hcount, SMILES, i, self):
 	On = SMILES.count('O') + SMILES.count('o')
 
 	# if name string of this component matches a string section in the list of
-	# reactive RO2 names
+	# reactive RO2 names (the RO2 pool)
 	if (self.comp_namelist[i] in self.RO2_names):
 		
 		# check that this name exactly matches (so not just a string subsection)
