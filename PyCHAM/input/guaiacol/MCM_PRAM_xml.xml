@@ -33790,6 +33790,9 @@
 <species species_name="GUAIACOL" species_number="n">
 <smiles>OC1=C(OC)C=C=C=C1</smiles>
 </species>
+<species species_name="ELVOC" species_number="n">
+<smiles>C(O)(O)(OO)C(O)(O)(OO)C(O)(O)(OO)C(O)(O)(OO)C(O)(O)(OO)C(O)(O)(OO)C(O)(O)(OO)</smiles>
+</species>
 <species species_name="OMCATECHOL" species_number="n">
 <smiles>OC1=C(OC)C(O)=CC=C1</smiles>
 </species>

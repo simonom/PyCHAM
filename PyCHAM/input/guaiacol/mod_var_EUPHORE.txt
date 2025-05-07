@@ -3,7 +3,7 @@
 # need to constrain to everything possible w/ wall and w/ particle
 # and then inspect the 
 # gas-phase concentration of guaiacol products
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_all_constrained_wall_particle
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w
 chem_sch_name = guaiacol-MCM-model.fac
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;, .
 xml_name = MCM_PRAM_xml.xml
@@ -18,9 +18,9 @@ DayOfYear = 135
 # dilution rate (fraction of air removed per second)
 dil_fac = 1.63e-5
 # initial concentrations of components (ppb)
-Comp0 = HNO3, O3, GUAIACOL, GLYOX, NO, NO2, HCHO
-C0 = 0.817, 1730.0, 43249.8, 251., 3519.5, 4205.9, 248.3
-const_comp = H2O, HONO, O3, GUAIACOL, HCHO, NO, NO2
+Comp0 = HONO, O3, GUAIACOL, NO, NO2, HCHO
+C0 = 40., 17.3, 432.498, 35.2, 41.7, 0.07
+const_comp = H2O, HONO, O3, HCHO, NO, NO2
 wall_on = 1
 # gas-wall partitioning
 # estimated by Huang et al. 2018 (https://doi.org/10.1021/acs.est.7b05575)
@@ -28,20 +28,25 @@ mass_trans_coeff = -1
 # g/m3
 eff_abs_wall_massC = 1.e-3
 chamSA = 200.
-chamV = 200. 
+chamV = 200.
 # set the vapour pressure estimation method
 nonHOMs_vp_method = SIMPOL
 # set the vapour pressure estimation method for HOMs
 HOMs_vp_method = SIMPOL
-number_size_bins = 1
+number_size_bins = 10
 coag_on = 1
-#space_mode = log
-upper_part_size = 1.e2
-#nucv1 = 6.e6
-#nucv2 = -10.
-#nucv3 = 1.e2
+space_mode = log
+lower_part_size = 5.e-4
+upper_part_size = 1.e1
+nucv1 = 1.22e5
+nucv2 = -10.
+nucv3 = 1.e2
+new_partr = 1.e-7
+nuc_comp = core
+#vol_Comp = NGUAIACOL
+#volP = 0.
 Rate_at_inflect = 4.1e-5
-pconct = 0; 60; 120; 180; 240; 300; 360; 420; 480; 540
-pconc = 23777.924; 1484008.929; 1484008.929; 1484008.929; 1484008.929; 127924.2474; 127924.2474; 127924.2474; 127924.2474; 127924.2474
-mean_rad = 0.09; 0.09; 0.09; 0.09; 0.09; 0.09; 0.09; 0.1; 0.1; 0.1
-tracked_comp = OMCATECHOL
+#pconct = 0.1; 60; 120; 180; 240; 256; 300; 360; 420; 512
+#pconc = 371.4335513; 20000; 20000; 20000; 20000; 20000; 3000; 3000; 3000; 3000
+#mean_rad = 0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; #0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; #0.159790129489126
+tracked_comp = ELVOC
