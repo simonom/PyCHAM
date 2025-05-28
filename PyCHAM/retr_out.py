@@ -457,10 +457,13 @@ def retr_out(self):
 			# path
 			# note this definition of organic peroxy radicals is based
 			# on the RO2 pool, so is limited to the list of RO2 in the RO2 pool
-			load_path = str(self.dir_path + 
-				'/organic_peroxy_radical_pool_index.npy')
-			group_indx['RO2pooli'] = (np.load(load_path, 
-				allow_pickle=True)).tolist()
+			try:
+				load_path = str(self.dir_path + 
+					'/organic_peroxy_radical_pool_index.npy')
+				group_indx['RO2pooli'] = (np.load(load_path, 
+					allow_pickle=True)).tolist()
+			except:
+				group_indx['RO2pooli'] = []
 
 			# path
 			load_path = str(self.dir_path + '/organic_alkoxy_radical_index.npy')

@@ -2414,7 +2414,7 @@ class PyCHAM(QWidget):
 			# (as identified by self.inname) and store to pickle
 			import mod_var_read
 			mod_var_read.mod_var_read(self)
-
+			
 			if (type(self.param_const) == dict):
 				if (self.pars_skip_forcetozero == 1):
 					self.pars_skip = 0
@@ -2422,10 +2422,11 @@ class PyCHAM(QWidget):
 			# end this function if an error thrown by reading of model variables
 			if (self.bd_st == 1 or self.bd_st == 2):
 				return()
-
+			
 			# get the save path name variables
 			input_by_sim = str(self.PyCHAM_path 
 				+ '/PyCHAM/pickle.pkl')
+			
 			with open(input_by_sim, 'rb') as pk:
 				[y0, siz_stru, num_sb,
 				lowsize, uppsize, std,

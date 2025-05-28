@@ -12,10 +12,16 @@
 <species species_number="s1" species_name="AMMSUL">
 <smiles>NOS(O)(O)ON</smiles>
 </species>
+<species species_number="s1" species_name="AMM_SUL">
+<smiles>NOS(O)(O)ON</smiles>
+</species>
 <species species_number="s1" species_name="AMMChloride">
 <smiles>NCl</smiles>
 </species>
 <species species_number="s1" species_name="AMMNitrate">
+<smiles>NN(=O)(O)(O)</smiles>
+</species>
+<species species_number="s1" species_name="AMM_NIT">
 <smiles>NN(=O)(O)(O)</smiles>
 </species>
 <species species_number="s1" species_name="AMMBiSUL">
@@ -27,14 +33,80 @@
 <species species_number="s1" species_name="C8H17CHO">
 <smiles>CCCCCCCCCO</smiles>
 </species>
+<species species_number="s1" species_name="NH3">
+<smiles>N</smiles>
+</species>
+<species species_number="s1" species_name="bc">
+<smiles>C</smiles>
+</species>
+<species species_number="s1" species_name="bcin">
+<smiles>C</smiles>
+</species>
+<species species_number="s1" species_name="pri_orgin">
+<smiles>CCCCCCCCCCCCCCCC(=O)O</smiles>
+</species>
+<species species_number="s1" species_name="core_ind">
+<smiles>CCCCCCCCCC</smiles>
+</species>
+<species species_number="s1" species_name="BaP">
+<smiles>c1ccc2c(c1)cc3ccc4cccc5c4c3c2cc5</smiles>
+</species>
+<species species_number="s1" species_name="NICOTINE">
+<smiles>c1ncccc1[C]2CCCN2C</smiles>
+</species>
+<species species_number="s1" species_name="MYOSMINE">
+<smiles>n1cccc(c1)/C2=N/CCC2</smiles>
+</species>
+<species species_number="s1" species_name="NAPHTHALENE">
+<smiles>c1c2ccccc2ccc1</smiles>
+</species>
+<species species_number="s1" species_name="methyl2naphthalene">
+<smiles>Cc1ccc2ccccc2c1</smiles>
+</species>
+<species species_number="s1" species_name="methyl1naphthalene">
+<smiles>Cc1cccc2cccc12</smiles>
+</species>
+<species species_number="s1" species_name="PYRIDINE">
+<smiles>c1ccncc1</smiles>
+</species>
+<species species_number="s1" species_name="PICOLINE2">
+<smiles>Cc1ccccn1</smiles>
+</species>
+<species species_number="s1" species_name="PICOLINE3">
+<smiles>Cc1cccnc1</smiles>
+</species>
+<species species_number="s1" species_name="PYRROLE">
+<smiles>N1C=CC=C1</smiles>
+</species>
+<species species_number="s1" species_name="VINYL4PYRIDINE">
+<smiles>C=CC1=CC=NC=C1</smiles>
+</species>
+<species species_number="s1" species_name="ACETONITRILE">
+<smiles>CC#N</smiles>
+</species>
+<species species_number="s1" species_name="ACRYLONITRILE">
+<smiles>N#CC=C</smiles>
+</species>
+<species species_number="s1" species_name="C7H15CHO">
+<smiles>CCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="C8H17CHO">
+<smiles>CCCCCCCCCO</smiles>
+</species>
 <species species_number="s1" species_name="C9H19CHO">
 <smiles>CCCCCCCCCCO</smiles>
+</species>
+<species species_number="s1" species_name="SiO2_ind">
+<smiles>O=[Si]=O</smiles>
 </species>
 <species species_number="s1" species_name="pri_org">
 <smiles>CCCCCCCCCCCCCCCC(=O)O</smiles>
 </species>
 <species species_number="s1" species_name="pri_org_ind">
 <smiles>CCCCCCCCCCCCCCCC(=O)O</smiles>
+</species>
+<species species_number="s1" species_name="nalk_ind">
+<smiles>CCCCCCCCCCCCCCCCCCCCC</smiles>
 </species>
 <species species_number="s1" species_name="sec_org">
 <smiles>CCCCCCCCCCCCCCC</smiles>
@@ -51,6 +123,7 @@
 <species species_number="s1" species_name="sec_org-2">
 <smiles>OOCCOOCOOCCOCOOCCCCOO</smiles>
 </species>
+
 <species species_number="s1" species_name="O">
 <smiles>[O]</smiles>
 </species>

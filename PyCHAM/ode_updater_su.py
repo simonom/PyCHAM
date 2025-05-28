@@ -321,6 +321,14 @@ def ode_updater_su(y, H2Oi,
 	else:
 		self.kwf = 0 # filler when no wall
 
+	# get air pressure (Pa) now
+	if (len(self.Press) > 1):
+		self.Pressn = np.interp(sumt, self.Presst, self.Press)	
+	else:
+		self.Pressn = self.Press
+	# get relative humidity now
+	self.RHn = self.RH[0]
+
 	import ode_solv
 	import dydt_rec
 	importlib.reload(ode_solv) # import most recent version

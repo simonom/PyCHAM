@@ -1280,7 +1280,7 @@ def mod_var_read(self):
 		with open(input_by_sim, 'wb') as pk: 
 			pickle.dump(list_vars, pk) # pickle
 			pk.close() # close
-		
+
 		return() # end function	
 		
 	read(self) # call on function to read the model variables
