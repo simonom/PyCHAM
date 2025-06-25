@@ -1688,6 +1688,7 @@ class PyCHAM(QWidget):
 		INSTRtabs.addTab(self.CPCtab(), "CPC")
 		INSTRtabs.addTab(self.SMPStab(), "SMPS")
 		INSTRtabs.addTab(self.CIMStab(), "CIMS")
+		INSTRtabs.addTab(self.WallLosstab(), "Wall Loss")
 		self.INSTRlayout.addWidget(INSTRtabs, 1, 0, 1, 1)
 		INSTRtabs.setTabPosition(2)
 		
@@ -1882,7 +1883,8 @@ class PyCHAM(QWidget):
 		
 		# input for number of channels per decade (channels means size bins)
 		self.e230_m = QTextEdit(self)
-		self.e230_m.setText('Number of channels per decade of particle size.  Defaults to 128.')
+		self.e230_m.setText(str('Number of channels per decade of ' +
+		'particle size.  Defaults to 128.'))
 		self.SMPSscrolllayout.addWidget(self.e230_m, 4, 7, 1, 3)
 		
 		# button to plot counting efficiency dependence on particle size 
@@ -1955,13 +1957,25 @@ class PyCHAM(QWidget):
 		# sensitivity dependence on molar mass
 		self.e283 = QTextEdit(self)
 		self.e283.setText(str('Sensitivity (instrument count/real count) ' +
-		'dependence on molar mass (g/mol), use y_MM to denote molar ' +
-		'mass (g/mol) of components.  Defaults to 1.0 which implies ' +
-		'no dependency on molar mass. To zero ranges of m/z use ' +
-		'inequalities, e.g. <200. sets all m/z less than 200 to 0.' +
-		'To zero inorganics, follow any (or blank) molar mass functions ' +
-		'with a comma and the words organics only, e.g.: <73., organics only'))
+		'dependence on molar mass (g/mol). ' +
+		'Defaults to 1.0 which implies no dependency on molar mass. ' +
+		'Separate multiple functions by a comma and higher priority ' +
+		'functions furthest along list. ' +
+		'To multiply by a factor ' +
+		'use inequalities, e.g. <200.=0 sets all m/z less than 200 to 0. ' +
+		'To zero inorganics, use the phrase organics only' +
+		', e.g.: >275.=2, organics only. This example would multiply all ' +
+		'components with molar mass greater than 275 g/mol by two and ' +	
+		'zero all inorganics.'))
 		self.CIMSscrolllayout.addWidget(self.e283, 3, 0)
+
+		# limits of mass spectrum plot
+		self.e284 = QTextEdit(self)
+		self.e284.setText(str('Lower value for horizontal axis, upper ' +
+		'value for horizontal axis, lower value for vertical axis, ' +
+		'upper value for vertical axis. E.g.: 150., 480., 0.0, 1.7e8. ' +
+		'Defaults to the limits necessary to display all data.'))
+		self.CIMSscrolllayout.addWidget(self.e284, 4, 0)
 		
 		# button to plot probability distribution function 
 		# demonstrating mass:charge resolution
@@ -1983,7 +1997,7 @@ class PyCHAM(QWidget):
 		self.b290_ab.addItem('Logarithmic y')	
 		self.b290_ab.setToolTip(str('Select whether to have a linear ' +
 		'or logarithmic spacing on the CIMS y-axis'))	
-		self.CIMSscrolllayout.addWidget(self.b290_ab, 4, 0)	
+		self.CIMSscrolllayout.addWidget(self.b290_ab, 5, 0)	
 
 		# drop-down button to select histogram or markers	
 		self.b290_abb = QComboBox(self)
@@ -1993,7 +2007,7 @@ class PyCHAM(QWidget):
 		self.b290_abb.addItem('Markers (normalised)')	
 		self.b290_abb.setToolTip(str('Select whether to have ' +
 		'bars or markers layout'))	
-		self.CIMSscrolllayout.addWidget(self.b290_abb, 4, 1)
+		self.CIMSscrolllayout.addWidget(self.b290_abb, 5, 1)
 
 		# drop-down button to select which phase is plotted	
 		self.b290_abc = QComboBox(self)
@@ -2001,20 +2015,20 @@ class PyCHAM(QWidget):
 		self.b290_abc.addItem('Particle')
 		self.b290_abc.addItem('Gas and Particle')	
 		self.b290_abc.setToolTip(str('Select the phase(s) to plot'))	
-		self.CIMSscrolllayout.addWidget(self.b290_abc, 5, 0)
+		self.CIMSscrolllayout.addWidget(self.b290_abc, 6, 0)
 
 		# button to plot mass spectrum
 		self.b290 = QPushButton('CIMS mass spectrum', self)
 		self.b290.setToolTip(str('Plot the mass spectrum as observed ' +
 		'by a chemical ionisation mass spectrometer'))
 		self.b290.clicked.connect(self.on_click290)
-		self.CIMSscrolllayout.addWidget(self.b290, 6, 0)
+		self.CIMSscrolllayout.addWidget(self.b290, 7, 0)
 		
 		# button to save output in CIMS form
 		self.b290_aaa = QPushButton('Save in CIMS form', self)
 		self.b290_aaa.setToolTip('Save the results in CIMS format at all time steps')
 		self.b290_aaa.clicked.connect(self.on_click290_aaa)
-		self.CIMSscrolllayout.addWidget(self.b290_aaa, 6, 1)
+		self.CIMSscrolllayout.addWidget(self.b290_aaa, 7, 1)
 
 		# properties of CIMS scroll area ----------------
 		self.scrollwidget.setLayout(self.CIMSscrolllayout)
@@ -2022,6 +2036,85 @@ class PyCHAM(QWidget):
 		self.CIMSlayout.addWidget(self.scroll, 0, 0, 1, 1)
 	
 		return(CIMSTab)
+
+	def WallLosstab(self): # instrument comparison plotting tab definition
+	
+		WallLossTab = QWidget() # define tab widget
+		self.WallLosslayout = QGridLayout() 
+		WallLossTab.setLayout(self.WallLosslayout)
+		
+		# create scrollable widget inside tab
+		self.scroll = QScrollArea()
+		self.scroll.setWidgetResizable(True)
+		self.scrollwidget = QWidget()
+		self.WallLossscrolllayout  = QGridLayout()
+
+		# text explaining purpose of tab
+		# label to explain what happens on this instrument comparison tab
+		l300 = QLabel(self)
+		l300.setText(str('Apply a wall loss correction and assumed SOA mass ' +
+		'density to estimate the SOA mass concentration'))
+		l300.setWordWrap(True)
+		self.WallLossscrolllayout.addWidget(l300, 0, 0, 1, 10)
+
+		# input for fractional particle loss rate inflection diameter
+		self.e300_h = QTextEdit(self)
+		self.e300_h.setText(str('Particle diameter (um) at which inflection of the ' +
+		'particle loss rate function occurs. Defaults to 0.3'))
+		self.WallLossscrolllayout.addWidget(self.e300_h, 1, 0, 1, 1)
+
+		# input for fractional particle loss rate at inflection diameter
+		self.e301_h = QTextEdit(self)
+		self.e301_h.setText(str('Particle loss rate (fraction/s) at ' +
+		'the inflection diameter. Defaults to 0.'))
+		self.WallLossscrolllayout.addWidget(self.e301_h, 2, 0, 1, 1)
+
+		# gradient for fractional particle loss rate before inflection diameter
+		self.e302_h = QTextEdit(self)
+		self.e302_h.setText(str('Particle loss rate gradient before ' +
+		'the inflection diameter in log-log space. Defaults to 0.'))
+		self.WallLossscrolllayout.addWidget(self.e302_h, 3, 0, 1, 1)
+
+		# gradient for fractional particle loss rate after inflection diameter
+		self.e303_h = QTextEdit(self)
+		self.e303_h.setText(str('Particle loss rate gradient after ' +
+		'the inflection diameter in log-log space. Defaults to 0.'))
+		self.WallLossscrolllayout.addWidget(self.e303_h, 4, 0, 1, 1)
+
+		# SOA mass density for converting particle volume to mass concentration 
+		self.e304_h = QTextEdit(self)
+		self.e304_h.setText(str('SOA density (g/cm^3) for converting particle volume ' +
+		'to particle mass concentration for estimating mass of SOA formed, ' +
+		'defaults to 1.4 g/cm^3'))
+		self.WallLossscrolllayout.addWidget(self.e304_h, 5, 0, 1, 1)
+
+		# button to plot particle loss rate as a function of particle diameter
+		self.b300_k = QPushButton('Loss rate with \nparticle diameter', self)
+		self.b300_k.setStyleSheet(str('background-color : white; border-width ' +
+		': 1px; border-radius : 7px; border-color: silver; padding: 2px; ' +
+		'border-style : solid'))
+		self.b300_k.setToolTip(str('Plot the fractional particle loss rate ' +
+		'as a function of particle diameter'))
+		self.b300_k.clicked.connect(self.on_click300_h)
+		self.WallLossscrolllayout.addWidget(self.b300_k, 1, 1)
+
+		# button to correct simulated particles for wall loss and
+		# and output estimated SOA mass formed
+		self.b301_k = QPushButton('Wall loss\ncorrected \n[SOA]', self)
+		self.b301_k.setStyleSheet(str('background-color : white; border-width ' +
+		': 1px; border-radius : 7px; border-color: silver; padding: 2px; ' +
+		'border-style : solid'))
+		self.b301_k.setToolTip(str('Estimate [SOA] vs. time ' +
+		'as would be done from observations of particle volume'))
+		self.b301_k.clicked.connect(self.on_click301_h)
+		self.WallLossscrolllayout.addWidget(self.b301_k, 2, 1)
+	
+		# properties of WallLoss scroll area ----------------
+		self.scrollwidget.setLayout(self.WallLossscrolllayout)
+		self.scroll.setWidget(self.scrollwidget)
+		self.WallLosslayout.addWidget(self.scroll, 0, 0, 1, 1)
+
+		return(WallLossTab)
 	
 	def OBStab(self): # comparing with observations
 
@@ -4295,7 +4388,7 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
 		
-		# ------------------------------------------------------------------------------------------------
+		# ---------------------------------------------------------------------
 		
 		try:	
 			# get particle diameter at 50 % counting efficiency and width 
@@ -4330,9 +4423,9 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid magenta', 0., 0.)
 				self.bd_pl = 1
 			max_size = -1
-		# -------------------------------------------------------------------------------------
+		# -----------------------------------------------------------------------
 		
-		# inlet loss function and time ------------------------------------------------------------
+		# inlet loss function and time ------------------------------------------
 		try:
 			# get relevant inputs in list form
 			ins = ((self.e230_k.toPlainText()).split(';'))
@@ -4355,7 +4448,7 @@ class PyCHAM(QWidget):
 			
 			loss_func_str = str('0.')
 			losst = 0.
-		# -----------------------------------------------------------------------------------
+		# -------------------------------------------------------------------
 		if (max_size == -1): # if defaulted
 			max_size = 1.e3
 		# radius range (um)
@@ -4446,7 +4539,7 @@ class PyCHAM(QWidget):
 			
 			loss_func_str = str('0.')
 			losst = 0.
-		# -----------------------------------------------------------------------------------
+		# ---------------------------------------------------------------------
 		if (max_size == -1): # if defaulted
 			max_size = 1.e3
 		# radius range (um)
@@ -4467,6 +4560,80 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 
 		return()
+
+	# button to plot loss rate of particles to walls
+	@pyqtSlot()
+	def on_click300_h(self):
+
+		import inlet_loss
+
+		# particle diameter at loss rate inflection point (um)
+		try:
+			self.inflectDp = float(self.e300_h.toPlainText())
+		except:
+			self.inflectDp = 0.3
+		# fractional loss rate of particles at inflection point (fraction/s)
+		try:
+			self.inflectk = float(self.e301_h.toPlainText())
+		except:
+			self.inflectk = 0.
+		# gradient of loss rate:particle diameter before inflection point
+		try:
+			self.pwl_xpre = float(self.e302_h.toPlainText())
+		except:
+			self.pwl_xpre = 0.
+		# gradient of loss rate:particle diameter after inflection point
+		try:
+			self.pwl_xpro = float(self.e303_h.toPlainText())
+		except:
+			self.pwl_xpro = 0.
+
+		# radii to caluclate loss rate at (um)
+		xn = np.logspace(np.log10(1.e-3), np.log10(1.e2), int(1e3))
+		xn = xn.reshape(1, -1)
+
+		inlet_loss.inlet_loss(4, [], xn, [], 1., 0, self)
+
+		return()
+
+	# button to plot [SOA] as estimated from particle volume
+	# observations
+	@pyqtSlot()
+	def on_click301_h(self):
+
+		import inlet_loss
+
+		# particle diameter at loss rate inflection point (um)
+		try:
+			self.inflectDp = float(self.e300_h.toPlainText())
+		except:
+			self.inflectDp = 0.3
+		# fractional loss rate of particles at inflection point (fraction/s)
+		try:
+			self.inflectk = float(self.e301_h.toPlainText())
+		except:
+			self.inflectk = 0.
+		# gradient of loss rate:particle diameter before inflection point
+		try:
+			self.pwl_xpre = float(self.e302_h.toPlainText())
+		except:
+			self.pwl_xpre = 0.
+		# gradient of loss rate:particle diameter after inflection point
+		try:
+			self.pwl_xpro = float(self.e303_h.toPlainText())
+		except:
+			self.pwl_xpro = 0.
+
+		# get mass density (g/cm^3) of particle SOA for converting particle
+		# volume to mass concentration
+		try:
+			self.soa_rho = float(self.e304_h.toPlainText())
+		except:
+			self.soa_rho = 1.4
+
+		inlet_loss.wl_correct(self)
+
+		return()	
 
 	# button to plot probability distribution function 
 	# demonstrating mass:charge resolution
@@ -4495,11 +4662,11 @@ class PyCHAM(QWidget):
 				self.bd_pl = 1
 			res_in = [1.0, 0.3] # default
 
-		y_MW = np.arange(0., 1000., res_in[1]/3.)
-		
+		y_MM = np.arange(0., 1000., res_in[1]/3.)
+
 		import plotter_CIMS
 		
-		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MW)
+		[_, _, _, _] = plotter_CIMS.write_mzres(3, res_in, y_MM)
 		
 	@pyqtSlot() # button to plot sensitivity to molar mass
 	def on_click290_a(self):
@@ -4510,12 +4677,15 @@ class PyCHAM(QWidget):
 		dir_path = self.l201.text() # name of folder with results
 		
 		y_MM = np.arange(1000.)
+		Cn = np.ones(len(y_MM)) # dummy carbon number
+		Cn[y_MM==132.] = 0 # e.g. ammonium sulphate
 		
 		# get sensitivity (Hz/ppt) dependence on molar mass
 		try:
 			sensit = str((self.e283.toPlainText()))
 		except:
 			sensit = 'np.ones(len(y_MW))' # default
+		
 		# means that the edit label text has not been 
 		# changed from the description
 		if (sensit[0:3] == 'Sen' or sensit == ''):
@@ -4523,7 +4693,7 @@ class PyCHAM(QWidget):
 		
 		import plotter_CIMS
 		
-		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MM)
+		blank = plotter_CIMS.write_sens2mm(3, sensit, y_MM, Cn)
 
 
 	@pyqtSlot() # button to save results in CIMS format at all times through experiment

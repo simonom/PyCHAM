@@ -457,6 +457,9 @@ def mod_var_read(self):
 			if (key == 'chamV' and (value.strip())): # chamber volume (m^3)
 				self.chamV = float(value.strip())
 
+			if (key == 'mix_time' and (value.strip())): # chamber mixing time (s)
+				self.mix_time = float(value.strip())
+
 			if (key == 'size_structure' and (value.strip())): # the size structure
 				siz_stru = int(value.strip())
 

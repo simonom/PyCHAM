@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#								       #
+# Copyright (C) 2018-2025					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''plots a replication of number size distribution as reported by a Scanning Mobility Particle Spectrometer (SMPS)'''
 # simulation results are represented graphically
 
@@ -52,11 +53,29 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# --------------------------------------------------------------------------
 
 	# chamber condition ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _, _, _, _) = retr_out.retr_out(dir_path, self)
-	
+	# retrieve results from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
+	y_MV = np.array((self.ro_obj.comp_MV)) # cm3/mol
+	space_mode = self.ro_obj.spacing
+	siz_str = self.ro_obj.siz_struc
+		
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
 
@@ -82,7 +101,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	
 	# ---------------------------------------------------------------
 		
-	# affect whether particle number concentration is for dry or wet inlet to instrument (# particles/cm3)
+	# affect whether particle number concentration is for dry or wet 
+	# inlet to instrument (# particles/cm3)
 	if (dryf == 0):
 		Nuse = Ndry
 	else:
@@ -128,7 +148,7 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# normalise number concentration by size (diameter) bin width (# particles/cm3/um)
 	Nuse = Nuse/sbwm
 	
-	# interpolate particle number concentration to the counter size bins --------------------
+	# interpolate particle number concentration to the counter size bins --------------
 	
 	Nint = np.zeros((len(timehr), csbn)) # empty array to hold interpolated results (#/m3)
 	
@@ -141,15 +161,19 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# difference in log10 of size bins (diameter) bin widths of instrument (um)
 	sbwc = np.log10(csbb[1::])-np.log10(csbb[0:-1])
 
-	# interpolation based on fixed size bin centres - note that this is preferred over changeable
+	# interpolation based on fixed size bin centres - note that this is 
+	# preferred over changeable
 	# size bin centres when calculating number size distribution, total particle number 
 	# concentration and total mass concentration, since the area under the
-	# number vs size line is comparable between times with changeable size bin centres, note when
-	# this is not the case, even when a particle grows when using moving centre size structure
+	# number vs size line is comparable between times with changeable size bin centres, 
+	# note when
+	# this is not the case, even when a particle grows when using moving centre 
+	# size structure
 	# the area beneath the curve may decrease because it becomes more jagged, thereby 
 	# unrealistically affecting particle number concentration during interpolation
 	for ti in range(len(timehr)):
-		Nint[ti, :] = np.interp(csbc, xf[ti, :]*2., Nuse[ti, :]) # (# particles/cm3/difference in log 10(size(um)))
+		# (# particles/cm3/difference in log 10(size(um)))
+		Nint[ti, :] = np.interp(csbc, xf[ti, :]*2., Nuse[ti, :])
 		Nint[ti, :] = Nint[ti, :]*sbwc # correct for size bin width (# particles/cm3)
 	
 	
@@ -178,7 +202,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	dNdlog10D = np.transpose(dNdlog10D)
 	
 	# customised colormap (https://www.rapidtables.com/web/color/RGB_Color.html)
-	colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), (1., 1., 0.), (1., 0., 0.)]  # R -> G -> B
+	colors = [(0.6, 0., 0.7), (0, 0, 1), (0, 1., 1.), (0, 1., 0.), (1., 1., 0.), 
+		(1., 0., 0.)]  # R -> G -> B
 	n_bin = 100  # discretizes the colormap interpolation into bins
 	cmap_name = 'my_list'
 	# create the colormap
@@ -193,7 +218,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	# contour plot with times (hours) along x axis and 
 	# particle diameters (nm) along y axis
 	for ti in range(len(timehr)-1): # loop through times
-		p1 = ax0.pcolormesh(timehr[ti:ti+2], (csbb*1e3), dNdlog10D[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
+		p1 = ax0.pcolormesh(timehr[ti:ti+2], (csbb*1e3), 
+			dNdlog10D[:, ti].reshape(-1, 1), cmap=cm, norm=norm1)
 	
 	# plot vertical axis logarithmically
 	ax0.set_yscale("log")
@@ -210,7 +236,8 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	cb = plt.colorbar(p1, format=ticker.FuncFormatter(fmt), pad=0.25)
 	cb.ax.tick_params(labelsize=14)   
 	# colour bar label
-	cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
+	cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D ($\mathrm{\mu m}$))', 
+		size=14, rotation=270, labelpad=20)
 
 	# total particle number concentration (# particles/cm3) -------------------------
 	
@@ -219,11 +246,13 @@ def plotter(caller, dir_path, self, dryf, cdt, sdt, min_size, max_size, csbn, p_
 	
 	p3, = par1.plot(timehr, Nvs_time, '-+k', label = 'N')
 	
-	par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20) # vertical axis label
-	par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
+	# vertical axis label
+	par1.set_ylabel('N (#$\,$ $\mathrm{cm^{-3})}$', size=14, rotation=270, labelpad=20)
+	# set tick format for vertical axis
+	par1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e'))
 	par1.yaxis.set_tick_params(labelsize=14)
 
-	# mass concentration of particles (ug/m3) ---------------------------------------------------------------
+	# mass concentration of particles (ug/m3) --------------------------------------
 	
 	MCvst = np.zeros((len(timehr))) # empty array for total mass concentration (ug/m3)
 	
@@ -285,7 +314,8 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# self - reference to GUI
-	# dryf - relative humidity of aerosol at entrance to condensing unit of CPC (fraction 0-1)
+	# dryf - relative humidity of aerosol at entrance to condensing unit 
+	# 	of CPC (fraction 0-1)
 	# cdt - false background counts (# particles/cm3)
 	# max_dt - maximum detectable actual concentration (# particles/cm3)
 	# sdt - particle size at 50 % detection efficiency (nm), 
@@ -306,10 +336,29 @@ def cpc_plotter(caller, dir_path, self, dryf, cdt, max_dt, sdt, max_size, uncert
 	# --------------------------------------------------------------------------
 
 	# required outputs ---------------------------------------------------------
-	# retrieve results
-	(num_sb, num_comp, Cfac, yrec, Ndry, rbou_rec, x, timehr, _, 
-		y_mw, Nwet, _, y_MV, _, wall_on, space_mode, indx_plot, 
-		comp0, _, PsatPa, OC, H2Oi, _, siz_str, _, _, _, _) = retr_out.retr_out(dir_path, self)
+	# retrieve results from self
+	wall_on = self.ro_obj.wf
+	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	yrec[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
+	y_MV = np.array((self.ro_obj.comp_MV)) # cm3/mol
+	space_mode = self.ro_obj.spacing
+	siz_str = self.ro_obj.siz_struc
+	x = self.ro_obj.cen_size
 	# ------------------------------------------------------------------------------
 	
 	# condition wet particles assuming equilibrium with relative humidity at 
@@ -929,7 +978,7 @@ def resp_time_func(caller, delays, wfuncs):
 	f = open('PyCHAM/cpc_response_eqs.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')
@@ -1015,3 +1064,7 @@ def resp_time_func(caller, delays, wfuncs):
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 
 	return(w, t)
+
+def wall_loss_correction(self):
+
+	return()

@@ -371,7 +371,7 @@ def plotter(caller, dir_path, uc, self):
 		par2.spines['right'].set_color('black')
 		par2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1e')) # set tick format for vertical axis
 		par2.yaxis.set_tick_params(labelsize=16)
-		plt.legend(fontsize=14, handles=[p3, p5] , loc=4, fancybox=True, framealpha=0.5)	
+		plt.legend(fontsize=14, handles=[p3, p5], loc=4, fancybox=True, framealpha=0.5)	
 
 	# end of particle properties sub-plot -----------------------------------
 

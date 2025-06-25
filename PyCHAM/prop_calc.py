@@ -90,9 +90,6 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 	# are carried over from previous simulation 
 	if (self.pars_skip == 3):
 
-		# import dependency
-		from scipy.interpolate import CubicSpline
-
 		# get reference vapour pressures at various 
 		# temperatures for these components
 
@@ -143,11 +140,16 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 
 		# create cubic spline functions for all vapour pressures
 		# (molecules/cm3) as a function of temperature
-		cs = CubicSpline(temp_list, ref_vp_molecpcc, axis = 0)
-		# get cubic spline interpolation at the current temperature
+		# note that scipy.CubicSpline function gave negative values,
+		# so used linear interpolation (np.interp) instead
+		
+		# get vapour pressure estimate at the current temperature
 		# (molecules/cm3)
-		self.Psat = cs(self.TEMP[tempt_cnt])
-
+		self.Psat = np.zeros((num_comp))
+		for ci in range(num_comp): # loop through components
+			self.Psat[ci] = np.interp(self.TEMP[tempt_cnt], temp_list, 
+				ref_vp_molecpcc[:, ci])
+		
 		# ensure any component named core has zero vapour pressure
 		self.Psat[corei[0]] = 0.
 
@@ -196,7 +198,6 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		f_init.close()
 
 	# point to umansysprop folder
-	# address for updated version
 	sys.path.insert(1, (self.PyCHAM_path + '/umansysprop'))
 	
 	from umansysprop import boiling_points
@@ -537,8 +538,9 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 				except: # in case float
 					self.Psat_Pa_rec[i] = Psatnow
 			
-		# if component is chlorine, then H:C is 0 and can continue
 		if (self.ac_by_cs == 0):
+
+			# if component is chlorine, then H:C is 0 and can continue
 			if (self.rel_SMILES[i] == 'ClCl'):
 				self.HC[0, i] = 0.
 				self.nom_mass[0, i] = 70.

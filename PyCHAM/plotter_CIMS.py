@@ -1,6 +1,6 @@
 ########################################################################
 #								       #
-# Copyright (C) 2018-2024					       #
+# Copyright (C) 2018-2025					       #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			       #
 #								       #
 # All Rights Reserved.                                                 #
@@ -147,7 +147,9 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 
 	# account for mass to charge resolution
 	[pdf, comp_indx, comp_prob, mm_all] = write_mzres(1, res_in, y_MW)
+	# gas phase
 	gpres = np.zeros((len(comp_indx)))
+	# particle phase
 	ppres = np.zeros((len(comp_indx)))
 	
 	# prepare to hold component with greatest contribution to each
@@ -174,7 +176,7 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 		ppres = ppres/np.sum(ppres)
 		ylabel = 'abundance normalised'
 	else:
-		ylabel = str(r'Concentration (molecules cm$\mathrm{-3}$)')
+		ylabel = str(r'Concentration (molecules cm$\mathrm{^{-3}}$)')
 
 	plt.ion() # disply plot in interactive mode
 
@@ -185,12 +187,7 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 	if hasattr(self, 'oandm'):
 		if (self.oandm == 10):
 			obs_CIMS_plot(self, ax0) # call function to also plot observations
-
-			# show simulated results in a mirror, using the x axis as
-			# the reflection point
-			gpres = -1*gpres
-			ppres = -1*ppres
-
+	
 	if ('Particle' in self.b290_abc.currentText()):
 
 		# loop through molar masses with signals above 1 and print out the main
@@ -202,10 +199,9 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 
 	if ('Stem' in self.b290_abb.currentText()):	 
 		if ('Gas' in self.b290_abc.currentText()):
-			stem = ax0.stem(mm_all, gpres, 'k', 
-				linefmt='grey', markerfmt='',  
+			stem = ax0.plot(mm_all[gpres>0.], gpres[gpres>0.], 'ok',  
 				label = str('simulated gas-phase'))
-			stem[2].set_linewidth(0)
+			
 		if ('Particle' in self.b290_abc.currentText()):
 			stem = ax0.stem(mm_all, ppres, 'k',
 				markerfmt='', label = str('simulated particle-phase'))
@@ -233,28 +229,6 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 				ax0.semilogy(mm_all, ppres, 'xb', markersize = 10, 
 				markeredgewidth = 3, label = str('simulated particle-phase'))	
 	
-	if hasattr(self, 'oandm'):
-		if (self.oandm == 10):
-			# set negative values to positive
-			yt_loc = ax0.get_yticks()
-			yt_lab = ax0.get_yticklabels(which='both')
-			yt_newloc = [] # prepare to hold tick locations
-			yt_newlab = [] # prepare to hold tick labels
-			
-			for i in range(len(yt_lab)):
-				
-				text_now = (yt_lab[i].get_text())
-				
-				if ('\N{MINUS SIGN}' in text_now):
-					yt_newlab.append(text_now[1::])
-				else:
-					yt_newlab.append(text_now)
-				yt_newloc.append(yt_lab[i].get_position()[1])
-
-			ax0.set_yticks(np.array(yt_newloc), yt_newlab)
-	else:
-		ax0.set_ylabel(ylabel, fontsize = 14)
-
 	#ax0.set_title(str('Mass spectrum at ' + time_str), fontsize = 14)
 	ax0.set_xlabel(r'm/z', fontsize = 18)
 	
@@ -263,17 +237,35 @@ def plotter_CIMS(self, res_in, tn, iont, sens_func):
 
 	if hasattr(self, 'oandm'):
 		if (self.oandm == 10):
-			
-			ax0.text(np.min(mm_all[ppres!=0.])-45., np.min(ppres)/2., 
-				'Simulated\nsignal\n(normalised)', 
-				fontsize = 18, rotation = 'vertical')
-			ax0.text(np.min(mm_all[ppres!=0.])-45., 0., 
-				'Observed\nsignal\n(normalised)', 
-				fontsize = 18, rotation = 'vertical')
-			ax0.set_xlim(left = np.min(mm_all[ppres!=0.])-5., right = 400.)
-	else:
-		ax0.legend(fontsize = 14)
+		
+			# get unit
+			if ('normalised' in self.b290_abb.currentText()):
+				unit = '(normalised)'
+			if ('molecule' in self.b290_abb.currentText()):
+				unit = str('(molecules cm$\mathrm{^{-3}}$)')
 
+			ax0.set_ylabel(str('Abundance ' + unit), fontsize = 18)
+
+			#if ('Gas' in self.b290_abc.currentText()):
+			#	ax0.text(np.min(mm_all[gpres!=0.])-45., np.min(gpres)/2., 
+			#	str('Simulated\nsignal\n' + unit), 
+			#	fontsize = 18, rotation = 'vertical')
+			#	ax0.text(np.min(mm_all[gpres!=0.])-45., 0., 
+			#	str('Observed\nsignal\n' + unit), 
+			#	fontsize = 18, rotation = 'vertical')
+			#	ax0.set_xlim(left = np.min(mm_all[gpres!=0.])-5., right = 400.)
+	
+	# show legend
+	ax0.legend(fontsize = 14)
+
+	# limit axis
+	try:
+		ax_lim = (str((self.e284.toPlainText()))).replace(' ', '').split(',')
+		ax0.set_xlim(left = float(ax_lim[0]), right = float(ax_lim[1]))
+		ax0.set_ylim(bottom = float(ax_lim[2]), top = float(ax_lim[3]))
+	except:
+		ax_lim = 0.
+	
 	return()
 
 # function for transforming and saving output in CIMS format
@@ -615,10 +607,12 @@ def obs_CIMS_plot(self, ax0):
 	ci = 0
 	for co in obs.iter_cols(values_only=True):
 
-		if (ci == 0): # molar masses
+		if (ci == 0): # molar masses in first column
 			obs_mm = co[1::]
-		if (ci == 1): # signal
+			obs_mm = (np.asarray(obs_mm)[np.asarray(obs_mm)!=None]).astype('float')
+		if (ci == 1): # signal in second column
 			obs_sig = co[1::]
+			obs_sig = (np.asarray(obs_sig)[np.asarray(obs_sig)!=None]).astype('float')
 
 		# count on columns
 		ci += 1
@@ -626,8 +620,12 @@ def obs_CIMS_plot(self, ax0):
 			break
 
 	# plot observed mass spectrum
-	stem = ax0.stem(obs_mm, obs_sig, 'k',
-		markerfmt='', label = str('observed particle-phase'))
+	if ('Gas' in self.b290_abc.currentText()):
+		stem = ax0.stem(obs_mm, obs_sig, 'k',
+			markerfmt='', label = str('observed gas-phase'))
+	if ('Particle' in self.b290_abc.currentText()):
+		stem = ax0.stem(obs_mm, obs_sig, 'k',
+			markerfmt='', label = str('observed particle-phase'))
 	stem[2].set_linewidth(0)
 
 	# end of CIMS plotting function
@@ -653,7 +651,7 @@ def write_sens2mm(caller, sens_func, y_MM, Cn):
 
 	f.write('####################################################################\n')
 	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
 	f.write('#                                                                                        #\n')
 	f.write('#    All Rights Reserved.                                                                #\n')
 	f.write('#    This file is part of PyCHAM                                                         #\n')
@@ -687,20 +685,29 @@ def write_sens2mm(caller, sens_func, y_MM, Cn):
 	f.write('	# Cn - carbon number\n')
 	f.write('	# ---------------------------\n')
 	f.write('	\n')
-	if '<' not in sens_func[0] and '>' not in sens_func[0]:
-		f.write('	fac_per_comp = %s # sensitivity (Hz/ppt) per molar mass (g/mol) \n' %(sens_func[0]))
-	else:
-		f.write('	fac_per_comp = np.ones((len(y_MM))) # sensitivity (Hz/ppt) per molar mass (g/mol) \n')
-		f.write('	fac_per_comp[y_MM%s] = 0. # sensitivity (Hz/ppt) per molar mass (g/mol) \n' %(sens_func[0]))
-	f.write('	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape \n')
-	f.write('	if (len(fac_per_comp) == 1): # if just a single value then tile across components \n')
-	f.write('		fac_per_comp = np.tile(fac_per_comp, len(y_MM)) # if just a single value then tile across components \n')
-	f.write('	\n')
-	if (len(sens_func)>1): # if further information contained in sens_func
-		if 'organics only' in sens_func[1]: # if only keeping organic components
+	# prepare to hold factors per m/z
+	f.write('	fac_per_comp = np.ones((len(y_MM))) # sensitivity (Hz/ppt) per molar mass (g/mol) \n')
+	
+	# loop through sensitivity functions
+	for sensi in range(len(sens_func)):
+		if ('= 0' in sens_func[sensi]):
+			f.write(str('	fac_per_comp[y_MM%s] = 0. # sensitivity ' +
+				'(Hz/ppt) per molar mass (g/mol) \n') %(sens_func[sensi][0:sens_func[sensi].index('=')]))
+			continue
+		if ('>' in sens_func[sensi]) or ('<' in sens_func[sensi]):
+			sensii = sens_func[sensi].index('=') # index of where to split string
+			s1 = (sens_func[sensi][0:sensii])
+			s2 = (sens_func[sensi][sensii+1::])
+			
+			f.write(str(f'	fac_per_comp[y_MM{s1}] = {s2} # sensitivity ' +
+				'(Hz/ppt) per molar mass (g/mol) \n'))
+
+		if 'organics only' in sens_func[sensi]: # if only keeping organic components
 			f.write('	inorganic_indx = (Cn == 0.) # get index of inorganics \n')
 			f.write('	fac_per_comp[inorganic_indx] = 0. # zero inorganics \n')
 
+	f.write('	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape \n')
+	f.write('	\n')
 	f.write('	if (caller == 3): # called on to plot sensitivity to molar mass\n')
 	f.write('		import matplotlib.pyplot as plt \n')
 	f.write('		plt.ion()\n')

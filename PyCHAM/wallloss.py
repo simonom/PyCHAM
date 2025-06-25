@@ -1,25 +1,24 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
-'''module to model particle loss to walls, called on by ode_gen'''
+########################################################################								  
+# Copyright (C) 2018-2025					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################'''module to model particle loss to walls, called on by ode_gen'''
 # the process of particle deposition to walls is reproduced here using either
 # the McMurry and Rader (1985) model, or the user-defined parameters
 
@@ -66,13 +65,13 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	if (Rader == 0): # manual input of wall loss rate
 		
 		Beta = np.zeros((Pn.shape))
-		Beta[Dp<inflectDp, 0] = 10**((np.log10(inflectDp)-
-								np.log10(Dp[Dp<inflectDp]))*pwl_xpre+np.log10(inflectk))
-		Beta[Dp>=inflectDp, 0] = 10**((np.log10(Dp[Dp>=inflectDp])-
-								np.log10(inflectDp))*pwl_xpro+np.log10(inflectk))
+		Beta[Dp<inflectDp, 0] = (10**((np.log10(inflectDp)-np.log10(
+			Dp[Dp<inflectDp]))*pwl_xpre+np.log10(inflectk)))
+		Beta[Dp>=inflectDp, 0] = (10**((np.log10(Dp[Dp>=inflectDp])-np.log10(
+			inflectDp))*pwl_xpro+np.log10(inflectk)))
 		
 	if (Rader == 1):
-		# -------------------------------------------------------------------------
+		# --------------------------------------------------------
 		# McMurry & Rader option McMurry 1985, DOI: 10.1080/02786828508959054
 		# average number of charges per particle (/particle)
 		n = p_char

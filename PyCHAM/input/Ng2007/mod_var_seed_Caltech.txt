@@ -1,0 +1,101 @@
+# model variable file for reproducing the Caltech benzene SOA experiments of Ng et al. 2017:
+# doi.org/10.5194/acp-7-3909-2007. Note that HNO3 (nitric acid) is not expected to partition 
+# considerably to 
+# the particle phase because the ammonium sulphate is crystalline, and so does not provide a
+# means to dissolve. The organic phase can absorb nitric acid according to 
+# doi.org/10.1021/acs.jpca.6b01402, however they return a Henry's law constant (H) 
+# (defined as concentration of HNO3 in condensed organic (C) divided by the HNO3 partial # 
+# pressure (P) in air) of 3.7e4 M/atm. Based on H = C/P, and knowing the value of H resturned by
+# the study, and the fact that around 60 ppb under an atmospheric pressure of 1 atm (giving a 
+# partial pressure of 60e-9 atm), then one can find the value of C and convert this into ug/m3
+# of air by knowing that there is around 45 um^3/cm^3 (of air) of particle volume and HNO3 has 
+# a molar mass of 63.01 g/mol. This gives a C value on the order of 10^-3 ug/m3 (of air) in the
+# particle phase, so very small compared to the observed value of order 10^1 ug/m3
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Ng2007/Caltech_benzene_loNOx_seed_EVAPORATIONnonHOM_EVAPORATIONHOM
+chem_sch_name = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/Ng2007/benzene_MCM_autoAPRAMfw.eqn
+rate_constant_file = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/prop_store/constants_mcm.f90
+xml_name = MCM_PRAM_xml.xml
+total_model_time = 1.e4
+update_step = 3.e1
+recording_time_step = 9.e1
+# 297. at hi-NOx, 298. at lo-NOx
+temperature = 298.
+tempt = 0.
+p_init = 101325.0
+# 0.05 at high-NOx, 0.06 at low-NOx
+rh = 0.06
+rht = 0
+light_status = 0, 1
+light_time = 0., 3590.
+trans_fac = 0.5
+act_flux_path = Caltech_Actinic_Flux_Spectrum.csv
+# initial concentrations of components (ppb) for high-NOx case
+#Comp0 = BENZENE, HONO, NO, NO2, SO2, CO, H2O2
+#C0 = 337., 277., 0., 0., 1.e-2, 1.e0, 0.
+# initial concentrations of components (ppb) for low-NOx case
+Comp0 = BENZENE, HONO, NO, NO2, SO2, CO, H2O2, O3
+C0 = 395., 0., 1.e-4, 1.e-3, 1.e-2, 1.e0, 4000., 15.
+const_comp = O3
+# O3 values of 10-20 ppb reported for low-NOx case
+cont_infl = O3
+Cinfl = 0., 5.e-3
+cont_infl_t = 0., 3600.
+wall_on = 1
+# particle deposition to wall
+inflectDp = 3.0e-7
+Grad_pre_inflect = 1.44
+Grad_post_inflect = 1.64
+Rate_at_inflect = 3.33e-6
+McMurry_flag = 0
+# gas-wall partitioning
+# 1.e-4 used in Pichelstorfer et al. (2024), -1 for Huang2018 treatment
+# 4.e-4 suggested by Jafar et al. 2021
+mass_trans_coeff = 4.e-4
+ChamV = 28
+ChamSA = 28
+eff_abs_wall_massC = 10.8e-3
+chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = EVAPORATION
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = EVAPORATION
+# particle section
+number_size_bins = 8
+seed_name = C5_RO2_O10, core
+seedx = 0.01 ; 0.99
+vol_Comp = C5_RO2_O10
+volP = 0.
+pconc = 0., 0., 0., 0., 0., 0., 0., 0.; 3.e4, 0., 0., 0., 0., 0., 0., 0.
+pconct = 0.; 3.3e3
+pcont = 0
+mean_rad = 50.e-3: 58.e-3: 70.e-3: 82.e-3: 94.e-3: 106.e-3: 118.e-3: 162.e-3; 50.e-3: 58.e-3: 70.e-3: 82.e-3: 94.e-3: 106.e-3: 118.e-3: 162.e-3
+std = 1.2: 1.2: 1.2: 1.2: 1.2: 1.2: 1.2: 1.2; 1.2: 1.2: 1.2: 1.2: 1.2: 1.2: 1.2: 1.2
+Vwat_inc = 0
+seed_eq_wat = 0
+seed_diss = 1., 3.e-6
+nonseed_diss_wrtw = 0.
+seed_diss_wrtw = 3.
+H2O_diss_wrtorg = 0.
+accom_coeff_comp = all
+accom_coeff_user = 1./(1.+np.exp(-((Rp-5.e-9)*1.e8)*100.))
+# 25 % of particles are double charged according to ST6 of Pichelstorfer et al. 2024,
+# and these double charged particles have twice the volume of single charged particles.
+# Alegbra then shows that 60 % of the particle volume concentration is single charged,
+# with the remaining 40 % of particle volume concentration double charged.
+# Ng et al. 2007 give the initial particle volume concentration and number 
+# concentration, allowing the single particle volume of a single charged particle
+# to be calculated as: (15*0.6)/(3.e4*0.75) = 4e-4 um3, which gives a radius of 46 nm,
+# likewise the single particle volume for double charged particles is:
+# (15*0.4)/(3.e4*0.25) = 8e-4 um3m, which gives a radius of 58 nm. Note that it appears
+# they mistakenly say 'geometric mean diameter' of 50 nm on page 3910, but they
+# must mean 'geometric mean radius' to allow their calculated number concentration and
+# initial particle volume to be consistent with one another.
+# , using a linear spacing allows these radii to be at the centre
+# of the two smallest size bins, followed by an empty size bin
+# HOWEVER, Keywood (2004) (10.1021/es035363o) and Cocker (2001) (10.1021/es0019169) 
+# both say that charge on particle is minimised, so all initial particles are placed in the 
+# bin with radius 50 nm
+lower_part_size = 40.e-3, 52.e-3, 64.e-3, 76.e-3, 88.e-3, 100.e-3, 112.e-3, 124.e-3, 200.e-3
+space_mode = man
+tracked_comp = O3, BENZENE, HO2
+int_tol = 1.e-7, 1.e-7

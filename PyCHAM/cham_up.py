@@ -290,7 +290,7 @@ def cham_up(sumt,
 				 H2Oi, num_comp, vol_Comp, 
 				volP, 0, corei, 
 				0, 0.0, [], 1, nuci, self)
-			
+
 			# note that air pressure does not respond to temperature in
 			# PyCHAM, it needs to be set by the user
 
@@ -441,7 +441,7 @@ def cham_up(sumt,
 				# reset flag for time step reduction due to boundary conditions
 				bc_red = 1
 		
-
+			self.RHn = RHn # prepare for passing to rate_coeffs
 			# update vapour pressure of water (log10(atm)), and change 
 			# gas-phase concentration of water vapour since 
 			# RH stays as stated in the RH and RHt model variables

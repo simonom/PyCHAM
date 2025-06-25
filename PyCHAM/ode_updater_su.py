@@ -370,8 +370,9 @@ def ode_updater_su(y, H2Oi,
 		# remember water history flag at start of integration 
 		# step
 		wat_hist0 = wat_hist 
-		# relative humidity at start of integration step
-		RH0 = RHn
+		# relative humidity at start of integration step, note that
+		# self.RHn is set in cham_up
+		RH0 = self.RHn
 
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
@@ -381,6 +382,12 @@ def ode_updater_su(y, H2Oi,
 		gasinj_cnt0 = gasinj_cnt
 		light_time_cnt0 = light_time_cnt
 		conPin_cnt0 = conPin_cnt
+
+		# get air pressure (Pa) now
+		if (len(self.Press) > 1):
+			self.Pressn = np.interp(sumt, self.Presst, self.Press)	
+		else:
+			self.Pressn = self.Press
 		
 		# -----------------------------------------------------
 
@@ -448,7 +455,7 @@ def ode_updater_su(y, H2Oi,
 				num_comp, 
 				accom_coeff, y_mw, surfT, R_gas, temp_now, NA, N_perbin, 
 				x.reshape(1, -1)*1.e-6, therm_sp, H2Oi, act_coeff, 1,
-				Pnow, DStar_org, z_prt_coeff, self)
+				DStar_org, z_prt_coeff, self)
 			
 				# update particle-phase activity coefficients, note the output,
 				# note that if ODE solver unstable, then y resets to y0 via
@@ -464,8 +471,8 @@ def ode_updater_su(y, H2Oi,
 				dydt_erh_flag = 0
 			
 			# reaction rate coefficient going into this time step
-			[rrc, erf, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
-				Pnow, Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
+			[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(y[H2Oi], temp_now, y, 
+				Jlen, y[NOi], y[HO2i], y[NO3i], sumt, self)
 
 			if (erf == 1): # if error message from reaction rate calculation
 				print(err_mess)
@@ -681,12 +688,13 @@ def ode_updater_su(y, H2Oi,
 					
 					# coagulation
 					[N_perbin, y[num_comp:(num_comp)*(num_sb-self.wall_on+1)], x, Gi, eta_ai, 
-						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt], temp_now, x*1.e-6, 
+						Varr, Vbou, rbou] = coag.coag(self.RH[RHt_cnt],
+						temp_now, x*1.e-6, 
 						(Varr*1.0e-18).reshape(1, -1), 
 						y_mw.reshape(-1, 1), x*1.e-6, 
 						Cp, (N_perbin).reshape(1, -1), update_count, 
 						(Vbou*1.0e-18).reshape(1, -1), rbou,
-						num_comp, 0, Vol0, rad0, Pnow, 0,
+						num_comp, 0, Vol0, rad0, 0,
 						Cp, (N_perbin).reshape(1, -1), (Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
 					
@@ -809,6 +817,7 @@ def count_zero(y, N_perbin, self, x, num_comp): # for setting counts to zero
 	# remember first abundance of RO2 pool
 	RO2_pool0 = sum(y[0:num_comp][self.RO2_indices[:, 1]])
 
-	return(step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, pcontf, infx_cnt, infx_cnt0, RHt_cnt, RHt_cnt0, conPin_cnt, conPin_cnt0, update_count, y0, N_perbin0, x0, t0, 
-		ic_red, tnew,
+	return(step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, pcontf, infx_cnt,
+		infx_cnt0, RHt_cnt, RHt_cnt0, conPin_cnt, conPin_cnt0, update_count, y0, 
+		N_perbin0, x0, t0, ic_red, tnew,
 		pconcn_frac, self.pcont_ongoing, RO2_pool0, tempt_cnt, RHt_cnt, conPin_cnt)

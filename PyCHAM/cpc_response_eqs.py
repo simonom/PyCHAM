@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
 #                                                                                       											 #
 #    All Rights Reserved.                                                                									 #
 #    This file is part of PyCHAM                                                         									 #
@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving the weighting of particles of different ages over response time of instrument'''
 # module to estimate the weighting of particles of different ages during the response time of instrument to represent the mixing of particles of different ages due to differential flow prior to counter 
-# File Created at 2021-08-16 12:38:02.703258
+# File Created at 2025-06-05 14:48:52.518119
 
 import numpy as np
 

@@ -259,7 +259,7 @@ def init_conc(num_comp, init_conc,
 	[C_H2O, H2O_mw, self] = water_calc(self.TEMP[0], self.RH[0], si.N_A, self)
 	
 	# if skipping parsing and property estimation
-	if (self.pars_skip == 1 or self.pars_skip == 3):
+	if (self.pars_skip == 1):
 		H2Oi = self.H2Oi # index for water
 		y_mw = self.y_mw
 		num_comp = self.num_comp
@@ -269,7 +269,7 @@ def init_conc(num_comp, init_conc,
 			y[self.seedi] = self.y[self.seedi]
 
 	# if not skipping parsing and property estimation
-	if (self.pars_skip == 0 or self.pars_skip == 2):
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3):
 		# holder for water index (will be used if not identified in chemical scheme)
 		H2Oi = num_comp # index for water
 		self.H2Oi = H2Oi # index for water
@@ -278,6 +278,13 @@ def init_conc(num_comp, init_conc,
 		# count on components
 		indx = -1
 		for single_chem in self.rel_SMILES:
+
+			# if continuing from previous simulation with equation parsing
+			# but new vapour pressure estimation from interpolation, then
+			# need to skip to next statement
+			if (self.pars_skip == 3):
+				break
+
 			indx += 1
 			# ensure this is water rather than single 
 			# oxygen (e.g. due to ozone photolysis 
@@ -319,22 +326,26 @@ def init_conc(num_comp, init_conc,
 			y = np.append(y, C_H2O)
 			# append molar weight of water (g/mol)
 			y_mw = (np.append(y_mw, H2O_mw)).reshape(-1, 1)
-			# append water's name to component name list
-			self.comp_namelist.append('H2O')
-			# add to SMILES list
-			H2O_SMILES = 'O'
-			self.rel_SMILES.append(H2O_SMILES)
-			# generate pybel object
-			Pybel_object = pybel.readstring('smi', H2O_SMILES)
+
+			if (self.pars_skip != 3):
+			
+				# append water's name to component name list
+				self.comp_namelist.append('H2O')
+				# add to SMILES list
+				H2O_SMILES = 'O'
+				self.rel_SMILES.append(H2O_SMILES)
+
+				# generate pybel object
+				Pybel_object = pybel.readstring('smi', self.rel_SMILES[H2Oi])
 				
-			# append to Pybel object list
-			self.Pybel_objects.append(Pybel_object)
+				# append to Pybel object list
+				self.Pybel_objects.append(Pybel_object)
 
 	# ------------------------------------------------------------------------------------
 	# seed components
 
 	# if this information already gained in previous run then skip
-	if (self.pars_skip == 0 or self.pars_skip == 2): 
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3): 
 
 		# empty array for index of core component
 		self.seedi = (np.zeros((len(self.seed_name)))).astype(int)
@@ -348,15 +359,17 @@ def init_conc(num_comp, init_conc,
 				self.seedi[seed_cnt] = self.comp_namelist.index(
 					self.seed_name[seed_cnt])
 
-		# append name of core to component name list
-		self.comp_namelist.append('core')
+		if (self.pars_skip != 3):
+			# append name of core to component name list
+			self.comp_namelist.append('core')
 		
 		# increase number of components to account for 'core' component
 		num_comp += 1
 		# prepare for skipping of parsing in following simulations
 		self.num_comp = num_comp
-		# add to SMILES list
-		self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
+		if (self.pars_skip != 3):
+			# add to SMILES list
+			self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
 		# append core gas-phase concentration (molecules/cm3 (air)) and molar 
 		# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 

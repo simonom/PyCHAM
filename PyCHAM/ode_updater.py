@@ -438,8 +438,9 @@ def ode_updater(y, H2Oi,
 		temp_now0 = temp_now # remember temperature (K)
 		# remember water history flag at start of integration step
 		wat_hist0 = wat_hist
-		RH0 = RHn # relative humidity at start of integration step
-		self.RHn = RHn
+		# relative humidity at start of integration step, note that
+		# self.RHn is set in cham_up
+		RH0 = self.RHn
 
 		# remember counts at start of integration step
 		infx_cnt0 = infx_cnt
@@ -463,7 +464,8 @@ def ode_updater(y, H2Oi,
 		# flag for stability in gas-particle partitioning for time interval reset
 		stab_red = 0
 		lin_int = 0 # flag to linearly interpolate changes to chamber
-		t00 = tnew # remember the initial integration step for this integration step (s)
+		# remember the initial integration step for this integration step (s)
+		t00 = tnew
 		save_cntf = 0 # flag for updating count on number of recordings
 		
 		while (gpp_stab != 1): # whilst ode solver flagged as unstable
@@ -604,7 +606,7 @@ def ode_updater(y, H2Oi,
  			pcontf, Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
 			volP, ic_red)
-			
+
 			# ------------------------------------------------------------
 			# if particles and/or wall present		
 			if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
@@ -853,12 +855,12 @@ def ode_updater(y, H2Oi,
 		# if any gas-phase components constrained 
 		# to observations
 		if (any(self.obs_comp_i)):
-				# get observed concentrations now
-				# loop through components
-				for ci in range(len(self.obs_comp_i)):
-					y[self.obs_comp_i[ci]] = np.interp(
-					sumt, self.obs[:, 0], self.obs[:, ci+1])
-				
+			# get observed concentrations now
+			# loop through components
+			for ci in range(len(self.obs_comp_i)):
+				y[self.obs_comp_i[ci]] = np.interp(
+				sumt, self.obs[:, 0], self.obs[:, ci+1])
+			
 		# dilute particle number following an integration 
 		# time step, e.g. for flow-reactor -----
 		# note that concentrations of components inside 

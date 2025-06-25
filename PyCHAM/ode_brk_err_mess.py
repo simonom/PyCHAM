@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -76,10 +76,10 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 	# --------------------------------------------------------------------------
 
 	# create new  file to store fluxes
-	f = open('PyCHAM/ODE_solver_break_relevant_fluxes.txt', mode='w')
+	f = open('PyCHAM/ODE_solver_break_relevant_fluxes.txt', mode='w+')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        											 #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
+	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk                  				 #\n')
 	f.write('#                                                                                       											 #\n')
 	f.write('#    All Rights Reserved.                                                                									 #\n')
 	f.write('#    This file is part of PyCHAM                                                         									 #\n')

@@ -21,7 +21,7 @@
 ##################################################################
 '''solution of the mass transfer coefficient for components to surfaces'''
 # module to estimate mass transfer coefficient for components to surface, generated in mod_var_read and called from both partit_var_prep and cham_up
-# File Created at 2025-03-03 12:28:52.492862
+# File Created at 2025-06-03 11:04:11.886105
 
 # function for mass transfer coefficient
 def mtc(DStar_org, TEMP, num_comp, kwn, self):

@@ -3,11 +3,11 @@
 # need to constrain to everything possible w/ wall and w/ particle
 # and then inspect the 
 # gas-phase concentration of guaiacol products
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w_mt2p40_fullELVOC
 chem_sch_name = guaiacol-MCM-model.fac
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;, .
 xml_name = MCM_PRAM_xml.xml
-total_model_time = 5.4e3
+total_model_time = 9.2e3
 update_step = 6.e1
 recording_time_step = 6.e1
 obs_file = constraining_obs_wp.xlsx
@@ -19,7 +19,7 @@ DayOfYear = 135
 dil_fac = 1.63e-5
 # initial concentrations of components (ppb)
 Comp0 = HONO, O3, GUAIACOL, NO, NO2, HCHO
-C0 = 40., 17.3, 432.498, 35.2, 41.7, 0.07
+C0 = 40., 17.3, 458.498, 35.2, 41.7, 0.07
 const_comp = H2O, HONO, O3, HCHO, NO, NO2
 wall_on = 1
 # gas-wall partitioning
@@ -29,24 +29,24 @@ mass_trans_coeff = -1
 eff_abs_wall_massC = 1.e-3
 chamSA = 200.
 chamV = 200.
+mix_time = 2.40
 # set the vapour pressure estimation method
-nonHOMs_vp_method = SIMPOL
+nonHOMs_vp_method = EVAPORATION
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = SIMPOL
-number_size_bins = 10
+HOMs_vp_method = EVAPORATION
+number_size_bins = 20
 coag_on = 1
 space_mode = log
 lower_part_size = 5.e-4
 upper_part_size = 1.e1
-nucv1 = 1.22e5
-nucv2 = -10.
+nucv1 = 1.42e5
+nucv2 = -20000000000000000.
 nucv3 = 1.e2
 new_partr = 1.e-7
 nuc_comp = core
-#vol_Comp = NGUAIACOL
-#volP = 0.
-Rate_at_inflect = 4.1e-5
-#pconct = 0.1; 60; 120; 180; 240; 256; 300; 360; 420; 512
-#pconc = 371.4335513; 20000; 20000; 20000; 20000; 20000; 3000; 3000; 3000; 3000
-#mean_rad = 0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; #0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; 0.159790129489126; #0.159790129489126
-tracked_comp = ELVOC
+inflectDp = 3.e-7
+Rate_at_inflect = 2.e-5
+Grad_pre_inflect = 1.
+Grad_post_inflect = 0.
+McMurry_flag = 0
+tracked_comp = ELVOC, NO3, OH, GUAIACO, ELVOCp, ELVOC, ELVOCpp

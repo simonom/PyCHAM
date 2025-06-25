@@ -94,9 +94,9 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
 	
-	# core
-	diff_vol = (np.append(diff_vol, 
-	np.array((1.)))).reshape(-1, 1)
+	# core not included in self.Pybel_objects
+	diff_vol = (np.append(diff_vol, np.array((1.))))
+	diff_vol = diff_vol.reshape(-1, 1)
 	
 	# water	
 	diff_vol[self.comp_namelist.index('H2O')] = 13.1
@@ -111,10 +111,12 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# kg/mol.  This is a replication of the original method from 
 	# Fuller et al. (1969): 
 	# doi.org/10.1021/j100845a020
-	Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
+	try:
+		Dstar_org = (1.013e-2*TEMP**1.75*(((y_mw+ma*1.e3)/
 		(y_mw*ma*1.e3))**0.5)/
 		(self.Press[0]*(diff_vol**(1./3.)+19.7**(1./3.))**2.))
-	
+	except:
+		import ipdb; ipdb.set_trace()
 	# convert to cm^2/s
 	Dstar_org = Dstar_org*1.e4
 

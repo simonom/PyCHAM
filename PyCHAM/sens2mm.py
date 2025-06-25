@@ -1,6 +1,6 @@
 ####################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving the sensitivity (Hz/ppt) of instrument to molar mass (g/mol)'''
 # module to estimate the sensitivity of an instrument to the molar mass of components, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2025-01-17 10:49:56.955923
+# File Created at 2025-06-09 15:17:44.678180
 
 import numpy as np
 
@@ -34,10 +34,8 @@ def sens2mm(caller, y_MM, Cn):
 	# Cn - carbon number
 	# ---------------------------
 	
-	fac_per_comp = 1. # sensitivity (Hz/ppt) per molar mass (g/mol) 
+	fac_per_comp = np.ones((len(y_MM))) # sensitivity (Hz/ppt) per molar mass (g/mol) 
 	fac_per_comp = np.array((fac_per_comp)).reshape(-1) # reshape 
-	if (len(fac_per_comp) == 1): # if just a single value then tile across components 
-		fac_per_comp = np.tile(fac_per_comp, len(y_MM)) # if just a single value then tile across components 
 	
 	if (caller == 3): # called on to plot sensitivity to molar mass
 		import matplotlib.pyplot as plt 

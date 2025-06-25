@@ -99,7 +99,7 @@ def sch_interr(total_list_eqn, self):
 
 		# open the rate constants file
 		try:
-			f_open_eqn = open(self.rate_cons_name, mode='r')
+			f_open_grc = open(self.rate_cons_name, mode='r')
 		# in case in same folder as model variables file
 		except:
 			pd_indx = self.inname[::-1].index('/')
@@ -123,10 +123,10 @@ def sch_interr(total_list_eqn, self):
 			line = line.replace(' ', '')
 
 			# if a photolysis rate constant
-			if (line.count('=') == 2 and line.count('::') == 1):
+			if (line.count('=')> 1 and line.count('::') == 1):
 				# get the code for this rate constant
 				jcode_now = line[line.index('::')+2:line.index('=')]
-			
+				
 				# get the photolysis rate number
 				try: # in case two digits
 					jnum_now = int(line[line.index('!MCM')+6:
@@ -134,7 +134,7 @@ def sch_interr(total_list_eqn, self):
 				except: # in case one digit
 					jnum_now = int(line[line.index('!MCM')+6:
 						line.index('!MCM')+7])
-
+				
 				jcode_list.append(jcode_now)
 				jnum_list.append(jnum_now)
 
@@ -436,9 +436,11 @@ def sch_interr(total_list_eqn, self):
 								prn_now = jnum_list[
 									jcode_list.index(
 									jcode_now)]
-								line2 = line2.replace(
-									jcode_now, 
-									str(prn_now))
+	
+								line2 = str(
+								line2[0:si] + 'J(' + 
+								str(prn_now) + ')' + 
+								line2[ei+1::])
 
 						# updated photolysis rate constants
 						line1 = str(line2[:])

@@ -42,7 +42,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	# num_asb - number of actual size bins (excluding wall)
 	# testf - marker for whether in test mode or not
 	# self.eqn_num - number of gas- and particle-phase reactions
-	# self.dil_fac - fraction of chamber air extracted/s
+	# self.dil_fac_now - fraction of chamber air extracted/s
 	# self - reference to PyCHAM
 	# -------------------------------------------------------
 	
@@ -144,7 +144,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('	# jac_part_H2O_indx - sparse Jacobian indices for the effect of\n')
 	f.write('	#	particle-phase water on all other components\n')
 	f.write('	# H2Oi - index for water\n')
-	f.write('	# self.dil_fac - dilution factor for chamber (fraction of chamber air removed/s)\n')
+	f.write('	# self.dil_fac_now - dilution factor for chamber (fraction of chamber air removed/s)\n')
 	f.write('	# self.RO2_indx - index of organic peroxy radicals\n')
 	f.write('	# self.comp_namelist - chemical scheme names of components\n')
 	f.write('	# self.Psat_Pa - saturation vapour pressure of components (Pa) at starting\n')
@@ -312,7 +312,7 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('			# dilute gas-phase water \n')
 		f.write('			dd[H2Oi, 0] -= y[H2Oi, 0]*self.dil_fac_H2Og_now\n')
 		f.write('			# dilute particle-phase water \n')
-		f.write('			dd[num_comp+H2Oi::num_comp, 0] -= y[num_comp+H2Oi::num_comp, 0]*self.dil_fac\n')
+		f.write('			dd[num_comp+H2Oi::num_comp, 0] -= y[num_comp+H2Oi::num_comp, 0]*self.dil_fac_now\n')
 		f.write('		# water diluted either in water solver or above \n')
 		f.write('		df_indx[H2Oi::num_comp] = 0 \n')
 		f.write('		# cannot dilute what is on wall \n')
@@ -383,11 +383,11 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 			f.write('		Csit[num_asb::, :][wsb, :] = (ymat[num_asb::, :][wsb, :]/csum[num_asb::, :][wsb, :])\n')
 		f.write('		\n')
 		if (num_asb > 0):
-			#f.write('		if any(isb):\n')
 			f.write('		# gas-phase concentration of components at\n')
 			f.write('		# particle surface (# molecules/cm3 (air))\n')
 			f.write('		Csit[0:num_asb, :][isb, :] = Csit[0:num_asb, :][isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]\n')	
 			f.write('		# partitioning rate (# molecules/cm3/s)\n')
+			
 			f.write('		dd_all = kimt[0:num_asb, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[0:num_asb, :])\n')
 			f.write('		# gas-phase change\n')
 			f.write('		dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')

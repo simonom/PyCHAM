@@ -1,0 +1,40 @@
+# model variable file for reproducing the flow tube Benzene gas-phase only observations given in # Molteni et al. 2018 (10.5194/acp-18-1909-2018). Inputs are derived from 
+# several sources: Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) supplementary material  # Table ST3 
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Molteni2018/flowtube_benzene_gponly_loNOx
+chem_sch_name = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/Ng2007/benzene_MCM_autoAPRAMfw.eqn
+rate_constant_file = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/prop_store/constants_mcm.f90
+xml_name = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/Ng2007/MCM_PRAM_xml.xml
+chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
+total_model_time = 2.e1
+update_step = 0.1
+recording_time_step = 1.e0
+# T according to Molteni et al. 2018
+temperature = 298.15
+tempt = 0.
+# this paper says tube operates at atmospheric pressure: 10.1039/B604321F 
+p_init = 101325.0
+rh = 0.4
+rht = 0
+light_status = 0
+# initial concentrations of components (ppb)
+Comp0 = BENZENE, OH, HO2, O3
+C0 = 4.e3, 34.5, 69., 136.5
+#cont_infl = H2O, BENZENE, OH, HO2, O3
+#cont_infl_t = 0.
+#Cinfl = 2.363e3; 5.51e3; 7.e3; 8.e3; 3.7e2
+# OH, HO2, O3 influx needed to maintain observed concentrations
+# without benzene and without any background reactivity of OH, HO2, O3
+#7.e3; 8.e3; 3.7e2
+# residence time of 20 s
+#dil_fac = 0.05
+wall_on = 0
+# gas-wall partitioning
+# (1./75.)*(D_ig/D_C10H16O8iso1) from Roldin et al. 2019 (Eq. 1 of Methods 
+# (https://doi.org/10.1038/s41467-019-12338-8))
+#mass_trans_coeff = (1.)*((D_ig/D_BZo_RO_O8))
+#eff_abs_wall_massC = 1.e10
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = SIMPOL
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = SIMPOL
+tracked_comp = BENZENE, OH, HO2

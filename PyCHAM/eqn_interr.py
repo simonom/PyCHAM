@@ -191,8 +191,9 @@ def eqn_interr(num_sb, erf, err_mess, self):
 				1))*-9999).astype(int), axis=1)
 			y_arr_fixer = ((np.arange(0, self.eqn_num[0], 
 				dtype = 'int')).reshape(-1, 1))
-			y_arr_fixer = np.tile(y_arr_fixer, (1, int(max_no_reac)))
-			y_arr[y_arr!=-9999] = y_arr[y_arr!=-9999]+y_arr_fixer[y_arr!=-9999] 
+			y_arr_fixer = np.tile(y_arr_fixer, (1, y_arr.shape[1]))
+			y_arr[y_arr!=-9999] = y_arr[y_arr!=-9999]+y_arr_fixer[y_arr!=-9999]
+			
 
 		while (max_no_prod > np.minimum(pindx.shape[1], pstoi.shape[1])): 
 			pindx = np.append(pindx, 

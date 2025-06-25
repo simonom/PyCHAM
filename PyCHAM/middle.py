@@ -89,7 +89,7 @@ def middle(self): # define function
 	self] = init_conc.init_conc(comp_num, 
 	y0, 0, self.eqn_num[0], Compt,
 	seed_mw, self)
-
+	
 	# if error raised, then tell GUI to display it and to stop 
 	# programme
 	if (erf == 1):

@@ -21,7 +21,7 @@
 ##########################################################################################
 '''solving probability density function of mass:charge resolution'''
 # module to estimate the probability density function that is demonstrative of an instrument's mass:charge resolution, for example a Chemical Ionisiation Mass Spectrometer
-# File Created at 2025-01-17 10:49:56.988518
+# File Created at 2025-06-09 15:17:44.707070
 
 import numpy as np
 import scipy.stats as st

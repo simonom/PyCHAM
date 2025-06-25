@@ -176,7 +176,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 			# create variable inside the concentrations group
 			c_gvar = rootgrp.createVariable(str('/concentrations_g/' + var_name), 
 				'float32', ('time'))
-			# get gas-phase concentration with time (molecules/cm3)
+			# get gas-phase concentration with time (molecules/cm^3)
 			c_g = y_mat[:, ci]
 			# set values for variable
 			c_gvar[:] = c_g
@@ -272,10 +272,9 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 			# set units of concentration
 			c_svar.setncattr('units', 'molecules/cm^3')
 
-	# the mass concentration of secondary organic aerosol (ug/m3)	
+	# the mass concentration of secondary organic particulate matter (ug/m^3)	
 	if (ud_var == 'SOA'):
 
-		
 		# isolate just particle-phase component concentrations
 		# (molecules/cm3)
 		y_pp = np.zeros((y_mat.shape[0], self.nc*self.nasb))
@@ -290,9 +289,9 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 		# (molecules/cm3)
 		y_pp = y_pp[:, 0:self.nc]
 
-
 		# zero the concentrations of components without a carbon 
-		# (molecules/cm3)
+		# (molecules/cm3), note this will zero water, and so
+		# represent dry particulate matter
 		y_pp[:, self.HC[0, :] == 0] = 0.
 
 		# zero the seed components (molecules/cm3)
@@ -315,6 +314,91 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 		soavar.setncattr('units', 'ug/m^3')
 		# set values for SOA variable
 		soavar[:] = y_pp
+
+	# the mass concentration of all particulate matter (ug/m^3)	
+	if (ud_var == 'PM'):
+
+		
+		# isolate just particle-phase component concentrations
+		# (molecules/cm^3)
+		y_pp = np.zeros((y_mat.shape[0], self.nc*self.nasb))
+		y_pp[:, :] = y_mat[:, self.nc:self.nc*(self.nasb+1)]
+
+		# sum concentrations of individual components over size bins
+		# loop over size bins beyond first
+		for sbi in range(1, self.nasb):
+			y_pp[:, 0:self.nc] += y_pp[self.nc*sbi:self.nc*(sbi+1)]
+
+		# keep just the total concentration in particle phase
+		# (molecules/cm^3)
+		y_pp = y_pp[:, 0:self.nc]
+
+		# tile molar masses over times
+		y_MMtiled = np.tile(y_MM.reshape(1, -1), (y_pp.shape[0], 1))
+
+		# convert concentrations from molecules/cm^3 to ug/m^3
+		y_pp[:, :] = ((y_pp[:, :]/si.N_A)*y_MMtiled)*1.e12
+
+		# sum mass concentrations over components to get total
+		# particulate matter concentration (ug/m^3)
+		y_pp = np.sum(y_pp, axis= 1)
+
+		# create total particulate matter mass concentration variable
+		pmvar = rootgrp.createVariable(str('mass_concentration_of_' + 
+		'particulate_matter_wet_aerosol_particles_in_air'), 
+		'float32', ('time'))
+		# set units
+		pmvar.setncattr('units', 'ug/m^3')
+		# set values for variable
+		pmvar[:] = y_pp
+
+	# the oxygen number to carbon number ratio of organics with C>4 
+	# in gas-phase
+	if (ud_var == 'O:C'):
+
+		# array to hold number concentration weighted O:C 
+		# of organics in the gas-phase with C>4 in 
+		# gas-phase
+		OC = np.zeros((len(t_out), self.nc))
+
+		# index for components with more than four carbons
+		cni = (self.Cnum>4).reshape(1, -1)
+
+		# tile over times
+		cni = np.tile(cni, (y_mat.shape[0], 1))
+
+		# copy of gas-phase number concentrations (molecules/cm^3)
+		y_g = np.zeros((y_mat.shape[0], self.nc))
+		y_g[:, :] = y_mat[:, 0:self.nc]
+
+		# zero the components to be ignored (Cn<=4)
+		y_g[cni == 0] = 0.
+
+		# sum of considered components (molecules/cm^3)
+		y_gsum = np.sum(y_g, axis=1).reshape(-1, 1)
+
+		# times when sum is above zero
+		ti = y_gsum[:, 0]>0.
+
+		# normalise the number concentration of components
+		# with Cn>4
+		y_g[ti, :] = y_g[ti, :]/(y_gsum[ti].reshape(-1, 1))
+
+		# multiply number concentration fractions by O:C ratio,
+		# thereby weighting the O:C ratio
+		OC = y_g*(self.OC[0, :].reshape(1, -1))
+
+		# sum O:C across components to get 
+		# number concentration-weighted O:C ration
+		OC = np.sum(OC, axis = 1)
+
+		# create O:C variable
+		OCvar = rootgrp.createVariable(str('O:C_for_C>4_weighted_by_number' + 
+				'_concentration_in_air'), 'float32', ('time'))
+		# set O:C units
+		OCvar.setncattr('units', 'fraction')
+		# set values for O:C variable
+		OCvar[:] = OC
 	
 	# end of bespoke saving function
 	return(rootgrp)

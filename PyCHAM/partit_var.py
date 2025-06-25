@@ -260,7 +260,12 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# for mixing in the chamber, also described as the mxing 
 		# timescale in the chamber (page 2138 of Huang et al. 
 		# 2018)
-		ke = 1./(4.*60) # mixing time of 4 minutes in EUPHORE
+		# mixing time of 17 minutes without air
+		# pulses in Caltech
+		# ke for Caltech 28m^3 chamber from page 4-37 of
+		# https://core.ac.uk/download/pdf/33750172.pdf
+		#ke = 0.015
+		ke = 1./self.mix_time
 		ve = ((2./np.pi)*((ke*DStar_org*1.e-4)**0.5)).reshape(1, -1)
 		vc = (1.*therm_sp/4.).reshape(1, -1)
 

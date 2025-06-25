@@ -62,7 +62,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# if number size distribution DOES include volume of 
 		# water
 		if (self.Vwat_inc > 0):
-
+			
 			# hold seed indices in new array
 			seedi_here = np.zeros((len(self.seedi))).astype('int')
 			seedi_here[:] = self.seedi[:].astype('int')
