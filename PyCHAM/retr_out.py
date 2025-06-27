@@ -29,6 +29,7 @@ import os
 import ast
 import pickle
 import scipy.constants as si
+import matplotlib.pyplot as plt
 
 # define function, note that retr_out is called by the click202 function in gui.py 
 # and it can return progress updates on loading results
@@ -417,7 +418,7 @@ def retr_out(self):
 		load_path = str(self.dir_path + '/y_mw.npy') # path
 		y_MM = np.load(load_path, allow_pickle=True)
 
-		# cm3/mol
+		# cm^3/mol
 		load_path = str(self.dir_path + '/MV.npy') # path
 		MV = np.load(load_path, allow_pickle=True)
 		
@@ -602,7 +603,7 @@ def retr_out(self):
 	yield (80.)
 
 	# withdraw concentrations (ppb in gas, 
-	# # molecules/cm3 in particle and wall)
+	# # molecules/cm^3 in particle and wall)
 	fname = str(self.dir_path + 
 	'/concentrations_all_components_all_times_gas_particle_wall')
 	y = np.loadtxt(fname, delimiter=',', skiprows=1)

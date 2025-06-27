@@ -332,7 +332,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 
 			if (i != corei[0] and i != H2Oi and 
 				self.rel_SMILES[i] != '[HH]'):
-				# density (convert from g/cm3 to kg/m3)
+				# density (convert from g/cm^3 to kg/m^3)
 				self.y_dens[i] = liquid_densities.girolami(
 						self.Pybel_objects[i])*1.e3
 			

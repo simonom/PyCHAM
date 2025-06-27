@@ -3,7 +3,7 @@
 # need to constrain to everything possible w/ wall and w/ particle
 # and then inspect the 
 # gas-phase concentration of guaiacol products
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w_mt2p40_fullELVOC
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w_mt2p40_fullELVOC_NANNOOLAL
 chem_sch_name = guaiacol-MCM-model.fac
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;, .
 xml_name = MCM_PRAM_xml.xml
@@ -31,9 +31,9 @@ chamSA = 200.
 chamV = 200.
 mix_time = 2.40
 # set the vapour pressure estimation method
-nonHOMs_vp_method = EVAPORATION
+nonHOMs_vp_method = NANNOOLAL
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = EVAPORATION
+HOMs_vp_method = NANNOOLAL
 number_size_bins = 20
 coag_on = 1
 space_mode = log

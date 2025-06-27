@@ -397,7 +397,7 @@ def ode_updater(y, H2Oi,
 		self.Pressn = self.Press
 	# get relative humidity now
 	self.RHn = self.RH[0]
-	
+
 	# prepare recording matrices, including recording of initial
 	# conditions, note initial change tendencies not recorded 
 	# in this call but are recorded below
@@ -425,7 +425,7 @@ def ode_updater(y, H2Oi,
 	importlib.reload(ode_solv) # import most recent version
 	importlib.reload(ode_solv_wat) # import most recent version
 	importlib.reload(dydt_rec) # import most recent version
-	
+
 	while (self.tot_time-sumt) > (self.tot_time/1.e10):
 		
 		# remembering variables at the start of the 
