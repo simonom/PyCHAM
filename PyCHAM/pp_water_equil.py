@@ -44,7 +44,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
 	# act_coeff - activity coefficient of components
 	# Vperbin - volume concentration of new seed particles 
-	#	(um3/cm3 (air))
+	#	(um^3/cm^3 (air))
 	# x - particle radii (um)
 	# num_comp - number of components
 	# self - parent PyCHAM object
@@ -344,10 +344,14 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# ensure where no mole fractions are present (e.g. because a size bin
 		# has no new particles, seedx_now is 0 rather than nan)
 		seedx_zeros_indx = np.sum(seedx_now, axis=0) == 0.
+	
+		# index of size bins where mole fractions are not zero
+		seedx_nzeros_indx = np.sum(seedx_now, axis=0) != 0.
 
 		# ensure seedx sums to 1 per size bin (columns) across
 		# components (rows)
-		seedx_now = seedx_now/np.sum(seedx_now, axis=0)
+		seedx_now[:, seedx_nzeros_indx] = (seedx_now[:, seedx_nzeros_indx]/
+			np.sum(seedx_now[:, seedx_nzeros_indx], axis=0))
 		
 		# zero any nan values
 		seedx_now[:, seedx_zeros_indx] = 0.
@@ -367,16 +371,15 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		av_MM = (np.sum(seedx_now*seed_mm, axis=0)).reshape(1, num_asb)
 
 		# average liquid-phase density of seed particles
-		# including water (g/cm3) per size bin
+		# including water (g/cm^3) per size bin
 		av_dens = (np.sum(seedx_now*dens_seed, axis=0)).reshape(1, num_asb)
 
 		# molar volume averaged over seed 
 		# components (including water) (cm3/mol) 
 		# per size bin (columns)
-		avMV = np.sum(av_MM/av_dens, axis=0)
-
-		# convert any nans to 0
-		avMV[seedx_zeros_indx] = 0.
+		avMV = np.ones((1, num_asb))
+		avMV[1, seedx_nzeros_indx] = np.sum(av_MM[1, seedx_nzeros_indx]/
+			av_dens[1, seedx_nzeros_indx], axis=0)
 
 		# total molecular concentration of seed 
 		# components 
