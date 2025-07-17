@@ -869,6 +869,8 @@ def ode_updater(y, H2Oi,
 		# note self.pp_dil set in def_mod_var and obs_file_open
 		if (self.dil_fac_now > 0 and self.pp_dil == 1):
 			N_perbin -= N_perbin*(self.dil_fac_now*tnew)
+			# reality check
+			N_perbin[N_perbin<0.] = 0.
 		
 		# if particle size bins present, rebin
 		if ((num_sb-self.wall_on) > 0):

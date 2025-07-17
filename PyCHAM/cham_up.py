@@ -506,7 +506,7 @@ def cham_up(sumt,
 		if (pinsumt >= self.pconct[0, seedt_cnt]):
 			
 			# get the current injection concentration
-			# particles/cm3				
+			# particles/cm^3				
 			pconcn = self.pconc[:, seedt_cnt]
 
 			if (self.pmode == 0): # if in modal mode

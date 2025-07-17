@@ -9,7 +9,6 @@ dependencies:
   - netcdf4
   - numpy
   - openpyxl
-  - python
-  - pyqt
+  - python<=3.10
   - scipy
   - xmltodict
