@@ -165,13 +165,126 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, vol_Comp,
 				(4.5e-04*TEMP-1.2e-1)*9.869e-6)
 			continue # onto next component
 		
-		# vapour pressure (log10 atm) (# eq. 6 of Nannoolal et 
-		# al. (2008), with dB of 
-		# that equation given by eq. 7 of same reference)
-		self.Psat[:, i] = ((vapour_pressures.nannoolal(
-			self.Pybel_objects[i], TEMP, 
-			boiling_points.nannoolal(
-			self.Pybel_objects[i]))))
+		# possibly use different method for vapour pressure 
+		# (log10(atm)) of HOMs
+		
+		# if HOMs component
+		if (self.ac_by_cs == 0): # if using SMILES
+			if (self.rel_SMILES[i].count('O') + 
+			self.rel_SMILES[i].count('o') >= 6):
+
+				# tell recording section we are dealing 
+				# with a HOM		
+				rec_now_flag = 1
+			
+				if ('Nannoolal' in self.HOMs_vp or 
+				'nannoolal' in self.HOMs_vp or
+				'NANNOOLAL' in self.HOMs_vp):
+					# if Nannoolal method wanted for HOMs
+					self.Psat[:, i] = ((vapour_pressures.nannoolal(
+						self.Pybel_objects[i],
+						TEMP, 
+						boiling_points.nannoolal(
+						self.Pybel_objects[i]))))
+
+				# if Mohr et al. 2019 method wanted for HOMs
+				if ('Mohr' in self.HOMs_vp or 'mohr' in self.HOMs_vp or 
+				'MOHR' in self.HOMs_vp):
+			
+					# log(C* (ug/m3)) (natural logarithm of effective 
+					# saturation concentration) of component 
+					# (Eq. 1 Mohr et al. 2019)
+					nC = (self.rel_SMILES[i].count('C') + 
+					self.rel_SMILES[i].count('c'))
+					nO = (self.rel_SMILES[i].count('O') + 
+					self.rel_SMILES[i].count('o'))
+					nN = (self.rel_SMILES[i].count('N') + 
+						self.rel_SMILES[i].count('n'))
+					if (self.pars_skip != 2):
+						Psatnow = ((25.-nC)*0.475-
+						(nO-3.*nN)*0.2-2.*(((nO-3.*nN)*nC)/
+						(nC+nO-3.*nN))*0.9-nN*2.5)
+						# convert to vapour pressure (log10(atm))
+						# (eq. 1 O'Meara et al. 2014)
+						# first raise to the natural logarithm
+						Psatnow = np.exp(Psatnow) # ug/m3
+						# now convert ug/m3 to atm and take log10
+						# (log10(atm))
+						self.Psat[:, i] = np.log10((Psatnow*8.2057e-5*
+						TEMP)/(1.e6*y_mw[i]))
+
+				if (self.HOMs_vp == 'EVAPORATION'):
+					if (self.pars_skip != 2):
+						# if EVAPORATION method wanted for HOMs
+						self.Psat[:, i] = ((
+							vapour_pressures.evaporation2(
+							self.Pybel_objects[i],
+							TEMP)))
+
+				if (self.HOMs_vp == 'MY'):
+					if (self.pars_skip != 2):
+						# if Myrdal and Yalkowsky method wanted for HOMs
+						self.Psat[:, i] = ((
+							vapour_pressures.myrdal_and_yalkowsky(
+							self.Pybel_objects[i],
+							TEMP, 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
+			
+				if (self.HOMs_vp == 'SIMPOL'):
+					if (self.pars_skip != 2):
+						# if SIMPOL method wanted for HOMs
+						self.Psat[:, i] = ((vapour_pressures.simpol(
+							self.Pybel_objects[i],
+							TEMP)))
+					
+					
+			
+			# vapour pressure (log10(atm)) (eq. 6 of Nannoolal 
+			# et al. (2008), with dB of 
+			# that equation given by eq. 7 of same reference)
+			else: # if not HOMs component
+				if (self.pars_skip != 2):
+
+					if ('Nannoolal' in self.nonHOMs_vp or 
+						'nannoolal' in self.nonHOMs_vp or
+						'NANNOOLAL' in self.nonHOMs_vp):
+						# if Nannoolal method wanted for nonHOMs
+						self.Psat[:, i] = ((vapour_pressures.nannoolal(
+							self.Pybel_objects[i],
+							TEMP, 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
+			
+					if (self.nonHOMs_vp == 'EVAPORATION'):
+						# if EVAPORATION method wanted for nonHOMs
+						self.Psat[:, i] = ((
+							vapour_pressures.evaporation2(
+							self.Pybel_objects[i],
+							TEMP)))
+
+					# if Myrdal and Yalkowsky method wanted for nonHOMs
+					if (self.nonHOMs_vp == 'MY'):
+						# Myrdal and Yalkowsky method in UManSysProp
+						# cannot deal with bimolecular hydrogen as it
+						# gives a 0 mass, so assign an arbitrarilly high
+						# vapour pressure here
+						if (self.comp_namelist[i] == 'H2'):
+							self.Psat[:, i] = 10. # log10(atm)
+						else:
+							self.Psat[:, i] = ((
+							vapour_pressures.myrdal_and_yalkowsky(
+							self.Pybel_objects[i],
+							TEMP, 
+							boiling_points.nannoolal(
+							self.Pybel_objects[i]))))
+			
+					if (self.nonHOMs_vp == 'SIMPOL'):
+						# if SIMPOL method wanted for nonHOMs
+						self.Psat[:, i] = ((vapour_pressures.simpol(
+							self.Pybel_objects[i],
+							TEMP)))
+
 		
 	ish = (self.Psat == 0.) # non-volatiles
 
@@ -298,7 +411,7 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, vol_Comp,
 		self.Psat[:, nuci] = 0.
 	    
 	# convert saturation vapour pressures from Pa to 
-	# # molecules/cm3 (air) using ideal
+	# # molecules/cm^3 (air) using ideal
 	# gas law, R has units cm3.Pa/K.mol
 	self.Psat = self.Psat*(NA/((si.R*1.e6)*TEMP))
 	

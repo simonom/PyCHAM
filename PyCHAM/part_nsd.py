@@ -55,7 +55,7 @@ def part_nsd(lowersize, num_asb, uppersize, mean_radn, stdn, pconcn, testf, self
 					+np.log10(uppersize))/2.)]
 			if (lowersize == 0.):
 				mean_radn[mean_radn == -1.e6] = [10**(np.log10(uppersize)-1)]
-
+	
 	# if multiple size bins, this call will assume a lognormal distribution if initial 
 	# particle concentration is described by mode, or will assign particles to size bins if
 	# initial particle concentration per size bin provided

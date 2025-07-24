@@ -283,14 +283,14 @@ def cham_up(sumt,
 			# but don't update gas-phase concentration of water, since
 			# RH should be allowed to vary with temperature
 			[_, _, self] = water_calc(temp_nown, self.RH[RHt_cnt], si.N_A, self)
-
+			
 			# update vapour pressures of all components (# molecules/cm3 and Pa), 
 			# ignore density output
 			[self, _] = volat_calc.volat_calc(0, temp_nown,
 				 H2Oi, num_comp, vol_Comp, 
 				volP, 0, corei, 
 				0, 0.0, [], 1, nuci, self)
-
+			
 			# note that air pressure does not respond to temperature in
 			# PyCHAM, it needs to be set by the user
 
@@ -506,7 +506,7 @@ def cham_up(sumt,
 		if (pinsumt >= self.pconct[0, seedt_cnt]):
 			
 			# get the current injection concentration
-			# particles/cm3				
+			# particles/cm^3				
 			pconcn = self.pconc[:, seedt_cnt]
 
 			if (self.pmode == 0): # if in modal mode
