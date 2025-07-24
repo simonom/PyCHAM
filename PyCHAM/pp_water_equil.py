@@ -367,26 +367,26 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 	
 		# average molar mass of 
 		# dry (no water) seed components (rows)
-		# (cm3/mol) per size bin (columns)
-		av_MM = (np.sum(seedx_now*seed_mm, axis=0)).reshape(1, num_asb)
+		# (cm^3/mol) per size bin (columns)
+		av_MM = (np.sum(seedx_now*seed_mm, axis=0)).reshape(num_asb)
 
 		# average liquid-phase density of seed particles
 		# including water (g/cm^3) per size bin
-		av_dens = (np.sum(seedx_now*dens_seed, axis=0)).reshape(1, num_asb)
+		av_dens = (np.sum(seedx_now*dens_seed, axis=0)).reshape(num_asb)
 
 		# molar volume averaged over seed 
-		# components (including water) (cm3/mol) 
+		# components (including water) (cm^3/mol) 
 		# per size bin (columns)
-		avMV = np.ones((1, num_asb))
-		avMV[1, seedx_nzeros_indx] = np.sum(av_MM[1, seedx_nzeros_indx]/
-			av_dens[1, seedx_nzeros_indx], axis=0)
+		avMV = np.zeros((num_asb))
+		avMV[seedx_nzeros_indx] = np.sum(av_MM[seedx_nzeros_indx]/
+			av_dens[seedx_nzeros_indx], axis=0)
 
 		# total molecular concentration of seed 
 		# components 
-		# (molecules/cm3) per size bin, 
+		# (molecules/cm^3) per size bin, 
 		# note that volume multiplied by 1e-12 to convert 
-		# from um3 to cm3, multiply by NA to convert
-		# moles/cm3 to molecules/cm3
+		# from um^3 to cm^3, multiply by NA to convert
+		# moles/cm^3 to molecules/cm^3
 		tmc = ((Vperbin*1.e-12)/avMV)*NA
 
 		# convert any nans to 0

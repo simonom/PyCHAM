@@ -1,8 +1,0 @@
-# chamber environmental conditions throughout the simulation, with rows corresponding to the time points in the time output file, first column is temperature (K), second is pressure (Pa), third is relative humidity (fraction (0-1), fourth is transmission factor of light (0-1))
-301.15,100000.0,0.85000028808847,1.0
-301.15,100000.0,0.8500002875205578,1.0
-301.15,100000.0,0.8599999733173638,1.0
-301.15,100000.0,0.8499999945868403,1.0
-301.15,100000.0,0.8499999945878796,1.0
-301.15,100000.0,0.8300000284275785,1.0
-301.15,100000.0,0.8300000290105093,1.0

@@ -1147,6 +1147,14 @@ def mod_var_read(self):
 			if key == 'elec_field' and (value.strip()):
 				e_field = float(value.strip())
 			
+			# status of dilution factor
+			if (key == 'dil_fac_status' and (value.strip())):
+				# if user doesn't want particle-phase 
+				# components nor particle number 
+				# concentration to be diluted
+				if (int(value.strip()) == 1):
+					self.pp_dil = 0
+
 			# dilution factor rate
 			if key == 'dil_fac' and (value.strip()):
 				self.dil_fac = np.array(([float(i) for i in 
