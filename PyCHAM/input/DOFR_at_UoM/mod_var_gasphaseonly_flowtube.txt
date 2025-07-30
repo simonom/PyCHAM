@@ -1,0 +1,36 @@
+# model variable file for the flow tube gas-phase experiments
+# in the Dekati Oxidation Flow Reactor at University of Manchester 
+# several sources: Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) supplementary material  # Table ST3 
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_outputs/Aircraft/test_experiment_31_07_2025
+chem_sch_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_inputs/mcm_CH4_PROPANE_BENZENE.kpp
+rate_constant_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/prop_store/constants_mcm.f90
+xml_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/input/Ng2007/MCM_PRAM_xml.xml
+rate_constant_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_inputs/constants_mcm.f90
+chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
+total_model_time = 3.7e1
+update_step = 0.1
+recording_time_step = 1.e0
+# T according to Aristeidis email 24/07/2025
+temperature = 295.15
+tempt = 0.
+p_init = 101325.0
+# RH according to Aristeidis email 24/07/2025
+rh = 0.4
+rht = 0
+light_status = 1
+act_flux_file = MAC_OFR_Actinic_Flux_Spectrum.csv
+# initial concentrations of components (ppb)
+Comp0 = BENZENE, OH, HO2, O3, NO, C3H8, CO
+C0 = 0., 0., 0., 2.e3, 1.e3, 0.e3, 40000.
+wall_on = 0
+# gas-wall partitioning
+# (1./75.)*(D_ig/D_C10H16O8iso1) from Roldin et al. 2019 (Eq. 1 of Methods 
+# (https://doi.org/10.1038/s41467-019-12338-8))
+#mass_trans_coeff = (1.)*((D_ig/D_BZo_RO_O8))
+#eff_abs_wall_massC = 1.e10
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = NANNOOLAL
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = NANNOOLAL
+tracked_comp = BENZENE, OH, HO2, O3
+pars_skip = 1
