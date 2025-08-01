@@ -1,6 +1,7 @@
 name: PyCHAM
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - git
   - gitpython
@@ -12,3 +13,5 @@ dependencies:
   - python<=3.10
   - scipy
   - xmltodict
+  - pyqt=5
+  - openbabel

@@ -1,11 +1,10 @@
 # model variable file for the flow tube gas-phase experiments
 # in the Dekati Oxidation Flow Reactor at University of Manchester 
 # several sources: Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) supplementary material  # Table ST3 
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_outputs/Aircraft/test_experiment_31_07_2025
-chem_sch_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_inputs/mcm_CH4_PROPANE_BENZENE.kpp
-rate_constant_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/prop_store/constants_mcm.f90
+res_file_name = test_experiment_31_07_2025
+chem_sch_name = mcm_CH4_PROPANE_BENZENE_chem_sch.kpp
+rate_constant_file = constants_mcm.f90
 xml_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/input/Ng2007/MCM_PRAM_xml.xml
-rate_constant_file = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MAN_OFR/PyCHAM_inputs/constants_mcm.f90
 chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
 total_model_time = 3.7e1
 update_step = 0.1
