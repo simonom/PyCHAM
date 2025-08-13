@@ -816,7 +816,7 @@ def part_mass_vs_time_sizeseg(self):
 	# get the index of particle size bins
 	for psb_dubi in psb_dub:
 		
-		psb_ind += dbou_rec[:, 1::]<psb_dubi
+		psb_ind += dbou_rec[:, 1::]<=psb_dubi
 		
 	# then use this index to find the mass concentrations 
 	# inside each size bound
@@ -826,16 +826,16 @@ def part_mass_vs_time_sizeseg(self):
 	# zero water
 	yp[:, self.ro_obj.H2O_ind::self.ro_obj.nc] = 0
 
-	# mass concentrations of each component in each size bin (ug/m3)
-	mc = (yp/si.N_A)*np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1),  (1, num_asb))*1e12
+	# mass concentrations of each component in each size bin (ug/m^3)
+	mc = (yp/si.N_A)*np.tile(np.array((self.ro_obj.comp_MW)).reshape(1, -1), (1, num_asb))*1e12
 
-	# mass concentrations summed across components in each size bin (ug/m3)
+	# mass concentrations summed across components in each size bin (ug/m^3)
 	mc_psb = np.zeros((len(self.ro_obj.thr), num_asb))
 	
 	for i in range(num_asb): # loop through size bins
 		mc_psb[:, i] = np.sum(mc[:, i*self.ro_obj.nc:(i+1)*self.ro_obj.nc], axis=1)
 
-	# average mass per particle in this size bin (ug/m3/particle), note that components have been
+	# average mass per particle in this size bin (ug/m^3/particle), note that components have been
 	# allocated to size bins based on their wet (with water) sizes, and we want to display
 	# the mass based on dry sizes
 	mc_psb[self.ro_obj.Nrec_dry>0.] = mc_psb[self.ro_obj.Nrec_dry>0.]/self.ro_obj.Nrec_dry[self.ro_obj.Nrec_dry>0.]
@@ -850,7 +850,8 @@ def part_mass_vs_time_sizeseg(self):
 	# temporary holder array
 	mc_psb_temp = np.zeros((len(self.ro_obj.thr), num_asb))
 
-	for psb_dubi in range(len(psb_dub)): # loop through size categories
+	# loop through size categories in ascending order
+	for psb_dubi in range(len(psb_dub)):
 		
 		# temporary holder array
 		mc_psb_temp[:, :] = mc_psb[:, :]
@@ -858,10 +859,10 @@ def part_mass_vs_time_sizeseg(self):
 		# zero the unwanted size bins
 		mc_psb_temp[psb_ind<(len(psb_dub)-psb_dubi)] = 0.
 
-		# get the concentrations of components in this size category (ug/m3)
+		# get the concentrations of components in this size category (ug/m^3)
 		psb_res[:, psb_dubi] = np.sum(mc_psb_temp, axis=1)
 	
-		ax0.plot(self.ro_obj.thr, psb_res[:, psb_dubi], label = str(str(r'$D_{p}$<') + str(psb_dub[psb_dubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
+		ax0.plot(self.ro_obj.thr, psb_res[:, psb_dubi], label = str(str(r'$D_{p}\leq$') + str(psb_dub[psb_dubi]/1.e3) + ' '+ str(r'$\rm{\mu}$m')))
 		
 
 	ax0.set_ylabel(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)', fontsize = 14)

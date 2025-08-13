@@ -387,7 +387,8 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# note that volume multiplied by 1e-12 to convert 
 		# from um^3 to cm^3, multiply by NA to convert
 		# moles/cm^3 to molecules/cm^3
-		tmc = ((Vperbin*1.e-12)/avMV)*NA
+		tmc = np.zeros((len(Vperbin)))
+		tmc[seedx_nzeros_indx] = ((Vperbin[seedx_nzeros_indx]*1.e-12)/avMV[seedx_nzeros_indx])*NA
 
 		# convert any nans to 0
 		tmc[seedx_zeros_indx] = 0.
@@ -400,10 +401,10 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# components
 		for ci in seedi_here: 
 					
-			# concentration per size bins (# molecules/cm3)
+			# concentration per size bins (# molecules/cm^3)
 			yn[ci:(num_comp*(num_asb-1)+ci)+1:
 			num_comp] = tmc*(seedx_now[seed_cnt, :])
 
 			seed_cnt += 1 # count on seed components
-	
+		
 	return(yn)

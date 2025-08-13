@@ -199,7 +199,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	Vperbin = pconc_new*((4./3.)*np.pi*(radn)**3.)
 
 	# container for concentrations of components in new seed particles 
-	# (# molecules/cm3 (air))
+	# (# molecules/cm^3 (air))
 	yn = np.zeros((num_comp*(num_sb)))
 	
 	# account for particle-phase concentration of components 
@@ -210,7 +210,9 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	seedx_now = np.squeeze(self.seedx[:, :, self.seedx_tcnt]).reshape(
 		self.seedx.shape[0], self.seedx.shape[1])
 	
-	# consider water equilibrium between gas and particles
+	# consider water equilibrium between gas and particles to
+	# get concentration of components (molecules/cm^3) in
+	# new particles
 	yn = pp_water_equil(H2Ogc, yn, seedx_now, num_sb, y_mm, 
 		R_gas, TEMP, surfT, act_coeff, Vperbin, radn, 
 		num_comp, self)

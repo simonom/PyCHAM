@@ -163,7 +163,7 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1) + ', reac: ' + str(reac_loss_rate[sbi*self.eqn_num[1]+i, 0:self.nreac_aq[i]]) + '\n'))
 				f.write(str('size bin ' + str(sbi+1) + ', eq. ' + str(i+1)  + ', prod: ' + str(prod_gain_rate[sbi*self.eqn_num[1]+i, 0:self.nprod_aq[i]]) + '\n'))
 	
-	if (self.wall_on == 1): # include fluxes of trouble components to wall if wall is considered
+	if (self.wall_on > 0): # include fluxes of trouble components to wall if wall is considered
 		
 		f.write('\n')
 		f.write('Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall\n')
@@ -176,7 +176,7 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 		
 		if (sum(sum(self.Cw > 0.)) > 0.):
 			Csit = self.Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
-			# rate of transfer (# molecules/cm3/s), note sum over wall bins
+			# rate of transfer (# molecules/cm^3/s), note sum over wall bins
 			dd_trouble = np.sum((-1.*self.kw[:, neg_comp_indx]*(y0[neg_comp_indx].reshape(1, -1)-Csit)), axis=0)
 			
 		else: # otherwise there is zero partitioning with walls
@@ -192,30 +192,30 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 	if (num_asb > 0): # if particle size bins present
 
 		f.write('\n')
-		f.write('Gas-particle partitioning fluxes (molecules/cm3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.\n')
+		f.write('Gas-particle partitioning fluxes (molecules/cm^3/s) for each component with negative concentrations following call to ODE solver, where a negative flux represents loss from the gas-phase and positive represents gain to the gas-phase.  For each component, flux to the smallest size bin is the first value, and flux to the largest size bin is the final value.\n')
 		
 		# get particle-phase concentrations (molecules/cm3/s)
 		ymat = (y0[num_comp:num_comp*(num_asb+1)]).reshape(num_asb, num_comp)
 		# force all components in size bins with no particle to zero
 		ymat[N_perbin[:, 0] == 0, :] = 0.
-		# total particle-phase concentration per size bin (molecules/cc (air))		
+		# total particle-phase concentration per size bin (molecules/cm^3 (air))		
 		csum = ((ymat.sum(axis=1)-ymat[:, self.seedi].sum(axis=1))+((ymat[:, self.seedi]*self.core_diss).sum(axis=1)).reshape(-1)).reshape(-1, 1)
-		# tile over components
+		# tile over components, note that particle size bins are in rows in csum
 		csum = np.tile(csum, [1, len(neg_comp_indx)])
 		ymat = ymat[:, neg_comp_indx] # keep just the components with negative values output by ODE solver
-		# container for gas-phase concentrations at particle surface (molecules/cm3)
+		# container for gas-phase concentrations at particle surface (molecules/cm^3)
 		Csit = np.zeros((num_asb, len(neg_comp_indx)))
 		# index of particles containing components
-		isb = csum[:,0] > 0
+		isb = csum[:, 0] > 0
 		# mole fractions at particle surface
 		Csit[isb, :] = (ymat[isb, :]/csum[isb, :])
 		# filter just the components with negative concentrations following call to ODE solver
 		self.Psat = self.Psat[:, neg_comp_indx]
 		act_coeff = act_coeff[:, neg_comp_indx]
 		kimt = kimt[:, neg_comp_indx]
-		# gas-phase concentration of components at particle surface (molecules/cm3)
-		Csit[isb, :] = Csit[isb, :]*self.Psat[isb, :]*kelv_fac[isb]*act_coeff[isb, :]
-		# gas-particle partitioning rate (molecules/cm3/s)
+		# gas-phase concentration of components at particle surface (molecules/cm^3)
+		Csit[isb, :] = Csit[isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]
+		# gas-particle partitioning rate (molecules/cm^3/s)
 		dd_trouble = -1.*kimt*(y0[neg_comp_indx].reshape(1, -1)-Csit)
 		
 		for i in range(len(neg_comp_indx)): # loop through trouble components

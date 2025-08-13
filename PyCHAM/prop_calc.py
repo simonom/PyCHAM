@@ -333,14 +333,18 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 			# potassium nitrate density stated manually to be sure
 			# it agrees with internet
 			if (self.rel_SMILES[i] == '[K+].[O-][N+]([O-])=O'):
-				# liquid density code does not like H2, 
-				# so manually input kg/m3
 				self.y_dens[i] = 2.11e3
+			
+			# black carbon density stated manually to be sure
+			# it agrees with internet
+			if (self.comp_namelist[i] == 'bcin'):
+				self.y_dens[i] = 2.26e3
 
 			# get density of components from UManSysProp
 			if (i != corei[0] and i != H2Oi and 
 				self.rel_SMILES[i] != '[HH]'and 
-				self.rel_SMILES[i] != '[K+].[O-][N+]([O-])=O'):
+				self.rel_SMILES[i] != '[K+].[O-][N+]([O-])=O' and
+				self.comp_namelist[i] != 'bcin'):
 				# density (convert from g/cm^3 to kg/m^3)
 				self.y_dens[i] = liquid_densities.girolami(
 						self.Pybel_objects[i])*1.e3

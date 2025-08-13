@@ -63,7 +63,7 @@ def cham_up(sumt,
 	# self.nucv2 - nucleation parameter two
 	# self.nucv3 - nucleation parameter three
 	# new_part_sum1 - total number concentration of new 
-	#	particles so far (#/cm3 (air))
+	#	particles so far (#/cm^3 (air))
 	# self.update_stp - time interval between operator-split 
 	#	updates (s)
 	# update_count - count since operator-split last 
@@ -83,14 +83,14 @@ def cham_up(sumt,
 	# self.pmode - whether particle number size distributions stated 
 	#	explicitly or by mode
 	# self.pconc - concentration of injected particles 
-	#	(# particles/cm3 (air))
+	#	(# particles/cm^3 (air))
 	# self.pconct - times of particle injection (s)
 	# seedt_cnt - count on injections of particles
 	# num_comp - number of components
 	# y0 - concentration of components prior to integration 
 	# 	(# molecules/cm3 (air))
 	# y - variable concentration of components prior to 
-	#	integration (# molecules/cm3 (air))
+	#	integration (# molecules/cm^3 (air))
 	# N_perbin0 - concentration of particles 
 	#	(# particles/cm3 (air)) at start of time interval
 	# self.mean_rad - mean radius for particle number size 
@@ -165,8 +165,10 @@ def cham_up(sumt,
 	num_asb = (num_sb-self.wall_on)
 
 	# ensure N_perbin has a value
-	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
-	N_perbin[:] = N_perbin0[:] # particle number concentration (# particles/cm3)
+	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1]))
+	# particle number concentration (# particles/cm^3) at start 
+	# of time step
+	N_perbin[:] = N_perbin0[:]
 
 	# check on dilution factor setting --------------------------
 	self.dil_fac_cnt =  sum(self.dil_fact <= (sumt))-1
@@ -640,7 +642,7 @@ def cham_up(sumt,
 		
 		if (seedt_cnt != -1):
 			
-			# index for mole fraction of seed particles
+			# time index for mole fraction of seed particles
 			self.seedx_tcnt = seedt_cnt-1
 			
 			if (self.pmode == 0): # if in modal mode
@@ -655,7 +657,7 @@ def cham_up(sumt,
 		
 			# injected seed particle number concentration 
 			# integrated over proposed 
-			# time step (# particles/cm3)
+			# time step (# particles/cm^3)
 			pconcn = self.pconc[:, seedt_cnt-1]*tnew
 		
 		if (seedt_cnt == -1):
@@ -671,7 +673,7 @@ def cham_up(sumt,
 		# number of actual particle size bins
 		num_asb = (num_sb-self.wall_on)
 
-		# prepare to hold particle-phase concentrations (molecules/cm3)
+		# prepare to hold particle-phase concentrations (molecules/cm^3)
 		yp0 = np.zeros((num_comp*num_asb))
 		yp0[:] = y0[num_comp:num_comp*(num_asb+1)]
 		
@@ -681,7 +683,7 @@ def cham_up(sumt,
 		uppsize, num_comp, num_asb, MV, 
 		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], x, self)
-			
+		
 	# --------------------------------------------------------------------------
 	
 	# check on continuous influx of gas-phase components -------------

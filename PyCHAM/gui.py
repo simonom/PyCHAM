@@ -1455,7 +1455,8 @@ class PyCHAM(QWidget):
 		
 		# button to plot cumulative particle-phase mass 
 		# concentration by different sizes of particle
-		self.b303 = QPushButton(str('''Cumulative particle ''') 		+ str('''mass \nconcentration without water'''))
+		self.b303 = QPushButton(str('Cumulative particle mass' + 
+							  '\nconcentration without water'))
 		self.b303.setToolTip('See the time series of particle mass grouped by upper diameter limits (mass and particle size excludes water)')
 		self.b303.clicked.connect(self.on_click303)
 		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
