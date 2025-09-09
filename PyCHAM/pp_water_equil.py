@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#								                                       #
+# Copyright (C) 2018-2025					                           #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			               #
+#								                                       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -168,7 +168,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				av_dens = np.sum(seedxn*dens_seed, axis=0)
 
 				# molar volume averaged over seed 
-				# components (including water) (cm3/mol) 
+				# components (including water) (cm^3/mol) 
 				# per size bin
 				avMV = av_MM/av_dens
 
@@ -229,7 +229,6 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			# then zero its mole fraction to begin the 
 			# equilibration process
 			else:
-		
 				seedx_now[seedi_here==self.H2Oi, :] = 0.
 
 			# indices of non-water seed components
@@ -261,9 +260,9 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			av_dens = np.sum(seedx_now*dens_seed, axis=0)
 
 			# molar volume averaged over seed 
-			# components (including water) (cm3/mol) 
+			# components (including water) (cm^3/mol) 
 			# per size bin
-			avMV = np.sum(av_MM/av_dens, axis=0)				
+			avMV = (av_MM/av_dens)				
 
 			# calculate Kelvin effect factor 
 			# for the provided number size 
@@ -289,15 +288,15 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				
 			# total molecular concentration of dry (no water) seed 
 			# components 
-			# (molecules/cm3) per size bin, 
+			# (molecules/cm^3) per size bin, 
 			# note that volume multiplied by 1e-12 to convert 
-			# from um3 to cm3 (this is no water seed components
+			# from um^3 to cm^3 (this is no water seed components
 			# as the condition above says that volume size 
 			# distribution exclused volume of water)
 			tmc = ((Vperbin*1.e-12)/avMV)*NA
 
 			# the molecular concentration of water per size bin
-			# (molecules/cm3), note that (xwat/(1.-wat)) gives 
+			# (molecules/cm^3), note that (xwat/(1.-wat)) gives 
 			# the fraction of tmc that gives the molecular 
 			# concentration of water
 			wmc = tmc*(xwat/(1.-xwat))
@@ -311,14 +310,14 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				
 				if (ci != self.H2Oi): # if non-water
 				
-					# concentration per size bins (# molecules/cm3)
+					# concentration per size bins (# molecules/cm^3)
 					yn[ci:
 					(num_comp*(num_asb-1)+ci)+1:
 					num_comp] = tmc*(seedx_now[seed_cnt, :])
 
 				else: # if water
 					
-					# concentration per size bins (# molecules/cm3)
+					# concentration per size bins (# molecules/cm^3)
 					yn[ci:
 					(num_comp*(num_asb-1)+ci)+1:
 					num_comp] = wmc
@@ -378,8 +377,8 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# components (including water) (cm^3/mol) 
 		# per size bin (columns)
 		avMV = np.zeros((num_asb))
-		avMV[seedx_nzeros_indx] = np.sum(av_MM[seedx_nzeros_indx]/
-			av_dens[seedx_nzeros_indx], axis=0)
+		avMV[seedx_nzeros_indx] = (av_MM[seedx_nzeros_indx]/
+			av_dens[seedx_nzeros_indx])
 
 		# total molecular concentration of seed 
 		# components 

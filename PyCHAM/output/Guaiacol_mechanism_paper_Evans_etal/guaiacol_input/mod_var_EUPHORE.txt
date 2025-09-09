@@ -1,35 +1,31 @@
 # model variable file for the EUPHORE guaiacol experiments, informed
 # by Rhianna Evans at University of York
-# need to constrain to everything possible w/ wall and w/ particle
-# and then inspect the 
-# gas-phase concentration of guaiacol products
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/NCAS/MCM_working_group/guaiacol/PyCHAM_output/guaiacol_constrained_1e-3w_mt2p40_fullELVOC_NANNOOLAL
+res_file_name = 1e-2w_mt24p0_NANNOOLAL_pcrh
 chem_sch_name = guaiacol-MCM-model.fac
 chem_scheme_markers = %, RO2, +, , , ;, +, ;, , %, :, ;, .
 xml_name = MCM_PRAM_xml.xml
-total_model_time = 9.2e3
+total_model_time = 9000.0
 update_step = 6.e1
 recording_time_step = 6.e1
-obs_file = constraining_obs_wp.xlsx
+obs_file = constraining_obs_wp_pcrh.xlsx
 lat = 39.55
 lon = 359.54
-daytime_start = 30600
+daytime_start = 27000.0
 DayOfYear = 135
 # dilution rate (fraction of air removed per second)
 dil_fac = 1.63e-5
 # initial concentrations of components (ppb)
 Comp0 = HONO, O3, GUAIACOL, NO, NO2, HCHO
-C0 = 40., 17.3, 458.498, 35.2, 41.7, 0.07
-const_comp = H2O, HONO, O3, HCHO, NO, NO2
+C0 = 40., 17.3, 470., 35.2, 41.7, 0.07
 wall_on = 1
 # gas-wall partitioning
 # estimated by Huang et al. 2018 (https://doi.org/10.1021/acs.est.7b05575)
 mass_trans_coeff = -1
 # g/m3
-eff_abs_wall_massC = 1.e-3
+eff_abs_wall_massC = 1.e-2
 chamSA = 200.
 chamV = 200.
-mix_time = 2.40
+mix_time = 24.0
 # set the vapour pressure estimation method
 nonHOMs_vp_method = NANNOOLAL
 # set the vapour pressure estimation method for HOMs
@@ -49,4 +45,4 @@ Rate_at_inflect = 2.e-5
 Grad_pre_inflect = 1.
 Grad_post_inflect = 0.
 McMurry_flag = 0
-tracked_comp = ELVOC, NO3, OH, GUAIACO, ELVOCp, ELVOC, ELVOCpp
+tracked_comp = NO3, OH, GUAIACO, GUAIACOL, HONO, NO, O3, NO2

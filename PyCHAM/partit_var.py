@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#								                                       #
+# Copyright (C) 2018-2025					                           #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			               #
+#								                                       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -85,11 +85,10 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	
 	if (num_sb-self.wall_on > 0): # if particles present
 		
-		# density (g/cm3) and average molecular weight (g/mol) of 
+		# density (g/cm^3) and average molecular weight (g/mol) of 
 		# particles (excluding wall)
 		[tot_rho, ish, avMW] = part_prop(y_part, num_comp, 
 			(num_sb-self.wall_on), NA, y_mw, N_perbin, self)
-	
 	
 		# Knudsen number (dimensionless)
 		Kn = np.repeat(mfp, 
@@ -135,7 +134,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		
 		# ------------------------------------------------
 		# gas-phase diffusion coefficient*Fuch-Sutugin 
-		# correction (cm2/s)
+		# correction (cm^2/s)
 		# eq. 5 Zaveri et al. (2008) 
 		# (https://doi.org/10.1029/2007JD008782)
 		kimt = (DStar_org)*correction
@@ -189,7 +188,14 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 			y_gp[self.seedi, :] = 0.
 			# sum over gas and particle size bins for each component
 			y_gp = np.sum(y_gp, axis=1)
-			y_gp_frac = y_gp/np.sum(y_gp)
+			# in case no anhydrous components present 
+			# in gas or particle phase
+			if (np.sum(y_gp) == 0.):
+				y_gp_frac = np.ones(len(y_gp))
+			# in case anhydous components are present 
+			# in gas and/or particle phase
+			else:
+				y_gp_frac = y_gp/np.sum(y_gp)
 			# if any components in tiny abundance but are present
 			if (sum((y_gp_frac < self.z_prt_coeff_loC)*(y_gp > 0)) >  0):
 				# index of components to be zeroed 
@@ -207,7 +213,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# if a value provided (default is empty list)
 		if (self.ppartit_cutoff):
 
-			# convert partit_cutoff from Pa to molecules/cm3
+			# convert partit_cutoff from Pa to molecules/cm^3
 			# (air), note README states
 			# that just one value accepted for partit_cutoff 
 			# input
@@ -224,7 +230,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 		# if a value provided (default is empty list)
 		if (self.wpartit_cutoff):
 
-			# convert wpartit_cutoff from Pa to molecules/cm3
+			# convert wpartit_cutoff from Pa to molecules/cm^3
 			# (air), note README states
 			# that just one value accepted for wpartit_cutoff 
 			# input

@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#								                                       #
+# Copyright (C) 2018-2025					                           #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			               #
+#								                                       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -27,9 +27,9 @@ PyCHAM, and connects that GUI with the core PyCHAM model'''
 # window, takes inputs
 # and sends to model modules, also calls the saving module
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import  *
-from PyQt5.QtCore import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtGui import  *
+from PyQt6.QtCore import *
 import pickle # for storing inputs
 import sys
 import os
@@ -62,13 +62,7 @@ class PyCHAM(QWidget):
 		self.top = 10
 		self.width = 800
 		self.height = 530
-		self.initUI() # call on initialisation function to fill window	
-
-		# changing the background color
-		#self.setStyleSheet("background-color: darkCyan;")
-  
-		# set the title
-		#self.setWindowTitle('PyCHAM')		
+		self.initUI() # call on initialisation function to fill window			
 
 		self.err_mess = '' # begin with no error message
 		
@@ -94,7 +88,8 @@ class PyCHAM(QWidget):
 		# PyCHAM logo
 		l00 = QLabel(self)
 		pixmap = QPixmap('PyCHAM/PyCHAM_logo_transparent.png')
-		l00.setPixmap(pixmap.scaled(400, 100, transformMode = Qt.SmoothTransformation))
+		l00.setPixmap(pixmap.scaled(400, 100, Qt.AspectRatioMode.KeepAspectRatio, 
+			Qt.TransformationMode.SmoothTransformation))
 		PyCHlogo_hindx = 0 # horizontal position on grid
 		grid.addWidget(l00, 0, PyCHlogo_hindx, 1, 1)
 		# link to PyCHAM website
@@ -103,18 +98,12 @@ class PyCHAM(QWidget):
 		bn00.setToolTip('Visit the PyCHAM README (online)')
 		bn00.clicked.connect(self.on_clickn00)
 		grid.addWidget(bn00, 0, PyCHlogo_hindx, 1, 1)
-
-		#l0 = QLabel(self)
-		#l0.setOpenExternalLinks(True)
-		#l0.setText(str('Welcome to PyCHAM - please see ' + 
-		#'<a href=\"\">README</a> for guidance'))
-		#l0.setFont(QFont('Arial', 20))
-		#grid.addWidget(l0, 0, 0, 1, 1)
 		
 		# EUROCHAMP logo
 		l0b= QLabel(self)
 		pixmap = QPixmap('PyCHAM/logos_eurochamp2020-orange-noir.png')
-		l0b.setPixmap(pixmap.scaled(100, 100, transformMode = Qt.SmoothTransformation))
+		l0b.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio, 
+			Qt.TransformationMode.SmoothTransformation))
 		EUROlogo_hindx = 3 # horizontal position on grid
 		grid.addWidget(l0b, 0, EUROlogo_hindx)
 		# link to EUROCHAMP website
@@ -127,7 +116,8 @@ class PyCHAM(QWidget):
 		# NCAS logo
 		l0c= QLabel(self)
 		pixmap = QPixmap('PyCHAM/NCAS_national_centre_logo_transparent.png')
-		l0c.setPixmap(pixmap.scaled(160, 40, transformMode = Qt.SmoothTransformation))
+		l0c.setPixmap(pixmap.scaled(160, 40, Qt.AspectRatioMode.KeepAspectRatio, 
+			Qt.TransformationMode.SmoothTransformation))
 		NCASlogo_hindx = EUROlogo_hindx+1 # horizontal position on grid
 		grid.addWidget(l0c, 0, NCASlogo_hindx)
 		# link to NCAS website
@@ -140,7 +130,8 @@ class PyCHAM(QWidget):
 		# University of Manchester logo
 		l0d= QLabel(self)
 		pixmap = QPixmap('PyCHAM/TAB_col_background.png')
-		l0d.setPixmap(pixmap.scaled(96, 32, transformMode = Qt.SmoothTransformation))
+		l0d.setPixmap(pixmap.scaled(96, 32, Qt.AspectRatioMode.KeepAspectRatio, 
+			Qt.TransformationMode.SmoothTransformation))
 		UoMlogo_hindx = EUROlogo_hindx+2 # horizontal position on grid
 		grid.addWidget(l0d, 0, UoMlogo_hindx)
 		# link to EUROCHAMP website
@@ -217,11 +208,6 @@ class PyCHAM(QWidget):
 		self.l3.setText(self.sch_name)
 		self.NSlayout.addWidget(self.l3, 2, ffscn+1,  1, 1)
 		
-		b1 = QPushButton('Select Different Chemical Scheme', self)
-		b1.setToolTip('Select the file containing the required chemical scheme file')
-		b1.clicked.connect(self.on_click2)
-		self.NSlayout.addWidget(b1, 3, ffscn, 1, 2)
-		
 		l4 = QLabel(self)
 		l4.setText("XML: ")
 		self.NSlayout.addWidget(l4, 4, ffscn, 1, 1)
@@ -229,11 +215,6 @@ class PyCHAM(QWidget):
 		self.l5 = ScrollLabel(self)
 		self.l5.setText(self.xml_name)
 		self.NSlayout.addWidget(self.l5, 4, ffscn+1, 1, 1)
-			
-		b2 = QPushButton('Select Different XML', self)
-		b2.setToolTip('Select the file containing the required xml file')
-		b2.clicked.connect(self.on_click3)
-		self.NSlayout.addWidget(b2, 5, ffscn, 1, 2)
 		
 		l6 = QLabel(self)
 		l6.setText("Model \nVariables: ")
@@ -242,17 +223,11 @@ class PyCHAM(QWidget):
 		self.l7 = ScrollLabel(self)
 		self.l7.setText(self.inname)
 		self.NSlayout.addWidget(self.l7, 6, ffscn+1, 1, 1)
-			
-		b3 = QPushButton('Select Different Model Variables', self)
-		b3.setToolTip('Select the file containing the required model variables file')
-		b3.clicked.connect(self.on_click4)
-		self.NSlayout.addWidget(b3, 7, ffscn, 1, 2)
-		
 		
 		# vertical separator line -------------------------------
 		self.separatorLine = QFrame()
-		self.separatorLine.setFrameShape(QFrame.VLine)
-		self.separatorLine.setFrameShadow(QFrame.Raised)
+		self.separatorLine.setFrameShape(QFrame.Shape.VLine)
+		self.separatorLine.setFrameShadow(QFrame.Shadow.Raised)
 		self.NSlayout.addWidget(self.separatorLine, 0, ffscn+2, 10, 1)
 		self.separatorLine.show()
 		
@@ -278,7 +253,9 @@ class PyCHAM(QWidget):
 		l9a = QLabel(self)
 		l9a.setText('General')
 		self.varbox.addWidget(l9a, 0, 0)
-		l9a.setFont(QFont("Arial", 13, QFont.Bold))
+		font = QFont("Arial", 13)
+		font.setBold(True)
+		l9a.setFont(font)
 		gen_row = 0
 		
 		l9 = QLabel(self)
@@ -344,7 +321,7 @@ class PyCHAM(QWidget):
 		
 		l14a = QLabel(self)
 		l14a.setText('Chamber Environment')
-		l14a.setFont(QFont("Arial", 13, QFont.Bold))
+		l14a.setFont(font)
 		env_row = gen_row+8
 		self.varbox.addWidget(l14a, env_row+0, 0)
 		
@@ -395,7 +372,7 @@ class PyCHAM(QWidget):
 		
 		l18a = QLabel(self)
 		l18a.setText('Particle Properties')
-		l18a.setFont(QFont("Arial", 13, QFont.Bold))
+		l18a.setFont(font)
 		par_row = env_row+7
 		
 		self.varbox.addWidget(l18a, par_row+0, 0)
@@ -628,7 +605,7 @@ class PyCHAM(QWidget):
 		
 		l39a = QLabel(self)
 		l39a.setText('Gas')
-		l39a.setFont(QFont("Arial", 13, QFont.Bold))
+		l39a.setFont(font)
 		gas_row = par_row+30
 		self.varbox.addWidget(l39a, gas_row+0, 0)
 		
@@ -699,7 +676,7 @@ class PyCHAM(QWidget):
 
 		l49b = QLabel(self)
 		l49b.setText('Lights')
-		l49b.setFont(QFont("Arial", 13, QFont.Bold))
+		l49b.setFont(font)
 		light_row = gas_row+10
 		self.varbox.addWidget(l49b, light_row+0, 0)
 		
@@ -793,7 +770,7 @@ class PyCHAM(QWidget):
 		
 		l59b = QLabel(self)
 		l59b.setText('Walls')
-		l59b.setFont(QFont("Arial", 13, QFont.Bold))
+		l59b.setFont(font)
 		wall_row = light_row+13
 		self.varbox.addWidget(l59b, wall_row+0, 0)
 		
@@ -891,7 +868,7 @@ class PyCHAM(QWidget):
 		
 		l70b = QLabel(self)
 		l70b.setText('Specific Component Properties')
-		l70b.setFont(QFont("Arial", 13, QFont.Bold))
+		l70b.setFont(font)
 		scp_row = wall_row+12
 		self.varbox.addWidget(l70b, scp_row+0, 0)
 		
@@ -1080,7 +1057,7 @@ class PyCHAM(QWidget):
 		
 		#self.separatorLine = QFrame()
 		#self.separatorLine.setFrameShape(QFrame.VLine)
-		#self.separatorLine.setFrameShadow(QFrame.Raised)
+		#self.separatorLine.setFrameShadow(QFrame.Shadow.Raised)
 		#self.PLlayout.addWidget(self.separatorLine, 0, cil, 13, 1)
 		#self.separatorLine.show()
 		
@@ -1281,15 +1258,15 @@ class PyCHAM(QWidget):
 
 		# horizontal separator line -------------------------------
 		self.separatorLine3 = QFrame()
-		self.separatorLine3.setFrameShape(QFrame.HLine)
-		self.separatorLine3.setFrameShadow(QFrame.Raised)
+		self.separatorLine3.setFrameShape(QFrame.Shape.HLine)
+		self.separatorLine3.setFrameShadow(QFrame.Shadow.Raised)
 		self.SEClayout.addWidget(self.separatorLine3, 3, 0, 1, 4)
 		self.separatorLine3.show()
 		
 		# vertical separator line -------------------------------
 		self.separatorLine4 = QFrame()
-		self.separatorLine4.setFrameShape(QFrame.VLine)
-		self.separatorLine4.setFrameShadow(QFrame.Raised)
+		self.separatorLine4.setFrameShape(QFrame.Shape.VLine)
+		self.separatorLine4.setFrameShadow(QFrame.Shadow.Raised)
 		self.SEClayout.addWidget(self.separatorLine4, 3, 1, 5, 1)
 		self.separatorLine4.show()
 
@@ -1334,8 +1311,8 @@ class PyCHAM(QWidget):
 
 		# horizontal separator line -------------------------------
 		self.separatorLine3a = QFrame()
-		self.separatorLine3a.setFrameShape(QFrame.HLine)
-		self.separatorLine3a.setFrameShadow(QFrame.Raised)
+		self.separatorLine3a.setFrameShape(QFrame.Shape.HLine)
+		self.separatorLine3a.setFrameShadow(QFrame.Shadow.Raised)
 		self.SEClayout.addWidget(self.separatorLine3a, 7, 0, 1, 4)
 		self.separatorLine3a.show()
 
@@ -1486,8 +1463,8 @@ class PyCHAM(QWidget):
 		
 		# horizontal separator line ---------------------------
 		self.separatorLine3 = QFrame()
-		self.separatorLine3.setFrameShape(QFrame.HLine)
-		self.separatorLine3.setFrameShadow(QFrame.Raised)
+		self.separatorLine3.setFrameShape(QFrame.Shape.HLine)
+		self.separatorLine3.setFrameShadow(QFrame.Shadow.Raised)
 		self.PARlayout.addWidget(self.separatorLine3, 2, 0, 1, 
 		3)
 		self.separatorLine3.show()
@@ -1681,7 +1658,9 @@ class PyCHAM(QWidget):
 		
 		# label to explain what happens on this instrument comparison tab
 		l240 = QLabel(self)
-		l240.setText('Use the tabs on either side to convolve model output into a form comparable with the corresponding instruments')
+		l240.setText(str('Use the tabs on either side to convolve ' +
+			'model output into a form comparable with the ' +
+			'corresponding instruments'))
 		l240.setWordWrap(True)
 		self.INSTRlayout.addWidget(l240, 0, 0, 1, 1)
 		
@@ -1691,7 +1670,7 @@ class PyCHAM(QWidget):
 		INSTRtabs.addTab(self.CIMStab(), "CIMS")
 		INSTRtabs.addTab(self.WallLosstab(), "Wall Loss")
 		self.INSTRlayout.addWidget(INSTRtabs, 1, 0, 1, 1)
-		INSTRtabs.setTabPosition(2)
+		INSTRtabs.setTabPosition(QTabWidget.TabPosition.West)
 		
 		# -------------------------------------------------------------------------
 	
@@ -2273,13 +2252,10 @@ class PyCHAM(QWidget):
 		
 		# button to get path to folder/file containing 
 		# relevant files
-		options = QFileDialog.Options()
-		#QFileDialog.getOpenFileName
-		fol_nme = getExistingFilesAndDirs(self, "Select Input", "./PyCHAM/input/")
+		fol_nme = getExistingFilesAndDirs(self, "Select inputs folder", "./PyCHAM/input/")
 		
 		if (fol_nme == []): # if no folder selected (e.g. because selection cancelled)
 			return()
-		fol_nme = fol_nme[0]
 		
 		# unknown names
 		self.sch_name = self.xml_name = self.inname = 'Not found'
@@ -2303,7 +2279,7 @@ class PyCHAM(QWidget):
 		# variable file
 		except:
 			self.inname = fol_nme
-
+		
 		# read in model variables of this model variables file 
 		# and store to pickle
 		# Note that doing this call after searching for 
@@ -2841,7 +2817,6 @@ class PyCHAM(QWidget):
 	def on_click202(self): # when model results folder requires selection
 
 		# button to get path to folder containing relevant files
-		options = QFileDialog.Options()
 		fol_nme = QFileDialog.getExistingDirectory(self, "Select Folder Containing Required Input Files", "./PyCHAM/output/")
 		
 		# remember path of directory
@@ -2863,11 +2838,22 @@ class PyCHAM(QWidget):
 		
 		# check whether required files present here
 		try:
+			# module for retrieving all outputs and include in self
+			import retr_out
 			
-			# name of file where experiment constants saved
-			fname = str(self.dir_path + '/model_and_component_constants')
-			const_in = open(fname)
-			const_in.close()
+			try: # if saved in default setting (csv files)
+				# name of file where experiment constants saved
+				fname = str(self.dir_path + '/model_and_component_constants')
+				# test whether default saved files are available
+				const_in = open(fname)
+				const_in.close()
+				def_res_flag = 1
+			except: # if no default files, see if a netcdf file can be opened
+				import netCDF4 as nc
+				# try extracting information from netcdf file
+				retr_out.retr_out_noncsv(str(self.dir_path + '/PyCHAM_results.nc'), self)
+				print(self.tsaved, self.modv, self.SOAmass.shape)
+				def_res_flag = 2
 			
 			# enable plotting buttons
 			# disable plotting buttons
@@ -2880,20 +2866,19 @@ class PyCHAM(QWidget):
 			self.b221.setEnabled(True)
 			self.b223.setEnabled(True)
 			
-			# retrieve all outputs and include in self
-			from retr_out import retr_out
+			if (def_res_flag == 1):
 			
-			for prog in retr_out(self): # call on modules to solve problem
+				for prog in retr_out.retr_out(self): # call on modules to solve problem
 				
-				if (isinstance(prog, str)): # check if it's a message
-					mess = prog
+					if (isinstance(prog, str)): # check if it's a message
+						mess = prog
 					
-					self.l203a.setText(mess)
-					self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
-					self.bd_pl = 3
+						self.l203a.setText(mess)
+						self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+						self.bd_pl = 3
 
-				self.progress.setValue(int(prog)) # display progress	
-				QApplication.processEvents() # allow message panel to update
+					self.progress.setValue(int(prog)) # display progress	
+					QApplication.processEvents() # allow message panel to update
 
 			# remove any old progress message from previous run
 			self.l203a.setText('Results loaded')
@@ -2903,7 +2888,9 @@ class PyCHAM(QWidget):
 		except:
 			# remove the progress bar after each simulation
 			self.progress.deleteLater()
-			self.l203a.setText('The required output files cannot be found at this path, please ensure the folder immediately above the output is selected')
+			self.l203a.setText(str('The required output files cannot be found at ' +
+						  'this path, please ensure the folder immediately above ' +
+						  'the output is selected'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -5265,7 +5252,7 @@ class ScrollLabel(QScrollArea):
 		self.label = QLabel(content) 
   
 		# setting alignment to the text 
-		self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop) 
+		self.label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop) 
   
 		# making label multi-line 
 		#self.label.setWordWrap(True) 
@@ -5288,47 +5275,15 @@ class ScrollLabel(QScrollArea):
 		self.label.clear() # clearing text
 
 # function to allow opening of both file and directories
-def getExistingFilesAndDirs(parent, caption, directory, 
+def getExistingFilesAndDirs(self, caption, directory, 
                         filter='', initialFilter='', options=None):
-	def updateText():
+	#def updateText():
 		# update the contents of the line edit widget with the selected files
-		selected = []
-		for index in view.selectionModel().selectedRows():
-			selected.append('"{}"'.format(index.data()))
-			lineEdit.setText(' '.join(selected))
-
-	dialog = QFileDialog(parent, windowTitle=caption)
-	dialog.setFileMode(dialog.ExistingFiles)
-	if options:
-		dialog.setOptions(options)
-	dialog.setOption(dialog.DontUseNativeDialog, True)
-	if directory:
-		dialog.setDirectory(directory)
-	if filter:
-		dialog.setNameFilter(filter)
-		if initialFilter:
-			dialog.selectNameFilter(initialFilter)
-
-	# by default, if a directory is opened in file listing mode, 
-	# QFileDialog.accept() shows the contents of that directory, but we 
-	# need to be able to "open" directories as we can do with files, so we 
-	# just override accept() with the default QDialog implementation which 
-	# will just return exec_()
-	dialog.accept = lambda: QDialog.accept(dialog)
-
-	# there are many item views in a non-native dialog, but the ones displaying 
-	# the actual contents are created inside a QStackedWidget; they are a 
-	# QTreeView and a QListView, and the tree is only used when the 
-	# viewMode is set to QFileDialog.Details, which is not this case
-	stackedWidget = dialog.findChild(QStackedWidget)
-	view = stackedWidget.findChild(QListView)
-	view.selectionModel().selectionChanged.connect(updateText)
-
-	lineEdit = dialog.findChild(QLineEdit)
-	# clear the line edit contents whenever the current directory changes
-	dialog.directoryEntered.connect(lambda: lineEdit.setText(''))
-
-	dialog.exec_()
-
-	return(dialog.selectedFiles())
-		
+		#selected = []
+		#for index in view.selectionModel().selectedRows():
+			#selected.append('"{}"'.format(index.data()))
+			#lineEdit.setText(' '.join(selected))
+	
+	dialog = QFileDialog.getExistingDirectory(self, caption, directory)
+	
+	return(dialog)

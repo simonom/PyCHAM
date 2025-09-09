@@ -421,6 +421,11 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# with constant gas-phase concentration\n')
 	f.write('		for rowi in self.conCindxn:\n')
 	f.write('			dd[rowi] = 0.\n')
+	if (any(self.obs_comp_i)): # if a component has a fixed concentration
+		
+		f.write('		# account for components with fixed gas-phase concentration\n')	
+		f.write('		# by ensuring their rate of change is 0\n')	
+		f.write('		dd[self.obs_comp_i] = 0.\n')
 	f.write('		return (dd)\n')
 	f.write('\n')
 	
@@ -577,6 +582,12 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 	f.write('		# with constant gas-phase concentration\n')
 	f.write('		for rowi in self.conCindxn:\n')
 	f.write('			data[rowvals == rowi] = 0.\n')
+	if (any(self.obs_comp_i)): # if a component has a fixed concentration
+		
+		f.write('		# account for components with fixed gas-phase concentration\n')	
+		f.write('		# by ensuring their partial derivative rate of change is 0\n')
+		f.write('		for rowi in self.obs_comp_i:\n')
+		f.write('			data[rowvals == rowi] = 0.\n')
 	f.write('		# create Jacobian\n')
 	f.write('		j = SP.csc_matrix((data, rowvals, colptrs))\n')
 	f.write('		\n')

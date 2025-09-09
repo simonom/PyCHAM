@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#								                                       #
+# Copyright (C) 2018-2025					                           #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       		   #
+#								       								   #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -38,14 +38,14 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 			
 	# inputs -----------------------------------
 	# y - concentrations of components in particle phase 
-	# 	(# molecules/cm3 (air))
+	# 	(# molecules/cm^3 (air))
 	# N_perbin0 - starting number concentration of particles 
-	# 	(# particles/cm3 (air))
+	# 	(# particles/cm^3 (air))
 	# mean_rad - mean radius of seed particles at this time (um)
 	# self.pmode - whether particle number size distribution stated by 
 	#	 mode or explicitly
 	# pconc - number concentration of seed particles now
-	# 	(# particles/cm3 (air))
+	# 	(# particles/cm^3 (air))
 	# self.seedi - index of seed material
 	# self.seedx - mole ratio of non-water components comprising seed 
 	# 	particles
@@ -53,7 +53,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	# uppersize - greatest radius bound (um)
 	# num_comp - number of components
 	# num_sb - number of size bins (excluding wall)
-	# MV - molar volume of all components (cm3/mol) 
+	# MV - molar volume of all components (cm^3/mol) 
 	#	(shape: number of components, 1)
 	# std - standard deviation for lognormal size distribution 
 	# 	calculation (dimensionless)
@@ -98,60 +98,74 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
 
 	if (num_sb == 1):
-		# if this is the new overall particle number 
-		# concentration, e.g. from an observation 
-		# file, as interpretted by obs_file_open
-		if (self.pp_dil == 0):
 
-			# number concentration of new particles (particles/cm3)
-			pconc_new = (np.array((pconc)).reshape(-1, 1))-N_perbin[:, :]
-			# (# particles/cm3 (air))
-			N_perbin[:, :] = (np.array((
-			pconc)).reshape(-1, 1))
+		# if instantaneous injection of particles
+		if (pcontf == 0):
+
+			# if this is the new overall particle number 
+			# concentration, e.g. from an observation 
+			# file, as interpretted by obs_file_open
+			if (self.pp_dil == 0):
+
+				# number concentration of new particles (particles/cm^3)
+				pconc_new = (np.array((pconc)).reshape(-1, 1))-N_perbin[:, :]
+				# (# particles/cm^3 (air))
+				N_perbin[:, :] = (np.array((
+				pconc)).reshape(-1, 1))
+
+			# if this new particle represents
+			# injection of new particle in addition to
+			# the existing particles
+			else:
+				# (# particles/cm^3 (air))
+				N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc))
 
 		# if this new particle number represents
 		# injection of new particle in addition to
 		# the existing particles
-		else:		
+		if (pcontf == 1):		
 			# (# particles/cm^3 (air))
 			N_perbin[:, :] = N_perbin0[:, :] + np.array((pconc))
-			# number concentration of new particles (particles/cm^3)
-			pconc_new = pconc
+
+		# number concentration of new particles (particles/cm^3)
+		pconc_new = pconc
 
 	# number concentration stated per size bin in multi size bin 
 	# simulation
 	if (self.pmode == 1 and num_sb > 1):
-		# if this is the new overall particle number 
-		# concentration, e.g. from an observation 
-		# file, as interpretted by obs_file_open
-		if (self.pp_dil == 0):
-			# (# particles/cm3 (air))
-			N_perbin[:, :] = (np.array((
-			pconc)).reshape(-1, 1))
+
+		# if instantaneous injection of particles
+		if (pcontf == 0):
+
+			# if this is the new overall particle number 
+			# concentration, e.g. from an observation 
+			# file, as interpretted by obs_file_open
+			if (self.pp_dil == 0):
+				# (# particles/cm3 (air))
+				N_perbin[:, :] = (np.array((
+				pconc)).reshape(-1, 1))
+			# if this new particle represents
+			# injection of new particle in addition to
+			# the existing particles
+			else:
+				# (# particles/cm^3 (air))
+				N_perbin[:, :] = (N_perbin0[:, :] + 
+				np.array((pconc)).reshape(-1, 1))
+
 		# if this new particle number represents
 		# injection of new particle in addition to
 		# the existing particles
-		else:
-			# (# particles/cm3 (air))
+		if (pcontf == 1):	
+			# (# particles/cm^3 (air))
 			N_perbin[:, :] = (N_perbin0[:, :] + 
 			np.array((pconc)).reshape(-1, 1))
-
+		
 		pconc_new = pconc
 
 	# total number concentration per mode stated in modal 
 	# representation of multi size bin 
 	# simulation
 	if (self.pmode == 0 and num_sb > 1):
-		
-		# if this is the new overall particle number 
-		# concentration, so inherently including any 
-		# previously present particles, e.g. from an observation 
-		# file, as interpreted by obs_file_open
-		if (self.pp_dil == 0):
-			N_perbin[:, :] = 0.
-		# if this is adding to any previously present
-		# particles
-		N_perbin[:, 0] = N_perbin0[:, 0]
 		
 		for i in range(len(pconc)): # loop through modes
 			# set scale and standard deviation input for 
@@ -184,17 +198,39 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 			loc, scale)
 			pdf_out = np.interp(x, hires, pdf_output)	
 			# number concentration of seed in all size bins
-			# (# particle/cm3 (air))
+			# (# particle/cm^3 (air))
 			pconc_new = (pdf_out/sum(pdf_out))*pconc[i]
 				
 			# number concentration realism
 			pconc_new[pconc_new < 1.e-2] = 0.
 			
-			# include in number-size distribution 
-			# array (# particles/cm3 (air))
-			N_perbin[:, 0] += pconc_new
+			# if instantaneous injection of particles
+			if (pcontf == 0):
+
+				# if this is the new overall particle number 
+				# concentration, e.g. from an observation 
+				# file, as interpretted by obs_file_open
+				if (self.pp_dil == 0):
+					# (# particles/cm3 (air))
+					N_perbin[:, :] = (np.array((
+					pconc_new)).reshape(-1, 1))
+				# if this new particle represents
+				# injection of new particle in addition to
+				# the existing particles
+				else:
+					# (# particles/cm^3 (air))
+					N_perbin[:, :] = (N_perbin0[:, :] + 
+					np.array((pconc_new)).reshape(-1, 1))
+
+			# if this new particle number represents
+			# injection of new particle in addition to
+			# the existing particles
+			if (pcontf == 1):	
+				# (# particles/cm^3 (air))
+				N_perbin[:, :] = (N_perbin0[:, :] + 
+				np.array((pconc_new)).reshape(-1, 1))
 					
-	# volume concentration of new seed particles (um3/cm3 (air))
+	# volume concentration of new seed particles (um^3/cm^3 (air))
 	# per size bin summed across components
 	Vperbin = pconc_new*((4./3.)*np.pi*(radn)**3.)
 
@@ -219,7 +255,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	
 	# if instantaneous injection of particles
 	# factor concentrations of components comprising 
-	# new seed particles into existing concentration (# molecules/cm3)
+	# new seed particles into existing concentration (# molecules/cm^3)
 	if (pcontf == 0):
 		# if this is the new overall particle component 
 		# concentration, e.g. from an observation 
@@ -236,7 +272,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		y += yn # adding to y array here rather than in ode_solv
 	
 	# loop through size bins to estimate new total 
-	# volume concentrations (um3/cm3 (air))
+	# volume concentrations (um^3/cm^3 (air))
 	Vtot = np.zeros((num_sb))
 	# volume concentration of single 
 	# particles (um3/cm3 (air))

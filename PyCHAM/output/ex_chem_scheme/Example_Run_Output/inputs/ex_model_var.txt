@@ -1,4 +1,4 @@
-res_file_name = example_run_output
+res_file_name = Example_run_output
 total_model_time = 3600.
 update_step = 60.
 recording_time_step = 60.

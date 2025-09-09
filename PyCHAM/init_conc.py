@@ -85,7 +85,7 @@ def init_conc(num_comp, init_conc,
 	
 	if (testf == 1): # testing mode
 		# return dummies
-		return(0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+		return(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,self)
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	# empty array for storing component gas-phase concentrations, must be an array
@@ -164,9 +164,8 @@ def init_conc(num_comp, init_conc,
 				'scheme and associated chemical scheme ' +
 				'markers, which are stated in the model ' +
 				'variables input file.')
-				return (0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0,
-					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+				return (0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, erf, err_mess, 0, 0, 0, 0, self)
 			
 			# set initial concentration
 			if (Cfac_flag == 1): # gas-phase concentrations
@@ -198,9 +197,8 @@ def init_conc(num_comp, init_conc,
 				'in the chemical scheme.  Please check the scheme ' +
 				'and associated chemical scheme markers, which are ' +
 				'stated in the model variables input file.')
-				return (0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0,
-					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+				return (0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, erf, err_mess, 0, 0, 0, 0, self)
 
 			# insert surface concentration into surface array 
 			# convert from ppb to # molecules/cm3
@@ -447,9 +445,8 @@ def init_conc(num_comp, init_conc,
 					'markers, which are stated in ' + 
 					'the model variables input ' + 
 					'file.')
-					return (0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0,
-					0, 0, erf, err_mess, 0, 0, 0, 0, 0)
+					return (0, 0, 0, 0, 0, 0, 0, 0,
+					0, 0, erf, err_mess, 0, 0, 0, 0, self)
 				# remember index for plotting gas-phase
 				# concentrations later
 				dydt_traki.append([int(y_indx)])

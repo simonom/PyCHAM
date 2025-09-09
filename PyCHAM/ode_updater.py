@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -699,20 +699,34 @@ def ode_updater(y, H2Oi,
 						neg_names = self.comp_namelist_np[neg_comp_indx]
 
 						# isolate just water concentrations 
-						# (molecules/cm3)
+						# (molecules/cm^3)
 						y_H2O = y[H2Oi::num_comp]
 						# sum the negative concentrations and 
-						# convert to absolute value (molecules/cm3)
+						# convert to absolute value (molecules/cm^3)
 						neg_H2O = np.abs(sum(y_H2O[y_H2O<0.]))
 						
 						# allow a given fraction of water 
 						# concentrations to be negative
 						if (neg_H2O/sum(
 						np.abs(y[H2Oi::num_comp])) > 0. ):
-				
+							print('negative water occurs at water index: ', np.where(y_H2O<0.))
+							print(y[H2Oi::num_comp])
+							print(N_perbin)
 							gpp_stab = -1 # maintain unstable flag
 							# tell user what's happening
-							yield (str('Note: negative water concentration generated following call to ode_solv_wat module, the program assumes this is because of a change in relative humidity in chamber air, and will automatically half the integration time interval and linearly interpolate any change to chamber conditions supplied by the user.  To stop this the simulation must be cancelled using the Quit button in the PyCHAM graphical user interface.  Current update time interval is ' + str(tnew) + ' seconds'))
+							yield (str('Note: negative water concentration ' +
+				  				'generated following call to ode_solv_wat ' +
+								'module, the program assumes this is ' +
+								'because of a change in relative humidity ' +
+								'in chamber air, and will automatically ' +
+								'half the integration time interval and ' +
+								'linearly interpolate any change to ' +
+								'chamber conditions supplied by the user.  ' +
+								'To stop this the simulation must be ' +
+								'cancelled using the Quit button in the ' +
+								'PyCHAM graphical user interface.  Current ' +
+								'update time interval is ' + str(tnew) + 
+								' seconds'))
 							
 							# if time step has decreased to 
 							# unreasonably low and solver still 
@@ -774,7 +788,7 @@ def ode_updater(y, H2Oi,
 				self.conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
 
 			# model component concentration changes to 
-			# get new concentrations molecules/cm3 (air))
+			# get new concentrations molecules/cm^3 (air))
 			try:
 				[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
@@ -784,10 +798,10 @@ def ode_updater(y, H2Oi,
 				jac_mod_len, jac_part_hmf_indx, rw_indx, 
 				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
-				
+			
 			except:
 				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
-				
+			
 			# if negative, suggests ODE solver instability, 
 			# but could also be numerical 
 			# limits, especially if concentrations are
@@ -829,7 +843,23 @@ def ode_updater(y, H2Oi,
 						neg_comp_indx, N_perbin, kelv_fac, 
 						kimt, 1, H2Oi, y, self)
 
-					yield (str('Error: negative concentrations generated following call to ode_solv module, the program has assumed this is because of a change in chamber condition (e.g. injection of components), and has automatically halved the integration time interval and linearly interpolated any change to chamber conditions supplied by the user.  However, the integration time interval has now decreased to ' + str(tnew) + ' seconds, which is assumed too small to be useful, so the program has been stopped.  The components with negative concentrations are : ' + str(neg_names) + '.  The problem could be too stiff for the solver and the relevant fluxes (change tendencies) have been output to the file ODE_solver_break_relevant_fluxes.txt for your analysis of problem stiffness.  You could identify the maximum and minimum fluxes to gain indication of the components and/or processes making the problem stiff.  Therefafter you could modify the relevant model variables (supplied by the user) and the chemical scheme (supplied by the user).' ))
+					yield (str('Error: negative concentrations generated following call ' +
+						'to ode_solv module, the program has assumed this is because of ' +
+						'a change in chamber condition (e.g. injection of components), ' +
+						'and has automatically halved the integration time interval and ' +
+						'linearly interpolated any change to chamber conditions supplied ' +
+						'by the user.  However, the integration time interval has now ' +
+						'decreased to ' + str(tnew) + ' seconds, which is assumed too ' +
+						'small to be useful, so the program has been stopped.  The ' +
+						'components with negative concentrations are : ' + str(neg_names) + 
+						'.  The problem could be too stiff for the solver and the relevant ' +
+						'fluxes (change tendencies) have been output to the file ' +
+						'ODE_solver_break_relevant_fluxes.txt for your analysis of problem ' +
+						'stiffness.  You could identify the maximum and minimum fluxes to ' +
+						'gain indication of the components and/or processes making the ' +
+						'problem stiff.  Therefafter you could modify the relevant model ' +
+						'variables (supplied by the user) and the chemical scheme (supplied ' +
+						'by the user).' ))
 						
 				# half the update and integration time step (s) if necessary	
 				tnew = tnew/2.
@@ -840,12 +870,12 @@ def ode_updater(y, H2Oi,
 			else: # if solution stable, change stability flag to represent this
 				
 				# account for any partial addition of 
-				# newly injected seed particles
+				# newly injected seed particles (for instantaneous rather than
+				# continuous injection)
 				self.pconc[:, seedt_cnt] -= self.pconc[:, seedt_cnt]*pconcn_frac
 				# reset fraction of newly injected seed particles
 				pconcn_frac = 0.
 				gpp_stab = 1 # change to stable flag
-		
 		
 		# end of integration stability condition section ------
 		step_no += 1 # track number of steps
@@ -871,7 +901,7 @@ def ode_updater(y, H2Oi,
 			N_perbin -= N_perbin*(self.dil_fac_now*tnew)
 			# reality check
 			N_perbin[N_perbin<0.] = 0.
-		
+	
 		# if particle size bins present, rebin
 		if ((num_sb-self.wall_on) > 0):
 
@@ -895,7 +925,7 @@ def ode_updater(y, H2Oi,
  					num_comp, y[num_comp:(num_comp)*(
 					num_sb-self.wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
-			
+
 			# time since operator-split processes 
 			# last called (s)
 			update_count += tnew
@@ -909,7 +939,7 @@ def ode_updater(y, H2Oi,
 				
 					# particle-phase 
 					# concentration(s) 
-					# (# molecules/cm3)
+					# (# molecules/cm^3)
 					Cp = np.transpose(y[num_comp:(num_comp)*(
 					num_sb-self.wall_on+1)].reshape(
 					num_sb-self.wall_on, num_comp))
@@ -988,10 +1018,10 @@ def ode_updater(y, H2Oi,
 								np.sum(fi_est*tmc_comp_mc, axis=1))**-1)
 
 						# equilibrium concentrations in gas-phase
-						# (molecules/cm3) 	
+						# (molecules/cm^3) 	
 						Cpg[0, :] = (1.-se_est)*tmc_comp
 						# equilibrium concentrations in particle-phase
-						# (molecules/cm3), note this assumes just one
+						# (molecules/cm^3), note this assumes just one
 						# particle size bin, so future work needs
 						# to distribute over size bins 	
 						Cpg[1, :] = (se_est)*tmc_comp
@@ -1060,7 +1090,6 @@ def ode_updater(y, H2Oi,
 			y_NO2_reset = (y[self.NO2i]/(y[self.NOi]+y[self.NO2i]))*(y0[self.NOi]+y0[self.NO2i])
 			y[self.NOi] = y_NO_reset
 			y[self.NO2i] = y_NO2_reset
-			
 			
 			# change to ozone concentration between start 
 			# and finish of this integration step
@@ -1136,7 +1165,7 @@ def ode_updater(y, H2Oi,
 				# gas-wall partitioning, 
 				# estimate and record any 
 				# change tendencies (# 
-				# molecules/cm3/s) resulting 
+				# molecules/cm^3/s) resulting 
 				# from 
 				# these processes
 				if (self.testf != 5):
@@ -1154,7 +1183,7 @@ def ode_updater(y, H2Oi,
 			stab_red = 0 # reset flag
 		
 		# remember the gas-phase water concentration from 
-		# previous integration step (# molecules/cm3)
+		# previous integration step (# molecules/cm^3)
 		y_H2O0 = y[H2Oi]
 			
 	time_taken = time.time()-self.st_time

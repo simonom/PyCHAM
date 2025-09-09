@@ -212,7 +212,7 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 		# filter just the components with negative concentrations following call to ODE solver
 		self.Psat = self.Psat[:, neg_comp_indx]
 		act_coeff = act_coeff[:, neg_comp_indx]
-		kimt = kimt[:, neg_comp_indx]
+		kimt = kimt[0:num_asb, neg_comp_indx]
 		# gas-phase concentration of components at particle surface (molecules/cm^3)
 		Csit[isb, :] = Csit[isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]
 		# gas-particle partitioning rate (molecules/cm^3/s)

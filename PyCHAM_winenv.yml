@@ -8,10 +8,10 @@ dependencies:
   - ipdb
   - matplotlib
   - netcdf4
-  - numpy
+  - numpy>=2
   - openpyxl
   - python<=3.10
   - scipy
   - xmltodict
-  - pyqt=5
+  - pyqt=6
   - openbabel

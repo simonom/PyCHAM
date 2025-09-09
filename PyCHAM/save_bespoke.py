@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -32,13 +32,14 @@
 # import dependencies
 import scipy.constants as si
 import numpy as np
+import time
 
 def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 	
 	# inputs: -------------------------------------------------------
 	# savei - output index to save
 	# y_mat - component (columns) concentrations with time (rows) 
-	#	(# molecules/cm3 (air))
+	#	(# molecules/cm^3 (air))
 	# y_MM - molar masses of components (g/mol)
 	# t_out - the times (s) through simulation that outputs
 	# 	correspond to
@@ -52,8 +53,15 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 	# if first index, then save the unconditional variables
 	if (savei == 0):
 
-		# unconditional saving of: time, physical conditions 
+		# unconditional saving of: general attributes, time, 
+		# physical conditions 
 		# (temperature, pressure, RH, transmission factor of light)
+
+		# store general attributes
+		# get time now
+		now_time = time.time()
+		rootgrp.history = str('Saved at (Greenwhich Meridian Time) ' + str(time.gmtime(now_time)))
+		rootgrp.source = str('CHemistry with Aerosol Microphysics in Python (PyCHAM), version ' + self.vnum)
 
 		# for CF compliance, time should be a numeric value with
 		# a time unit based on a reference starting time. Note that
@@ -98,7 +106,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 		# set values for time variable (s)
 		timevar[:] = t_out
 
-		# create time variable
+		# create temperature variable
 		tempervar = rootgrp.createVariable('temperature', 'float32', ('time'))
 		# set units for temperature variable
 		tempervar.setncattr('units', 'K')
@@ -148,7 +156,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 
 	# move onto conditional saving ---------------------------------
 
-	# the gas-phase concentration(s) (molecules/cm3)	
+	# the gas-phase concentration(s) (molecules/cm^3)	
 	if ('_g' in ud_var):
 		
 		# get the component to be stored
@@ -276,14 +284,14 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 	if (ud_var == 'SOA'):
 
 		# isolate just particle-phase component concentrations
-		# (molecules/cm3)
+		# (molecules/cm^3)
 		y_pp = np.zeros((y_mat.shape[0], self.nc*self.nasb))
 		y_pp[:, :] = y_mat[:, self.nc:self.nc*(self.nasb+1)]
 
 		# sum concentrations of individual components over size bins
 		# loop over size bins beyond first
 		for sbi in range(1, self.nasb):
-			y_pp[:, 0:self.nc] += y_pp[self.nc*sbi:self.nc*(sbi+1)]
+			y_pp[:, 0:self.nc] += y_pp[:, self.nc*sbi:self.nc*(sbi+1)]
 
 		# keep just the total concentration in particle phase
 		# (molecules/cm3)
@@ -294,16 +302,16 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, rootgrp, self):
 		# represent dry particulate matter
 		y_pp[:, self.HC[0, :] == 0] = 0.
 
-		# zero the seed components (molecules/cm3)
+		# zero the seed components (molecules/cm^3)
 		y_pp[:, self.seedi] = 0
 
 		# tile molar masses over times
 		y_MMtiled = np.tile(y_MM.reshape(1, -1), (y_pp.shape[0], 1))
 
-		# convert concentrations of organics from molecules/cm3 to ug/m3
+		# convert concentrations of organics from molecules/cm3 to ug/m^3
 		y_pp[:, :] = ((y_pp[:, :]/si.N_A)*y_MMtiled)*1.e12
 
-		# sum mass concentrations over components to get SOA concentration (ug/m3)
+		# sum mass concentrations over components to get SOA concentration (ug/m^3)
 		y_pp = np.sum(y_pp, axis= 1)
 
 		# create SOA variable

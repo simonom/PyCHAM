@@ -1,0 +1,24 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Welcome to the input of PyCHAM simulations for the Evans et al. paper on the guaiacol gas-phase chemical mechanism.\expnd0\expndtw0\kerning0
+\
+\
+To run a simulation:\
+i) inside mod_var_EUPHORE.txt file of the guaiacol_input folder, provide the path to the chemical scheme and xml files, which are contained in the same folder as this README file, e.g.:\
+chem_sch_name = /PyCHAM/PyCHAM/output/Guaiacol_mechanism_paper_Evans_etal/guaiacol_input/guaiacol-MCM-model.fac\
+xml_name = PyCHAM/PyCHAM/output/Guaiacol_mechanism_paper_Evans_etal/guaiacol_input/MCM_PRAM_xml.xml\
+\
+ii) note that with respect to varying the effective absorbing mass of wall, used the eff_abs_wall_massC model variable, whilst the eddy diffusivity coefficient can be set by varying the mix_time model variable, e.g. a mix_time of 24 gives an eddy diffusivity coefficient of 1/24 = 4e-2 /s\
+\
+ii) open the PyCHAM GUI and run PyCHAM with the prepared simulation\
+\
+iii) new results will, by default, be stored in /PyCHAM/output/guaiacol-MCM-model\
+\
+iv) to plot results from individual components use {\field{\*\fldinst{HYPERLINK "https://github.com/NCAS-BoxModellingToolkit/concentration_analysis/blob/main/src/concentration_analysis/ind_component.py"}}{\fldrslt https://github.com/NCAS-BoxModellingToolkit/concentration_analysis/blob/main/src/concentration_analysis/ind_component.py}}\
+\
+v) to plot results for particle mass concentration use {\field{\*\fldinst{HYPERLINK "https://github.com/NCAS-BoxModellingToolkit/concentration_analysis/blob/main/src/concentration_analysis/total_particle_vs_obs.py"}}{\fldrslt https://github.com/NCAS-BoxModellingToolkit/concentration_analysis/blob/main/src/concentration_analysis/total_particle_vs_obs.py}}}

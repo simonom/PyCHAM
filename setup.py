@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="PyCHAM",
-    version="5.5.18",
+    version="5.6.0",
     author="Simon P. O'Meara, Shuxuan Xu and Ademipo Onanuga",
     author_email="simon.omeara@manchester.ac.uk",
     description="PyCHAM: CHemistry with Aerosol Microphysics in Python",
@@ -24,8 +24,8 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='<=3.10',
     
 # state dependencies for PyCHAM, note that openbabel is installed separately, as described in README
-install_requires=["PyQt5","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","scipy","xmltodict","requests"]
+install_requires=["PyQt6","pickleshare","numpy","backcall","certifi","cycler","decorator","gitpython","ipdb","matplotlib","scipy","xmltodict","requests"]
 )

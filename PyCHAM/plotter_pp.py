@@ -315,18 +315,18 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
 			yrec[:, :] = self.ro_obj.yrec[:, :]
 			
-			# particle-phase concentrations of all components (# molecules/cm3)
+			# particle-phase concentrations of all components (# molecules/cm^3)
 			if (self.ro_obj.wf > 0): # wall on
 				ppc = yrec[:, self.ro_obj.nc:-self.ro_obj.nc*self.ro_obj.wf]
 			if (self.ro_obj.wf == 0): # wall off
 				ppc = yrec[:, self.ro_obj.nc::]
 			
 			# particle-phase concentration of this component over all 
-			# size bins (# molecules/cm3)
+			# size bins (# molecules/cm^3)
 			conc = np.zeros((ppc.shape[0], self.ro_obj.nsb-self.ro_obj.wf))
 			for indxn in indx_plot: # loop through the indices
 				concf = ppc[:, indxn::self.ro_obj.nc]
-				# particle-phase concentration (ug/m3)
+				# particle-phase concentration (ug/m^3)
 				conc[:, :] += ((concf/si.N_A)*self.ro_obj.comp_MW[indxn])*1.e12
 			
 			# if summing values
@@ -341,7 +341,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			if (self.sum_ornot_flag == 0):
 				if (group_flag != 1): # if not a sum over a group of components
 					# plot this component
-					ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]])+' (particle-phase)'))
+					ax0.plot(timehr, conc.sum(axis = 1), '+', linewidth = 4., label = str(str(self.ro_obj.names_of_comp[indx_plot[0]]) + ' (particle-phase)'))
 			
 				else: # if a sum over a group of components
 					ax0.plot(timehr, conc.sum(axis = 1), '-+', linewidth = 4., label = str(r'$\Sigma$' + comp_names_to_plot[i].strip() + ' (particle-phase)'))

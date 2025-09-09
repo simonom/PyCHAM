@@ -30,9 +30,9 @@ import sys
 import numpy as np
 import pickle
 import chem_sch_SMILES
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import  *
-from PyQt5.QtCore import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtGui import  *
+from PyQt6.QtCore import *
 import write_hyst_eq
 import hyst_eq
 import importlib
@@ -755,7 +755,7 @@ def ui_check(self):
 			self.l81 = QLabel(self)
 			self.l81.setText('or')
 			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
-			self.l81.setAlignment(Qt.AlignCenter)
+			self.l81.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		
 			# allow adding to batch list
 			self.b82 = QPushButton('Add to Batch', self)

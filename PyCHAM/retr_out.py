@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -45,7 +45,7 @@ def retr_out(self):
 	
 	try: # try opening file
 		const_in = open(fname)
-	except:
+	except: # if still can't find a valid file return error message
 		err_mess = str('Error - no such file ' + fname + 
 			', please check it still exists')
 		self.l203a.setText(err_mess)
@@ -717,44 +717,34 @@ def retr_out(self):
 	
 	return(self)
 
-def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but for when non-csv files need interrogating
+def retr_out_noncsv(output_by_sim, self): # similar to above function but for when non-csv files need interrogating
 	
-	import netCDF4 as nc # for EASY outputs
-	
+	import netCDF4 as nc # e.g. for PyCHAM output saved to netcdf file, or for EASY outputs
 	# inputs: -------------------------------
 	# output_by_sim - name of folders requested by the calling code to be looked at
-	# comp_of_int - components of interest
 	# ---------------------------------------
-	
 	# if a .dat file used (e.g. FACSIMILE output)
 	if (output_by_sim[-4::] == '.dat'):
 	
 		datafile = open(output_by_sim)
-	
 		# flag stating whether column titles yet reached
 		col_title = 0
 		data_cnt = -1 # count on lines of data
-		
 		# prepare to create dictionary containing component names, 
 		# times and concentrations
 		data_dic = {}
 		for line in datafile.readlines():
-			
 			dlist = [] # prepare to convert to python list
-			
 			# identify whether tabs used to separate columns (if not then 
 			# spaces are)
 			if '\t' in line:
 				sep = '\t'
 			if ' ' in line:
 				sep = ' '
-			
 			if (col_title == 2): # ready to read in concentrations and times
 				data_cnt += 1 # count on lines of data
-			
 			# loop through sections of line separated by a space and/or tab
 			for i in line.split(sep):
-				
 				if (i == ''): # ignore spaces
 					continue
 				if (i.strip() == 'PRINT'): # identifier for header
@@ -767,52 +757,36 @@ def retr_out_noncsv(output_by_sim, comp_of_int): # similar to above function but
 					dlist.append(str(i)) # list column headers
 				if (col_title == 2): # ready to read in concentrations and times
 					dlist.append(float(i.strip()))
-			
 			if (col_title == 2):
 				data_dic[str('data'+str(data_cnt))] = dlist
 			if (col_title == 1):
 				data_dic['col_title'] = dlist
 				col_title = 2 # ready to read in concentrations and times
-			
-	
 		# extract times (s), component names and concentrations with time (molecules/cm3)
 		# from dictionary
 		comp_names = [i for i in data_dic['col_title'][1::]]
-	
 		Crec = np.zeros((data_cnt+1, len(comp_names))) # empty array for concentrations with time (molecules/cm3)
 		time_s = np.zeros((data_cnt+1, 1)) # empty array for times (s)
-	
 		for key in data_dic: # loop through dictionary keys
 			if (key[0:4] == 'data'): # if this a useful entry
 				rn = int(key[4::])# get row number
 				time_s[rn] = data_dic[key][0] # times (s)
-				Crec[rn, :] = data_dic[key][1::] # concentrations with time (molecules/cm3)
-	
-		
-		return(time_s, comp_names, Crec, [], [])
-	
+				Crec[rn, :] = data_dic[key][1::] # concentrations with time (molecules/cm^3)
+
 	# if a .nc file used (e.g. EASY output)
+	
 	if (output_by_sim[-3::] == '.nc'):
-		
 		ds = nc.Dataset(output_by_sim) # open file
-		
 		time_s = ds['time'][:] # get time (seconds)
 		
-		# in case want to see what variables are present
-		#print(ds.variables); import ipdb; ipdb.set_trace()
-		# empty array ready for component concentrations (molecules/cm3)
-		Crec = np.zeros((len(time_s), len(comp_of_int)))
+		# get time saved at
+		self.tsaved = ds.history
+		# get model version used
+		self.modv = ds.source
 		
-		# retrieve concentrations (molecules/cm3) of components of interest
-		c_cnt = 0 # count on components
-		for comp_name in comp_of_int:
-			#if comp_name == 'OCRESOL':
-			#	Crec[:, c_cnt] = ds[str(comp_name[1::]+'_0_0')][:]
-			#else:
-			Crec[:, c_cnt] = ds[str(comp_name+'_0')][:]
-			c_cnt += 1 # count on components
-			
-		return(time_s, comp_of_int, Crec, [], [])
-		
-	else: # if file type unrecognised return fillers
-		return([], [], [], [], [])
+		# check whether SOA (anhydrous particle) mass concentration saved
+		try:
+			self.SOAmass = ds.variables['mass_concentration_of_secondary_particulate_organic_matter_dry_aerosol_particles_in_air']
+		except:
+			self.SOAmass = 'not saved'	
+	return() # end of retr_out_noncsv function

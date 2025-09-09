@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -49,7 +49,24 @@ def share(self):
 
 	# remember this path in self, in case plotting scripts need it
 	self.dir_path = self.output_by_sim
-
+	
+	# get the version number of PyCHAM
+	# directory containing setup.py file, remembering to 
+	# remove the final PyCHAM directory
+	su_dir = os.path.join(dir_path, 'setup.py')
+	# open setup file
+	su_file = open(su_dir, mode='r')
+	# read the file and store lines into a list
+	su_cont = su_file.readlines()
+	su_file.close() # close file
+	# loop through setup.py file lines
+	for li in su_cont:
+		if ('version=' in li):
+			# get index of first occurrence of quotation marks
+			lii = li.index('"')
+			# extract version number and remember in self
+			self.vnum = str(li[lii+1:(lii+li[lii+1::].index('"')+1)])
+	
 	# path to store for variables
 	input_by_sim = str(self.PyCHAM_path + '/PyCHAM/pickle.pkl')
 	with open(input_by_sim, 'rb') as pk:

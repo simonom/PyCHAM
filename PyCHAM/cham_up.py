@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -120,7 +120,7 @@ def cham_up(sumt,
 	# diff_vol - diffusion volumes of components according to 
 	#	Fuller et al. (1969)
 	# DStar_org - gas-phase diffusion coefficients of components 
-	#	(cm2/s)
+	#	(cm^2/s)
 	# self.RH - relative humidities (fraction 0-1)
 	# self.RHt - times through experiment at which relative 
 	# humidities reached (s)
@@ -381,7 +381,7 @@ def cham_up(sumt,
 					inj_cntn += 1  # keep count on components
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 
-			# record additional injection of components (ug/m3)
+			# record additional injection of components (ug/m^3)
 			tot_in_res[Compti] += (((Ct_gain*Cfactor-y[inj_indx])/si.N_A)*(y_mw[inj_indx].squeeze()))*1.e12
 
 			# keep just the non-zero Ct gains, 
@@ -659,7 +659,7 @@ def cham_up(sumt,
 			# integrated over proposed 
 			# time step (# particles/cm^3)
 			pconcn = self.pconc[:, seedt_cnt-1]*tnew
-		
+			
 		if (seedt_cnt == -1):
 			pconcn = self.pconc[:, -1]
 			mean_radn = self.mean_rad[:, -1]
@@ -667,7 +667,7 @@ def cham_up(sumt,
 		
 			# injected seed particle number concentration 
 			# integrated over proposed 
-			# time step (# particles/cm3)
+			# time step (# particles/cm^3)
 			pconcn = self.pconc[:, -1]*tnew
 		
 		# number of actual particle size bins
@@ -683,7 +683,7 @@ def cham_up(sumt,
 		uppsize, num_comp, num_asb, MV, 
 		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], x, self)
-		
+	
 	# --------------------------------------------------------------------------
 	
 	# check on continuous influx of gas-phase components -------------
@@ -731,16 +731,16 @@ def cham_up(sumt,
 				# ensure correct shape
 				self.Cinfl_H2O_now = np.float64(self.Cinfl_H2O_now.reshape(-1, 1))
 			
-			# record cumulative injection of components (ug/m3)
+			# record cumulative injection of components (ug/m^3)
 			tot_in_res[self.cont_inf_reci] += (((((Cinfl_now.squeeze())*(tnew))/si.N_A)*(y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1)
 			
 		# check whether changes occur at start of this time step
 		if (ci_sumt == self.con_infl_t[infx_cnt] and (infx_cnt != -1)):
 			
-			# we need units of # molecules/cm3/s
+			# we need units of # molecules/cm^3/s
 			if ('ppb' in self.abun_unit):
 				# influx of components now, convert from ppb/s 
-				# to # molecules/cm3/s (air)
+				# to # molecules/cm^3/s (air)
 				Cinfl_now = np.float64(self.con_infl_C[:, infx_cnt]*Cfactor)
 
 			if ('mol' in self.abun_unit):
@@ -761,7 +761,7 @@ def cham_up(sumt,
 				# ensure correct shape
 				self.Cinfl_H2O_now = self.Cinfl_H2O_now.reshape(-1, 1)
 			
-			# record cumulative injection of components (ug/m3)
+			# record cumulative injection of components (ug/m^3)
 			tot_in_res[self.cont_inf_reci] += ((((((
 			Cinfl_now.squeeze())*(tnew))/si.N_A)*(
 			y_mw[self.con_infl_indx].squeeze()))*1.e12).reshape(-1))
@@ -775,9 +775,6 @@ def cham_up(sumt,
 					infx_cnt = 0
 				if (self.con_infl_tf == 0):
 					infx_cnt = -1 # reached end
-
-			# reset flag for time step reduction due to boundary conditions
-			bc_red = 0
 		
 		# check whether changes occur during proposed 
 		# integration time step

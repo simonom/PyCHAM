@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -31,6 +31,7 @@ import csv
 from shutil import copyfile
 import pickle
 import scipy.constants as si
+import time
 
 def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp, 
 	Cfactor_vst, testf, numsb, y_mw, MV,
@@ -42,11 +43,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# y_mat - component (columns) concentrations with time (rows) 
 	#	(# molecules/cm3 (air))
 	# Nresult_dry  - number concentration of dry particles 
-	# per size bin (# particles/cm3 (air))
+	# per size bin (# particles/cm^3 (air))
 	# Nresult_wet  - number concentration of dry particles 
-	# per size bin (# particles/cm3 (air))
-	# Cfactor - conversion factor to change gas-phase concentrations from # molecules/cm3 
-	# (air) into ppb
+	# per size bin (# particles/cm^3 (air))
+	# Cfactor - conversion factor to change gas-phase concentrations 
+	# from # molecules/cm^3 (air) into ppb
 	# testf - flag to show whether in normal mode (0) or test mode (1)
 	# numsb - number of size bins
 	# self.sav_nam - folder name/path to save results to
@@ -59,13 +60,13 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	#	by in Size_distributions.py for more than 1 size bin, 
 	# 	or in pp_intro.py for 1 size bin
 	# Cfactor_vst - one billionth the molecular concentration in a 
-	#	unit volume of chamber (# molecules/cm3) per recording 
+	#	unit volume of chamber (# molecules/cm^3) per recording 
 	# time step
 	# time_taken - computer processing time for entire simulation 
 	#	(s)
 	# y_mw - molar masses weights (g/mol)
 	# self.nom_mass - nominal molar mass (g/mol)
-	# MV - molar volumes of all components (cm3/mol)
+	# MV - molar volumes of all components (cm^3/mol)
 	# time_taken - simulation computer time (s)
 	# self.seed_name - chemical scheme name of component comprising seed particles
 	# x2 - record of size bin radii (um)
@@ -146,15 +147,14 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		# loop through outputs to save
 		for savei in range(len(self.user_output)):
 
-			# call on bespoke saving function, removing bounding 
-			# white space from variable name
+			# call on bespoke saving function
 			rootgrp = bespoke_saving(savei, y_mat, y_mw, t_out, 
 				cham_env, rootgrp, self)	
 
 		# close netCDF file
 		rootgrp.close()
 
-		return() # end of saving function
+		return() # end of netcdf saving function
 
 	# create folder to store copies of inputs
 	os.makedirs(str(self.output_by_sim+'/inputs'), exist_ok=True)
@@ -196,6 +196,11 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	const["size_structure_0_for_moving_centre_1_for_full_moving"] = siz_str
 	const["output_by_sim_sch_ext"] = output_by_sim_sch_ext
 	const["output_by_sim_mv_ext"] = output_by_sim_mv_ext
+	# store general attributes
+	# get time now
+	now_time = time.time()
+	const["history"] = str('Saved at (Greenwhich Meridian Time) ' + str(time.gmtime(now_time)))
+	const["source"] = str('CHemistry with Aerosol Microphysics in Python (PyCHAM), version ' + self.vnum)
 	
 	with open(os.path.join(self.output_by_sim,'model_and_component_constants'),'w') as f:
 		for key in const.keys():

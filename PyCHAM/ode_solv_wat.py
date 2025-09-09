@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -36,11 +36,11 @@ def ode_solv(y, integ_step, Cinfl_now,
 	N_perbin, jac_part_H2O_indx, H2Oi, self):
 
 	# inputs: -------------------------------------
-	# y - initial concentrations (molecules/cm3)
+	# y - initial concentrations (molecules/cm^3)
 	# integ_step - the maximum integration time step (s)
 	# rrc - reaction rate coefficient
 	# Cinfl_now - influx of components with constant influx 
-	#		(# molecules/cm3/s)
+	#		(# molecules/cm^3/s)
 	# rowvals - row indices of Jacobian elements
 	# colptrs - indices of  rowvals corresponding to each column of the
 	# 	Jacobian
@@ -210,6 +210,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) 
 	# and must be 1D even though y in dydt and jac has shape (number of elements, 1)
 	# as stated in GMD paper, BDF method used as this known to deal with stiff problems well
+	
 	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, 
 	method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
 	
@@ -217,13 +218,14 @@ def ode_solv(y, integ_step, Cinfl_now,
 	y_w = np.squeeze(sol.y)
 	
 	y_w = y_w.reshape(num_asb+1, 1)
+	
 	if (num_asb > 0):
 		y_w[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
 	# return to array
 	y_w = y_w.flatten()
 
-	# incorporate new water concentrations (molecules/cm3)
-	# implement new water gas- and particle-phase concentrations (molecules/cm3 (air))
+	# incorporate new water concentrations (molecules/cm^3)
+	# implement new water gas- and particle-phase concentrations (molecules/cm^3 (air))
 	y[H2Oi:num_comp*((num_sb-self.wall_on)+1):num_comp] = y_w
 
 	# return concentration(s) and time(s) following integration

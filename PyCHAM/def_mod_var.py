@@ -83,7 +83,7 @@ def def_mod_var(caller, self): # define function
 	self.RH = np.array(([0.65]))
 	# time through simulation (s) at which RH is reached
 	self.RHt = np.array(([0]))
-	self.Press = 9.8e4 # air pressure during experiment (Pa)
+	self.Press = np.array((9.8e4)).reshape(1) # air pressure during experiment (Pa)
 	self.Presst = 0. # time of (s) air pressure during experiment
 	# dilution factor (volume fraction per second)
 	self.dil_fac = np.zeros(1) 

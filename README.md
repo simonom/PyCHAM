@@ -53,11 +53,13 @@ The following steps are at the command line:
 
 4. cd into the directory where the PyCHAM package is stored.
 
-5. Use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAM, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for macOS)).
+5. Use the following command to install: conda env create -f PyCHAM_OSenv.yml -n PyCHAMenv, where OS is replaced by your operating system name (win (for Windows), lin (for Linux), mac (for macOS)).
 
-6. Activate the environment with the command: conda activate PyCHAM
+6. Activate the environment with the command: conda activate PyCHAMenv
 
-6a. For Windows only, now also install openbabel using the following at the command line: conda install openbabel. In addition, it has been noted that when following the above steps in Windows, openbabel does not always link to its data directory.  You can test this by looking for open babel warning messages when running the PyCHAM examples (to run PyCHAM please see [Running](#Running)).  A message such as 'the aromatic.txt file could not be found' indicates the data library is not set.  To set, search for Control Panel in the Windows search bar then User Accounts and User Accounts again.  Then select 'Change my environment variables' for User variables select New then create the new variable with Variable name 'BABEL_DATADIR' and with Variable value set as the path to the relevant open babel data directory.  To identify your open babel data directory you should look for the open babel folder containing aromatic.txt at a location such as: C:\Users\your_account_name\\.conda\pkgs\openbabel-2.4.1-py37_5\share\openbabel.  Once the path is suppled to the Variable value box select OK to create the variable then open a new anaconda prompt to restart PyCHAM.
+7. For Windows and Mac, now also install openbabel using the following at the command line: conda install conda-forge::openbabel.
+
+7a. In addition, it has been noted that when following the above steps in Windows, openbabel does not always link to its data directory.  You can test this by looking for open babel warning messages when running the PyCHAM examples (to run PyCHAM please see [Running](#Running)).  A message such as 'the aromatic.txt file could not be found' indicates the data library is not set.  To set, search for Control Panel in the Windows search bar then User Accounts and User Accounts again.  Then select 'Change my environment variables' for User variables select New then create the new variable with Variable name 'BABEL_DATADIR' and with Variable value set as the path to the relevant open babel data directory.  To identify your open babel data directory you should look for the open babel folder containing aromatic.txt at a location such as: C:\Users\your_account_name\\.conda\pkgs\openbabel-2.4.1-py37_5\share\openbabel.  Once the path is suppled to the Variable value box select OK to create the variable then open a new anaconda prompt to restart PyCHAM.
 
 6b. On Mac (please skip this step if on Linux or Windows) it has been noted that when following the above steps and then running PyCHAM (to run PyCHAM please see [Running](#Running)), an error is given stating that Developer Tools have not been installed. If this error displays please follow the on-screen instructions to install Developer Tools.
 

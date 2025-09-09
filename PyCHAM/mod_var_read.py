@@ -698,7 +698,7 @@ def mod_var_read(self):
 				# get observed values
 				from obs_file_open import obs_file_open
 				self = obs_file_open(self)
-			
+				
 			# name of file to save calculated continuous
 			# influx rates to
 			if (key == 'sim_cont_infl_file' and 
