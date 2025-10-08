@@ -1,4 +1,4 @@
-res_file_name = Example_run_output
+res_file_name = Example_run_output2
 total_model_time = 3600.
 update_step = 60.
 recording_time_step = 60.
@@ -33,5 +33,4 @@ volP = 1e-30
 light_time = 0., 7200.
 light_status = 1, 0
 umansysprop_update = 0
-tracked_comp = ELVOC_O3
-chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,
+tracked_comp = ELVOC_O3, APINENE

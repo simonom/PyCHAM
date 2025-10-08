@@ -1,10 +1,13 @@
-#########################################################################								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       ##								       #
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    ## under the terms of the GNU General Public License as published by    #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
 # the Free Software Foundation, either version 3 of the License, or    #
 # (at  your option) any later version.                                 #
 #                                                                      #
@@ -16,7 +19,8 @@
 # You should have received a copy of the GNU General Public License    #
 # along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                      #
-########################################################################'''module to implement nucleation in PyCHAM'''
+########################################################################
+# '''module to implement nucleation in PyCHAM'''
 
 import numpy as np
 import scipy.constants as si
@@ -30,12 +34,12 @@ def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr,
 	
 	# sumt - time through simulation (s)
 	# new_part_sum1 - number concentration of newly nucleated particles already 
-	# added (# particles/cm3 (air))
+	# added (# particles/cm^3 (air))
 	# n0 - original number concentration of particles (# particles/cm3 (air))
 	# y - molecular concentration of components in the gas and particle phase
-	# (# molecules/cm3 (air))
+	# (# molecules/cm^3 (air))
 	# MW - molecular weight (g/mol)
-	# rho - density (kg/m3)
+	# rho - density (kg/m^3)
 	# num_comp - number of components
 	# Varr - particles volumes per size bin(s) (um3)	
 	# x - particles radius per size bin(s) (um)
@@ -94,7 +98,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr,
 	new_vol1 = new_part1*((4./3.)*np.pi*(new_partr)**3.)
 	
 	# molecular volume of nucleating component
-	# molecular volume (cm3/molecule)
+	# molecular volume (cm^3/molecule)
 	Vpermolec = (MV[self.nuc_comp, 0])/si.N_A 
 	# concentration of nucleating component this represents 
 	# (# molecules/cm3 (air))
@@ -105,7 +109,7 @@ def nuc(sumt, new_part_sum1, n0, y, MW, num_comp, Varr, x, new_partr,
 	# mass conservation assumed negligible
 # 	y[self.nuc_comp[0]] -= nuc_conc1
 		
-	# addition to particle-phase (# molecules/cm3 (air))
+	# addition to particle-phase (# molecules/cm^3 (air))
 	y[self.num_comp*(1+sbi)+self.nuc_comp] += nuc_conc1
 	
 	# average volume of single particles now (scale MV by 1.e12 to 

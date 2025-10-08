@@ -119,7 +119,12 @@ def def_mod_var(caller, self): # define function
 	self.noncore_diss_wrtw = [1.]
 	# dissociation constant of water with respect to organics
 	self.H2O_diss_const_org = [1.]
-	seed_dens = np.ones((1)) # density of seed material (g/cm3)
+	# names of individual component(s) with dissociation constants 
+	# with respect to water
+	self.indiv_comp_diss_wrtw_name = []
+	# dissociation constants with respect to water of individal component(s)
+	self.indiv_comp_diss_wrtw = []
+	seed_dens = np.ones((1)) # density of seed material (g/cm^3)
 	self.seed_name = ['core'] # name of component forming seed material
 	# mole fraction of dry seed components
 	self.seedx = np.ones((1, 1, 1)) 

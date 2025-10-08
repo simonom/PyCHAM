@@ -57,7 +57,7 @@ def middle(self): # define function
 		erh_str, z_prt_coeff] = ui.share(self)
 	
 	# if not skipping parsing of chemical scheme	
-	if (self.pars_skip == 0 or self.pars_skip == 2): 
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 4): 
 		# parse the chemical scheme equation file to convert 
 		# equations into usable code
 		[rowvals, colptrs, comp_num, 
@@ -90,6 +90,7 @@ def middle(self): # define function
 	y0, 0, self.eqn_num[0], Compt,
 	seed_mw, self)
 	
+	
 	# if error raised, then tell GUI to display it and to stop 
 	# programme
 	if (erf == 1):
@@ -98,7 +99,7 @@ def middle(self): # define function
 	tempt_cnt = 0 # count on chamber temperatures
 	
 	# if not skipping component properties
-	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3): 
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3 or self.pars_skip == 4): 
 		# get component properties
 		[self, err_mess, erf] = prop_calc.prop_calc(H2Oi, 
 			num_comp, vol_comp, volP, 0, corei,
@@ -115,7 +116,7 @@ def middle(self): # define function
 		self] = partit_var_prep.prep(y_mw, 
 		self.TEMP[0], num_comp, act_comp, act_user, accom_comp, 
 		accom_coeff_user, num_sb+self.wall_on, num_sb, self)
-
+	
 	# if error raised or in testing mode then stop
 	if (err_mess != ''):
 		yield err_mess
@@ -127,7 +128,7 @@ def middle(self): # define function
 	num_sb, lowsize, uppsize, 0, std, 
 	therm_sp, act_coeff, seed_mw, R_gas, self)
 	
-	# estimate total inputs of emitted components (ug/m3)
+	# estimate total inputs of emitted components (ug/m^3)
 	[tot_in_res, Compti, tot_in_res_indx] = tot_in.tot_in(y0, 
 		Cfactor, y_mw, Compt, self)
 	

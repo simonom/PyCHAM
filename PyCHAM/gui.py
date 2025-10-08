@@ -62,13 +62,12 @@ class PyCHAM(QWidget):
 		self.top = 10
 		self.width = 800
 		self.height = 530
-		self.initUI() # call on initialisation function to fill window			
-
 		self.err_mess = '' # begin with no error message
+		self.initUI() # call on initialisation function to fill window			
 		
 		# if parameters have been provided automatically (without using GUI)
 		# then automatically setup and run the simulation, e.g. using the
-		# automated_setup_and_call.py
+		# automated_setup_and_call.py file
 		if (type(param_const) == dict):
 			self.autorun() # call on automatic setup and run
 			
@@ -87,9 +86,10 @@ class PyCHAM(QWidget):
 		# title ------------------------------------------------------------------------
 		# PyCHAM logo
 		l00 = QLabel(self)
-		pixmap = QPixmap('PyCHAM/PyCHAM_logo_transparent.png')
-		l00.setPixmap(pixmap.scaled(400, 100, Qt.AspectRatioMode.KeepAspectRatio, 
-			Qt.TransformationMode.SmoothTransformation))
+		pixmap = QPixmap('PyCHAM/PyCHAM_logo_transparent.pdf')
+		l00.setPixmap(pixmap)
+		l00.setScaledContents(True)
+		l00.setFixedSize(250, 100)
 		PyCHlogo_hindx = 0 # horizontal position on grid
 		grid.addWidget(l00, 0, PyCHlogo_hindx, 1, 1)
 		# link to PyCHAM website
@@ -102,9 +102,10 @@ class PyCHAM(QWidget):
 		# EUROCHAMP logo
 		l0b= QLabel(self)
 		pixmap = QPixmap('PyCHAM/logos_eurochamp2020-orange-noir.png')
-		l0b.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio, 
-			Qt.TransformationMode.SmoothTransformation))
-		EUROlogo_hindx = 3 # horizontal position on grid
+		l0b.setPixmap(pixmap)
+		l0b.setScaledContents(True)
+		l0b.setFixedSize(100, 100)
+		EUROlogo_hindx = PyCHlogo_hindx+3
 		grid.addWidget(l0b, 0, EUROlogo_hindx)
 		# link to EUROCHAMP website
 		bn1 = QPushButton('', self)
@@ -114,11 +115,12 @@ class PyCHAM(QWidget):
 		grid.addWidget(bn1, 0, EUROlogo_hindx)
 		
 		# NCAS logo
-		l0c= QLabel(self)
+		l0c = QLabel(self)
 		pixmap = QPixmap('PyCHAM/NCAS_national_centre_logo_transparent.png')
-		l0c.setPixmap(pixmap.scaled(160, 40, Qt.AspectRatioMode.KeepAspectRatio, 
-			Qt.TransformationMode.SmoothTransformation))
-		NCASlogo_hindx = EUROlogo_hindx+1 # horizontal position on grid
+		l0c.setPixmap(pixmap)
+		l0c.setScaledContents(True)
+		l0c.setFixedSize(150, 40)
+		NCASlogo_hindx = PyCHlogo_hindx+4
 		grid.addWidget(l0c, 0, NCASlogo_hindx)
 		# link to NCAS website
 		bn1a = QPushButton('', self)
@@ -130,9 +132,10 @@ class PyCHAM(QWidget):
 		# University of Manchester logo
 		l0d= QLabel(self)
 		pixmap = QPixmap('PyCHAM/TAB_col_background.png')
-		l0d.setPixmap(pixmap.scaled(96, 32, Qt.AspectRatioMode.KeepAspectRatio, 
-			Qt.TransformationMode.SmoothTransformation))
-		UoMlogo_hindx = EUROlogo_hindx+2 # horizontal position on grid
+		l0d.setPixmap(pixmap)
+		l0d.setScaledContents(True)
+		l0d.setFixedSize(100, 40)
+		UoMlogo_hindx = PyCHlogo_hindx+5
 		grid.addWidget(l0d, 0, UoMlogo_hindx)
 		# link to EUROCHAMP website
 		bn1b = QPushButton('', self)
@@ -146,26 +149,29 @@ class PyCHAM(QWidget):
 		tabs = QTabWidget()
 		tabs.addTab(self.NStab(), "Simulate")
 		tabs.addTab(self.PLtab(), "Plot")
-		grid.addWidget(tabs, 1, 0, 1, UoMlogo_hindx)
 
+		grid.addWidget(tabs, 1, 0, 1, UoMlogo_hindx+1)
+		
 		# README button ------------------------------------------
 		b89p = QPushButton('README', self)
 		b89p.setToolTip('Go to the online PyCHAM README page (alternatively see README in your local PyCHAM repository)')
 		b89p.clicked.connect(self.on_clickn00)
-		grid.addWidget(b89p, 0, PyCHlogo_hindx+1)
+		grid.addWidget(b89p, 0, PyCHlogo_hindx+1, 1, 1)
 
-		# Quit pane ----------------------------------------------
-		b89 = QPushButton('Quit', self)
-		b89.setToolTip('Finish with PyCHAM and close this window')
-		b89.clicked.connect(self.on_click89)
-		grid.addWidget(b89, 1, UoMlogo_hindx)
-		
+		# Quit button
+		# to quit software, note this prereffered over keyboard 
+		# shortcut to quit as the latter can return a
+		# 'Python closed unexpectedly' message
+		b89pa = QPushButton('Quit', self)
+		b89pa.setStatusTip('Finish with PyCHAM and close this window')
+		b89pa.clicked.connect(self.on_click89)
+		grid.addWidget(b89pa, 0, PyCHlogo_hindx+2, 1, 1)
 		
 		self.show()
 		return
 	
 	# simulate tab - note that this called only once to
-	# set uo the simulation tab when PyCHAM started
+	# set up the simulation tab when PyCHAM started
 	def NStab(self):
 	
 		NSTab = QWidget()
@@ -176,12 +182,12 @@ class PyCHAM(QWidget):
 		ffscn = 0
 		
 		# folder selection for new simulation -----------------------------------------
-		b0 = QPushButton('Select Folder Containing Input Files', self)
+		b0 = QPushButton('Select folder containing input files', self)
 		b0.setToolTip('Select the folder containing the required input files')
 		b0.clicked.connect(self.on_click1)
-		self.NSlayout.addWidget(b0, 0, ffscn, 1, 2)
+		self.NSlayout.addWidget(b0, 0, ffscn, 1, 1)
 		
-		# default variables for all required input model 
+		# get default variables for all required input model 
 		# variables -------------------------
 		[y0, siz_stru, num_sb, 
 		lowsize, uppsize, std, 
@@ -194,49 +200,47 @@ class PyCHAM(QWidget):
 		drh_str, erh_str, 
 		z_prt_coeff, 
 		self] = def_mod_var.def_mod_var(0, self)
+
+		# then get model variables specific to the example
+		# simulation, so that this simulation is ready to go
+		# when PyCHAM GUI opens
+		self.inname = str(self.PyCHAM_path + '/PyCHAM/input/gas-phase_ex/ex_model_var.txt')
+			
+		# read in model variables of this model variables file 
+		# (as identified by self.inname) and store to pickle
+		import mod_var_read
+		mod_var_read.mod_var_read(self)
 		
 		# listing input files ----------------------------------
 		l1 = QLabel(self)
 		l1.setText("The following files have been found: ")
 		self.NSlayout.addWidget(l1, 1, ffscn, 1, 2)
-		
-		l2 = QLabel(self)
-		l2.setText("Chemical \nScheme: ")
-		self.NSlayout.addWidget(l2, 2, ffscn, 1, 1)
 			
 		self.l3 = ScrollLabel(self)
-		self.l3.setText(self.sch_name)
-		self.NSlayout.addWidget(self.l3, 2, ffscn+1,  1, 1)
-		
-		l4 = QLabel(self)
-		l4.setText("XML: ")
-		self.NSlayout.addWidget(l4, 4, ffscn, 1, 1)
-			
+		self.l3.setText(str('Chemical scheme: ' + self.sch_name))
+		self.NSlayout.addWidget(self.l3, 2, ffscn,  1, 1)
+
 		self.l5 = ScrollLabel(self)
-		self.l5.setText(self.xml_name)
-		self.NSlayout.addWidget(self.l5, 4, ffscn+1, 1, 1)
-		
-		l6 = QLabel(self)
-		l6.setText("Model \nVariables: ")
-		self.NSlayout.addWidget(l6, 6, ffscn, 1, 1)
-			
+		self.l5.setText(str('XML: ' + self.xml_name))
+		self.NSlayout.addWidget(self.l5, 3, ffscn, 1, 1)
+
 		self.l7 = ScrollLabel(self)
-		self.l7.setText(self.inname)
-		self.NSlayout.addWidget(self.l7, 6, ffscn+1, 1, 1)
+		self.l7.setText('Model variables: ' + self.inname)
+		self.NSlayout.addWidget(self.l7, 4, ffscn, 1, 1)
 		
 		# vertical separator line -------------------------------
 		self.separatorLine = QFrame()
 		self.separatorLine.setFrameShape(QFrame.Shape.VLine)
 		self.separatorLine.setFrameShadow(QFrame.Shadow.Raised)
-		self.NSlayout.addWidget(self.separatorLine, 0, ffscn+2, 10, 1)
+		self.NSlayout.addWidget(self.separatorLine, 0, ffscn+1, 10, 1)
 		self.separatorLine.show()
 		
 		# model variables list ---------------------------------------------
-		self.mvpn = ffscn+3 # column number for model variables list
+		self.mvpn = ffscn+2 # column number for model variables list
 		
 		l8 = QLabel(self)
 		l8.setText("The following model variables have been found: ")
-		self.NSlayout.addWidget(l8, 0, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(l8, 0, self.mvpn, 1, 4)
 		
 		# begin a scroll area to contain model variables, note that
 		# setting the location of the scroll area is done below its contents
@@ -955,34 +959,34 @@ class PyCHAM(QWidget):
 		# properties of model variables scroll area ----------------
 		self.scrollwidget.setLayout(self.varbox)
 		self.scroll.setWidget(self.scrollwidget)
-		self.NSlayout.addWidget(self.scroll, 1, self.mvpn, 3, 3)
+		self.NSlayout.addWidget(self.scroll, 1, self.mvpn, 2, 4)
 		
 		# --------------------------------------------------------------------
 		# label to let user know preparedness of simulation - displayed text 
 		# updated in ui_check module below
 		self.l80 = ScrollLabel(self)
-		self.NSlayout.addWidget(self.l80, 4, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(self.l80, 3, self.mvpn, 1, 4)
 		self.bd_st = 2 # border status
 
 		# --------------------------------------------------------------------
 		# drop down button to let users view a variety of variables 
 		# determined by model variables
 		self.b80s = QComboBox(self)
-		self.b80s.addItem('Photolysis Rates')
-		self.b80s.addItem('Particle Number Size Distributions')
-		self.b80s.addItem('Gas-phase Diffusion Coefficients')
-		self.b80s.addItem('Gas-phase Mean Thermal Speeds')
-		self.b80s.addItem('Molar Masses')
-		self.b80s.addItem('Vapour Pressures')
-		self.b80s.addItem('Nucleation Function')
-		self.NSlayout.addWidget(self.b80s, 7, self.mvpn+0, 1, 2)
+		self.b80s.addItem('Photolysis rates')
+		self.b80s.addItem('Particle number size distributions')
+		self.b80s.addItem('Gas-phase diffusion coefficients')
+		self.b80s.addItem('Gas-phase mean thermal speeds')
+		self.b80s.addItem('Molar masses')
+		self.b80s.addItem('Vapour pressures')
+		self.b80s.addItem('Nucleation function')
+		self.NSlayout.addWidget(self.b80s, 6, self.mvpn+0, 1, 3)
 		
 		# button to run checks on variables selected in drop down button
-		self.b80 = QPushButton('Check Values', self)
+		self.b80 = QPushButton('Check values', self)
 		self.b80.setToolTip(str('See the values of the variables ' +
 		'selected in the drop down button to the left'))
 		self.b80.clicked.connect(self.on_clickb80)
-		self.NSlayout.addWidget(self.b80, 7, self.mvpn+2, 1, 1)
+		self.NSlayout.addWidget(self.b80, 6, self.mvpn+3, 1, 1)
 
 		# -------------------------------------------------------------------
 
@@ -994,7 +998,7 @@ class PyCHAM(QWidget):
 		
 		# label to let users know progress through simulation
 		self.l81b = ScrollLabel(self)
-		self.NSlayout.addWidget(self.l81b, 6, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(self.l81b, 4, self.mvpn, 1, 4)
 		self.l81b.setText('')
 		
 		self.fab = 0 # to begin single simulation widgets turned off
@@ -1035,11 +1039,11 @@ class PyCHAM(QWidget):
 		
 		self.l201 = ScrollLabel(self)
 		cwd = os.getcwd() # current working directory
-		path = str('Select results folder using Select New Folder')
+		path = str('Select results folder using Select new folder')
 		self.l201.setText(path)
 		self.PLlayout.addWidget(self.l201, 0, 0, 1, 1)
 		
-		b202 = QPushButton('Select New Folder', self)
+		b202 = QPushButton('Select new folder', self)
 		b202.setToolTip('Select the folder containing the result files to plot')
 		b202.clicked.connect(self.on_click202)
 		self.PLlayout.addWidget(b202, 0, 1)
@@ -1085,16 +1089,17 @@ class PyCHAM(QWidget):
 		self.PLlayout.setColumnStretch(4, 2)
 		
 		return(PLTab)
-		
-		
+
 	def PRIMtab(self): # basic plotting tab definition
 	
 		PRIMTab = QWidget()
 		self.PRIMlayout = QGridLayout() 
 		PRIMTab.setLayout(self.PRIMlayout)
 	
-		self.b203 = QPushButton('Standard Results Plot', self)
-		self.b203.setToolTip('Create standard results plot (gas-phase concentration temporal profiles of components with specified initial concentrations and particle properties)')
+		self.b203 = QPushButton('Standard results plot', self)
+		self.b203.setToolTip(str('Create standard results plot (gas-phase mixing ' +
+						   'ratio temporal profiles of components with specified ' +
+						   'initial mixing ratios and particle properties)'))
 		self.b203.clicked.connect(self.on_click203)
 		self.PRIMlayout.addWidget(self.b203, 0, 0)
 
@@ -1107,7 +1112,9 @@ class PyCHAM(QWidget):
 
 		# label for input line that receives component names to plot temporal profiles of
 		self.l203 = QLabel(self)
-		self.l203.setText('Write the chemical scheme names of components you want plotted in the box below (use H2O for water and RO2 for organic peroxy radicals)')
+		self.l203.setText(str('Write the chemical scheme names of components ' +
+						'you want plotted in the box below (use H2O for water ' +
+						'and RO2 for organic peroxy radicals)'))
 		self.l203.setWordWrap(True)
 		self.PRIMlayout.addWidget(self.l203, 1, 0, 1, 1)
 
@@ -1121,8 +1128,8 @@ class PyCHAM(QWidget):
 		# components, or the sum of their abundances
 		self.b205 = QComboBox(self)
 		self.b205.setToolTip('Chose whether to display abundances of single components, or the sum of their abundances')
-		self.b205.addItem('Individual Values')
-		self.b205.addItem('Sum Value')
+		self.b205.addItem('Individual values')
+		self.b205.addItem('Summed values')
 		self.PRIMlayout.addWidget(self.b205, 2, 1, 1, 1)
 
 		# gas-phase concentrations temporal profiles -------------
@@ -1148,7 +1155,8 @@ class PyCHAM(QWidget):
 		# chemical scheme and the oberved
 		# range of VOC and NOx
 		self.b206c = QPushButton(str('Ozone isopleth'), self)
-		self.b206c.setToolTip('Plot equilibrium ozone concentrations over the range of simulated concentrations of NOx and VOC')
+		self.b206c.setToolTip(str('Plot equilibrium ozone concentrations over ' +
+							'the range of simulated concentrations of NOx and VOC'))
 		self.b206c.clicked.connect(self.on_click206c)
 		self.PRIMlayout.addWidget(self.b206c, 3, 2, 1, 1)
 
@@ -1168,9 +1176,11 @@ class PyCHAM(QWidget):
 		#self.b209a.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PRIMlayout.addWidget(self.b209a, 4, 1, 1, 2)
 		
-		# button to plot temporal profile of air quality index, using the DEFRA definition (see reference inside plotter.py)
-		self.b209b = QPushButton(str('Air Quality Index'), self)
-		self.b209b.setToolTip('Plot air quality index as a function of time')
+		# button to plot temporal profile of air quality index, 
+		# using the DEFRA definition:
+		# https://uk-air.defra.gov.uk/air-pollution/daqi?view=more-info&pollutant=ozone#pollutant
+		self.b209b = QPushButton(str('Air quality index (U.K. Gov.)'), self)
+		self.b209b.setToolTip('Plot air quality index as a function of time, as defined by DEFRA (https://uk-air.defra.gov.uk/air-pollution/daqi?view=more-info&pollutant=ozone#pollutant)')
 		self.b209b.clicked.connect(self.on_click209b)
 		self.PRIMlayout.addWidget(self.b209b, 5, 1, 1, 1)
 
@@ -1199,7 +1209,7 @@ class PyCHAM(QWidget):
 		# chamber conditions temporal profiles -------------
 		
 		# button to plot temporal profile of chamber environmental variables
-		self.b215_a = QPushButton('Physical Conditions (T, P, RH)', self)
+		self.b215_a = QPushButton('Physical conditions (T, P, RH)', self)
 		self.b215_a.setToolTip(str('Plot the temporal profile of chamber ' +
 			'variables (temperature, pressure, relative humidity)'))
 		self.b215_a.clicked.connect(self.on_click215_a)
@@ -1397,14 +1407,16 @@ class PyCHAM(QWidget):
 		#self.b223.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.VOLlayout.addWidget(self.b223, 3, 0)
 		
-		# button to plot gas-phase concentration ordered by vapour pressure at the time through experiment defined by user
-		self.b223a = QPushButton('Gas-phase Concentrations Ordered by Volatility', self)
-		self.b223a.setToolTip('Plot gas-phase concentrations (ppb) of all components (ordered by volatility) at the time through experiment specified above')
+		# button to plot gas-phase mixing ratio ordered by vapour pressure at the time through experiment defined by user
+		self.b223a = QPushButton('Gas-phase mixing ratio ordered by volatility', self)
+		self.b223a.setToolTip(str('Plot gas-phase mixing ratios (ppb) of all ' +
+							'components (ordered by volatility) at the time ' +
+							'through experiment specified above'))
 		self.b223a.clicked.connect(self.on_click223a)
 		self.VOLlayout.addWidget(self.b223a, 4, 0)
 		
 		# button to plot pie chart of mass fraction by top n components at n time after experiment start, with vapour pressure given
-		self.b2231 = QPushButton('Pie Chart of Top Contributors', self)
+		self.b2231 = QPushButton('Pie chart of top contributors', self)
 		self.b2231.setToolTip('Plot a pie chart of the top (number specified to the right) mass contributors to the phase specified above at the time through experiment specified above')
 		self.b2231.clicked.connect(self.on_click2231)
 		self.VOLlayout.addWidget(self.b2231, 5, 0)
@@ -2253,8 +2265,9 @@ class PyCHAM(QWidget):
 		# button to get path to folder/file containing 
 		# relevant files
 		fol_nme = getExistingFilesAndDirs(self, "Select inputs folder", "./PyCHAM/input/")
-		
-		if (fol_nme == []): # if no folder selected (e.g. because selection cancelled)
+
+		# if no folder selected (e.g. because selection cancelled)
+		if (fol_nme == [] or fol_nme == ''):
 			return()
 		
 		# unknown names
@@ -2295,9 +2308,9 @@ class PyCHAM(QWidget):
 			return()
 			
 		# updating scroll labels showing path to files
-		self.l3.setText(self.sch_name)
-		self.l5.setText(self.xml_name)
-		self.l7.setText(self.inname)
+		self.l3.setText(str('Chemical scheme: ' + self.sch_name))
+		self.l5.setText(str('XML: ' + self.xml_name))
+		self.l7.setText(str('Model variables: ' + self.inname))
 			
 		self.show()
 		
@@ -2476,9 +2489,9 @@ class PyCHAM(QWidget):
 			txtn = txtn.split('\n')
 			
 			# update file names
-			self.sch_name = txtn[0]
-			self.xml_name = txtn[1]
-			self.inname = txtn[2]
+			self.sch_name = txtn[0][len('Chemical scheme: ')::]
+			self.xml_name = txtn[1][len('XML: ')::]
+			self.inname = txtn[2][len('Model variables: ')::]
 			
 			# read in model variables of this model variables file 
 			# (as identified by self.inname) and store to pickle
@@ -2705,7 +2718,7 @@ class PyCHAM(QWidget):
 		else:
 			# display progress bar
 			self.progress = QProgressBar(self)
-		self.NSlayout.addWidget(self.progress, 7, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(self.progress, 6, self.mvpn, 1, 4)
 		
 		
 		if (self.fab == 1): # if showing, remove single simulation widgets
@@ -2746,12 +2759,11 @@ class PyCHAM(QWidget):
 			self.l81b.setText(str('Simulation complete'))
 	
 	@pyqtSlot()
-	def on_click81(self): # when 'start series of simulation' button pressed
-		
+	def on_click81(self): # when 'Start series of simulation' button pressed
 		
 		# display progress bar
 		self.progress = QProgressBar(self)
-		self.NSlayout.addWidget(self.progress, 7, self.mvpn, 1, 3)
+		self.NSlayout.addWidget(self.progress, 6, self.mvpn, 1, 4)
 		
 		if (self.fab == 1): # if showing, remove single simulation widgets
 			self.l81.deleteLater()
@@ -2788,10 +2800,10 @@ class PyCHAM(QWidget):
 		if (self.btch_no == 1): # if first time adding to batch
 			
 			# add 'Start Series Of Simulations' button
-			self.b81 = QPushButton('Start Series Of Simulations', self)
+			self.b81 = QPushButton('Start series of simulations', self)
 			self.b81.setToolTip('Start the series of simulations')
 			self.b81.clicked.connect(self.on_click81)
-			self.NSlayout.addWidget(self.b81, 5, self.mvpn, 1, 1)
+			self.NSlayout.addWidget(self.b81, 5, self.mvpn, 1, 2)
 		
 		cs_file = self.l3.text()
 		xml_file = self.l5.text()
@@ -2805,20 +2817,25 @@ class PyCHAM(QWidget):
 		
 		# append output path to list of output paths
 		self.output_list.append(self.output_by_sim)
-		
-	@pyqtSlot() # button to quit software
+
+	# to quit software, note this prereffered over keyboard 
+	# shortcut to quit as the latter can return a
+	# 'Python closed unexpectedly' message
+	@pyqtSlot()
 	def on_click89(self):
 		QWidget.close(self)
 		sys.exit() # end program and release all memory
-		
+	
 	# plot functions -----------------------------------------
 	
 	@pyqtSlot()
 	def on_click202(self): # when model results folder requires selection
 
 		# button to get path to folder containing relevant files
-		fol_nme = QFileDialog.getExistingDirectory(self, "Select Folder Containing Required Input Files", "./PyCHAM/output/")
-		
+		try:
+			fol_nme = QFileDialog.getExistingDirectory(self, "Select folder containing required input files", "./PyCHAM/output/")
+		except:
+			return()
 		# remember path of directory
 		self.dir_path = fol_nme
 		
@@ -2830,7 +2847,7 @@ class PyCHAM(QWidget):
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.bd_pl = 3
 		
-		# display progress bar
+		# display progress bar for loading saved results
 		self.progress = QProgressBar(self)
 		self.PLlayout.addWidget(self.progress, 0, 4)
 
@@ -2933,7 +2950,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -2955,7 +2972,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -2987,6 +3004,13 @@ class PyCHAM(QWidget):
 		import plotter_gp
 		dir_path = self.l201.text() # name of folder with model results
 
+		# get whether to sum components or not
+		sum_ornot = self.b205.currentText()
+		if (sum_ornot[0] == 'I'):
+			self.sum_ornot_flag = 0
+		if (sum_ornot[0] == 'S'):
+			self.sum_ornot_flag = 1
+
 		if (dir_path[-4::] != '.nc'):
 			plotter_gp.plotter(caller, dir_path, comp_names, self) # plot results
 		if (dir_path[-3::] == '.nc'):
@@ -2999,7 +3023,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3024,7 +3048,7 @@ class PyCHAM(QWidget):
 			a_test = self.ro_obj.wf
 		except:
 			self.l203a.setText(str('Ensure that output is loaded' + 
-				' using the Load Outputs button'))
+				' using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3064,7 +3088,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Select New Folder button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3097,7 +3121,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3138,7 +3162,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3180,7 +3204,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3218,7 +3242,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3361,7 +3385,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3388,7 +3412,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3415,7 +3439,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3441,7 +3465,7 @@ class PyCHAM(QWidget):
 		try:
 			a_test = self.ro_obj.wf
 		except:
-			self.l203a.setText(str('Ensure that output is loaded using the Load Outputs button'))
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3636,12 +3660,30 @@ class PyCHAM(QWidget):
 
 		self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
 		self.l203a.setText('')
+
+		# test whether upload has happened
+		try:
+			a_test = self.ro_obj.wf
+		except:
+			self.l203a.setText(str('Ensure that output is loaded using the Select new folder button'))
+			# set border around error message
+			if (self.bd_pl == 1):
+				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+				self.bd_pl = 2
+			else:
+				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+				self.bd_pl = 1
+			return()
 			
 		# get the phase to consider
 		self.phase4vol = self.b221a.currentText()
-
+		
+		# whether or not to include seed or water in
+		# volatility basis set
 		if 'Seed' in self.phase4vol and 'Water' in self.phase4vol:
 			now = 1
+		else:
+			now = 0
 		
 		import vol_contr_analys
 		dir_path = self.l201.text() # name of folder with results
@@ -3657,7 +3699,8 @@ class PyCHAM(QWidget):
 		try: # get time through experiment (s) at which to plot
 			t_thro = float(self.e222.text())
 		except: # give error message
-			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
+			self.l203a.setText(('Error - time through experiment (seconds) must '+
+					   'be a single number and provided in the box'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3683,7 +3726,8 @@ class PyCHAM(QWidget):
 		try: # get time through experiment (s) at which to plot
 			t_thro = float(self.e222.text())
 		except: # give error message
-			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
+			self.l203a.setText(('Error - time through experiment (seconds) must '+
+					   'be a single number and provided in the box'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3710,7 +3754,8 @@ class PyCHAM(QWidget):
 		try: # get time through experiment (s) at which to plot
 			self.t_thro = float(self.e222.text())
 		except: # give error message
-			self.l203a.setText('Error - time through experiment (seconds) must be a single number')
+			self.l203a.setText(('Error - time through experiment (seconds) must '+
+					   'be a single number and provided in the box'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -3719,10 +3764,13 @@ class PyCHAM(QWidget):
 				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
 				self.bd_pl = 1
 
+			return()
+
 		try: # get number of components to plot
 			self.num_pie_comp = int(self.e2231.text())
 		except: # give error message
-			self.l203a.setText('Error - number of components for pie chart must be a single integer')
+			self.l203a.setText(str('Error - number of components for pie chart must ' +
+						  'be a single integer and provided in the box'))
 			# set border around error message
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -4868,11 +4916,11 @@ class PyCHAM(QWidget):
 			uppsize, std, 
 			0, self)
 
-		if (input_check_text == 'Gas-phase Diffusion Coefficients'):
+		if (input_check_text == 'Gas-phase diffusion coefficients'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_gpdc(self)
 
-		if (input_check_text == 'Gas-phase Mean Thermal Speeds'):
+		if (input_check_text == 'Gas-phase mean thermal speeds'):
 			import plotter_simulate_tab
 			plotter_simulate_tab.plotter_gpmts(self)
 
@@ -5054,31 +5102,31 @@ class PyCHAM(QWidget):
 		
 		# if total particle concenrations
 		if ('Particle concentrations' in om_choice): 
-			if ('Standard Results Plot' in om_choice):
+			if ('Standard results plot' in om_choice):
 				self.oandm = 1.1
 			if ('Cumulative particle mass concentration without water' 
 			in om_choice):
 				self.oandm = 1.2
 	
 		# if Van Krevelen
-		if ('Van Krevelen (Time Profile, Averaged Over All Hydrocarbons)' in om_choice):
+		if ('Van Krevelen (Time profile, averaged over all hydrocarbons)' in om_choice):
 			self.oandm = 2
-		if (str('Van Krevelen (All Individual Hydrocarbons at The Time ' +
-			'Through Experiment (s) Provided Below)') in om_choice):
+		if (str('Van Krevelen (All individual hydrocarbons at the time ' +
+			'through experiment (s) provided below)') in om_choice):
 			self.oandm = 3
-		if ('Van Krevelen (Time Profile, Averaged Over Non-methane Hydrocarbons)' in om_choice):
+		if ('Van Krevelen (Time profile, averaged over non-methane hydrocarbons)' in om_choice):
 			self.oandm = 4
-		if ('Van Krevelen (Non-methane Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+		if ('Van Krevelen (Non-methane individual hydrocarbons at the time through experiment (s) provided below)' in om_choice):
 			self.oandm = 5
 		if ('Van Krevelen (Time Profile, Averaged Over _ Extension Hydrocarbons)' in om_choice):
 			self.oandm = 6
-		if ('Van Krevelen (_ Extension Individual Hydrocarbons at The Time Through Experiment (s) Provided Below)' in om_choice):
+		if ('Van Krevelen (_ Extension individual hydrocarbons at the time through experiment (s) provided below)' in om_choice):
 			self.oandm = 7
 
 		# if mass defect
-		if ('Mass Defect of All Components in Chemical Scheme' in om_choice):
+		if ('Mass defect of all components in chemical scheme' in om_choice):
 			self.oandm = 8
-		if ('Mass Defect of All Hydrocarbons Scaled to Concentrations at Time Through Experiment (s) Provided Below' in om_choice):
+		if ('Mass defect of all hydrocarbons scaled to concentrations at time through experiment (s) provided below' in om_choice):
 			self.oandm = 9
 
 		# if CIMS mass spectrum
@@ -5195,9 +5243,9 @@ class PyCHAM(QWidget):
 
 			# set labels for chemical scheme file, xml file 
 			# and model variable file
-			self.l3.setText(self.sch_name)
-			self.l5.setText(self.xml_name)
-			self.l7.setText(self.inname)
+			self.l3.setText(str('Chemical scheme: ' + self.sch_name))
+			self.l5.setText(str('XML: ' + self.xml_name))
+			self.l7.setText(str('Model variables: ' + self.inname))
 
 			self.btch_str = (str(str(1.)+'.\n' + self.sch_name + 
 			'\n' + self.xml_name + '\n' + self.inname + '\n'))
@@ -5284,6 +5332,9 @@ def getExistingFilesAndDirs(self, caption, directory,
 			#selected.append('"{}"'.format(index.data()))
 			#lineEdit.setText(' '.join(selected))
 	
-	dialog = QFileDialog.getExistingDirectory(self, caption, directory)
-	
+	try:
+		dialog = QFileDialog.getExistingDirectory(self, caption, directory)
+	except:
+		dialog = []
+
 	return(dialog)

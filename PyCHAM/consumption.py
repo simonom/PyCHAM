@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2024 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''estimating consumption of a component over simulation'''
 # a module to calculate the consumed mass concentration of a 
 # component introduced artificially to chamber, so not produced
@@ -102,29 +103,31 @@ def cons(self, caller):
 	for comp_name in (self.comp_names_to_plot):
 		comp_name = comp_name.strip() # remove any white space
 		
-		# prepare to store chemical reaction losses in # molecules/cm3/s
-		crl = np.zeros((dydt_list[compi].shape[0], 1))
+		# prepare to store chemical reaction losses in # molecules/cm^3/s
+		# note that length of time axis in dydt_list[compi] has -1
+		# because of header in dydt_list[compi]
+		crl = np.zeros((dydt_list[compi].shape[0]-1, 1))
 
 		for ti in range(dydt_list[compi].shape[0]-1): # loop through times
 			indx = dydt_list[compi][ti+1, 0:-2] < 0 # indices of reactions that lose component
 			crl[ti] = dydt_list[compi][ti+1, 0:-2][indx].sum()
 		
-		# convert change tendencies from # molecules/cm3/s to ug/m3/s
+		# convert change tendencies from # molecules/cm^3/s to ug/m^3/s
 		crl = ((crl/si.N_A)*y_MW[comp_names.index(self.comp_names_to_plot[compi].strip())])*1.e12
 		
-		# integrate chemical losses over time intervals within the period of interest (ug/m3) for total consumed
-		cons[:] += crl[indxt][0:-1][:, 0]*(np.diff(timehr[indxt])*3.6e3)
-		
-		# in case we just want change in concentration
-		#cons = yrec[:, comp_names.index(self.comp_names_to_plot[compi].strip())]
-		#cons = (((cons[0, :]-cons[-1, :])*Cfac[0])/si.N_A)*y_MW[comp_names.index(self.comp_names_to_plot[compi].strip())]*1.e12
+		# integrate chemical losses over time intervals within 
+		# the period of interest (ug/m^3) for total consumed,
+		# averaging (arithmetic mean) the change tendency over 
+		# each time step
+		cons[:] += ((crl[indxt, 0][0:-1]+crl[indxt, 0][1::])/2.)*(np.diff(timehr[indxt])*3.6e3)
 		
 		compi += 1 # count on components
 	
 
 	if (caller == 0): # call from the consumption button
 		
-		self.l203a.setText(str('Total consumption of ' + str(self.comp_names_to_plot) + ': ' + str(sum(cons)) + ' ' + u'\u03BC' + 'g/m' + u'\u00B3'))
+		self.l203a.setText(str('Total consumption of ' + str(self.comp_names_to_plot) + 
+						 ': ' + str(sum(-1*cons)) + ' ' + u'\u03BC' + 'g/m' + u'\u00B3'))
 		# set border around message
 		if (self.bd_pl == 1):
 			self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)
@@ -142,22 +145,22 @@ def cons(self, caller):
 		SOA[0, seedi[0]::num_comp] = 0.
 		SOA[0, H2Oi::num_comp] = 0.
 		
-		# convert from # molecules/cm3 to ug/m3
+		# convert from # molecules/cm^3 to ug/m^3
 		SOA = ((SOA/si.N_A)*np.tile(y_MW, (num_sb-wall_on)))*1.e12
 
-		# sum for total (ug/m3)
+		# sum for total (ug/m^3)
 		SOAfi = np.sum(SOA)
 
-		# concentrations of components in particle phase at start of time interval (# molecules/cm3)
+		# concentrations of components in particle phase at start of time interval (# molecules/cm^3)
 		SOA = yrec[timehr==min(timehr[indxt]), num_comp:num_comp*(num_sb-wall_on+1)]
 		# remove seed and water in all size bins
 		SOA[0, seedi[0]::num_comp] = 0.
 		SOA[0, H2Oi::num_comp] = 0.
 		
-		# convert from # molecules/cm3 to ug/m3
+		# convert from # molecules/cm^3 to ug/m^3
 		SOA = ((SOA/si.N_A)*np.tile(y_MW, (num_sb-wall_on)))*1.e12
 
-		# sum for total (ug/m3)
+		# sum for total (ug/m^3)
 		SOAst = np.sum(SOA)
 
 		# get model variables file name
@@ -172,7 +175,8 @@ def cons(self, caller):
 		in_list = inputs.readlines() # read file and store everything into a list
 		inputs.close() # close file
 
-		for i in range(len(in_list)): # loop through supplied model variables to interpret
+		# loop through supplied model variables to interpret
+		for i in range(len(in_list)):
 			
 			# ----------------------------------------------------
 			# if commented out continue to next line
@@ -204,12 +208,13 @@ def cons(self, caller):
 
 		# integrate loss of SOA due to dilution over time interval
 		tint = (max(timehr[indxt])-min(timehr[indxt]))*3600. # time interval (s)
-		SOA_loss_by_dil = ((SOAfi+SOAst)/2.)*tint*dil_fac # note calculation of mean SOA in this time interval
+		# note calculation of mean SOA in this time interval
+		SOA_loss_by_dil = ((SOAfi+SOAst)/2.)*tint*dil_fac
 
-		yld = (SOA_loss_by_dil+(SOAfi-SOAst))/sum(cons)
+		yld = (SOA_loss_by_dil+(SOAfi-SOAst))/sum(-1*cons)
 
 	
-		self.l203a.setText(str('Yield of ' + str(self.comp_names_to_plot) + ': ' + str(yld)))
+		self.l203a.setText(str('Mass SOA yield of ' + str(self.comp_names_to_plot) + ' (%) : ' + str(yld*100.)  + ' (%)'))
 		# set border around message
 		if (self.bd_pl == 1):
 			self.l203a.setStyleSheet(0., '2px dashed magenta', 0., 0.)

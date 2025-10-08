@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#								                                       #
+# Copyright (C) 2018-2025					                           #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			               #
+#								                                       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -732,7 +732,7 @@ def ui_check(self):
 	# update model variables message in GUI
 	if (em_flag < 2): # if no error message
 	
-		self.l80.setText(str('Setup Status: \n' + err_mess))
+		self.l80.setText(str('Setup status: \n' + err_mess))
 		self.l80.setStyleSheet(0., '0px', 0., 0.) # remove any borders
 		self.bd_st = 3 # change border status to ready for change
 		
@@ -746,22 +746,22 @@ def ui_check(self):
 			self.atb = 1 # remember that add to batch button showing
 			
 			# allow single simulation to start
-			self.b81 = QPushButton('Start Single Simulation', self)
+			self.b81 = QPushButton('Start single simulation', self)
 			self.b81.setToolTip('Button to run the simulation')
 			self.b81.clicked.connect(self.on_click81sing)
-			self.NSlayout.addWidget(self.b81, 5, self.mvpn, 1, 1)
+			self.NSlayout.addWidget(self.b81, 5, self.mvpn, 1, 2)
 		
 			# add 'or' label
 			self.l81 = QLabel(self)
 			self.l81.setText('or')
-			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
+			self.NSlayout.addWidget(self.l81, 5, self.mvpn+2)
 			self.l81.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		
 			# allow adding to batch list
-			self.b82 = QPushButton('Add to Batch', self)
+			self.b82 = QPushButton('Add to batch', self)
 			self.b82.setToolTip('Add this simulation setup to batch')
 			self.b82.clicked.connect(self.on_click82)
-			self.NSlayout.addWidget(self.b82, 5, self.mvpn+2)
+			self.NSlayout.addWidget(self.b82, 5, self.mvpn+3)
 			
 		
 		# if in batch mode
@@ -771,17 +771,17 @@ def ui_check(self):
 			self.b82 = QPushButton('Add To Batch', self)
 			self.b82.setToolTip('Add this simulation setup to batch')
 			self.b82.clicked.connect(self.on_click82)
-			self.NSlayout.addWidget(self.b82, 5, self.mvpn+2)
+			self.NSlayout.addWidget(self.b82, 5, self.mvpn+3)
 			
 			# add 'or' label
 			self.l81 = QLabel(self)
 			self.l81.setText('or')
-			self.NSlayout.addWidget(self.l81, 5, self.mvpn+1)
+			self.NSlayout.addWidget(self.l81, 5, self.mvpn+2)
 		
 	else: # if there is a message
 		
 		# update error message
-		self.l80.setText(str('Setup Status: \n' + err_mess))
+		self.l80.setText(str('Setup status: \n' + err_mess))
 		# change border accordingly
 		if (self.bd_st == 1):
 			self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)

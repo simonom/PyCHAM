@@ -63,6 +63,7 @@ def plotter(caller, dir_path, uc, self):
 	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
+	Cfac = self.ro_obj.cfac
 	
 	# number of actual particle size bins
 	num_asb = (num_sb-wall_on)
@@ -130,7 +131,8 @@ def plotter(caller, dir_path, uc, self):
 		if (uc == 0): # ppb
 			gp_conc = yrec[:, 0:num_comp] # ppb is original units
 			gpunit = '(ppb)'
-		if (uc == 1 or uc == 2): # ug/m3 or # molecules/cm3
+		if (uc == 1 or uc == 2): # ug/m^3 or # molecules/cm^3
+			
 			# convert to numpy array from list
 			y_MW = (np.array(y_MW)).reshape(1, -1)
 			# convert to numpy array from list
@@ -138,11 +140,11 @@ def plotter(caller, dir_path, uc, self):
 			
 			gp_conc = yrec[:, 0:num_comp] 
 
-			# # molecules/cm3
+			# # molecules/cm^3
 			gp_conc = gp_conc.reshape(yrec.shape[0], num_comp)*Cfaca
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
 
-			if (uc == 1): # ug/m3
+			if (uc == 1): # ug/m^3
 				gp_conc = ((gp_conc/si.N_A)*y_MW)*1.e12
 				gpunit = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + ')')
 
@@ -325,9 +327,9 @@ def plotter(caller, dir_path, uc, self):
 		cb.set_label('dN (#$\,$$\mathrm{cm^{-3}}$)/d$\,$log$_{10}$(D$\mathrm{_p}$ ($\mathrm{\mu m}$))', size=14, rotation=270, labelpad=20)
 
 		# ------------------------------------------------------------------
-		# total particle number concentration # particles/cm3
+		# total particle number concentration # particles/cm^3
 	
-		# include total number concentration (# particles/cm3 (air)) on contour plot
+		# include total number concentration (# particles/cm^3 (air)) on contour plot
 		# first identify size bins with radius exceeding 3nm
 		# empty array for holding total number of particles
 		Nvs_time = np.zeros((Nwet.shape[0]))
@@ -380,7 +382,10 @@ def plotter(caller, dir_path, uc, self):
 
 	return()
 	
-
+# function to estimate the air quality index as defined by the UK
+# government's Department for Environment Food and Rural Affairs in
+# 2025: 
+# https://uk-air.defra.gov.uk/air-pollution/daqi?view=more-info&pollutant=ozone#pollutant
 def aqi_calc(self): # define function
 	
 	# inputs ----------------------------------------------------------
@@ -410,17 +415,33 @@ def aqi_calc(self): # define function
 	seedi = self.ro_obj.seed_ind
 	indx_plot = self.ro_obj.plot_indx
 	comp0 = self.ro_obj.init_comp
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	space_mode = self.ro_obj.spacing
 	Cfac = self.ro_obj.cfac
 	cen_size = self.ro_obj.cen_size
 
+	if ((num_sb-wall_on) == 0):
+	
+		self.l203a.setText(str('Note: no particles simulated ' +
+				'and air quality index estimation requires particles.'))
+		# set border around message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
+
 	# time in minutes
 	timemin = timehr*60.
 
 	# limit of index for 24-hour running means
-	indx_lim24 = sum(timehr <= (timehr[-1]-24.))
+	if (timehr[-1] < 24.):
+		indx_lim24 = 1
+	else:
+		indx_lim24 = sum(timehr <= (timehr[-1]-24.))
 
 	# limit of index for 15-minute running means
 	indx_lim15 = sum(timemin <= (timemin[-1]-15.))
@@ -429,7 +450,10 @@ def aqi_calc(self): # define function
 	indx_lim1 = sum(timehr <= (timehr[-1]-1.))
 
 	# limit of index for 8-hour running means
-	indx_lim8 = sum(timehr <= (timehr[-1]-8.))
+	if (timehr[-1] < 8.):
+		indx_lim8 = 1
+	else:
+		indx_lim8 = sum(timehr <= (timehr[-1]-8.))
 	
 	# prepare results matrices
 	sim_PMc = np.zeros((indx_lim24))
@@ -438,19 +462,56 @@ def aqi_calc(self): # define function
 	sim_NO2 = np.zeros((indx_lim1))
 	sim_O3 = np.zeros((indx_lim8))
 	
-	# prepare output concentrations (ug/m3)
+	# prepare output concentrations (ug/m^3)
 	# gas-phase concentrations as ppb
 	# index of O3, NO2, SO2
-	O3_indx = comp_names.index('O3')
-	NO2_indx = comp_names.index('NO2')
-	SO2_indx = comp_names.index('SO2')
+	try:
+		O3_indx = comp_names.index('O3')
+	except:
+		self.l203a.setText(str('Note: no O3 simulated ' +
+				'and air quality index estimation requires it.'))
+		# set border around message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
+	try:
+		NO2_indx = comp_names.index('NO2')
+	except:
+		
+		self.l203a.setText(str('Note: no NO2 simulated ' +
+				'and air quality index estimation requires it.'))
+		# set border around message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
+	try:
+		SO2_indx = comp_names.index('SO2')
+	except:
+		self.l203a.setText(str('Note: no SO2 simulated ' +
+				'and air quality index estimation requires it.'))
+		# set border around message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+		return()
 	
-	# concentrations (# molecules/cm3)
-	O3 = yrec[:, O3_indx]*Cfac
-	NO2 = yrec[:, NO2_indx]*Cfac
-	SO2 = yrec[:, SO2_indx]*Cfac
+	# concentrations (# molecules/cm^3)
+	O3 = (yrec[:, O3_indx]*np.array(Cfac)[:, 0])
+	NO2 = (yrec[:, NO2_indx]*np.array(Cfac)[:, 0])
+	SO2 = (yrec[:, SO2_indx]*np.array(Cfac)[:, 0])
 	
-	# convert concentrations into ug/m3
+	# convert concentrations into ug/m^3
 	O3 = (O3/si.N_A)*1.e12*y_MW[0, O3_indx]
 	NO2 = (NO2/si.N_A)*1.e12*y_MW[0, NO2_indx]
 	SO2 = (SO2/si.N_A)*1.e12*y_MW[0, SO2_indx]
@@ -464,7 +525,7 @@ def aqi_calc(self): # define function
 	# PM10.0
 	sim_PMc = np.zeros((len(timehr)))
 
-	# get volumes in all particle size bins at all times (um3)
+	# get volumes in all particle size bins at all times (um^3)
 	vols = (4./3.*np.pi*cen_size**3.)
 	
 	# loop through times to get the indices for PM2.5 and PM10
@@ -480,7 +541,7 @@ def aqi_calc(self): # define function
 		# assuming a particle density of 1.4 g/cm3 (1.4e-6 ug/um3)
 		sim_PMc[it] = (np.sum(Ndry[it, PMc_indxn]*vols[it, PMc_indxn]))*1.e-6
 	
-	# finally convert ug/cm3 to ug/m3
+	# finally convert ug/cm^3 to ug/m^3
 	sim_PMf = sim_PMf*1.e6
 	sim_PMc = sim_PMc*1.e6
 
@@ -506,9 +567,9 @@ def aqi_calc(self): # define function
 			tindx = (timehr>=timehr[i])*(timehr<=timehr[i]+24.)
 			# convert to boolean
 			tindx = (tindx==1)
-			# estimate PM10 24-hour running mean (ug/m3)
+			# estimate PM10 24-hour running mean (ug/m^3)
 			sim_PMc_mean[i] = sum(sim_PMc[tindx])/sum(tindx)
-			# estimate PM2.5 24-hour running mean (ug/m3)
+			# estimate PM2.5 24-hour running mean (ug/m^3)
 			sim_PMf_mean[i] = sum(sim_PMf[tindx])/sum(tindx)
 
 			# get the corresponding time points (hour)
@@ -520,12 +581,7 @@ def aqi_calc(self): # define function
 			tindx = (timemin>=timemin[i])*(timemin<=timemin[i]+15.)
 			# convert to boolean
 			tindx = (tindx==1)
-			# estimate SO2 15-minute running mean (ug/m3)
-			print(type(tindx))
-			print(type(SO2))
-			print(SO2_mean[i])
-			print(sum(SO2[tindx]))
-			print(sum(tindx))
+			# estimate SO2 15-minute running mean (ug/m^3)
 			SO2_mean[i] = sum(SO2[tindx])/sum(tindx)
 	
 			# get the corresponding time points (hour)
@@ -537,7 +593,7 @@ def aqi_calc(self): # define function
 			tindx = (timehr>=timehr[i])*(timehr<=timehr[i]+1.)
 			# convert to boolean
 			tindx = (tindx==1)
-			# estimate NO2 1-hour running mean (ug/m3)
+			# estimate NO2 1-hour running mean (ug/m^3)
 			NO2_mean[i] = sum(NO2[tindx])/sum(tindx)
 
 			# get the corresponding time points (hour)
@@ -549,13 +605,13 @@ def aqi_calc(self): # define function
 			tindx = (timehr>=timehr[i])*(timehr<=timehr[i]+8.)
 			# convert to boolean
 			tindx = (tindx==1)
-			# estimate O3 8-hour running mean (ug/m3)
+			# estimate O3 8-hour running mean (ug/m^3)
 			O3_mean[i] = sum(O3[tindx])/sum(tindx)
 
 			# get the corresponding time points (hour)
 			time8[i] = np.mean(timehr[tindx])
 	
-	# PM10.0 24-hour running mean values (ug/m3)
+	# PM10.0 24-hour running mean values (ug/m^3)
 	PMc_levels = [0., 16., 33., 50., 58., 66., 75., 83., 91., 100.]
 
 	# PM2.5 24-hour running mean values
@@ -578,8 +634,8 @@ def aqi_calc(self): # define function
 		# relevant time
 		timen = time24[it]
 
-		# find the index of 8 hour, 15 minunte and 1 hour means that
-		# is closest to this 24 hour time
+		# find the index of 8 hour, 15 minute and 1 hour means that
+		# are closest to this 24 hour time
 		indx8 = (np.abs(time8-timen) == (min(np.abs(time8-timen)))) == 1
 		# in case more than one, choose the first
 		indx8_first = np.where(indx8 == 1)[0][0]
@@ -595,7 +651,6 @@ def aqi_calc(self): # define function
 		indx1_first = np.where(indx1 == 1)[0][0]
 		indx1[:] = 0; indx1[indx1_first] = True
 		
-
 		# get levels
 		lev = []
 		lev.append(np.sum(PMc_levels<=sim_PMc_mean[it]))
@@ -610,9 +665,9 @@ def aqi_calc(self): # define function
 		
 	# prepare plot
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
-	ax0.plot(time24[0: indx_lim24], AQI_res)
+	ax0.plot(time24[0: indx_lim24], AQI_res, 'x')
 
-	ax0.set_ylabel(r'Air Quality Index', fontsize = 14)
+	ax0.set_ylabel(r'Air quality index (U.K. Gov.)', fontsize = 14)
 	ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')

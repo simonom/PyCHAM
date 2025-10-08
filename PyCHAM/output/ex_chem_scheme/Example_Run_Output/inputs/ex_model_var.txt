@@ -34,4 +34,3 @@ light_time = 0., 7200.
 light_status = 1, 0
 umansysprop_update = 0
 tracked_comp = ELVOC_O3
-chem_scheme_markers = {, RO2, +, C(ind_, ), , &, , , :, }, ;,

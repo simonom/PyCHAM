@@ -32,6 +32,7 @@ import pp_dursim
 import volat_calc
 import scipy.constants as si
 from water_calc import water_calc
+import math as math
 
 # define function
 def cham_up(sumt, 
@@ -43,7 +44,7 @@ def cham_up(sumt,
 	uppsize, num_sb, MV, radn, std, 
 	H2Oi, rbou, infx_cnt, Cfactor, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, nuci, y_mw, 
-	temp_now, gpp_stab, t00, x, pcontf, Cinfl_now, surfT, 
+	temp_now, gpp_stab, t00, x, Cinfl_now, surfT, 
 	act_coeff, tot_in_res, Compti, self, vol_Comp, volP, ic_red):
 	
 	# inputs: ------------------------------------------------
@@ -140,18 +141,16 @@ def cham_up(sumt,
 	# x - starting sizes of particles per size bin (um)
 	# self.pcont - flags for whether particle injection instantaneous 
 	# 	or continuous
-	# pcontf - whether current state of particle injection is 
-	#	continuous
 	# Cinfl_now - influx rate of components with continuous influx 
 	#	(ppb/s)
-	# surfT - surface tension of particles (g/s2 == mN/m == dyn/cm)
+	# surfT - surface tension of particles (g/s^2 == mN/m == dyn/cm)
 	# act_coeff - activity coefficient of components
 	# self.seed_eq_wat - whether seed particles to be equilibrated 
 	#	with water prior to ODE solver
 	# self.Vwat_inc - whether suppled seed particle volume 
 	#	contains equilibrated water
 	# tot_in_res - count on total injected concentration of 
-	#	injected components (ug/m3)
+	#	injected components (ug/m^3)
 	# Compti - index for total injection record for 
 	#	instantaneously injected components
 	# self.cont_inf_reci - index for total injection record for 
@@ -377,11 +376,12 @@ def cham_up(sumt,
 				inj_cntn = 0 # keep count on components
 				Ct_gain = np.zeros((len(inj_indx))) # empty results
 				for inj_indxi in inj_indx:
-					Ct_gain[inj_cntn] = np. interp(tnew, [0, t00], [y0[inj_indxi]/Cfactor, Ct[inj_cntn, gasinj_cnt]])
+					Ct_gain[inj_cntn] = np.interp(tnew, [0, t00], [y0[inj_indxi]/Cfactor, Ct[inj_cntn, gasinj_cnt]])
 					inj_cntn += 1  # keep count on components
 				bc_red = 1 # reset flag for time step reduction due to boundary conditions
 
 			# record additional injection of components (ug/m^3)
+			# for total injection of instantaneously injected particles
 			tot_in_res[Compti] += (((Ct_gain*Cfactor-y[inj_indx])/si.N_A)*(y_mw[inj_indx].squeeze()))*1.e12
 
 			# keep just the non-zero Ct gains, 
@@ -390,7 +390,7 @@ def cham_up(sumt,
 			nz_indx = (Ct_gain != 0.)
 
 			# account for change in gas-phase concentration,
-			# convert from ppb to molecules/cm3 (air)
+			# convert from ppb to molecules/cm^3 (air)
 			y[inj_indx[nz_indx]] = Ct_gain[nz_indx]*Cfactor
 			
 		# check whether changes occur during proposed integration time step
@@ -469,8 +469,7 @@ def cham_up(sumt,
 	# if we are at start of simulation and there is 
 	# continuous injection of particles from start, 
 	# then set flag to solve continuous injection 
-	# of particles. Note that pcontf set in 
-	# ode_updater
+	# of particles. Note that pcontf set above
 	if (sumt == 0. and pcontf == 1):
 		self.pcont_ongoing = 1
 	
@@ -676,14 +675,14 @@ def cham_up(sumt,
 		# prepare to hold particle-phase concentrations (molecules/cm^3)
 		yp0 = np.zeros((num_comp*num_asb))
 		yp0[:] = y0[num_comp:num_comp*(num_asb+1)]
-		
+
 		[y[num_comp:num_comp*(num_sb-self.wall_on+1)], N_perbin, _, 
 		_] = pp_dursim.pp_dursim(yp0, 
 		N_perbin0, mean_radn, pconcn, lowsize, 
 		uppsize, num_comp, num_asb, MV, 
 		stdn, H2Oi, rbou, y_mw, surfT, self.TEMP[tempt_cnt], act_coeff, 
 		pcontf, y[H2Oi], x, self)
-	
+		
 	# --------------------------------------------------------------------------
 	
 	# check on continuous influx of gas-phase components -------------
@@ -842,4 +841,4 @@ def cham_up(sumt,
 
 	return(temp_now, light_time_cnt, tnew, bc_red, update_count, 
 		Cinfl_now, seedt_cnt, Cfactor, infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
-		RHt_cnt, N_perbin, x, pconcn_frac, pcontf, tot_in_res, self)
+		RHt_cnt, N_perbin, x, pconcn_frac, tot_in_res, self)

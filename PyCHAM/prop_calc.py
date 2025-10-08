@@ -68,7 +68,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 	# self.num_asb - number of actual size bins (excluding wall)
 	# dens_comp - chemical scheme names of components with 
 	# 	manually assigned densities
-	# dens - manually assigned densities (g/cm3)
+	# dens - manually assigned densities (g/cm^3)
 	# y_mw - molar mass of components (g/mol)
 	# self - reference to PyCHAM
 	# tempt_cnt - count on temperatures
@@ -88,7 +88,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 	# temperature and then return to middle so that
 	# other variables (like y_dens and group_indices) 
 	# are carried over from previous simulation 
-	if (self.pars_skip == 3):
+	if (self.pars_skip == 3 or self.pars_skip == 4):
 
 		# get reference vapour pressures at various 
 		# temperatures for these components
@@ -279,8 +279,8 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		'/pure_component_saturation_vapour_pressures_at_298p15K_Pa.npy') # path
 		self.Psat_Pa_rec = (np.load(load_path, allow_pickle=True))
 
-	# estimate condensed-phase densitites (kg/m3) vapour pressures 
-	# (log10(atm)) and O:C ratio
+	# estimate condensed-phase densitites (kg/m^3), vapour pressures 
+	# (log10(atm)), and O:C ratio
 	# note when the O:C ratio and vapour pressure at 298.15 K are
 	# combined, one can produce the two-dimensional volatility
 	# basis set, as shown in 
@@ -334,17 +334,23 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 			# it agrees with internet
 			if (self.rel_SMILES[i] == '[K+].[O-][N+]([O-])=O'):
 				self.y_dens[i] = 2.11e3
+
+			# benzalkonium chloride density stated manually to be 
+			# sure it agrees with internet
+			if (self.rel_SMILES[i] == '[Cl-].CCCCCCCCCCCCCC[N+](C)(C)Cc1ccccc1'):
+				self.y_dens[i] = 0.8613842553191489e3
 			
 			# black carbon density stated manually to be sure
 			# it agrees with internet
-			if (self.comp_namelist[i] == 'bcin'):
+			if (self.rel_SMILES[i] == '[C]'):
 				self.y_dens[i] = 2.26e3
 
 			# get density of components from UManSysProp
 			if (i != corei[0] and i != H2Oi and 
 				self.rel_SMILES[i] != '[HH]'and 
 				self.rel_SMILES[i] != '[K+].[O-][N+]([O-])=O' and
-				self.comp_namelist[i] != 'bcin'):
+				self.rel_SMILES[i] != '[Cl-].CCCCCCCCCCCCCC[N+](C)(C)Cc1ccccc1' and 
+				self.rel_SMILES[i] != '[C]'):
 				# density (convert from g/cm^3 to kg/m^3)
 				self.y_dens[i] = liquid_densities.girolami(
 						self.Pybel_objects[i])*1.e3
@@ -526,7 +532,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 							self.TEMP[tempt_cnt])))
 
 
-		if (self.pars_skip != 2 and self.pars_skip != 3 and self.ac_by_cs == 0):
+		if (self.pars_skip != 2 and self.pars_skip != 3 and self.pars_skip != 4 and self.ac_by_cs == 0):
 			try: # in case array
 				self.Psat[0, i] = Psatnow[0]
 			except: # in case float
@@ -626,7 +632,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 	# in case not parsing
 	if (self.pars_skip != 2):
 		# in case not using archived vapour pressures
-		if (self.pars_skip != 3):
+		if (self.pars_skip != 3 and self.pars_skip != 4):
 			# convert to Pa from log10(atm)
 			self.Psat_Pa_rec = (10.**self.Psat_Pa_rec)*101325.
 

@@ -166,16 +166,20 @@ def ode_brk_err_mess(y0, neg_names, rrc, num_comp,
 	if (self.wall_on > 0): # include fluxes of trouble components to wall if wall is considered
 		
 		f.write('\n')
-		f.write('Fluxes (molecules/cm3/s) of components with negative values output by ODE solver to (-) or from (+) wall\n')
+		f.write('Fluxes (molecules/cm^3/s) of components with negative values output by ODE solver to (-) or from (+) wall\n')
 		
 		# concentration on wall (# molecules/cm3 (air))
 		Csit = y0[num_comp*(num_asb+1)::]
-		# saturation vapour pressure on wall (# molecules/cm3 (air))
+		# saturation vapour pressure on wall (# molecules/cm^3 (air))
 		# note, just using the top rows of Psat and act_coeff
 		# as do not need the repetitions over size bins
 		
 		if (sum(sum(self.Cw > 0.)) > 0.):
-			Csit = self.Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
+			try:
+				Csit = self.Psat[0, neg_comp_indx].reshape(1, -1)*(Csit[neg_comp_indx].reshape(1, -1)/self.Cw[:, neg_comp_indx])*act_coeff[0, neg_comp_indx].reshape(1, -1)
+			except:
+				print('problem at line 181 in ode_brk_err_mess')
+				import ipdb; ipdb.set_trace()
 			# rate of transfer (# molecules/cm^3/s), note sum over wall bins
 			dd_trouble = np.sum((-1.*self.kw[:, neg_comp_indx]*(y0[neg_comp_indx].reshape(1, -1)-Csit)), axis=0)
 			

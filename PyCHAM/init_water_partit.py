@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2022 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''function to estimate the initial concentration of water on particles and walls'''
 
 import numpy as np
@@ -69,17 +70,17 @@ def init_water_partit(x, y, H2Oi, Psat, mfp, siz_str, num_sb, num_speci,
 				x.reshape(1, -1)*1.0e-6, Psat, therm_sp, 
 				H2Oi, act_coeff, wall_on, 0, partit_cutoff, Press, coll_dia)
 
-			# get seed particle properties: concentration (molecules/cm3 (air))
+			# get seed particle properties: concentration (molecules/cm^3 (air))
 			ycore = 0.			
 			for ci in range(len(seedi)):
 				ycore += y[
 					num_speci*(sbstep+1)+seedi[ci]]*self.core_diss_wrtw[ci]
 			
 			# first guess of particle-phase water concentration based on RH = mole 
-			# fraction (molecules/cc (air))
+			# fraction (molecules/cm^3 (air))
 			y[num_speci*(sbstep+1)+H2Oi] = (ycore/kelv_fac[sbstep])*RH
 			
-			# gas phase concentration of water (molecules/cc (air)), will stay constant
+			# gas phase concentration of water (molecules/cm^3 (air)), will stay constant
 			# because RH is constant
 			Cgit = y[H2Oi]
 			

@@ -1,4 +1,4 @@
-# model variable file for reproducing the Caltech benzene SOA experiments of Ng et al. 2017:
+# model variable file for reproducing the Caltech benzene SOA experiments of Ng et al. 2007:
 # doi.org/10.5194/acp-7-3909-2007. Note that HNO3 (nitric acid) is not expected to partition 
 # considerably to 
 # the particle phase because the ammonium sulphate is crystalline, and so does not provide a
@@ -10,8 +10,9 @@
 # partial pressure of 60e-9 atm), then one can find the value of C and convert this into ug/m3
 # of air by knowing that there is around 45 um^3/cm^3 (of air) of particle volume and HNO3 has 
 # a molar mass of 63.01 g/mol. This gives a C value on the order of 10^-3 ug/m3 (of air) in the
-# particle phase, so very small compared to the observed value of order 10^1 ug/m3
-res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Ng2007/Caltech_benzene_loNOx_seed_EVAPORATIONnonHOM_EVAPORATIONHOM
+# particle phase, so very small compared to the observed value of total PM, which is of the 
+# order 10^1 ug/m3
+res_file_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/SOAPRA/EMEP/PyCHAM_outputs/Ng2007/Caltech_benzene_loNOx_seed_SIMPOLnonHOM_SIMPOLHOM
 chem_sch_name = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/input/Ng2007/benzene_MCM_autoAPRAMfw.eqn
 rate_constant_file = /Users/user/Documents/GitHub/PyCHAM/PyCHAM/prop_store/constants_mcm.f90
 xml_name = MCM_PRAM_xml.xml
@@ -56,9 +57,9 @@ ChamSA = 28
 eff_abs_wall_massC = 10.8e-3
 chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
 # set the vapour pressure estimation method for nonHOMs
-nonHOMs_vp_method = EVAPORATION
+nonHOMs_vp_method = SIMPOL
 # set the vapour pressure estimation method for HOMs
-HOMs_vp_method = EVAPORATION
+HOMs_vp_method = SIMPOL
 # particle section
 number_size_bins = 8
 seed_name = C5_RO2_O10, core

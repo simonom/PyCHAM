@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -86,6 +86,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 		# gas-phase concentration sub-plot --------------------	
 		ip_fail = 0 # start by assuming all requested components available
+
+		# prepare to store summed results
+		if (self.sum_ornot_flag == 1):
+			sum_conc = np.zeros((len(timehr)))
+			sum_comp_names_to_plot = comp_names_to_plot[0]
 
 		for i in range(len(comp_names_to_plot)):
 
@@ -273,13 +278,13 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					plt.close() # close figure window
 					return()
 			
-			if (caller == 0  or caller == 5): # ug/m3 plot
+			if (caller == 0  or caller == 5): # ug/m^3 plot
 			
-				# gas-phase concentration (# molecules/cm3)
+				# gas-phase concentration (# molecules/cm^3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
 					(indx_plot).shape[0])*Cfac
 
-				# gas-phase concentration (ug/m3)
+				# gas-phase concentration (ug/m^3)
 				conc = (((conc/si.N_A)*(y_MW[indx_plot].reshape(1, -1)))*1.e12)
 			
 			if (caller == 1 or caller == 4): # ppb plot
@@ -288,9 +293,9 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
 					(indx_plot).shape[0])
 
-			if (caller == 3  or caller == 6): # # molecules/cm3 plot
+			if (caller == 3  or caller == 6): # # molecules/cm^3 plot
 			
-				# gas-phase concentration (# molecules/cm3)
+				# gas-phase concentration (# molecules/cm^3)
 				conc = yrec[:, indx_plot].reshape(yrec.shape[0], 
 					(indx_plot).shape[0])*Cfac
 			
@@ -300,14 +305,33 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# plot this component
 			if (group_flag == 0): # if not a sum of components
 				if (caller == 4 or caller == 5 or caller == 6): # log10 y axis
-					ax0.semilogy(timehr, conc, '-+', linewidth = 4., 
+					# if summing values
+					if (self.sum_ornot_flag == 0):
+						ax0.semilogy(timehr, conc, '-+', linewidth = 4., 
+							label = str(str(comp_names[int(indx_plot)]+
+								' (gas-phase)')))
+					# if summing values
+					if (self.sum_ornot_flag == 1):
+						sum_conc += conc.sum(axis = 1)
+						if (i > 0):
+							sum_comp_names_to_plot = str(sum_comp_names_to_plot + ', ' + comp_names_to_plot[i].strip())
+						if (i == len(comp_names_to_plot)-1):
+							ax0.semilogy(timehr, sum_conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + sum_comp_names_to_plot + ' (gas-phase)'))
+
+				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
+					if (self.sum_ornot_flag == 0):
+						ax0.plot(timehr, conc, '-+', linewidth = 4., 
 						label = str(str(comp_names[int(indx_plot)]+
 							' (gas-phase)')))
-				if (caller == 0 or caller == 1 or caller == 3): # linear y axis
-					ax0.plot(timehr, conc, '-+', linewidth = 4., 
-					label = str(str(comp_names[int(indx_plot)]+
-						' (gas-phase)')))
-			
+					# if summing values
+					if (self.sum_ornot_flag == 1):
+						sum_conc += conc.sum(axis = 1)
+						if (i > 0):
+							sum_comp_names_to_plot = str(sum_comp_names_to_plot + ', ' + comp_names_to_plot[i].strip())
+						if (i == len(comp_names_to_plot)-1):
+							ax0.plot(timehr, sum_conc, '-+', linewidth = 4., label = str(r'$\Sigma$' + sum_comp_names_to_plot + ' (particle-phase)'))
+
+
 			else: # if a sum over a group of components
 				if (caller == 4 or caller == 5 or 
 					caller == 6): # log y axis
@@ -321,11 +345,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					label = str(r'$\Sigma$' + comp_names_to_plot[
 					i].strip() + ' (gas-phase)'))
 
-		if (caller == 0 or caller == 5): # ug/m3 plot
+		if (caller == 0 or caller == 5): # ug/m^3 plot
 			ax0.set_ylabel(str(r'Concentration ($\rm{\mu}$g$\,$m$\rm{^{-3}}$)'), fontsize = 14)
 		if (caller == 1 or caller == 4): # ppb plot
 			ax0.set_ylabel(str(r'Mixing ratio (ppb)'), fontsize = 14)
-		if (caller == 3 or caller == 6): # # molecules/cm3 plot
+		if (caller == 3 or caller == 6): # # molecules/cm^3 plot
 			gpunit = str('\n(' + u'\u0023' + ' molecules/cm' + u'\u00B3' + ')')
 			ax0.set_ylabel(str(r'Concentration ' + gpunit), fontsize = 14)
 
@@ -750,7 +774,7 @@ def plotter_rad_flux(self):
 
 	return()
 
-# function to plots ozone isopleths -----------------------------------------
+# function to plot ozone isopleths -----------------------------------------
 def O3_iso(self):
 
 	import pickle # for dealing with pickle files
@@ -790,15 +814,57 @@ def O3_iso(self):
 	# sum carbon numbers in SMILE strings
 	for zg_i in zg_smile:
 		if (zg_i.count('c') + zg_i.count('C') > 1): # more than 1 carbon
-			if (zg_i.count('o') + zg_i.count('O') == 0): # no oxygen
-				VOC_smile = zg_i # get VOC SMILE string
-				break
-
-	# VOC index
-	self.VOCi = rel_SMILES.index(VOC_smile)
+			VOC_smile = zg_i # get VOC SMILE string
+			break
 	
-	# get range (# molecules/cm3) of gas-phase VOC seen in simulation
+	# VOC index
+	try:
+		self.VOCi = rel_SMILES.index(VOC_smile)
+	except:
+		mess = str('Please note, no parent VOC found, and one needed to estimate ozone isopleths.')
+
+		self.l203a.setText(mess)
+			
+		# set border around error message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+			
+		plt.ioff() # turn off interactive mode
+		plt.close() # close figure window
+			
+		return()
+	
+	# get range (# molecules/cm^3) of gas-phase VOC seen in simulation
 	VOC_range = [min(yrec[:, self.VOCi]*Cfac), max(yrec[:, self.VOCi]*Cfac)]
+
+	try:
+		check = comp_names.index('NO')
+		check = comp_names.index('NO2')
+		check = comp_names.index('NO3')
+		check = comp_names.index('O3')
+	except:
+		mess = str('Please note, one, or all, of the following components ' +
+			 'was not seen in the chemical scheme, but is required to ' +
+			 'calculate ozone isopleths: NO, NO2, NO3, O3.')
+			
+		self.l203a.setText(mess)
+			
+		# set border around error message
+		if (self.bd_pl == 1):
+			self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+			self.bd_pl = 2
+		else:
+			self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+			self.bd_pl = 1
+			
+		plt.ioff() # turn off interactive mode
+		plt.close() # close figure window
+			
+		return()
 
 	# NOx index
 	self.NOxi = [comp_names.index('NO'), comp_names.index('NO2'), comp_names.index('NO3')]
@@ -809,10 +875,10 @@ def O3_iso(self):
 	self.O3i = comp_names.index('O3')
 
 	NOxsum = np.zeros((len(timehr)))
-	# sum NOx constituents (# molecules/cm3)
+	# sum NOx constituents (# molecules/cm^3)
 	for NOxii in self.NOxi:
 		NOxsum += yrec[:, NOxii]*Cfac
-	# range of NOx (# molecules/cm3)
+	# range of NOx (# molecules/cm^3)
 	NOx_range = [min(NOxsum), max(NOxsum)]
 	NOx_range = [1.0*Cfac[0], 1500.*Cfac[0]]
 	VOC_range = [1.0*Cfac[0], 200.*Cfac[0]]
@@ -861,7 +927,7 @@ def O3_iso(self):
 			from middle import middle # prepare to communicate with main program
 		
 			note_messf = 0 # cancel note message flag
-		
+			
 			for prog in middle(self): # call on modules to solve problem
 		
 				if (isinstance(prog, str)): # check if it's a message

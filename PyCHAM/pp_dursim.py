@@ -94,7 +94,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	R_gas = si.R # ideal gas constant (kg.m2.s-2.K-1.mol-1)
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 	
-	# prepare for new concentration of particles (# particles/cm3)
+	# prepare for new concentration of particles (# particles/cm^3)
 	N_perbin = np.zeros((N_perbin0.shape[0], N_perbin0.shape[1])) 
 
 	if (num_sb == 1):

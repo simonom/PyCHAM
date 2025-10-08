@@ -18,7 +18,8 @@
 # You should have received a copy of the GNU General Public License    #
 # along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                      #
-########################################################################'''module to model particle loss to walls, called on by ode_gen'''
+########################################################################
+# '''module to model particle loss to walls, called on by ode_gen'''
 # the process of particle deposition to walls is reproduced here using either
 # the McMurry and Rader (1985) model, or the user-defined parameters
 
@@ -34,7 +35,7 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# inputs:----------------------------------------------------------
 	
 	# Pn - particle number concentration per size bin before time step
-	# (# particle/cm3 (air))
+	# (# particle/cm^3 (air))
 	# Cn - particle phase concentration per component per size bin
 	# after a time step over which gas phase reaction and 
 	# gas-particle partitioning have occurred (# molecules/cm3 (air))
@@ -178,12 +179,12 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	# Beta to the realistic maximum
 	ish = Pn<(Beta*Pn)
 	Beta[ish] = 1.
-		
+
 	# new particle number concentration
 	Pn -= (Beta*Pn)
 	# change in particle-phase concentrations of components
 	delC = (Beta*Cn.reshape(sbn, nc)).flatten(order = 'C')
-	Cn -= delC # new particle-phase concentrations of components (# molecules/cm3)
+	Cn -= delC # new particle-phase concentrations of components (# molecules/cm^3)
 	# wall concentrations of components deposited through particle 
 	# loss to wall (# molecules/cm3)
 	self.C_p2w += delC

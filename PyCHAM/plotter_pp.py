@@ -574,7 +574,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')
 
-	if (caller == 8): # if called by button to plot generational contribution to particle-phase mass
+	# if called by button to plot generational contribution to particle-phase mass
+	if (caller == 8):
 
 		import sch_interr # for interpeting chemical scheme
 		import re # for parsing chemical scheme
@@ -605,11 +606,11 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 			# ----------------------------------------------------
 			# formatting for chemical scheme
 			if key == 'chem_scheme_markers' and (value.strip()):
-				chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
+				self.chem_sch_mrk = [str(i).strip() for i in (value.split(','))]
 
 		# interrogate scheme to list equations
-		[rrc, rrc_name, RO2_names, self] = sch_interr.sch_interr(total_list_eqn, self)	
-
+		self = sch_interr.sch_interr(total_list_eqn, self)	
+		
 		# loop through components to identify their generation
 		for compi in comp_names[0:-2]: # don't include core and water
 			
@@ -626,8 +627,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 
 					line = self.eqn_list[eqn_step] # extract this line
 					# work out whether equation or reaction rate coefficient part comes first
-					eqn_start = str('.*\\' +  chem_sch_mrk[10])
-					rrc_start = str('.*\\' +  chem_sch_mrk[9])
+					eqn_start = str('.*\\' +  self.chem_sch_mrk[10])
+					rrc_start = str('.*\\' +  self.chem_sch_mrk[9])
 					# get index of these markers, note span is the property of the match object that
 					# gives the location of the marker
 					eqn_start_indx = (re.match(eqn_start, line)).span()[1]
@@ -644,14 +645,14 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 					# except for new line characters, so final part is stating the character(s) we 
 					# are specifically looking for, \\ ensures the marker is recognised
 					if eqn_sec == 1:
-						eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[11])
+						eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[11])
 					else: # end of equation part is start of reaction rate coefficient part
-						eqn_markers = str('\\' +  chem_sch_mrk[10]+ '.*\\' +  chem_sch_mrk[9])
+						eqn_markers = str('\\' +  self.chem_sch_mrk[10]+ '.*\\' +  self.chem_sch_mrk[9])
 
 					# extract the equation as a string ([0] extracts the equation section and 
 					# [1:-1] removes the bounding markers)
 					eqn = re.findall(eqn_markers, line)[0][1:-1].strip()
-		
+					
 					eqn_split = eqn.split()
 					eqmark_pos = eqn_split.index('=')
 					# reactants with stoichiometry number and omit any photon
@@ -726,24 +727,26 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		y_MW = np.tile(y_MW, (len(timehr), num_sb-wall_on))
 
 		# convert particle-phase concentrations into mass 
-		# concentration (ug/m3) from # molecules/cm3		
+		# concentration (ug/m^3) from # molecules/cm^3		
 		ppc[:, :] += ((ppc/si.N_A)*y_MW)*1.e12
 		# zero water and seed contribution
 		ppc[:, int(H2Oi)::int(num_comp)] = 0.
 		for seei in seedi:
 			ppc[:, int(seei)::int(num_comp)] = 0.
 		# sum concentrations over all size bins 
-		# and components per time step (ug/m3)
+		# and components per time step (ug/m^3)
 		ppc_sum = np.sum(ppc, axis= 1)
+		# non-zero indices of ppc_sum
+		nzi = np.squeeze(ppc_sum != 0.)
 
 		# tile generation number over size bins
 		gen_num = np.tile(gen_num, (num_sb-wall_on))
 		# loop through generations
 		for gi in range(int(np.max(gen_num))):
 			# get percentage contribution from this generation
-			res[:, gi] = (np.sum(ppc[:, gen_num == gi], axis = 1)/ppc_sum)*100.
+			res[nzi, gi] = (np.sum(ppc[:, gen_num == gi], axis = 1)[nzi]/ppc_sum[nzi])*100.
 			ax0.plot(timehr, res[:, gi], label = str('Generation ' + str(gi)))
-		ax0.set_ylabel(r'% Contribution to organic particle-phase mass concentration ($\%$)', fontsize = 14)
+		ax0.set_ylabel(r'Contribution to organic particle-phase mass concentration ($\%$)', fontsize = 14)
 		ax0.set_xlabel(r'Time through simulation (hours)', fontsize = 14)
 		ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in')
 		ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in')

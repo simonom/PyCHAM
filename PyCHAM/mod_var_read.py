@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -228,8 +228,9 @@ def mod_var_read(self):
 				self.comp0 = [str(i).strip() for i in 
 				(value.split(','))]			
 
-			# initial concentrations of components present 
-			# at experiment start (ppb)
+			# initial concentrations of components and 
+			# (where applicable) particles present 
+			# at experiment start
 			if (key == 'C0' and (value.strip())):
 				
 				# treat as path to file
@@ -473,7 +474,7 @@ def mod_var_read(self):
 				else:
 					self.pmode = 0
 
-			# seed particle number concentrations (# particles/cm3)
+			# seed particle number concentrations (# particles/cm^3)
 			if (key == 'pconc' and (value.strip())):
 			
 				time_cnt = 1 # track number of times
@@ -516,7 +517,7 @@ def mod_var_read(self):
 					for i in range(time_cnt):
 						self.pconc[:, i] = [float(ii.strip()) for ii 
 						in ((value.split(';')[i]).split(':'))]
-
+				
 			# seed particle input times (s)
 			if (key == 'pconct' and (value.strip())):
 				time_cnt = 1 # track number of times
@@ -755,6 +756,18 @@ def mod_var_read(self):
 				self.core_diss_wrtw = [float(i) for i in 
 				(value.split(','))]
 
+			# name of of individual component(s) with specified dissociation constant(s)
+			# with respect to water
+			if (key == 'indiv_comp_diss_wrtw_name' and value.strip()):
+				self.indiv_comp_diss_wrtw_name = [str(i).strip() for i in 
+				(value.split(','))]
+			
+			# dissociation constant(s) of individual component(s) with specified 
+			# with respect to water
+			if (key == 'indiv_comp_diss_wrtw' and value.strip()):
+				self.indiv_comp_diss_wrtw = [float(i) for i in 
+				(value.split(','))]
+
 			# dissociation constant(s) of nonseed component(s) with
 			# respect to water
 			if (key == 'nonseed_diss_wrtw' and value.strip()):
@@ -950,7 +963,7 @@ def mod_var_read(self):
 					# list of component names
 					# attempt as path to file 
 					# containing continuous influxes
-					try: 
+					try:
 						from cont_infl_file_open import cont_infl_open
 						self.const_infl_path = str(
 						value.strip())
@@ -1108,7 +1121,7 @@ def mod_var_read(self):
 			if (key == 'nuc_comp' and (value.strip())): 
 				self.nuc_comp = [str(i).strip() for i in
  					(value.split(','))]
-
+				
 			# marker for whether to adapt time interval to 
 			# nucleation
 			if (key == 'nuc_adapt' and (value.strip())): 
@@ -1225,7 +1238,7 @@ def mod_var_read(self):
 				self.PM_nudge_target = float([str(i).strip() for i in
 				(value.split(','))][1])
 			
-			# user-defined outputs (molecules/cm3)
+			# user-defined outputs (molecules/cm^3)
 			if (key == 'user_output' and (value.strip())):
 				# begin with the unconditional variables
 				self.user_output = ['unconditional_variables']
@@ -1248,9 +1261,9 @@ def mod_var_read(self):
 		if (err_mess != '' or self.err_mess != ''):
 			# update error message
 			if (err_mess != ''):
-				self.l80.setText(str('Setup Status: \n' + err_mess))
+				self.l80.setText(str('Setup status: \n' + err_mess))
 			if (self.err_mess != ''):
-				self.l80.setText(str('Setup Status: \n' + self.err_mess))
+				self.l80.setText(str('Setup status: \n' + self.err_mess))
 			# change border accordingly
 			if (self.bd_st == 1):
 				self.l80.setStyleSheet(0., '2px dashed red', 0., 0.)
@@ -1351,7 +1364,8 @@ def mass_trans_coeff_open(self):
 	
 	return(value)
 
-# function for converting csv of initial concentrations
+# function for getting initial concentrations
+# from previously completed and saved simulation
 def C0_open(self):
 
 	import os
@@ -1376,10 +1390,7 @@ def C0_open(self):
 		 user in model variables file for initial concentrations
 		 of components not found, file path attempted was: ''' 
 		+ fname)
-		# bypass error, e.g. when you know that the file will
-		# become available following completion of preceding
-		# simulations
-		self.err_mess = ''
+		
 		return([], self)
 
 	# now get names of components that concentrations correspond to
@@ -1417,7 +1428,7 @@ def C0_open(self):
 	if os.path.exists(str(self.path_to_C0 + '/particle_number_concentration_wet')):
 
 		# set starting particle properties
-		# withdraw number-size distributions (# particles/cm3 (air))
+		# withdraw number-size distributions (# particles/cm^3 (air))
 		fname = str(self.path_to_C0 + '/particle_number_concentration_wet')
 		self.N_perbin0_prev_sim = np.loadtxt(fname, delimiter=',', skiprows=1)
 		# keep just final time
@@ -1430,14 +1441,14 @@ def C0_open(self):
 		# keep just final time
 		self.x0_prev_sim = self.x0_prev_sim[-1, :]
 
-		# particle volumes (um3)
+		# single particle volumes (um^3)
 		self.Varr0_prev_sim = (4./3.)*np.pi*self.x0_prev_sim**3.
 	
 
 	# starting concentrations (ppb) of just the gas-phase
 	y0_gas = y0[0:len(self.comp0)]
 
-	# get concentrations (molecules/cm3) of any other
+	# get concentrations (molecules/cm^3) of any other
 	# phases at this final time step
 	if (y0.shape[0]>len(self.comp0)):
 		self.y0_other_phase = y0[len(self.comp0)::]
@@ -1449,5 +1460,5 @@ def C0_open(self):
 	# remove water
 	y0_gas = (y0_gas[self.comp0 != 'H2O']).tolist()
 	self.comp0 = (self.comp0[self.comp0 != 'H2O']).tolist()
-	
+
 	return(y0_gas, self)

@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -45,10 +45,11 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	# uppersize - largest size bin radius bound (um)
 	# self.pmode - whether particle number concentrations given as 
 	#	modes or explicitly
-	# self.pconc - starting particle concentration (# particle/cm3 (air))
+	# self.pconc - starting particle concentration (# particle/cm^3 (air))
 	#	 - if scalar then gets split between size bins in 
 	#	Size_distributions call, or if an array, elements 
-	# 	are allocated to corresponding size bins
+	# 	are allocated to corresponding size bins, note this could also
+	# 	be starting particle concentration influx (# particle/cm^3 (air))
 	# self.pconct - time(s) through experiment that particle number 
 	#	concentrations correspond to (s)
 	# self.nuc_comp - name of the nucleating component
@@ -138,6 +139,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		nuc_compi = self.comp_namelist.index(self.nuc_comp[0])
 		self.nuc_comp = np.empty(1, dtype=int)
 		self.nuc_comp[0] = nuc_compi
+		
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	
@@ -156,11 +158,16 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		rbou = np.zeros((1, 1))
 		upper_bin_rad_amp = 1.e6
 		# empty array for concentration of components on wall due to 
-		# particle deposition to wall (# molecules/cm3)
+		# particle deposition to wall (# molecules/cm^3)
 		self.C_p2w  = 0.
 
 	# if size bins present, get the particle number size distribution from inputs
 	else:
+
+		# note that even if pconcn represents initial particle 
+		# continuous influx rate, the call to part_nsd is made
+		# to establish variables like rbou and Vbou, whilst
+		# N_perbin will be zeroed below
 		[N_perbin, x, rbou, Vbou, Varr, 
 		upper_bin_rad_amp] = part_nsd.part_nsd(lowersize, 
 		num_asb, uppersize, mean_radn, stdn, pconcn, testf, self)
@@ -186,14 +193,14 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	rbou[0] = 0. # this reversed in saving.py back to rbou00
 	
 	if (num_asb > 0):
-		# remember the radii (um) and volumes (um3) at size bin 
+		# remember the radii (um) and volumes (um^3) at size bin 
 		# centre now
 		rad0 = np.zeros((len(x)))
 		rad0[:] = x[:]
 		Vol0 = np.zeros((len(Varr)))
 		Vol0[:] = Varr[:]
 		# empty array for concentration of components on wall due
-		# to particle deposition to wall (# molecules/cm3)
+		# to particle deposition to wall (# molecules/cm^3)
 		self.C_p2w = np.zeros((num_asb*num_comp))
 	
 	if (self.wall_on > 0):
@@ -207,38 +214,52 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	y_w = y[num_comp::]
 
 	# include particle-phase concentrations of components to y 
-	# (# molecules/cm3 (air))
+	# (# molecules/cm^3 (air))
 	y = np.append(y[0:num_comp], np.zeros(((num_sb-
 		self.wall_on)*num_comp)))
 
-	# include wall concentrations (# molecules/cm3)
+	# include wall concentrations (# molecules/cm^3)
 	y = np.append(y, y_w)	
 
 	# molar volume of components (multiply self.y_dens by 1e-3 to 
-	# convert from kg/m3 to g/cm3 and give
-	# MV in units cm3/mol)
+	# convert from kg/m^3 to g/cm^3 and give
+	# MV in units cm^3/mol)
 	MV = (y_mw/(self.y_dens*1.e-3)).reshape(num_comp, 1)
 
 	# number of size bins, excluding wall
 	num_aasb = num_sb-self.wall_on
 
+	# prepare matrix to hold dissociation constants of components (columns)
+	# with respect to water over all size bins (rows)
+	self.diss_wrtw = np.zeros((num_asb, num_comp))
+	self.diss_wrtw[:, :] = self.noncore_diss_wrtw
+	self.diss_wrtw[:, self.seedi] = self.core_diss_wrtw
+	self.diss_wrtw[:, H2Oi] = 1. # water with respect to itself
+	# dissociation constants with respect to water of user-defined
+	# individual components
+	for indi in range(0, len(self.indiv_comp_diss_wrtw_name)):
+		self.diss_wrtw[:, 
+				 self.comp_namelist.index(
+				self.indiv_comp_diss_wrtw_name[indi])] = self.indiv_comp_diss_wrtw[indi]
+
 	# account for particle-phase concentration of components 
-	# contained in seed particles
-	if (sum(pconcn) > 0.):
+	# contained in particles if particle influx at start is
+	# not continuous
+	if (sum(pconcn) > 0. and self.pcont[0, 0] != 1):
 		
-		# volume concentration of new seed particles (um3/cm3 (air)),
+		# volume concentration of particles (um^3/cm^3 (air)),
 		# note that for N_perbin, size bins are in rows (as set in size_distr.py)
 		Vperbin = Varr*N_perbin[:, 0]
 		
-		# concentrations of components in new seed particles 
-		# (# molecules/cm3 (air))
+		# prepare to hold concentrations of components in particles 
+		# (# molecules/cm^3 (air))
 		yn = np.zeros((num_comp*(num_aasb)))
 		
 		yn = pp_water_equil(y[self.H2Oi], yn, seedx_now, num_aasb, y_mw, 
 			R_gas, TEMP, surfT, act_coeff, Vperbin, x, num_comp, self)
 		
 		# include particle-phase concentations in y 
-		# (molecules/cm3)
+		# (molecules/cm^3)
 		y[num_comp:(num_comp*(num_aasb+1))] = yn[:]
 		
 	# if wall present and water to be equilibrated between wall and
@@ -250,10 +271,10 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 			(self.Psat[num_asb+walli, H2Oi]*act_coeff[num_asb+walli, H2Oi])) 
 			
 	# mass concentration of particles (scale self.y_dens by 1e-3 
-	# to convert from kg/m3 to g/cm3)
+	# to convert from kg/m^3 to g/cm^3)
 	if (num_aasb > 0): # with particles
 		mass_conc = 0. # start cumulation
-		# as size bin now account for wall too
+		# as size bins account for wall too
 		for i in range(num_aasb): 
 			mass_conc += (sum((self.y_dens[:, 0]*1.0e-3)*
 			((y[num_comp*(i+1):num_comp*(i+2)]/si.N_A)*
@@ -261,15 +282,15 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 			mass_conc -= ((self.y_dens[int(H2Oi), 0]*1.e-3)
 			*((y[num_comp*(i+1)+int(H2Oi)]/si.N_A)*
 			MV[int(H2Oi), 0]))
-		mass_conc = mass_conc*1.e12 # convert from g/cm3 (air) to ug/m3 (air)
+		mass_conc = mass_conc*1.e12 # convert from g/cm^3 (air) to ug/m^3 (air)
 
 	# start counter on number concentration of newly 
-	# nucleated particles (# particles/cm3(air))
+	# nucleated particles (# particles/cm^3 (air))
 	np_sum = 0.
 
 	try: # in case called from autorun, in which a finisher simulation is setup
 		if (self.param_const['sim_type'] == 'finisher'):
-			# particle and wall concentrations (# molecules/cm3)
+			# particle and wall concentrations (# molecules/cm^3)
 			y[num_comp::] = self.param_const['ynow'][num_comp::]
 			N_perbin[:, 0] = self.param_const['Nnow'][:]
 			
@@ -283,13 +304,12 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		N_perbin = self.N_perbin0_prev_sim
 		x = self.x0_prev_sim
 		Varr = self.Varr0_prev_sim
+		# remember the radii (um) and volumes (um^3) at size bin 
+		# centre now
+		rad0 = np.zeros((len(x)))
+		rad0[:] = x[:]
+		Vol0 = np.zeros((len(Varr)))
+		Vol0[:] = Varr[:]
 
-	# prepare matrix to hold dissociation constants of components (columns)
-	# with respect to water over all size bins (rows)
-	self.diss_wrtw = np.zeros((num_asb, num_comp))
-	self.diss_wrtw[:, :] = self.noncore_diss_wrtw
-	self.diss_wrtw[:, self.seedi] = self.core_diss_wrtw
-	self.diss_wrtw[:, H2Oi] = 1. # water with respect to itself
-	
 	return(y, N_perbin, x, Varr, Vbou, rad0, Vol0, rbou, MV, num_sb,
 		 rbou00, upper_bin_rad_amp, np_sum)

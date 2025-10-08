@@ -101,7 +101,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 		# of particle-phase concentrations for all components
 		ymat[:, H2Oi] = y[1::, 0]
 		
-		# total particle-phase concentration per size bin (# molecules/cm3 (air))
+		# total particle-phase concentration per size bin (# molecules/cm^3 (air))
 		csum = ((ymat*self.diss_wrtw).sum(axis=1)).reshape(-1, 1)
 		
 		isb = (csum[:, 0] != 0.) # indices of size bins with contents 

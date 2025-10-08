@@ -67,10 +67,12 @@ def xml_interr(self):
 		self.comp_xmlname[i] = a[i]['@species_name']
 		if (self.comp_xmlname[i] == ''): # nothing to register here
 			continue
-		
+
 		if ("smiles" in a[i]):
 			self.comp_smil[i] = a[i]['smiles']
-		else: # if no SMILE string explicitly given
+
+		# if no SMILE string given
+		if (("smiles" not in a[i]) or (self.comp_smil[i] == '') or (self.comp_smil[i] is None)):
 		
 			succ = 0 # assume no success
 			if (self.comp_xmlname[i] == 'O3'):
@@ -81,6 +83,15 @@ def xml_interr(self):
 				succ = 1
 			if (self.comp_xmlname[i] == 'NO3'):
 				self.comp_smil[i] = '[N+](=O)([O-])[O]'
+				succ = 1
+			if (self.comp_xmlname[i] == 'PROD'):
+				self.comp_smil[i] = 'C'
+				succ = 1
+			if (self.comp_xmlname[i] == 'NA'):
+				self.comp_smil[i] = '[N+](=O)(O)[O-]'
+				succ = 1
+			if (self.comp_xmlname[i] == 'SA'):
+				self.comp_smil[i] = 'OS(=O)(=O)O'
 				succ = 1
 			if (succ == 0):
 				# first try assuming that SMILE string 
@@ -96,4 +107,5 @@ def xml_interr(self):
 					' in the xml file, nor could its ' +
 					'name be interpreted as a SMILE string')
 					break
+
 	return(err_mess_new, self)

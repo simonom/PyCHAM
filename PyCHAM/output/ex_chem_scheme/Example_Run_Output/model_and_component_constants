@@ -1,7 +1,7 @@
 number_of_size_bins,17
 number_of_components,19
 factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194], [25476142822.043194]]
-simulation_computer_time(s),2.8974220752716064
+simulation_computer_time(s),2.8854429721832275
 seed_name,['core']
 wall_on_flag_0forNO_>0forYES,1
 space_mode,log
@@ -10,5 +10,5 @@ index_of_seed_components,[18]
 size_structure_0_for_moving_centre_1_for_full_moving,0
 output_by_sim_sch_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/Example_run_output/inputs/ex_chem_scheme.txt
 output_by_sim_mv_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/output/ex_chem_scheme/Example_run_output/inputs/ex_model_var.txt
-history,Saved at (Greenwhich Meridian Time) time.struct_time(tm_year=2025, tm_mon=9, tm_mday=9, tm_hour=11, tm_min=3, tm_sec=38, tm_wday=1, tm_yday=252, tm_isdst=0)
-source,CHemistry with Aerosol Microphysics in Python (PyCHAM), version 5.6.0
+history,Saved at (Greenwhich Meridian Time) time.struct_time(tm_year=2025, tm_mon=10, tm_mday=8, tm_hour=10, tm_min=6, tm_sec=8, tm_wday=2, tm_yday=281, tm_isdst=0)
+source,CHemistry with Aerosol Microphysics in Python (PyCHAM), version 5.6.1

@@ -117,26 +117,26 @@ def ode_updater(y, H2Oi,
 	# self.seedx - mole ratio of components comprising seed material
 	# self.core_diss - dissociation constant of seed with respect 
 	#	to non-water components
-	# self.core_diss_wrtw - dissociation constant of seed with respect 
-	#	to water
+	# self.diss_wrtw - dissociation constant of all components
+	# 	with respect to water
 	# self.Psat - pure component saturation vapour pressure 
-	# 	(# molecules/cm3 (air))
+	# 	(# molecules/cm^3 (air))
 	# mfp - mean free path (m)
 	# accom_coeff - accommodation coefficient
 	# y_mw - molecular weight (g/mol)
-	# surfT - surface tension (g/s2)
-	# R_gas - ideal gas constant (kg.m2.s-2.K-1.mol-1)
+	# surfT - surface tension (g/s^2)
+	# R_gas - ideal gas constant (kg.m^2.s^-2.K^-1.mol^-1)
 	# NA - Avogadro's constant (molecules/mol)
-	# self.y_dens - component densities (kg/m3)
+	# self.y_dens - component densities (kg/m^3)
 	# x - particle radii (um)
-	# Varr - particle volume (um3)
+	# Varr - particle volume (um^3)
 	# therm_sp - thermal speed (m/s)
 	# act_coeff - activity coefficient
 	# self.Cw - effective absorbing mass of wall (# molecules/cm3 
 	#	(air))
 	# self.kw - gas-wall mass transfer coefficient (/s)
 	# Cfactor - conversion factor for concentrations (ppb/# 
-	#	molecules/cm3)
+	#	molecules/cm^3)
 	# self.tf - transmission factor for natural sunlight
 	# self.light_ad - marker for whether to adapt time interval for 
 	#	changing natural light intensity
@@ -176,7 +176,7 @@ def ode_updater(y, H2Oi,
 	# Vol0 - initial single particle volumes per size bin (um3)
 	# rad0 - initial radius at particle centres (um)
 	# np_sum - number concentration of newly nucleated particles 
-	#		(#/cc (air))
+	#		(#/cm^3 (air))
 	# new_partr - radius of newly nucleated particles (cm)
 	# self.nucv1, v2, v3 - nucleation parameters
 	# nuci - index of nucleating component
@@ -204,7 +204,7 @@ def ode_updater(y, H2Oi,
 	#	instantaneously after experiment start
 	# self.pmode - whether number size distributions expressed as modes
 	# 	or explicitly
-	# self.pconc - concentration of injected particles (#/cm3 (air))
+	# self.pconc - concentration of injected particles (#/cm^3 (air))
 	# self.pconct - times of particle injection (s)
 	# self.mean_rad - mean radius for particle number size 
 	#	distribution (um)
@@ -323,8 +323,15 @@ def ode_updater(y, H2Oi,
 	# counters on updates
 	light_time_cnt = 0 # light time status count
 	gasinj_cnt = 0 # count on injection times of components
+
+	# discern whether particle injection is instantaneous, 
+	# in which case the initial particle numebr concentration
+	# will have been dealt with in pp_intro (and seedt_cnt = 1), 
+	# or whether it is
+	# continuous in which case we need to deal with the initial
+	# continuous injection in cham_up (and seedt_cnt = 0)
 	if (self.pconct[0, 0] == 0. and len(self.pconct[0, :]) > 1 and 
-	self.pcont[0, 0] == 0):
+		self.pcont[0, 0] == 0):
 		# count on injection times of particles
 		seedt_cnt = 1
 		self.seedx_tcnt = 1 
@@ -334,12 +341,7 @@ def ode_updater(y, H2Oi,
 	
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
-	
-	# current status of whether injection of particles instantaneous 
-	# or continuous, if not stated assume instantaneous
-	pcontf = 0
-	if (self.pconct[0, 0] == 0 and self.pcont[0, 0] == 1):
-		pcontf = 1
+
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	infx_cnt0 = 0 # remember count at start of integration step
 	tempt_cnt0 = 0 # remember count at start of integration step
@@ -416,7 +418,7 @@ def ode_updater(y, H2Oi,
 	lowsize, uppsize, x, std, rbou, 
 	infx_cnt, MV, diff_vol, DStar_org, 
 	tempt_cnt, RHt_cnt, nuci, 
-	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	t0, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, wat_hist, self, vol_Comp, volP)
 	
@@ -430,9 +432,10 @@ def ode_updater(y, H2Oi,
 		
 		# remembering variables at the start of the 
 		# integration step -----------------------------------
-		# remember initial concentrations (# molecules/cm3 (air))
+		# remember initial concentrations (# molecules/cm^3 (air))
 		y0[:] = y[:]
-		# remember initial particle number concentration (# particles/cm3)
+	
+		# remember initial particle number concentration (# particles/cm^3)
 		N_perbin0[:] = N_perbin[:]
 		x0[:] = x[:] # remember initial particle sizes (um)
 		temp_now0 = temp_now # remember temperature (K)
@@ -473,7 +476,7 @@ def ode_updater(y, H2Oi,
 			# if integration interval decreased, reset 
 			# concentrations to those at start of interval
 			if (gpp_stab == -1):
-				y[:] = y0[:] # (# molecules/cm3)
+				y[:] = y0[:] # (# molecules/cm^3)
 						
 			# record output if on the first attempt at solving this time interval,
 			# note that recording before calling cham_up means that 
@@ -520,7 +523,7 @@ def ode_updater(y, H2Oi,
 
 					# if particles and/or wall present		
 					if ((num_sb-self.wall_on) > 0 or self.wall_on > 0):
-				
+						
 						# update partitioning variables
 						[kimt, kelv_fac] = partit_var.kimt_calc(y, 
 						mfp, num_sb, num_comp, 
@@ -551,7 +554,7 @@ def ode_updater(y, H2Oi,
 					 
 					# estimate and record any 
 					# change tendencies 
-					# (molecules/cm3/s)
+					# (molecules/cm^3/s)
 					if (self.testf != 5):
 						
 						self = dydt_rec.dydt_rec(y, rrc, dydt_cnt-1, 
@@ -583,7 +586,7 @@ def ode_updater(y, H2Oi,
 			if (sumt+tnew > self.tot_time):
 				tnew = (self.tot_time-sumt)
 				ic_red = 1
-
+			
 			# update chamber variables, note this has to come after
 			# updates to tnew, so that things with influx can
 			# have the correct time integration applied
@@ -591,7 +594,7 @@ def ode_updater(y, H2Oi,
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
 			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 			RHt_cnt, N_perbin, x,
-			pconcn_frac,  pcontf, tot_in_res, 
+			pconcn_frac,  tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
 			light_time_cnt0, 
 			tnew, np_sum, update_count, 
@@ -603,9 +606,10 @@ def ode_updater(y, H2Oi,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
 			y_mw, temp_now0, gpp_stab, t00, x0,
- 			pcontf, Cinfl_now, surfT,
+ 			Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
 			volP, ic_red)
+			
 
 			# ------------------------------------------------------------
 			# if particles and/or wall present		
@@ -659,14 +663,15 @@ def ode_updater(y, H2Oi,
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
 				 and (sum(N_perbin) > 0)):
 
-				# if on the deliquescence curve rather 								# than the 
-				# efflorescence curve in terms of water 							# gas-particle partitioning and therefore
+				# if on the deliquescence curve rather 	than the 
+				# efflorescence curve in terms of water 							
+				# gas-particle partitioning and therefore
 				# water able to gas-particle partition
 				if (wat_hist == 1):
 					# flag that water gas-particle 
 					# partitioning solved separately
 					self.odsw_flag = 1
-		
+					
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, 
 					tnew,
@@ -680,8 +685,9 @@ def ode_updater(y, H2Oi,
 					jac_part_H2O_indx, H2Oi, self)
 					
 					# check on stability of water 
-					# partitioning	
-					if (any(y[H2Oi::num_comp] < 0.)): 
+					# partitioning, allowing some leeway for negative
+					# values	
+					if (any(y[H2Oi::num_comp]/sum(y[H2Oi::num_comp]) <-1.e-10)): 
 
 						# identify components with negative 
 						# concentrations
@@ -710,8 +716,7 @@ def ode_updater(y, H2Oi,
 						if (neg_H2O/sum(
 						np.abs(y[H2Oi::num_comp])) > 0. ):
 							print('negative water occurs at water index: ', np.where(y_H2O<0.))
-							print(y[H2Oi::num_comp])
-							print(N_perbin)
+							
 							gpp_stab = -1 # maintain unstable flag
 							# tell user what's happening
 							yield (str('Note: negative water concentration ' +
@@ -755,7 +760,7 @@ def ode_updater(y, H2Oi,
 					else:
 						gpp_stab = 1 # change to stable flag
 
-				# if on the efflorescence curve rather 								# than the 
+				# if on the efflorescence curve rather than the 
 				# deliquescence curve in terms of water 
 				# gas-particle partitioning and therefore
 				# water unable to gas-particle partition, then don't solve
@@ -786,7 +791,7 @@ def ode_updater(y, H2Oi,
 				const_comp_tindx = sum(self.const_compt<=sumt)-1
 				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
 				self.conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
-
+			
 			# model component concentration changes to 
 			# get new concentrations molecules/cm^3 (air))
 			try:
@@ -910,13 +915,13 @@ def ode_updater(y, H2Oi,
 			# containing particles
 			if (((num_sb-self.wall_on) > 1) and 
 			(any(N_perbin > 1.e-10))):
-
+				
 				if (siz_str == 0): # moving centre
 					(N_perbin, Varr, y, x, redt, t, 
 					bc_red) = mov_cen.mov_cen_main(N_perbin, 
 					Vbou, num_sb, num_comp, y_mw, x, Vol0, tnew, 
 					y0, MV, ic_red, y, res_t, self)
-					
+				
 				if (siz_str == 1): # full-moving
 					(Varr, x, y[num_comp:(num_comp*(
 					num_sb-self.wall_on+1))], 
@@ -957,7 +962,7 @@ def ode_updater(y, H2Oi,
 						Cp, (N_perbin).reshape(1, -1),
 						(Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
-
+					
 					# if particle loss to walls turned on, 
 					# account for this now
 					if ((McMurry_flag > -1) and (self.wall_on > 0)):
@@ -973,20 +978,20 @@ def ode_updater(y, H2Oi,
 							chamR, McMurry_flag, 
 							0, p_char, e_field, 
 							(num_sb-self.wall_on), self)
-
+					
 					# if equilibrium gas-particle partitioning turned on
 					if (self.equi_gtop_partit == 1):
 
 						# note that Cstar is set in cham_up
 
 						# concentrations in gas and particle phase 
-						# (molecules/cm3) of components
+						# (molecules/cm^3) of components
 						Cpg = (y[0:(num_comp)*(
 						num_sb-self.wall_on+1)].reshape(
 						(num_sb-self.wall_on+1), num_comp))
 
 						# total molecular concentration of each
-						# component (gas+particle) (molecules/cm3),
+						# component (gas+particle) (molecules/cm^3),
 						# note that sum is over size bins
 						tmc_comp =  np.sum(Cpg, axis=0).reshape(1, -1)
 						# get total molecular concentration of each 

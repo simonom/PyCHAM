@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2024					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -19,7 +19,10 @@
 # You should have received a copy of the GNU General Public License    #
 # along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                      #
-########################################################################'''script for plotting volatility basis set mass fraction of particle phase with time and tabulating component volatilities and particle-phase concentrations'''
+########################################################################
+# '''script for plotting volatility basis set mass fraction of '''
+# '''particle phase with time and tabulating component volatilities '''
+# '''and particle-phase concentrations'''
 # aids interpretation of gas-particle partitioning results, 
 # assumes calling from the PyCHAM home directory
 
@@ -85,7 +88,9 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 	if (self.phase4vol == 'Particle Phase' or self.phase4vol == 'Particle and Gas Phase Combined'):
 		
 		if ((num_sb-wall_on) == 0 or sum(sum(Ndry))== 0.):
-			self.l203a.setText('Error - volatility basis set for particle phase may only be estimated for simulations where gas-particle partitioning has occurred')
+			self.l203a.setText(str('Error - volatility basis set for particle ' +
+					  'phase may only be estimated for simulations where ' +
+					  'gas-particle partitioning has occurred'))
 			if (self.bd_pl == 1):
 				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
 				self.bd_pl = 2
@@ -154,17 +159,16 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 
 		num_asb = 1
 
-	
-	
-	# total particulate concentrations at each time (ug/m3)
+	# total particulate concentrations at each time (ug/m^3)
 	tpc = pc.sum(axis=1)
 	
 	# standard temperature for pure component saturation vapour pressures (K)
 	TEMP = 298.15
 
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
-	# saturation concentrations in ug/m3
+	# saturation concentrations in ug/m^3
 	# using eq. 1 of O'Meara et al. (2014)
+	# https://doi.org/10.1039/C4CP00857J
 	Psat_Cst = (1.e6*y_mw[0, :])*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
 	# tile over size bins
@@ -214,13 +218,13 @@ def plotter_wiw(caller, dir_path, self, now): # define function
 
 	p0 = ax1.pcolormesh(t_array[ptindx], sc, nmc[:, ptindx], cmap=cm, norm=norm1, shading='auto')
 
-	cax = plt.axes([0.875, 0.40, 0.02, 0.18]) # specify colour bar position
-	cb = plt.colorbar(p0, cax = cax, ticks=[0.00, 0.25, 0.50, 0.75, 1.00], orientation = 'vertical')
+	#cax = plt.axes([0.875, 0.40, 0.02, 0.18]) # specify colour bar position
+	cb = plt.colorbar(p0, ticks=[0.00, 0.25, 0.50, 0.75, 1.00], orientation = 'vertical', pad = 0.05)
 	cb.ax.tick_params(labelsize = 12)
 	cb.set_label('mass fraction', size = 12, rotation = 270, labelpad = 10.)
 
 	ax1.set_xlabel(r'Time through experiment (hours)', fontsize=14)
-	ax1.set_ylabel(r'$\rm{log_{10}(}$$C*_{\mathrm{298.15 K}}$$\rm{\, (\mu g\, m^{-3}))}$', fontsize=14, labelpad = 10.)
+	ax1.set_ylabel(r'$\rm{log_{10}(}$$C*_{\mathrm{298.15\;K}}$$\rm{\, (\mu g\, m^{-3}))}$', fontsize=14, labelpad = 10.)
 	ax1.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 	ax1.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 	# array containing the location of tick labels
@@ -304,8 +308,9 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 	PsatPa = np.array((PsatPa))
 	
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
-	# saturation concentrations in ug/m3
+	# saturation concentrations in ug/m^3
 	# using eq. 1 of O'Meara et al. 2014
+	# https://doi.org/10.1039/C4CP00857J
 	Psat_Cst = (1.e6*y_MW)*(PsatPa/101325.)/(8.2057e-5*TEMP)
 	
 	# get particle concentrations at this time (# molecules/cm3)
@@ -389,12 +394,11 @@ def plotter_2DVBS(caller, dir_path, self, t_thro):
 
 	p0 = ax1.pcolormesh(VP_range, OC_range, mf, cmap=cm, norm=norm1, shading='auto')
 
-	cax = plt.axes([0.875, 0.40, 0.02, 0.18]) # specify colour bar position
-	cb = plt.colorbar(p0, cax = cax, ticks=[0.00, max_mf*0.25, max_mf*0.50, max_mf*0.75, max_mf], orientation = 'vertical')
+	cb = plt.colorbar(p0, ticks=[0.00, max_mf*0.25, max_mf*0.50, max_mf*0.75, max_mf], orientation = 'vertical', pad=0.05)
 	cb.ax.tick_params(labelsize = 12)
 	cb.set_label('mass fraction', size = 12, rotation = 270, labelpad = 10.)
 
-	ax1.set_xlabel(r'$\rm{log_{10}(}$$C*_{\mathrm{298.15 K}}$$\rm{\, (\mu g\, m^{-3}))}$', fontsize=14)
+	ax1.set_xlabel(r'$\rm{log_{10}(}$$C*_{\mathrm{298.15\;K}}$$\rm{\, (\mu g\, m^{-3}))}$', fontsize=14)
 	ax1.set_ylabel(r'O:C ratio', fontsize=14, labelpad = 10.)
 	ax1.set_title(str('Mass fraction of non-water and non-seed components at ' + str(t_thro) + str(' s through experiment')), fontsize=14)
 	
@@ -445,12 +449,32 @@ def plotter_gpc(caller, dir_path, self, t_thro):
 	
 	# prepare plot data --------------------------------------
 	# required outputs from full-moving
-	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
-		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(dir_path, self)
+	# prepare plot data --------------------------------------
+	# required outputs
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	y = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	y[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_MW = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 	
 	# subtract recorded times from requested time and absolute
-	t_diff = np.abs(t_thro-(t_array*3600.))
+	t_diff = np.abs(t_thro-(timehr*3600.))
 	
 	# find closest recorded time to requested time to plot
 	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
@@ -476,13 +500,14 @@ def plotter_gpc(caller, dir_path, self, t_thro):
 	# plot gas-phase concentrations against component names in descending order of volatility
 	ax0.semilogy(np.arange(len(y_gp_ppb)), y_gp_ppb[des_ind], '+')
 
-	ax0.set_ylabel(str('Gas-phase Concentration at ' + str(t_thro) + ' s Through Experiment (ppb)'), fontsize = 14)
-	ax0.set_xlabel(r'Component Name (Pure Component Saturation Vapour Pressure at 298.15 K (Pa))', fontsize = 14)
+	ax0.set_ylabel(str('Gas-phase mixing ratio at \n' + str(t_thro) + ' s through experiment (ppb)'), fontsize = 14)
+	ax0.set_xlabel(r'Component name (pure component saturation vapour pressure at 298.15 K (Pa))', fontsize = 14)
 	# set location of x ticks
 	ax0.set_xticks(np.arange(len(y_gp_ppb)))
 	ax0.set_xticklabels(xticks_str, rotation = 45)
 	ax0.yaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
 	ax0.xaxis.set_tick_params(labelsize = 14, direction = 'in', which = 'both')
+	plt.tight_layout()
 
 	return()
 	
@@ -501,12 +526,30 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	
 	# prepare plot data --------------------------------------
 	# required outputs from full-moving
-	(num_sb, num_comp, Cfac, y, Ndry, rbou_rec, xfm, t_array, rel_SMILES, 
-		y_mw, N, comp_names, y_MV, _, wall_on, space_mode, _, _, _, PsatPa, OC, 
-		H2Oi, seedi, _, _, _, _, _) = retr_out.retr_out(self.dir_path, self)
+	# get required variables from self
+	wall_on = self.ro_obj.wf
+	y = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
+	y[:, :] = self.ro_obj.yrec[:, :]
+	num_comp = self.ro_obj.nc
+	num_sb = self.ro_obj.nsb
+	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
+	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
+	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
+	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
+	timehr = self.ro_obj.thr
+	comp_names = self.ro_obj.names_of_comp
+	rel_SMILES = self.ro_obj.rSMILES
+	y_mw = self.ro_obj.comp_MW
+	H2Oi = self.ro_obj.H2O_ind
+	seedi = self.ro_obj.seed_ind
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec[:, :] = self.ro_obj.rad[:, :]
+	group_indx = self.ro_obj.gi
+	PsatPa = self.ro_obj.vpPa
+	OC = self.ro_obj.O_to_C
 	
 	# subtract recorded times from requested time and absolute
-	t_diff = np.abs(self.t_thro-(t_array*3600.))
+	t_diff = np.abs(self.t_thro-(timehr*3600.))
 	
 	# find closest recorded time to requested time to plot
 	t_indx = (np.where(t_diff == np.min(t_diff)))[0][0]
@@ -525,7 +568,7 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 		# ensure correct size
 		y_mw = np.tile(y_mw, num_sb-wall_on)
 		
-		# convert # molecules/cm3 to ug/m3
+		# convert # molecules/cm^3 to ug/m^3
 		yn = ((yn)/(si.N_A))*y_mw*1.e12
 
 		# sum over size bins
@@ -535,7 +578,8 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	# isolate concentrations for phase to consider
 	if (self.phase4vol == 'Particle Phase Excluding Seed and Water'):
 		import scipy.constants as si
-		yn = y[t_indx, num_comp:(num_sb-wall_on+1)*num_comp] # particle-phase concentrations (# molecules/cm3)
+		# particle-phase concentrations (# molecules/cm^3)
+		yn = y[t_indx, num_comp:(num_sb-wall_on+1)*num_comp]
 	
 		# zero seed
 		for seedin in seedi:
@@ -557,7 +601,7 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	if (self.phase4vol == 'Gas Phase Only C>1, O>0'):
 		import scipy.constants as si
 		yn = y[t_indx, 0:num_comp] # gas-phase concentrations (ppb)
-		# convert ppb to ug/m3
+		# convert ppb to ug/m^3
 		yn = ((yn*Cfac[t_indx])/(si.N_A))*y_mw*1.e12
 	
 		# now extract only components with more than one carbon and containing oxygen
@@ -600,7 +644,7 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 	label = []
 	
 	# convert standard (at 298.15 K) vapour pressures in Pa to 
-	# saturation concentrations in ug/m3 (at 298.15 K)
+	# saturation concentrations in ug/m^3 (at 298.15 K)
 	# using eq. 1 of O'Meara et al. (2014)
 	Psat_Cst = (1.e6*top_mw)*(top_vp/101325.)/(8.2057e-5*298.15)
 
@@ -613,9 +657,12 @@ def plotter_pie_top_n(self): # define function to plot the top n mass contributo
 
 	# plot pie chart with labels and title
 	wedges, labels = ax0.pie(yn, labels = label, normalize=True)
-	plt.setp(labels, fontsize=25)	
+	plt.setp(labels, fontsize=14)	
 
 	# include title
-	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + str(self.t_thro) + ' s through experiment for top ' + str(self.num_pie_comp) + ' components (C*)' ), fontsize=14)
-	
+	ax0.set_title(str('Contribution to mass of ' + self.phase4vol + ' at ' + 
+				   str(self.t_thro) + ' s\nthrough experiment for top ' + 
+				   str(self.num_pie_comp) + ' components (C*)' ), fontsize=14)
+	plt.tight_layout()
+
 	return()

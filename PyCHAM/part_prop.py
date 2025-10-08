@@ -20,7 +20,7 @@
 # along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                      #
 ########################################################################
-'''module to calculate density of particles (kg/m3)'''
+'''module to calculate density of particles (kg/m^3)'''
 
 import numpy as np
 
@@ -29,29 +29,29 @@ def part_prop(y, num_comp, num_asb, NA, y_mw, n0, self):
 	# inputs: ------------------------------------------------------------------
 	
 	# y - concentration of components in particle size bins 
-	#	(# molecules/cm3 (air)), excluding gas and wall
+	#	(# molecules/cm^3 (air)), excluding gas and wall
 	# num_asb - number of actual particle bins (no wall)
-	# n0 - particle concentration per size bin now (# particles/cm3 (air))
+	# n0 - particle concentration per size bin now (# particles/cm^3 (air))
 	# ---------------------------------------------------------------------------
 
-	y_dens = self.y_dens*1.e-3 # convert density from kg/m3 to g/cm3
+	y_dens = self.y_dens*1.e-3 # convert density from kg/m^3 to g/cm^3
 
 	y_asmat = (y.reshape(num_asb, num_comp))
-	y_asmat = y_asmat.transpose() # species in rows and size bins in columns
+	y_asmat = y_asmat.transpose() # components in rows and size bins in columns
 	
-	# convert # molecules/cm3 (air) to # moles/cm3 (air) 
+	# convert # molecules/cm^3 (air) to # moles/cm^3 (air) 
 	# and then multiply by molecular weight  
-	# to get g/cm3 (air) of all components in size bins
+	# to get g/cm^3 (air) of all components in size bins
 	y_mass_array = (y_asmat/NA)*y_mw # mass conc. ind. species
 	
 	mass_fracs = np.zeros((num_comp, num_asb)) # empty matrix for mass fractions
 		
 	ish = np.array((n0[:, 0])) > 0. # size bins with particles
 	
-	# mass fractions of each species including core
+	# mass fractions of each component (rows) (including core) per size bin (columns)
 	mass_fracs[:, ish] = y_mass_array[:, ish]/((np.sum(y_mass_array, 0))[ish])
 
-	# total density of particles per size bin (g/cm3), by calculating the
+	# total density of particles per size bin (g/cm^3), by calculating the
 	# mass-weighted average density
 	tot_rho = np.zeros((num_asb))
 	tot_rho[ish] = ((np.sum(mass_fracs*y_dens, 0))[ish])

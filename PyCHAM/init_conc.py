@@ -116,12 +116,11 @@ def init_conc(num_comp, init_conc,
 	if hasattr(self, 'obs'):
 		if (len(self.comp0) == 0 and sum(self.obs[:, 0] == 0)>0):
 			self.comp0 = (np.array((self.comp_namelist))[self.obs_comp_i]).tolist()
-			# molecules/cm3
+			# molecules/cm^3
 			init_conc = np.squeeze(self.obs[self.obs[:, 0] == 0, 1::])
 			# flag to not use Cfactor on initial concentrations
 			Cfac_flag = 0
-
-	
+			self.comp0_orig = self.comp0 # remember, in case needed in future
 
 	# insert initial concentrations where appropriate
 	for i in range(len(self.comp0)):
@@ -145,7 +144,7 @@ def init_conc(num_comp, init_conc,
 			wall_flag = 0
 
 		if (wall_flag == 0):
-    			# index of where initial components occur in list of components
+    		# index of where initial components occur in list of components
 			# in case components already listed via 
 			# interpretation of the chemical scheme
 			try:
@@ -169,10 +168,10 @@ def init_conc(num_comp, init_conc,
 			
 			# set initial concentration
 			if (Cfac_flag == 1): # gas-phase concentrations
-				# convert from ppb to # molecules/cm3
+				# convert from ppb to # molecules/cm^3
 				y[y_indx] = init_conc[i]*Cfactor
 			if (Cfac_flag == 0):
-				# # molecules/cm3
+				# # molecules/cm^3
 				y[y_indx] = init_conc[i]
 
 			# remember index for plotting gas-phase concentrations later
@@ -201,7 +200,7 @@ def init_conc(num_comp, init_conc,
 					0, 0, erf, err_mess, 0, 0, 0, 0, self)
 
 			# insert surface concentration into surface array 
-			# convert from ppb to # molecules/cm3
+			# convert from ppb to # molecules/cm^3
 			y_w[(num_comp+2)*wall_number+y_indx] = init_conc[i]*Cfactor
 			y_indx_plot.append(y_indx) # remember for plotting
 		
@@ -251,7 +250,7 @@ def init_conc(num_comp, init_conc,
 	# --------------------------------------------------------------
 	# account for water's properties
 	
-	# get initial gas-phase concentration (# molecules/cm3 (air)) 
+	# get initial gas-phase concentration (# molecules/cm^3 (air)) 
 	# and vapour pressure
 	# of water (log10(atm))
 	[C_H2O, H2O_mw, self] = water_calc(self.TEMP[0], self.RH[0], si.N_A, self)
@@ -265,9 +264,9 @@ def init_conc(num_comp, init_conc,
 			y = np.append(y, np.zeros((2)))
 			y[self.H2Oi] = self.y[self.H2Oi]
 			y[self.seedi] = self.y[self.seedi]
-
+	
 	# if not skipping parsing and property estimation
-	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3):
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3  or self.pars_skip == 4):
 		# holder for water index (will be used if not identified in chemical scheme)
 		H2Oi = num_comp # index for water
 		self.H2Oi = H2Oi # index for water
@@ -293,7 +292,7 @@ def init_conc(num_comp, init_conc,
 				H2Oi = indx
 				self.H2Oi = H2Oi # index for water
 				# include initial concentration of water
-				# (# molecules/cm3)
+				# (# molecules/cm^3)
 				y[H2Oi] = C_H2O
 				
 				# include molar weight of water (g/mol)
@@ -343,7 +342,7 @@ def init_conc(num_comp, init_conc,
 	# seed components
 
 	# if this information already gained in previous run then skip
-	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3): 
+	if (self.pars_skip == 0 or self.pars_skip == 2 or self.pars_skip == 3 or self.pars_skip == 4): 
 
 		# empty array for index of core component
 		self.seedi = (np.zeros((len(self.seed_name)))).astype(int)
@@ -369,7 +368,7 @@ def init_conc(num_comp, init_conc,
 			# add to SMILES list
 			self.rel_SMILES.append('[NH4+].[NH4+].[O-]S(=O)(=O)[O-]')
 
-		# append core gas-phase concentration (molecules/cm3 (air)) and molar 
+		# append core gas-phase concentration (molecules/cm^3 (air)) and molar 
 		# mass (g/mol) (needs to have a 1 length in second dimension for the kimt 
 		# calculations)
 		y = np.append(y, 0.)

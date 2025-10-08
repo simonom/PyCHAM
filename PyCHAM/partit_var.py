@@ -59,7 +59,7 @@ def kimt_calc(y, mfp, num_sb, num_comp, accom_coeff, y_mw, surfT,
 	# self.partit_cutoff - the product of self.Psat and act_coeff above
 	#	 which gas-particle partitioning assumed zero (Pa)
 	# DStar_org - gas-phase diffusion coefficients of components 
-	#	(cm2/s)
+	#	(cm^2/s)
 	# z_prt_coeff - fraction of total gas-particle partitioning 
 	#	coefficient 
 	#	below which partitioning to a particle size bin is 

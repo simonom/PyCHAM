@@ -1,7 +1,8 @@
-########################################################################							
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -42,7 +43,7 @@ def rec_prep(nrec_step, y, y0,
 	lowsize, uppsize, radn, std, rbou, 
 	infx_cnt, MV, diff_vol, 
 	DStar_org, tempt_cnt, RHt_cnt, 
-	nuci, t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	nuci, t0, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, wat_hist, self, vol_Comp, volP):
 	
@@ -151,8 +152,6 @@ def rec_prep(nrec_step, y, y0,
 	# t0 - initial integration step (s)
 	# self.pcont - flag for whether particle injection instantaneous or 
 	#	continuous
-	# pcontf - current status of particle injection (instantaneous 
-	#	or continuous)
 	# NOi - index of NO
 	# HO2i - index of HO2
 	# NO3i - index of NO3
@@ -192,7 +191,7 @@ def rec_prep(nrec_step, y, y0,
 	[temp_now, light_time_cnt, tnew, ic_red, 
 		update_count, Cinfl_now, seedt_cnt, Cfactor, infx_cnt, 
 		gasinj_cnt, DStar_org, y, tempt_cnt, RHt_cnt, 
-		N_perbin, x, pconcn_frac,  pcontf, tot_in_res, 
+		N_perbin, x, pconcn_frac, tot_in_res, 
 		self] = cham_up.cham_up(sumt, 
 		light_time_cnt, 0, 
 		np_sum, update_count, 
@@ -202,7 +201,7 @@ def rec_prep(nrec_step, y, y0,
 		lowsize, uppsize, num_sb, MV, radn, std, H2Oi, 
 		rbou, infx_cnt, Cfactor, diff_vol, 
 		DStar_org, tempt_cnt, RHt_cnt, nuci,
-		y_mw, self.TEMP[0], 0, t0, x,  pcontf, 0., 
+		y_mw, self.TEMP[0], 0, t0, x, 0., 
 		surfT, act_coeff, tot_in_res, Compti, self, vol_Comp, 
 		volP, 0)
 	

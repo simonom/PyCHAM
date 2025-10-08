@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2025                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -141,7 +141,7 @@ def cont_infl_open(self):
 					self.seedx = np.zeros((0, 0, nt))
 
 					# initiate array for holding particle number
-					# concentrations (particles/cm3)
+					# concentrations (particles/cm^3)
 					self.pconc = np.zeros((0, nt))
 
 					# initiate array for holding particle mean

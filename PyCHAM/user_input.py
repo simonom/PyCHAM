@@ -172,6 +172,9 @@ def share(self):
 		self.dil_fac_orig = self.dil_fac
 		self.tf_UVC_orig = self.tf_UVC
 		self.num_asb = num_sb
+		self.wall_on_orig = self.wall_on
+		if hasattr(self, 'obs'):
+			self.obs_orig = self.obs
 
 	return(y0, siz_stru, num_sb, lowsize, uppsize, 
 		std, Compt, injectt, Ct,
