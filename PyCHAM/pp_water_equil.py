@@ -300,8 +300,8 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			# self.Psat has particle size bins and walls in rows
 			xwat = np.zeros((num_asb))
 			xwat[seedx_nzeros_indx] = (H2Ogc/(
-				self.Psat[0:num_asb, self.H2Oi]*kelv[seedx_nzeros_indx]*
-				act_coeff[0:num_asb, self.H2Oi][[seedx_nzeros_indx]]))
+				self.Psat[0:num_asb, self.H2Oi][seedx_nzeros_indx]*kelv[seedx_nzeros_indx]*
+				act_coeff[0:num_asb, self.H2Oi][seedx_nzeros_indx]))
 				
 			# total molecular concentration of dry (no water) seed 
 			# components 
