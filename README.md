@@ -179,7 +179,7 @@ Beneath this, every component included in the reactions of the chemical scheme m
 
 Here the first line states that the species definition is beginning and gives a unique code, s6058 in this case, and its chemical scheme name, in this case O2.  The second line provides the SMILES string, in this case O=O.  The third line states that the definition is finished.  For information on SMILES please see: [SMILES website](https://daylight.com/smiles/index.html).
 
-For Master Chemical Mechanism chemical schemes the associated xml file can be acquired from the MCM website.
+For v3.3.1 of the Master Chemical Mechanism chemical schemes, the associated xml file is stored in PyCHAM/prop_store/mcm_v3p3p1_all_species.xml.
 
 
 ## Model Variables .txt file
