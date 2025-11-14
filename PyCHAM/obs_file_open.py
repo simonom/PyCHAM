@@ -309,7 +309,7 @@ def obs_file_open(self):
 				for sbi in range(uni_sb):
 					self.seedx[:, sbi, -1] = np.array((i))[
 					0:col_num+1][pm_col[sbi, :]]
-			# PM number concentration at this time (# particles/cm3)
+			# PM number concentration at this time (# particles/cm^3)
 			if (pconc_flag == 1):
 				self.pconc[:, -1] = np.array((i))[0:col_num+1][pconc_col]
 				self.pconct[0, -1] = np.array((i))[0]

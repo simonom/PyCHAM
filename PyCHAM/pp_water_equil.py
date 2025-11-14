@@ -28,7 +28,7 @@ import numpy as np
 import scipy.constants as si
 
 def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas, 
-		TEMP, surfT, act_coeff, Vperbin, x, num_comp, self):
+		TEMP, surfT, act_coeff, Vperbin, x, num_comp, MV, self):
 	
 	# inputs: ---------------------------------------------------------
 	# H2Ogc - concentration of water in gas-phase (molecules/cm^3)
@@ -47,6 +47,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 	#	(um^3/cm^3 (air))
 	# x - particle radii (um)
 	# num_comp - number of components
+	# MV - molar volume (cm^3/mol)
 	# self - parent PyCHAM object
 	# -----------------------------------------------------------------
 	
@@ -59,8 +60,9 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# check whether the stated initial number size 
 		# distribution included the 
 		# volume of water
-		# if number size distribution DOES include volume of 
-		# water
+		
+		# start with when number size distribution DOES 
+		# include volume of  water
 		if (self.Vwat_inc > 0):
 			
 			# hold seed indices in new array
@@ -116,16 +118,18 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 
 			# average molar mass of seed in each size
 			# bin (g/mol)
-			avMM1 = np.sum(y_mm[seedi_here]*seedx_now)
+			avMM1 = np.zeros((num_asb))
+			avMM1[:] = np.sum(y_mm[seedi_here]*seedx_now)
 
-			avMM = avMM1 # for calculating Kelvin factor
-	
+			av_MM = np.zeros((num_asb))
+			av_MM[:] = avMM1[:] # for calculating Kelvin factor
+			
 			# maximum difference when comparing across
 			# iterations
-			while (np.max((avMM1-avMM0)/avMM1) > 0.1):
+			while (np.max((avMM1[:]-avMM0[:])/avMM1[:]) > 0.1):
 				
 				# average density of seed components 
-				# and water (g/cm3)
+				# and water (g/cm^3)
 				av_dens = np.sum(seedx_now*dens_seed, axis=0)
 
 				# calculate Kelvin effect factor for the 
@@ -139,7 +143,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				# 1e7 for units g cm2/s2.mol.K, 
 				# TEMP is K, x (radius) is multiplied by 
 				# 1e-4 to give cm from um and
-				kelv = (np.exp((2.e0*avMM*surfT)/
+				kelv = (np.exp((2.e0*av_MM[:]*surfT)/
 					(R_gas*1.e7*TEMP*(x*1.e-4)*av_dens)))
 				
 				# equilibrium mole fraction of water per 
@@ -158,19 +162,11 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				seedxn = np.zeros((seedx_now.shape[0], seedx_now.shape[1]))
 				seedxn[seedi_w, :] = xwat
 				seedxn[seedi_nw, :] = seedx_now[seedi_nw, :]*(1.-xwat)
-				
-				# average molar mass of seed particles
-				# including water (g/mol) per size bin
-				av_MM = np.sum(seedxn*y_mm[seedi_here], axis=0)
-
-				# average liquid-phase density of seed particles
-				# including water (g/cm3) per size bin
-				av_dens = np.sum(seedxn*dens_seed, axis=0)
 
 				# molar volume averaged over seed 
 				# components (including water) (cm^3/mol) 
 				# per size bin
-				avMV = av_MM/av_dens
+				avMV = np.sum(seedx_now*MV[seedi_here], axis=0)	
 
 				# total molecular concentration of seed 
 				# components including water 
@@ -186,7 +182,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				# loop through indices of seed 
 				# components
 				for ci in seedi_here: 
-					# concentration per size bins (# molecules/cm3)
+					# concentration per size bins (# molecules/cm^3)
 					yn[ci:
 					(num_comp*(num_asb-1)+ci)+1:
 					num_comp] = tmc*(seedxn[seed_cnt, :])
@@ -198,10 +194,10 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 				# average molar mass of seed in 
 				# each size bin (g/mol)
 				if (lcnt % 2 != 0): # if on even count
-					avMM0 = av_MM
+					avMM0[:] = av_MM[:]
 						
 				else: # if on odd count
-					avMM1 = av_MM
+					avMM1[:] = av_MM[:]
 				
 				lcnt += 1 # loop count
 		
@@ -260,22 +256,20 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			# * by 1.e-3 to convert from kg/m^3
 			# to g/cm3
 			dens_seed = self.y_dens[seedi_here, 0].reshape(-1, 1)*1.e-3
-	
+
 			# average molar mass of 
 			# dry (no water) seed components 
 			# (cm^3/mol) per size bins
 			av_MM = np.sum(seedx_now*seed_mm, axis=0)
 
-			# average liquid-phase density of seed particles
+			# average particle-phase density of seed particles
 			# including water (g/cm^3) per size bin
 			av_dens = np.sum(seedx_now*dens_seed, axis=0)
 
 			# molar volume averaged over seed 
 			# components (including water) (cm^3/mol) 
 			# per size bin
-			avMV = np.zeros((num_asb))
-			avMV[seedx_nzeros_indx] = (av_MM[seedx_nzeros_indx]/
-				av_dens[seedx_nzeros_indx])			
+			avMV = np.sum(seedx_now*MV[seedi_here], axis=0)			
 
 			# calculate Kelvin effect factor 
 			# for the provided number size 
@@ -316,7 +310,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			# get the mole-fraction weighted dissociation
 			# constant with respect to water of non-water
 			# particle-phase components
-			av_diss_cons_wrtw = np.sum(seedx_now*np.transpose(self.diss_wrtw[:, self.seedi]), axis = 0)
+			av_diss_cons_wrtw = np.sum(seedx_now*np.transpose(self.diss_wrtw[:, seedi_here]), axis = 0)
 
 			# the molecular concentration of water per size bin
 			# (molecules/cm^3), note that (xwat/(1.-wat)) gives 
@@ -343,7 +337,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 					yn[ci:
 					(num_comp*(num_asb-1)+ci)+1:
 					num_comp] = tmc*(seedx_now[seed_cnt, :])
-
+					
 				else: # if water
 					
 					# concentration per size bins (# molecules/cm^3)
@@ -405,9 +399,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 		# molar volume averaged over seed 
 		# components (including water) (cm^3/mol) 
 		# per size bin (columns)
-		avMV = np.zeros((num_asb))
-		avMV[seedx_nzeros_indx] = (av_MM[seedx_nzeros_indx]/
-			av_dens[seedx_nzeros_indx])
+		avMV = np.sum(seedx_now*MV[seedi_here], axis=0)	
 
 		# total molecular concentration of seed 
 		# components 

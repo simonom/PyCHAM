@@ -57,21 +57,22 @@ def ac_up(y, H2Oi, RH0, TEMP, wat_hist, act_coeff, num_comp, num_asb):
 		
 	# relative humidity now
 	# (rearranged equation from water_calc module)
-	# R has units cc.Pa/K.mol
+	# R has units cm^3.Pa/K.mol
 	RHn = y[H2Oi]*(8.3144598e6*TEMP)/(Psat_watern*si.N_A)
 	
 	if (RHn != RH0):
 	
 		importlib.reload(hyst_eq) # import most recent version
-	
+		
 		# if history of relative humidity is below the deliquescence RH
 		if (wat_hist == 0):
 			# deliquescence relative humidity at this temperature
 			DRH = hyst_eq.drh(TEMP)
+			
 			if (RHn >= DRH):
 				act_coeff[:, H2Oi] = 1.
 				wat_hist = 1
-		# if history of relative humidity is above the  the deliquescence RH
+		# if history of relative humidity is above the deliquescence RH
 		if (wat_hist == 1):
 			# efflorescence relative humidity at this temperature
 			ERH = hyst_eq.erh(TEMP)

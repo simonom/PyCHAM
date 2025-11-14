@@ -225,7 +225,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 	# convert from kg/m^3 to g/cm^3 and give
 	# MV in units cm^3/mol)
 	MV = (y_mw/(self.y_dens*1.e-3)).reshape(num_comp, 1)
-
+	
 	# number of size bins, excluding wall
 	num_aasb = num_sb-self.wall_on
 
@@ -256,7 +256,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		yn = np.zeros((num_comp*(num_aasb)))
 		
 		yn = pp_water_equil(y[self.H2Oi], yn, seedx_now, num_aasb, y_mw, 
-			R_gas, TEMP, surfT, act_coeff, Vperbin, x, num_comp, self)
+			R_gas, TEMP, surfT, act_coeff, Vperbin, x, num_comp, MV, self)
 		
 		# include particle-phase concentations in y 
 		# (molecules/cm^3)

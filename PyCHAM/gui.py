@@ -53,7 +53,7 @@ class PyCHAM(QWidget):
 		super().__init__()
 
 		self.param_const = param_const
-
+		
 		# get path to PyCHAM folder
 		self.PyCHAM_path = os.path.dirname(__file__)[0:-7]	
 		
@@ -1445,8 +1445,8 @@ class PyCHAM(QWidget):
 		# button to plot cumulative particle-phase mass 
 		# concentration by different sizes of particle
 		self.b303 = QPushButton(str('Cumulative particle mass' + 
-							  '\nconcentration without water'))
-		self.b303.setToolTip('See the time series of particle mass grouped by upper diameter limits (mass and particle size excludes water)')
+							  '\nconcentration w/ and w/o water'))
+		self.b303.setToolTip('See the time series of particle mass grouped by upper diameter limits')
 		self.b303.clicked.connect(self.on_click303)
 		self.b303.setStyleSheet('background-color : white; border-width : 1px; border-radius : 7px; border-color: silver; padding: 2px; border-style : solid')
 		self.PARlayout.addWidget(self.b303, 1, 0, 1, 1)

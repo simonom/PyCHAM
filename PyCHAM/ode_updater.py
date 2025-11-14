@@ -358,9 +358,9 @@ def ode_updater(y, H2Oi,
 		
 	# count on time since update to integration initial values/constants last called (s)
 	update_count = 0.
-	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm3 (air))
+	y0 = np.zeros((len(y))) # remember initial concentrations (molecules/cm^3 (air))
 	y0[:] = y[:]
-	# remember initial particle number concentrations (# particles/cm3)
+	# remember initial particle number concentrations (# particles/cm^3)
 	N_perbin0 = np.zeros((N_perbin.shape[0], N_perbin.shape[1]))
 	N_perbin0[:, :] = N_perbin[:, :]
 	x0 = np.zeros((len(x)))# remember initial particle sizes (um)
@@ -576,7 +576,7 @@ def ode_updater(y, H2Oi,
 				self.update_stp = tnew
 				update_count = 0.
 				ic_red = 1
-				
+
 			# ensure update to operator-split processes interval not surpassed
 			if (update_count+tnew > self.update_stp):
 				tnew = (self.update_stp-update_count)
@@ -795,6 +795,7 @@ def ode_updater(y, H2Oi,
 			# model component concentration changes to 
 			# get new concentrations molecules/cm^3 (air))
 			try:
+				
 				[y, res_t] = ode_solv.ode_solv(y, tnew, rrc,
 				Cinfl_now, rowvalsn, colptrsn, num_comp, 
 				num_sb, act_coeff,
@@ -803,8 +804,9 @@ def ode_updater(y, H2Oi,
 				jac_mod_len, jac_part_hmf_indx, rw_indx, 
 				N_perbin, 
 				jac_part_H2O_indx, H2Oi, self)
-			
+				
 			except:
+				import ipdb; ipdb.set_trace()
 				yield(str('Error: the call to ode_solv.ode_solv in ode_updater.py has been unsuccessful. ode_solv.ode_solv may have reported an error message at the command line. This issue has been observed when values for continuous influx of components are unrealistic or when the time period to integrate over is zero. The time period to integrate over when this message was generated is ' + str(tnew) + ' s, if this is zero or less s, please report the issue on the PyCHAM GitHub page. Otherwise, please check that continuous influx values are reasonable, and if this does not solve the problem, please report an issue on the PyCHAM GitHub page.'))
 			
 			# if negative, suggests ODE solver instability, 
@@ -930,7 +932,7 @@ def ode_updater(y, H2Oi,
  					num_comp, y[num_comp:(num_comp)*(
 					num_sb-self.wall_on+1)], MV*1.e12, 
 					Vol0, Vbou, rbou)
-
+		
 			# time since operator-split processes 
 			# last called (s)
 			update_count += tnew
@@ -963,7 +965,7 @@ def ode_updater(y, H2Oi,
 						(Varr*1.e-18).reshape(1, -1),
 						coag_on, siz_str, self)
 					
-					# if particle loss to walls turned on, 
+					# if particle loss to non-particle surfaces turned on, 
 					# account for this now
 					if ((McMurry_flag > -1) and (self.wall_on > 0)):
 						[N_perbin, y[num_comp:(num_comp)*(

@@ -216,9 +216,8 @@ def ode_solv(y, integ_step, Cinfl_now,
 	
 	# force all components in size bins with no particle to zero
 	y_w = np.squeeze(sol.y)
-	
 	y_w = y_w.reshape(num_asb+1, 1)
-	
+
 	if (num_asb > 0):
 		y_w[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
 	# return to array

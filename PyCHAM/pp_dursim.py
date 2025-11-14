@@ -72,7 +72,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	# contains equilibrated water
 	# pcontf - flag for whether injection of particles is continuous 	
 	#	or instantaneous
-	# H2Ogc - gas-phase concentration of water (# molecules/cm3)
+	# H2Ogc - gas-phase concentration of water (# molecules/cm^3)
 	# x - particle radius per size bin (um)
 	# self - reference to PyCHAM object
 	# ------------------------------------------
@@ -137,11 +137,14 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		# if instantaneous injection of particles
 		if (pcontf == 0):
 
+			print('l140 pp_dursim')
+			print(pconc)
+			print(N_perbin0[:, :])
 			# if this is the new overall particle number 
 			# concentration, e.g. from an observation 
 			# file, as interpretted by obs_file_open
 			if (self.pp_dil == 0):
-				# (# particles/cm3 (air))
+				# (# particles/cm^3 (air))
 				N_perbin[:, :] = (np.array((
 				pconc)).reshape(-1, 1))
 			# if this new particle represents
@@ -151,6 +154,8 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 				# (# particles/cm^3 (air))
 				N_perbin[:, :] = (N_perbin0[:, :] + 
 				np.array((pconc)).reshape(-1, 1))
+			print(self.pp_dil)
+			print(N_perbin[:, :])
 
 		# if this new particle number represents
 		# injection of new particle in addition to
@@ -251,7 +256,7 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	# new particles
 	yn = pp_water_equil(H2Ogc, yn, seedx_now, num_sb, y_mm, 
 		R_gas, TEMP, surfT, act_coeff, Vperbin, radn, 
-		num_comp, self)
+		num_comp, MV, self)
 	
 	# if instantaneous injection of particles
 	# factor concentrations of components comprising 
@@ -282,13 +287,13 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 	# prepare to get new mean radius of particles per size bin (um)
 	for i in range(num_sb): # size bin loop
 		Vtot[i] = np.sum(y[num_comp*i:num_comp*(i+1)]/NA*(MV[:, 0]*1.e12))
-		# new volume concentration of single particles (um3/cm3 (air))
+		# new volume concentration of single particles (um^3/cm^3 (air))
 		if (N_perbin[i, 0] > 0.):
 			Varr[i] = Vtot[i]/N_perbin[i, 0]
 		else:
 			Varr[i] = (4./3.*np.pi)*x[i]**3.
-		# multiply y_dens by 1e-9 to get ug/um3 (particle) from kg/m3, 
-		# then multiplying ug/um3 (particle) by um3/cm3 (air) gives ug/cm3 (air)
+		# multiply y_dens by 1e-9 to get ug/um^3 (particle) from kg/m^3, 
+		# then multiplying ug/um^3 (particle) by um3/cm^3 (air) gives ug/cm^3 (air)
 		mass_conc += np.sum((self.y_dens[self.seedi, 0]*1.e-9)*Vtot[i])
 	
 	# new radius of single particles (um)

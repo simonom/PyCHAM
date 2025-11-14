@@ -285,7 +285,7 @@ def ode_updater_su(y, H2Oi,
 	# numpy array version of chemical scheme names
 	self.comp_namelist_np = np.array(self.comp_namelist)	
 
-	[step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, pcontf, infx_cnt, infx_cnt0, 
+	[step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, infx_cnt, infx_cnt0, 
 		RHt_cnt, RHt_cnt0, conPin_cnt, conPin_cnt0, update_count, y0, N_perbin0, x0, 
 		t0, ic_red, tnew, 
 		pconcn_frac, self.pcont_ongoing, RO2_pool0, tempt_cnt, RHt_cnt, 
@@ -351,9 +351,10 @@ def ode_updater_su(y, H2Oi,
 	lowsize, uppsize, x, std, rbou, 
 	infx_cnt, MV, diff_vol, DStar_org, 
 	tempt_cnt, RHt_cnt, nuci, 
-	t0, pcontf, NOi, HO2i, NO3i, z_prt_coeff,
+	t0, NOi, HO2i, NO3i, z_prt_coeff,
 	tot_in_res, Compti, 
 	tot_in_res_indx, wat_hist, self, vol_Comp, volP)
+
 
 	while (RO2_pool_diff) >= (1.e1):
 		print('Time through spin-up (s): ', sumt)	
@@ -430,7 +431,7 @@ def ode_updater_su(y, H2Oi,
 			update_count, Cinfl_now, seedt_cnt, Cfactor, 
 			infx_cnt, gasinj_cnt, DStar_org, y, tempt_cnt, 
 			RHt_cnt, N_perbin, x,
-			pconcn_frac,  pcontf, tot_in_res, 
+			pconcn_frac, tot_in_res, 
 			self] = cham_up.cham_up(sumt, 
 			light_time_cnt0, 
 			tnew, np_sum, update_count, 
@@ -442,7 +443,7 @@ def ode_updater_su(y, H2Oi,
 			infx_cnt0, Cfactor, diff_vol, 
 			DStar_org, tempt_cnt0, RHt_cnt0, nuci,
 			y_mw, temp_now0, gpp_stab, t00, x0,  
-			pcontf, Cinfl_now, surfT,
+			Cinfl_now, surfT,
 			act_coeff, tot_in_res, Compti, self, vol_Comp, 
 			volP, ic_red)
 
@@ -495,7 +496,6 @@ def ode_updater_su(y, H2Oi,
 					# flag that water gas-particle 
 					# partitioning solved separately
 					self.odsw_flag = 1
-					print(sumt)
 			
 					# call on ode solver for water
 					[y, res_t] = ode_solv_wat.ode_solv(y, tnew,
@@ -750,7 +750,7 @@ def ode_updater_su(y, H2Oi,
 			RO2_pool_diff = ((RO2_pool1-RO2_pool0)/(RO2_pool1))*1.e2
 			
 			# reset counts, including time through simulation (s)
-			[step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, pcontf, infx_cnt, 
+			[step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, infx_cnt, 
 			infx_cnt0, RHt_cnt, RHt_cnt0, conPin_cnt, conPin_cnt0, update_count, y0, 
 			N_perbin0, x0, 
 			t0, ic_red, tnew, pconcn_frac, self.pcont_ongoing, 
@@ -778,11 +778,6 @@ def count_zero(y, N_perbin, self, x, num_comp): # for setting counts to zero
 	# current status of lights
 	self.light_stat_now = self.light_stat[light_time_cnt]
 	
-	# current status of whether injection of particles instantaneous 
-	# or continuous, if not stated assume instantaneous
-	pcontf = 0
-	if (self.pconct[0, 0] == 0 and self.pcont[0, 0] == 1):
-		pcontf = 1
 	infx_cnt = 0 # count on constant gas-phase influx occurrences
 	infx_cnt0 = 0 # remember count at start of integration step
 	tempt_cnt0 = 0 # remember count at start of integration step
@@ -817,7 +812,7 @@ def count_zero(y, N_perbin, self, x, num_comp): # for setting counts to zero
 	# remember first abundance of RO2 pool
 	RO2_pool0 = sum(y[0:num_comp][self.RO2_indices[:, 1]])
 
-	return(step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, pcontf, infx_cnt,
+	return(step_no, sumt, light_time_cnt, gasinj_cnt, seedt_cnt, infx_cnt,
 		infx_cnt0, RHt_cnt, RHt_cnt0, conPin_cnt, conPin_cnt0, update_count, y0, 
 		N_perbin0, x0, t0, ic_red, tnew,
 		pconcn_frac, self.pcont_ongoing, RO2_pool0, tempt_cnt, RHt_cnt, conPin_cnt)

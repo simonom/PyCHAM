@@ -166,7 +166,8 @@ def wallloss(Pn, Cn, Gi, eta_ai, Dp, MW, Varr, sbn, nc, TEMP, t,
 	
 	if ((Beta < 0).sum() > 0):
 		Beta[Beta<0] = 0.
-		print('Warning Beta in walloss.py estimated below 0, which is not possible, so value forced to 0.0')
+		print(str('Warning Beta in walloss.py estimated below 0, ' +
+			'which is not possible, so value forced to 0.0'))
 	
 	if (testf == 1): # if in test mode
 		return(Beta)

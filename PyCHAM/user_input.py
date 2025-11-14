@@ -53,7 +53,7 @@ def share(self):
 	# get the version number of PyCHAM
 	# directory containing setup.py file, remembering to 
 	# remove the final PyCHAM directory
-	su_dir = os.path.join(dir_path, 'setup.py')
+	su_dir = os.path.join(self.PyCHAM_path, 'setup.py')
 	# open setup file
 	su_file = open(su_dir, mode='r')
 	# read the file and store lines into a list

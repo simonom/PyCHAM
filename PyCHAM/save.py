@@ -441,10 +441,10 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		np.savetxt(os.path.join(self.output_by_sim, 'concentrations_all_components_all_times_on_wall_due_to_particle_deposition_to_wall'), self.yrec_p2w, delimiter=',', header=str('concentration of components on wall due to particle deposition to wall (# molecules/cm3 (air)) time changes with rows which correspond to the time output file, components in columns and size bin changing with columns with size bin numbers given in the second row of the header\n'+ x2_header)) 
 	
 		np.savetxt(os.path.join(self.output_by_sim, 'particle_number_concentration_dry'), Nresult_dry, delimiter=',',
-				header=('particle number concentration assuming water removed from particles (#/cm3 (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
+				header=('particle number concentration assuming water removed from particles (#/cm^3 (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))
 		
 		np.savetxt(os.path.join(self.output_by_sim, 'particle_number_concentration_wet'), Nresult_wet, delimiter=',',
-				header=('particle number concentration assuming water not removed from particles (#/cc (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))	
+				header=('particle number concentration assuming water not removed from particles (#/cm^3 (air)), with time changing with rows (corresponding times given in the time output file) and size bin changing with columns with size bin numbers given in the second row of the header\n'+x2_header))	
 	
 		np.savetxt(os.path.join(self.output_by_sim, 'size_bin_radius'), x2, delimiter=',',
 				header= str('particle radii (um) per size_bin (including water contribution to size), with size bins represented by columns and their number (starting from 1) given in second line of header, per time step which is represented by rows and corresponding times given in the time output file \n'+x2_header))

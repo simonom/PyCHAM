@@ -46,8 +46,6 @@ def cont_infl_open(self):
 		sb_nam_pconc = []
 		# size bin names for mean_rad
 		sb_nam_mean_rad = []
-		# prepare to hold seed component names
-		self.seed_name = []
 
 		
 		try: # try to open the file at the user-supplied path
@@ -87,6 +85,9 @@ def cont_infl_open(self):
 			# continuous influxes
 			value = ''
 
+			# flag for whether particle-phase described in file
+			pphase_flag = 0
+
 			# names of gas-phase components with
 			# continuous influx
 			self.con_infl_nam = np.empty((0))	
@@ -107,14 +108,17 @@ def cont_infl_open(self):
 						self.abun_unit and 
 						'cm' not in 
 						self.abun_unit):
-							self.err_mess = str('Error: units of continuous influx in first column of first row of the file for continuous influx of components could not be found, acceptable units are ppb or molec/cm3/s; file path attempted was: ' + self.const_infl_path)
+							self.err_mess = (str('Error: units of continuous influx in first ' +
+						   'column of first row of the file for continuous influx of ' +
+						   'components could not be found, acceptable units are ppb or ' +
+						   'molec/cm^3/s; file path attempted was: ' + self.const_infl_path))
 							
 							return(self)
 
 					clim = 0 # count on columns
 					for ic in i[0::]:	
 						if ic is None:
-							# stop looping 														# through 
+							# stop looping through 
 							# columns
 							break
 						# count on columns	
@@ -132,21 +136,6 @@ def cont_infl_open(self):
 					self.con_infl_C = np.empty((0, clim-1)).astype('float')
 					# number of times
 					nt = len(self.con_infl_t)
-					# remember times for particle influx
-					self.pconct = np.array((self.con_infl_t)).reshape(1, -1)
-	
-					# prepare to hold seed mole fractions per 
-					# component (rows), per size bin 
-					# (columns), per time (3rd dimension)
-					self.seedx = np.zeros((0, 0, nt))
-
-					# initiate array for holding particle number
-					# concentrations (particles/cm^3)
-					self.pconc = np.zeros((0, nt))
-
-					# initiate array for holding particle mean
-					# radius (um)
-					self.mean_rad = np.zeros((0, nt))
 
 					continue # onto next row			
 
@@ -161,6 +150,32 @@ def cont_infl_open(self):
 					# matter component
 					if 'PM' in i[0] or 'pm' in i[0] or 'sb' in i[0]:
 						oc = i[0]
+
+						# if particle-phase variables not yet initiated
+						if (pphase_flag == 0):
+
+							# prepare to hold seed component names
+							self.seed_name = []
+
+							# remember times for particle influx
+							self.pconct = np.array((self.con_infl_t)).reshape(1, -1)
+	
+							# prepare to hold seed mole fractions per 
+							# component (rows), per size bin 
+							# (columns), per time (3rd dimension)
+							self.seedx = np.zeros((0, 0, nt))
+
+							# initiate array for holding particle number
+							# concentrations (particles/cm^3)
+							self.pconc = np.zeros((0, nt))
+
+							# initiate array for holding particle mean
+							# radius (um)
+							self.mean_rad = np.zeros((0, nt))
+
+							# flag for whether particle-phase described in file
+							pphase_flag = 1
+
 						if ('seedx' in oc):
 							# index where size bin 
 							# name starts
@@ -234,16 +249,20 @@ def cont_infl_open(self):
 	else:
 		self.con_infl_nam = 'not in a file'
 
-	# whether particle number concentrations expressed 
-	# by modes (0) or explicitly per size bin (1)
-	if (self.pconc.shape[0] == self.num_asb):
-		self.pmode = 1
-	else:
-		self.pmode = 0
+	# if particle-phase properties specified in this file
+	if (pphase_flag == 1):
+
+		# whether particle number concentrations expressed 
+		# by modes (0) or explicitly per size bin (1)
+		if (self.pconc.shape[0] == self.num_asb):
+			self.pmode = 1
+		else:
+			self.pmode = 0
+	
 
 	# ensure array defining whether particle injection
 	# is continuous or instantaneous is same length as
 	# number of injection times
 	self.pcont = (np.ones((1, self.pconct.shape[1]))).astype('int')
-	
+
 	return(self)

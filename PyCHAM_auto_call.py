@@ -8,7 +8,7 @@ def autorun(): # define function
 	import os
 	import platform
 	import sys
-	from PyQt5.QtWidgets import QApplication, QWidget	
+	from PyQt6.QtWidgets import QApplication, QWidget	
 
 	# get operating system
 	if 'Darwin' in platform.system() or 'Linux' in platform.system():
