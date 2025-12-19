@@ -333,7 +333,7 @@ def init_conc(num_comp, init_conc,
 				self.rel_SMILES.append(H2O_SMILES)
 
 				# generate pybel object
-				Pybel_object = pybel.readstring('smi', self.rel_SMILES[H2Oi])
+				Pybel_object = pybel.readstring('smi', self.rel_SMILES[-1])
 				
 				# append to Pybel object list
 				self.Pybel_objects.append(Pybel_object)

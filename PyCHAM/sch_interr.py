@@ -58,11 +58,12 @@ def sch_interr(total_list_eqn, self):
 	# begin by not looking out for component atomic composition
 	ac_flag = 0
 	# the atom name register
-	atom_reg = ['H', 'C', 'N', 'O', 'S', 'Cl']
+	atom_reg = ['H', 'C', 'N', 'O', 'S', 'Cl', 'Br']
 	# get the molar masses of these components according to pybel (g/mol)
 	self.atom_reg_mm = np.zeros((len(atom_reg)))
 
-	# get the molar mass of a single hydrogen atom according to pybel
+	# get the molar mass of a single hydrogen atom according to pybel by first
+	# getting the mass of the FH molecule
 	Hnum = (pybel.readstring('smi', 'F'))
 
 	# difference between molwt, exactmass functions in pybel given 
