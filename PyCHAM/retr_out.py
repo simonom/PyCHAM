@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -762,10 +762,10 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 			if (col_title == 1):
 				data_dic['col_title'] = dlist
 				col_title = 2 # ready to read in concentrations and times
-		# extract times (s), component names and concentrations with time (molecules/cm3)
+		# extract times (s), component names and concentrations with time (molecules/cm^3)
 		# from dictionary
 		comp_names = [i for i in data_dic['col_title'][1::]]
-		Crec = np.zeros((data_cnt+1, len(comp_names))) # empty array for concentrations with time (molecules/cm3)
+		Crec = np.zeros((data_cnt+1, len(comp_names))) # empty array for concentrations with time (molecules/cm^3)
 		time_s = np.zeros((data_cnt+1, 1)) # empty array for times (s)
 		for key in data_dic: # loop through dictionary keys
 			if (key[0:4] == 'data'): # if this a useful entry
@@ -776,17 +776,182 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 	# if a .nc file used (e.g. EASY output)
 	
 	if (output_by_sim[-3::] == '.nc'):
+
+		yield (0.)
+
 		ds = nc.Dataset(output_by_sim) # open file
-		time_s = ds['time'][:] # get time (seconds)
 		
+		timehr = ds['time'][:]/3600. # get time (seconds to hours)
+
+		yield (10.)
+
 		# get time saved at
 		self.tsaved = ds.history
 		# get model version used
 		self.modv = ds.source
+
+		yield (20.)
 		
 		# check whether SOA (anhydrous particle) mass concentration saved
 		try:
 			self.SOAmass = ds.variables['mass_concentration_of_secondary_particulate_organic_matter_dry_aerosol_particles_in_air']
 		except:
-			self.SOAmass = 'not saved'	
-	return() # end of retr_out_noncsv function
+			self.SOAmass = 'not saved'
+
+		yield (30.)
+
+		# number of particle size bins
+		num_sb = ds['number_of_particle_size_bins'][:]
+
+		# get total number of components
+		num_comp = ds['number_of_components'][:]
+
+		# get wall on flag
+		wall_on = ds['wall_on_flag'][:]
+
+		# get chemical scheme names of components
+		comp_names = ds['component_chemical_scheme_name'][:].tolist()
+
+		# get SMILES strings of components in chemical scheme
+		rel_SMILES = ds['SMILES_strings'][:]
+
+		# get molar masses of components in chemical scheme
+		y_MM = ds['molar_masses'][:]
+
+		# index of water component
+		H2Oi = ds['water_component_index'][:]
+
+		# index of seed component
+		seedi = ds['seed_component_indices'][:]
+
+		# index of organic peroxy radicals
+		ro2i = ds['organic_peroxy_radical_component_indices'][:]
+
+		# empty dictionary to contain indices of certain groups of components
+		group_indx = {}
+		try:
+			group_indx['RO2i'] = ro2i
+		except:
+			group_indx['RO2i'] = [] # filler in case of no RO2i
+
+		# chemical scheme names of components with initial concentration specified
+		comp0 = ds['names_of_components_with_initial_gas_phase_concentrations_specified'][:]
+		
+		yield (40.)
+		
+		# prepare to hold concentrations of components (molecules/cm^3)
+		y = np.zeros((len(timehr), len(comp_names)))
+		
+		# get the factor for converting molecules/cm^3 to ppb
+		Cfactor = ds['factor_for_multiplying_ppb_to_get_molec/cm3_with_time'][:]
+
+		yield (50.)
+
+		# loop through these components to get their gas-phase concentrations (molecules/cm^3)
+		for ci in range(len(comp_names)):
+			
+			# set variable name
+			var_name = str('number_concentration_of_' +
+				'gas_phase_' + comp_names[ci] + '_molecules_in_air')
+
+			# get values in molecules/cm^3
+			y[:, ci] = ds[str('/concentrations_g/' + var_name)][:]
+
+			# convert value to ppb to be consistent with gas-phase concetrations
+			# returned by default saving type
+			y[:, ci] = y[:, ci]/Cfactor
+		
+		
+		yield (60.)
+
+		# hydrous and anhydrous particle number concentrations (# particles/cm^3 (air))
+		N = ds['particle_number_concentration_anhydrous'][:] # anhydrous
+		Nwet = ds['particle_number_concentration_anhydrous'][:] # hydrous
+
+		yield (70.)
+
+		# open records needed to return rates of production and loss of
+		# individual components
+
+		# rate coefficients of reactions (/s for unimolecular reactions, 
+		# cm^3/molecules/s for bimolecular reactions, 
+		# cm^6/molecules^2/s for termolecular reactions), time in rows
+		# and reactions in columns
+		rateCoeff = ds['rate_coefficients_of_all_reactions'][:]
+
+		# indices of components acting as reactants (columns) per reaction (rows)
+		rindx_g = ds['reactant_indices'][:]
+
+		# reactant stoichiometries per reaction (row) per reactant (column)
+		rstoi_g = ds['reactant_stoichiometries'][:]
+
+		# number of reactants per reaction
+		nreac_g = ds['number_of_reactants_per_reaction'][:]
+
+		# indices of components acting as products (columns) per reaction (rows)
+		pindx_g = ds['product_indices'][:]
+
+		# product stoichiometries per reaction (row) per reactant (column)
+		pstoi_g = ds['product_stoichiometries'][:]
+
+		# number of products per reaction
+		nprod_g = ds['number_of_products_per_reaction'][:]
+
+		# strings of gas-phase chemical reaction equation per reaction
+		eq_str = ds['equations_per_reaction'][:]
+
+		yield (80.)
+
+		# create a class to hold outputs
+		class ro_outputs:
+	
+			
+			#sp = output_by_sim_sch_ext # chemical scheme path
+			#vp = output_by_sim_mv_ext # model variables path
+			gi = group_indx # indices of groups of components
+			# for each component, the generation number
+			#gen_numbers = gen_num 
+			# hydrogen:carbon ratios for each component, this 
+			# output added on 31/05/2022
+			#HyC = HC
+			#nominal_mass = nom_mass 
+			nsb = num_sb
+			nc = num_comp
+			cfac = Cfactor
+			yrec = y
+			Nrec_dry = N
+			#rad = rbou_rec
+			#cen_size = x
+			thr = timehr
+			rSMILES = rel_SMILES
+			comp_MW = y_MM
+			Nrec_wet = Nwet
+			names_of_comp = comp_names
+			#comp_MV = MV
+			#proc_time = comp_time
+			wf = wall_on
+			#spacing = space_mode
+			#plot_indx = indx_plot
+			init_comp = comp0
+			#part_to_wall = yrec_p2w
+			#vpPa = PsatPa
+			#vpPa0 = PsatPa0
+			#O_to_C = OC
+			H2O_ind = H2Oi
+			seed_ind = seedi
+			#siz_struc = siz_str
+			#env_cond = cham_env
+			#total_influx = tot_in_res
+			reac_coef = rateCoeff
+			rindx_g = rindx_g
+			rstoi_g = rstoi_g
+			nreac_g = nreac_g
+			pindx_g = pindx_g
+			pstoi_g = pstoi_g
+			nprod_g = nprod_g
+		
+		self.ro_obj = ro_outputs() # create object to hold outputs
+	
+		yield (100.)
+	
+	return(self) # end of retr_out_noncsv function

@@ -1,6 +1,6 @@
 ########################################################################
 #								                                       #
-# Copyright (C) 2018-2025					                           #
+# Copyright (C) 2018-2026					                           #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			               #
 #								                                       #
 # All Rights Reserved.                                                 #
@@ -447,7 +447,7 @@ def sch_interr(total_list_eqn, self):
 						line1 = str(line2[:])
 						
 							
-				self.eqn_list.append(line1) # store reaction equations
+				self.eqn_list.append(line1) # store gas-phase reaction equations
 
 		# aqueous-phase reaction equation part
 		# ^ means occurs at start of line and, first \ means second \ can be interpreted 

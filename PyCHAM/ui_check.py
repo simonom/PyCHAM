@@ -1,6 +1,6 @@
 ########################################################################
 #								                                       #
-# Copyright (C) 2018-2025					                           #
+# Copyright (C) 2018-2026					                           #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			               #
 #								                                       #
 # All Rights Reserved.                                                 #
@@ -459,7 +459,7 @@ def ui_check(self):
 				  'the number of mole fractions of dry (excluding water) seed ' +
 				  'particle components (seedx in model variables input file), ' +
 				  'please see README for guidance'))
-			import ipdb; ipdb.set_trace()
+			
 			em_flag = 2
 	
 	# check on consistency of dry seed component 

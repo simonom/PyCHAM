@@ -1,6 +1,6 @@
 ########################################################################
 #								                                       #
-# Copyright (C) 2018-2025					                           #
+# Copyright (C) 2018-2026					                           #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			               #
 #								                                       #
 # All Rights Reserved.                                                 #
@@ -2830,7 +2830,7 @@ class PyCHAM(QWidget):
 	# plot functions -----------------------------------------
 	
 	@pyqtSlot()
-	def on_click202(self): # when model results folder requires selection
+	def on_click202(self): # when folder containing model results requires selection
 
 		# button to get path to folder containing relevant files
 		try:
@@ -2868,9 +2868,11 @@ class PyCHAM(QWidget):
 				def_res_flag = 1
 			except: # if no default files, see if a netcdf file can be opened
 				import netCDF4 as nc
+				output_by_sim = str(self.dir_path + '/PyCHAM_output.nc')
+
 				# try extracting information from netcdf file
-				retr_out.retr_out_noncsv(str(self.dir_path + '/PyCHAM_results.nc'), self)
-				print(self.tsaved, self.modv, self.SOAmass.shape)
+				if (output_by_sim[-3::] == '.nc'):
+					ds = nc.Dataset(output_by_sim) # open file
 				def_res_flag = 2
 			
 			# enable plotting buttons
@@ -2884,9 +2886,9 @@ class PyCHAM(QWidget):
 			self.b221.setEnabled(True)
 			self.b223.setEnabled(True)
 			
-			if (def_res_flag == 1):
+			if (def_res_flag == 1): # if saved in default setting (csv files)
 			
-				for prog in retr_out.retr_out(self): # call on modules to solve problem
+				for prog in retr_out.retr_out(self): # call on module to get outputs
 				
 					if (isinstance(prog, str)): # check if it's a message
 						mess = prog
@@ -2903,7 +2905,29 @@ class PyCHAM(QWidget):
 			# remove the progress bar after each simulation
 			self.progress.deleteLater()
 			QApplication.processEvents() # allow message panel to update
-		except:
+
+			if (def_res_flag == 2): # if saved in non-default setting (e.g. netCDF files)
+
+				for prog in retr_out.retr_out_noncsv(str(self.dir_path + '/PyCHAM_output.nc'), self): # call on module to get outputs
+				
+					if (isinstance(prog, str)): # check if it's a message
+						mess = prog
+					
+						self.l203a.setText(mess)
+						self.l203a.setStyleSheet(0., '0px dashed red', 0., 0.)
+						self.bd_pl = 3
+
+					self.progress.setValue(int(prog)) # display progress	
+					QApplication.processEvents() # allow message panel to update
+
+			# remove any old progress message from previous run
+			self.l203a.setText('Results loaded')
+			# remove the progress bar after each simulation
+			self.progress.deleteLater()
+			QApplication.processEvents() # allow message panel to update
+
+
+		except: # if no output can be identified
 			# remove the progress bar after each simulation
 			self.progress.deleteLater()
 			self.l203a.setText(str('The required output files cannot be found at ' +
@@ -3011,11 +3035,11 @@ class PyCHAM(QWidget):
 			self.sum_ornot_flag = 0
 		if (sum_ornot[0] == 'S'):
 			self.sum_ornot_flag = 1
-
-		if (dir_path[-4::] != '.nc'):
-			plotter_gp.plotter(caller, dir_path, comp_names, self) # plot results
-		if (dir_path[-3::] == '.nc'):
-			plotter_gp.plotter_noncsv(caller, dir_path, comp_names, self) # plot results
+		print(dir_path[-3::])
+		
+		# plot results
+		plotter_gp.plotter(caller, dir_path, comp_names, self)
+		
 	
 	@pyqtSlot() # button to plot ozone isopleth
 	def on_click206c(self):
@@ -5101,7 +5125,7 @@ class PyCHAM(QWidget):
 			self.gp_units = self.b206b.currentText()
 
 		
-		# if total particle concenrations
+		# if total particle concentrations
 		if ('Particle concentrations' in om_choice): 
 			if ('Standard results plot' in om_choice):
 				self.oandm = 1.1

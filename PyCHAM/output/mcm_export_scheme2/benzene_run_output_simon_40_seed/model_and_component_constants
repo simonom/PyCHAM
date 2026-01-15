@@ -1,0 +1,14 @@
+number_of_size_bins,32
+number_of_components,1076
+factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273], [24871624178.808273]]
+simulation_computer_time(s),159.88125491142273
+seed_name,['AMMNitrate', 'AMMSUL']
+wall_on_flag_0forNO_>0forYES,0
+space_mode,log
+index_of_water,1074
+index_of_seed_components,[1072, 1073]
+size_structure_0_for_moving_centre_1_for_full_moving,0
+output_by_sim_sch_ext,C:\Users\Psymo\OneDrive - The University of Manchester\GitHub\PyCHAM\PyCHAM/output\mcm_export_scheme2\benzene_run_output_simon_40_seed/inputs/mcm_export_scheme2.txt
+output_by_sim_mv_ext,C:\Users\Psymo\OneDrive - The University of Manchester\GitHub\PyCHAM\PyCHAM/output\mcm_export_scheme2\benzene_run_output_simon_40_seed/inputs/ex_mod_var_2.txt
+history,Saved at (Greenwhich Meridian Time) time.struct_time(tm_year=2026, tm_mon=1, tm_mday=15, tm_hour=12, tm_min=45, tm_sec=1, tm_wday=3, tm_yday=15, tm_isdst=0)
+source,CHemistry with Aerosol Microphysics in Python (PyCHAM), version 5.7.4

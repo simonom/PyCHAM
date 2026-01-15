@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -306,9 +306,17 @@ def rec_prep(nrec_step, y, y0,
 	dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
 	wat_hist, act_coeff, num_comp, (num_sb-self.wall_on))
 
+	# if user wants reaction rates of all reactions
+	# saved
+	# (/s for unimolecular reactions, 
+	# cm^3/molecules/s for bimolecular reactions, 
+	# cm^6/molecules^2/s for termolecular reactions)
+	if 'reactionCoeff' in self.user_output:
+		self.reactionRates = rrc.reshape(1, -1)
+
 	# before solving ODEs for chemistry, gas-particle partitioning 
 	# and gas-wall partitioning, 
-	# estimate and record any change tendencies (# molecules/cm3/s)
+	# estimate and record any change tendencies (# molecules/cm^3/s)
 	# resulting from these processes
 	if (self.testf != 5 and len(self.dydt_vst) > 0):
 		import dydt_rec

@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -1217,7 +1217,7 @@ def mod_var_read(self):
 
 			# name of component who's abundance needs to be nudged to give
 			# the prescribed OH reactivity, followed by the prescribed
-			# OH reactivity (molecules/cm3)
+			# OH reactivity (molecules/cm^3)
 			if (key == 'comp_nudge_kOH' and (value.strip())):
 				self.comp_nudge_kOH = [str(i).strip() for i in
 				(value.split(','))][0]

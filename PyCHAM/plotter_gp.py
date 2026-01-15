@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -41,7 +41,7 @@ import openbabel.pybel as pybel
 def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# inputs: ------------------------------------------------------------------
-	# caller - marker for whether PyCHAM (0 for ug/m3 or 1 for ppb, 3 for # molecules/cm3) 
+	# caller - marker for whether PyCHAM (0 for ug/m^3 or 1 for ppb, 3 for # molecules/cm^3) 
 	# or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot

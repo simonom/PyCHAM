@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        #
+#    Copyright (C) 2018-2026 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
+##########################################################################################
 '''plots results for the change tendency temporal profiles of specified 
 components'''
 # simulation results are represented graphically
@@ -74,33 +73,44 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	wall_on = self.ro_obj.wf
 	PsatPa = self.ro_obj.vpPa
 	OC = self.ro_obj.O_to_C
+	rindx_g = self.rindx_g
+	reac_coef = self.reac_coef
+	rstoi_g = self.rstoi_g
+	nreac_g = self.nreac_g
+	pindx_g = self.pindx_g
+	pstoi_g = self.pstoi_g
+	nprod_g = self.nprod_g
+	eq_str = self.eq_str
 
-	# loop through components to plot to check they are available
-	for comp_name in (comp_names_to_plot):
-		
-		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
-		try: # try to open
-			# skiprows = 1 omits header	
-			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1)
-		except:
-			mess = str('Please note, a change tendency record for the component ' + 
-			str(comp_name) + ' was not found, note that it must specified in the ' +
-			'tracked_comp input of the model variables file. Please ' + 
-			'see README for more information.')
-			self.l203a.setText(mess)
-			
-			# set border around error message
-			if (self.bd_pl == 1):
-				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-				self.bd_pl = 2
-			else:
-				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-				self.bd_pl = 1
-			
-			plt.ioff() # turn off interactive mode
-			plt.close() # close figure window
-			
-			return()
+
+	
+
+#	# loop through components to plot to check they are available
+#	for comp_name in (comp_names_to_plot):
+#		
+#		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
+#		try: # try to open
+#			# skiprows = 1 omits header	
+#			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1)
+#		except:
+#			mess = str('Please note, a change tendency record for the component ' + 
+#			str(comp_name) + ' was not found, note that it must specified in the ' +
+#			'tracked_comp input of the model variables file. Please ' + 
+#			'see README for more information.')
+#			self.l203a.setText(mess)
+#			
+#			# set border around error message
+#			if (self.bd_pl == 1):
+#				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
+#				self.bd_pl = 2
+#			else:
+#				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
+#				self.bd_pl = 1
+#			
+#			plt.ioff() # turn off interactive mode
+#			plt.close() # close figure window
+#			
+#			return()
 	
 	
 	# if all files are available, then proceed without error message
@@ -117,6 +127,10 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
+	# convert the gas-phase concentrations from ppb to molecules/cm^3
+	# in preparation for calculation of rates
+	y = np.zeros((self.yrec.shape[0], self.yrec.shape[1]))
+	y[:, 0:self.nc] = self.yrec[:, 0:self.nc]*self.cfac
 	
 	for comp_name in (comp_names_to_plot): # loop through components to plot
 		
@@ -143,6 +157,52 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 						
 			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
 			ci = len(y_mw)-1
+
+		# prepare to hold loss rates (molecules/cm^3/s)
+		lr_all = np.zeros((y.shape[0], 0))
+		# prepare to hold loss equations
+		leq_all = []
+
+		# prepare to hold production rates (molecules/cm^3/s)
+		pr_all = np.zeros((y.shape[0], 0))
+		# prepare to hold production equations
+		peq_all = []
+
+		# loop through reactions to
+		# identify the reactions where this component occurs as a reactant 
+		# (loss process)
+		# and to identify where it occurs as a product 
+		# (production process), note ci is index of component of interest
+		for reaci in range(rindx_g.shape[0]):
+
+			# if a reactant
+			if ci in rindx_g[reactioni, 0:self.nreac_g[reactioni]]:
+				# get loss rate at all times
+				lr = ((y[:, rindx_g[reaci, 0:nreac_g[reaci]]]**rstoi_g[
+					reaci, 0:nreac_g[reaci]]).prod())*reac_coef[:, reaci]
+				
+				# include with all gas-phase chemistry loss rates
+				lr_all = np.concatenate((lr_all, lr), axis=1)
+
+				# include with all gas-phase chemistry loss reactions
+				leq_all.append(eq_str[reaci])
+			
+			# if a product
+			if ci in pindx_g[reactioni, 0:self.nprod_g[reactioni]]:
+				# get reaction rate (molecules/cm^3/s)
+				lr = ((y[:, rindx_g[reaci, 0:nreac_g[reaci]]]**rstoi_g[
+					reaci, 0:nreac_g[reaci]]).prod())*reac_coef[:, reaci]
+				
+				# get production rate of component of interest
+				# (molecules/cm^3/s)
+				pr = lr*pstoi_g[ci == pindx_g[reactioni, 0:self.nprod_g[reactioni]]]
+				
+				# include with all gas-phase chemistry loss rates
+				pr_all = np.concatenate((pr_all, pr), axis=1)
+
+				# include with all gas-phase chemistry production reactions
+				peq_all.append(eq_str[reaci])
+
 		
 		# note that column -3 in dydt is gas-particle 
 		# partitioning and column -2 is gas-wall partitioning
@@ -151,48 +211,45 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# row of these columns containing chemical reaction numbers
 		
 		# extract the change tendency due to gas-particle partitioning
-		gpp = dydt[1::, -3]
+		#gpp = dydt[1::, -3]
 		# extract the change tendency due to gas-wall partitioning
-		gwp = dydt[1::, -2]
+		#gwp = dydt[1::, -2]
 		# extract the change tendency due to dilution
-		dil = dydt[1::, -1]
-		# sum chemical reaction gains
-		crg = np.zeros((dydt.shape[0]-1, 1))
-		# sum chemical reaction losses
-		crl = np.zeros((dydt.shape[0]-1, 1))
-		for ti in range(dydt.shape[0]-1): # loop through times
-			# indices of reactions that produce component
-			indx = dydt[ti+1, 0:-3] > 0
-			crg[ti] = dydt[ti+1, 0:-3][indx].sum()
-			# indices of reactions that lose component
-			indx = dydt[ti+1, 0:-3] < 0
-			crl[ti] = dydt[ti+1, 0:-3][indx].sum()
+		#dil = dydt[1::, -1]
+		# sum chemical reaction losses (molecules/cm^3/s)
+		crl = np.sum(lr_all, axis= 1)
+		# sum chemical reaction gains (molecules/cm^3/s)
+		crg = np.sum(pr_all, axis= 1)
+		
+		#for ti in range(dydt.shape[0]-1): # loop through times
+		#	# indices of reactions that produce component
+		#	indx = dydt[ti+1, 0:-3] > 0
+		#	crg[ti] = dydt[ti+1, 0:-3][indx].sum()
+		#	# indices of reactions that lose component
+		#	indx = dydt[ti+1, 0:-3] < 0
+		#	crl[ti] = dydt[ti+1, 0:-3][indx].sum()
 			 
-		# convert change tendencies from molecules/cm3/s to ug/m3/s
-		gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
-		gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
-		dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
-		crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
-		crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
+		# convert change tendencies from molecules/cm^3/s to ug/m^3/s
+		#gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
+		#gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
+		#dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
+		#crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
+		#crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 			 
 		# plot temporal profiles of change tendencies due to chemical 
-		# reaction production and loss, gas-particle
-		# partitioning and gas-wall partitioning
-		
-		ax0.plot(timehr, gpp, 
-			label = str('gas-particle partitioning '+ comp_name))
-		ax0.plot(timehr, gwp, label = str('gas-wall partitioning '+ comp_name))
-		ax0.plot(timehr, dil, label = str('dilution '+ comp_name))
-		ax0.plot(timehr, crg, 
-			label = str('chemical reaction gain '+ comp_name))
+		# reaction loss and production
 		ax0.plot(timehr, crl, 
 			label = str('chemical reaction loss '+ comp_name))
+		ax0.plot(timehr, crg, 
+			label = str('chemical reaction gain '+ comp_name))
+		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
 		ax0.set_title('Change tendencies, where a tendency ' + 
 		'to decrease \ngas-phase concentrations is negative')
 		ax0.set_xlabel('Time through experiment (hours)')
-		ct_units = str('(' + u'\u03BC' + 'g/m' +u'\u00B3' + '/s)')
+		#ct_units = str('(' + u'\u03BC' + 'g/m' + u'\u00B3' + '/s)')
+		ct_units = str('(molecules cm' + u'\u207B' + u'\u00B3 + ' s' + u'\u207B' + u'\u00B9' + ')')
 		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
 		ax0.yaxis.set_tick_params(direction = 'in')

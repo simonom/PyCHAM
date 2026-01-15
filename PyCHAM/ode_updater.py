@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -105,7 +105,7 @@ def ode_updater(y, H2Oi,
 	# 		and quantum yields
 	# Jlen - number of photochemical reactions
 	# self.con_infl_C - influx of components with continuous 
-	#	influx (# molecules/cm3/s)
+	#	influx (# molecules/cm^3/s)
 	# nrec_step - number of recording steps
 	# self.dydt_vst - dictionary for holding change tendencies of 
 	#	specified components
@@ -496,6 +496,22 @@ def ode_updater(y, H2Oi,
 				# prepare for recording next point
 				save_cnt += 1
 
+				# reaction rate coefficient prior to 
+				# calling cham_up, so that reactionRates
+				# records in step with rec.rec function 
+				[rrc, erf, y, err_mess] = rrc_calc.rrc_calc(
+					y[H2Oi], temp_now, y, 
+					Jlen, y[NOi], y[HO2i], y[NO3i], 
+					sumt, self)
+
+				# if user wants reaction rates of all reactions
+				# saved
+				# (/s for unimolecular reactions, 
+				# cm^3/molecules/s for bimolecular reactions, 
+				# cm^6/molecules^2/s for termolecular reactions)
+				if 'reactionCoeff' in self.user_output:
+					self.reactionRates = np.concatenate((self.reactionRates, rrc.reshape(1, -1)), axis=0)
+
 			# for change tendencies, t=0 recording done
 			# inside rec_prep
 			# record any change tendencies of specified 
@@ -552,7 +568,7 @@ def ode_updater(y, H2Oi,
 							num_sb-self.wall_on, 1))
 						dydt_erh_flag = 0
 					 
-					# estimate and record any 
+					# estimate and record 
 					# change tendencies 
 					# (molecules/cm^3/s)
 					if (self.testf != 5):
@@ -1157,12 +1173,15 @@ def ode_updater(y, H2Oi,
 			rbou_rec, cham_env, temp_now, 
 			tot_in_res, self)
 
+			# if user wants reaction rates of all reactions
+			# saved
+			# (/s for unimolecular reactions, 
+			# cm^3/molecules/s for bimolecular reactions, 
+			# cm^6/molecules^2/s for termolecular reactions)
+			if 'reactionCoeff' in self.user_output:
+				self.reactionRates = np.concatenate((self.reactionRates, rrc.reshape(1, -1)), axis=0)
+
 			# record final change tendency
-			# for change tendencies, t=0 recording done
-			# inside rec_prep
-			# record any change tendencies of specified 
-			# components after t=0
-			
 			if (len(self.dydt_vst) > 0):
 				dydt_cnt = len(trec)-1
 				

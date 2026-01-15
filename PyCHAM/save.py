@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -123,7 +123,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		from netCDF4 import Dataset
 
 		# file name for results
-		y_pp_fname = os.path.join(self.output_by_sim, 'PyCHAM_results.nc')
+		y_pp_fname = os.path.join(self.output_by_sim, 'PyCHAM_output.nc')
 
 		# see https://unidata.github.io/
 		# netcdf4-python/#creatingopeningclosing-a-netcdf-file
@@ -149,7 +149,9 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 
 			# call on bespoke saving function
 			rootgrp = bespoke_saving(savei, y_mat, y_mw, t_out, 
-				cham_env, rootgrp, self)	
+				cham_env, Cfactor_vst, 
+				numsb, Nresult_wet, Nresult_dry, rbou_rec, H2Oi, 
+				rootgrp, self)
 
 		# close netCDF file
 		rootgrp.close()
@@ -506,7 +508,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 		rbou_rec = (np.array((rbou_rec)))	
 	
 	# convert vapour pressure at starting simulation temperature 
-	# from molecules/cm3 to Pa using ideal gas law
+	# from molecules/cm^3 to Pa using ideal gas law
 	self.Psat_rec0 = self.Psat_rec0/(si.Avogadro/((si.R*1.e6)*float(cham_env[0, 0])))	
 
 	# to ensure quick use of output, store results in an object in an identical 
