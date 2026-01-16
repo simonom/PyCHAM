@@ -675,6 +675,13 @@ def ode_updater(y, H2Oi,
 				colptrs, (num_sb-self.wall_on), num_comp, 
 				H2Oi, y[H2Oi], ser_H2O, self)
 			
+			# get indices of any components with constant concentration
+			# now
+			if (self.con_C_indx.shape[0]>0):
+				const_comp_tindx = sum(self.const_compt<=sumt)-1
+				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
+				self.conCindxn = self.con_C_indx[conCindxn, const_comp_tindx]
+			
 			# if water gas-particle partitioning serialised
 			if (ser_H2O == 1 and (num_sb-self.wall_on) > 0
 				 and (sum(N_perbin) > 0)):
@@ -699,6 +706,15 @@ def ode_updater(y, H2Oi,
 					jac_mod_len, jac_part_hmf_indx,
  					rw_indx, N_perbin, 
 					jac_part_H2O_indx, H2Oi, self)
+					
+					# if gas-phase concentration of water is due to stay
+					# constant, then ensure any numerical drift has not affected 
+					# its concentration (not only numerical drift can perturb a
+					# constant concentration since dd for gas-phase water is set
+					# to 0 in the solver of ode_solv_wat if constant 
+					# concentration is prescribed)
+					if (H2Oi in self.conCindxn):
+						y[H2Oi] = y0[H2Oi]
 					
 					# check on stability of water 
 					# partitioning, allowing some leeway for negative
@@ -800,13 +816,6 @@ def ode_updater(y, H2Oi,
 				# water gas-particle partitioning not 
 				# solved separately
 				self.odsw_flag = 0
-
-			# get indices of any components with constant concentration
-			# now
-			if (self.con_C_indx.shape[0]>0):
-				const_comp_tindx = sum(self.const_compt<=sumt)-1
-				conCindxn = self.con_C_indx[:, const_comp_tindx] != -1e6
-				self.conCindxn = self.con_C_indx[conCindxn, const_comp_tindx] 
 			
 			# model component concentration changes to 
 			# get new concentrations molecules/cm^3 (air))

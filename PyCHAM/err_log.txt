@@ -1,1 +1,1 @@
-C:\Users\Psymo\OneDrive - The University of Manchester\GitHub\PyCHAM\PyCHAM/output\mcm_export_scheme2\benzene_run_output_simon_40_seed
+/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/output/mcm_export_scheme2/benzene_run_output_simon_80_seed

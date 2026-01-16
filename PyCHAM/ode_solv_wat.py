@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -111,19 +111,20 @@ def ode_solv(y, integ_step, Cinfl_now,
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
 			# gas-phase concentration of water at particle surface
-			# (# molecules/cm3 (air))
+			# (# molecules/cm^3 (air))
 			Csit = Csit*self.Psat[0:num_sb-self.wall_on, :][
 				isb, H2Oi]*kelv_fac[isb, 0]*act_coeff[
 				0:num_sb-self.wall_on, :][isb, H2Oi]
 
-			# partitioning rate (# molecules/cm3/s)
+			# partitioning rate (# molecules/cm^3/s)
 			dd_all = (kimt[0:num_asb, :][isb, H2Oi]*(y[0, 0]-Csit)).reshape(-1, 1)
-			dd[0, 0] -= sum(dd_all) # gas-phase change
+
+			# only let gas-phase water change if not set to be constant concentration
+			if (H2Oi not in self.conCindxn):
+				dd[0, 0] -= sum(dd_all) # gas-phase change
 			
 			dd[1::, 0][isb] += (dd_all.flatten()) # particle change
 			
-			
-		
 		# force all components in size bins with no particle to zero
 		if (num_asb > 0):
 			dd[1:num_asb+1, 0][N_perbin[:, 0] == 0] = 0.
@@ -131,13 +132,13 @@ def ode_solv(y, integ_step, Cinfl_now,
 		# this ensures dd is
 		# a vector rather than matrix, since y00 is a vector
 		dd = dd.flatten()
-	
+
 		return (dd)
 
 	def jac(t, y): # define the Jacobian
 		
 		# inputs: ----------------
-		# y - concentrations (molecules/cm3), note when using scipy integrator 
+		# y - concentrations (molecules/cm^3), note when using scipy integrator 
 		#	solve_ivp, this should have shape (number of elements, 1)
 		# t - time interval to integrate over (s)
 		# ---------------------------------------------
@@ -168,10 +169,10 @@ def ode_solv(y, integ_step, Cinfl_now,
 		
 		y[1::][N_perbin[:, 0] == 0] = 0 # ensure zero water where zero particles
 		
-		# update the particle-phase concentrations of water (molecules/cm3 (air))
+		# update the particle-phase concentrations of water (molecules/cm^3 (air))
 		ymat[:, H2Oi] = y[1::, 0]
 
-		# total particle-phase concentration per size bin (# molecules/cm3 (air))
+		# total particle-phase concentration per size bin (# molecules/cm^3 (air))
 		csum = ((ymat*self.diss_wrtw).sum(axis=1))
 		
 		
@@ -207,10 +208,9 @@ def ode_solv(y, integ_step, Cinfl_now,
 	# force all components in size bins with no particle to zero
 	ymat[N_perbin[:, 0] == 0, :] = 0.
 	
-	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm3 (air)) 
+	# call on the ODE solver, note y contains the initial condition(s) (molecules/cm^3 (air)) 
 	# and must be 1D even though y in dydt and jac has shape (number of elements, 1)
 	# as stated in GMD paper, BDF method used as this known to deal with stiff problems well
-	
 	sol = solve_ivp(dydt, [0, integ_step], y_w, atol = atol, rtol = rtol, 
 	method = 'Radau', t_eval = [integ_step], vectorized = True, jac = jac)
 	

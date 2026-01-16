@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -175,7 +175,7 @@ def cham_up(sumt,
 	# update dilution factor
 	self.dil_fac_now = self.dil_fac[self.dil_fac_cnt]
 	# for water vapour
-	# if gas-phase water previously set to 0, e.g. below because of
+	# if gas-phase water dilution previously set to 0, e.g. below because of
 	# fixing to observation, then keep at 0.
 	if hasattr(self, 'dil_fac_H2Og_now'):
 		if (self.dil_fac_H2Og_now == 0.):
