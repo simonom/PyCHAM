@@ -1,8 +1,8 @@
 ########################################################################
-#								                                       #
-# Copyright (C) 2018-2026					                           #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			               #
-#								                                       #
+#								       #
+# Copyright (C) 2018-2026					       #
+# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
+#								       #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -2856,25 +2856,32 @@ class PyCHAM(QWidget):
 		
 		# check whether required files present here
 		try:
+			
 			# module for retrieving all outputs and include in self
 			import retr_out
 			
 			try: # if saved in default setting (csv files)
+				
 				# name of file where experiment constants saved
 				fname = str(self.dir_path + '/model_and_component_constants')
 				# test whether default saved files are available
 				const_in = open(fname)
 				const_in.close()
 				def_res_flag = 1
+				
 			except: # if no default files, see if a netcdf file can be opened
+				
 				import netCDF4 as nc
+				
 				output_by_sim = str(self.dir_path + '/PyCHAM_output.nc')
-
+				
 				# try extracting information from netcdf file
 				if (output_by_sim[-3::] == '.nc'):
+
 					ds = nc.Dataset(output_by_sim) # open file
+					
 				def_res_flag = 2
-			
+				
 			# enable plotting buttons
 			# disable plotting buttons
 			self.b203.setEnabled(True)
@@ -2907,8 +2914,9 @@ class PyCHAM(QWidget):
 			QApplication.processEvents() # allow message panel to update
 
 			if (def_res_flag == 2): # if saved in non-default setting (e.g. netCDF files)
-
-				for prog in retr_out.retr_out_noncsv(str(self.dir_path + '/PyCHAM_output.nc'), self): # call on module to get outputs
+				
+				# call on module to get outputs
+				for prog in retr_out.retr_out_noncsv(str(self.dir_path + '/PyCHAM_output.nc'), self):
 				
 					if (isinstance(prog, str)): # check if it's a message
 						mess = prog
@@ -3549,7 +3557,7 @@ class PyCHAM(QWidget):
 
 		import plotter_ct
 		dir_path = self.l201.text() # name of folder with results
-		plotter_ct.plotter(0, dir_path, comp_names, self) # plot results
+		plotter_ct.plotter(0, dir_path, comp_names, 0, 0, self) # plot results
 	
 	@pyqtSlot() # button to plot change tendencies due to individual chemical reactions
 	def on_click218aa(self):
@@ -3588,7 +3596,7 @@ class PyCHAM(QWidget):
 		import plotter_ct	
 		# name of folder with results
 		dir_path = self.l201.text()
-		plotter_ct.plotter_ind(0, dir_path, comp_names, 
+		plotter_ct.plotter(1, dir_path, comp_names, 
 			top_num, uc, self) # plot results
 	
 	@pyqtSlot() # button to show production

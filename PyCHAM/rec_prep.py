@@ -306,13 +306,17 @@ def rec_prep(nrec_step, y, y0,
 	dydt_erh_flag] = act_coeff_update.ac_up(y, H2Oi, RH0, temp_now, 
 	wat_hist, act_coeff, num_comp, (num_sb-self.wall_on))
 
-	# if user wants reaction rates of all reactions
-	# saved
-	# (/s for unimolecular reactions, 
-	# cm^3/molecules/s for bimolecular reactions, 
-	# cm^6/molecules^2/s for termolecular reactions)
-	if 'reactionCoeff' in self.user_output:
+	# prepare to store reaction rates (molecules/cm^3/s)
+	if 'reactionRate' in self.user_output:
 		self.reactionRates = rrc.reshape(1, -1)
+
+		rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))
+		rrc_y[self.y_arr_g] = y[self.y_rind_g]
+		rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = 'C')
+		# reaction rate (molecules/cm^3/s) 
+		gprates = rrc[0:self.rindx_g.shape[0]]*((rrc_y**self.rstoi_g).prod(axis=1))
+		# append to results at all times
+		self.reactionRates = gprates.reshape(1, -1)
 
 	# before solving ODEs for chemistry, gas-particle partitioning 
 	# and gas-wall partitioning, 

@@ -649,7 +649,7 @@ def retr_out(self):
 		x = []
 
 	try:
-		# particle size bin bounds (radii) (um3)
+		# particle size bin bounds (radii) (um^3)
 		fname = str(self.dir_path + '/size_bin_bounds')
 		rbou_rec = np.loadtxt(fname, delimiter=',', skiprows=1) # skiprows=1 omits header
 	except:
@@ -718,12 +718,13 @@ def retr_out(self):
 	return(self)
 
 def retr_out_noncsv(output_by_sim, self): # similar to above function but for when non-csv files need interrogating
-	
+
 	import netCDF4 as nc # e.g. for PyCHAM output saved to netcdf file, or for EASY outputs
 	# inputs: -------------------------------
 	# output_by_sim - name of folders requested by the calling code to be looked at
 	# ---------------------------------------
 	# if a .dat file used (e.g. FACSIMILE output)
+	
 	if (output_by_sim[-4::] == '.dat'):
 	
 		datafile = open(output_by_sim)
@@ -778,7 +779,7 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 	if (output_by_sim[-3::] == '.nc'):
 
 		yield (0.)
-
+		
 		ds = nc.Dataset(output_by_sim) # open file
 		
 		timehr = ds['time'][:]/3600. # get time (seconds to hours)
@@ -794,7 +795,9 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 		
 		# check whether SOA (anhydrous particle) mass concentration saved
 		try:
-			self.SOAmass = ds.variables['mass_concentration_of_secondary_particulate_organic_matter_dry_aerosol_particles_in_air']
+			self.SOAmass = ds.variables[
+			str('mass_concentration_of_secondary_particulate' +
+				'_organic_matter_dry_aerosol_particles_in_air')]
 		except:
 			self.SOAmass = 'not saved'
 
@@ -804,7 +807,7 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 		num_sb = ds['number_of_particle_size_bins'][:]
 
 		# get total number of components
-		num_comp = ds['number_of_components'][:]
+		num_comp = np.array((ds['number_of_components']))[0]
 
 		# get wall on flag
 		wall_on = ds['wall_on_flag'][:]
@@ -817,6 +820,15 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 
 		# get molar masses of components in chemical scheme
 		y_MM = ds['molar_masses'][:]
+
+		# get molar volumes of components in chemical scheme (cm^3/mol)
+		y_MV = ds['molar_volumes'][:]
+
+		# pure-component saturation vapour pressure of components at 298.15 K (Pa)
+		PsatPa = ds['pure_component_saturation_vapour_pressure_of_components_at_298.15_K']
+
+		# oxygen to carbon ratios of components 
+		OC = ds['oxygen_to_carbon_ratios']
 
 		# index of water component
 		H2Oi = ds['water_component_index'][:]
@@ -836,16 +848,20 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 
 		# chemical scheme names of components with initial concentration specified
 		comp0 = ds['names_of_components_with_initial_gas_phase_concentrations_specified'][:]
+
+		# indices of components with initial concentration specified
+		indx_plot = ds['indices_of_components_with_initial_gas_phase_concentrations_specified'][:]
 		
 		yield (40.)
 		
-		# prepare to hold concentrations of components (molecules/cm^3)
-		y = np.zeros((len(timehr), len(comp_names)))
 		
 		# get the factor for converting molecules/cm^3 to ppb
 		Cfactor = ds['factor_for_multiplying_ppb_to_get_molec/cm3_with_time'][:]
 
 		yield (50.)
+		
+		# prepare to hold concentrations of components (molecules/cm^3)
+		y = np.zeros((len(timehr), len(comp_names)))
 
 		# loop through these components to get their gas-phase concentrations (molecules/cm^3)
 		for ci in range(len(comp_names)):
@@ -855,12 +871,13 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 				'gas_phase_' + comp_names[ci] + '_molecules_in_air')
 
 			# get values in molecules/cm^3
-			y[:, ci] = ds[str('/concentrations_g/' + var_name)][:]
-
-			# convert value to ppb to be consistent with gas-phase concetrations
-			# returned by default saving type
-			y[:, ci] = y[:, ci]/Cfactor
-		
+			try:
+				y[:, ci] = ds[str('/concentrations_g/' + var_name)][:]
+				# convert value to ppb to be consistent with gas-phase concetrations
+				# returned by default saving type
+				y[:, ci] = y[:, ci]/Cfactor
+			except: # in case this component not saved, then continue to next component
+				continue
 		
 		yield (60.)
 
@@ -868,16 +885,23 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 		N = ds['particle_number_concentration_anhydrous'][:] # anhydrous
 		Nwet = ds['particle_number_concentration_anhydrous'][:] # hydrous
 
+		# radius bounds (um)
+		rbou_rec = ds['particle_radius_bounds'][:]
+
+		# hydrous particle radius (um)
+		x_rec = ds['hydrous_particle_radius'][:]
+
+		# mode of spacing between particle size bins
+		space_mode = ds['particle_size_bin_spacing_mode'][:]
+
 		yield (70.)
 
 		# open records needed to return rates of production and loss of
 		# individual components
 
-		# rate coefficients of reactions (/s for unimolecular reactions, 
-		# cm^3/molecules/s for bimolecular reactions, 
-		# cm^6/molecules^2/s for termolecular reactions), time in rows
+		# rates of reactions (molecules/cm^3/s), time in rows
 		# and reactions in columns
-		rateCoeff = ds['rate_coefficients_of_all_reactions'][:]
+		reactionRates = ds['rates_of_reaction_of_all_reactions'][:, :]
 
 		# indices of components acting as reactants (columns) per reaction (rows)
 		rindx_g = ds['reactant_indices'][:]
@@ -901,11 +925,10 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 		eq_str = ds['equations_per_reaction'][:]
 
 		yield (80.)
-
+		
 		# create a class to hold outputs
 		class ro_outputs:
 	
-			
 			#sp = output_by_sim_sch_ext # chemical scheme path
 			#vp = output_by_sim_mv_ext # model variables path
 			gi = group_indx # indices of groups of components
@@ -920,35 +943,36 @@ def retr_out_noncsv(output_by_sim, self): # similar to above function but for wh
 			cfac = Cfactor
 			yrec = y
 			Nrec_dry = N
-			#rad = rbou_rec
-			#cen_size = x
+			rad = rbou_rec
+			cen_size = x_rec
 			thr = timehr
 			rSMILES = rel_SMILES
 			comp_MW = y_MM
 			Nrec_wet = Nwet
 			names_of_comp = comp_names
-			#comp_MV = MV
+			comp_MV = y_MV
 			#proc_time = comp_time
 			wf = wall_on
-			#spacing = space_mode
-			#plot_indx = indx_plot
+			spacing = space_mode
+			plot_indx = indx_plot
 			init_comp = comp0
 			#part_to_wall = yrec_p2w
-			#vpPa = PsatPa
+			vpPa = PsatPa
 			#vpPa0 = PsatPa0
-			#O_to_C = OC
+			O_to_C = OC
 			H2O_ind = H2Oi
 			seed_ind = seedi
 			#siz_struc = siz_str
 			#env_cond = cham_env
 			#total_influx = tot_in_res
-			reac_coef = rateCoeff
-			rindx_g = rindx_g
-			rstoi_g = rstoi_g
-			nreac_g = nreac_g
-			pindx_g = pindx_g
-			pstoi_g = pstoi_g
-			nprod_g = nprod_g
+			reactionRates_ret = np.array((reactionRates))
+			rindx_g_ret = np.array((rindx_g))
+			rstoi_g_ret = np.array((rstoi_g))
+			nreac_g_ret = np.array((nreac_g))
+			pindx_g_ret = np.array((pindx_g))
+			pstoi_g_ret = np.array((pstoi_g))
+			nprod_g_ret = np.array((nprod_g))
+			eq_str_ret = eq_str
 		
 		self.ro_obj = ro_outputs() # create object to hold outputs
 	

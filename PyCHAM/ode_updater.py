@@ -504,13 +504,16 @@ def ode_updater(y, H2Oi,
 					Jlen, y[NOi], y[HO2i], y[NO3i], 
 					sumt, self)
 
-				# if user wants reaction rates of all reactions
-				# saved
-				# (/s for unimolecular reactions, 
-				# cm^3/molecules/s for bimolecular reactions, 
-				# cm^6/molecules^2/s for termolecular reactions)
-				if 'reactionCoeff' in self.user_output:
-					self.reactionRates = np.concatenate((self.reactionRates, rrc.reshape(1, -1)), axis=0)
+				if 'reactionRate' in self.user_output:
+					# estimate gas-phase rate of reaction (molecules/cm^3/s)
+					# for all reactions
+					rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))
+					rrc_y[self.y_arr_g] = y[self.y_rind_g]
+					rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = 'C')
+					# reaction rate (molecules/cm^3/s) 
+					gprates = rrc[0:self.rindx_g.shape[0]]*((rrc_y**self.rstoi_g).prod(axis=1))
+					# append to results at all times
+					self.reactionRates = np.concatenate((self.reactionRates, gprates.reshape(1, -1)), axis=0)
 
 			# for change tendencies, t=0 recording done
 			# inside rec_prep
@@ -1183,12 +1186,17 @@ def ode_updater(y, H2Oi,
 			tot_in_res, self)
 
 			# if user wants reaction rates of all reactions
-			# saved
-			# (/s for unimolecular reactions, 
-			# cm^3/molecules/s for bimolecular reactions, 
-			# cm^6/molecules^2/s for termolecular reactions)
-			if 'reactionCoeff' in self.user_output:
-				self.reactionRates = np.concatenate((self.reactionRates, rrc.reshape(1, -1)), axis=0)
+			# saved (molecules/cm^3/s)
+			if 'reactionRate' in self.user_output:
+					# estimate gas-phase rate of reaction (molecules/cm^3/s)
+					# for all reactions
+					rrc_y = np.ones((self.rindx_g.shape[0]*self.rindx_g.shape[1]))
+					rrc_y[self.y_arr_g] = y[self.y_rind_g]
+					rrc_y = rrc_y.reshape(self.rindx_g.shape[0], self.rindx_g.shape[1], order = 'C')
+					# reaction rate (molecules/cm^3/s) 
+					gprates = rrc[0:self.rindx_g.shape[0]]*((rrc_y**self.rstoi_g).prod(axis=1))
+					# append to results at all times
+					self.reactionRates = np.concatenate((self.reactionRates, gprates.reshape(1, -1)), axis=0)
 
 			# record final change tendency
 			if (len(self.dydt_vst) > 0):

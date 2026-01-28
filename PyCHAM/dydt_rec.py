@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2026 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -24,7 +24,7 @@
 # changes due to gas-phase photochemistry and partitioning are included; 
 # generated in init_conc and treats loss from gas-phase as negative
 
-# File Created at 2026-01-16 11:34:04.439810
+# File Created at 2026-01-28 09:25:52.493210
 
 import numpy as np 
 

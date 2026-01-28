@@ -19,5 +19,4 @@ DayOfYear = 173
 daytime_start = 0.
 light_status = 1
 ac_by_cs = 1
-tracked_comp = O3, HCHO, OH, HO2, NO, NO2
-user_output = all_g, reactionCoeff
+user_output = O3_g, reactionRate

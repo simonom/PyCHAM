@@ -35,8 +35,8 @@ import numpy as np
 import time
 
 def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst, 
-				   numsb, Nresult_wet, Nresult_dry, rbou_rec, H2Oi, 
-				   rootgrp, self):
+				   numsb, Nresult_wet, Nresult_dry, rbou_rec, H2Oi,
+				   MV, indx_plot, x, rootgrp, self):
 	
 	# inputs: -------------------------------------------------------
 	# savei - output index to save
@@ -59,12 +59,14 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		Nresult_wet = (np.array((Nresult_wet))).reshape(-1, 1)
 		Nresult_dry = (np.array((Nresult_dry))).reshape(-1, 1)
 		rbou_rec = (np.array((rbou_rec))).reshape(-1, 1)
+		x = (np.array((x))).reshape(-1, 1)
 		
-	if ((numsb-self.wall_on) == 1): # if one size bins
+	if ((numsb-self.wall_on) == 1): # if one size bin
 		# ensure numpy arrays, rather than float
 		Nresult_wet = (np.array((Nresult_wet)))
 		Nresult_dry = (np.array((Nresult_dry)))
 		rbou_rec = (np.array((rbou_rec)))	
+		x = (np.array((x)))	
 
 	# if first index, then save the unconditional variables
 	if (savei == 0):
@@ -106,6 +108,9 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 
 		# set the particle size bin number dimension
 		rootgrp.createDimension('particle_size_bins', self.nasb)
+
+		# set the particle size bin bounds dimension
+		rootgrp.createDimension('particle_size_bin_bounds', self.nasb+1)
 
 		# set the surface number dimension
 		rootgrp.createDimension('surface_number', self.wall_on)
@@ -185,9 +190,9 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		for stri in range(len(self.comp_namelist)):
 			cnamesvar[stri] = self.comp_namelist[stri]
 
-		# create number of components variable
+		# create variable for number of components
 		ncvar = rootgrp.createVariable('number_of_components', 
-			'float32', ('single_values'))
+			'int', ('single_values'))
 		# set units
 		ncvar.setncattr('units', 'total number of components')
 		# set values
@@ -225,6 +230,31 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# set values
 		Nwet_var[:, :] = Nresult_wet[:, :]
 
+		# radius bounds of particles variable (um)
+		rbou_var = rootgrp.createVariable('particle_radius_bounds', 
+			'float32', ('time', 'particle_size_bin_bounds'))
+		# set units
+		rbou_var.setncattr('units', 'um')
+		# set values
+		rbou_var[:, :] = rbou_rec[:, :]
+
+		# radius of hydrous particles variable (um)
+		r_var = rootgrp.createVariable('hydrous_particle_radius', 
+			'float32', ('time', 'particle_size_bins'))
+		# set units
+		r_var.setncattr('units', 'um')
+		# set values
+		r_var[:, :] = x[:, :]
+
+		# spacing between particle size bins
+		space_mode_var = rootgrp.createVariable('particle_size_bin_spacing_mode', 
+			'str', ('single_values'))
+		# set units
+		space_mode_var.setncattr('units', 'string')
+		# set values
+		space_mode_var[0] = self.space_mode
+
+
 		# create SMILES variable for components in chemical scheme
 		SMILES_var = rootgrp.createVariable('SMILES_strings', 
 			'str', ('components'))
@@ -244,6 +274,32 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		mm_var.setncattr('units', 'g/mol')
 		# set values
 		mm_var[:] = np.squeeze(y_MM)[:]
+
+		# create molar volume variable for components in chemical scheme
+		mm_var = rootgrp.createVariable('molar_volumes', 
+			'float32', ('components'))
+		# set units
+		mm_var.setncattr('units', 'cm^3/mol')
+		# set values
+		mm_var[:] = np.squeeze(MV)[:]
+
+		# create variable for pure component vapour pressure at 298.15 K
+		# for components in the chemical scheme
+		PsatPa_var = rootgrp.createVariable('pure_component_saturation_vapour_pressure_of_components_at_298.15_K', 
+			'float32', ('components'))
+		# set units
+		PsatPa_var.setncattr('units', 'Pa')
+		# set values
+		PsatPa_var[:] = self.Psat_Pa_rec[:]
+
+		# create variable for oxygen to carbon ratios
+		# for components in the chemical scheme
+		OC_var = rootgrp.createVariable('oxygen_to_carbon_ratios', 
+			'float32', ('components'))
+		# set units
+		OC_var.setncattr('units', 'fraction')
+		# set values
+		OC_var[:] = self.OC[:]
 
 		# create seed index variable
 		h2oi_var = rootgrp.createVariable('water_component_index', 
@@ -269,7 +325,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# set values
 		ro2i_var[:] = self.RO2_indices[:, -1]
 
-		# create chemical scheme names of components with initial gas-phase concentration variable
+		# chemical scheme names of components with initial gas-phase concentration variable
 		comp0_var = rootgrp.createVariable('names_of_components_with_initial_gas_phase_concentrations_specified', 
 			'str', ('initial_components'))
 		# set units
@@ -281,7 +337,14 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		for stri in range(len(self.comp0)):
 			comp0_var[stri] = self.comp0[stri]
 		
-		self.comp0
+		# indices of components with initial gas-phase concentration variable
+		indx0_var = rootgrp.createVariable('indices_of_components_with_initial_gas_phase_concentrations_specified', 
+			'int', ('initial_components'))
+		
+		# set units
+		indx0_var.setncattr('units', 'indices of components with initial gas-phase concentrations specified')
+		# set values
+		indx0_var[:] = indx_plot[:]
 
 		return(rootgrp)
 
@@ -554,16 +617,14 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# set values for O:C variable
 		OCvar[:] = OC
 
-	# the rate coefficients of reactions (molecules/cm^3/s)	
-	if ('reactionCoeff' in ud_var):
+	# the rate of reactions (molecules/cm^3/s)	
+	if ('reactionRate' in ud_var):
 
-		# create reaction coefficient variable
-		rrvar = rootgrp.createVariable(str('rate_coefficients_of_all_reactions'), 
+		# create variable for reaction rates
+		rrvar = rootgrp.createVariable(str('rates_of_reaction_of_all_reactions'), 
 								 'float32', ('time', 'reactions'))
 		# set units
-		rrvar.setncattr('units', str('/s for unimolecular reactions, ' +
-							   'cm^3/molecules/s for bimolecular reactions, ' +
-							   'cm^6/molecules^2/s for termolecular reactions)'))
+		rrvar.setncattr('units', str('molecules/cm^3/s'))
 		
 		# set values
 		rrvar[:, :] = self.reactionRates[:, :]
@@ -572,7 +633,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# create variable for indices of components in gas-phase reactions,
 		# with reactions in rows and reactants in columns
 		rig_var = rootgrp.createVariable(str('reactant_indices'), 
-								 'float32', ('reactions', 'maximum_reactants'))
+								 'int', ('reactions', 'maximum_reactants'))
 		# set units
 		rig_var.setncattr('units', str('component indices for reactions (rows) and reactants (columns)'))
 		
@@ -593,7 +654,7 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 
 		# create variable for number of reactants per reaction
 		nreac_var = rootgrp.createVariable(str('number_of_reactants_per_reaction'), 
-								 'float32', ('reactions'))
+								 'int', ('reactions'))
 		# set units
 		nreac_var.setncattr('units', str('number of reactants per reaction'))
 		
@@ -604,12 +665,12 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# create variable for indices of components as products in gas-phase reactions,
 		# with reactions in rows and reactants in columns
 		pig_var = rootgrp.createVariable(str('product_indices'), 
-								 'float32', ('reactions', 'maximum_products'))
+								 'int', ('reactions', 'maximum_products'))
 		# set units
 		pig_var.setncattr('units', str('component indices for reactions (rows) and products (columns)'))
 		
 		# set values
-		pig_var[:, :] = self.pindx_g[:, :]
+		pig_var[:, :] = self.pindx_g[:, 0:max(self.nprod_g)]
 		# ------
 
 		# create variable for stoichiometry of components in gas-phase reactions,
@@ -620,13 +681,13 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		stoi_p_var.setncattr('units', str('stoichiometries of products for reactions (rows) and products (columns)'))
 		
 		# set values
-		stoi_p_var[:, :] = self.pstoi_g[:, :]
+		stoi_p_var[:, :] = self.pstoi_g[:, 0:max(self.nprod_g)]
 		
 		# ------
 
 		# create variable for number of products per reaction
 		nprod_var = rootgrp.createVariable(str('number_of_products_per_reaction'), 
-								 'float32', ('reactions'))
+								 'int', ('reactions'))
 		# set units
 		nprod_var.setncattr('units', str('number of products per reaction'))
 		
@@ -636,12 +697,16 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 
 		# create variable for reaction strings
 		eq_str_var = rootgrp.createVariable(str('equations_per_reaction'), 
-								 'float32', ('reactions'))
+								 'str', ('reactions'))
 		# set units
 		eq_str_var.setncattr('units', str('chemical equations per reaction'))
 		
 		# set values
-		eq_str_var[:] = self.eqn_list[:]
+		# note that because of variable numbers of 
+		# characters per string, they must be assigned to the netCDF variable 
+		# individually
+		for stri in range(len(self.eqn_list)):
+			eq_str_var[stri] = self.eqn_list[stri]
 		# ------
 
 	# end of bespoke saving function

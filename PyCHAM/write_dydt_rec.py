@@ -1,25 +1,24 @@
-########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
-# All Rights Reserved.                                                 #
-# This file is part of PyCHAM                                          #
-#                                                                      #
-# PyCHAM is free software: you can redistribute it and/or modify it    #
-# under the terms of the GNU General Public License as published by    #
-# the Free Software Foundation, either version 3 of the License, or    #
-# (at  your option) any later version.                                 #
-#                                                                      #
-# PyCHAM is distributed in the hope that it will be useful, but        #
-# WITHOUT ANY WARRANTY; without even the implied warranty of           #
-# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
-# General Public License for more details.                             #
-#                                                                      #
-# You should have received a copy of the GNU General Public License    #
-# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
-#                                                                      #
-########################################################################
+##########################################################################################
+#                                                                                        #
+#    Copyright (C) 2018-2026 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#                                                                                        #
+#    All Rights Reserved.                                                                #
+#    This file is part of PyCHAM                                                         #
+#                                                                                        #
+#    PyCHAM is free software: you can redistribute it and/or modify it under             #
+#    the terms of the GNU General Public License as published by the Free Software       #
+#    Foundation, either version 3 of the License, or (at your option) any later          #
+#    version.                                                                            #
+#                                                                                        #
+#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
+#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
+#    details.                                                                            #
+#                                                                                        #
+#    You should have received a copy of the GNU General Public License along with        #
+#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
+#                                                                                        #
+##########################################################################################
 '''generates module that records change tendencies'''
 # function to automatically generate a module that is used to record the 
 # tendency
@@ -39,7 +38,7 @@ def write_dydt_rec(self): # define function
 	f = open(self.PyCHAM_path + '/PyCHAM/dydt_rec.py', mode='w')
 	f.write('##########################################################################################\n')
 	f.write('#                                                                                        #\n')
-	f.write('#    Copyright (C) 2018-2025 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
+	f.write('#    Copyright (C) 2018-2026 Simon O\'Meara : simon.omeara@manchester.ac.uk               #\n')
 	f.write('#                                                                                        #\n')
 	f.write('#    All Rights Reserved.                                                                #\n')
 	f.write('#    This file is part of PyCHAM                                                         #\n')

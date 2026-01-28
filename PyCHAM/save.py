@@ -41,7 +41,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 	# inputs: ----------------------------------------------------------------------------
 	
 	# y_mat - component (columns) concentrations with time (rows) 
-	#	(# molecules/cm3 (air))
+	#	(# molecules/cm^3 (air))
 	# Nresult_dry  - number concentration of dry particles 
 	# per size bin (# particles/cm^3 (air))
 	# Nresult_wet  - number concentration of dry particles 
@@ -151,7 +151,7 @@ def saving(y_mat, Nresult_dry, Nresult_wet, t_out, num_comp,
 			rootgrp = bespoke_saving(savei, y_mat, y_mw, t_out, 
 				cham_env, Cfactor_vst, 
 				numsb, Nresult_wet, Nresult_dry, rbou_rec, H2Oi, 
-				rootgrp, self)
+				MV, indx_plot, x2, rootgrp, self)
 
 		# close netCDF file
 		rootgrp.close()

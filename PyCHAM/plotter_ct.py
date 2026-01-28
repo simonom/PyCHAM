@@ -35,12 +35,14 @@ import scipy.constants as si
 
 # plot change tendency due to all processes (e.g. gas-wall partitioning and the sum
 # of chemical reaction loss and the sum of chemical reaction gain)
-def plotter(caller, dir_path, comp_names_to_plot, self):
+def plotter(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
 	# comp_names_to_plot - chemical scheme names of components to plot
+	# top_num - top number of reactions to plot
+	# uc - units of change rates to use
 	# self - reference to PyCHAM
 	# --------------------------------------------------------------------------
 
@@ -65,25 +67,22 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	seedi = self.ro_obj.seed_ind
 	indx_plot = self.ro_obj.plot_indx
 	comp0 = self.ro_obj.init_comp
-	rbou_rec= np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
+	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
 	rbou_rec[:, :] = self.ro_obj.rad[:, :]
 	x = self.ro_obj.cen_size
 	space_mode = self.ro_obj.spacing
-	Cfac = self.ro_obj.cfac
+	Cfac = self.ro_obj.cfac.reshape(-1, 1)
 	wall_on = self.ro_obj.wf
 	PsatPa = self.ro_obj.vpPa
 	OC = self.ro_obj.O_to_C
-	rindx_g = self.rindx_g
-	reac_coef = self.reac_coef
-	rstoi_g = self.rstoi_g
-	nreac_g = self.nreac_g
-	pindx_g = self.pindx_g
-	pstoi_g = self.pstoi_g
-	nprod_g = self.nprod_g
-	eq_str = self.eq_str
-
-
-	
+	rindx_g = self.ro_obj.rindx_g_ret
+	reac_rate = self.ro_obj.reactionRates_ret
+	rstoi_g = self.ro_obj.rstoi_g_ret
+	nreac_g = self.ro_obj.nreac_g_ret
+	pindx_g = self.ro_obj.pindx_g_ret
+	pstoi_g = self.ro_obj.pstoi_g_ret
+	nprod_g = self.ro_obj.nprod_g_ret
+	eq_str = self.ro_obj.eq_str_ret
 
 #	# loop through components to plot to check they are available
 #	for comp_name in (comp_names_to_plot):
@@ -129,8 +128,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 	
 	# convert the gas-phase concentrations from ppb to molecules/cm^3
 	# in preparation for calculation of rates
-	y = np.zeros((self.yrec.shape[0], self.yrec.shape[1]))
-	y[:, 0:self.nc] = self.yrec[:, 0:self.nc]*self.cfac
+	y = np.zeros((yrec.shape[0], yrec.shape[1]))
+	y[:, 0:num_comp] = yrec[:, 0:num_comp]*Cfac
 	
 	for comp_name in (comp_names_to_plot): # loop through components to plot
 		
@@ -163,7 +162,8 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		# prepare to hold loss equations
 		leq_all = []
 
-		# prepare to hold production rates (molecules/cm^3/s)
+		# prepare to hold production rates (molecules/cm^3/s),
+		# times in rows and reactions in columns
 		pr_all = np.zeros((y.shape[0], 0))
 		# prepare to hold production equations
 		peq_all = []
@@ -176,29 +176,25 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		for reaci in range(rindx_g.shape[0]):
 
 			# if a reactant
-			if ci in rindx_g[reactioni, 0:self.nreac_g[reactioni]]:
+			if ci in rindx_g[reaci, 0:nreac_g[reaci]]:
 				# get loss rate at all times
-				lr = ((y[:, rindx_g[reaci, 0:nreac_g[reaci]]]**rstoi_g[
-					reaci, 0:nreac_g[reaci]]).prod())*reac_coef[:, reaci]
+				lr = rstoi_g[reaci, 0:nreac_g[reaci]][ci == rindx_g[reaci, 0:nreac_g[reaci]]]*reac_rate[:, reaci]
 				
 				# include with all gas-phase chemistry loss rates
-				lr_all = np.concatenate((lr_all, lr), axis=1)
+				lr_all = np.concatenate((lr_all, lr.reshape(-1, 1)), axis=1)
 
 				# include with all gas-phase chemistry loss reactions
 				leq_all.append(eq_str[reaci])
 			
 			# if a product
-			if ci in pindx_g[reactioni, 0:self.nprod_g[reactioni]]:
-				# get reaction rate (molecules/cm^3/s)
-				lr = ((y[:, rindx_g[reaci, 0:nreac_g[reaci]]]**rstoi_g[
-					reaci, 0:nreac_g[reaci]]).prod())*reac_coef[:, reaci]
+			if ci in pindx_g[reaci, 0:nprod_g[reaci]]:
 				
 				# get production rate of component of interest
 				# (molecules/cm^3/s)
-				pr = lr*pstoi_g[ci == pindx_g[reactioni, 0:self.nprod_g[reactioni]]]
-				
-				# include with all gas-phase chemistry loss rates
-				pr_all = np.concatenate((pr_all, pr), axis=1)
+				pr = pstoi_g[reaci, 0:nprod_g[reaci]][ci == pindx_g[reaci, 0:nprod_g[reaci]]]*reac_rate[:, reaci]
+
+				# include with all gas-phase chemistry production rates
+				pr_all = np.concatenate((pr_all, pr.reshape(-1, 1)), axis=1)
 
 				# include with all gas-phase chemistry production reactions
 				peq_all.append(eq_str[reaci])
@@ -220,7 +216,12 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		crl = np.sum(lr_all, axis= 1)
 		# sum chemical reaction gains (molecules/cm^3/s)
 		crg = np.sum(pr_all, axis= 1)
-		
+
+		# rank the magnitude of individual processes
+		rank = np.concatenate((lr_all.sum(axis=0), pr_all.sum(axis=0)))
+		rank_indices = np.argsort(rank)
+		rank_indices = rank_indices[-top_num[0]::]
+
 		#for ti in range(dydt.shape[0]-1): # loop through times
 		#	# indices of reactions that produce component
 		#	indx = dydt[ti+1, 0:-3] > 0
@@ -235,13 +236,25 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		#dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
 		#crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
 		#crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
-			 
-		# plot temporal profiles of change tendencies due to chemical 
-		# reaction loss and production
-		ax0.plot(timehr, crl, 
-			label = str('chemical reaction loss '+ comp_name))
-		ax0.plot(timehr, crg, 
-			label = str('chemical reaction gain '+ comp_name))
+		
+		if (caller == 0): # if total change rates to be plotted
+			# plot temporal profiles of change tendencies due to chemical 
+			# reaction loss and production
+			ax0.plot(timehr, crl, 
+				label = str('chemical reaction loss '+ comp_name))
+			ax0.plot(timehr, crg, 
+				label = str('chemical reaction gain '+ comp_name))
+			
+		if (caller == 1): # if change rates due to individual processes to be plotted
+		
+			rank = np.concatenate((lr_all, pr_all), axis=1)
+			rank_labels = leq_all + peq_all
+
+			for tni in range(top_num[0]):
+				print(rank_indices[tni])
+				print(rank[:, rank_indices[tni]])
+				ax0.plot(timehr, rank[:, rank_indices[tni]], 
+				label = rank_labels[rank_indices[tni]])
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
 		
@@ -249,7 +262,7 @@ def plotter(caller, dir_path, comp_names_to_plot, self):
 		'to decrease \ngas-phase concentrations is negative')
 		ax0.set_xlabel('Time through experiment (hours)')
 		#ct_units = str('(' + u'\u03BC' + 'g/m' + u'\u00B3' + '/s)')
-		ct_units = str('(molecules cm' + u'\u207B' + u'\u00B3 + ' s' + u'\u207B' + u'\u00B9' + ')')
+		ct_units = str('(molecules cm' + u'\u207B' + u'\u00B3' + ' s' + u'\u207B' + u'\u00B9' + ')')
 		ax0.set_ylabel(str('Change tendency ' + ct_units))
 		
 		ax0.yaxis.set_tick_params(direction = 'in')
