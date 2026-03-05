@@ -1,8 +1,8 @@
 ########################################################################
-#								                                       #
-# Copyright (C) 2018-2025					                           #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       		   #
-#								       								   #
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -137,9 +137,9 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 		# if instantaneous injection of particles
 		if (pcontf == 0):
 
-			print('l140 pp_dursim')
-			print(pconc)
-			print(N_perbin0[:, :])
+			#print('l140 pp_dursim')
+			#print(pconc)
+			#print(N_perbin0[:, :])
 			# if this is the new overall particle number 
 			# concentration, e.g. from an observation 
 			# file, as interpretted by obs_file_open
@@ -154,8 +154,8 @@ def pp_dursim(y, N_perbin0, mean_rad, pconc, lowersize,
 				# (# particles/cm^3 (air))
 				N_perbin[:, :] = (N_perbin0[:, :] + 
 				np.array((pconc)).reshape(-1, 1))
-			print(self.pp_dil)
-			print(N_perbin[:, :])
+			#print(self.pp_dil)
+			#print(N_perbin[:, :])
 
 		# if this new particle number represents
 		# injection of new particle in addition to

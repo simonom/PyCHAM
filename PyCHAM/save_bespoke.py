@@ -178,6 +178,15 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 		# set values for tranmission factor of light variable (0-1)
 		tfvar[:] = cham_env[:, 3]
 
+		# save the conversion factor (with time) for converting molecules/cm^3 to ppb
+		# create variable inside the concentrations group
+		cfac_var = rootgrp.createVariable(str('factor_for_multiplying_ppb_to_get_molec/cm3_with_time'), 
+			'float32', ('time'))
+		# set units
+		cfac_var.setncattr('units', 'molecules/cm^3/ppb')
+		# set values for variable
+		cfac_var[:] = Cfactor_vst
+
 		# create component chemical scheme name variable
 		cnamesvar = rootgrp.createVariable('component_chemical_scheme_name', 
 			'str', ('components'))
@@ -356,17 +365,6 @@ def bespoke_saving(savei, y_mat, y_MM, t_out, cham_env, Cfactor_vst,
 
 	# the gas-phase concentration(s) (molecules/cm^3)	
 	if ('_g' in ud_var):
-		
-		# save the conversion factor (with time) for converting molecules/cm^3 to ppb
-		# create variable inside the concentrations group
-		cfac_var = rootgrp.createVariable(str('factor_for_multiplying_ppb_to_get_molec/cm3_with_time'), 
-			'float32', ('time'))
-		
-		# set values for variable
-		cfac_var[:] = Cfactor_vst
-
-		# set units
-		cfac_var.setncattr('units', 'molecules/cm^3/ppb')
 
 		# get the component to be stored
 		comp_name = ud_var[0:ud_var.index('_g')]

@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -223,20 +223,18 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 
 			skip_acu = 1 # skip setting accommodation coef
 		else:
-			# get index of component stated
+			# get index of this component
 			ac_indx = self.comp_namelist.index(acc_comp[i].strip())
 
-			for i in range(len(ac_indx)):
-		
-				# if it is a constant (not a function, which would be a string)
-				if isinstance(accom_coeff_user[i], str) == False:
-					accom_coeff[ac_indx] = accom_coeff_user[i]
-				# if it is a function, it will be a string and needs making 
-				# available to the partit_var module
-				if isinstance(accom_coeff_user[i], str) == True:
-					accom_coeff_func.append(str('accom_coeff[' + 
-						str(ac_indx[i]) + ', 0:self.num_asb]' + ' = ' + 
-						accom_coeff_user[i]))
+			# if it is a constant (not a function, which would be a string)
+			if isinstance(accom_coeff_user[i], str) == False:
+				accom_coeff[ac_indx] = accom_coeff_user[i]
+			# if it is a function, it will be a string and needs making 
+			# available to the partit_var module
+			if isinstance(accom_coeff_user[i], str) == True:
+				accom_coeff_func.append(str('accom_coeff[' + 
+					str(ac_indx) + ', 0:self.num_asb]' + ' = ' + 
+					accom_coeff_user[i]))
 
 	# generate module that contains any accommodation coefficient functions, note, do 
 	# this even if no functions supplied so that the accomm_coeff_calc is updated and
@@ -244,7 +242,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	f = open(self.PyCHAM_path + '/PyCHAM/accom_coeff_calc.py', mode='w')
 	f.write('#################################################################\n')
 	f.write('#                                                               #\n')
-	f.write('#    Copyright (C) 2018-2024 Simon O\'Meara : 			 #\n')
+	f.write('#    Copyright (C) 2018-2026 Simon O\'Meara : 			 #\n')
 	f.write('#    simon.omeara@manchester.ac.uk              		 #\n')
 	f.write('#                                                               #\n')
 	f.write('#    All Rights Reserved.                                       #\n')

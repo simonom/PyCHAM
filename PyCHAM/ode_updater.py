@@ -709,7 +709,7 @@ def ode_updater(y, H2Oi,
 					jac_mod_len, jac_part_hmf_indx,
  					rw_indx, N_perbin, 
 					jac_part_H2O_indx, H2Oi, self)
-					
+
 					# if gas-phase concentration of water is due to stay
 					# constant, then ensure any numerical drift has not affected 
 					# its concentration (not only numerical drift can perturb a

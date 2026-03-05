@@ -384,9 +384,9 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		f.write('		\n')
 		if (num_asb > 0):
 			f.write('		# gas-phase concentration of components at\n')
-			f.write('		# particle surface (# molecules/cm3 (air))\n')
+			f.write('		# particle surface (# molecules/cm^3 (air))\n')
 			f.write('		Csit[0:num_asb, :][isb, :] = Csit[0:num_asb, :][isb, :]*self.Psat[0:num_asb, :][isb, :]*kelv_fac[isb]*act_coeff[0:num_asb, :][isb, :]\n')	
-			f.write('		# partitioning rate (# molecules/cm3/s)\n')
+			f.write('		# partitioning rate (# molecules/cm^3/s)\n')
 			
 			f.write('		dd_all = kimt[0:num_asb, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[0:num_asb, :])\n')
 			f.write('		# gas-phase change\n')
@@ -397,9 +397,9 @@ def ode_gen(int_tol, rowvals, num_comp, num_asb, testf, self):
 		if (self.wall_on > 0):
 			f.write('		if any(wsb):\n')
 			f.write('			# gas-phase concentration of components at\n')
-			f.write('			# wall surface (# molecules/cm3 (air))\n')
+			f.write('			# wall surface (# molecules/cm^3 (air))\n')
 			f.write('			Csit[num_asb::, :][wsb, :] = Csit[num_asb::, :][wsb, :]*self.Psat[num_asb::, :][wsb, :]*act_coeff[num_asb::, :][wsb, :]\n')	
-			f.write('			# partitioning rate (# molecules/cm3/s)\n')
+			f.write('			# partitioning rate (# molecules/cm^3/s)\n')
 			f.write('			dd_all = kimt[num_asb::, :]*(y[0:num_comp, 0].reshape(1, -1)-Csit[num_asb::, :])\n')
 			f.write('			# gas-phase change (summed over all wall bins)\n')
 			f.write('			dd[0:num_comp, 0] -= dd_all.sum(axis=0)\n')

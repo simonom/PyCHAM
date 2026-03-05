@@ -1,6 +1,6 @@
 #################################################################
 #                                                               #
-#    Copyright (C) 2018-2024 Simon O'Meara : 			 #
+#    Copyright (C) 2018-2026 Simon O'Meara : 			 #
 #    simon.omeara@manchester.ac.uk              		 #
 #                                                               #
 #    All Rights Reserved.                                       #
@@ -40,5 +40,6 @@ def accom_coeff_func(accom_coeff, Rp, self):
 
 	import numpy as np
 	# calculate accommodation coefficients 
+	accom_coeff[8, 0:self.num_asb] = 0.2 
 
 	return(accom_coeff)

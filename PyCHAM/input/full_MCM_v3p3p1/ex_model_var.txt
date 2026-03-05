@@ -1,9 +1,9 @@
 res_file_name = example_PyCHAM_output
 rate_constant_file = constants_mcm.f90
 chem_sch_name = mcm_export.eqn
-total_model_time = 720.
+total_model_time = 6000.
 update_step = 120.
-recording_time_step = 360.
+recording_time_step = 1000.
 number_size_bins = 0
 wall_on = 0
 temperature = 288.
@@ -19,4 +19,4 @@ DayOfYear = 173
 daytime_start = 0.
 light_status = 1
 ac_by_cs = 1
-user_output = O3_g, reactionRate
+user_output = O3_g, O_g, O1D_g, NO_g, NO2_g, reactionRate

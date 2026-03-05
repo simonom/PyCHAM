@@ -1,0 +1,31 @@
+# model variable file for the flow tube gas-phase experiments
+# in the Dekati Oxidation Flow Reactor at University of Manchester 
+# several sources: Pichelstorfer et al. 2024 (doi.org/10.1039/D4EA00054D) supplementary material  # Table ST3 
+res_file_name = O3_CO_characterisation
+chem_sch_name = mcm_CH4_PROPANE_BENZENE_chem_sch.kpp
+rate_constant_file = constants_mcm.f90
+xml_name = /Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/input/Ng2007/MCM_PRAM_xml.xml
+chem_scheme_markers = <, RO2, +, C(ind_, ), , &, , , :, >, ;, 
+total_model_time = 3.7e1
+update_step = 0.1
+recording_time_step = 1.e0
+temperature = 295.15
+tempt = 0.
+p_init = 101325.0
+rh = 0.575
+rht = 0
+light_status = 1
+act_flux_file = MAC_OFR_Actinic_Flux_Spectrum.csv
+# initial concentrations of components (ppb)
+Comp0 = O3, CO
+C0 = 3.e4, 1.e4
+wall_on = 0
+# gas-wall partitioning
+# (1./75.)*(D_ig/D_C10H16O8iso1) from Roldin et al. 2019 (Eq. 1 of Methods 
+# (https://doi.org/10.1038/s41467-019-12338-8))
+#mass_trans_coeff = (1.)*((D_ig/D_BZo_RO_O8))
+#eff_abs_wall_massC = 1.e10
+# set the vapour pressure estimation method for nonHOMs
+nonHOMs_vp_method = SIMPOL
+# set the vapour pressure estimation method for HOMs
+HOMs_vp_method = SIMPOL

@@ -1,0 +1,14 @@
+number_of_size_bins,0
+number_of_components,228
+factor_for_multiplying_ppb_to_get_molec/cm3_with_time,[[24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274], [24865119008.563274]]
+simulation_computer_time(s),6.35972785949707
+seed_name,['core']
+wall_on_flag_0forNO_>0forYES,0
+space_mode,lin
+index_of_water,226
+index_of_seed_components,[227]
+size_structure_0_for_moving_centre_1_for_full_moving,0
+output_by_sim_sch_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/output/mcm_CH4_PROPANE_BENZENE_chem_sch/O3_CO_characterisation/inputs/mcm_CH4_PROPANE_BENZENE_chem_sch.kpp
+output_by_sim_mv_ext,/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/PyCHAM/PyCHAM/output/mcm_CH4_PROPANE_BENZENE_chem_sch/O3_CO_characterisation/inputs/mod_var_CO_O3_gasphaseonly_flowtube copy.txt
+history,Saved at (Greenwhich Meridian Time) time.struct_time(tm_year=2026, tm_mon=2, tm_mday=4, tm_hour=14, tm_min=53, tm_sec=30, tm_wday=2, tm_yday=35, tm_isdst=0)
+source,CHemistry with Aerosol Microphysics in Python (PyCHAM), version 5.7.7
