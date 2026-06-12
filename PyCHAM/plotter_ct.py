@@ -37,6 +37,9 @@ import scipy.constants as si
 # of chemical reaction loss and the sum of chemical reaction gain)
 def plotter(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	
+	# module required for rate of production and rate of destruction calculation
+	import PyCHAM_ROPA_RODA_calc
+
 	# inputs: ------------------------------------------------------------------
 	# caller - marker for whether PyCHAM (0) or tests (2) are the calling module
 	# dir_path - path to folder containing results files to plot
@@ -46,72 +49,11 @@ def plotter(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	# self - reference to PyCHAM
 	# --------------------------------------------------------------------------
 
-	# chamber condition ---------------------------------------------------------
-		
-	# get required variables from self
-	wall_on = self.ro_obj.wf
-	yrec = np.zeros((self.ro_obj.yrec.shape[0], self.ro_obj.yrec.shape[1]))
-	yrec[:, :] = self.ro_obj.yrec[:, :]
-	num_comp = self.ro_obj.nc
-	num_sb = self.ro_obj.nsb
-	Nwet = np.zeros((self.ro_obj.Nrec_wet.shape[0], self.ro_obj.Nrec_wet.shape[1]))
-	Nwet[:, :] = self.ro_obj.Nrec_wet[:, :]
-	Ndry = np.zeros((self.ro_obj.Nrec_dry.shape[0], self.ro_obj.Nrec_dry.shape[1]))
-	Ndry[:, :] = self.ro_obj.Nrec_dry[:, :]
-	timehr = self.ro_obj.thr
-	comp_names = self.ro_obj.names_of_comp
-	rel_SMILES = self.ro_obj.rSMILES
-	y_mw = (np.array((self.ro_obj.comp_MW))).reshape(1, -1)
-	y_MV = (np.array((self.ro_obj.comp_MV))).reshape(1, -1)
-	H2Oi = self.ro_obj.H2O_ind
-	seedi = self.ro_obj.seed_ind
-	indx_plot = self.ro_obj.plot_indx
-	comp0 = self.ro_obj.init_comp
-	rbou_rec = np.zeros((self.ro_obj.rad.shape[0], self.ro_obj.rad.shape[1]))
-	rbou_rec[:, :] = self.ro_obj.rad[:, :]
-	x = self.ro_obj.cen_size
-	space_mode = self.ro_obj.spacing
-	Cfac = self.ro_obj.cfac.reshape(-1, 1)
-	wall_on = self.ro_obj.wf
-	PsatPa = self.ro_obj.vpPa
-	OC = self.ro_obj.O_to_C
-	rindx_g = self.ro_obj.rindx_g_ret
-	reac_rate = self.ro_obj.reactionRates_ret
-	rstoi_g = self.ro_obj.rstoi_g_ret
-	nreac_g = self.ro_obj.nreac_g_ret
-	pindx_g = self.ro_obj.pindx_g_ret
-	pstoi_g = self.ro_obj.pstoi_g_ret
-	nprod_g = self.ro_obj.nprod_g_ret
-	eq_str = self.ro_obj.eq_str_ret
+	# pass information to the ROPA and RODA module to get rates of individual
+	# reactions with time and strings of corresponding reactions
+	[lr_all, leq_all, pr_all, peq_all, timehr] = PyCHAM_ROPA_RODA_calc.main(
+		dir_path, comp_names_to_plot)
 
-#	# loop through components to plot to check they are available
-#	for comp_name in (comp_names_to_plot):
-#		
-#		fname = str(dir_path+ '/' + comp_name +'_rate_of_change')
-#		try: # try to open
-#			# skiprows = 1 omits header	
-#			dydt = np.loadtxt(fname, delimiter = ',', skiprows = 1)
-#		except:
-#			mess = str('Please note, a change tendency record for the component ' + 
-#			str(comp_name) + ' was not found, note that it must specified in the ' +
-#			'tracked_comp input of the model variables file. Please ' + 
-#			'see README for more information.')
-#			self.l203a.setText(mess)
-#			
-#			# set border around error message
-#			if (self.bd_pl == 1):
-#				self.l203a.setStyleSheet(0., '2px dashed red', 0., 0.)
-#				self.bd_pl = 2
-#			else:
-#				self.l203a.setStyleSheet(0., '2px solid red', 0., 0.)
-#				self.bd_pl = 1
-#			
-#			plt.ioff() # turn off interactive mode
-#			plt.close() # close figure window
-#			
-#			return()
-	
-	
 	# if all files are available, then proceed without error message
 	mess = str('')
 	# if no priority message, e.g. from gui.py prior to plotter_ct call
@@ -126,133 +68,37 @@ def plotter(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 	plt.ion() # display figure in interactive mode
 	fig, (ax0) = plt.subplots(1, 1, figsize=(14, 7))
 	
-	# convert the gas-phase concentrations from ppb to molecules/cm^3
-	# in preparation for calculation of rates
-	y = np.zeros((yrec.shape[0], yrec.shape[1]))
-	y[:, 0:num_comp] = yrec[:, 0:num_comp]*Cfac
 	
-	for comp_name in (comp_names_to_plot): # loop through components to plot
+	# loop through components to plot
+	for compi in comp_names_to_plot:
 		
-		if (comp_name != 'HOMRO2' and comp_name != 'RO2'):
-			ci = comp_names.index(comp_name) # get index of this component
-			
-		if (comp_name == 'HOMRO2'):
-			# get mean molecular weight of HOMRO2 (g/mol)
-			counter = 0 # count on HOMRO2 components
-			mw_extra = 0. # count on HOMRO2 molecular weights (g/mol)
-			for cni in range(len(comp_names)): # loop through all components
-				if 'API_' in comp_names[cni] or 'api_' in comp_names[cni]:
-					if 'RO2' in comp_names[cni]:
-						mw_extra += y_mw[cni]
-						counter += 1
-			y_mw = np.concatenate((y_mw, (np.array(mw_extra/counter)).reshape(1)))
-			ci = len(y_mw)-1
-			
-		if (comp_name == 'RO2'):
-			# get indices of RO2
-			RO2indx = (np.array((ro_obj.gi['RO2i'])))
-			# get mean molecular weight of RO2 (g/mol)
-			mw_extra = np.sum((np.array((y_mw)))[RO2indx])/len(RO2indx)
-						
-			y_mw = np.concatenate((y_mw, (np.array(mw_extra)).reshape(1)))
-			ci = len(y_mw)-1
-
-		# prepare to hold loss rates (molecules/cm^3/s)
-		lr_all = np.zeros((y.shape[0], 0))
-		# prepare to hold loss equations
-		leq_all = []
-
-		# prepare to hold production rates (molecules/cm^3/s),
-		# times in rows and reactions in columns
-		pr_all = np.zeros((y.shape[0], 0))
-		# prepare to hold production equations
-		peq_all = []
-
-		# loop through reactions to
-		# identify the reactions where this component occurs as a reactant 
-		# (loss process)
-		# and to identify where it occurs as a product 
-		# (production process), note ci is index of component of interest
-		for reaci in range(rindx_g.shape[0]):
-
-			# if a reactant
-			if ci in rindx_g[reaci, 0:nreac_g[reaci]]:
-				# get loss rate at all times
-				lr = rstoi_g[reaci, 0:nreac_g[reaci]][ci == rindx_g[reaci, 0:nreac_g[reaci]]]*reac_rate[:, reaci]
-				
-				# include with all gas-phase chemistry loss rates
-				lr_all = np.concatenate((lr_all, lr.reshape(-1, 1)), axis=1)
-
-				# include with all gas-phase chemistry loss reactions
-				leq_all.append(eq_str[reaci])
-			
-			# if a product
-			if ci in pindx_g[reaci, 0:nprod_g[reaci]]:
-				
-				# get production rate of component of interest
-				# (molecules/cm^3/s)
-				pr = pstoi_g[reaci, 0:nprod_g[reaci]][ci == pindx_g[reaci, 0:nprod_g[reaci]]]*reac_rate[:, reaci]
-
-				# include with all gas-phase chemistry production rates
-				pr_all = np.concatenate((pr_all, pr.reshape(-1, 1)), axis=1)
-
-				# include with all gas-phase chemistry production reactions
-				peq_all.append(eq_str[reaci])
-
-		
-		# note that column -3 in dydt is gas-particle 
-		# partitioning and column -2 is gas-wall partitioning
-		# and column -1 is dilution, whilst columns 0 up to, but
-		# not including -3 are chemical reactions, with the first
-		# row of these columns containing chemical reaction numbers
-		
-		# extract the change tendency due to gas-particle partitioning
-		#gpp = dydt[1::, -3]
-		# extract the change tendency due to gas-wall partitioning
-		#gwp = dydt[1::, -2]
-		# extract the change tendency due to dilution
-		#dil = dydt[1::, -1]
-		# sum chemical reaction losses (molecules/cm^3/s)
-		crl = np.sum(lr_all, axis= 1)
-		# sum chemical reaction gains (molecules/cm^3/s)
-		crg = np.sum(pr_all, axis= 1)
-
 		# rank the magnitude of individual processes
-		rank = np.concatenate((lr_all.sum(axis=0), pr_all.sum(axis=0)))
+		rank = np.concatenate((lr_all[compi].sum(axis=0), pr_all[compi].sum(axis=0)))
 		rank_indices = np.argsort(rank)
 		rank_indices = rank_indices[-top_num[0]::]
-
-		#for ti in range(dydt.shape[0]-1): # loop through times
-		#	# indices of reactions that produce component
-		#	indx = dydt[ti+1, 0:-3] > 0
-		#	crg[ti] = dydt[ti+1, 0:-3][indx].sum()
-		#	# indices of reactions that lose component
-		#	indx = dydt[ti+1, 0:-3] < 0
-		#	crl[ti] = dydt[ti+1, 0:-3][indx].sum()
-			 
-		# convert change tendencies from molecules/cm^3/s to ug/m^3/s
-		#gpp = ((gpp/si.N_A)*y_mw[0, ci])*1.e12
-		#gwp = ((gwp/si.N_A)*y_mw[0, ci])*1.e12
-		#dil = ((dil/si.N_A)*y_mw[0, ci])*1.e12
-		#crg = ((crg/si.N_A)*y_mw[0, ci])*1.e12
-		#crl = ((crl/si.N_A)*y_mw[0, ci])*1.e12
 		
 		if (caller == 0): # if total change rates to be plotted
 			# plot temporal profiles of change tendencies due to chemical 
 			# reaction loss and production
-			ax0.plot(timehr, crl, 
-				label = str('chemical reaction loss '+ comp_name))
-			ax0.plot(timehr, crg, 
-				label = str('chemical reaction gain '+ comp_name))
+			ax0.plot(timehr, lr_all[compi].sum(axis=1), 
+				label = str('chemical reaction loss '+ compi))
+			ax0.plot(timehr, pr_all[compi].sum(axis=1), 
+				label = str('chemical reaction gain '+ compi))
 			
 		if (caller == 1): # if change rates due to individual processes to be plotted
 		
-			rank = np.concatenate((lr_all, pr_all), axis=1)
-			rank_labels = leq_all + peq_all
+			rank = np.concatenate((lr_all[compi], pr_all[compi]), axis=1)
+			rank_labels = leq_all[compi] + peq_all[compi]
 
-			for tni in range(top_num[0]):
-				print(rank_indices[tni])
-				print(rank[:, rank_indices[tni]])
+			# make number of reactions to plot equal
+			# to total number of reactions if less
+			# than the user-defined number to plot
+			if (rank.shape[1] < top_num[0]):
+				top_num_now = rank.shape[1]
+			else:
+				top_num_now = top_num[0]
+
+			for tni in range(top_num_now):
 				ax0.plot(timehr, rank[:, rank_indices[tni]], 
 				label = rank_labels[rank_indices[tni]])
 		
@@ -269,7 +115,6 @@ def plotter(caller, dir_path, comp_names_to_plot, top_num, uc, self):
 		ax0.xaxis.set_tick_params(direction = 'in')
 		
 		ax0.legend()
-			 
 
 	return()
 	

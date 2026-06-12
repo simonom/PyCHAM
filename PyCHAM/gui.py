@@ -897,7 +897,7 @@ class PyCHAM(QWidget):
 		self.varbox.addWidget(self.l71a, scp_row+2, 1)
 		
 		l72 = QLabel(self)
-		l72.setText('Specified densities of \ncomponents (g/cc): ')
+		l72.setText('Specified densities of \ncomponents (g/cm^3): ')
 		self.varbox.addWidget(l72, scp_row+3, 0)
 		self.l72a = QLabel(self)
 		self.l72a.setText((str(dens)).replace('\'', '').replace(
@@ -3567,7 +3567,7 @@ class PyCHAM(QWidget):
 		self.l203a.setText('')
 			
 		# get names of components to plot
-		comp_names = [str(i) for i in self.e217.text().split(',')]
+		comp_names = [str(i.replace(' ', '')) for i in self.e217.text().split(',')]
 		
 		# get top number of chemical reactions to plot
 		try:
@@ -3592,10 +3592,12 @@ class PyCHAM(QWidget):
 			uc = 1
 		if (ct_units[2] == 'm'):
 			uc = 2
-		
-		import plotter_ct	
+
+		import plotter_ct # module for change tendencies
+
 		# name of folder with results
-		dir_path = self.l201.text()
+		dir_path = str(self.l201.text() + '/PyCHAM_output.nc')
+
 		plotter_ct.plotter(1, dir_path, comp_names, 
 			top_num, uc, self) # plot results
 	

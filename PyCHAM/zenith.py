@@ -1,6 +1,6 @@
 ##########################################################################################
 #                                                                                        #
-#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
+#    Copyright (C) 2018-2026 Simon O'Meara : simon.omeara@manchester.ac.uk               #
 #                                                                                        #
 #    All Rights Reserved.                                                                #
 #    This file is part of PyCHAM                                                         #
@@ -77,7 +77,7 @@ def zenith(self):
 	# local hour angle (lha): representing the time of the day - taken from 
 	# solarFunctions.f90 of AtChem2
 	self.lha = pi*((currentFracHour/12.)-(1.+self.lon/180.))+eqtime
-
+	
 	sinld = np.sin(self.lat_rad)*np.sin(self.dec)
 	cosld = np.cos(self.lat_rad)*np.cos(self.dec)
    
