@@ -96,12 +96,24 @@ def volat_calc(comp_list, TEMP, H2Oi, num_comp, vol_Comp,
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 		Repo.clone_from(git_url, (cwd + '/umansysprop'))
 	
-	# point to umansysprop folder
-	sys.path.insert(1, (cwd + '/umansysprop')) # address for updated version
-	
-	from umansysprop import boiling_points
-	from umansysprop import vapour_pressures
-	from umansysprop import liquid_densities
+	if (self.prop_calc_path == 'UManSysProp'):
+		# point to umansysprop folder
+		sys.path.insert(1, (self.PyCHAM_path + '/umansysprop'))
+		from umansysprop import boiling_points
+		from umansysprop import vapour_pressures
+		from umansysprop import liquid_densities
+	if (self.prop_calc_path == 'AeroSysPropv0'):
+		# point to V0 of AeroSysProp folder
+		sys.path.insert(1, ('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/AeroSysProp_July2026/AeroSysProp-main/aerosysprop/methods'))
+		import boiling_points
+		import vapour_pressures
+		import liquid_densities
+	if (self.prop_calc_path == 'AeroSysPropv1'):
+		# point to V1 of AeroSysProp folder
+		sys.path.insert(1, ('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/AeroSysProp_July2026_updated/AeroSysProp-main/aerosysprop/methods'))
+		import boiling_points
+		import vapour_pressures
+		import liquid_densities
 
 	NA = si.Avogadro # Avogadro's number (# molecules/mol)
 	y_dens = np.zeros((num_comp, 1)) # components' liquid density (kg/m3)

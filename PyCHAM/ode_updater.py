@@ -277,7 +277,7 @@ def ode_updater(y, H2Oi,
 	# 	where 0 is dry (therefore on the deliquescence curve) 
 	#	and 1 is wet 
 	#	(therefore on the efflorescence curve)
-	# self.Pybel_objects - the pybel objects for components
+	# self.mol_objects - the mol objects for components
 	# self.pcont - flag for whether particle injection continuous or 
 	#	instantaneous
 	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
@@ -434,7 +434,6 @@ def ode_updater(y, H2Oi,
 		# integration step -----------------------------------
 		# remember initial concentrations (# molecules/cm^3 (air))
 		y0[:] = y[:]
-	
 		# remember initial particle number concentration (# particles/cm^3)
 		N_perbin0[:] = N_perbin[:]
 		x0[:] = x[:] # remember initial particle sizes (um)
@@ -709,7 +708,7 @@ def ode_updater(y, H2Oi,
 					jac_mod_len, jac_part_hmf_indx,
  					rw_indx, N_perbin, 
 					jac_part_H2O_indx, H2Oi, self)
-
+					
 					# if gas-phase concentration of water is due to stay
 					# constant, then ensure any numerical drift has not affected 
 					# its concentration (not only numerical drift can perturb a

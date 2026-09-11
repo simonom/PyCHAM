@@ -127,7 +127,6 @@ def cham_up(sumt,
 	# humidities reached (s)
 	# tempt_cnt - count on temperatures
 	# RHt_cnt - relative humidity counts
-	# self.Pybel_objects - the pybel identifiers for components
 	# nuci - index of nucleating component
 	# y_mw - molar weight of components (g/mol)
 	# temp_now - chamber temperature (K) prior to this update

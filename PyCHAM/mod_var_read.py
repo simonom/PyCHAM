@@ -745,7 +745,8 @@ def mod_var_read(self):
 				except:
 					seed_mw = ['fail']
 		
-			# dissociation constant(s) of seed component(s)
+			# dissociation constant(s) of seed component(s) with respect
+			# to non-water
 			if (key == 'seed_diss' and value.strip()):
 				self.core_diss = [float(i) for i in 
 				(value.split(','))]
@@ -762,7 +763,7 @@ def mod_var_read(self):
 				self.indiv_comp_diss_wrtw_name = [str(i).strip() for i in 
 				(value.split(','))]
 			
-			# dissociation constant(s) of individual component(s) with specified 
+			# dissociation constant(s) of individual component(s) 
 			# with respect to water
 			if (key == 'indiv_comp_diss_wrtw' and value.strip()):
 				self.indiv_comp_diss_wrtw = [float(i) for i in 
@@ -1246,6 +1247,11 @@ def mod_var_read(self):
 				user_output_list = [str(i).strip() for i in
  					(value.split(','))]
 				self.user_output += user_output_list
+
+			# user-defined outputs (molecules/cm^3)
+			if (key == 'prop_calc_option' and (value.strip())):
+				# remember user-defined variables
+				self.prop_calc_path = str(value.strip())
 		
 		# UManSysProp check ----------------------------------
 		# for UManSysProp if no update requested, check that there 

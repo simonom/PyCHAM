@@ -1,24 +1,25 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''module to interrogate equations to withdraw essential information for solution'''
 # code to extract the equation information for chemical reactions required for 
 # their solution in PyCHAM 
@@ -26,7 +27,7 @@
 import numpy as np
 import re
 import formatting
-import openbabel.pybel as pybel
+from rdkit import Chem
 import sys
 
 def eqn_interr(num_sb, erf, err_mess, self):
@@ -90,8 +91,8 @@ def eqn_interr(num_sb, erf, err_mess, self):
 	self.comp_namelist = []
 	# list for the SMILE strings of components present in the chemical scheme
 	comp_list = []
-	# list of Pybel objects of components in chemical scheme
-	Pybel_objects = []
+	# list of mol objects of components in chemical scheme
+	self.mol_objects = []
 	comp_num = 0 # count the number of unique components in the chemical scheme	
 	self.gen_num = [] # for holding generation numbers of components
 	self.RO2_in_rrc = np.empty(0) # whether 'RO2' in the reaction rate coefficient
@@ -283,11 +284,11 @@ def eqn_interr(num_sb, erf, err_mess, self):
 					reac_SMILES.append(name_SMILE)
 
 					comp_list.append(name_SMILE) # list SMILE names
-					# generate pybel object
-					Pybel_object = pybel.readstring('smi', name_SMILE)
-				
-					# append to Pybel object list
-					Pybel_objects.append(Pybel_object)			
+
+					# generate mol object
+					mol_object = Chem.MolFromSmiles(name_SMILE)
+					# append to mol object list
+					self.mol_objects.append(mol_object)		
 	
 				name_indx = comp_num # allocate index to this species
 				comp_num += 1 # number of unique species
@@ -368,12 +369,11 @@ def eqn_interr(num_sb, erf, err_mess, self):
 				
 					# list SMILE string of parsed species
 					comp_list.append(name_SMILE)
-					# generate pybel object
-					Pybel_object = pybel.readstring('smi', 
-						name_SMILE)
-					
-					# append to Pybel object list
-					Pybel_objects.append(Pybel_object)
+
+					# generate mol object
+					mol_object = Chem.MolFromSmiles(name_SMILE)
+					# append to mol object list
+					self.mol_objects.append(mol_object)
 	
 				name_indx = comp_num # allocate index to this component								
 				comp_num += 1 # number of unique component
@@ -620,19 +620,17 @@ def eqn_interr(num_sb, erf, err_mess, self):
 					err_mess = str('Error: inside eqn_interr, seed ' +
 					'component ' + 
 					str(sname) + ' not found in xml file.')
-					return(comp_list, Pybel_objects, comp_num, 
-						erf, err_mess, self)
+					return(comp_list, comp_num, erf, err_mess, self)
 				
 				# get SMILES string
 				name_SMILE = self.comp_smil[name_indx]
 				# list SMILE names
 				comp_list.append(name_SMILE)
 			
-				# generate pybel object
-				Pybel_object = pybel.readstring('smi', name_SMILE)
-			
-				# append to Pybel object list
-				Pybel_objects.append(Pybel_object)
+				# generate mol object
+				mol_object = Chem.MolFromSmiles(name_SMILE)
+				# append to mol object list
+				self.mol_objects.append(mol_object)
 	
 	# same for aqueous-phase and surface (e.g. wall) reactions ------------
 	for phasei in range(2): # 0 for aqueous-phase and 1 for surface (e.g. wall) reactions
@@ -848,11 +846,11 @@ def eqn_interr(num_sb, erf, err_mess, self):
 			
 						# list SMILE names
 						comp_list.append(name_SMILE)
-						# Generate pybel
-						Pybel_object = pybel.readstring('smi',
-							name_SMILE)
-						# append to Pybel object list
-						Pybel_objects.append(Pybel_object)
+
+						# generate mol object
+						mol_object = Chem.MolFromSmiles(name_SMILE)
+						# append to mol object list
+						self.mol_objects.append(mol_object)
 
 					name_indx = comp_num # allocate index to this species	
 					comp_num += 1 # number of unique species
@@ -932,12 +930,11 @@ def eqn_interr(num_sb, erf, err_mess, self):
 				
 						# list SMILE string of parsed species
 						comp_list.append(name_SMILE)
-						# generate pybel object
-						Pybel_object = pybel.readstring('smi',
-							name_SMILE)
 
-						# append to Pybel object list
-						Pybel_objects.append(Pybel_object)
+						# generate mol object
+						mol_object = Chem.MolFromSmiles(name_SMILE)
+						# append to mol object list
+						self.mol_objects.append(mol_object)
 
 
 					# allocate index to this component
@@ -1107,10 +1104,10 @@ def eqn_interr(num_sb, erf, err_mess, self):
 				# list SMILE string of parsed species
 				comp_list.append(name_SMILE)
 				
-				# generate pybel object
-				Pybel_object = pybel.readstring('smi', name_SMILE)
-				# append to Pybel object list
-				Pybel_objects.append(Pybel_object)
+				# generate mol object
+				mol_object = Chem.MolFromSmiles(name_SMILE)
+				# append to mol object list
+				self.mol_objects.append(mol_object)
 
 	# get indices of observed gas-phase components
 	if hasattr(self, 'obs_comp'):
@@ -1118,4 +1115,4 @@ def eqn_interr(num_sb, erf, err_mess, self):
 			self.obs_comp_i[i] = self.comp_namelist.index(
 			self.obs_comp[i])
 	
-	return(comp_list, Pybel_objects, comp_num, erf, err_mess, self)
+	return(comp_list, comp_num, erf, err_mess, self)

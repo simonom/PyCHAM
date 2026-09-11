@@ -27,7 +27,8 @@
 import re
 import numpy as np
 import formatting
-import openbabel.pybel as pybel
+from rdkit import Chem
+from rdkit.Chem import Descriptors
 
 # define function
 def sch_interr(total_list_eqn, self):
@@ -59,36 +60,28 @@ def sch_interr(total_list_eqn, self):
 	ac_flag = 0
 	# the atom name register
 	atom_reg = ['H', 'C', 'N', 'O', 'S', 'Cl', 'Br']
-	# get the molar masses of these components according to pybel (g/mol)
+	# get the molar masses of these components (g/mol)
 	self.atom_reg_mm = np.zeros((len(atom_reg)))
 
-	# get the molar mass of a single hydrogen atom according to pybel by first
+	# get the molar mass of a single hydrogen atom by first
 	# getting the mass of the FH molecule
-	Hnum = (pybel.readstring('smi', 'F'))
-
-	# difference between molwt, exactmass functions in pybel given 
-	# here (24/01/2025): 
-	# https://openbabel.org/api/3.0/
-	# classOpenBabel_1_1OBMol.shtml#a7cac960f30506aa53d083983845032df,
-	# and I chose molwt (for molecules), which is equivalent to atomic mass
-	# for atoms, because this represents the average isotopic abundance,
-	# whereas exactmass should only be used when the isotopic abundance
-	# has been purposefully set in an experiment
+	Hnum = Chem.MolFromSmiles('F')
 
 	# molar mass (g/mol) of whole FH molecule
-	MM = Hnum.molwt
-	for atom in Hnum:
-		# subtract the mass of fluorine get the mass
+	MM = Descriptors.MolWt(Hnum)
+
+	for atom in Hnum.GetAtoms():
+		# subtract the mass of fluorine to get the mass
 		# of a single hydrogen atom
-		MM -= atom.atomicmass
+		MM -= atom.GetMass()
 
 	for atomi in range(len(atom_reg)):
 		
 		if atom_reg[atomi] == 'H':
 			self.atom_reg_mm[atomi] = MM
 		else:
-			for atom in (pybel.readstring('smi', atom_reg[atomi])):
-				self.atom_reg_mm[atomi] = atom.atomicmass
+			for atom in (Chem.MolFromSmiles(atom_reg[atomi])).GetAtoms():
+				self.atom_reg_mm[atomi] = atom.GetMass()
 
 	# if a generic rate constant file provided, 
 	# then read in the lines from this
@@ -319,7 +312,7 @@ def sch_interr(total_list_eqn, self):
 		RO2_start_mark = str('^' + self.chem_sch_mrk[1])
 		
 		# if starting marker for peroxy radical list seen, flag that recording needed
-		if (re.match(RO2_start_mark, line1) != None):
+		if (re.match(RO2_start_mark, line1) != None and (len(self.chem_sch_mrk[1].strip()) > 0)):
 			
 			# to double check that recording needed for peroxy radicals (in case 
 			# self.chem_sch_mrk[1] is not unique)
@@ -340,12 +333,13 @@ def sch_interr(total_list_eqn, self):
 			# .* allows search across all elements of line, \\ ensures marker is
 			# recognised as string
 			mark = str('.*\\' + self.chem_sch_mrk[6])
-			if (re.match(mark, line1) != None):
-				pr_flag = 1
+		
+			if (len(self.chem_sch_mrk[6].strip()) > 0):
+				if (re.match(mark, line1) != None):
+					pr_flag = 1
 			
 			# if line end or continuation marker not supplied then 
-			# assume the RO2 start
-			# marker is unique
+			# assume the RO2 start marker is unique
 			if (len(self.chem_sch_mrk[5].strip()) == 0 and 
 				len(self.chem_sch_mrk[6].strip()) == 0):
 				pr_flag = 1

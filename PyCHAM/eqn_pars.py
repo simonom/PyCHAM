@@ -109,7 +109,7 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 		[err_mess_new, self] = xml_interr.xml_interr(self)
 	
 	# get equation information for chemical reactions
-	[comp_list, Pybel_objects, comp_num, erf, err_mess, self] = eqn_interr.eqn_interr(
+	[comp_list, comp_num, erf, err_mess, self] = eqn_interr.eqn_interr(
 		num_sb, erf, err_mess, self)    
 
 	if (erf != 0): # exit and display error, if it exists
@@ -251,8 +251,8 @@ def extr_mech(int_tol, num_sb, drh_str, erh_str, self):
 	Jlen = photo_num.photo_num(self.photo_path)
 
 	# in case equation parsing to be skipped in further simulations
-	self.rowvals = rowvals; self.colptrs = colptrs; self.comp_num = comp_num;
-	self.rel_SMILES = comp_list; self.Pybel_objects = Pybel_objects; self.Jlen = Jlen
+	self.rowvals = rowvals; self.colptrs = colptrs; self.comp_num = comp_num
+	self.rel_SMILES = comp_list; self.Jlen = Jlen
 
 	return(rowvals, colptrs, comp_num, 
 		Jlen, erf, err_mess, self)

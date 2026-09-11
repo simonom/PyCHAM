@@ -1,6 +1,6 @@
 ########################################################################
 #								                                       #
-# Copyright (C) 2018-2025					                           #
+# Copyright (C) 2018-2026					                           #
 # Simon O'Meara : simon.omeara@manchester.ac.uk			               #
 #								                                       #
 # All Rights Reserved.                                                 #
@@ -346,7 +346,7 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 					num_comp] = wmc
 
 				seed_cnt += 1 # count on seed components
-
+			
 	# if water not to be equilibrated with seed 
 	# particles prior to experiment start (possibly because
 	# particle-phase mole fraction of water already supplied by
@@ -433,6 +433,5 @@ def pp_water_equil(H2Ogc, yn, seedx_now, num_asb, y_mm, R_gas,
 			num_comp] = tmc*(seedx_now[seed_cnt, :])
 
 			seed_cnt += 1 # count on seed components
-			
 
 	return(yn)

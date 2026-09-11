@@ -38,7 +38,7 @@ Version numbers of PyCHAM try to adhere to the semantic described by [semver](ht
 
 ## Installation
 
-There are two options for installing, via conda and via pip.  The pip method takes longer as the openbabel package has to be installed separately.  The instructions below for the pip method currently apply only to linux and macOS, whilst the conda instructions apply to windows, linux and macOS.
+There are two options for installing, via conda and via pip.  The instructions below for the pip method currently apply only to linux and macOS, whilst the conda instructions apply to windows, linux and macOS.
 
 
 ## Install via conda
@@ -57,12 +57,6 @@ The following steps are at the command line:
 
 6. Activate the environment with the command: conda activate PyCHAMenv
 
-7. For Windows and Mac, now also install openbabel using the following at the command line: conda install conda-forge::openbabel.
-
-7a. In addition, it has been noted that when following the above steps in Windows, openbabel does not always link to its data directory.  You can test this by looking for open babel warning messages when running the PyCHAM examples (to run PyCHAM please see [Running](#Running)).  A message such as 'the aromatic.txt file could not be found' indicates the data library is not set.  To set, search for Control Panel in the Windows search bar then User Accounts and User Accounts again.  Then select 'Change my environment variables'. Then, under User variables, select New. Then create the new variable with Variable name 'BABEL_DATADIR' and with Variable value set as the path to the relevant open babel data directory.  To identify your open babel data directory you should look for the open babel folder containing aromatic.txt at a location such as: C:\Users\your_account_name\\.conda\pkgs\openbabel-2.4.1-py37_5\share\openbabel.  Once the path is suppled to the Variable value box select OK to create the variable then open a new anaconda prompt to restart PyCHAM.
-
-6b. On Mac (please skip this step if on Linux or Windows) it has been noted that when following the above steps and then running PyCHAM (to run PyCHAM please see [Running](#Running)), an error is given stating that Developer Tools have not been installed. If this error displays please follow the on-screen instructions to install Developer Tools.
-
 7. Install is complete for Linux, Mac and Windows; to run PyCHAM please see [Running](#Running).  
 
 ## Install via pip
@@ -75,40 +69,11 @@ The following steps are at the command line:
 
 4) Activate this environment.  For example, for a virtual environment called 3env on macOS and linux the command at the command line is: source 3env/bin/activate.  For example, for a virtual environment called 3env on Windows the command at the command line is: .\3env\Scripts\activate
 
-5) openbabel must be installed separately to PyCHAM, begin by downloading and unzipping the tar file (file name containing .tar.) for the latest version of openbabel on [github](https://github.com/openbabel/openbabel/releases).  Note that the unzipped version can be stored in the Downloads folder for the installation process.
-
 The following steps are at the command line:
 
-6) At the command line cd into the unzipped openbabel folder, for example: cd openbabel-3.1.1
+5) Ensure pip and wheel up to date: pip install --upgrade pip wheel
 
-7) Create a build directory: mkdir build
-
-8) Change into the build directory: cd build
-
-9) Using cmake, prepare the openbabel build files.  This requires several specifications, the -DCMAKE_INSTALL_PREFIX specification should be the path to the site-packages folder of the virtual environment created above: cmake -DRUN_SWIG=ON -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/3env/lib/python3.6/site-packages ..
-
-9a) If the above command causes a message at the command prompt that eigen cannot be found this can be fixed by stating its location, for example: 
-cmake .. -DRUN_SWIG=ON -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/3env/lib/python3.6/site-packages -DEIGEN3_INCLUDE_DIR=/usr/local/Cellar/eigen/3.3.9/include/eigen3
-
-10) Complete installation with: make install
-
-11) Test that openbabel is functioning with: python
-
-11a) Then inside the python interpreter use: import openbabel
-
-11b) If this works fine (no error message) continue to step 12 If this returns: ModuleNotFoundError: No module named 'openbabel', then quit the python interpreter: quit()
-
-11c) If error seen in step above, add the openbabel path to the python path, for example: export PYTHONPATH=~/3env/lib/python3.6/site-packages/lib/python3.6/site-packages/openbabel:$PYTHONPATH
-
-12) Test that pybel is functioning with: python
-
-12a) Then inside the python interpreter use: import pybel
-
-12b) If no error message seen continue to next step.  During testing this threw a relative import error which was corrected by changing the relevant line (given in the error message) in the pybel.py file (file location given in the error message) from "from . import openbabel as ob" to "import openbabel as ob"
-
-13) Ensure pip and wheel up to date: pip install --upgrade pip wheel
-
-14) Install PyCHAM and its dependencies in the virtual environment: python -m pip install --upgrade PyCHAM
+6) Install PyCHAM and its dependencies in the virtual environment: python -m pip install --upgrade PyCHAM
 
 Install is complete, to run PyCHAM please see [Running](#Running).
 
@@ -268,9 +233,10 @@ In addition, you can find more information around photochemistry and flow mode i
 | seedx = | Mole fraction of non-water components in dry (no water) seed particles.  Defaults to equal mole fractions for all non-water components stated in the seed_name model variable.  Must match length of seed_name with the mole fractions of different components separated by a semicolon.  If just one mole fraction provided for each component it will be assumed that this applies to all size bins.  If mole fractions are to be provided for each size bin, then separate values with a comma and the number of values per component must equal the number_size_bins variable above (the first value representing the smallest size bin and so on). If representing different times, then separate times with a colon (:). If values given for just one time, but multiple injections of seed occur, t will be assumed that the same seed mole fractions apply to all injections.  For example, for two components (seed_name = AMM_SUL, SOOT) and two size bins at two different times, with mole fractions for the first component (AMM_SUL) of 0.1 (size bin 1) and 0.2 (size bin 2), changing to 0.3 and 0.4 in the second time and mole fractions for the second component (SOOT) of 0.9 (size bin 1) and 0.8 (size bin 2), chaning to 0.7 and 0.6 in the second time: seedx = 0.1, 0.2; 0.9, 0.8: 0.3, 0.4; 0.7, 0.6 , where the component order (first, second, etc.), is given by the order stated in seed_name.  Please note that PyCHAM does not automatically estimate the effect of particle composition on activity coefficients (which affect gas-particle partitioning), nor reactions at the particle surface, nor reactions in the particle bulk.  Please see the [Gas-particle Partitioning](#Gas-particle-Partitioning) section for more related information. |
 | Vwat_inc = | Flag to say whether (set to 1) or not (set to 0) water volume is accounted for in the seed particle number size distribution. Set to 2 to account for water in seed particles and equilibrate water with surfaces prior to simulation start.  Default is 2. |
 | mean_rad = | Mean radius of particles (um).  If in number size distributions given in modal mode, then mean_rad should represent the mean radius of the lognormal size distribution per mode (modes separated by a colon). Whereas if particle number concentrations given per size bin, mean_rad .  Defaults to mean radius of the particle size bin radius bounds given by lower_part_size and upper_part_size inputs.  If seed particles are introduced at more than one time, then mean_rad for the different times should be separated by a semicolon.  For example, if seed particle with two modes of mean radii of 1.e-2 and 1.e-1 um introduced at start and with mean radii of 2.0e-2 and 2.e-1 um introduced after 120 s, the mean_rad input is: mean_rad = 1.e-2 : 1.e-1 ; 2.e-2 : 2.e-1 and the pconct input is pconct = 0. ; 120. |
-| seed_eq_wat = | If water is not included in the provided seed particle number size distribution (determined by the Vwat_inc model variable), this variable determines whether (1) or not (0) to allow water vapour in chamber (determined by the relative humidity) to equilibrate with seed particles prior to the experiment starting.  Defaults to 1 which allows equilibrium. |
+| seed_eq_wat = | If water is not included in the provided seed particle number size distribution (determined by the Vwat_inc model variable), this variable determines whether (1) or not (0) to allow water vapour (determined by the relative humidity) to equilibrate with seed particles prior to the experiment starting.  Defaults to 1 which allows equilibrium. |
 | std = | Geometric mean standard deviation of seed particle number concentration (dimensionless) when total particle number concentrations per mode provided in pconc variable.  If more than one mode, separate modes with a colon.  Role explained online in scipy.stats.lognorm page, under pdf method: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html.  If left empty defaults to 1.2.  If seed particles introduced at multiple times, then separate std for different times using a semicolon.  For example, if seed particle with modes of standard deviation  1.2 and 1.3 introduced at start and with standard deviations of 1.4 and 1.5 introduced after 120 s, the std input is: std = 1.2 : 1.3 ; 1.4 : 1.5 and the pconct input is: pconct = 0. ; 120..  Note that std must be greater than 1.0, with wider distributions given by greater values.  Will error if a number less than or equal to 1.0 supplied.|
-| seed_diss = | Dissociation constant(s) for seed component(s) (dimensionless), if empty defaults to one.  If more than one component comprising seed particles please separate their dissociation constants with a comma and ensure that number of constants matches number of components named in seed_name input. |
+| seed_diss = | Dissociation constant(s) for seed component(s) (dimensionless) with respect to non-water components, if empty defaults to one.  If more than one component comprising seed particles please separate their dissociation constants with a comma and ensure that number and order of constants corresponds to components in seed_name input. |
+| seed_diss_wrtw = | Dissociation constant(s) for seed component(s) (dimensionless) with respect to water , if empty defaults to one.  If more than one component comprising seed particles please separate their dissociation constants with a comma and ensure that number and order of constants corresponds to components in seed_name input. | 
 | ppartit_cutoff = | The threshold product of pure component saturation vapour pressure and component particle-phase activity coefficient (Pa) above which gas-particle partitioning rate is assumed zero. Defaults to off setting, meaning that this assumption is not applied and all components may undergo gas-particle partitioning. This model variable may reduce wall clock time for simulations because gas-particle partitioning of components with relatively very small rates of partitioning can be ignored and therefore reduce problem stiffness.|
 | z_prt_coeff = | Fraction of total gas-particle partitioning coefficient below which the partitioning coefficient is set to zero, e.g. because surface area of a size bin is relatively very small.  Defaults to one billionth (1.0e-9).  This setting is necessary for ODE solver stability when some particle size bins have relatively very small surface area.  To the best of our knowledge, the default value of one billionth has no significant effect on model results.  Please note that this is a variable required for numerical practicality and not for improved representation of simulated processes.  See the [Numerical Considerations](#Numerical-Considerations) section for further information.|
 | z_prt_coeff_loC = | Fraction of total gas- and particle-phase concentrations (excluding seed and water) below which partitioning to particles and walls is set to zero. Defaults to zero. |
@@ -435,8 +401,14 @@ The [Lunderberg et al. (2020)] (https://dx.doi.org/10.1021/acs.est.0c00966) stud
 
 ## Major Version Updates
 
-Major version updates are updates that are not backward compatible, meaning that using the same model inputs in the updated version may give results that are different to those created using the same inputs in previous versions. Major version updates are represented by a change to the first number in the verison number. The version number represents MAJOR.MINOR.PATCH changes. In 2024, work with Yarê Baker (then of Forschungszentrum Jülich GmbH) recognised that PyCHAM version 4 and below had been using the incorrect calculation for the mean free path (mfp) of trace components in air inside the partit_var_prep module (which is then applied in the partit_var module to estimate Knudsen number for the transiton regime correction factor for the diffusion coefficient of components (required to estimate rate of gas-particle partitioning)). In PyCHAM version 4 and below equation 15.24 of Jacobson 2005 (Fundamentals of Atmospheric Modeling) was used, but this equation is intended for the mean free path of the main (relatively small) components of air, such as N2 and O2, through air, whereas in PyCHAM version 5 and above, Eq. 9.15 of Seinfeld and Pandis 2016 (Atmospheric Chemistry and Physics, 3rd edition, print ISBN 9781118947401) is used, which is better suited to the mean free path of relatively large trace components of air through air. The effect on resulting particulate matter is demonstrated below, where results from v4.8.0 (using the old mean free path calculation) are compared against results from v5.0.0 (using the new mean free path calculation) for the secondary particulate matter formed during the simulation described in Figure 1 of the PyCHAM [GMD paper](https://doi.org/10.5194/gmd-14-675-2021) (2021). It should be noted that although the relative effect can reach a factor of around three, this relates to a relatively small absolute difference, due to a relatively small absolute mass concentration.
+Major version updates are updates that are not backward compatible, meaning that using the same model inputs in the updated version may give results that are different to those created using the same inputs in previous versions. Major version updates are represented by a change to the first number in the verison number. The version number represents MAJOR.MINOR.PATCH changes. 
+
+In 2024, work with Yarê Baker (then of Forschungszentrum Jülich GmbH) recognised that PyCHAM version 4 and below had been using the incorrect calculation for the mean free path (mfp) of trace components in air inside the partit_var_prep module (which is then applied in the partit_var module to estimate Knudsen number for the transiton regime correction factor for the diffusion coefficient of components (required to estimate rate of gas-particle partitioning)). In PyCHAM version 4 and below equation 15.24 of Jacobson 2005 (Fundamentals of Atmospheric Modeling) was used, but this equation is intended for the mean free path of the main (relatively small) components of air, such as N2 and O2, through air, whereas in PyCHAM version 5 and above, Eq. 9.15 of Seinfeld and Pandis 2016 (Atmospheric Chemistry and Physics, 3rd edition, print ISBN 9781118947401) is used, which is better suited to the mean free path of relatively large trace components of air through air. The effect on resulting particulate matter is demonstrated below, where results from v4.8.0 (using the old mean free path calculation) are compared against results from v5.0.0 (using the new mean free path calculation) for the secondary particulate matter formed during the simulation described in Figure 1 of the PyCHAM [GMD paper](https://doi.org/10.5194/gmd-14-675-2021) (2021). It should be noted that although the relative effect can reach a factor of around three, this relates to a relatively small absolute difference, due to a relatively small absolute mass concentration.
 ![Example of effect of changing mean free path calculation (PyCHAM v4 to v5)](https://github.com/simonom/PyCHAM/blob/master/Images_for_readme/v4_to_v5_effect_example.png "Figure 2")
+
+PyCHAM version 3 contained an error in the calculation of the kelvin factor, causing it to be underestimated. Specifically, the particle density was in units of mg/cm^3 when it should have been in units of g/cm^3 (i.e. a factor 1e3 too great). This error is corrected in v5 and later versions. This error can cause substantial discrepancies for simulations involving gas-particle partitioning where significant particle mass is represented by particles of radius less than 0.5 um. 
+
+PyCHAM v3 contained a vapour pressure estimation for certain molecules that were thought to be highly oxidisied based on atomic number. This estimation method was enforced and not documented. As of version 5 and above, the applied vapour pressure estimation method for organics is determined by the user. 
 
 ## Ambient Modelling
 

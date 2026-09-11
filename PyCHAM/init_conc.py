@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2025					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -29,8 +29,8 @@ import scipy.constants as si
 import math
 from water_calc import water_calc
 import write_dydt_rec
-import openbabel.pybel as pybel
-
+from rdkit import Chem
+from rdkit.Chem import Descriptors
 
 def init_conc(num_comp, init_conc,
 	testf, num_eqn, Compt, seed_mw,
@@ -231,9 +231,9 @@ def init_conc(num_comp, init_conc,
 	
 	if (self.ac_by_cs == 0):
 		# loop through all components to get molar mass (g/mol)
-		# from pybel objects that are from SMILES strings
+		# from mol objects that are from SMILES strings
 		for i in range(num_comp):
-			y_mw[i] = self.Pybel_objects[i].molwt
+			y_mw[i] = Descriptors.MolWt(self.mol_objects[i])
 	else:
 		# loop through all components to get molar mass (g/mol) from atomic
 		# composition in chemical scheme file
@@ -332,11 +332,10 @@ def init_conc(num_comp, init_conc,
 				H2O_SMILES = 'O'
 				self.rel_SMILES.append(H2O_SMILES)
 
-				# generate pybel object
-				Pybel_object = pybel.readstring('smi', self.rel_SMILES[-1])
-				
-				# append to Pybel object list
-				self.Pybel_objects.append(Pybel_object)
+				# generate mol object
+				mol_object = Chem.MolFromSmiles(self.rel_SMILES[-1])
+				# append to mol object list
+				self.mol_objects.append(mol_object)
 
 	# ------------------------------------------------------------------------------------
 	# seed components

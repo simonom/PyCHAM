@@ -57,6 +57,7 @@ dependencies:
   - python-dateutil
   - pytz
   - qt
+  - rdkit
   - readline
   - requests
   - scipy

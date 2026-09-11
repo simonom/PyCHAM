@@ -110,6 +110,7 @@ def ode_solv(y, integ_step, Cinfl_now,
 
 			# mole fraction of water at particle surface
 			Csit = (y[1::, 0][isb]/csum[isb, 0])
+			
 			# gas-phase concentration of water at particle surface
 			# (# molecules/cm^3 (air))
 			Csit = Csit*self.Psat[0:num_sb-self.wall_on, :][

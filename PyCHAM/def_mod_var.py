@@ -1,8 +1,8 @@
 ########################################################################
-#								       #
-# Copyright (C) 2018-2026					       #
-# Simon O'Meara : simon.omeara@manchester.ac.uk			       #
-#								       #
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
 # All Rights Reserved.                                                 #
 # This file is part of PyCHAM                                          #
 #                                                                      #
@@ -65,6 +65,7 @@ def def_mod_var(caller, self): # define function
 		uman_up = 0 
 	if (caller == 1): # called from Travis
 		uman_up = 1
+	self.prop_calc_path = 'UManSysProp' # alternatives are AeroSysPropv0, AeroSysPropv1
 	# integration tolerances (absolute first, relative second)
 	int_tol = [1.e-3, 1.e-4] 
 	self.testf = 0 # whether in testing mode or not

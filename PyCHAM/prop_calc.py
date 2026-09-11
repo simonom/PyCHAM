@@ -1,6 +1,6 @@
 ########################################################################
 #                                                                      #
-# Copyright (C) 2018-2025                                              #
+# Copyright (C) 2018-2026                                              #
 # Simon O'Meara : simon.omeara@manchester.ac.uk                        #
 #                                                                      #
 # All Rights Reserved.                                                 #
@@ -38,6 +38,7 @@ import errno
 import stat
 from water_calc import water_calc
 import group_indices
+from rdkit.Chem import rdMolDescriptors
 
 def prop_calc(H2Oi, num_comp, vol_Comp, 
 		volP, testf, corei, umansysprop_update, 
@@ -48,7 +49,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 	# inputs: ------------------------------------------------------
 	# self.rel_SMILES - array of SMILE strings for components 
 	# (omitting water and core, if present)
-	# self.Pybel_objects - list of Pybel objects representing 
+	# self.mol_objects - list of molecule objects representing 
 	# the components in self.rel_SMILES
 	# (omitting water and core, if present)
 	# self.TEMP - temperature (K) in chamber at all times
@@ -152,7 +153,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		
 		# ensure any component named core has zero vapour pressure
 		self.Psat[corei[0]] = 0.
-
+		
 		# in preparation for ode solver, tile over size and 
 		# wall bins if present
 		if (self.num_asb+self.wall_on > 0):
@@ -186,23 +187,25 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		git_url = 'https://github.com/loftytopping/UManSysProp_public.git'
 		Repo.clone_from(git_url, (self.PyCHAM_path + '/umansysprop'))
 		
-		# now check on whether import pybel written in data/__init__.py
-		f_init = open(str(self.PyCHAM_path + '/umansysprop/umansysprop/' +
-		'data/__init__.py'), mode='r')
-		lines = f_init.readlines()
-		if 'import pybel' in lines[21]:
-			lines[21] = 'import openbabel.pybel as pybel\n'	
-			f_init = open(str(cwd + '/umansysprop/umansysprop/data' +
-			'/__init__.py'), mode='w')
-			f_init.writelines(lines)
-		f_init.close()
 
-	# point to umansysprop folder
-	sys.path.insert(1, (self.PyCHAM_path + '/umansysprop'))
-	
-	from umansysprop import boiling_points
-	from umansysprop import vapour_pressures
-	from umansysprop import liquid_densities
+	if (self.prop_calc_path == 'UManSysProp'):
+		# point to umansysprop folder
+		sys.path.insert(1, (self.PyCHAM_path + '/umansysprop'))
+		from umansysprop import boiling_points
+		from umansysprop import vapour_pressures
+		from umansysprop import liquid_densities
+	if (self.prop_calc_path == 'AeroSysPropv0'):
+		# point to V0 of AeroSysProp folder
+		sys.path.insert(1, ('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/AeroSysProp_July2026/AeroSysProp-main'))
+		from aerosysprop.methods import boiling_points
+		from aerosysprop.methods import vapour_pressures
+		from aerosysprop.methods import liquid_densities
+	if (self.prop_calc_path == 'AeroSysPropv1'):
+		# point to V1 of AeroSysProp folder
+		sys.path.insert(1, ('/Users/user/Library/CloudStorage/OneDrive-TheUniversityofManchester/GitHub/AeroSysProp_July2026_updated/AeroSysProp-main'))
+		from aerosysprop.methods import boiling_points
+		from aerosysprop.methods import vapour_pressures
+		from aerosysprop.methods import liquid_densities
 
 	NA = si.Avogadro # Avogadro's number (molecules/mol)
 
@@ -295,7 +298,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 		rec_now_flag = 0
 			
 		if (i == corei[0]): # if this component is 'core'
-			# core component not included in self.Pybel_objects
+			# core component not included in self.mol_objects
 			self.y_dens[i] = core_dens*1.e3 # core density (kg/m^3 (particle))
 			# assign an assumed O:C ratio of 0.
 			self.OC[0, i] = 0.
@@ -307,7 +310,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 			continue
 		
 		# water vapour pressure already given by self.Psat_water (log10(atm))
-		# and water not included in self.Pybel_objects
+		# and water not included in self.mol_objects
 		if (i == H2Oi):
 			self.y_dens[i] = 1.*1.e3 # (kg/m3 (particle))
 			if (self.pars_skip != 2):
@@ -353,7 +356,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 				self.rel_SMILES[i] != '[C]'):
 				# density (convert from g/cm^3 to kg/m^3)
 				self.y_dens[i] = liquid_densities.girolami(
-						self.Pybel_objects[i])*1.e3
+						self.mol_objects[i])*1.e3
 			
 		if (self.comp_namelist[i] == 'O3'):
 			if (self.pars_skip != 2 and self.ac_by_cs == 0):
@@ -430,10 +433,10 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 				'NANNOOLAL' in self.HOMs_vp):
 					# if Nannoolal method wanted for HOMs
 					Psatnow = ((vapour_pressures.nannoolal(
-						self.Pybel_objects[i],
+						self.mol_objects[i],
 						self.TEMP[tempt_cnt], 
 						boiling_points.nannoolal(
-						self.Pybel_objects[i]))))
+						self.mol_objects[i]))))
 
 				# if Mohr et al. 2019 method wanted for HOMs
 				if ('Mohr' in self.HOMs_vp or 'mohr' in self.HOMs_vp or 
@@ -465,7 +468,7 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 					if (self.pars_skip != 2):
 						# if EVAPORATION method wanted for HOMs
 						Psatnow = ((vapour_pressures.evaporation2(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt])))
 
 				if (self.HOMs_vp == 'MY'):
@@ -473,16 +476,16 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 						# if Myrdal and Yalkowsky method wanted for HOMs
 						Psatnow = ((
 							vapour_pressures.myrdal_and_yalkowsky(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt], 
 							boiling_points.nannoolal(
-							self.Pybel_objects[i]))))
+							self.mol_objects[i]))))
 			
 				if (self.HOMs_vp == 'SIMPOL'):
 					if (self.pars_skip != 2):
 						# if SIMPOL method wanted for HOMs
 						Psatnow = ((vapour_pressures.simpol(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt])))
 					
 					
@@ -498,15 +501,15 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 						'NANNOOLAL' in self.nonHOMs_vp):
 						# if Nannoolal method wanted for nonHOMs
 						Psatnow = ((vapour_pressures.nannoolal(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt], 
 							boiling_points.nannoolal(
-							self.Pybel_objects[i]))))
+							self.mol_objects[i]))))
 			
 					if (self.nonHOMs_vp == 'EVAPORATION'):
 						# if EVAPORATION method wanted for nonHOMs
 						Psatnow = ((vapour_pressures.evaporation2(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt])))
 
 					# if Myrdal and Yalkowsky method wanted for nonHOMs
@@ -520,17 +523,16 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 						else:
 							Psatnow = ((
 							vapour_pressures.myrdal_and_yalkowsky(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt], 
 							boiling_points.nannoolal(
-							self.Pybel_objects[i]))))
+							self.mol_objects[i]))))
 			
 					if (self.nonHOMs_vp == 'SIMPOL'):
 						# if SIMPOL method wanted for nonHOMs
 						Psatnow = ((vapour_pressures.simpol(
-							self.Pybel_objects[i],
+							self.mol_objects[i],
 							self.TEMP[tempt_cnt])))
-
 
 		if (self.pars_skip != 2 and self.pars_skip != 3 and self.pars_skip != 4 and self.ac_by_cs == 0):
 			try: # in case array
@@ -548,9 +550,9 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 			else: 
 				if  (self.ac_by_cs == 0):
 					Psatnow = ((vapour_pressures.nannoolal(
-						self.Pybel_objects[i], 298.15,  
+						self.mol_objects[i], 298.15,  
 						boiling_points.nannoolal(
-						self.Pybel_objects[i]))))
+						self.mol_objects[i]))))
 
 				try: # in case array
 					self.Psat_Pa_rec[i]  = Psatnow[0]
@@ -564,27 +566,27 @@ def prop_calc(H2Oi, num_comp, vol_Comp,
 				self.HC[0, i] = 0.
 				self.nom_mass[0, i] = 70.
 				continue
+
+			# get formula of this molecule
+			molec_formula = rdMolDescriptors.CalcMolFormula(self.mol_objects[i])
 		
 			# if hydrogen is present in this molecule
-			if ('H' in self.Pybel_objects[i].formula):
+			if ('H' in molec_formula):
 
-				Hindx_start = self.Pybel_objects[i].formula.index('H')+1
+				Hindx_start = molec_formula.index('H')+1
 				Hindx_end = Hindx_start
-				for Hnum_test in self.Pybel_objects[i].formula[Hindx_start::]:
+				for Hnum_test in molec_formula[Hindx_start::]:
 					try:
 						# only continue if this character is a number
 						float(Hnum_test)
 						Hindx_end += 1
-						if (Hindx_end == len(
-							self.Pybel_objects[i].formula)):
+						if (Hindx_end == len(molec_formula)):
 							Hcount = float(
-								self.Pybel_objects[i].formula[
-								Hindx_start:Hindx_end])
+								molec_formula[Hindx_start:Hindx_end])
 					except:
 						if (Hindx_end != Hindx_start):
 							Hcount = float(
-								self.Pybel_objects[i].formula[
-							Hindx_start:Hindx_end])
+								molec_formula[Hindx_start:Hindx_end])
 						else:
 							# if no number then Hydrogen 
 							# must be alone

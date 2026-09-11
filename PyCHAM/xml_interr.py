@@ -24,7 +24,7 @@
 # from the xml file
 
 import xmltodict # for opening and converting xml files to python dictionaries
-import openbabel.pybel as pybel # for converting SMILE strings to pybel objects
+from rdkit import Chem # for converting SMILE strings to pybel objects
 
 # define function
 def xml_interr(self):
@@ -94,18 +94,18 @@ def xml_interr(self):
 				self.comp_smil[i] = 'OS(=O)(=O)O'
 				succ = 1
 			if (succ == 0):
-				# first try assuming that SMILE string 
+				# first try assuming that SMILES string 
 				# is represented by component name
-				try:
+				try: # test to see if this is an acceptable SMILES string
 					self.comp_smil[i] = self.comp_xmlname[i]
-					Pybel_object = pybel.readstring(
-					'smi', self.comp_smil[i])
+					# generate mol object
+					mol_object = Chem.MolFromSmiles(self.comp_smil[i])
 				except:
 					err_mess_new = str('Error: a ' +
-					'smiles string was not found for ' +
+					'SMILES string was not found for ' +
 					'component ' + str(self.comp_xmlname[i]) + 
 					' in the xml file, nor could its ' +
-					'name be interpreted as a SMILE string')
+					'name be interpreted as a SMILES string')
 					break
 
 	return(err_mess_new, self)

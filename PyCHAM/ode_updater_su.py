@@ -255,7 +255,7 @@ def ode_updater_su(y, H2Oi,
 	# wat_hist - flag for history of particle-phase with respect to water partitioning,
 	# 	where 0 is dry (therefore on the deliquescence curve) and 1 is wet 
 	#	(therefore on the efflorescence curve)
-	# self.Pybel_objects - the pybel objects for components
+	# self.mol_objects - the mol objects for components
 	# self.pcont - flag for whether particle injection continuous or instantaneous
 	# self.dil_fac - chamber dilution factor (fraction of chamber/s)
 	# NOi - NO index

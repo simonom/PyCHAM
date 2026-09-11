@@ -11,7 +11,7 @@ dependencies:
   - numpy>=2
   - openpyxl
   - python<=3.10
+  - rdkit
   - scipy
   - xmltodict
   - pyqt=6
-  - openbabel

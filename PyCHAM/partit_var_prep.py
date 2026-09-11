@@ -58,7 +58,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# num_sb - number of size bins (including wall)
 	# num_asb - number of actual size bins excluding wall
 	# self.Press - air pressure inside chamber (Pa)
-	# self.Pybel_objects - Pybel objects for components
+	# self.mol_objects - mol objects for components
 	# self - reference to program
 	# self.kw - rate of transfer of components to wall (/s)
 	# -------------------------------------------------------------
@@ -86,7 +86,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	
 	if (self.ac_by_cs == 0): # if SMILES being used
 		# get diffusion volumes
-		diff_vol = diff_vol_est.diff_vol_est(self.Pybel_objects)
+		diff_vol = diff_vol_est.diff_vol_est(self)
 	else:
 		diff_vol = np.zeros((len(self.comp_namelist)-1))
 
@@ -94,7 +94,7 @@ def prep(y_mw, TEMP, num_comp, act_comp, act_user, acc_comp,
 	# Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1)
 	
-	# core not included in self.Pybel_objects
+	# core not included in self.mol_objects
 	diff_vol = (np.append(diff_vol, np.array((1.))))
 	diff_vol = diff_vol.reshape(-1, 1)
 	

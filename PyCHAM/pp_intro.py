@@ -242,6 +242,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 				 self.comp_namelist.index(
 				self.indiv_comp_diss_wrtw_name[indi])] = self.indiv_comp_diss_wrtw[indi]
 
+	
 	# account for particle-phase concentration of components 
 	# contained in particles if particle influx at start is
 	# not continuous
@@ -249,7 +250,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		
 		# volume concentration of particles (um^3/cm^3 (air)),
 		# note that for N_perbin, size bins are in rows (as set in size_distr.py)
-		Vperbin = Varr*N_perbin[:, 0]
+		Vperbin = (Varr*N_perbin[:, 0]).reshape(-1)
 		
 		# prepare to hold concentrations of components in particles 
 		# (# molecules/cm^3 (air))
@@ -261,7 +262,7 @@ def pp_intro(y, num_comp, TEMP, H2Oi,
 		# include particle-phase concentations in y 
 		# (molecules/cm^3)
 		y[num_comp:(num_comp*(num_aasb+1))] = yn[:]
-		
+	
 	# if wall present and water to be equilibrated between wall and
 	# gas
 	if (self.wall_on > 0 and self.Vwat_inc == 2):

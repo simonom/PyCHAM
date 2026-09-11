@@ -1,25 +1,27 @@
-##########################################################################################
-#                                                                                        #
-#    Copyright (C) 2018-2025 Simon O'Meara : simon.omeara@manchester.ac.uk               #
-#                                                                                        #
-#    All Rights Reserved.                                                                #
-#    This file is part of PyCHAM                                                         #
-#                                                                                        #
-#    PyCHAM is free software: you can redistribute it and/or modify it under             #
-#    the terms of the GNU General Public License as published by the Free Software       #
-#    Foundation, either version 3 of the License, or (at your option) any later          #
-#    version.                                                                            #
-#                                                                                        #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT               #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              #
-#    details.                                                                            #
-#                                                                                        #
-#    You should have received a copy of the GNU General Public License along with        #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                #
-#                                                                                        #
-##########################################################################################
-'''generates an array of component indices for the components that constitute a particular component type'''
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
+'''generates an array of component indices for the components that 
+constitute a particular component type'''
 # for peroxy radicals makes a two column array, with the first column giving the 
 # index of components
 # included in the peroxy radical list and the
@@ -28,6 +30,7 @@
 # to all other components from the chemical scheme)
 
 import numpy as np
+from rdkit.Chem import rdMolDescriptors
 
 def group_indices(Hcount, SMILES, i, self):
 
@@ -270,19 +273,21 @@ def group_indices(Hcount, SMILES, i, self):
 						Hn_pre = self.Hn_list[pre_RO2i[0]]
 					except: # if H count not already found for this precursor component
 						# if hydrogen is present in this molecule
-						if ('H' in self.Pybel_objects[pre_RO2i[0]].formula):
+						# get formula for this molecule
+						molec_formula = rdMolDescriptors.CalcMolFormula(self.mol_objects[pre_RO2i[0]])
+						if ('H' in molec_formula):
 
-							Hindx_start = self.Pybel_objects[pre_RO2i[0]].formula.index('H')+1
+							Hindx_start = molec_formula.index('H')+1
 							Hindx_end = Hindx_start
-							for Hnum_test in self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start::]:
+							for Hnum_test in molec_formula[Hindx_start::]:
 								try:
 									float(Hnum_test) # only continue if this character is a number
 									Hindx_end += 1
-									if (Hindx_end == len(self.Pybel_objects[pre_RO2i[0]].formula)):
-										Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+									if (Hindx_end == len(molec_formula)):
+										Hn_pre = float(molec_formula[Hindx_start:Hindx_end])
 								except:
 									if (Hindx_end != Hindx_start):
-										Hn_pre = float(self.Pybel_objects[pre_RO2i[0]].formula[Hindx_start:Hindx_end])
+										Hn_pre = float(molec_formula[Hindx_start:Hindx_end])
 									else:
 										Hn_pre = 1. # if no number then Hydrogen must be alone
 									break
@@ -371,19 +376,21 @@ def group_indices(Hcount, SMILES, i, self):
 						Hn_pre = self.Hn_list[pre_RO2i]
 					except: # if H count not already found for this precursor component
 						# if hydrogen is present in this molecule
-						if ('H' in self.Pybel_objects[pre_RO2i].formula):
+						# get formula for this molecule
+						molec_formula = rdMolDescriptors.CalcMolFormula(self.mol_objects[pre_RO2i])
+						if ('H' in molec_formula):
 
-							Hindx_start = self.Pybel_objects[pre_RO2i].formula.index('H')+1
+							Hindx_start = molec_formula.index('H')+1
 							Hindx_end = Hindx_start
-							for Hnum_test in self.Pybel_objects[pre_RO2i].formula[Hindx_start::]:
+							for Hnum_test in molec_formula[Hindx_start::]:
 								try:
 									float(Hnum_test) # only continue if this character is a number
 									Hindx_end += 1
-									if (Hindx_end == len(self.Pybel_objects[pre_RO2i].formula)):
-										Hn_pre = float(self.Pybel_objects[pre_RO2i].formula[Hindx_start:Hindx_end])
+									if (Hindx_end == len(molec_formula)):
+										Hn_pre = float(molec_formula[Hindx_start:Hindx_end])
 								except:
 									if (Hindx_end != Hindx_start):
-										Hn_pre = float(self.Pybel_objects[pre_RO2i].formula[Hindx_start:Hindx_end])
+										Hn_pre = float(molec_formula[Hindx_start:Hindx_end])
 									else:
 										Hn_pre = 1. # if no number then Hydrogen must be alone
 									break

@@ -426,18 +426,13 @@ def RO2_av_molec(caller, dir_path, comp_names_to_plot, self):
 	for i in rel_SMILES:
 		Ccnt.append(i.count('C')+i.count('c'))
 		Ocnt.append(i.count('O'))
-		# generate pybel object
-		Pybel_object = pybel.readstring('smi', i)
-		try:
-			Hi = (Pybel_objects[indx].formula).index('H')
-			Hcnt = -1
-		except:
-			Hcnt = 0.0
-		if (Hcnt == -1):
-			try:
-				Hcnt.append(float(Pybel_objects[indx].formula[Hi+1:Hi+3]))
-			except:
-				Hcnt.append(float(Pybel_objects[indx].formula[Hi+1:Hi+2]))
+		# generate mol object
+		mol_object = Chem.MolFromSmiles(i)
+		# number of hydrogens found by summing the number of implicit atoms with the 
+		# number of explicitly stated aliphatic and aromatic hydrogens
+		Hcnt.append(mol_object.GetNumAtoms(onlyExplicit=False) - mol_object.GetNumAtoms(onlyExplicit=True) + 
+			  i.count('H') + i.count('h'))
+		
 	Ccnt = np.tile(((np.array((Ccnt))).reshape(1, -1)), (conc.shape[0], 1))
 	Ocnt = np.tile(((np.array((Ocnt))).reshape(1, -1)), (conc.shape[0], 1))
 	Hcnt = np.tile(((np.array((Hcnt))).reshape(1, -1)), (conc.shape[0], 1))

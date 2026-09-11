@@ -352,8 +352,8 @@ def ui_check(self):
 		if (len(self.TEMP) == len(self.tempt) and len(self.TEMP)>1):
 			# maximum change
 			max_change = np.max(np.abs(np.diff(self.TEMP)))
-			if (max_change > 1.):
-				err_mess_n = str('Note - the maximum change of chamber temperature exceeds 1 K.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to temperature given in the temperature model variable are limited to 1 K, with their corresponding times given in the tempt model variable (PyCHAM will automatically limit the update step according to the time differences given by the tempt model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as temperature change, and will attempt to rectify the instability by attempting incrementally smaller temperature changes over incrementally smaller time steps.\n')
+			if (max_change > 1.00001): # allow for numerical divergence
+				err_mess_n = str('Note - the maximum change of temperature exceeds 1 K.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to temperature given in the temperature model variable are limited to 1 K, with their corresponding times given in the tempt model variable (PyCHAM will automatically limit the update step according to the time differences given by the tempt model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as temperature change, and will attempt to rectify the instability by attempting incrementally smaller temperature changes over incrementally smaller time steps.\n')
 				if (em_flag == 0):
 					err_mess = err_mess_n
 				else:
@@ -374,8 +374,8 @@ def ui_check(self):
 	# check on big jumps in relative humidity
 	if (em_flag<2):
 		if (len(self.RH) > 1):
-			if (np.max(np.abs(np.diff(self.RH))) > 0.01):
-				err_mess_n = str('Note - the maximum change of chamber relative humidity exceeds 0.01.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to relative humidity given in the rh model variable are limited to 0.01, with their corresponding times given in the rht model variable (PyCHAM will automatically limit the update step according to the time differences given by the rht model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as relative humidity change, and will attempt to rectify the instability by attempting incrementally smaller relative humidity changes over incrementally smaller time steps.\n')
+			if (np.max(np.abs(np.diff(self.RH))) > 0.010001): # allow for numerical divergence
+				err_mess_n = str('Note - the maximum change of relative humidity exceeds 0.01.  This may destabilise the solver for gas-particle partitioning of water.  It is recommended that changes to relative humidity given in the rh model variable are limited to 0.01, with their corresponding times given in the rht model variable (PyCHAM will automatically limit the update step according to the time differences given by the rht model variable).  If the solver does become unstable, PyCHAM will assume this results from a change in chamber condition, such as relative humidity change, and will attempt to rectify the instability by attempting incrementally smaller relative humidity changes over incrementally smaller time steps.\n')
 				if (em_flag == 0):
 					err_mess = err_mess_n
 				else:

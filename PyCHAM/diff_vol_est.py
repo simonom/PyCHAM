@@ -1,111 +1,117 @@
-##########################################################################################
-#                                                                                        											 #
-#    Copyright (C) 2018-2023 Simon O'Meara : simon.omeara@manchester.ac.uk                  				 #
-#                                                                                       											 #
-#    All Rights Reserved.                                                                									 #
-#    This file is part of PyCHAM                                                         									 #
-#                                                                                        											 #
-#    PyCHAM is free software: you can redistribute it and/or modify it under              						 #
-#    the terms of the GNU General Public License as published by the Free Software       					 #
-#    Foundation, either version 3 of the License, or (at your option) any later          						 #
-#    version.                                                                            										 #
-#                                                                                        											 #
-#    PyCHAM is distributed in the hope that it will be useful, but WITHOUT                						 #
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS       			 #
-#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more              				 #
-#    details.                                                                            										 #
-#                                                                                        											 #
-#    You should have received a copy of the GNU General Public License along with        					 #
-#    PyCHAM.  If not, see <http://www.gnu.org/licenses/>.                                 							 #
-#                                                                                        											 #
-##########################################################################################
+########################################################################
+#                                                                      #
+# Copyright (C) 2018-2026                                              #
+# Simon O'Meara : simon.omeara@manchester.ac.uk                        #
+#                                                                      #
+# All Rights Reserved.                                                 #
+# This file is part of PyCHAM                                          #
+#                                                                      #
+# PyCHAM is free software: you can redistribute it and/or modify it    #
+# under the terms of the GNU General Public License as published by    #
+# the Free Software Foundation, either version 3 of the License, or    #
+# (at  your option) any later version.                                 #
+#                                                                      #
+# PyCHAM is distributed in the hope that it will be useful, but        #
+# WITHOUT ANY WARRANTY; without even the implied warranty of           #
+# MERCHANTABILITY or## FITNESS FOR A PARTICULAR PURPOSE.  See the GNU  #
+# General Public License for more details.                             #
+#                                                                      #
+# You should have received a copy of the GNU General Public License    #
+# along with PyCHAM.  If not, see <http://www.gnu.org/licenses/>.      #
+#                                                                      #
+########################################################################
 '''estimate of the diffusion volume of components'''
-# following the method of Fuller et al. (1966) (doi.org/10.1021/ie50677a007) and Fuller et al. (1969) (doi.org/10.1021/j100845a020), the calculated, with the volume increments given in Table 4.1 
+# following the method of Fuller et al. (1966) (doi.org/10.1021/ie50677a007) 
+# and Fuller et al. (1969) (doi.org/10.1021/j100845a020), the calculated,
+# with the volume increments given in Table 4.1 
 # of the Taylor (1993) textbook Multicomponent Mass Transfer, ISBN: 0-471-57417-1
 # diffusion volumes will be used to estimate gas-phase diffusion coefficients
-# documents for pybel: http://openbabel.org/docs/dev/UseTheLibrary/Python_PybelAPI.html#pybel.Molecule.sssr
 
 import numpy as np
-import openbabel.pybel as pybel
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors
 import math
+import re # regular expression
 
 # define function
-def diff_vol_est(Pybel_object):
+def diff_vol_est(self):
 
 	# inputs: -------------------------------------------------------------------------
-	# Pybel_object - Pybel objects of components
+	# self.mol_objects - mol objects of components
 	# -----------------------------------------------------------------------------------
 	
 	# simple molecules given in Table 4.1 of Taylor (1993)
-	# SMILE strings for simple molecules
-	simp_molec = ['[He]', '[Ne]', '[Ar]', '[Kr]', '[Xe]', '[H][H]', r'N#N', 'O=O', 'CO', 'O=C=O', 'NO=N', '[H]N([H])[H]', 'O', 'S(F)(F)(F)(F)(F)F', 'ClCl', 'BrBr', 'O=S=O']
+	# SMILES strings for simple molecules
+	simp_molec = ['[He]', '[Ne]', '[Ar]', '[Kr]', '[Xe]', '[H][H]', r'N#N', 'O=O', 'CO', 'O=C=O', '[N-]=[N+]=O', '[H]N([H])[H]', 'O', 'S(F)(F)(F)(F)(F)F', 'ClCl', 'BrBr', 'O=S=O']
 	
 	# diffusion volumes for simple molecules given in Table 4.1 of  the Taylor (1993) textbook 
 	# Multicomponent Mass Transfer, ISBN: 0-471-57417-1
 	simp_molec_vol = [2.67, 5.98, 16.2, 24.5, 32.7, 6.12, 18.5, 16.3, 18., 26.7, 35.9, 20.7, 13.1, 71.3, 38.4, 69., 41.8]
 	
-	Pybel_object_ref = [] # empty list
-	# convert to SMARTS (pybel_objects)
-	# generate pybel objects from SMILES
+	mol_object_ref = [] # empty list
+	# convert to SMARTS (mol_objects)
+	# generate mol objects from SMILES
 	for i in simp_molec:	
-		Pybel_object_ref.append(pybel.readstring('smi', i))
+		mol_object_ref.append(Chem.MolFromSmiles(i))
 	
-	diff_vol = np.zeros((len(Pybel_object))) # empty results array
+	diff_vol = np.zeros((len(self.mol_objects))) # empty results array
 	
-	for compi in range(len(Pybel_object)): # component loop
+	for compi in range(len(self.mol_objects)): # component loop
 	
 		simp_cnt = 0 # count
 	
 		# check if component is a simple molecule
-		for i_smrt in Pybel_object_ref: # loop through simple molecules
-			if (Pybel_object[compi].formula == i_smrt.formula):
+		for i_smrt in mol_object_ref: # loop through simple molecules
+			
+			if (rdMolDescriptors.CalcMolFormula(self.mol_objects[compi]) == rdMolDescriptors.CalcMolFormula(i_smrt)):
 				diff_vol[compi] = simp_molec_vol[simp_cnt]
 				break
 			simp_cnt += 1
 			
 		# if a simple molecule move onto next component
-		if (simp_cnt < len(Pybel_object_ref)):
+		if (simp_cnt < len(mol_object_ref)):
 			continue
 			
 		# SMARTS for the atoms given in Table 4.1 of  the Taylor (1993) textbook 
 		# Multicomponent Mass Transfer, ISBN: 0-471-57417-1
 		smarts = []
-		smarts.append(pybel.Smarts('[#6]'))
-		smarts.append(pybel.Smarts('[H]'))
-		smarts.append(pybel.Smarts('[#8]'))
-		smarts.append(pybel.Smarts('[#7]'))
-		smarts.append(pybel.Smarts('[#16]'))
-		smarts.append(pybel.Smarts('[#9]'))
-		smarts.append(pybel.Smarts('[#17]'))
-		smarts.append(pybel.Smarts('[#35]'))
-		smarts.append(pybel.Smarts('[#53]'))
+		# reference SMILES
+		#ref_SMARTS = ['[#6]', '[H]', '[#8]', '[#7]', '[#16]', '[#9]', '[#17]', '[#35]', '[#53]']
+		ref_SMARTS = ['C', 'H', 'O', 'N', 'S', 'F', 'Cl', 'Br', 'I']
 	
 		# count atoms present, final element will be used for number of rings
-		atm_cnt = np.zeros((len(smarts)+1))
+		atm_cnt = np.zeros((len(ref_SMARTS)+1))
 	
 		# atomic and molecular diffusion volume increments (Table 4.1 Taylor 1993)
 		vol_inc = np.array((15.9, 2.31, 6.11, 4.54, 22.9, 14.7, 21., 21.9, 29.8, -18.3))
 	
 		i_cnt = 0
-		for i_smrt in smarts: # loop through reference groups
-			atm_cnt[i_cnt] = len(i_smrt.findall(Pybel_object[compi]))
+		for i_smrt in ref_SMARTS: # loop through reference groups
+			# find all occurrences of this atom, note that IGNORECASE means that both
+			# aliphatic and aromatic occurrences are counted
+			atm_cnt[i_cnt] = len(re.findall(i_smrt, self.rel_SMILES[compi], re.IGNORECASE))
+			#atm_cnt[i_cnt] = len(i_smrt.GetSubstructMatches(self.mol_objects[compi]))
+			
 			i_cnt += 1
+
+		# get any implicitly stated hydrogen atoms
+		atm_cnt[ref_SMARTS=='H'] += (self.mol_objects[compi].GetNumAtoms(onlyExplicit=False)-sum(atm_cnt))
 			
 		# smarts for rings
 		smarts = []
-		smarts.append(pybel.Smarts('[r3]'))
-		smarts.append(pybel.Smarts('[r4]'))
-		smarts.append(pybel.Smarts('[r5]'))
-		smarts.append(pybel.Smarts('[r6]'))
-		smarts.append(pybel.Smarts('[r7]'))
-		smarts.append(pybel.Smarts('[r8]'))
-		smarts.append(pybel.Smarts('[r9]'))
-		smarts.append(pybel.Smarts('[r10]'))
+		smarts.append(Chem.MolFromSmarts('[r3]'))
+		smarts.append(Chem.MolFromSmarts('[r4]'))
+		smarts.append(Chem.MolFromSmarts('[r5]'))
+		smarts.append(Chem.MolFromSmarts('[r6]'))
+		smarts.append(Chem.MolFromSmarts('[r7]'))
+		smarts.append(Chem.MolFromSmarts('[r8]'))
+		smarts.append(Chem.MolFromSmarts('[r9]'))
+		smarts.append(Chem.MolFromSmarts('[r10]'))
 		
 		# check for rings
 		num_atm = 3 # count on number of atoms in rings
 		for i_smrt in smarts: # loop through reference groups
-			atm_cnt[i_cnt]  += math.ceil(len(i_smrt.findall(Pybel_object[compi]))/num_atm)
+			atm_cnt[i_cnt]  += math.ceil(len(i_smrt.GetSubstructMatches(self.mol_objects[compi]))/num_atm)
 			num_atm += 1 # count on number of atoms in rings
 
 		# diffusion volume

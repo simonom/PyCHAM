@@ -40,6 +40,5 @@ def accom_coeff_func(accom_coeff, Rp, self):
 
 	import numpy as np
 	# calculate accommodation coefficients 
-	accom_coeff[8, 0:self.num_asb] = 0.2 
 
 	return(accom_coeff)
